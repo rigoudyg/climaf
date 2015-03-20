@@ -1,0 +1,10 @@
+*.pyc
+*~
+*#
+/TAGS
+scripts.out
+/climaf/TAGS
+examples/.ipynb_checkpoints
+/externals/
+/doc/_build
+/README.html
