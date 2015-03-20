@@ -1,7 +1,7 @@
 *Notes* :
 
  - *This is a template for describing a CliMAF operator.* 
- - *Depending on your reading context, one of these links may work for downloading it*: :download:`Download <scripts_template.rst>` *or* http://climaf.readthedocs.org/en/latest/_downloads/template.rst 
+ - *Depending on your reading context, one of these links may work for downloading it*: :download:`Download <scripts_template.rst>` *or* http://climaf.readthedocs.org/en/latest/_downloads/scripts_template.rst 
  - *The syntax is ReST (see http://docutils.sourceforge.net/docs/user/rst/quickref.html)*
  - *Text between single multiply signs (or showing in italics) are comments indicating how to use the template*
  - *Underlining, tabs, '::' and double multiply signs are ReST construct that you should keep for a nice rendering*
