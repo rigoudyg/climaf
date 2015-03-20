@@ -100,12 +100,11 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
 
 
 def skipUnless_Ciclad():
-    if os.path.exists('/prodigfs') or os.path.exists('/home/senesi/tmp/ciclad/prodigfs'):
+    if os.path.exists('/prodigfs') or os.path.exists('/home/senesi/tmp/ciclad/prodigfs/esg/CMIP5'):
         return lambda func: func
     return unittest.skip("because not on Ciclad")
 
 @skipUnless_Ciclad()
-#@unittest.skip("Not tested here")
 class B_CMIP5_DRS_Ciclad(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
