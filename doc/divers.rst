@@ -1,6 +1,6 @@
 
-.. automodule:: api
-.. automodule:: __init__
+#.. automodule:: api
+#.. automodule:: __init__
 
 
 

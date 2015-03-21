@@ -17,7 +17,6 @@ CliMAF - a Climate Model Assessment Framework
     operators.rst
     howto.rst
 
-
 Welcome
 -------
 
@@ -84,6 +83,7 @@ Content
 
 .. toctree::
 
+   licence
    requirements
    installing
    examples

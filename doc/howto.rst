@@ -9,6 +9,8 @@ HowTo...
 
 Read the `Grand Tour <../../../examples/ATourOfCliMAF.html>`_ 
 
+or the :download:`Grand Tour <../examples/ATourOfCliMAF.html>`
+
 ..install CliMAF
 -----------------------
 
@@ -102,7 +104,7 @@ If you are willing to share any diagnostic tool that can be integrated in CliMAF
 #. if your module is a binary which needs some compilation, prepare a makefile for that, which ideally should be tested both with Intel and Gnu compilers (... TBD : think deeper on a tractable way to integrate binaries...)
 #. check twice the Climaf function call that will allow to declare the operator in CliMAF, and adapt it to the new script location, as e.g. ::
 
-    >>> cscript ("my_op", cpath+"/operators/"+"<calling sequence pattern>") 
+    >>> cscript ("my_op", cpath+"/scripts/"+"<calling sequence pattern>") 
 
    and edit file ``<climaf_install_dir>/climaf/standard_operators.py`` to add this call
 #. restart a CliMAF session and check that your test script for this module (where the ``cscript`` declaration of the module should now be discarded)  still works after these changes
@@ -128,9 +130,5 @@ Once happy with the result, please contribute your work for a merge in next CliM
 
 TBD 
 
-..contribute to improve CliMAF code
------------------------------------
-
-TBD
 
 
