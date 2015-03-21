@@ -14,6 +14,7 @@ function (hereafter called a 'diagnostic'), and to combine it with other
 processing stages. CliMAF provides some services to the diagnostics,
 which allows to focus their development on the science.
 
+The present section explains the basics of such an interfacing. The way to use operators is up-to-now described mainly by the :ref:`examples` section
 
 The main principles for a diagnostic are that :
 

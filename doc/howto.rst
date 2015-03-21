@@ -7,9 +7,7 @@ HowTo...
 ..go quick through most CliMAF features 
 ------------------------------------------
 
-Read the `Grand Tour <../../../examples/ATourOfCliMAF.html>`_ 
-
-or the :download:`Grand Tour <../examples/ATourOfCliMAF.html>`
+Read the :download:`Grand Tour <../examples/ATourOfCliMAF.html>`
 
 ..install CliMAF
 -----------------------

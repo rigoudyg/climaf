@@ -8,7 +8,9 @@
 
    **For running the example Ipython notebook**::
      
-     $ cd <climaf_install_dir>/examples
+     $ cd <climaf_install_dir>
+     $ export PYTHONPATH=$PYTHONPATH:$(pwd)
+     $ cd examples
      $ ipython notebook 
 
      # Once the notebook server tab shows in your favorite Web Browser, 
@@ -16,7 +18,9 @@
 
 .. _examples:
 
-For running CliMAF, or running an example, you will use a a Python shell, after telling Python where the CliMAF code is:: 
+:download:`A Tour Of Climaf <../examples/ATourOfCliMAF.html>` is **a progressive but quite comprehensive tour**, which is :download:`here presented as an html page <../examples/ATourOfCliMAF.html>` , but which can also be run as an IPython notebook (see sidenote)
+
+For running CliMAF, or running one of the Python scripts example described below, you will use a Python shell, after telling Python where the CliMAF code is:: 
 
     $ export PYTHONPATH=$PYTHONPATH:<climaf_install_dir>
     $ python
@@ -43,5 +47,3 @@ Others can run only if they have access to some datasets on the local file syste
   - :download:`obscami.py <../examples/obscami.py>`     : access observation data organized 'a la CAMI', here at CNRM
 
 
-In the same directory, `ATourOfClimaf <../../../examples/ATourOfCliMAF.html>`_ is **a progressive but quite comprehensive
-tour**, which is here presented as an html page, but which can also be run as an IPython notebook (see sidenote)
