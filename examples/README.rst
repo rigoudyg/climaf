@@ -16,7 +16,6 @@
      # Once the notebook server tab shows in your favorite Web Browser, 
      # just click on "ATourOfClimaf"
 
-.. _examples:
 
 :download:`A Tour Of Climaf <../examples/ATourOfCliMAF.html>` is **a progressive but quite comprehensive tour**, which is :download:`here presented as an html page <../examples/ATourOfCliMAF.html>` , but which can also be run as an IPython notebook (see sidenote)
 

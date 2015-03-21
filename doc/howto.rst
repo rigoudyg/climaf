@@ -18,7 +18,7 @@ See :doc:`installing`
 ..run CliMAF, run an example
 -------------------------------
 
-.. include:: ../examples/README.rst
+See :ref:`examples`
 
 
 ..describe where my data is
@@ -29,7 +29,7 @@ If your data is organized after one of the organization scheme known to CliMAF, 
   >>> dataloc(project="GEOMIP", organization="CMIP5_DRS", url=['/tmp/data','~/data/CMIP5'])
 
 
-See function :py:meth:`dataloc` for reference, and :ref:`the section on data access examples <examples_data>` for finding the relevant data organization name.
+See function :py:meth:`dataloc` for reference, and the section on data access in :ref:`examples` for finding the relevant data organization name.
 
 
 .. _how_to_online_help:
@@ -113,7 +113,7 @@ If you are willing to share any diagnostic tool that can be integrated in CliMAF
 
 ..contribute to improve CliMAF documentation
 --------------------------------------------
-CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be modified and improved, provided you are not afraid by looking at text files formated using the `REStructured Text syntax <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_. All doc files stand in directory ``<climaf_install_dir>/doc``, with quite easy-to-understand filenames. You can modify any file and test the result by typing::
+CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be modified and improved, provided you are not afraid by looking at text files formated using the `REStructured Text syntax <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_ (and Sphinx is installed on your computer, which is often the case; check with ``which sphinx-build``). All doc files stand in directory ``<climaf_install_dir>/doc``, with quite easy-to-understand filenames. You can modify any file and test the result by typing::
 
   $ cd <climaf_install_dir>/doc
   $ make -h html
