@@ -5,17 +5,6 @@
 
 CliMAF - a Climate Model Assessment Framework
 ========================================================
-.. sidebar:: A selection of the :ref:`full content<mastertoc>`
-
- .. toctree::
-    :maxdepth: 1
-
-    requirements.rst
-    Installing <installing> 
-    examples.rst
-    scripts.rst
-    operators.rst
-    howto.rst
 
 Welcome
 -------
