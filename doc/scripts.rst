@@ -184,7 +184,7 @@ such as in::
 
   cscript ( < operator_name > , < calling_sequence_pattern > )
 
-The script calling sequence pattern string should use the following syntax 
+The script calling sequence pattern string should use the following syntax:
 
 -  formal arguments appear as : ``${argument}`` (see example above :
    ``${in}``,  ``${out}``, ``${operator}`` )
@@ -208,7 +208,7 @@ __ basic_script_example_
      -  **in** stands for the URL of the first dataset invoked in diagnostic
         operator call
 
-     - **in_<digit>** stands for the next ones, in the same order
+     -  **in_<digit>** stands for the next ones, in the same order
 
      -  **ins** and **ins_<digit>** stand for the case where the script can
         select input from multiple input files or URLs (e.g. when the
@@ -237,8 +237,6 @@ __ basic_script_example_
      CliMAF has to select the period upstream of feeding CDO with the
      data
 
-.. _naming_script_ouputs:
-
    - **out, out_<word>** : CliMAF provide file names for output files. Main
      output file must be created by the script with the name provided
      at the location or argument ${out}; using arguments like
@@ -248,9 +246,9 @@ __ basic_script_example_
      apply the convention used by CDO, which expects that you provide
      an output filename as last argument on the command line
 
-  - **crs** : will be replaced by the CliMAF Reference Syntax expression
-    describing the first input stream; can be useful for plot title
-    or legend
+   - **crs** : will be replaced by the CliMAF Reference Syntax expression
+     describing the first input stream; can be useful for plot title
+     or legend
 
 
 
@@ -262,14 +260,12 @@ __ basic_script_example_
 -  (TBC) every NetCDF meta-data in input data must be reproduced in
    output data, except those which becomes irrelevant
 
-A more comprehensive script interfacing example  
+More script interfacing examples  
 -------------------------------------------------
 
 While a basic script interfacing example show in
-`basic_script_example`_, we here address most features of the interface
-syntax in a more complex case
+:ref:`basic_script_example`, module :download:`standard_operators.py <../climaf/standard_operators.py>` includes the actual, commented declarations of all standard operators defined in current CLiMAF version.
 
-TBD ...
 
 Syntax for interfacing a Python function
 -----------------------------------------

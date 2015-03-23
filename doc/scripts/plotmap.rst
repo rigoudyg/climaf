@@ -9,17 +9,17 @@ Plot a geographical map, using NCL, and allowing for tuning a number of graphic 
   - any dataset (but only one)
 
 **Mandatory arguments**:
-  - ``color`` : name of the Ncl colormap to use
+  - ``color`` : name of the Ncl colormap to use; see e.g. https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness
   - ``vmin``, ``vmax`` , ``vdelta`` : min and max values and levels
     when applying the colormap 
-  - ``scale, offset`` : for scaling the input field ( x -> x*scale +
-    offset); yet mandatory but this will be improved soon
-  - ``units`` : name of the field units; used in the caption; yet
-    mandatory, but this will be improved to use CF metadata
 
 **Optional arguments**:
   - ``crs`` : string for graphic title; optional : CliMAF will provide the CRS of
     the dataset
+  - ``scale``, ``offset`` : for scaling the input field ( x -> x*scale +
+    offset); default = 1. and 0. (no scaling)
+  - ``units`` : name of the field units; used in the caption; default
+    is to use the corresponding CF metadata
 
 **Outputs** :
   - main output : a PNG figure
@@ -27,7 +27,7 @@ Plot a geographical map, using NCL, and allowing for tuning a number of graphic 
 **Climaf call example** ::
  
   >> tas= ....some dataset like e.g. of monthly mean of a low level temperature
-  >> map=plotmap(ta,color="BlueDarkRed18", min=260, max=300, delta=4, scale=1, offset=0, units="K")
+  >> map=plotmap(ta,color="BlueDarkRed18", vmin=260, vmax=300, delta=4")
 
 **Side effects** : create temporary files in the directory provided for output fields
 

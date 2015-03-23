@@ -16,6 +16,13 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin 
   print("plotting map "+plotname+" from :"+vmin+" to: "+vmax+" by: "+vdelta+" with cmap: "+cmap  )
+  if (.not. isvar("scale")) then      
+      scale=1.0
+  end if
+  if (.not. isvar("offset")) then      
+      offset=0.0
+  end if
+
   type="png"
   LINEON=False
   LABELON=False
@@ -36,6 +43,13 @@ begin
     status_exit(2)
   end if
 
+  if (.not. isvar("units")) then 
+    if ( isatt(fld,"units")) then
+      units=fld@units
+    else
+      units="None"
+    end if
+  end if
   ; Try to adapt to various cases, using heuristics !
   Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
   dime=dimsizes(fld)
@@ -47,6 +61,8 @@ begin
     lat=ffile->$latname$
     lon=ffile->$lonname$
   else
+    print("This script is not yet tuned to reduced grid")
+    status_exit(1)
     nlat=1 
     nlon=dime(0)
     lonname = Var_DimNames(0)
