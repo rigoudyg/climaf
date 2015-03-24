@@ -92,7 +92,7 @@ be cost-effective to let it handle these operations
 
 **Selecting a variable to process**
 
- Primary datafiles may be multi-variable datafiles; one the other hand
+ Primary datafiles may be multi-variable datafiles; on the other hand,
  some scripts may wish to be released with variable selection; to
  accomodate both cases, every script can:
 
@@ -101,7 +101,7 @@ be cost-effective to let it handle these operations
 
     - or let CliMAF do the variable selection upstream; in that case,
       the script must be able to identify which is the NetCDF variable
-      it should work on (i.e. letting apart coordinate variables)
+      it should work on (i.e. to let apart coordinate variables)
 
 
 **Aliasing and re-scaling**
@@ -139,28 +139,28 @@ Constraints on scripts
 Example for interfacing a diagnostic script with CliMAF
 -------------------------------------------------------
 
--   Declaring operator ``my_cdo`` based on an off-the-shelf
+-   Declare operator ``my_cdo`` based on an off-the-shelf
     script/binary (``cdo``)::
 
-     cscript('mycdo','cdo ${operator} ${in} ${out}')
+     >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
 
 -   Use the defined operator in CliMAF : define a dataset ``tas_ds``
     and apply ``my_cdo`` on it, providing it with value ``tim_avg`` for
     argument ``operator``::
 
-     tas_ds = ds(experiment="AMIPV6”, variable="tas", period=”1980-1981”)
-     tas_avg = mycdo(tas_ds,operator='timavg')
+     >>> tas_ds = ds(experiment="AMIPV6”, variable="tas", period=”1980-1981”)
+     >>> tas_avg = mycdo(tas_ds,operator='timavg')
 
 -   The script/binary is actually called e.g. when requesting a file with
     the content of object ``tas_avg``, as in::
 
-     filen = cfile(tas_avg)
+     >>> filen = cfile(tas_avg)
 
-    which returns the filename :
+    which returns the filename::
 
-    */home/my/tmp/climaf_cache/4e/4.nc*
+    /home/my/tmp/climaf_cache/4e/4.nc
 
-    ..while the actual system call launched behind the curtain by CliMAF would look like ::
+    ..while the actual system call launched behind the curtain by CliMAF would look like::
 
      $ cdo tim_avg /home/my/data/AMIP/AMIP_tas.nc /home/my/tmp/climaf_cache/4e/4.nc
 

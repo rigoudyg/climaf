@@ -1,11 +1,12 @@
 *Notes* :
 
- - *This is a template for describing a CliMAF operator.* 
- - *Depending on your reading context, one of these links may work for downloading it*: :download:`Download <scripts_template.rst>` *or* http://climaf.readthedocs.org/en/latest/_downloads/scripts_template.rst 
- - *The syntax is ReST (see http://docutils.sourceforge.net/docs/user/rst/quickref.html)*
- - *Text between single multiply signs (or showing in italics) are comments indicating how to use the template*
- - *Underlining, tabs, '::' and double multiply signs are ReST construct that you should keep for a nice rendering*
- - *The first two lines give a title,which must be the CliMAF operator name*
+ - *This is a template for describing a CliMAF operator. Depending on your reading context, one of these links may work for downloading it*: :download:`scripts_template.rst <scripts_template.rst>` *or* http://climaf.readthedocs.org/en/latest/_downloads/scripts_template.rst 
+ - *The syntax is* `ReST <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_:
+
+  - *Underlining, tabs, '::' and double multiply signs are ReST construct that you should keep for a nice rendering*
+  - *The first two lines give a title, which must be the CliMAF operator name, and a summary sentence*
+  - *The Rest 'single' emphasis, namely text between single multiply signs (or showing in italics) is used here for the comments indicating how to use the template*
+
  - *Please read the CliMAF doc section dealing with operators for context information. This link may work :* :ref:`operators`
 
 
@@ -41,9 +42,9 @@ my_new_climaf_operator : what it does
 
 **Climaf call example** ::
  
-  >> ds= ....some dataset
-  >> m = my_new_climaf_operator(ds, argument1='abcd')  
-  >> secondary_ouput = m.sec_out_nam  
+  >>> ds= ....some dataset
+  >>> m = my_new_climaf_operator(ds, argument1='abcd')  
+  >>> secondary_ouput = m.sec_out_nam  
 
 **Side effects** : *describe side effects if any (e.g. showing a
 figure, creating temporary files); Note : side effects do not match

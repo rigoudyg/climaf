@@ -94,7 +94,7 @@ Using any script in CliMAF is very easy, and you can do so for your own use only
 ..contribute a diagnostic module
 ---------------------------------------------------
 
-If you are willing to share any diagnostic tool that can be integrated in CliMAF as a so-called 'CliMAF standard operator', you should first go through :ref:`how_to_own_script` or :ref:`operators` for the basics of integrating it, and for testing the integration. At that stage, the actual binary or script will not be hosted in CliMAF installation directory. The next steps will be to :
+If you are willing to share any diagnostic tool that can be integrated in CliMAF as a so-called 'CliMAF standard operator', you should first go through :ref:`how_to_own_script` for the basics of integrating it, and for testing the integration. At that stage, the actual binary or script will not be hosted in CliMAF installation directory. The next steps will be to :
 
 #. think about a name for the corresponding CliMAF standard operator : it should not collide with existing operators (see :doc:`operators`), and should be both short and explicit; let us call it ``my_op`` for now; if the diagnostic module has more than one (main) output, also think twice about the names for the secondary outputs (`details here <script_syntax>`_) as they will also join the 'CliMAF Reference Syntax' 
 #. if you are working with a version of CliMAF that has been installed by somebody else, you should now install your own; see :doc:`installing`
