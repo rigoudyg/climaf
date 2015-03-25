@@ -19,7 +19,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
-#sys.path.insert(0, os.path.abspath('../climaf'))
+sys.path.insert(0, os.path.abspath('../climaf'))
 
 # -- General configuration ------------------------------------------------
 
@@ -356,3 +356,10 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {'python': ('https://docs.python.org/2', None)}
 
 autoclass_content="init"
+
+# import os
+# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# if on_rtd:
+#     html_theme = 'default'
+# else:
+#     html_theme = 'nature'
