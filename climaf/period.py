@@ -19,9 +19,10 @@
 import re, datetime, logging
 
 class cperiod():
-    """ A class for handling a pair of datetime objects defining a period.
+    """
+    A class for handling a pair of datetime objects defining a period.
 
-    Period is [ date1, date2 [
+    Period is defined as \[ date1, date2 \[
 
     """
     def __init__(self,start,end,leng) :
@@ -56,8 +57,18 @@ class cperiod():
         cperiod(included.end,self.end,self.len)
 
 def init_period(dates) :
-    # dates match YYYY[MM[DD[HH[MM]]]][(-|_)YYYY[MM[DD[HH[MM]]]]]
-    # TBD : If second part is missing, assume the longest possible duration re. accuracy
+    """
+    Init a CliMAF 'period' object
+
+    Args:
+      dates (str): must match YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]]
+
+    Returns:
+      the corresponding CliMAF 'period' object
+      
+    TBD : If second part is missing, assume the longest possible duration re. accuracy
+    """
+    
     logging.debug("climaf.period.init_period : processing %s"%dates)
     start=re.sub(r'^([0-9]{4,12}).*',r'\1',dates)
     # TBD : check that start actually matches a date

@@ -248,7 +248,8 @@ def cdrop(crs) :
         return None
 
 def csync() :
-    """ Writes in-memory cache dictionnary to file ; should be called before exit
+    """
+    Writes in-memory cache dictionnary to disk ; should be called before exit
 
     """
     import pickle
@@ -270,6 +271,13 @@ def cload() :
         logging.debug("cache.cload : no index file yet")
 
 def creset(hideError=False) :
+    """
+    Clear CliMAF cache : erase existing files content, reset in-memory index
+
+    Args:
+      hideError (bool): if True, will not warn for non existing cache
+
+    """
     global crs2filename
     cc=os.path.expanduser(currentCache)
     if (os.path.exists(currentCache) or hideError is False) :
@@ -280,6 +288,10 @@ def creset(hideError=False) :
     crs2filename=dict()
 
 def cdump():
+    """
+    Dumps the in-memory content of CliMAF cache index
+    
+    """
     print crs2filename
 
 

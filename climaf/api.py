@@ -1,30 +1,37 @@
 """
-CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Programm Interface for scripting in Python with CliMAF for easy climate model output processing. It also declares a number of standard 'Operators'
+CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Programm Interface for scripting in Python with CliMAF for easy climate model output processing.
 
-Main functions are ``dataloc``, ``cscript``, ``cfile``, ``CMA``, ``cexport``
+It also imports a few functions from other modules, and declares a number of 'CliMAF standard operators'
 
+Main functions are ``dataloc``, ``ds``, ``cdataset``, ``cdef``, ``cscript``, ``cfile``, ``cMA`` :
+ - ``dataloc`` : set data locations for a series of experiments
+ - ``cdef``    : define some default values for datasets attributes
+ - ``ds``      : define a dataset object
+ - ``cscript`` : define a new CliMAF operator (this also defines a new Pyhton fucntion)
+ - ``cfile``   : get the file         value of a CliMAF object (compute it)
+ - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
+
+
+Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
+ - ``clog``    : tune verbosity
+ - ``cdump``   : tell what's in cache
+ - ``craz``    : reset cache
+ - ``csave``   : save cache index to disk
 
 """
 # Created : S.Senesi - 2014
 
-# The CliMAF software is an environment for Climate Model Assessment. It
-# has been developped mainly by CNRM-GAME (Meteo-France and CNRS), and
-# by IPSL, in the context of the `CONVERGENCE project
-# <http://convergence.ipsl.fr/>`_, funded by The
-# French 'Agence Nationale de la Recherche' under grant 
-# ANR-13-MONU-0008-01
-# 
-# This software is governed by the CeCILL-C license under French law and
-# biding by the rules of distribution of free software. The CeCILL-C
-# licence is a free software license,explicitly compatible with the GNU
-# GPL (see http://www.gnu.org/licenses/license-list.en.html#CeCILL)
+
+import os
 
 #Void if logging level already set by the user :
 import logging ; logging.basicConfig(level=logging.ERROR)
 
 import climaf, climaf.cache
-climafPath=climaf.__path__[0] # Used for test data and test scripts
-cpath=climafPath
+
+#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``
+cpath=os.path.abspath(climaf.__path__[0]) 
+
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 
 
@@ -36,11 +43,21 @@ from climaf.cache     import creset as craz, csync as csave , cdump
 import climaf.standard_operators
 
 # Commodity functions
-def cfile(*args,**kwargs) :
-    """ Provides the filename for a CliMAF object. Launches computation if needed
+def cfile(object,deep=None) :
+    """
+    Provide the filename for a CliMAF object. Launch computation if needed.
+
+    Args:
+      deep (logical) : governs the use of cached values when computing the object
+        - if missing, or None : use cache as much as possible
+        - False : make a shallow computation, i.e. do not use cached values for top level operation
+        - True  : make a deep computation, i.e. do not use any cached value
+
+    Returns: a filename in CliMAF cache; the file contains the object's value
+
 
     """
-    return climaf.driver.ceval(*args,format='file',**kwargs)
+    return climaf.driver.ceval(object,format='file',deep=deep)
 
 def cobj(*args,**kwargs) :
     """ Provides the in-memory value of a CliMAF object. Launches computation if needed
@@ -50,11 +67,20 @@ def cobj(*args,**kwargs) :
     #print "kwargs=",keyw
     return climaf.driver.ceval(*args,format='MaskedArray',**kwargs)
 
-def cMA(*args,**kwargs) :
-    """ Provides the Masked Array value of a CliMAF object. Launches computation if needed
+def  cMA(object,deep=None) :
+    """
+    Provide the Masked Array value for a CliMAF object. Launch computation if needed.
+
+    Args:
+      deep (logical) : governs the use of cached values when computing the object
+        - if missing, or None : use cache as much as possible
+        - False : make a shallow computation, i.e. do not use cached values for top level operation
+        - True  : make a deep computation, i.e. do not use any cached value
+
+    Returns: a Masked Array containing the object's value
 
     """
-    return climaf.driver.ceval(*args,format='MaskedArray',**kwargs)
+    return climaf.driver.ceval(object,format='MaskedArray',deep=deep)
 
 def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
@@ -81,6 +107,12 @@ def cimport(cobject,crs) :
     
 
 def clog(arg) :
+    """
+    Sets the verbosity level for CliMAF log messages.
+
+    Among : logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
+
+    """
     logging.getLogger().setLevel(arg)
 
 

@@ -6,6 +6,8 @@ The plot is yet ugly, and will be improved soon
 
 **References** : 
 
+**Provider / contact** : climaf at meteo dot fr
+
 **Inputs** (in the order of CliMAF call):
   - any dataset (but only one)
 

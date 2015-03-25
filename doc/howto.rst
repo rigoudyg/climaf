@@ -94,7 +94,7 @@ Using any script in CliMAF is very easy, and you can do so for your own use only
 ..contribute a diagnostic module
 ---------------------------------------------------
 
-If you are willing to share any diagnostic tool that can be integrated in CliMAF as a so-called 'CliMAF standard operator', you should first go through :ref:`how_to_own_script` for the basics of integrating it, and for testing the integration. At that stage, the actual binary or script will not be hosted in CliMAF installation directory. The next steps will be to :
+If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org/wiki/Open-source_software>`_ any diagnostic tool that can be integrated in CliMAF as a so-called 'CliMAF standard operator', you should first go through :ref:`how_to_own_script` for the basics of integrating it, and for testing the integration. At that stage, the actual binary or script will not be hosted in CliMAF installation directory. The next steps will be to :
 
 #. think about a name for the corresponding CliMAF standard operator : it should not collide with existing operators (see :doc:`operators`), and should be both short and explicit; let us call it ``my_op`` for now; if the diagnostic module has more than one (main) output, also think twice about the names for the secondary outputs (`details here <script_syntax>`_) as they will also join the 'CliMAF Reference Syntax' 
 #. if you are working with a version of CliMAF that has been installed by somebody else, you should now install your own; see :doc:`installing`
@@ -106,7 +106,20 @@ If you are willing to share any diagnostic tool that can be integrated in CliMAF
 
    and edit file ``<climaf_install_dir>/climaf/standard_operators.py`` to add this call
 #. restart a CliMAF session and check that your test script for this module (where the ``cscript`` declaration of the module should now be discarded)  still works after these changes
-#. prepare a text providing a description of the diagnostic; this text is intended to become part of CliMAF standard documentation; it should preferably be in `REStructured Text format <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_, and follow  :download:`this template <scripts_template.rst>` which will render :doc:`e.g. as shows here <scripts_template>` , or for a real example  :doc:`like this <scripts/plotmap>` , but this is not a firm pre-requisite. Save this text as ``<climaf_install_dir>/doc/operators/my_op.rst``. The text may describe your diagnostic at length, and should provide all necessary bibliographic references for a sound sharing. It will automatically be included in the CliMAF operator Python on-line help (available as ``help(my_op)``).
+#. prepare a text providing a description of the diagnostic; this text
+   is intended to become part of CliMAF standard documentation; it
+   should preferably be in `REStructured Text format
+   <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_,
+   and follow  :download:`this template <scripts_template.rst>` which
+   will render :doc:`e.g. as shows here <scripts_template>` , or for a
+   real example  :doc:`like this <scripts/plotmap>` , but this is not
+   a firm pre-requisite. Save this text as
+   ``<climaf_install_dir>/doc/operators/my_op.rst``. The text may
+   describe your diagnostic at length, and should provide all
+   necessary bibliographic references for a sound sharing. It will
+   automatically be included in the CliMAF operator Python on-line
+   help (available as ``help(my_op)``). It will be accessible from CliMAF
+   doc if you add a reference in file ``doc/std_operators.rst``
 #. submit your changes as described at :ref:`contributing_changes`
 
 .. _how_to_improve_doc:

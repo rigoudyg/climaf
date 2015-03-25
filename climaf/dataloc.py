@@ -5,18 +5,6 @@ Handles a database of attributes for describing organization and location of dat
 
 # Created : S.Senesi - 2014
 
-# The CliMAF software is an environment for Climate Model Assessment. It
-# has been developped mainly by CNRM-GAME (Meteo-France and CNRS), and
-# by IPSL, in the context of the `CONVERGENCE project
-# <http://convergence.ipsl.fr/>`_, funded by The
-# French 'Agence Nationale de la Recherche' under grant #
-# ANR-13-MONU-0008-01
-# 
-# This software is governed by the CeCILL-C license under French law and
-# biding by the rules of distribution of free software. The CeCILL-C
-# licence is a free software license,explicitly compatible with the GNU
-# GPL (see http://www.gnu.org/licenses/license-list.en.html#CeCILL)
-
 import os, re,logging, string, glob
 from climaf.period import init_period
 
@@ -24,6 +12,36 @@ locs=[]
 
 class dataloc():
     def __init__(self,project="*",model="*",experiment="*",frequency="*",rip="*",organization="CLIPROC",url="/cnrm/aster/data1/simulations"):
+        """
+        Create an entry in the data locations dictionnary for an ensemble of datsets.
+
+        Args:
+          project (str): project name
+          model (str): model name
+          experiment (str): exepriment name
+          frequency (str): frequency
+          organization (str): name of the organization type, among those handled by :py:func:`selectLocalFiles`
+          url (list of strings): list of URLS for the data root directories
+
+        Each entry provides :
+         - a list of path or URLS, which are root paths for
+           finding datafiles for datasets;
+         - the name for the corresponding data files organization
+
+        Datasets sets are there indexed by a combination of attributes
+        values (the arguments keywords);
+
+        For the sake of brievity, each attribute can have the '*'
+        wildcard value; when using the dictionnary, the most specific
+        entries will be used
+
+        Example, for declaring that all IPSLCM-Z-HR data for project
+        PRE_CMIP6 are stored under a single root path and folllows
+        organization named CMIP6_DRS::
+        
+        >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
+
+        """
         self.project=project
         self.model=model
         self.experiment=experiment
@@ -52,8 +70,8 @@ class dataloc():
  
 def getlocs(project="*",model="*",experiment="*",frequency="*"):
     """ Returns the list of org,freq,url triples which may match the 
-    list of given attributes values (allowing for '*') and which have 
-    the lowest number of stars in attributes 
+    list of given attributes values (allowing for wildcards '*') and which have 
+    the lowest number of wildcards (*) in attributes 
 
     """
     rep=[]
@@ -109,11 +127,15 @@ def isLocal(project, model, experiment, frequency) :
     return rep
 
 def selectLocalFiles(project, model, experiment, frequency, variable, period, rip="r1i1p1", version="last"):
-    """ Returns the shortest list of (local) files which include the data for the dataset
+    """
+    Returns the shortest list of (local) files which include the data for the dataset
     
     Method : depending on the data organization, select the relevant files for the
-    requested period and variable
-    Implicitly assumes that organization is the same for all 
+    requested period and variable, using datalocations indexed by :py:func:`dataloc`, and based
+    on the datafiles organization for the corresponding datasets; each organization has a
+    corresponding filename search function sur as :py:func:selectCmip5DrsFiles
+
+    Known organizations as of today: EM, CMIP5_DRS, OCMIP5_Ciclad, OBS4MIPS_CNRM, OBS_CAMI
     
     """
     rep=[]

@@ -9,6 +9,8 @@ CliMAF - a Climate Model Assessment Framework
 Welcome
 -------
 
+CliMAF is an `Open Source software <http://en.wikipedia.org/wiki/Open-source_software>`_ , distributed with a GPL-compatible licence. See :doc:`the licence notice <licence>` 
+
 The aim of CliMAF is to allow for an actual, **easy, collaborative development of climate model outputs assessment suites by climate scientists with varied IT background**, and to ultimately share such suites for the benefit of the Climate Science. 
 
 
@@ -25,8 +27,6 @@ So, CliMAF can be described as :
 - and (to be developped) a visualisation engine for the corresponding
   results
 
-CliMAF is distributed with a GPL-compatible licence. See `the licence notice <../LICENCE.rst>`_ 
-
 
 Description 
 ----------------
@@ -37,7 +37,7 @@ CliMAF is basically a Python-scriptable way to process NetCDF `CF compliant <htt
   'variables' in 'experiments', CliMAF knows a bunch of data
   organization schemes, you just quote some root locations, usually in
   configuration files ; [ under development : data can also be on the
-  `ESGF <http://esgf-node.ipsl.fr/esgf-web-fe/>`_ ] 
+  `ESGF <http://esgf.llnl.gov/>`_ ] 
 - **to apply diagnostics (i.e. any post-processing module) coded in
   any langage**, provided they meet very minimal requirements, such as
   described in section :ref:`operators` ;  they can be :
@@ -60,7 +60,7 @@ Documentation
 
 An overview of basic tasks is provided by :ref:`the first items of the howto section <howto>`
 
-The side bar shows a top level view of the full table of content showing below.
+A top level table of contents show below, and a full one at :ref:`contents`
 
 There are also some direct access tools : :ref:`search`, :ref:`genindex` , :ref:`modindex`
 
@@ -68,16 +68,20 @@ There are also some direct access tools : :ref:`search`, :ref:`genindex` , :ref:
 Content
 ----------
 
+See the full, extended table at :ref:`contents`
+
 .. _mastertoc:
 
 .. toctree::
+   :maxdepth: 1
 
    licence
    requirements
    installing
    examples
-   scripts
    operators
+   std_operators
+   API
    howto
    contributing
 

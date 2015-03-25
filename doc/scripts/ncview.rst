@@ -5,6 +5,8 @@ Launch ncview in the background for displaying the dataset
 
 **References** : 
 
+**Provider / contact** : climaf at meteo dot fr
+
 **Inputs** (in the order of CliMAF call):
   - any dataset (but only one)
 

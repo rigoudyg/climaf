@@ -16,7 +16,13 @@ my_new_climaf_operator : what it does
 *You should here describe in one or two phrases what the new operator computes*
 
 
-**References** : *any bibliographic reference or link to technical documents*
+**References** : *any bibliographic reference or link to technical
+documents*
+
+**Provider / contact** : *one or two mail adresses, for acknowledgment
+and/or for support - In order to limit spamming, use e.g. : myself at
+mylab dot fr. You may use : climaf at meteo dot fr , if you do not
+want to be involved in support, nor feedback*
 
 **Inputs** (in the order of CliMAF call):
   - *describe here if the first (main) input dataset can be any

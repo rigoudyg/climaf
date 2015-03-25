@@ -5,6 +5,8 @@ Plot a geographical map, using NCL, and allowing for tuning a number of graphic 
 
 **References** : http://www.ncl.ucar.edu
 
+**Provider / contact** : climaf at meteo dot fr
+
 **Inputs** (in the order of CliMAF call):
   - any dataset (but only one)
 

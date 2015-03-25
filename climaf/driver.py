@@ -99,9 +99,9 @@ def ceval(cobject,userflags=operators.scriptFlags(False,False,False,False,False)
     as a string of filenames (which either represent a superset or exactly includes
     the desired data)
 
-    with arg deep=True , re-evaluates all components
-    with arg deep=False, re-evaluates top level operation
-    without arg deep   , use cached values as far as possible
+    - with arg deep=True , re-evaluates all components
+    - with arg deep=False, re-evaluates top level operation
+    - without arg deep   , use cached values as far as possible
 
     arg derived_list is the list of variables that have been considered as 'derived'
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly

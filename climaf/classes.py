@@ -22,12 +22,17 @@ import re, logging
 import dataloc
 from period import init_period,cperiod
 
-# Managing user-default values for dataset attributes, and initializing system defaults
-#########################################################################################
-
+#: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
 cdefaults=dict()
 
 def cdefault(attribute,value=None):
+    """
+    Set or get the default value for a CliMAF dataset attributes (as e.g. 'model', 'project' ...),
+    for use by next calls to :py:class:`~climaf.classes.cdataset` or to :py:func:`~climaf.classes.ds`
+
+    Theres is no actual check that 'attribute' is a valid keyword for a call to ``ds`` or ``cdateset``
+
+    """
     if value is None :
         if attribute in cdefaults.keys() :
             return cdefaults[attribute]
@@ -75,9 +80,26 @@ class cobject():
 class cdataset(cobject):
     def __init__(self,project=None,model=None,experiment=None,period=None,
                  rip=None,frequency=None,domain=None,variable=None,version='last') :
-        """ Create a CLIMAF dataset. 
+        """
+        Create a CLIMAF dataset. 
         
-        A CLIMAF dataset is a description of what the data is and not the data itself nor a file
+        A CLIMAF dataset is a description of what the data is and not the data itself nor a file.
+        It is essentially a set of attributes
+
+        All args (but period and version) defaults to the value set by :py:func:`~climaf.classes.cdefault`
+
+        Args:
+          project (str, optional): project attribute
+          model (str, optional): model attribute
+          experiment (str, optional): experiment attribute
+          frequency (str, optional): frequency attribute
+          rip (str, optional): rip attribute
+          domain (str, optional): domain attribute
+          variable (str, optional): variable attribute
+          period (str): a period, syntax as explained with :py:func:`climaf.period.init_period`
+          variable (str, optional): version of the data; default to 'last'
+        
+        
         """
         # Should check following initializations w.r.t. relevant regexps
         self.project=    cdefault("project")   if project   is None else project
@@ -260,8 +282,10 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
 #     # TBC : take care of exceptions, and remove period and domain info, and upgrade to non-basic datasets
 
 def ds(*args,**kwargs) :
-    """ Returns a dataset from its full Climate Reference Syntax.
-    Also a front end for cdataset, when there is any kwarg (and no positional argument)
+    """
+    Returns a dataset from its full Climate Reference Syntax.
+
+    Also a shortcut for :py:meth:`~climaf.classes.cdataset`, when used with with only keywords arguments
 
     """
     # Note : muts be kept phased with self.crs defined in cdataset.init(), both for

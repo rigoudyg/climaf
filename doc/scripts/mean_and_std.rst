@@ -7,6 +7,9 @@ CDO output
 
 **References** : https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html#x1-3040002.8.5
 
+
+**Provider / contact** : climaf at meteo dot fr
+
 **Inputs** (in the order of CliMAF call):
   - any dataset (but only one)
 

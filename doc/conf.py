@@ -18,8 +18,8 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../climaf'))
+sys.path.insert(0, os.path.abspath('.'))
+#sys.path.insert(0, os.path.abspath('../climaf'))
 
 # -- General configuration ------------------------------------------------
 
@@ -32,8 +32,10 @@ sys.path.insert(0, os.path.abspath('../climaf'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.napoleon'
 ]
+#     'sphinx.ext.napoleon'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -352,3 +354,5 @@ epub_exclude_files = ['search.html']
 #epub_use_index = True
 
 intersphinx_mapping = {'python': ('https://docs.python.org/2', None)}
+
+autoclass_content="init"
