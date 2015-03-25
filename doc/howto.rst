@@ -133,6 +133,11 @@ CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can e
 
 and loading the resulting file ``<climaf_install_dir>/doc/_build/html/index.html`` in your browser.
 
+Also : part of the doc (e.g. section :ref:`api` ) is built from the Python docstrings (docstrings
+at the beginning of classes, modules, functions, .....). The full
+python object path let you know where to find the corresponding file
+and docstring, in dicrectory <climaf_install_dir>/climaf
+
 Once happy with the result, please contribute your work for a merge in next CliMAF release as described at :ref:`contributing_changes`
 
 

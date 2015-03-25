@@ -20,10 +20,11 @@ class dataloc():
           model (str): model name
           experiment (str): exepriment name
           frequency (str): frequency
-          organization (str): name of the organization type, among those handled by :py:func:`selectLocalFiles`
+          organization (str): name of the organization type, among those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
         Each entry provides :
+        
          - a list of path or URLS, which are root paths for
            finding datafiles for datasets;
          - the name for the corresponding data files organization

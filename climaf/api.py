@@ -48,7 +48,9 @@ def cfile(object,deep=None) :
     Provide the filename for a CliMAF object. Launch computation if needed.
 
     Args:
-      deep (logical) : governs the use of cached values when computing the object
+      object (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
+      deep (logical, optional) : governs the use of cached values when computing the object
+      
         - if missing, or None : use cache as much as possible
         - False : make a shallow computation, i.e. do not use cached values for top level operation
         - True  : make a deep computation, i.e. do not use any cached value
@@ -72,7 +74,9 @@ def  cMA(object,deep=None) :
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.
 
     Args:
-      deep (logical) : governs the use of cached values when computing the object
+      object (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
+      deep (logical, optional) : governs the use of cached values when computing the object
+
         - if missing, or None : use cache as much as possible
         - False : make a shallow computation, i.e. do not use cached values for top level operation
         - True  : make a deep computation, i.e. do not use any cached value
