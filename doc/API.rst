@@ -3,7 +3,7 @@ Application Program Interface
 -----------------------------
 .. default-domain:: python
 
-.. automodule:: api
+.. automodule:: climaf.api
 
 Function names used as section titles are those defined by ``climaf.api`` and
 can be used 'as is' after executing ``from climaf.api import *``
@@ -14,23 +14,23 @@ For documented standard operators see  :ref:`standard_operators` ; for the other
 dataloc
 -------
 
-.. autoclass:: dataloc.dataloc
+.. autoclass:: climaf.dataloc.dataloc
 
 cdataset
 ----------
 
-.. autoclass:: classes.cdataset
+.. autoclass:: climaf.classes.cdataset
 
 ds
 ------
 
-.. autofunction:: classes.ds
+.. autofunction:: climaf.classes.ds
 
 
 cdef
 ------
 
-.. autofunction:: classes.cdefault
+.. autofunction:: climaf.classes.cdefault
 
 cscript
 ----------------------
@@ -40,45 +40,45 @@ cscript
 cfile
 ------
 
-.. autofunction:: api.cfile 
+.. autofunction:: climaf.api.cfile 
 
 cMA
 ------
 
-.. autofunction:: api.cMA
+.. autofunction:: climaf.api.cMA
 
 clog
 ------
 
-.. autofunction:: api.clog 
+.. autofunction:: climaf.api.clog 
 
 cdump
 ------
 
-.. autofunction:: cache.cdump 
+.. autofunction:: climaf.cache.cdump 
 
 craz 
 ---------------------
 
-.. autofunction:: cache.creset
+.. autofunction:: climaf.cache.creset
 
 csave 
 ---------------------
 
-.. autofunction:: cache.csync
+.. autofunction:: climaf.cache.csync
 
 
 init_period
 ---------------
 
-.. autofunction:: period.init_period
+.. autofunction:: climaf.period.init_period
 
 Some useful variables
 ------------------------
 **cpath**
 
-.. autodata:: api.cpath
+.. autodata:: climaf.api.cpath
 
 **cdefaults**
 
-.. autodata:: classes.cdefaults
+.. autodata:: climaf.classes.cdefaults
