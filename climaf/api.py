@@ -23,24 +23,21 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 
 
 import os
-
 #Void if logging level already set by the user :
 import logging ; logging.basicConfig(level=logging.ERROR)
 
 import climaf, climaf.cache
-
-#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``
-cpath=os.path.abspath(climaf.__path__[0]) 
-
-climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
-
-
 from climaf.classes   import cdefault as cdef,cdataset,ds #,cperiod
 from climaf.driver    import ceval,varOf #,cfile,cobj 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
 from climaf.cache     import creset as craz, csync as csave , cdump
 import climaf.standard_operators
+
+#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``
+cpath=os.path.abspath(climaf.__path__[0]) 
+climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
+climaf.standard_operators.load_standard_operators()
 
 # Commodity functions
 def cfile(object,deep=None) :

@@ -1,1 +1,2 @@
-doc/licence.rst
+
+.. include:: ../doc/license.rst

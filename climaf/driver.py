@@ -1,20 +1,11 @@
-""" CliMAF driver
+""" 
+CliMAF driver
+
+There is quite a lot of things to document here. Maybe at a later stage ....
 
 """
 
 # Created : S.Senesi - 2014
-
-# The CliMAF software is an environment for Climate Model Assessment. It
-# has been developped mainly by CNRM-GAME (Meteo-France and CNRS), and
-# by IPSL, in the context of the `CONVERGENCE project
-# <http://convergence.ipsl.fr/>`_, funded by The
-# French 'Agence Nationale de la Recherche' under grant #
-# ANR-13-MONU-0008-01
-# 
-# This software is governed by the CeCILL-C license under French law and
-# biding by the rules of distribution of free software. The CeCILL-C
-# licence is a free software license,explicitly compatible with the GNU
-# GPL (see http://www.gnu.org/licenses/license-list.en.html#CeCILL)
 
 #Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
 
@@ -37,6 +28,9 @@ def capply (operator, *operands, **parameters):
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
     res=None
+    if operands is None or operands[0] is None :
+        logging.debug("driver.capply : Operands is None")
+        return None
     opds=map(str,operands)
     if operator in operators.scripts :
         logging.debug("driver.capply : applying script %s to"%operator + `opds` + `parameters`)
@@ -52,12 +46,12 @@ def capply_script (script_name, *operands, **parameters):
     """ Create object for application of a script to OPERANDS with keyword PARAMETERS."""
 
     if script_name not in operators.scripts :
-        logging.error("Script %s is not know. Consider declaring it with function 'cscript'",
+        logging.error("Operator %s is not know. Consider declaring it with function 'cscript'",
                       script_name)
         return None
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
-        logging.error("driver.capply_script : script %s is declared with %d inputs, "+
+        logging.error("driver.capply_script : operator %s is declared with %d inputs, "+
                       "while you provided %d"%\
                       (script_name,script.inputs_number(),len(operands)))
         return None
@@ -77,12 +71,12 @@ def capply_script (script_name, *operands, **parameters):
                 son.variable=script.outputs[outname]%defaultVariable
                 rep.outputs[outname]=son
                 setattr(rep,outname,son)
-                #
-                # Check that all parameters to the call are expected by the script 
-                for para in parameters :
-                    if re.match(r".*\{"+para+r"\}",script.command) is None :
-                        logging.error("driver.capply_script : parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command))
-                        return None
+        #
+        # Check that all parameters to the call are expected by the script 
+        for para in parameters :
+            if re.match(r".*\{"+para+r"\}",script.command) is None :
+                logging.error("driver.capply_script : parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command))
+                return None
     #
     return rep
 

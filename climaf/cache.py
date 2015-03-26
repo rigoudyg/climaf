@@ -134,7 +134,7 @@ def register(filename,crs):
             logging.critical("cache.register : cannot stamp by %s"%command)
             return None
     else :
-        logging.error("cache.register : file %s does not exist (for crs %s)"%(filename,crs))
+        logging.debug("cache.register : file %s does not exist (for crs %s)"%(filename,crs))
 
 def getCRS(filename) :
     """ Returns the CRS expression found in FILENAME's meta-data"""
