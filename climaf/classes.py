@@ -128,8 +128,10 @@ class cdataset(cobject):
         if period is None : period=self.period
         # Note : function 'ds' (far below) must be modified when buildcrs is modified
         s= "."
+	if type(self.domain) is list : sdomain=`self.domain`
+	else : sdomain=self.domain
         return "ds('"+self.project+s+self.model+s+self.experiment+s+self.rip+s+`period`+s+\
-                  self.frequency+s+self.domain+s+self.variable+"')"
+                  self.frequency+s+sdomain+s+self.variable+"')"
 
     def isLocal(self) :
         return(dataloc.isLocal(project=self.project, model=self.model, \
@@ -150,6 +152,10 @@ class cdataset(cobject):
     def periodIsFine(self):
         logging.debug("classes.cdataset.periodIsFine : always returns False, yet - TBD")
         return(False) 
+        
+    def domainIsFine(self):
+        logging.debug("classes.cdataset.domainIsFine : a bit too simple yet (domain=='global')- TBD")
+        return(self.domain == 'global') 
         
     def periodHasOneFile(self) :
         logging.debug("classes.cdataset.periodHasOneFIle : always returns False, yet - TBD")
@@ -304,6 +310,12 @@ def ds(*args,**kwargs) :
     period=init_period(fields[4]) 
     frequency=fields[5]
     domain=fields[6]
+    # domain may be the string representation of a list of corner coordinates, 
+    # let us try to evaluate it
+    try :
+        domain=eval(domain)
+    except :
+        pass
     variable=fields[7]
     return cdataset(project=project,model=model,experiment=experiment,rip=rip,period=period,\
              frequency=frequency,domain=domain,variable=variable)

@@ -35,6 +35,7 @@ Some of the examples can be run anywhere, as they use the data sample installed 
   - :download:`export.py <../examples/export.py>`        : how to 'export' results out of CliMAF
   - :download:`derived.py <../examples/derived.py>`      : how to define a new geophysical variable and use it in CliMAF
   - :download:`increm.py <../examples/increm.py>`        : compute any derived variable incrementally (i.e. using new inputs as they become available)
+  - :download:`latlonbox.py <../latlonbox/increm.py>`    : define a dataset on a lat-lon box; also extract another box
 
 .. _examples_data:
 

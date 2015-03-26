@@ -28,16 +28,20 @@ operators=dict()
 derived_variables=dict()
 
 class scriptFlags():
-    def __init__(self,canOpendap, canSelectVar, canSelectTime, canAggregateTime, doSqueezeTime):
+    def __init__(self,canOpendap=False, canSelectVar=False, 
+                 canSelectTime=False, canSelectDomain=False, 
+                 canAggregateTime=False, doSqueezeTime=False,doSqueezeSpace=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
         self.canSelectTime=canSelectTime
+        self.canSelectDomain=canSelectDomain
         self.canAggregateTime=canAggregateTime
         self.doSqueezeTime=doSqueezeTime
+        self.doSqueezeSpace=doSqueezeSpace
 
 class cscript():
-    def __init__(self,name, command, format="nc", canOpendap=False, doSqueezTime=False, **kwargs):
-
+    def __init__(self,name, command, format="nc", canOpendap=False, 
+                 doSqueezeTime=False, doSqueezeSpace=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a function with the same name
 
@@ -46,7 +50,10 @@ class cscript():
           command (str): script calling sequence, according to the syntax described below.
           format (str): script outputs format -- either 'nc' or 'png'; defaults to 'nc'
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
-          doSqueezeTime (bool, optional): does the script lead degenerate/aggregate time dimension ? defaults to False
+          doSqueezeTime (bool, optional): does the script lead degenerate/aggregate the time 
+            dimension ? defaults to False
+          doSqueezeSpace (bool, optional): does the script lead degenerate/aggregate the space
+            dimension ? defaults to False
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).
         
@@ -124,6 +131,18 @@ class cscript():
             - 'period' stands for the first input_stream,
             - 'period_<n>' for the next ones, in the order of actual call;
 
+         -  **domain, domain_<digit>** : when a script can select a domain 
+            in the input grid, this is declared by adding this
+            keyword in the calling sequence; CliMAF will replace it by the
+            domain definition if needed, as 'latmin,latmax,lonmin,lonmax' ;
+            'domain' stands for first input stream, 'domain_<digit>' for the 
+            next ones;
+
+            - in the example above, we assume that external binary CDO is
+              not tasked with selecting the domain, and that CliMAF must
+              feed CDO with a datafile where it has already performed the
+              selection
+         
           - in the example above, this keyword is not used, which means that
             CliMAF has to select the period upstream of feeding CDO with the
             data
@@ -233,11 +252,14 @@ class cscript():
         canSelectTime=False
         if command.find("${period}") > 0  or command.find("${period_1}") > 0 :
             canSelectTime=True
+        canSelectDomain=False
+        if command.find("${domain}") > 0  or command.find("${domain_1}") > 0 :
+            canSelectDomain=True
         self.name=name
         self.command=command
         #
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-                                   canAggregateTime, doSqueezTime )
+            canSelectDomain, canAggregateTime, doSqueezeTime, doSqueezeSpace )
         self.outputFormat=format
         scripts[name]=self
 
@@ -272,7 +294,8 @@ class cscript():
         return(len(ls))
 
 class coperator():
-    def __init__(self,op, command, canOpendap=False, canSelectVar=False, canSelectTime=False, canAggregateTime=False ):
+    def __init__(self,op, command, canOpendap=False, canSelectVar=False, 
+	canSelectTime=False, canSelectDomain=False, canAggregateTime=False ):
         logging.error("operators.coperator : not yet developped")
 
 

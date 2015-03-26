@@ -29,7 +29,7 @@ import operators
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
 #operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
-operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period} ${ins} ' )
+operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period} ${domain} ${ins} ' )
 
 def capply (operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script or function)
@@ -94,8 +94,11 @@ def capply_operator (operator, *operands, **parameters):
     return None
     
 
-def ceval(cobject,userflags=operators.scriptFlags(False,False,False,False,False),format="MaskedArray",deep=None, derived_list=[]) :
-    """ Actually evaluates a CliMAF object, either as an in-memory data structure or
+def ceval(cobject,
+          userflags=operators.scriptFlags(),
+          format="MaskedArray",deep=None, derived_list=[]) :
+    """ 
+    Actually evaluates a CliMAF object, either as an in-memory data structure or
     as a string of filenames (which either represent a superset or exactly includes
     the desired data)
 
@@ -138,6 +141,7 @@ def ceval(cobject,userflags=operators.scriptFlags(False,False,False,False,False)
                 return(derived_value)
             if ((userflags.canSelectVar or ds.oneVarPerFile()) and \
                 (userflags.canSelectTime or ds.periodIsFine()) and \
+                (userflags.canSelectDomain or ds.domainIsFine()) and \
                 (userflags.canAggregateTime or ds.periodHasOneFile()) and 
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
                 #(userflags.canOffsetScale or ds.hasExactVariable()) and 
@@ -305,7 +309,8 @@ def ceval_script (scriptCall,deep):
         infile=dict_invalues[op]
         subdict[ label ]='"'+infile+'"'
         subdict["var"]='"'+op.variable+'"'
-        subdict["period"]=str(timePeriod(op))
+        subdict["period"]='"'+str(timePeriod(op))+'"'
+        subdict["domain"]='"'+domainOf(op)+'"'
     i=0
     for op in scriptCall.operands :
         opscrs += op.crs+" - "
@@ -315,9 +320,10 @@ def ceval_script (scriptCall,deep):
             label,multiple,serie=script.inputs[i]
             subdict[ label ]='"'+infile+'"'
             # Provide the name of the variable in input file if script allows for
-            subdict["var_%d"%i]=op.variable
+            subdict["var_%d"%i]='"'+op.variable+'"'
             # Provide period selection if script allows for
-            subdict["period_%d"%i]=timePeriod(op)
+            subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
+            subdict["domain_%d"%i]='"'+domainOf(op)+'"'
     logging.debug("driver.ceval_script - subdict for operands is "+`subdict`)
     # substituion is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
@@ -393,6 +399,27 @@ def timePeriod(cobject) :
         return timePeriod(cobject.father)
     else : logging.error("driver.timePeriod : unkown class for argument "+`cobject`)
                   
+def domainOf(cobject) :
+    """ Returns a domain for a CliMAF object : if object is a dataset, returns
+    its domain, otherwise returns domain of first operand
+    """
+    if isinstance(cobject,classes.cdataset) : 
+	if type(cobject.domain) is list :
+            rep=""
+            for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
+            rep="%s%d"%(rep,cobject.domain[-1])
+            return(rep)
+	else : 
+	    if cobject.domain == "global" : return ""
+	    else : return(cobject.domain)
+    elif isinstance(cobject,classes.ctree) :
+        logging.debug("driver.domainOf : for now, domainOf logic for scripts output is basic (1st operand) - TBD")
+        return domainOf(cobject.operands[0])
+    elif isinstance(cobject,classes.scriptChild) :
+        logging.debug("driver.domainOf : for now, domainOf logic for scriptChilds is basic - TBD")
+        return domainOf(cobject.father)
+    else : logging.error("driver.domainOf : unkown class for argument "+`cobject`)
+                  
 def varOf(cobject) :
     """ Returns the variable for a CliMAF object : if object is a dataset, returns
     its 'variable' property, otherwise returns variable of first operand
@@ -431,8 +458,9 @@ def ceval_select(includer,included,userflags,format,deep) :
     and the required delivering FORMAT(file or object)
     """
     if format=='file' : 
-        if userflags.canSelectTime :
-            logging.debug("driver.ceval_select : TBD - should do smthg smart when user can select time")
+        if userflags.canSelectTime or userflags.canSelectDomain:
+            logging.debug("driver.ceval_select : TBD - should do"
+               " smthg smart when user can select time or domain")
             #includer.setperiod(included.period)
         incperiod=timePeriod(included)
         extract=capply('select',includer, period=incperiod)

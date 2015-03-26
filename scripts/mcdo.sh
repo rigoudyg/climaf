@@ -15,12 +15,20 @@ operator=$1
 outs=$2
 var=$3
 period=$4
-shift; shift ;shift; shift
+region=$5
+shift;shift; shift ;shift; shift
 #filesList=$*
 
 tmp=~/tmp/$(basename $0)
 mkdir -p $tmp
 i=0
+if [ "$region" ] ; then 
+    latmin=$(echo $region | cut -d "," -f 1)
+    latmax=$(echo $region | cut -d "," -f 2)
+    lonmin=$(echo $region | cut -d "," -f 3)
+    lonmax=$(echo $region | cut -d "," -f 4)
+    selregion="-sellonlatbox,$lonmin,$lonmax,$latmin,$latmax"
+fi
 for out in $outs ; do 
     i=$((i+1))
     eval files=\$$i
@@ -29,17 +37,27 @@ for out in $outs ; do
 	tmp2=$tmp/$(basename $file)
 	if [ "$period" ] ; then 
 	    [ "$var" ] && selvar="-selname,$var" 
-	    cdo seldate,${period/-/,} $selvar $file $tmp2  && vfiles+=" "$tmp2
+	    cdo seldate,${period/-/,} $selvar $selregion $file $tmp2  && vfiles+=" "$tmp2
 	else
 	    if [ "$var" ] ; then 
-		cdo selname,$var $file $tmp2 && vfiles+=" "$tmp2
-	    else vfiles+=" "$file ; fi
+		cdo selname,$var $selregion $file $tmp2 && vfiles+=" "$tmp2
+	    else 
+		if [ "$region" ] ; then 
+		    cdo $selregion $file $tmp2 && vfiles+=" "$tmp2
+		else
+		    vfiles+=" "$file ; 
+		fi
+	    fi
 	fi
     done
     if [ "$vfiles" ] ; then 
 	tmp3=$tmp/$(basename $0).nc
-        # In next line, should avoid single file copy followed by rm ...
-	cdo copy $vfiles $tmp3 && [ "$var" -o "$period" ] && rm $vfiles 
+        # let us avoid single file copy followed by rm ...
+	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
+	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && rm $vfiles 
+	else
+	    mv $vfiles $tmp3
+	fi
 	if [ "$operator" ] ; then 
 	    if cdo $operator $tmp3 $out ;then 
 		rm $tmp3 
