@@ -51,9 +51,9 @@ def capply_script (script_name, *operands, **parameters):
         return None
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
-        logging.error("driver.capply_script : operator %s is declared with %d inputs, "+
-                      "while you provided %d"%\
-                      (script_name,script.inputs_number(),len(operands)))
+        logging.error("driver.capply_script : operator %s is "
+	    "declared with %d input streams, while you provided %d"%(
+		script_name,script.inputs_number(),len(operands)))
         return None
     rep=classes.ctree(script_name, script, *operands, **parameters)
     if rep is not None :

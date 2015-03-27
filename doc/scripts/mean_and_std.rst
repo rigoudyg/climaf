@@ -28,9 +28,9 @@ CDO output
 
 **Climaf call example** ::
  
-  >> ds= ....some dataset, with whatever variable
-  >> m=mean_and_std(ds)  # m receives the field mean
-  >> dev=m.std           # dev receives operator output named "std", namely the field standard deviation
+  >>> ds= ....some dataset, with whatever variable
+  >>> m=mean_and_std(ds)  # m receives the field mean
+  >>> dev=m.std           # dev receives operator output named "std", namely the field standard deviation
 
 **Side effects** : create temporary files in the directory provided for output fields
 

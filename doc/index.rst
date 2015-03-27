@@ -9,7 +9,7 @@ CliMAF - a Climate Model Assessment Framework
 Welcome
 -------
 
-CliMAF is an `Open Source software <http://en.wikipedia.org/wiki/Open-source_software>`_ , distributed with a GPL-compatible licence. See :doc:`the licence notice <licence>` 
+CliMAF is an `Open Source software <http://en.wikipedia.org/wiki/Open-source_software>`_ , distributed with a GPL-compatible licence. See :doc:`the licence notice <license>` 
 
 The aim of CliMAF is to allow for an actual, **easy, collaborative development of climate model outputs assessment suites by climate scientists with varied IT background**, and to ultimately share such suites for the benefit of the Climate Science. 
 
@@ -75,7 +75,7 @@ See the full, extended table at :ref:`contents`
 .. toctree::
    :maxdepth: 1
 
-   licence
+   license
    requirements
    installing
    examples

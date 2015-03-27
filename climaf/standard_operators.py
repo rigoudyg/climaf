@@ -30,9 +30,15 @@ def load_standard_operators():
     cscript('llbox' ,
             scriptpath+'mcdo.sh ""  ${out} ${var} ${period} ${latmin},${latmax},${lonmin},${lonmax} ${ins}')
     #
+    cscript('regrid' ,
+            scriptpath+'regrid.sh ${in} ${in_2} ${out} ${option}')
+    #
+    cscript('regridn' ,
+            scriptpath+'regrid.sh ${in} ${cdogrid} ${out} ${option}')
+    #
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} &' , format=None)
     cscript('timeplot'  , scriptpath+'timeplot.sh ${in} ${out} ${var} ${args}',format="png")
     cscript('plotmap'   , "ncl "+ scriptpath +"plotmap.ncl infile=${in} plotname=${out} "+\
                 "cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} var=${var} title=${crs} "+\
-                "scale=${scale} offset=${offset} units=${units}",format="png")
+                "scale=${scale} offset=${offset} units=${units} ; convert ${out} -trim ${out}",format="png")

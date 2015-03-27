@@ -12,6 +12,10 @@ For each operator, the content of the doc file is also made available in the Pyt
 
 Documented operators as of today : 
 
+ - basic functions:
+    - :doc:`scripts/regrid`
+    - :doc:`scripts/regridn`
+
  - graphics
     - :doc:`scripts/plotmap`
     - :doc:`scripts/timeplot`
