@@ -1,27 +1,29 @@
 #!/bin/bash
 # Applies a cdo OPERATOR without arg to a number of list of FILES, 
-# selecting a variable VAR and a PERIOD in the files
+# selecting a variable VAR and a PERIOD and a REGION in the files
 #
 # Puts results in OUT (assumed to be a string have the right number of filenames in it)
 # Exit with non-0 status if any problem
-# PERIOD and/or VAR can be empty, in which case filtering will not occur
+# PERIOD and/or VAR and/or REGION can be empty, in which case filtering will not occur
 # OPERATOR can be empty, in which case processing will not occur
 
 # Lack of variable VAR in some file(s) is not considered an error
 # Having no data for the PERIOD is not considered an error
 
 set -x 
-operator=$1
-outs=$2
-var=$3
-period=$4
-region=$5
-shift;shift; shift ;shift; shift
-#filesList=$*
+operator=$1 ; shift
+outs=$1 ; shift
+var=$1 ; shift
+period=$1 ; shift
+region=$1 ; shift
 
 tmp=~/tmp/$(basename $0)
 mkdir -p $tmp
-i=0
+
+# Prepare CDO operator strings
+
+[ "$var" ] && selvar="-selname,$var" 
+[ "$period" ] && seldate="seldate,${period/-/,}"
 if [ "$region" ] ; then 
     latmin=$(echo $region | cut -d "," -f 1)
     latmax=$(echo $region | cut -d "," -f 2)
@@ -29,27 +31,36 @@ if [ "$region" ] ; then
     lonmax=$(echo $region | cut -d "," -f 4)
     selregion="-sellonlatbox,$lonmin,$lonmax,$latmin,$latmax"
 fi
+
+i=0
+# Loop on the list of list of files 
 for out in $outs ; do 
     i=$((i+1))
+
+    # 'files' is the next list of filenames (listed in a single string)
     eval files=\$$i
     vfiles=""
+
+    # Make all selections (time, space, variable) before applying the operator
     for file in $files ; do
 	tmp2=$tmp/$(basename $file)
 	if [ "$period" ] ; then 
-	    [ "$var" ] && selvar="-selname,$var" 
-	    cdo seldate,${period/-/,} $selvar $selregion $file $tmp2  && vfiles+=" "$tmp2
+	    cdo $seldate $selvar $selregion $file $tmp2  && vfiles+=" "$tmp2
 	else
 	    if [ "$var" ] ; then 
-		cdo selname,$var $selregion $file $tmp2 && vfiles+=" "$tmp2
+		cdo ${selvar#-} $selregion $file $tmp2 && vfiles+=" "$tmp2
 	    else 
 		if [ "$region" ] ; then 
-		    cdo $selregion $file $tmp2 && vfiles+=" "$tmp2
+		    cdo ${selregion#-} $file $tmp2 && vfiles+=" "$tmp2
 		else
 		    vfiles+=" "$file ; 
 		fi
 	    fi
 	fi
     done
+
+    # Then, assemble all datafiles in a single one before applying the operator 
+    # (because it may be non-linear in time - e.g. eigenvectors )
     if [ "$vfiles" ] ; then 
 	tmp3=$tmp/$(basename $0).nc
         # let us avoid single file copy followed by rm ...
@@ -58,6 +69,8 @@ for out in $outs ; do
 	else
 	    mv $vfiles $tmp3
 	fi
+
+	# Apply operator if requested, plus some house keeping on coordinates
 	if [ "$operator" ] ; then 
 	    if cdo $operator $tmp3 $out ;then 
 		rm $tmp3 
