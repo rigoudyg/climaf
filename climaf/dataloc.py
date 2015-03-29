@@ -7,20 +7,23 @@ Handles a database of attributes for describing organization and location of dat
 
 import os, re,logging, string, glob
 from climaf.period import init_period
+from climaf.netcdfbasics import fileHasVar
 
 locs=[]
 
 class dataloc():
-    def __init__(self,project="*",model="*",experiment="*",frequency="*",rip="*",organization="CLIPROC",url="/cnrm/aster/data1/simulations"):
+    def __init__(self,project="*",model="*", experiment="*",
+                 frequency="*", rip="*",organization=None, url=None):
         """
         Create an entry in the data locations dictionnary for an ensemble of datsets.
 
         Args:
-          project (str): project name
-          model (str): model name
-          experiment (str): exepriment name
-          frequency (str): frequency
-          organization (str): name of the organization type, among those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
+          project (str,optional): project name
+          model (str,optional): model name
+          experiment (str,optional): exepriment name
+          frequency (str,optional): frequency
+          organization (str): name of the organization type, among 
+           those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
         Each entry provides :
@@ -28,6 +31,8 @@ class dataloc():
          - a list of path or URLS, which are root paths for
            finding datafiles for datasets;
          - the name for the corresponding data files organization
+         - the set of attributes defining the experiments which data are 
+           stored there and with that organization
 
         Datasets sets are there indexed by a combination of attributes
         values (the arguments keywords);
@@ -36,11 +41,17 @@ class dataloc():
         wildcard value; when using the dictionnary, the most specific
         entries will be used
 
-        Example, for declaring that all IPSLCM-Z-HR data for project
+        Example :
+
+        - Declaring that all IPSLCM-Z-HR data for project
         PRE_CMIP6 are stored under a single root path and folllows
         organization named CMIP6_DRS::
         
         >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
+
+        - and declaring an exception for one experiment (here, both location and organization are supposed to be different)
+
+        >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='model_output', url=['~/tmp/my_exp_data'])
 
         """
         self.project=project
@@ -109,12 +120,16 @@ def oneVarPerFile(project="*",model="*",experiment="*",frequency="*"):
         return(False)
     else :
         org=llocs[0][0]
-        if org=="CLIPROC" : return False
-        if org=="ESGF"    : return True
-        if org=="DRS"     : return True
-        if org=="COUGAR"  : return False
-        logging.warning("dataloc.oneVarPerFile : cannot yet handle organization "+m.organization+\
-                         " for experiment "+experiment+", model "+model+" , and project "+project)
+        if org=="EM"          : return False
+        if org=="example"     : return False
+        if org=="ESGF"        : return True
+        if org=="CMIP5_DRS"   : return True
+        if (org == "OCMIP5_Ciclad") : return True
+        if (org == "OBS4MIPS_CNRM") : return True
+        if (org == "OBS_CAMI")      : return True
+        logging.warning("dataloc.oneVarPerFile : cannot yet handle organization "+
+                        m.organization+ " for experiment "+experiment+
+                        ", model "+model+" , and project "+project)
         return False
         
 
@@ -146,7 +161,9 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
         logging.warning("dataloc.selectLocalFiles : no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
     for org,freq,urls in ofu :
         if (org == "EM") :
-            rep.extend(selectEmFiles(experiment, frequency, period, urls))
+            rep.extend(selectEmFiles(experiment, frequency, variable, period))
+        elif (org == "example") :
+            rep.extend(selectExampleFiles(experiment, frequency, period, urls))
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, period, rip, version, urls))
         elif (org == "OCMIP5_Ciclad") :
@@ -174,18 +191,66 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
     # Assemble filenames in one single string
     return(string.join(rep))
 
-def selectEmFiles(experiment, frequency, period, urls) :
+def selectEmFiles(experiment, frequency, variable, period) :
+    #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
+    freqs={ "monthly" : "mon" }
+    f=frequency
+    if f in freqs : f=freqs[f]
+    rep=[]
+    # Must look for all realms, here identified by a single letter
+    for realm in ["A", "L", "O", "I" ] :
+        # Use external function em_get_archive_location for finding data dir
+        try :
+            ex = subprocess.Popen(["em_get_archive_location", experiment, realm, f], 
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except :
+            logging.debug("dataloc.selectEmFiles: Issue with "
+                          "em_get_archive_location on "+experiment+" for realm "+realm)
+            break
+        if ex.wait()==0 :
+            dir=ex.stdout.read().split(" ")[0]
+            if os.path.exists(dir) :
+                logging.debug("dataloc.selectEmFiles : Looking at dir "+dir)
+                lfiles= os.listdir(dir)
+                for fil in lfiles :
+                    logging.debug("dataloc.selectEmFiles: Looking at file "+fil)
+                    fileperiod=periodOfEmFile(fil,realm,f)
+                    if fileperiod and period.intersects(fileperiod) :
+                        if fileHasVar(fil,variable) :
+                            rep.append(dir+"/"+fil)
+    return rep
+
+def periodOfEmFile(filename,realm,freq):
+    """
+    Return the period covered by a file handled by EM, based on filename
+    rules for EM
+    """
+    if (realm == 'A' or realm == 'L' ) :
+        if freq=='mon':
+            year=re.sub(r'^.*([0-9]{4}).nc',r'\1',filename)
+            if year.isdigit(): 
+                return init_period("%s-%s"%(year,year+1))
+        else:
+            logging.error("dataloc.periodOfEmFile : can yet handle only "
+                          "monthly frequency for realms A and L - TBD")
+    elif (realm == 'O' or realm == 'I' ) :
+        logging.error("dataloc.periodOfEmFile : cannot yet handle realms O and I - TBD - please complain !")
+    else: logging.error("dataloc.periodOfEmFile : unexpected realm "+realm)
+
+
+                        
+def selectExampleFiles(experiment, frequency, period, urls) :
     rep=[]
     if (frequency == "monthly") :
         for l in urls :
             for realm in ["A","L"] :
                 #dir=l+"/"+realm+"/Origin/Monthly/"+experiment
                 dir=l+"/"+realm
-                logging.debug("dataloc.selectEmFiles : Looking at dir "+dir)
+                logging.debug("dataloc.selectExampleFiles : Looking at dir "+dir)
                 if os.path.exists(dir) :
                     lfiles= os.listdir(dir)
                     for f in lfiles :
-                        logging.debug("dataloc.selectEmFiles: Looking at file "+f)
+                        logging.debug("dataloc.selectExampleFiles: Looking at file "+f)
                         year=re.sub(r'^.*([0-9]{4}).nc',r'\1',f)
                         if year.isdigit() and period.hasFullYear(year) : rep.append(dir+"/"+f)
     return rep

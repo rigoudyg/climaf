@@ -1,4 +1,4 @@
-.. requirements_
+.. _requirements:
 
 Requirements
 ------------

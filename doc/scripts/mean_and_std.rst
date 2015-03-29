@@ -28,7 +28,7 @@ CDO output
 
 **Climaf call example** ::
  
-  >>> ds= ....some dataset, with whatever variable
+  >>> ds= .... #some dataset, with whatever variable
   >>> m=mean_and_std(ds)  # m receives the field mean
   >>> dev=m.std           # dev receives operator output named "std", namely the field standard deviation
 
@@ -36,9 +36,3 @@ CDO output
 
 **Implementation** : just two calls to ``cdo`` and the use of ``ncwa`` for discarding
 degenerated space dimensions (because CDO does not discard them)
-
-
-**CliMAF call sequence pattern** (for reference) :: 
-
-  "mean_and_std.sh ${in} ${var} ${out} ${out_sdev}"
-

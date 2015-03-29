@@ -21,14 +21,10 @@ Launch ncview in the background for displaying the dataset
 
 **Climaf call example** ::
  
-  >>> tas= ....some dataset like e.g. of monthly mean of a low level temperature
+  >>> tas= .... #some dataset like e.g. of monthly mean of a low level temperature
   >>> cobj(ncview(tas))
 
 **Side effects** : ncview is launched, displaying the file correspondign to the dataset
 
 **Implementation** : just a call to ``ncview`` 
-
-**CliMAF call sequence pattern** (for reference) ::
-
-  "ncview ${in}", format=None
 

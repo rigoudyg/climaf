@@ -1,18 +1,29 @@
-Installing
------------
+Installing and running
+----------------------
+
+First check the listed :ref:`requirements`
 
 Installing CliMAF is quick, through only a few commands, using CliMAF GitHub
-repository; this will also copy some data allowing for test install and for running a few examples ::
+repository; this will also copy some data allowing for test install and for allowing to run a few examples::
 
-  cd some_dir
- 
-  git clone https://github.com/senesis/climaf climaf
+  $ cd some_installation_dir
+  $ git clone https://github.com/senesis/climaf climaf
+  $ cd climaf
+  $ export PYTHONPATH=$PYTHONPATH:$(pwd)
+  $ cd testing
+  $ test_install.sh 
 
-  cd climaf
+After successful installation, for running CliMAF, you will :
 
-  export PYTHONPATH=$PYTHONPATH:$(pwd)
+- set your PYTHONPATH , e.g. in your ``~/.profile`` ::
 
-  cd testing
+  $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
 
-  test_install.sh 
+- import ``climaf.api`` in your Python session or script::
 
+  $ python
+
+  >>> import climaf.api
+  >>> ...
+
+Please see also : :ref:`examples`

@@ -14,7 +14,7 @@ craz()
 # Define data location for an experiment, as concisely as possible
 cdef("experiment","AMIPV6ALB2G")
 cdef("variable","tas")
-dataloc(experiment="AMIPV6ALB2G", organization="EM", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
 
 # Define a 1-year dataset and have it written to cache
 ds1=ds(period="1980-1980")

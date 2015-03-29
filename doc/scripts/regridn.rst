@@ -22,7 +22,7 @@ Interpolate the object to another grid, using CDO
 
 **Climaf call example** ::
  
-  >>> ds= ....some dataset, with whatever variable
+  >>> ds= .... #some dataset, with whatever variable
   >>> remapcon2_ds=regridn(ds,cdogrid="r180x90")  # Target Grid is 2°x2° - interpolation is 2nd order conservative
   >>> remapbil_ds=regridn(ds,cdogrid="n127", option="remapbil") # Target Grid is Gaussian - interpolation is bilinear
 

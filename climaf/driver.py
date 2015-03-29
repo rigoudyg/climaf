@@ -17,12 +17,13 @@ import climaf
 import classes
 import cache
 import operators
+from climaf.netcdfbasics import varOfFile
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
 #operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
 operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period} ${domain} ${ins} ' )
 
-def capply (operator, *operands, **parameters):
+def capply (climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script or function)
     
     Returns results as a list of CliMAF objects and stores them if auto-store is on
@@ -32,14 +33,14 @@ def capply (operator, *operands, **parameters):
         logging.debug("driver.capply : Operands is None")
         return None
     opds=map(str,operands)
-    if operator in operators.scripts :
-        logging.debug("driver.capply : applying script %s to"%operator + `opds` + `parameters`)
-        res=capply_script(operator, *operands, **parameters)
-    elif operator in operators.operators :
-        logging.debug("driver.capply : applying operator %s to"%operator + `opds` + `parameters`)
-        res=capply_operator(operator,*operands, **parameters)
+    if climaf_operator in operators.scripts :
+        logging.debug("driver.capply : applying script %s to"%climaf_operator + `opds` + `parameters`)
+        res=capply_script(climaf_operator, *operands, **parameters)
+    elif climaf_operator in operators.operators :
+        logging.debug("driver.capply : applying operator %s to"%climaf_operator + `opds` + `parameters`)
+        res=capply_operator(climaf_operator,*operands, **parameters)
     else:
-        logging.error("climaf.driver.capply : %s is not a known operator nor script"%operator)
+        logging.error("climaf.driver.capply : %s is not a known operator nor script"%climaf_operator)
     return res
 
 def capply_script (script_name, *operands, **parameters):
@@ -80,7 +81,7 @@ def capply_script (script_name, *operands, **parameters):
     #
     return rep
 
-def capply_operator (operator, *operands, **parameters):
+def capply_operator (climaf_operator, *operands, **parameters):
     """ Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
 
     """
@@ -423,27 +424,6 @@ def varOf(cobject) :
         logging.debug("driver.varOf : for now, varOf logic is basic (1st operand) - TBD")
         return varOf(cobject.operands[0])
     else : logging.error("driver.varOf : unkown class for argument "+`cobject`)
-
-def varOfFile(filename) :
-    """ returns the name of the unique non-dimension variable in
-    NetCDF file FILENAME, or None if it is not unique
-    """
-    varname=None
-    from Scientific.IO.NetCDF import NetCDFFile as ncf
-    fileobj=ncf(filename)
-    #import NetCDF4
-    #fileobj=netCDF4.Dataset(filename)
-    for filevar in fileobj.variables :
-        if filevar not in fileobj.dimensions :
-            if varname is None : 
-                varname=filevar
-            else :
-                logging.debug("driver.varOf : Got at least two variables (%s and %s) "+\
-                                  "and no direction to choose  - File is %s"%\
-                                  (varname,filevar,datafile))
-                return(None)
-    fileobj.close()
-    return(varname)
 
                   
 def ceval_select(includer,included,userflags,format,deep) :

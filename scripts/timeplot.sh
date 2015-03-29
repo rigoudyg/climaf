@@ -12,12 +12,6 @@ set -x
 in=$1
 out=$2
 var=$3
-format=${4:-PNG}
-shift; shift ; shift ; shift ; 
-args=$*
-if [ "$format" == screen ] ; then 
-    ncview $in & 
-    format=PNG
-fi
-xmgrace -netcdf $in -netcdfxy time "$var" -hardcopy -hdevice $format -printfile $out 
+title=${4:--}
+xmgrace -netcdf $in -netcdfxy time "$var" -hardcopy -hdevice PNG -printfile $out 
 #exit 0

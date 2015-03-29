@@ -28,15 +28,11 @@ Plot a geographical map, using NCL, and allowing for tuning a number of graphic 
 
 **Climaf call example** ::
  
-  >>> tas= ....some dataset like e.g. of monthly mean of a low level temperature
-  >>> map=plotmap(ta,color="BlueDarkRed18", vmin=260, vmax=300, delta=4")
+  >>> tas= .... #some dataset like e.g. of monthly mean of a low level temperature
+  >>> map=plotmap(ta,color="BlueDarkRed18", vmin=260, vmax=300, delta=4)
 
 **Side effects** : create temporary files in the directory provided for output fields
 
 **Implementation** : just two calls to ``cdo`` and the use of ``ncwa`` for discarding
 degenerated space dimensions (because CDO does not discard them)
-
-**CliMAF call sequence pattern** (for reference) ::
-
-  "ncl plotmap.ncl infile=${in} plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}",format="png"
 

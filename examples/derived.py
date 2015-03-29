@@ -14,7 +14,7 @@ from climaf.api import *
 clog(logging.INFO) # default is WARNING
 
 # Define data location and organization for an experiment, as concisely as possible
-dataloc(experiment="AMIPV6ALB2G", organization="EM", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
 
 # Set some default values
 cdef("experiment","AMIPV6ALB2G")

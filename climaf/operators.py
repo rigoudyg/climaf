@@ -127,7 +127,7 @@ class cscript():
            YYYYMMDDHHMM or shorter depending on the corresponding dataset's
            frequency value;
 
-            - all time intervals are interpeted as [date1, date2[
+            - all time intervals are interpreted as [date1, date2[
             - 'period' stands for the first input_stream,
             - 'period_<n>' for the next ones, in the order of actual call;
 
@@ -177,7 +177,7 @@ class cscript():
         if name in scripts : logging.warning("Redefining CliMAF script %s"%name)
         #
         # Check now that script is executable
-        scriptcommand=command.split(' ')[0]
+        scriptcommand=command.split(' ')[0].replace("(","")
         try :
             executable=subprocess.check_output('which '+scriptcommand, \
                                                    shell=True)

@@ -5,7 +5,7 @@ from climaf.api import *
 import os
 
 # Define data location for an experiment, as concisely as possible
-dataloc(experiment="AMIPV6ALB2G", organization="EM", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
 
 # Define a default value for one dataset facet
 cdef("frequency","monthly")

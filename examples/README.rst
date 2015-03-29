@@ -8,7 +8,7 @@
 
    **For running the example Ipython notebook**::
      
-     $ cd <climaf_install_dir>
+     $ cd <climaf_dir>
      $ export PYTHONPATH=$PYTHONPATH:$(pwd)
      $ cd examples
      $ ipython notebook 
@@ -19,10 +19,13 @@
 
 :download:`A Tour Of Climaf <../examples/ATourOfCliMAF.html>` is **a progressive but quite comprehensive tour**, which is :download:`here presented as an html page <../examples/ATourOfCliMAF.html>` , but which can also be run as an IPython notebook (see sidenote)
 
-For running CliMAF, or running one of the Python scripts example described below, you will use a Python shell, after telling Python where the CliMAF code is:: 
+For **running CliMAF**, or running one of the Python scripts example described below, you will use a Python shell, after telling Python where the CliMAF code is:: 
 
-    $ export PYTHONPATH=$PYTHONPATH:<climaf_install_dir>
+    $ export PYTHONPATH=$PYTHONPATH:<climaf_dir>
     $ python
+
+::
+
     >>> import climaf.api
     >>> .... 
 
@@ -36,7 +39,8 @@ Some of the examples can be run anywhere, as they use the data sample installed 
   - :download:`derived.py <../examples/derived.py>`      : how to define a new geophysical variable and use it in CliMAF
   - :download:`increm.py <../examples/increm.py>`        : compute any derived variable incrementally (i.e. using new inputs as they become available)
   - :download:`latlonbox.py <../examples/latlonbox.py>`    : define a dataset on a lat-lon box; also extract another box
-  - :download:`regrid.py <../examples/regrid.py>`    : regrid a dataset to a named grid or to the grid of another dataset
+  - :download:`regrid.py <../examples/regrid.py>`    : regrid some data or object to a named grid or to the grid of another object/data
+  - :download:`ann_cycle.py <../examples/ann_cycle.py>`    : compute an annual cycle, using CDO
 
 .. _examples_data:
 

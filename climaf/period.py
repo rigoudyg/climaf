@@ -4,18 +4,6 @@
 
 # S.Senesi 08/2014 : created
 
-# The CliMAF software is an environment for Climate Model Assessment. It
-# has been developped mainly by CNRM-GAME (Meteo-France and CNRS), and
-# by IPSL, in the context of the `CONVERGENCE project
-# <http://convergence.ipsl.fr/>`_, funded by The
-# French 'Agence Nationale de la Recherche' under grant #
-# ANR-13-MONU-0008-01
-# 
-# This software is governed by the CeCILL-C license under French law and
-# biding by the rules of distribution of free software. The CeCILL-C
-# licence is a free software license,explicitly compatible with the GNU
-# GPL (see http://www.gnu.org/licenses/license-list.en.html#CeCILL)
-
 import re, datetime, logging
 
 class cperiod():
@@ -25,11 +13,11 @@ class cperiod():
     Period is defined as \[ date1, date2 \[
 
     """
-    def __init__(self,start,end,leng) :
+    def __init__(self,start,end) :
         if not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
             logging.error("classes.cperiod : issue with start or end")
             return(None)
-        self.start=start ; self.end=end ; self.len=leng
+        self.start=start ; self.end=end 
     #
     def __repr__(self):
         return "%04d%02d%02d-%04d%02d%02d"%(
@@ -47,14 +35,25 @@ class cperiod():
         """ If period BEGIN actually begins period SELF, returns the 
         complement of BEGIN in SELF; otherwise returns None """
         if self.start==begin.start and self.end >= begin.end : 
-            return cperiod(begin.end,self.end,self.len)
+            return cperiod(begin.end,self.end)
                 
     def includes(self,included) :
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
         if self.start <= included.start and included.end <= self.end :
-            return cperiod(self.start,included.start,self.len), 
-        cperiod(included.end,self.end,self.len)
+            return cperiod(self.start,included.start), 
+        cperiod(included.end,self.end)
+
+    def intersect(self,other) :
+        """ 
+        Returns the intersection of period self and period 'other' if any
+        """
+        if other :
+            start=self.start
+            if (other.start > start) : start=other.start
+            end=self.end
+            if (other.end < end) : end=other.end
+            if (start < end) : return cperiod(start,end)
 
 def init_period(dates) :
     """
@@ -108,4 +107,4 @@ def init_period(dates) :
         if s > e :
             logging.error("climaf.classes : must have start before (or equals to) end ")
         else :
-            return cperiod(s,e,len(start))
+            return cperiod(s,e)

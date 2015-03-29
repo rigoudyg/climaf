@@ -174,8 +174,8 @@ class cdataset(cobject):
         
         """
         return(dataloc.selectLocalFiles(project=self.project, model=self.model, \
-                                   experiment=self.experiment, frequency=self.frequency,\
-                                        variable=self.variable, period=self.period, version=self.version))
+                 experiment=self.experiment, frequency=self.frequency,\
+                 variable=self.variable, period=self.period, version=self.version))
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
         in files (rather than being a derived, virtual variable)
@@ -187,11 +187,11 @@ class cdataset(cobject):
         return(False)
 
 class ctree(cobject):
-    def __init__(self, operator, script, *operands, **parameters ) :
+    def __init__(self, climaf_operator, script, *operands, **parameters ) :
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
-        self.operator=operator
+        self.operator=climaf_operator
         self.script=script
         self.operands=operands
         if "period" in parameters :

@@ -58,20 +58,20 @@ def cfile(object,deep=None) :
     """
     return climaf.driver.ceval(object,format='file',deep=deep)
 
-def cobj(*args,**kwargs) :
-    """ Provides the in-memory value of a CliMAF object. Launches computation if needed
-
+def cshow(obj) :
+    """ 
+    Provide the in-memory value of a CliMAF object. 
+    For a figure object, this will lead to display it
+    ( launch computation if needed. )
     """
-    #print "args=",args
-    #print "kwargs=",keyw
-    return climaf.driver.ceval(*args,format='MaskedArray',**kwargs)
+    return climaf.driver.ceval(obj,format='MaskedArray')
 
-def  cMA(object,deep=None) :
+def  cMA(obj,deep=None) :
     """
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.
 
     Args:
-      object (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
+      obj (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
       deep (logical, optional) : governs the use of cached values when computing the object
 
         - if missing, or None : use cache as much as possible
@@ -81,7 +81,7 @@ def  cMA(object,deep=None) :
     Returns: a Masked Array containing the object's value
 
     """
-    return climaf.driver.ceval(object,format='MaskedArray',deep=deep)
+    return climaf.driver.ceval(obj,format='MaskedArray',deep=deep)
 
 def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'

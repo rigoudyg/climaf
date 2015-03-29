@@ -21,7 +21,7 @@ Interpolate the object to the grid of another object, using CDO
 
 **Climaf call example** ::
  
-  >>> ds= ....some dataset, with whatever variable
+  >>> ds= .... #some dataset, with whatever variable
   >>> target_ds= ....some other dataset
   >>> remapcon2_ds=regrid(ds,target_ds) # Interpolation is 2nd order conservative
   >>> remapbil_ds=regridn(ds,target_ds, option="remapbil")  # Interpolation is bilinear
