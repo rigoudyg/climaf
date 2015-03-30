@@ -13,20 +13,26 @@ For each operator, the content of the doc file is also made available in the Pyt
 Documented operators as of today : 
 
  - basic functions:
+    - :doc:`scripts/llbox`
     - :doc:`scripts/regrid`
     - :doc:`scripts/regridn`
+    - :doc:`scripts/time_average`
+    - :doc:`scripts/space_average`
 
  - graphics
     - :doc:`scripts/plotmap`
     - :doc:`scripts/timeplot`
     - :doc:`scripts/ncview`
 
- - simple operations :
+ - swiss knife :
+    - :doc:`scripts/ccdo`
+
+ - example for two outputs :
     - :doc:`scripts/mean_and_std`
 
 Albeit this is not a proper practice, **some more operators may exist in your CliMAF release** which would not be documented here. Please see :ref:`how_to_list_operators` for such cases
 
-A sorted list of operators :
+A name-sorted list :
 
 .. toctree::
   :glob:

@@ -43,15 +43,15 @@ class dataloc():
 
         Example :
 
-        - Declaring that all IPSLCM-Z-HR data for project
-        PRE_CMIP6 are stored under a single root path and folllows
-        organization named CMIP6_DRS::
-        
-        >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
-
-        - and declaring an exception for one experiment (here, both location and organization are supposed to be different)
-
-        >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='model_output', url=['~/tmp/my_exp_data'])
+         - Declaring that all IPSLCM-Z-HR data for project
+         PRE_CMIP6 are stored under a single root path and folllows
+         organization named CMIP6_DRS::
+            
+            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
+            
+         - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
+            
+            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='model_output', url=['~/tmp/my_exp_data'])
 
         """
         self.project=project

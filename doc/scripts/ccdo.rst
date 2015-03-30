@@ -9,7 +9,9 @@ Apply CDO on a single dataset or object, with a CDO operator as argument
 
 **Input** : any object or dataset 
 
-**Mandatory argument**: ``operator`` : a CDO unary operator (as e.g. fldavg, timavg ...)
+**Mandatory argument**: 
+
+- ``operator`` : a CDO unary operator (as e.g. ``fldavg``, ``timavg`` ...)
 
 **Output** : the result of CDO operator
 
@@ -22,5 +24,5 @@ Apply CDO on a single dataset or object, with a CDO operator as argument
 
 **Implementation** : using script mcdo.sh, which can also select a variable, a time period, a latlon box ...; 
 
-** Note** : because the choice of operatr is left to the user, CliMAF assumes that the output has squeezed dimension(s) over time or space (and hence will not attempt to re-use this output for extracting a sub-period or sub-domain)
+**Note** : because the choice of operator is left to the user, CliMAF assumes that the output has squeezed dimension(s) over time or space (and hence will not attempt to re-use this output for extracting a sub-period or sub-domain)
 

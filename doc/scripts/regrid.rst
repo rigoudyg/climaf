@@ -19,14 +19,15 @@ Interpolate the object to the grid of another object, using CDO
 
 **Output** : the interpolated object
 
-**Climaf call example** ::
+**Climaf call example**::
  
-  >>> ds= .... #some dataset, with whatever variable
-  >>> target_ds= ....some other dataset
-  >>> remapcon2_ds=regrid(ds,target_ds) # Interpolation is 2nd order conservative
-  >>> remapbil_ds=regridn(ds,target_ds, option="remapbil")  # Interpolation is bilinear
+  >>> ds= .... # some dataset, with whatever variable
+  >>> grid_ds= ....# some other dataset, used here for its grid
+  >>> remapcon2_ds=regrid(ds,grid_ds) # Interpolation is 2nd order conservative
+  >>> remapbil_ds=regridn(ds,grid_ds, option="remapbil")  # Interpolation is bilinear
 
-**Side effects** : a temporary file is created in current directory (name : climaf_tmp_grid)
+**Side effects** : a temporary file is created in current directory,
+then erased (name : climaf_tmp_grid)
 
 **Implementation** : standard CDO calls (griddes and remapgrid)
 
