@@ -1,4 +1,4 @@
-Licence and acknowledgements
+License and acknowledgements
 ----------------------------
 
 The CliMAF software is an environment for Climate Model Assessment. It
