@@ -1,10 +1,10 @@
-from Scientific.IO.NetCDF import NetCDFFile as ncf
 
 def varOfFile(filename) :
     """ 
     returns the name of the unique non-dimension variable in
     NetCDF file FILENAME, or None if it is not unique
     """
+    from Scientific.IO.NetCDF import NetCDFFile as ncf
     varname=None
     fileobj=ncf(filename)
     #import NetCDF4
@@ -26,6 +26,7 @@ def fileHasVar(filename,varname):
     """ 
     returns True if FILENAME has variable VARNAME
     """
+    from Scientific.IO.NetCDF import NetCDFFile as ncf
     rep=False
     varname=None
     fileobj=ncf(filename)
