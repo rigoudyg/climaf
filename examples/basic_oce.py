@@ -65,5 +65,4 @@ cshow(ncview(space_average))
 
 # Regrid the 2D annual cycle to a latlon grid, using CDO grid names
 anncycle_4deg=regridn(anncycle, cdogrid="r90x45")
-anncycle_4deg=regridn(anncycle, "r90x45")
 cshow(ncview(anncycle_4deg))
