@@ -15,4 +15,4 @@ Contents
    API
    howto
    contributing
-
+   community

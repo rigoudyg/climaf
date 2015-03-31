@@ -10,7 +10,7 @@ Application Program Interface
 **Function names used as section titles are those defined by** ``climaf.api`` **and
 can be used 'as is' after executing**::
 
->>> from climaf.api import
+>>> from climaf.api import *
 
 For documented standard operators see  :ref:`standard_operators` ; for the other ones, see :ref:`how_to_list_operators`
 

@@ -46,9 +46,9 @@ def load_standard_operators():
             doSqueezeSpace=True)
     #
     # Declare plot scripts
-    cscript('ncview'    ,'ncview ${in} &' , format=None)
+    cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' , format=None)
     cscript('timeplot'  , scriptpath+'timeplot.sh ${in} ${out} ${var} ${title}',format="png")
-    cscript('plotmap'   , "(ncl "+ scriptpath +"plotmap.ncl infile=${in} "
+    cscript('plotmap'   , "(ncl -Q "+ scriptpath +"plotmap.ncl infile=${in} "
             "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
             "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units} ;"
             "convert ${out} -trim ${out})",format="png")

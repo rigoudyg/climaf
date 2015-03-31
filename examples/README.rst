@@ -50,5 +50,6 @@ Others can run only if they have access to some datasets on the local file syste
   - :download:`ocmip_ciclad.py <../examples/ocmip_ciclad.py>`: access data which are organized using the OCMIP5 conventions on Ciclad
   - :download:`obs4mips.py <../examples/obs4mips.py>`     : access OBS4MIPS data organized as at CNRM
   - :download:`obscami.py <../examples/obscami.py>`     : access observation data organized 'a la CAMI', here at CNRM
+  - :download:`basic_oce.py <../examples/basic_oce.py>`     : acces ocean data on ORCA grid in CMIP5_DRS data, and perfome some basic operations
 
 
