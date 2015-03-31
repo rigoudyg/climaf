@@ -439,8 +439,11 @@ def ceval_select(includer,included,userflags,format,deep) :
         incperiod=timePeriod(included)
         extract=capply('select',includer, period=incperiod)
         objfile=ceval(extract,format='file',deep=deep)
-        crs=includer.buildcrs(`incperiod`)
-        return(cache.rename(objfile,crs))
+	if objfile :
+            crs=includer.buildcrs(`incperiod`)
+            return(cache.rename(objfile,crs))
+        else :
+            logging.critical("driver.ceval_select : cannot evaluate "+`extract`)
     else :
         logging.error("driver.ceval_select : can yet process only files - TBD")
 
