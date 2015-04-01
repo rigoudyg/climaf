@@ -1,4 +1,4 @@
-; Basic map plot using NCL, for use in CliMAF. 
+ ; Basic map plot using NCL, for use in CliMAF. 
 ; Derived from CAMI's plot_map_atmo.ncl
 ;
 ; Should be declared to CliMAF as :
@@ -15,13 +15,16 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin 
-  print("plotting map "+plotname+" from :"+vmin+" to: "+vmax+" by: "+vdelta+" with cmap: "+cmap  )
+  if (.not. isvar("cmap")) then      
+      cmap="BlueDarkRed18"
+  end if
   if (.not. isvar("scale")) then      
       scale=1.0
   end if
   if (.not. isvar("offset")) then      
       offset=0.0
   end if
+  print("plotting map "+plotname+" from :"+vmin+" to: "+vmax+" by: "+vdelta+" with cmap: "+cmap  )
 
   type="png"
   LINEON=False
@@ -54,23 +57,52 @@ begin
   Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
   dime=dimsizes(fld)
   rank=dimsizes(dime)
+  if (rank.gt.3) then
+    print("This script is not tuned for high rank data ("+rank+")")
+    print(Var_DimNames)
+    status_exit(1)
+  end if
+  if ( rank .eq. 3) then
+    ; use first time-step only
+    fldtmp=fld(0,:,:)
+    delete(fld)
+    delete(Var_DimNames)
+    delete(dime)
+    fld=fldtmp
+    Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
+    dime=dimsizes(fld)
+    rank=dimsizes(dime)
+    end if
+
+  ; we now have a 1 or 2d field
   if (rank.gt.1) then
+    REDU=False 
+    CURVI=False
     latname = Var_DimNames(0)
     lonname = Var_DimNames(1)
-    REDU=False 
+    if (ismissing(str_index_of_substr(latname,"lat",-1))) then
+      CURVI=True
+      ; search for the variables providing lat and lon
+      latname="lat"
+      lonname="lon"
+      if isfilevar(ffile,"nav_lat") then
+        latname="nav_lat"
+        lonname="nav_lon"
+      end if
+    end if
     lat=ffile->$latname$
     lon=ffile->$lonname$
   else
-    print("This script is not yet tuned to reduced grid")
+
+    print("This script is not yet tuned to the reduced grid of "+infile)
     status_exit(1)
+
     nlat=1 
     nlon=dime(0)
     lonname = Var_DimNames(0)
     REDU=True 
     lat=ffile->$latname$(:)
     lon=ffile->$lonname$(:)  
-    print("plotmap.ncl not yet tuned to the kind of reduced grid data in "+infile)
-    status_exit (1)
   end if
 
   units=units
@@ -191,15 +223,15 @@ begin
   res@tiMainString       = title
   res@vpXF      = 0.1
   res@vpYF      = 0.96
-  if (REDU) then
+  if (CURVI) then
     res@trGridType          = "TriangularMesh"
-    res@sfXArray            = lon2
-    res@sfYArray            = lat2
-    res@gsnZonalMean = False
-    plot0=gsn_csm_contour_map_ce(wks,fld(0,:),res)
-  else
-    plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)  
+    res@sfXArray            = lon
+    res@sfYArray            = lat
+    ; Pour REDU ?:
+    ;res@gsnZonalMean = False
+    res@gsnAddCyclic        = False
   end if  
+  plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
   draw(plot0)
   
   frame(wks)

@@ -273,16 +273,21 @@ def selectCmip5DrsFiles(project, model, experiment, frequency, variable, period,
         patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/*/*/"+rip
         # Get version directories list
         ldirs=glob.glob(patternv)
+        #print "looking at "+patternv+ " gives:" +`ldirs`
         for repert in ldirs :
             lversions=os.listdir(repert)
             lversions.sort()
+            #print "lversions="+`lversions`+ "while version="+version
+            cversion=version
             if (version == "last") :
-                if (len(lversions)== 1) : version=lversions[0]
+                if (len(lversions)== 1) : cversion=lversions[0]
                 elif (len(lversions)> 1) :
                     if "last" in lversions : lversions=["last"]
                     else : version=lversions[-1] # Assume that order provided by sort() is OK
-            if version in lversions :
-                lfiles=glob.glob(repert+"/"+version+"/"+variable+"/*.nc")
+            #print "checkinv version "+`lversions`+" against"+cversion
+            if cversion in lversions :
+                lfiles=glob.glob(repert+"/"+cversion+"/"+variable+"/*.nc")
+                #print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
                 for f in lfiles :
                     logging.debug("dataloc.selectCmip5DrsFiles : checking period for "+ f)
                     regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'

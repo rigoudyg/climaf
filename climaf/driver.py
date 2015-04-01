@@ -53,8 +53,8 @@ def capply_script (script_name, *operands, **parameters):
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
         logging.error("driver.capply_script : operator %s is "
-	    "declared with %d input streams, while you provided %d"%(
-		script_name,script.inputs_number(),len(operands)))
+	    "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
+            script_name,script.inputs_number(),len(operands), script_name ))
         return None
     rep=classes.ctree(script_name, script, *operands, **parameters)
     if rep is not None :
@@ -439,8 +439,11 @@ def ceval_select(includer,included,userflags,format,deep) :
         incperiod=timePeriod(included)
         extract=capply('select',includer, period=incperiod)
         objfile=ceval(extract,format='file',deep=deep)
-        crs=includer.buildcrs(`incperiod`)
-        return(cache.rename(objfile,crs))
+	if objfile :
+            crs=includer.buildcrs(`incperiod`)
+            return(cache.rename(objfile,crs))
+        else :
+            logging.critical("driver.ceval_select : cannot evaluate "+`extract`)
     else :
         logging.error("driver.ceval_select : can yet process only files - TBD")
 

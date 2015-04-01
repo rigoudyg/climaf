@@ -1,4 +1,6 @@
-ccdo : invoke CDO with a unary operator
+.. |sk| image:: swiss_knife_50.png
+
+ccdo : |sk| invoke CDO with a unary operator
 ---------------------------------------------------------
 
 Apply CDO on a single dataset or object, with a CDO operator as argument 
