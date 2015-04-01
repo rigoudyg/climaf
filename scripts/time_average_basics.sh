@@ -8,7 +8,7 @@ set -ex
 out=$1
 files=$2
 
-tmp3=$(mktemp /tmp/tmp_file.XXXXXX) || exit 1 echo "execution du programme" >> $FILE_TMP 
+tmp3=$(mktemp /tmp/tmp_file.XXXXXX) 
 
 cdo timavg $files $out
 ncwa -O -a time $out $tmp3 && ncks -O -x -v time $tmp3 $out && rm $tmp3 
