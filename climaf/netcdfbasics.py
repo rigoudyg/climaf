@@ -28,7 +28,6 @@ def fileHasVar(filename,varname):
     """
     from Scientific.IO.NetCDF import NetCDFFile as ncf
     rep=False
-    varname=None
     fileobj=ncf(filename)
     for filevar in fileobj.variables :
         if filevar == varname :

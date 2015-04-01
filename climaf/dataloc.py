@@ -163,7 +163,7 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
         if (org == "EM") :
             rep.extend(selectEmFiles(experiment, frequency, variable, period))
         elif (org == "example") :
-            rep.extend(selectExampleFiles(experiment, frequency, period, urls))
+            rep.extend(selectExampleFiles(experiment, frequency, variable, period, urls))
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, period, rip, version, urls))
         elif (org == "OCMIP5_Ciclad") :
@@ -229,7 +229,8 @@ def periodOfEmFile(filename,realm,freq):
         if freq=='mon':
             year=re.sub(r'^.*([0-9]{4}).nc',r'\1',filename)
             if year.isdigit(): 
-                return init_period("%s-%s"%(year,year+1))
+                speriod="%s-%d"%(year,int(year)+1)
+                return init_period(speriod)
         else:
             logging.error("dataloc.periodOfEmFile : can yet handle only "
                           "monthly frequency for realms A and L - TBD")
@@ -239,7 +240,7 @@ def periodOfEmFile(filename,realm,freq):
 
 
                         
-def selectExampleFiles(experiment, frequency, period, urls) :
+def selectExampleFiles(experiment, frequency, variable, period, urls) :
     rep=[]
     if (frequency == "monthly") :
         for l in urls :
@@ -251,8 +252,12 @@ def selectExampleFiles(experiment, frequency, period, urls) :
                     lfiles= os.listdir(dir)
                     for f in lfiles :
                         logging.debug("dataloc.selectExampleFiles: Looking at file "+f)
-                        year=re.sub(r'^.*([0-9]{4}).nc',r'\1',f)
-                        if year.isdigit() and period.hasFullYear(year) : rep.append(dir+"/"+f)
+                        fileperiod=periodOfEmFile(f,realm,'mon')
+                        print 'ty=',type(period)
+                        if fileperiod and fileperiod.intersects(period) :
+                            if fileHasVar(dir+"/"+f,variable) :
+                                rep.append(dir+"/"+f)
+                            else: print "No var ",variable," in file", dir+"/"+f
     return rep
                         
 

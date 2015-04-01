@@ -44,7 +44,7 @@ class cperiod():
             return cperiod(self.start,included.start), 
         cperiod(included.end,self.end)
 
-    def intersect(self,other) :
+    def intersects(self,other) :
         """ 
         Returns the intersection of period self and period 'other' if any
         """
