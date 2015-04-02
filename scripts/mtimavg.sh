@@ -9,7 +9,7 @@ vfiles=""
 failure=1
 for file in $1 ; do
     tmp2=$tmp/$(basename $file)
-    cdo seldate,${period/-/,} -selname,$var $file $tmp2  &&  vfiles+=" "$tmp2
+    cdo seldate,$period -selname,$var $file $tmp2  &&  vfiles+=" "$tmp2
 done
 if [ "$vfiles" ] ; then 
     tmp3=$tmp/$(basename $0).nc

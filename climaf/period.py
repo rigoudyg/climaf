@@ -10,14 +10,20 @@ class cperiod():
     """
     A class for handling a pair of datetime objects defining a period.
 
-    Period is defined as \[ date1, date2 \[
+    Period is defined as [ date1, date2 ]. Resolution for date2 is 1 minute
+    Attribute 'pattern' usually provides a more condensed form
 
     """
-    def __init__(self,start,end) :
+    def __init__(self,start,end,pattern=None) :
         if not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
             logging.error("classes.cperiod : issue with start or end")
             return(None)
-        self.start=start ; self.end=end 
+        self.start=start ; self.end=end ;
+        #if pattern is None :
+        self.pattern=self.__repr__()
+        #else:
+        self.pattern=pattern
+        
     #
     def __repr__(self):
         return "%04d%02d%02d-%04d%02d%02d"%(
@@ -26,10 +32,10 @@ class cperiod():
     #
     def iso(self):
         """ Return isoformat(start)-isoformat(end), (with inclusive end, and 1 minute accuracy)
-        e.g. : 1980-01-01T00:00:00-1980-12-31T23:59:00
+        e.g. : 1980-01-01T00:00:00,1980-12-31T23:59:00
         """
         endproxy = self.end - datetime.timedelta(0,60)  # substract 1 minute
-        return "%s-%s"%(self.start.isoformat(),endproxy.isoformat())
+        return "%s,%s"%(self.start.isoformat(),endproxy.isoformat())
     #
     def pr(self) :
         return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
@@ -72,6 +78,19 @@ def init_period(dates) :
 
     Returns:
       the corresponding CliMAF 'period' object
+
+    Examples :
+    
+    -  a one-year long period : '1980', or '1980-1980'
+    -  a decade : '1980-1989'
+    -  one month : '198005'
+    -  two months : '198003-198004'
+    -  one day : '17890714'
+    -  the same single day, in a more complicated way : '17890714-17890714'
+
+    CliMAF internally handles date-time values with a 1 minute accurracy; it can provide date
+    information to external scripts in two forms; see keywords 'period' and 'period_iso' in
+    :py:func:`~climaf.operators.cscript`
       
     """
     
@@ -91,24 +110,54 @@ def init_period(dates) :
     end=re.sub(r'.*[-_]([0-9]{4,12})$',r'\1',dates)
     logging.debug("climaf.period.init_period : for dates=%s, start= %s, end=%s"%(dates,start,end))
     if (end==dates) :
-        # No string found for end of period 
-        print "lstart=",len(start)
-        eyear   = syear  if len(start) > 5  else  syear+1
-        emonth  = smonth if len(start) > 7  else  smonth+1
-        eday    = sday   if len(start) > 9  else  sday+1
-        ehour   = shour+1
+        # No string found for end of period
+        if (len(start)==4 ) : eyear=syear+1 ; emonth=1 ; eday=1 ; ehour=0 
+        elif (len(start)==6 ) :
+            eyear=syear ; emonth=smonth+1 ;
+            if (emonth > 12) :
+                emonth=1
+                eyear=eyear+1
+            eday=1 ; ehour=0 
+        elif (len(start)==8 ) :
+            eyear=syear ; emonth=smonth ; eday=sday+1 ; ehour=0 
+            if (sday > 27) :
+                logging.error("period.init_period: cannot yet compute next day near end of month (day=%d)"%sday)
+                return None
+        elif (len(start)==10 ) :
+            eyear=syear ; emonth=smonth ; eday=sday ; ehour=shour+1
+            if (ehour > 23) :
+                ehour=0
+                eday=eday+1
+            eday=1 ; ehour=0 
         eminute = 0
     else:
-        eyear  =int(end[0:4])
-        emonth =int(end[4:6])  if len(end) > 5  else 1
-        eday   =int(end[6:8])  if len(end) > 7  else 1
-        ehour  =int(end[8:10]) if len(end) > 9  else 0
-        eminute=int(end[10:12])if len(end) > 11 else 0
+        if len(start) != len(end) :
+            logging.error("period.init_period: Must have same numer of digits for start and end dates")
+            return None
+        if (len(end)==4 ) : eyear=int(end[0:4])+1 ; emonth=1 ; eday=1 ; ehour=0 
+        elif (len(end)==6 ) :
+            eyear=int(end[0:4]) ; emonth==int(end[4:6]) ; eday=1 ; ehour=0
+            if (emonth > 12) :
+                emonth=1
+                eyear=eyear+1
+        elif (len(end)==8 ) :
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])+1  ; ehour=0 
+            if (eday > 28) :
+                logging.error("period.init_period: cannot yet compute next day near end of month (day=%d)"%sday)
+                return None
+        elif (len(end)==10 ) :
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[10:12])+1 
+            if (ehour > 23) :
+                ehour=0
+                eday=eday+1
+        eminute = 0
     #
     try :
-        e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour)
+        #print "trying %d %d %d %d %d"%(eyear,emonth,eday,ehour,eminute)
+        e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
     except:
-        logging.debug("climaf.period.init_period : period end string %s is not a date"%end)
+        logging.error("climaf.period.init_period : period end string %s is not a date"%end)
+        return None
     # yearstart=False
     # if len(end) < 6 :
     #     eyear+=1
@@ -119,6 +168,7 @@ def init_period(dates) :
     #     eyear+=1
     #
     if s < e :
-        return cperiod(s,e)
+        return cperiod(s,e,None)
     else :
-        logging.error("climaf.classes : must have start before (or equals to) end ")
+        logging.error("climaf.classes : must have start before (or equals to) end "+`s`+`e`)
+

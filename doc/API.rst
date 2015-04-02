@@ -77,8 +77,8 @@ csave
 .. autofunction:: climaf.cache.csync
 
 
-init_period
----------------
+period.init_period
+----------------------
 
 .. autofunction:: climaf.period.init_period
 

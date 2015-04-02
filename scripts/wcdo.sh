@@ -28,7 +28,7 @@ for file in $files ; do
     tmp2=$tmp/$(basename $file)
     if [ "$period" ] ; then 
 	if [ "$var" ] ; then selvar="-selname,$var" ; fi
-	cdo seldate,${period/-/,} $selvar $file $tmp2  && vfiles+=" "$tmp2
+	cdo seldate,$period $selvar $file $tmp2  && vfiles+=" "$tmp2
     else
 	if [ "$var" ] ; then 
 	    cdo selname,$var $file $tmp2 && vfiles+=" "$tmp2

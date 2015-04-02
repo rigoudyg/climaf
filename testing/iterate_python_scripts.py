@@ -16,8 +16,8 @@ parser = argparse.ArgumentParser(description=description, formatter_class=RawTex
 #declaration des arguments
 parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
 parser.add_argument("-f", "--file", nargs='+', dest='infile',
-                    help="list of example filenames we want to test (by default, all examples"
-                    " of directory 'climaf/examples' are launched)")
+                    help="list of example filenames we want to test (by default, all python scripts"
+                    " of current directory are launched)")
 
 args = parser.parse_args()
 
@@ -31,10 +31,6 @@ else:
     vfiles = glob.glob('*.py')
     selfs=sys.argv[0]
     if selfs in vfiles : vfiles.remove(sys.argv[0])
-
-#tmp
-vfiles.remove('ocmip_ciclad.py')    
-#print vfiles, args.infile
 
 for file in vfiles:
 

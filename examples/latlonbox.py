@@ -11,6 +11,7 @@ dataloc(experiment="AMIPV6ALB2G", organization="example",url=[cpath+"/../example
 dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981", domain=[10,80,-50,40])
 cshow(ncview(dg))
 	
+# How to further extract from a dataset ( even if it is not a global one )
 de=llbox(dg, latmin=30, latmax=60, lonmin=-30, lonmax=30)
 cshow(ncview(de))
 

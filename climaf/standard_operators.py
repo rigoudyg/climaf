@@ -18,19 +18,19 @@ def load_standard_operators():
     # Compute scripts
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period} ${domain} ${ins}' ,
+            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} ${ins}' ,
             doSqueezeSpace=True,doSqueezeTime=True)
     #
     cscript('space_average',
-            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period} ${domain} ${ins}', 
+            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} ${ins}', 
             doSqueezeSpace=True)
     #
     cscript('time_average' ,
-            scriptpath+'mcdo.sh timavg  ${out} ${var} ${period} ${domain} ${ins}' ,
+            scriptpath+'mcdo.sh timavg  ${out} ${var} ${period_iso} ${domain} ${ins}' ,
             doSqueezeTime=True)
     #
     cscript('llbox' ,
-            scriptpath+'mcdo.sh ""  ${out} ${var} ${period} '
+            scriptpath+'mcdo.sh ""  ${out} ${var} ${period_iso} '
             '${latmin},${latmax},${lonmin},${lonmax} ${ins}')
     #
     cscript('regrid' ,

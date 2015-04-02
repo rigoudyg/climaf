@@ -76,16 +76,42 @@ class cdataset(cobject):
 
         All args (but period and version) defaults to the value set by :py:func:`~climaf.classes.cdefault`
 
+        For the time being, the attributes are based on CMIP5_DRS; this scheme should be relaxed sooner or
+        later. e.g., in a home-made 'project', the 'model' attribute could be superfluous 
+
         Args:
-          project (str, optional): project attribute
-          model (str, optional): model attribute
-          experiment (str, optional): experiment attribute
-          frequency (str, optional): frequency attribute
-          rip (str, optional): rip attribute
-          domain (str, optional): domain attribute
-          variable (str, optional): variable attribute
+          project (str, optional): project attribute; should match one of the data locations declared
+           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+
+          model (str, optional): model attribute; should match one of the data locations declared
+           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+
+          experiment (str, optional): experiment attribute ; should match one of the data locations declared
+           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+
+          frequency (str, optional): frequency attribute ; should match one of the data locations declared
+           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+
+          rip (str, optional): rip attribute; after CMIP5 syntax (e.g. : r1i1p1 )
+
+          domain (str, optional): domain attribute; allowed values are either 'global' or a list for latlon
+            corners ordered as in : [ latmin, latmax, lonmin, lonmax ]
+            
+          variable (str, optional): name of geophysical variable ; this should be :
+
+           - either a variable actually included in the datafiles, or
+           - a 'derived' variable (see  :py:func:`~climaf.operators.derive` ), or
+           - later on (to be developped), an aliased variable name
+
           period (str): a period, syntax as explained with :py:func:`climaf.period.init_period`
-          variable (str, optional): version of the data; default to 'last'
+
+          version (str, optional): version of the data; file access functions hanlde nicely values
+            'last' and '*'
+
+        Example, using no default value, and adressing some CMIP5 data ::
+
+          >>  dataloc(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
+              rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
         
         
         """

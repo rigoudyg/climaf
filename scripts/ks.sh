@@ -42,7 +42,7 @@ for out in $outs ; do
 	if [ "$period" ] ; then 
 	    [ "$var" ] && selvar="-selname,$var" 
 	    [ "$altvar" ] && selvar="-selname,$altvar" 
-	    cdo seldate,${period/-/,} $selvar $file $tmp2  && vfiles+=" "$tmp2
+	    cdo seldate,$period $selvar $file $tmp2  && vfiles+=" "$tmp2
 	else
 	    if [ "$var" ] ; then 
 		if [ "$altvar" ] ; then 

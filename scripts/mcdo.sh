@@ -23,7 +23,7 @@ mkdir -p $tmp
 # Prepare CDO operator strings
 
 [ "$var" ] && selvar="-selname,$var" 
-[ "$period" ] && seldate="seldate,${period/-/,}"
+[ "$period" ] && seldate="seldate,$period"
 if [ "$region" ] ; then 
     latmin=$(echo $region | cut -d "," -f 1)
     latmax=$(echo $region | cut -d "," -f 2)
@@ -43,15 +43,15 @@ for out in $outs ; do
 
     # Make all selections (time, space, variable) before applying the operator
     for file in $files ; do
-	tmp2=$tmp/$(basename $file)
+	tmp2=$tmp/$(basename $file) ; rm $tmp2
 	if [ "$period" ] ; then 
-	    cdo $seldate $selvar $selregion $file $tmp2  && vfiles+=" "$tmp2
+	    cdo $seldate $selvar $selregion $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
 	    if [ "$var" ] ; then 
-		cdo ${selvar#-} $selregion $file $tmp2 && vfiles+=" "$tmp2
+		cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
 	    else 
 		if [ "$region" ] ; then 
-		    cdo ${selregion#-} $file $tmp2 && vfiles+=" "$tmp2
+		    cdo ${selregion#-} $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
 		else
 		    vfiles+=" "$file ; 
 		fi
@@ -62,7 +62,7 @@ for out in $outs ; do
     # Then, assemble all datafiles in a single one before applying the operator 
     # (because it may be non-linear in time - e.g. eigenvectors )
     if [ "$vfiles" ] ; then 
-	tmp3=$tmp/$(basename $0).nc
+	tmp3=$tmp/$(basename $0).nc ; rm $tmp3
         # let us avoid single file copy followed by rm ...
 	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
 	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && rm $vfiles 
@@ -82,5 +82,6 @@ for out in $outs ; do
 		fi
 	    fi
 	else mv $tmp3 $out ; fi
+	#ls -al $out
     fi
 done

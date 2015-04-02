@@ -15,7 +15,7 @@ class dataloc():
     def __init__(self,project="*",model="*", experiment="*",
                  frequency="*", rip="*",organization=None, url=None):
         """
-        Create an entry in the data locations dictionnary for an ensemble of datsets.
+        Create an entry in the data locations dictionnary for an ensemble of datasets.
 
         Args:
           project (str,optional): project name
@@ -26,33 +26,45 @@ class dataloc():
            those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
-        Each entry provides :
+        Each entry in the dictionnary allows to store :
         
          - a list of path or URLS, which are root paths for
-           finding datafiles for datasets;
-         - the name for the corresponding data files organization
-         - the set of attributes defining the experiments which data are 
-           stored there and with that organization
+           finding some sets of datafiles which share a file organization scheme
+         - the name for the corresponding data files organization scheme. The current set of known
+           schemes is :
 
-        Datasets sets are there indexed by a combination of attributes
-        values (the arguments keywords);
+           - CMIP5_DRS : any datafile organized after the CMIP5 data reference syntax, such as on IPSL's Ciclad and CNRM's Lustre
+           - OCMIP5_Ciclad : OCMIP5 data on Ciclad
+           - OBS4MIPS_CNRM : Obs4MIPS data managed by VDR on CNRM's Lustre
+           - OBS_CAMI : Reference observation set managed by VDR and ASTER on CNRM's Lustre
+           - EM : (not yet working) CNRM-CM post-processed outputs as organized using EM
+           - example : the data included in CliMAF package
+
+           Please ask the CliMAF dev team for implementing further organizations. It is quite quick for data
+           which are on the filesystem. Organizations considered for future implementations are :
+
+           - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
+           - generic data organization described by the user using patterns
+           - ESGF
+           
+         - the set of attributes which define the experiments which data are 
+           stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
         wildcard value; when using the dictionnary, the most specific
-        entries will be used
+        entries will be used (whic means : the entry (or entries) with the lowest number of wildcards)
 
         Example :
 
-         - Declaring that all IPSLCM-Z-HR data for project
-         PRE_CMIP6 are stored under a single root path and folllows
-         organization named CMIP6_DRS::
+         - Declaring that all IPSLCM-Z-HR data for project PRE_CMIP6 are stored under a single root path and folllows organization named CMIP6_DRS::
             
             >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
             
          - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
             
-            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='model_output', url=['~/tmp/my_exp_data'])
+            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
+                
         """
         self.project=project
         self.model=model
@@ -253,11 +265,10 @@ def selectExampleFiles(experiment, frequency, variable, period, urls) :
                     for f in lfiles :
                         logging.debug("dataloc.selectExampleFiles: Looking at file "+f)
                         fileperiod=periodOfEmFile(f,realm,'mon')
-                        print 'ty=',type(period)
                         if fileperiod and fileperiod.intersects(period) :
                             if fileHasVar(dir+"/"+f,variable) :
                                 rep.append(dir+"/"+f)
-                            else: print "No var ",variable," in file", dir+"/"+f
+                            #else: print "No var ",variable," in file", dir+"/"+f
     return rep
                         
 

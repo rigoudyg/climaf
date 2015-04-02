@@ -21,7 +21,7 @@ from climaf.netcdfbasics import varOfFile
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
 #operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
-operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period} ${domain} ${ins} ' )
+operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period_iso} ${domain} ${ins} ' )
 
 def capply (climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script or function)
@@ -47,7 +47,7 @@ def capply_script (script_name, *operands, **parameters):
     """ Create object for application of a script to OPERANDS with keyword PARAMETERS."""
 
     if script_name not in operators.scripts :
-        logging.error("Operator %s is not know. Consider declaring it with function 'cscript'",
+        logging.error("Operator %s is not known. Consider declaring it with function 'cscript'",
                       script_name)
         return None
     script=operators.scripts[script_name]
@@ -91,7 +91,7 @@ def capply_operator (climaf_operator, *operands, **parameters):
 
 def ceval(cobject,
           userflags=operators.scriptFlags(),
-          format="MaskedArray",deep=None, derived_list=[]) :
+          format="MaskedArray",deep=None, derived_list=[], recurse_list=[]) :
     """ 
     Actually evaluates a CliMAF object, either as an in-memory data structure or
     as a string of filenames (which either represent a superset or exactly includes
@@ -108,6 +108,11 @@ def ceval(cobject,
         logging.error('Allowed formats yet are : "object", "file" and "png"')
         return None
     #
+    # Next check is too crude for dealing with use of operator 'select'
+    #if cobject.crs in recurse_list :
+    #    logging.critical("driver.ceval : INTERNAL ERROR : infinite loop on object: "+cobject.crs)
+    #    return None
+    recurse_list.append(cobject.crs)
     if isinstance(cobject,classes.cdataset):
         logging.debug("ceval : Evaluating dataset " + cobject.crs)
         ds=cobject
@@ -128,13 +133,14 @@ def ceval(cobject,
                                   (ds.variable,`derived`))
                 derived_value=ceval(derived, format=format, deep=deep, 
                                     userflags=userflags,
-                                    derived_list=derived_list.append(ds.variable))
+                                    derived_list=derived_list.append(ds.variable),
+                                    recurse_list=recurse_list)
                 if derived_value : 
                     logging.debug("ceval : succeeded in evaluating derived variable %s as %s"%\
                                       (ds.variable,`derived`))
                     set_variable(derived_value, ds.variable, format=format)
                 return(derived_value)
-            if ((userflags.canSelectVar or ds.oneVarPerFile()) and \
+            elif ((userflags.canSelectVar or ds.oneVarPerFile()) and \
                 (userflags.canSelectTime or ds.periodIsFine()) and \
                 (userflags.canSelectDomain or ds.domainIsFine()) and \
                 (userflags.canAggregateTime or ds.periodHasOneFile()) and 
@@ -144,20 +150,21 @@ def ceval(cobject,
                 logging.debug("ceval : Delivering file set or sets is OK for the target use")
                 return(ds.selectFiles()) # a single string with all filenames,
                                #or a list of such strings in case of ensembles
-            logging.debug("ceval : Must subset and/or aggregate and/or select "+
-                          "var from data files and/or get data, or provide object result")
-            ## extract=cread(ds)
-            ## logging.debug("ceval : Done with subsetting and caching data files")
-            ## cstore(extract) # extract should include the dataset def
-            ## return ceval(extract,userflags,format)
-            logging.debug("Fetching/selection/aggregation is done using an "+
+            else:
+                logging.debug("ceval : Must subset and/or aggregate and/or select "+
+                              "var from data files and/or get data, or provide object result")
+                ## extract=cread(ds)
+                ## logging.debug("ceval : Done with subsetting and caching data files")
+                ## cstore(extract) # extract should include the dataset def
+                ## return ceval(extract,userflags,format)
+                logging.debug("Fetching/selection/aggregation is done using an "+
                           "external script for now - TBD")
-            #ds.setOffsetScale()
-            extract=capply('select',ds)
-            if extract is None :
-                logging.error("ceval : cannot access dataset" + `ds`)
-                return None
-            return ceval(extract,userflags=userflags,format=format,deep=deep)
+                #ds.setOffsetScale()
+                extract=capply('select',ds)
+                if extract is None :
+                    logging.error("ceval : cannot access dataset" + `ds`)
+                    return None
+                return ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
         else :
             # else (non-local and non-cached dataset)
             #   if the user can access the dataset by one of the dataset-specific protocols
@@ -213,7 +220,7 @@ def ceval(cobject,
             # the cache doesn't have a similar tree, let us recursively eval subtrees
             # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
             if cobject.operator in operators.scripts :
-                file=ceval_script(cobject,deep) # Does return a filename, or list of filenames
+                file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
                 if ( format == 'file' ) : return (file)
                 else : return cread(file)
             elif cobject.operator in operators.operators :
@@ -226,9 +233,9 @@ def ceval(cobject,
         else :
             # isinstance(cobject,classes.scriptChild) should be True
             # Force evaluation of 'father' script
-            if ceval_script(cobject.father,deep)  is not None :
+            if ceval_script(cobject.father,deep,recurse_list=recurse_list)  is not None :
                 # Re-evaluate, which should succeed using cache
-                return ceval(cobject,userflags,format,deep)
+                return ceval(cobject,userflags,format,deep,recurse_list=recurse_list)
             else :
                 logging.error("driver.ceval : generating script aborted for "+cobject.father.crs)
                 return None
@@ -248,7 +255,7 @@ def ceval(cobject,
 
 
 
-def ceval_script (scriptCall,deep):
+def ceval_script (scriptCall,deep,recurse_list=[]):
     """ Actually applies a CliMAF-declared script on a script_call object 
     
     Prepare operands as fiels and build command from operands and parameters list
@@ -259,12 +266,12 @@ def ceval_script (scriptCall,deep):
     """
     script=operators.scripts[scriptCall.operator]
     template=Template(script.command)
-    
+
     # Evaluate input data 
     dict_invalues=dict()
     sizes=[]
     for op in scriptCall.operands :
-        inValue=ceval(op,userflags=script.flags,format='file',deep=deep)
+        inValue=ceval(op,userflags=script.flags,format='file',deep=deep,recurse_list=recurse_list)
         if inValue is None or inValue is "" : return None
         if isinstance(inValue,list) : size=len(inValue)
         else : size=1
@@ -305,6 +312,7 @@ def ceval_script (scriptCall,deep):
         subdict[ label ]='"'+infile+'"'
         subdict["var"]='"'+op.variable+'"'
         subdict["period"]='"'+str(timePeriod(op))+'"'
+        subdict["period_iso"]='"'+timePeriod(op).iso()+'"'
         subdict["domain"]='"'+domainOf(op)+'"'
     i=0
     for op in scriptCall.operands :
@@ -318,6 +326,7 @@ def ceval_script (scriptCall,deep):
             subdict["var_%d"%i]='"'+op.variable+'"'
             # Provide period selection if script allows for
             subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
+            subdict["period_iso_%d"%i]='"'+timePeriod(op).iso()+'"'
             subdict["domain_%d"%i]='"'+domainOf(op)+'"'
     logging.debug("driver.ceval_script - subdict for operands is "+`subdict`)
     # substituion is deffered after scriptcall parameters evaluation, which may
@@ -338,6 +347,7 @@ def ceval_script (scriptCall,deep):
     # Account for script call parameters
     for p in scriptCall.parameters : subdict[p]=scriptCall.parameters[p]
     if 'crs' not in scriptCall.parameters : subdict["crs"]=opscrs
+
     # Substitute all args, with special case of NCL convention for passing args
     if (script.command.split(' ')[0][-3:]=="ncl") :
         for o in subdict :

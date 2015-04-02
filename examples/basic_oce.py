@@ -49,7 +49,7 @@ cshow(ncview(tos_box))
 
 
 # Compute a time average on 50 years - this takes  ~10s on my PC
-tos=ds( experiment="historical", variable="tos", period="1860-1910")
+tos=ds( experiment="historical", variable="tos", period="1860-1909")
 tosavg=time_average(tos)
 cshow(ncview(tosavg))
 
