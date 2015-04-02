@@ -45,24 +45,24 @@ cshow(fig)
 
 # Select a latlon box and plot it
 tos_box=llbox(tos,latmin=40, lonmin=-30, lonmax=5, latmax=66)
-cshow(ncview(tos_box))
+ncview(tos_box)
 
 
 # Compute a time average on 50 years - this takes  ~10s on my PC
 tos=ds( experiment="historical", variable="tos", period="1860-1909")
 tosavg=time_average(tos)
-cshow(ncview(tosavg))
+ncview(tosavg)
 
 # Compute annual cycle over 50 years, using swiss knife operator 'ccdo', and look at it
 anncycle=ccdo(tos,operator='ymonavg')
-cshow(ncview(anncycle))
+ncview(anncycle)
 
 # Define the average annual cycle over the NINO34 box
 nino34=dict(lonmin=-170, lonmax=-120, latmin=-5, latmax=5)
 extract=llbox(anncycle,**nino34)
 space_average=ccdo(extract,operator='fldavg')
-cshow(ncview(space_average))
+ncview(space_average)
 
 # Regrid the 2D annual cycle to a latlon grid, using CDO grid names
 anncycle_4deg=regridn(anncycle, cdogrid="r90x45")
-cshow(ncview(anncycle_4deg))
+ncview(anncycle_4deg)

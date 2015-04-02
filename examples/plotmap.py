@@ -19,7 +19,7 @@ ta=time_average(dg)
 # For reference, here is the declaration of oeprator 'ncview' :
 # cscript('ncview' ,'ncview ${in}' , format=None)
 
-cshow(ncview(ta))
+ncview(ta)
 
 # A more sophisticated plot, using standard operator plotmap
 ############################################################

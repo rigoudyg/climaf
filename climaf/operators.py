@@ -48,11 +48,13 @@ class cscript():
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc' or 'png'; defaults to 'nc'
+          format (str): script outputs format -- either 'nc','png' or 'None'; defaults to 'nc'
+            format should be None whene there is no saved output but only a side effect (such
+            as displaying a datset or result with ncview) with low compute cost
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
-          doSqueezeTime (bool, optional): does the script lead degenerate/aggregate the time 
+          doSqueezeTime (bool, optional): does the script degenerate/aggregate the time 
             dimension ? defaults to False
-          doSqueezeSpace (bool, optional): does the script lead degenerate/aggregate the space
+          doSqueezeSpace (bool, optional): does the script degenerate/aggregate the space
             dimension ? defaults to False
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).

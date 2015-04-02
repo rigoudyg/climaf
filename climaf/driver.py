@@ -36,6 +36,8 @@ def capply (climaf_operator, *operands, **parameters):
     if climaf_operator in operators.scripts :
         logging.debug("driver.capply : applying script %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_script(climaf_operator, *operands, **parameters)
+        op=operators.scripts[climaf_operator]
+        if op.outputFormat is None : ceval(res,userflags=op.flags)
     elif climaf_operator in operators.operators :
         logging.debug("driver.capply : applying operator %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_operator(climaf_operator,*operands, **parameters)
