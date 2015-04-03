@@ -11,7 +11,7 @@ set -ex
 fieldin=$1
 fieldgrid=$2
 fieldout=$3
-option=${4:-remapcon2}
+option=${4:-remapbil}
 if [ -f $fieldgrid ] ; then 
     cdo griddes $fieldgrid > climaf_tmp_grid
     cdo $option,climaf_tmp_grid $fieldin $fieldout 

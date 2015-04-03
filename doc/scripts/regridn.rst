@@ -16,15 +16,15 @@ Interpolate the object to another grid, using CDO
 
 **Optional arguments**:
   - ``option`` : interpolation option (cf. CDO doc); default : 
-    'remapcon2' for 2nd order conservative
+    'remapbil' for bilinear interpolation
 
 **Output** : the interpolated object
 
 **Climaf call example** ::
  
   >>> ds= .... #some dataset, with whatever variable
-  >>> remapcon2_ds=regridn(ds,cdogrid="r180x90")  # Target Grid is 2°x2° - interpolation is 2nd order conservative
-  >>> remapbil_ds=regridn(ds,cdogrid="n127", option="remapbil") # Target Grid is Gaussian - interpolation is bilinear
+  >>> remapbil_ds=regridn(ds,cdogrid="r180x90")  # Target Grid is 2°x2° - interpolation is bilinear
+  >>> remapcon2_ds=regridn(ds,cdogrid="n127", option="remapcon2") # Target Grid is Gaussian - interpolation is 2nd order conservative
 
 **Side effects** : None
 
