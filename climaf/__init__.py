@@ -26,5 +26,5 @@ know more about the other modules, but ``driver``, which is rather for CliMAF wi
 # GPL (see http://www.gnu.org/licenses/license-list.en.html#CeCILL)
 
 
-__all__=[ "api", "classes", "operators", "cache" , "driver" , "dataloc" , "site_settings" , "netcdfbasics" ]
+__all__=[ "api", "classes", "operators", "cache" , "driver" , "dataloc" , "site_settings" , "netcdfbasics" , "clogger" ]
 import posixpath

@@ -6,9 +6,10 @@
  """
 # Created : S.Senesi - 2014
 
-import re, logging
+import re
 import dataloc
 from period import init_period,cperiod
+from clogging import clogger
 
 #: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
 cdefaults=dict()
@@ -60,10 +61,10 @@ class cobject():
         return self.crs
     def register(self):
         cobjects[self.crs]=self
-        logging.debug("Object Created ; crs = %s"%(self.crs))
+        clogger.debug("Object Created ; crs = %s"%(self.crs))
     def erase(self):
         del(cobjects[self.crs])
-        logging.debug("Object deleted ; crs = %s"%(self.crs))
+        clogger.debug("Object deleted ; crs = %s"%(self.crs))
 
 class cdataset(cobject):
     def __init__(self,project=None,model=None,experiment=None,period=None,
@@ -103,7 +104,7 @@ class cdataset(cobject):
            - a 'derived' variable (see  :py:func:`~climaf.operators.derive` ), or
            - later on (to be developped), an aliased variable name
 
-          period (str): a period, syntax as explained with :py:func:`climaf.period.init_period`
+          period (str): a period, syntax as explained with :py:func:`~climaf.period.init_period`
 
           version (str, optional): version of the data; file access functions hanlde nicely values
             'last' and '*'
@@ -154,7 +155,7 @@ class cdataset(cobject):
         """ TBD : analyze if a remote dataset is locally cached
         
         """
-        logging.error("classes.cdataset.isCached : TBD - remote datasets are not yet cached")
+        clogger.error("TBD - remote datasets are not yet cached")
         rep=False
         return rep
 
@@ -164,22 +165,22 @@ class cdataset(cobject):
         return(all([org for org,freq,url in locs]))
     
     def periodIsFine(self):
-        logging.debug("classes.cdataset.periodIsFine : always returns False, yet - TBD")
+        clogger.debug("always returns False, yet - TBD")
         return(False) 
         
     def domainIsFine(self):
-        logging.debug("classes.cdataset.domainIsFine : a bit too simple yet (domain=='global')- TBD")
+        clogger.debug("a bit too simple yet (domain=='global')- TBD")
         return(self.domain == 'global') 
         
     def periodHasOneFile(self) :
-        logging.debug("classes.cdataset.periodHasOneFIle : always returns False, yet - TBD")
+        clogger.debug("always returns False, yet - TBD")
         return(False) 
 
     def hasOneMember(self) :
-        logging.debug("classes.cdataset.hasOneMember : always returns True, yet - TBD")
+        clogger.debug("always returns True, yet - TBD")
         return(True) 
 
-    def selectFiles(self):
+    def baseFiles(self):
         """ Returns the list of (local) files which include the data for the dataset
         
         Method : depending on the data organization, select the relevant files for the
@@ -196,7 +197,7 @@ class cdataset(cobject):
 
         For the time being, returns False, which leads to always consider that variables
         declared as 'derived' actually are derived """
-        logging.debug("dataset.hasRawVariable : TBD: actually test variables in files, rather than assuming that variable %s is virtual for dataset %s"\
+        clogger.debug("TBD: actually test variables in files, rather than assuming that variable %s is virtual for dataset %s"\
                         %(self.variable,self.crs))
         return(False)
 
@@ -214,7 +215,7 @@ class ctree(cobject):
         self.parameters=parameters
         for o in operands :
             if not isinstance(o,cobject) :
-                logging.error("ctree : __init__ : operand "+`o`+" is not a CliMAF object")
+                clogger.error(" __init__ : operand "+`o`+" is not a CliMAF object")
                 return None
         self.crs=self.buildcrs()
         self.outputs=dict()
@@ -311,7 +312,7 @@ def ds(*args,**kwargs) :
     # Note : muts be kept phased with self.crs defined in cdataset.init(), both for
     # function name and CRS syntax
     if len(args) > 1 :
-        logging.error("climaf.classes.ds : must provide 0 or 1 positional arguments, not "+len(args))
+        clogger.error("must provide 0 or 1 positional arguments, not "+len(args))
         return None
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
@@ -335,7 +336,8 @@ def ds(*args,**kwargs) :
              frequency=frequency,domain=domain,variable=variable)
 
 def test():
-    logging.basicConfig(level=logging.DEBUG)
+#    clogger.basicConfig(level=clogger.DEBUG) #LV
+#    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
     cdefault("project","CMIP5")
     #cdefault("project","PR6")
     cdefault("model","CNRM-CM5")

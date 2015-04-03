@@ -5,9 +5,10 @@ Handles a database of attributes for describing organization and location of dat
 
 # Created : S.Senesi - 2014
 
-import os, re,logging, string, glob
+import os, os.path, re, string, glob, subprocess
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
+from clogging import clogger
 
 locs=[]
 
@@ -37,14 +38,15 @@ class dataloc():
            - OCMIP5_Ciclad : OCMIP5 data on Ciclad
            - OBS4MIPS_CNRM : Obs4MIPS data managed by VDR on CNRM's Lustre
            - OBS_CAMI : Reference observation set managed by VDR and ASTER on CNRM's Lustre
-           - EM : (not yet working) CNRM-CM post-processed outputs as organized using EM
+           - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
            - example : the data included in CliMAF package
 
            Please ask the CliMAF dev team for implementing further organizations. It is quite quick for data
            which are on the filesystem. Organizations considered for future implementations are :
 
+           - generic data organization described by the user using patterns such as described for 
+             :py:func:`~climaf.dataloc.selectGenericFiles`
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
-           - generic data organization described by the user using patterns
            - ESGF
            
          - the set of attributes which define the experiments which data are 
@@ -63,6 +65,8 @@ class dataloc():
          - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
             
             >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+
+         Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
                 
         """
@@ -127,7 +131,7 @@ def getlocs(project="*",model="*",experiment="*",frequency="*"):
 def oneVarPerFile(project="*",model="*",experiment="*",frequency="*"):
     org,freq,llocs=getlocs(project,model,experiment,frequency)
     if len(llocs) > 1 :
-        logging.warning("dataloc.oneVarPerFile : cannot yet handle case of multiple locs "+\
+        clogger.warning("cannot yet handle case of multiple locs "+\
                          " for experiment "+experiment+", model "+model+" , and project "+project)
         return(False)
     else :
@@ -139,7 +143,8 @@ def oneVarPerFile(project="*",model="*",experiment="*",frequency="*"):
         if (org == "OCMIP5_Ciclad") : return True
         if (org == "OBS4MIPS_CNRM") : return True
         if (org == "OBS_CAMI")      : return True
-        logging.warning("dataloc.oneVarPerFile : cannot yet handle organization "+
+        if (org == "generic")       : return False
+        clogger.warning("cannot yet handle organization "+
                         m.organization+ " for experiment "+experiment+
                         ", model "+model+" , and project "+project)
         return False
@@ -161,16 +166,16 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
     Method : depending on the data organization, select the relevant files for the
     requested period and variable, using datalocations indexed by :py:func:`dataloc`, and based
     on the datafiles organization for the corresponding datasets; each organization has a
-    corresponding filename search function sur as :py:func:selectCmip5DrsFiles
+    corresponding filename search function sur as :py:func:`selectCmip5DrsFiles`
 
-    Known organizations as of today: EM, CMIP5_DRS, OCMIP5_Ciclad, OBS4MIPS_CNRM, OBS_CAMI
+    Known organizations are documented with :py:class:`~dataloc`
     
     """
     rep=[]
     ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency)
-    logging.debug("dataloc.selectLocalFiles : locs="+ `ofu`)
+    clogger.debug("locs="+ `ofu`)
     if ( len(ofu) == 0 ) :
-        logging.warning("dataloc.selectLocalFiles : no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
+        clogger.warning("no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
     for org,freq,urls in ofu :
         if (org == "EM") :
             rep.extend(selectEmFiles(experiment, frequency, variable, period))
@@ -184,15 +189,17 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
             rep.extend(selectObs4mipsCnrmFiles(model, frequency, variable, period, urls))
         elif (org == "OBS_CAMI") :
             rep.extend(selectCamiObsFiles(model, frequency, variable, period, urls))
+        elif (org == "generic") :
+            rep.extend(selectGenericFiles(project,model, experiment, frequency, variable, period, rip, version, urls))
         else :
-            logging.error("dataloc.selectLocalFiles : cannot process organization "+org+ \
+            clogger.error("cannot process organization "+org+ \
                              " for experiment "+experiment+" and model "+model+\
                              " of project "+project)
     if (not ofu) :
         return None
     else :
         if (len(rep) == 0 ) :
-            logging.warning("dataloc.selectLocalFiles : no file found for variable : %s, period : %s, and rip : %s , at these data locations %s , for model : %s, experiment : %s frequency : %s "%(variable, `period`, rip,  `urls`,model,experiment,frequency))
+            clogger.warning("no file found for variable : %s, period : %s, and rip : %s , at these data locations %s , for model : %s, experiment : %s frequency : %s "%(variable, `period`, rip,  `urls`,model,experiment,frequency))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep.sort()
@@ -203,34 +210,67 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
     # Assemble filenames in one single string
     return(string.join(rep))
 
+def selectGenericFiles(project,model, experiment, frequency, variable, period, rip, version, urls):
+    """
+    **Warning : this function is not yet implemented**
+
+    Allow to describe a ``generic`` file organization : the list of files returned by this function
+    is thos of files which contain the variable and which match the period among
+    those files which name match one of the patterns computed by instantiating strings
+    in list urls by the other argument values
+
+    Example :
+
+    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', \
+    variable='tas', period='1980', urls=['~/DATA/${project}/${model}/.*${var}.*.nc)']
+
+    In the pattern strings, the keywords that can be used in addition to the argument
+    names (e.g. ${model}) are:
+    - var : use it if the filenames do include the variable name, if the fiels are split by variable,
+    as this speed up the search
+    - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of the period covered by
+    each file, if this is applicable; use a second time for end date, if applicable (otherwise
+    the assumption is that the whole year -resp. month or day- is included in the file
+
+    """
+    clogger.error("Not yet implemented")
+    return None
+    
+
 def selectEmFiles(experiment, frequency, variable, period) :
     #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
-    freqs={ "monthly" : "mon" }
+    freqs={ "monthly" : "" , "3h" : "_3h"}
     f=frequency
     if f in freqs : f=freqs[f]
     rep=[]
     # Must look for all realms, here identified by a single letter
     for realm in ["A", "L", "O", "I" ] :
-        # Use external function em_get_archive_location for finding data dir
+        # Use EM data for finding data dir
+        command=["grep", "^export EM_DIRECTORY_"+realm+f+"=", os.path.expanduser("~/.em/expe_")+experiment ]
         try :
-            ex = subprocess.Popen(["em_get_archive_location", experiment, realm, f], 
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ex = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except :
-            logging.debug("dataloc.selectEmFiles: Issue with "
-                          "em_get_archive_location on "+experiment+" for realm "+realm)
+            clogger.error("Issue getting archive_location for "+
+                          experiment+" for realm "+realm+" with: "+`command`)
             break
         if ex.wait()==0 :
-            dir=ex.stdout.read().split(" ")[0]
+            dir=ex.stdout.read().split("=")[1].replace('"',"").replace("\n","")
+            clogger.debug("Looking at dir "+dir)
             if os.path.exists(dir) :
-                logging.debug("dataloc.selectEmFiles : Looking at dir "+dir)
                 lfiles= os.listdir(dir)
                 for fil in lfiles :
-                    logging.debug("dataloc.selectEmFiles: Looking at file "+fil)
+                    clogger.debug("Looking at file "+fil)
                     fileperiod=periodOfEmFile(fil,realm,f)
                     if fileperiod and period.intersects(fileperiod) :
-                        if fileHasVar(fil,variable) :
+                        if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
+            else : clogger.error("Directory %s does not exist for EM experiment %s, realm %s "
+                                 "and frequency %s"%(dir,experiment,realm,f))
+        else :
+            clogger.info("No archive location found for "+
+                          experiment+" for realm "+realm+" with: "+`command`)
     return rep
+
 
 def periodOfEmFile(filename,realm,freq):
     """
@@ -238,17 +278,23 @@ def periodOfEmFile(filename,realm,freq):
     rules for EM
     """
     if (realm == 'A' or realm == 'L' ) :
-        if freq=='mon':
+        if freq=='mon' or freq=='' :
             year=re.sub(r'^.*([0-9]{4}).nc',r'\1',filename)
             if year.isdigit(): 
                 speriod="%s-%d"%(year,int(year)+1)
                 return init_period(speriod)
         else:
-            logging.error("dataloc.periodOfEmFile : can yet handle only "
+            clogger.error("can yet handle only "
                           "monthly frequency for realms A and L - TBD")
     elif (realm == 'O' or realm == 'I' ) :
-        logging.error("dataloc.periodOfEmFile : cannot yet handle realms O and I - TBD - please complain !")
-    else: logging.error("dataloc.periodOfEmFile : unexpected realm "+realm)
+        if freq=='mon' or freq=='' :
+            patt=r'^.*_([0-9]{8})_*([0-9]{8})_.*nc'
+            beg=re.sub(patt,r'\1',filename)
+            end=re.sub(patt,r'\2',filename)
+            return init_period("%s-%s"%(beg,end))
+        else:
+            clogger.error("Can yet handle only monthly frequency for realms O and I - TBD")
+    else: clogger.error("unexpected realm "+realm)
 
 
                         
@@ -259,11 +305,11 @@ def selectExampleFiles(experiment, frequency, variable, period, urls) :
             for realm in ["A","L"] :
                 #dir=l+"/"+realm+"/Origin/Monthly/"+experiment
                 dir=l+"/"+realm
-                logging.debug("dataloc.selectExampleFiles : Looking at dir "+dir)
+                clogger.debug("Looking at dir "+dir)
                 if os.path.exists(dir) :
                     lfiles= os.listdir(dir)
                     for f in lfiles :
-                        logging.debug("dataloc.selectExampleFiles: Looking at file "+f)
+                        clogger.debug("Looking at file "+f)
                         fileperiod=periodOfEmFile(f,realm,'mon')
                         if fileperiod and fileperiod.intersects(period) :
                             if fileHasVar(dir+"/"+f,variable) :
@@ -305,7 +351,7 @@ def selectCmip5DrsFiles(project, model, experiment, frequency, variable, period,
                 lfiles=glob.glob(repert+"/"+cversion+"/"+variable+"/*.nc")
                 #print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
                 for f in lfiles :
-                    logging.debug("dataloc.selectCmip5DrsFiles : checking period for "+ f)
+                    clogger.debug("checking period for "+ f)
                     regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
                     fileperiod=init_period(re.sub(regex,r'\1',f))
                     if fileperiod is not None : 
@@ -325,7 +371,7 @@ def selectOcmip5CicladFiles(project, model, experiment, frequency, variable, per
         for repert in ldirs :
             lfiles=glob.glob(repert+"/"+variable+"/"+variable+"*.nc")
             for f in lfiles :
-                logging.debug("dataloc.selectOcmip5CicladFiles : checking period for "+ f)
+                clogger.debug("checking period for "+ f)
                 regex=r'^.*_([0-9]*-[0-9]*).nc$'
                 fileperiod=init_period(re.sub(regex,r'\1',f))
                 if fileperiod is not None : 
@@ -342,10 +388,10 @@ def selectObs4mipsCnrmFiles(instrument, frequency, variable, period, urls):
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     for l in urls :
         pattern=l+"/"+freqd+"/"+variable+"_"+instrument+"*nc"
-        logging.debug("dataloc.selectObs4mipsCnrmFiles : looking at loc "+ l+" for "+pattern)
+        clogger.debug("looking at loc "+ l+" for "+pattern)
         lfiles=glob.glob(pattern)
         for f in lfiles :
-            logging.debug("dataloc.selectObs4mipsCnrmFiles : checking period for "+ f)
+            clogger.debug("checking period for "+ f)
             regex=r'^.*_([0-9]*-[0-9]*).nc$'
             fileperiod=init_period(re.sub(regex,r'\1',f))
             if fileperiod is not None : 
@@ -361,10 +407,10 @@ def selectCamiObsFiles(instrument, frequency, variable, period, urls):
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     for l in urls :
         pattern=l+"/"+instrument+"/"+variable+"_"+freqd+"_"+"*.nc"
-        logging.debug("dataloc.selectCamiObsFiles : looking at loc "+ l+" for "+pattern)
+        clogger.debug("looking at loc "+ l+" for "+pattern)
         lfiles=glob.glob(pattern)
         for f in lfiles :
-            logging.debug("dataloc.selectCamiObsFiles : checking period for "+ f)
+            clogger.debug("checking period for "+ f)
             regex=r'^.*_([0-9]*_[0-9]*)_'+instrument+'.nc$'
             fileperiod=init_period(re.sub(regex,r'\1',f))
             if fileperiod is not None : 
@@ -385,7 +431,7 @@ def cliproc_listfiles(loc,variable,period):
                         year=re.sub(r'^.*([0-9]{4}).nc',r'\1',f)
                         if year.isdigit() and period.hasFullYear(year) : rep.append(dir+"/"+f)
     else :
-        logging.error("dataloc.cliproc_listFiles : cannot yet process frequency "+loc.frequency+ \
+        clogger.error("cannot yet process frequency "+loc.frequency+ \
                          " ( for experiment "+experiment+", model "+model+" , and project "+project+")")
     return(rep)
 

@@ -22,9 +22,7 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 # Created : S.Senesi - 2014
 
 
-import os
-#Void if logging level already set by the user :
-import logging ; logging.basicConfig(level=logging.ERROR)
+import os, os.path, logging
 
 import climaf, climaf.cache
 from climaf.classes   import cdefault as cdef,cdataset,ds #,cperiod
@@ -32,8 +30,11 @@ from climaf.driver    import ceval,varOf #,cfile,cobj
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
 from climaf.cache     import creset as craz, csync as csave , cdump
+from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
 
+clog(logging.ERROR)
+clog_file(logging.ERROR)
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``
 cpath=os.path.abspath(climaf.__path__[0]) 
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
@@ -56,6 +57,7 @@ def cfile(object,deep=None) :
 
 
     """
+    clogger.debug("cfile called on"+str(object))  #LV
     return climaf.driver.ceval(object,format='file',deep=deep)
 
 def cshow(obj) :
@@ -64,6 +66,7 @@ def cshow(obj) :
     For a figure object, this will lead to display it
     ( launch computation if needed. )
     """
+    clogger.debug("cshow called on"+str(obj)) #LV
     return climaf.driver.ceval(obj,format='MaskedArray')
 
 def  cMA(obj,deep=None) :
@@ -81,12 +84,14 @@ def  cMA(obj,deep=None) :
     Returns: a Masked Array containing the object's value
 
     """
+    clogger.debug("cMA called with arguments"+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray',deep=deep)
 
 def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
 
     """
+    clogger.debug("cexport called with arguments"+str(args))  #LV
     if "format" in kwargs :
         if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc") :
             kwargs['format']="file" 
@@ -95,25 +100,17 @@ def cexport(*args,**kwargs) :
     return climaf.driver.ceval(*args,**kwargs)
 
 def cimport(cobject,crs) :
-    logging.debug("cimport : should check syntax of arg 'crs' -TBD")
-    logging.warning("cimport is not for the dummies - Playing at your own risks !")
+    clogger.debug("cimport called with argument",cobject)  
+    clogger.debug("should check syntax of arg 'crs' -TBD")
+    clogger.warning("cimport is not for the dummies - Playing at your own risks !")
     import numpy, numpy.ma
     if isinstance(cobject,numpy.ma.MaskedArray) :
-        logging.debug("cimport : for now, use a file for importing - should revisit - TBD")
-        logging.error("cimport : not yet implemented fro Masked Arrays - TBD")
+        clogger.debug("for now, use a file for importing - should revisit - TBD")
+        clogger.error("not yet implemented fro Masked Arrays - TBD")
     elif isinstance(cobject,str) :
         cache.register(cobject,crs)
     else :
-        logging.error("cimport : argument is not a Masked Array nor a filename",cobject)
+        clogger.error("argument is not a Masked Array nor a filename",cobject)
     
-
-def clog(arg) :
-    """
-    Sets the verbosity level for CliMAF log messages.
-
-    Among : logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
-
-    """
-    logging.getLogger().setLevel(arg)
 
 

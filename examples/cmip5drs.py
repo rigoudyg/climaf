@@ -31,7 +31,7 @@ tas1pc=ds(model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=tas1pc.selectFiles()
+files=tas1pc.baseFiles()
 print files
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (select period and/or variables, aggregate files...) 

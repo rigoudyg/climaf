@@ -3,8 +3,10 @@
 """
 # Created : S.Senesi - 2014
 
-import sys, os, os.path, logging, re, time
+import sys, os, os.path, re, time
 from climaf.classes import compare_trees
+
+from clogging import clogger
 
 directoryNameLength=2
 DynamicIsOn=False
@@ -54,15 +56,15 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
         readCRS=getCRS(existing)
         # Update index if needed
         if readCRS not in crs2filename :
-            logging.warning("cache : existing data %s in file %s was not yet registered in cache index"%\
+            clogger.warning("existing data %s in file %s was not yet registered in cache index"%\
                                 (readCRS,existing))
             crs2filename[readCRS]=existing
     while ( ( existing is not None ) and ( readCRS != expression )) :
-        logging.debug("cache.generate... : must skip %s which CRS is %s"%\
+        clogger.debug("must skip %s which CRS is %s"%\
                       (existing, getCRS(existing) ))
         number += 2
         if (number >= len(full) ) :
-            logging.critical("Critical issue in cache : "+len(full)+" digits is not enough for "+expression)
+            clogger.critical("Critical issue in cache : "+len(full)+" digits is not enough for "+expression)
             exit
         guess=full[0 : number - 1 ]
         existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
@@ -72,7 +74,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
     # Create the relevant directory, so that user scripts don't have to care
     dirn=os.path.dirname(rep)
     if not os.path.exists(dirn) : os.makedirs(dirn)
-    logging.debug("cache.generateUniqueFileName : returning %s"%rep)
+    clogger.debug("returning %s"%rep)
     return(rep)
 
 def stringToPath(name, length) :
@@ -112,16 +114,16 @@ def register(filename,crs):
         if re.findall(".png$",filename) :
             command="convert -set \"CRS_def\" \"%s\" %s %s.png && mv -f %s.png %s"%\
                 (crs,filename,filename,filename,filename)
-        logging.debug("cache.register : trying stamping by %s"%command)
+        clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
-            logging.info("cache.register : %s registered as %s"%(crs,filename))
+            clogger.info("%s registered as %s"%(crs,filename))
             return True
         else : 
-            logging.critical("cache.register : cannot stamp by %s"%command)
+            clogger.critical("cannot stamp by %s"%command)
             return None
     else :
-        logging.debug("cache.register : file %s does not exist (for crs %s)"%(filename,crs))
+        clogger.error("file %s does not exist (for crs %s)"%(filename,crs))
 
 def getCRS(filename) :
     """ Returns the CRS expression found in FILENAME's meta-data"""
@@ -132,17 +134,17 @@ def getCRS(filename) :
     elif re.findall(".png$",filename) :
         form='identify -verbose %s | grep -E " *CRS_def: " | sed -r -e "s/.*CRS_def: *//"'
     else :
-        logging.critical("cache.getCRS : unknown filetype for %s"%filename)
+        clogger.critical("unknown filetype for %s"%filename)
         return None
     command=form%filename
     try:
         rep=subprocess.check_output(command, shell=True).replace('\n','')
         if (rep == "" ) : 
-            logging.error("cache.getCRS : file %s is not well formed (no CRS)"%filename)
+            clogger.error("file %s is not well formed (no CRS)"%filename)
         if re.findall(".nc$",filename) : rep=rep.replace(r"\'",r"'")
     except:
         rep="failed"
-    logging.debug("cache.getCRS : CRS expression read in %s is %s"%(filename,rep))
+    clogger.debug("CRS expression read in %s is %s"%(filename,rep))
     return rep
 
 def rename(filename,crs) :
@@ -210,7 +212,7 @@ def complement(crsb, crse, crs) :
     filet=generateUniqueFileName(crs)
     command="ncrcat -O %s %s %s"%(fileb,filee,filet)
     if ( os.system(command) != 0 ) :
-        logging.error("cache.merge : Issue when merging %s and %s in %s (using command:%s)"%\
+        clogger.error("Issue when merging %s and %s in %s (using command:%s)"%\
                           (crsb,crse,crs,command))
         return None
     else :
@@ -223,7 +225,7 @@ def cdrop(crs) :
 
     Returns None if it does not exists, False if delete is unsuccessful, True if OK    """
     if crs in crs2filename :
-        logging.info("driver.ceval : discarding cached value for "+crs)
+        clogger.info("discarding cached value for "+crs)
         try :
             os.remove(crs2filename[crs])
             crs2filename.pop(crs)
@@ -231,7 +233,7 @@ def cdrop(crs) :
         except:
             return False
     else :
-        logging.error("cache.cdrop : %s is not cached"%crs)
+        clogger.error("%s is not cached"%crs)
         return None
 
 def csync() :
@@ -248,14 +250,14 @@ def cload() :
     import pickle
     global crs2filename
     if len(crs2filename) != 0 :
-        logging.critical("cache.cload : attempt to reset file index - would lead to inconsistency !")
+        clogger.critical("attempt to reset file index - would lead to inconsistency !")
         return 
     try :
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "r")
         crs2filename=pickle.load(cacheIndexFile)
         cacheIndexFile.close()
     except:
-        logging.debug("cache.cload : no index file yet")
+        clogger.debug("no index file yet")
 
 def creset(hideError=False) :
     """

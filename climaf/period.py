@@ -4,7 +4,8 @@
 
 # S.Senesi 08/2014 : created
 
-import re, datetime, logging
+import re, datetime
+from clogging import clogger
 
 class cperiod():
     """
@@ -16,7 +17,7 @@ class cperiod():
     """
     def __init__(self,start,end,pattern=None) :
         if not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
-            logging.error("classes.cperiod : issue with start or end")
+            clogger.error("issue with start or end")
             return(None)
         self.start=start ; self.end=end ;
         #if pattern is None :
@@ -104,11 +105,12 @@ def init_period(dates) :
     try :
         s=datetime.datetime(year=syear,month=smonth,day=sday,hour=shour,minute=sminute)
     except :
-        logging.debug("climaf.period.init_period : period start string %s is not a date"%start)
+        clogger.debug("period start string %s is not a date"%start)
         return(NOne)
     #
     end=re.sub(r'.*[-_]([0-9]{4,12})$',r'\1',dates)
-    logging.debug("climaf.period.init_period : for dates=%s, start= %s, end=%s"%(dates,start,end))
+    clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
+    done=False
     if (end==dates) :
         # No string found for end of period
         if (len(start)==4 ) : eyear=syear+1 ; emonth=1 ; eday=1 ; ehour=0 
@@ -119,10 +121,12 @@ def init_period(dates) :
                 eyear=eyear+1
             eday=1 ; ehour=0 
         elif (len(start)==8 ) :
-            eyear=syear ; emonth=smonth ; eday=sday+1 ; ehour=0 
+            eyear=syear ; emonth=smonth ; eday=sday ; ehour=0 
             if (sday > 27) :
-                logging.error("period.init_period: cannot yet compute next day near end of month (day=%d)"%sday)
-                return None
+                # Must use datetime for handling month length
+                e=s+datetime.timedelta(1)
+                done=True
+            else : eday=sday+1
         elif (len(start)==10 ) :
             eyear=syear ; emonth=smonth ; eday=sday ; ehour=shour+1
             if (ehour > 23) :
@@ -132,32 +136,43 @@ def init_period(dates) :
         eminute = 0
     else:
         if len(start) != len(end) :
-            logging.error("period.init_period: Must have same numer of digits for start and end dates")
+            clogger.error("Must have same numer of digits for start and end dates")
             return None
+        if (len(end)<12)  :
+            eminute = 0
+        else :
+            eminute=int(end[10:12])
         if (len(end)==4 ) : eyear=int(end[0:4])+1 ; emonth=1 ; eday=1 ; ehour=0 
         elif (len(end)==6 ) :
-            eyear=int(end[0:4]) ; emonth==int(end[4:6]) ; eday=1 ; ehour=0
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=1 ; ehour=0
             if (emonth > 12) :
                 emonth=1
                 eyear=eyear+1
         elif (len(end)==8 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])+1  ; ehour=0 
-            if (eday > 28) :
-                logging.error("period.init_period: cannot yet compute next day near end of month (day=%d)"%sday)
-                return None
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=0 
+            if (eday > 27) :
+                try :
+                    #print "trying %d %d %d %d %d"%(eyear,emonth,eday,ehour,eminute)
+                    e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
+                except:
+                    clogger.error("period end string %s is not a date"%end)
+                    return None
+                e=e+datetime.timedelta(1)
+                done=True
+            else:
+                eday=eday+1
         elif (len(end)==10 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[10:12])+1 
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10])+1 
             if (ehour > 23) :
                 ehour=0
                 eday=eday+1
-        eminute = 0
     #
-    try :
-        #print "trying %d %d %d %d %d"%(eyear,emonth,eday,ehour,eminute)
-        e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
-    except:
-        logging.error("climaf.period.init_period : period end string %s is not a date"%end)
-        return None
+    if not done :
+        try :
+            e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
+        except:
+            clogger.error("period end string %s is not a date"%end)
+            return None
     # yearstart=False
     # if len(end) < 6 :
     #     eyear+=1
@@ -170,5 +185,5 @@ def init_period(dates) :
     if s < e :
         return cperiod(s,e,None)
     else :
-        logging.error("climaf.classes : must have start before (or equals to) end "+`s`+`e`)
+        clogger.error("Must have start before (or equals to) end "+`s`+`e`)
 

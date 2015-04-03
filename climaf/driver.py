@@ -9,7 +9,7 @@ There is quite a lot of things to document here. Maybe at a later stage ....
 
 #Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
 
-import os, re, logging, posixpath, subprocess, time
+import os, re, posixpath, subprocess, time
 from string import Template
 
 # Climaf modules
@@ -17,6 +17,7 @@ import climaf
 import classes
 import cache
 import operators
+from clogging import clogger
 from climaf.netcdfbasics import varOfFile
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
@@ -30,31 +31,31 @@ def capply (climaf_operator, *operands, **parameters):
     """
     res=None
     if operands is None or operands[0] is None :
-        logging.debug("driver.capply : Operands is None")
+        clogger.debug("Operands is None")
         return None
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
-        logging.debug("driver.capply : applying script %s to"%climaf_operator + `opds` + `parameters`)
+        clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_script(climaf_operator, *operands, **parameters)
         op=operators.scripts[climaf_operator]
         if op.outputFormat is None : ceval(res,userflags=op.flags)
     elif climaf_operator in operators.operators :
-        logging.debug("driver.capply : applying operator %s to"%climaf_operator + `opds` + `parameters`)
+        clogger.debug("applying operator %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_operator(climaf_operator,*operands, **parameters)
     else:
-        logging.error("climaf.driver.capply : %s is not a known operator nor script"%climaf_operator)
+        clogger.error("%s is not a known operator nor script"%climaf_operator)
     return res
 
 def capply_script (script_name, *operands, **parameters):
     """ Create object for application of a script to OPERANDS with keyword PARAMETERS."""
 
     if script_name not in operators.scripts :
-        logging.error("Operator %s is not known. Consider declaring it with function 'cscript'",
+        clogger.error("Script %s is not know. Consider declaring it with function 'cscript'",
                       script_name)
         return None
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
-        logging.error("driver.capply_script : operator %s is "
+        clogger.error("Operator %s is "
 	    "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
             script_name,script.inputs_number(),len(operands), script_name ))
         return None
@@ -74,12 +75,12 @@ def capply_script (script_name, *operands, **parameters):
                 son.variable=script.outputs[outname]%defaultVariable
                 rep.outputs[outname]=son
                 setattr(rep,outname,son)
-        #
-        # Check that all parameters to the call are expected by the script 
-        for para in parameters :
-            if re.match(r".*\{"+para+r"\}",script.command) is None :
-                logging.error("driver.capply_script : parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command))
-                return None
+                #
+                # Check that all parameters to the call are expected by the script 
+                for para in parameters :
+                    if re.match(r".*\{"+para+r"\}",script.command) is None :
+                        clogger.error("parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command))
+                        return None
     #
     return rep
 
@@ -87,7 +88,7 @@ def capply_operator (climaf_operator, *operands, **parameters):
     """ Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
 
     """
-    logging.error("capply_operator : Not yet developped - TBD")
+    clogger.error("Not yet developped - TBD")
     return None
     
 
@@ -107,19 +108,19 @@ def ceval(cobject,
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'png' :
-        logging.error('Allowed formats yet are : "object", "file" and "png"')
+        clogger.error('Allowed formats yet are : "object", "file" and "png"')
         return None
     #
     # Next check is too crude for dealing with use of operator 'select'
     #if cobject.crs in recurse_list :
-    #    logging.critical("driver.ceval : INTERNAL ERROR : infinite loop on object: "+cobject.crs)
+    #    clogger.critical("INTERNAL ERROR : infinite loop on object: "+cobject.crs)
     #    return None
     recurse_list.append(cobject.crs)
     if isinstance(cobject,classes.cdataset):
-        logging.debug("ceval : Evaluating dataset " + cobject.crs)
+        clogger.debug("Evaluating dataset " + cobject.crs)
         ds=cobject
         if ds.isLocal() or ds.isCached() :
-            logging.debug("ceval : Dataset %s is local or cached "%ds )
+            clogger.debug("Dataset %s is local or cached "%ds )
             #  if the data is local, then
             #   if the user can select the data and aggregate time, and requested format is
             #     'file' return the filenames
@@ -127,18 +128,18 @@ def ceval(cobject,
             # Go to derived variable evaluation if appicable
             if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
                 if ds.variable in derived_list :
-                    logging.error("driver.ceval : Loop detected while evaluating derived variable "+
+                    clogger.error("Loop detected while evaluating derived variable "+
                                   ds.variable + " " + `derived_list`)
                     return None
                 derived=derive_variable(ds)
-                logging.debug("ceval : evaluating derived variable %s as %s"%\
+                clogger.debug("evaluating derived variable %s as %s"%\
                                   (ds.variable,`derived`))
                 derived_value=ceval(derived, format=format, deep=deep, 
                                     userflags=userflags,
                                     derived_list=derived_list.append(ds.variable),
                                     recurse_list=recurse_list)
                 if derived_value : 
-                    logging.debug("ceval : succeeded in evaluating derived variable %s as %s"%\
+                    clogger.debug("succeeded in evaluating derived variable %s as %s"%\
                                       (ds.variable,`derived`))
                     set_variable(derived_value, ds.variable, format=format)
                 return(derived_value)
@@ -149,22 +150,22 @@ def ceval(cobject,
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
                 #(userflags.canOffsetScale or ds.hasExactVariable()) and 
                 (format == 'file')) :
-                logging.debug("ceval : Delivering file set or sets is OK for the target use")
-                return(ds.selectFiles()) # a single string with all filenames,
+                clogger.debug("Delivering file set or sets is OK for the target use")
+                return(ds.baseFiles()) # a single string with all filenames,
                                #or a list of such strings in case of ensembles
             else:
-                logging.debug("ceval : Must subset and/or aggregate and/or select "+
+                clogger.debug("Must subset and/or aggregate and/or select "+
                               "var from data files and/or get data, or provide object result")
                 ## extract=cread(ds)
-                ## logging.debug("ceval : Done with subsetting and caching data files")
+                ## clogger.debug(" Done with subsetting and caching data files")
                 ## cstore(extract) # extract should include the dataset def
                 ## return ceval(extract,userflags,format)
-                logging.debug("Fetching/selection/aggregation is done using an "+
+                clogger.debug("Fetching/selection/aggregation is done using an "+
                           "external script for now - TBD")
                 #ds.setOffsetScale()
                 extract=capply('select',ds)
                 if extract is None :
-                    logging.error("ceval : cannot access dataset" + `ds`)
+                    clogger.error("Cannot access dataset" + `ds`)
                     return None
                 return ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
         else :
@@ -172,39 +173,40 @@ def ceval(cobject,
             #   if the user can access the dataset by one of the dataset-specific protocols
             #   then assume it can also select on time and provide it with the address
             #   else : fetch the relevant selection of the data, and store it in cache
-            logging.debug("ceval : Dataset is remote " )
+            clogger.debug("Dataset is remote " )
             if (userflags.canOpenDap and format == 'file' ) :
-                logging.debug("ceval : But user can OpenDAP " )
+                clogger.debug("But user can OpenDAP " )
                 return(ds.adressOf())
             else :
-                logging.debug("ceval : Must remote read and cache " )
+                clogger.debug("Must remote read and cache " )
                 # Assume remoteRead fetches the strict minimum 
                 extract=cache.remoteRead(ds)
                 if (format == 'file' ) :
                     cachefile=cstore(extract)
-                    logging.debug("ceval : And provide cache file reference " )
+                    clogger.debug("And provide cache file reference " )
                     return cachefile
                 else :
-                    logging.debug("ceval : And provide in-memory object " )
+                    clogger.debug("And provide in-memory object " )
                     return(extract)
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) : 
-        logging.debug("ceval : Evaluating compound object : " + cobject.crs)
+        clogger.debug("Evaluating compound object : " + cobject.crs)
         if (deep is not None) : cache.cdrop(cobject.crs)
         filename=cache.hasExactObject(cobject) 
-        if filename : 
-            logging.info("driver.ceval : Object found in cache : %s"%cobject.crs)
+        if filename :
+            clogger.info("Object found in cache: %s"%cobject.crs)
+            
             if format=='file' : return filename
             else: return cread(filename)
         it,altperiod=cache.hasIncludingObject(cobject)
-        if it : 
-            logging.info("driver.ceval : Including object found in cache : %s"%it.crs)
+        if it :
+            clogger.info("Including object found in cache : %s"%it.crs)
             # Just select (if necessary for the user) the portion relevant to the request
             return(ceval_select(it,cobject,userflags,format,deep))
         #
         it,comp_period=cache.hasBeginObject(cobject) 
         if it : 
-            logging.info("driver.ceval : partial result found in cache for %s : %s"%\
+            clogger.info("partial result found in cache for %s : %s"%\
                                   (cobject.crs,it.crs))
             begcrs=it.crs
             # Turn object for begin in complement object for end, and eval it
@@ -213,10 +215,10 @@ def ceval(cobject,
             if (format == 'file') :
                 return cache.complement(begcrs,it.crs,cobject.crs)
             else :
-                logging.debug("driver.ceval : cannot yet complement except for files")
+                clogger.debug("cannot yet complement except for files")
                 return(None)
         #
-        logging.info("driver.ceval : nothing relevant found in cache for %s"%cobject.crs)
+        clogger.info("nothing relevant found in cache for %s"%cobject.crs)
         if deep==False : deep=None
         if isinstance(cobject,classes.ctree)  :
             # the cache doesn't have a similar tree, let us recursively eval subtrees
@@ -230,7 +232,7 @@ def ceval(cobject,
                 if (format == 'file' ) : return(cstore(obj))
                 else : return(obj)
             else : 
-                logging.error("driver - ceval : operator %s is not a script nor known operator",str(cobject.operator))
+                clogger.error("operator %s is not a script nor known operator",str(cobject.operator))
                 return(None)
         else :
             # isinstance(cobject,classes.scriptChild) should be True
@@ -239,14 +241,14 @@ def ceval(cobject,
                 # Re-evaluate, which should succeed using cache
                 return ceval(cobject,userflags,format,deep,recurse_list=recurse_list)
             else :
-                logging.error("driver.ceval : generating script aborted for "+cobject.father.crs)
+                clogger.error("generating script aborted for "+cobject.father.crs)
                 return None
     elif isinstance(cobject,str) :
-        logging.debug("ceval : Evaluating object from crs : %s"%cobject)
-        logging.error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
+        clogger.debug("Evaluating object from crs : %s"%cobject)
+        clogger.error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
         return None
     else :
-        logging.error("driver - ceval : argument " +`cobject`+" is not (yet) managed")
+        clogger.error("argument " +`cobject`+" is not (yet) managed")
         return(None)
     # if cache.DynamicIsOn : 
     #    if hasDynamicInputs(cobject) :
@@ -296,12 +298,12 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #         maxRank=rank
     #     rank += 1
     #     if (s != 1) and (s != max(sizes)) :
-    #       logging.error("ceval : Cannot mix ensemble sizes : size of ensemble # %d is not 1 nor equals to max ensemble size (%d) in %s"%\
+    #       clogger.error("Cannot mix ensemble sizes : size of ensemble # %d is not 1 nor equals to max ensemble size (%d) in %s"%\
     #                         (rank,max(sizes),scriptCall.crs))
     #       return(None)
     # if ( nbSizeMax != 1 ) :
     #     if ( nbSizeMax != len(sizes)) :
-    #       logging.error("ceval : Cannot mix ensemble sizes : more than one operands has a size > 1, while some have size 1 in %s"%scriptCall.crs)
+    #       clogger.error("Cannot mix ensemble sizes : more than one operands has a size > 1, while some have size 1 in %s"%scriptCall.crs)
     #       return(None)
 
     # Replace input data placeholders with filenames
@@ -330,7 +332,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
             subdict["period_iso_%d"%i]='"'+timePeriod(op).iso()+'"'
             subdict["domain_%d"%i]='"'+domainOf(op)+'"'
-    logging.debug("driver.ceval_script - subdict for operands is "+`subdict`)
+    clogger.debug("Ssubdict for operands is "+`subdict`)
     # substituion is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
     #
@@ -368,7 +370,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
              "\n\n'> scripts.out  ; "+ template+\
              " >> scripts.out 2>&1"
     tim1=time.time()
-    logging.info("driver.ceval_script : Launching command:"+template)
+    clogger.info("Launching command:"+template)
     # Timing
     # TBD : Should use process.check_output and display stderr when exit is non-0
     if ( subprocess.call(command, shell=True) == 0):
@@ -381,15 +383,15 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 ok = ok and cache.register(subdict["out_"+output],scriptCall.crs+"."+output)
             if ok : 
                 duration=time.time() - tim1
-                logging.info(("driver.ceval_script : Done in %.1g s with command:"+template) % 
+                clogger.info(("Done in %.1g s with command:"+template) % 
                              duration)
                 return main_output_filename
             else :
-                logging.error("driver.ceval_script : Some output missing when executing : %s. \nSee scripts.out"%template)
+                clogger.error("Some output missing when executing : %s. \nSee scripts.out"%template)
         else :
-            logging.debug("driver.ceval_script : script %s has no ouput"%script.name)
+            clogger.debug("script %s has no ouput"%script.name)
     else:
-        logging.error("driver.ceval_script: Script call failure for %s . \nSee scripts.out"%template)
+        clogger.error("Script call failure for %s . \nSee scripts.out"%template)
     return None
 
 
@@ -399,12 +401,12 @@ def timePeriod(cobject) :
     """
     if isinstance(cobject,classes.cdataset) : return cobject.period
     elif isinstance(cobject,classes.ctree) :
-        logging.debug("driver.timePeriod : for now, timePeriod logic for scripts output is basic (1st operand) - TBD")
+        clogger.debug("for now, timePeriod logic for scripts output is basic (1st operand) - TBD")
         return timePeriod(cobject.operands[0])
     elif isinstance(cobject,classes.scriptChild) :
-        logging.debug("driver.timePeriod : for now, timePeriod logic for scriptChilds is basic - TBD")
+        clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
         return timePeriod(cobject.father)
-    else : logging.error("driver.timePeriod : unkown class for argument "+`cobject`)
+    else : clogger.error("unkown class for argument "+`cobject`)
                   
 def domainOf(cobject) :
     """ Returns a domain for a CliMAF object : if object is a dataset, returns
@@ -420,12 +422,12 @@ def domainOf(cobject) :
 	    if cobject.domain == "global" : return ""
 	    else : return(cobject.domain)
     elif isinstance(cobject,classes.ctree) :
-        logging.debug("driver.domainOf : for now, domainOf logic for scripts output is basic (1st operand) - TBD")
+        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
         return domainOf(cobject.operands[0])
     elif isinstance(cobject,classes.scriptChild) :
-        logging.debug("driver.domainOf : for now, domainOf logic for scriptChilds is basic - TBD")
+        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
         return domainOf(cobject.father)
-    else : logging.error("driver.domainOf : unkown class for argument "+`cobject`)
+    else : clogger.error("Unkown class for argument "+`cobject`)
                   
 def varOf(cobject) :
     """ Returns the variable for a CliMAF object : if object is a dataset, returns
@@ -433,9 +435,9 @@ def varOf(cobject) :
     """
     if isinstance(cobject,classes.cdataset) : return cobject.variable
     elif isinstance(cobject,classes.ctree) :
-        logging.debug("driver.varOf : for now, varOf logic is basic (1st operand) - TBD")
+        clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return varOf(cobject.operands[0])
-    else : logging.error("driver.varOf : unkown class for argument "+`cobject`)
+    else : clogger.error("Unkown class for argument "+`cobject`)
 
                   
 def ceval_select(includer,included,userflags,format,deep) :
@@ -445,8 +447,7 @@ def ceval_select(includer,included,userflags,format,deep) :
     """
     if format=='file' : 
         if userflags.canSelectTime or userflags.canSelectDomain:
-            logging.debug("driver.ceval_select : TBD - should do"
-               " smthg smart when user can select time or domain")
+            clogger.debug("TBD - should do smthg smart when user can select time or domain")
             #includer.setperiod(included.period)
         incperiod=timePeriod(included)
         extract=capply('select',includer, period=incperiod)
@@ -455,18 +456,18 @@ def ceval_select(includer,included,userflags,format,deep) :
             crs=includer.buildcrs(`incperiod`)
             return(cache.rename(objfile,crs))
         else :
-            logging.critical("driver.ceval_select : cannot evaluate "+`extract`)
+            clogger.critical("Cannot evaluate "+`extract`)
     else :
-        logging.error("driver.ceval_select : can yet process only files - TBD")
+        clogger.error("Can yet process only files - TBD")
 
 
 def cread(datafile,varname=None):
-    import re,logging
+    import re
     if not datafile : return(None)
     if re.findall(".png$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
     elif re.findall(".nc$",datafile) :
-        logging.debug("cread : reading NetCDF file %s"%datafile)
+        clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
         if varname is None: return(None)
         from Scientific.IO.NetCDF import NetCDFFile as ncf
@@ -482,14 +483,14 @@ def cread(datafile,varname=None):
         fileobj.close()
         return(rep)
     else :
-        logging.error("driver.cread : cannot yet handle %s"%datafile)
+        clogger.error("cannot yet handle %s"%datafile)
         return None
 
 def cview(datafile):
     if re.findall(".png$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
     else :
-        logging.error("driver.cread : cannot yet handle %s"%datafile)
+        clogger.error("cannot yet handle %s"%datafile)
         return None
 
 def derive_variable(ds):
@@ -498,10 +499,10 @@ def derive_variable(ds):
     operators.derived_variable
     """
     if not isinstance(ds,classes.cdataset):
-        logging.error("derive_variable : arg ds is not a dataset")
+        clogger.error("arg ds is not a dataset")
         return(None)
     if ds.variable not in operators.derived_variables :
-        logging.error("derive_variable : %s is not a derived variable")
+        clogger.error("%s is not a derived variable")
         return(None)
     op,outname,inVarNames,params=operators.derived_variables[ds.variable]
     inVars=[]
@@ -526,19 +527,19 @@ def set_variable(obj, varname, format) :
         oldvarname=varOfFile(obj)
         command="ncrename -v %s,%s %s >/dev/null 2>&1"%(oldvarname,varname,obj)
         if ( os.system(command) != 0 ) :
-            logging.error("driver.set_variable : Issue with changing varname to %s in %s"%(varname,obj))
+            clogger.error("Issue with changing varname to %s in %s"%(varname,obj))
             return None
-        logging.debug("driver.set_variable : Varname changed to %s in %s"%(varname,obj))
+        clogger.debug("Varname changed to %s in %s"%(varname,obj))
         command="ncatted -a long_name,%s,o,c,%s %s"%(varname,long_name,obj)
         if ( os.system(command) != 0 ) :
-            logging.error("driver.set_variable : Issue with changing long_name for var %s in %s"%
+            clogger.error("Issue with changing long_name for var %s in %s"%
                           (varname,obj))
             return None
         return True
     elif (format=='MaskedArray') :
-        logging.warning('driver.set_variable : TBD - Cannot yet set the varname for MaskedArray')
+        clogger.warning('TBD - Cannot yet set the varname for MaskedArray')
     else :
-        logging.error('driver.set_variable : Cannot handle format %s'%format)
+        clogger.error('Cannot handle format %s'%format)
     
 
 def CFlongname(varname) :

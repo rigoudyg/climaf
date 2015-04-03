@@ -25,7 +25,7 @@ pr_obs=ds(project="OBS4MIPS", model="GPCP", variable="pr", period="1979-1980", e
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=pr_obs.selectFiles()
+files=pr_obs.baseFiles()
 print files
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (select period and/or variables, aggregate files...) 

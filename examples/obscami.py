@@ -26,7 +26,7 @@ pr_gpcp=ds(project="OBS_CAMI", model="GPCP2.5d", variable="pr", period="1979-198
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=pr_gpcp.selectFiles()
+files=pr_gpcp.baseFiles()
 print files
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (select period and/or variables, aggregate files...) 

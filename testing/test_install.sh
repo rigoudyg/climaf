@@ -14,4 +14,9 @@ echo -e "\nEverything seems to be fine, you may proceed and use CliMAF -
 And don't forget to set :
 \t export PYTHONPATH=$(cd ..; pwd):\$PYTHONPATH
 either in your .profile or each time you want to use CliMAF\n
-Doc is at http://climaf.readthedocs.org\n"
+\n
+_______________________________________
+
+Doc is at http://climaf.readthedocs.org
+_______________________________________
+\n"

@@ -26,7 +26,7 @@ tos=ds( experiment="historical", variable="tos", period="186001-186002")
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=tos.selectFiles()
+files=tos.baseFiles()
 print files
 
 # Let CliMAF provide the filename for the exact dataset in its disk

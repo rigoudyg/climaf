@@ -60,7 +60,7 @@ class A_basic(unittest.TestCase):
         cscript('timeplot',cpath+'/../scripts/timeplot.sh ${in} ${out} ${var}',format="png")
         plot1d=climaf.driver.capply("timeplot",sdev) 
         # Have the plot displayed (this will also actually launch the script,
-        cobj(plot1d)
+        cshow(plot1d)
 	os.system("sleep 3s")
 
     def tearDown(self):
@@ -86,7 +86,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 
     def test_identifying_files(self):
-        files=self.ds.selectFiles()
+        files=self.ds.baseFiles()
         self.assertEqual(files,"/cnrm/aster/data2/ESG/data1/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc", 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
@@ -115,7 +115,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 
     def test_identifying_files(self):
-        files=self.ds.selectFiles()
+        files=self.ds.baseFiles()
         expected="/prodigfs/esg/CMIP5/merge/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
         print "actual=",files
         print "expected=",expected

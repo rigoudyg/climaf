@@ -28,7 +28,7 @@ cactl=ds(experiment="CTL", model="IPSL-CM4", variable="CACO3", period="1860-1861
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=cactl.selectFiles()
+files=cactl.baseFiles()
 print files
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (select period and/or variables, aggregate files...) 
