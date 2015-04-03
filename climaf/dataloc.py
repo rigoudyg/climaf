@@ -6,6 +6,8 @@ Handles a database of attributes for describing organization and location of dat
 # Created : S.Senesi - 2014
 
 import os, os.path, re, string, glob, subprocess
+from string import Template
+
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger
@@ -215,7 +217,7 @@ def selectGenericFiles(project,model, experiment, frequency, variable, period, r
     **Warning : this function is not yet implemented**
 
     Allow to describe a ``generic`` file organization : the list of files returned by this function
-    is thos of files which contain the variable and which match the period among
+    is composed of files which contain the variable, and which match the period, among
     those files which name match one of the patterns computed by instantiating strings
     in list urls by the other argument values
 
@@ -226,16 +228,41 @@ def selectGenericFiles(project,model, experiment, frequency, variable, period, r
 
     In the pattern strings, the keywords that can be used in addition to the argument
     names (e.g. ${model}) are:
-    - var : use it if the filenames do include the variable name, if the fiels are split by variable,
-    as this speed up the search
+    
+    - variable : use it if the files are split by variable and filenames do include the
+    variable name, as this speed up the search
     - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of the period covered by
-    each file, if this is applicable; use a second time for end date, if applicable (otherwise
-    the assumption is that the whole year -resp. month or day- is included in the file
+    each file, if this is applicable in the file naming; use a second time for end date,
+    if applicable (otherwise the assumption is that the whole year -resp. month or day- is
+    included in the file
 
     """
+    rep=[]
+    for l in urls :
+        template=Template(l)
+        d=dict(project=project, model=model, experiment=experiment, frequency=frequency,
+               variable=variable, rip=rip, version=version)
+        template=template.safe_substitute(d)
+        dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
+        temp2=template.safe_substitute(d2)
+        lfiles=glob.glob(temp2)
+        for f in lfiles :
+            # Analyze file time period
+            starty=template.find("${YYYY}") 
+            startym=template.find("${YYYYMM}") 
+            startymd=template.find("${YYYYMMDD}")
+            if (starty >=0 ) :
+                start=f[starty:starty+4]
+            # Filter file time period against required period
+            
+            # Filter against variable 
+            if (template.find("${variable}")>=0) or fileHasVar(variable) : rep.append(f)
+        
+            
+        
     clogger.error("Not yet implemented")
     return None
-    
+
 
 def selectEmFiles(experiment, frequency, variable, period) :
     #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
