@@ -29,7 +29,8 @@ If your data is organized after one of the organization scheme known to CliMAF, 
   >>> dataloc(project="GEOMIP", organization="CMIP5_DRS", url=['/tmp/data','~/data/CMIP5'])
 
 
-See function :py:meth:`dataloc` for reference, and the section on data access in :ref:`examples` for finding the relevant data organization name.
+See the section on data access in :ref:`examples` for finding the
+relevant data organization name, and see also function :py:class:`~climaf.dataloc.dataloc` for reference.
 
 
 .. _how_to_online_help:
