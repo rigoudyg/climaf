@@ -15,8 +15,8 @@ from clogging import clogger
 locs=[]
 
 class dataloc():
-    def __init__(self,project="*",model="*", experiment="*",
-                 frequency="*", rip="*",organization=None, url=None):
+    def __init__(self,organization, url, project="*",model="*", experiment="*", 
+                 realm="*", table="*", frequency="*", rip="*"):
         """
         Create an entry in the data locations dictionnary for an ensemble of datasets.
 
@@ -43,8 +43,9 @@ class dataloc():
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
            - example : the data included in CliMAF package
 
-           Please ask the CliMAF dev team for implementing further organizations. It is quite quick for data
-           which are on the filesystem. Organizations considered for future implementations are :
+           Please ask the CliMAF dev team for implementing further organizations. 
+           It is quite quick for data which are on the filesystem. Organizations 
+           considered for future implementations are :
 
            - generic data organization described by the user using patterns such as described for 
              :py:func:`~climaf.dataloc.selectGenericFiles`
@@ -81,6 +82,8 @@ class dataloc():
         else :
             if re.findall("^esgf://.*",url) : self.organization="ESGF"
             self.urls=[url]
+        self.urls = map(os.path.expanduser,self.urls)
+        self.urls = map(os.path.abspath,self.urls)
         # Register new dataloc only if not already registered
         if not (any([ l == self for l in locs])) : locs.append(self)
     def __eq__(self, other):
@@ -184,15 +187,18 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
         elif (org == "example") :
             rep.extend(selectExampleFiles(experiment, frequency, variable, period, urls))
         elif (org == "CMIP5_DRS") :
-            rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, period, rip, version, urls))
+            rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
+                                           realm, table, period, rip, version, urls))
         elif (org == "OCMIP5_Ciclad") :
-            rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, variable, period, urls))
+            rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
+                                               variable, period, urls))
         elif (org == "OBS4MIPS_CNRM") :
             rep.extend(selectObs4mipsCnrmFiles(model, frequency, variable, period, urls))
         elif (org == "OBS_CAMI") :
             rep.extend(selectCamiObsFiles(model, frequency, variable, period, urls))
         elif (org == "generic") :
-            rep.extend(selectGenericFiles(project,model, experiment, frequency, variable, period, rip, version, urls))
+            rep.extend(selectGenericFiles(experiment, variable, period, urls, project,model, 
+                                          frequency,  rip, version))
         else :
             clogger.error("cannot process organization "+org+ \
                              " for experiment "+experiment+" and model "+model+\
@@ -212,56 +218,106 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
     # Assemble filenames in one single string
     return(string.join(rep))
 
-def selectGenericFiles(project,model, experiment, frequency, variable, period, rip, version, urls):
-    """
-    **Warning : this function is not yet implemented**
+# u="/home/stephane/Bureau/climaf/examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
+# selectGenericFiles(experiment="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
-    Allow to describe a ``generic`` file organization : the list of files returned by this function
-    is composed of files which contain the variable, and which match the period, among
-    those files which name match one of the patterns computed by instantiating strings
-    in list urls by the other argument values
+def selectGenericFiles(experiment, variable, period, urls, project="*",
+                       model="*", frequency="*", rip="*", version="*",
+                       realm="*", table="*"):
+    """
+    Allow to describe a ``generic`` file organization : the list of files returned 
+    by this function is composed of files which :
+
+    - match the patterns in ``url`` once these patterns are instantiated by 
+      the other argument's values, and 
+
+     - contain the ``variable`` provided as argument
+
+     - match the `period`` provided as argument
+
+    In the pattern strings, no pattern is mandatory
 
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', \
-    variable='tas', period='1980', urls=['~/DATA/${project}/${model}/.*${var}.*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
+    /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
     names (e.g. ${model}) are:
     
-    - variable : use it if the files are split by variable and filenames do include the
-    variable name, as this speed up the search
-    - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of the period covered by
-    each file, if this is applicable in the file naming; use a second time for end date,
-    if applicable (otherwise the assumption is that the whole year -resp. month or day- is
-    included in the file
+    - ${variable} : use it if the files are split by variable and filenames do include 
+      the variable name, as this speed up the search
+
+    - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of the period covered by 
+      each file, if this is applicable in the file naming; use a second time for end date,
+      if applicable (otherwise the assumption is that the whole year -resp. month or day- is
+      included in the file
+
+    - wildcards '?' and '*' for matching respectively one and any number of charcacters
+
 
     """
     rep=[]
     for l in urls :
         template=Template(l)
+        #
+        # Instantiate keywords in pattern with attributes values
         d=dict(project=project, model=model, experiment=experiment, frequency=frequency,
-               variable=variable, rip=rip, version=version)
+               variable=variable, rip=rip, version=version, realm=realm, table=table)
         template=template.safe_substitute(d)
+        print "template after attributes replace : "+template
+        #
+        # Construct a pattern for globbing dates
+        temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        temp2=template.safe_substitute(d2)
+        for k in dt : temp2=temp2.replace(k,dt[k])
+        print "template with date wildcards : "+temp2
         lfiles=glob.glob(temp2)
+        #
+        # Analyze all filenames
         for f in lfiles :
+            print "looking at file"+f
+            # Construct regexp for extracting dates from filename
+            dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
+                    YYYYMMDD="([0-9]{10})")
+            regexp=None
+            #print "template before searching dates : "+template
+            lkeys=dt.keys() ; lkeys.sort(reverse=True)
+            for key in lkeys :
+                #print "searchin "+key+" in "+template
+                start=template.find(key)
+                if (start>=0 ) :
+                    #print "found "+key
+                    regexp=template.replace(key,dt[key],1)
+                    hasEnd=False
+                    start=regexp.find(key) 
+                    if (start >=0 ) :
+                        hasEnd=True
+                        regexp=regexp.replace(key,dt[key],1)
+                    break
+            #
             # Analyze file time period
-            starty=template.find("${YYYY}") 
-            startym=template.find("${YYYYMM}") 
-            startymd=template.find("${YYYYMMDD}")
-            if (starty >=0 ) :
-                start=f[starty:starty+4]
+            fperiod=None
+            if regexp :
+                regexp=regexp.replace("*",".*").replace("?",r".")
+                #print "regexp for extracting dates : "+regexp
+                start=re.sub(regexp,r'\1',f)
+                if hasEnd :
+                    end=re.sub(regexp,r'\2',f)
+                    fperiod=init_period("%s-%s"%(start,end))
+                else :
+                    fperiod=init_period(start)
+            #print "fperiod="+`fperiod`
+            if (not regexp):
+                clogger.warning("Cannot yet filter on time with file content. TBD")
             # Filter file time period against required period
-            
-            # Filter against variable 
-            if (template.find("${variable}")>=0) or fileHasVar(variable) : rep.append(f)
-        
-            
-        
-    clogger.error("Not yet implemented")
-    return None
+            if (fperiod and period.intersects(fperiod)) or not regexp :
+                # Filter against variable 
+                if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                    # Should check time period in the file if not regexp
+                    print "appending "+f
+                    rep.append(f)
+    return rep
 
 
 def selectEmFiles(experiment, frequency, variable, period) :

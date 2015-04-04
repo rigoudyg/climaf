@@ -1,3 +1,4 @@
+from climaf.clogging import clogger
 
 def varOfFile(filename) :
     """ 
@@ -28,7 +29,12 @@ def fileHasVar(filename,varname):
     """
     from Scientific.IO.NetCDF import NetCDFFile as ncf
     rep=False
-    fileobj=ncf(filename)
+    print "opening "+filename
+    try :
+        fileobj=ncf(filename)
+    except:
+        clogger.error("Issue opening file "+filename)
+        return False
     for filevar in fileobj.variables :
         if filevar == varname :
             rep=True

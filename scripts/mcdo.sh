@@ -43,7 +43,7 @@ for out in $outs ; do
 
     # Make all selections (time, space, variable) before applying the operator
     for file in $files ; do
-	tmp2=$tmp/$(basename $file) ; rm $tmp2
+	tmp2=$tmp/$(basename $file) ; rm -f $tmp2
 	if [ "$period" ] ; then 
 	    cdo $seldate $selvar $selregion $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
@@ -62,7 +62,7 @@ for out in $outs ; do
     # Then, assemble all datafiles in a single one before applying the operator 
     # (because it may be non-linear in time - e.g. eigenvectors )
     if [ "$vfiles" ] ; then 
-	tmp3=$tmp/$(basename $0).nc ; rm $tmp3
+	tmp3=$tmp/$(basename $0).nc ; rm $-f tmp3
         # let us avoid single file copy followed by rm ...
 	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
 	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && rm $vfiles 

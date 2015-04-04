@@ -67,17 +67,23 @@ class cobject():
         clogger.debug("Object deleted ; crs = %s"%(self.crs))
 
 class cdataset(cobject):
-    def __init__(self,project=None,model=None,experiment=None,period=None,
-                 rip=None,frequency=None,domain=None,variable=None,version='last') :
+    #def __init__(self,project=None,model=None,experiment=None,period=None,
+    #             rip=None,frequency=None,domain=None,variable=None,version='last') :
+    def __init__(self,project=None, experiment=None, period=None, variable=None, 
+                 model=None, rip=None,frequency=None,domain=None,version=None) :
         """
         Create a CLIMAF dataset. 
         
         A CLIMAF dataset is a description of what the data is and not the data itself nor a file.
-        It is essentially a set of attributes
+        It is essentially a set of pairs attributes-values. The list of attributes actually used 
+        to describe a dataset is defined by the 'project' it refers to. However, all projects 
+        include attributes experiment, period and variable
 
-        All args (but period and version) defaults to the value set by :py:func:`~climaf.classes.cdefault`
+        All attributes defaults to the value set by :py:func:`~climaf.classes.cdefault`
 
-        For the time being, the attributes are based on CMIP5_DRS; this scheme should be relaxed sooner or
+        For the time being, the attributes used in the string description of a dataset 
+        (its CRS) are the whole list of CMIP5_DRS attributes, with wildcards 
+        values when attribute is not applicable; this scheme should be relaxed sooner or
         later. e.g., in a home-made 'project', the 'model' attribute could be superfluous 
 
         Args:
@@ -126,8 +132,14 @@ class cdataset(cobject):
         self.frequency=  cdefault("frequency") if frequency is None else frequency
         self.domain=     cdefault("domain")    if domain    is None else domain
         self.variable=   cdefault("variable")  if variable  is None else variable
-        self.version=    version
+        self.version=    cdefault("version")   if version   is None else version
         self.fileVarName=self.variable
+        if (self.experiment is None or self.period is None or 
+            self.variable is None) :
+            clog.error("experiment(%s) and period(%s) and variable(%s) "
+                       "must be set explicilty or using cdefault"%
+                       (experiment,`period`,variable))
+            return
         #
         self.crs=self.buildcrs()
         # Some more stuff for looking for data location and organization for this very experiment
