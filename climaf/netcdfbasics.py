@@ -29,7 +29,7 @@ def fileHasVar(filename,varname):
     """
     from Scientific.IO.NetCDF import NetCDFFile as ncf
     rep=False
-    print "opening "+filename
+    clogger.debug("opening "+filename)
     try :
         fileobj=ncf(filename)
     except:

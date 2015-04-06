@@ -55,3 +55,4 @@ map2=plotmap(ta,crs="Surface temperature (tas)",**map_graph_attributes(varOf(ta)
 cshow(map2)
 
 
+if (cfile(map2)  is None) : exit(1)

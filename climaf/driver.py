@@ -19,6 +19,7 @@ import cache
 import operators
 from clogging import clogger
 from climaf.netcdfbasics import varOfFile
+from climaf.period import init_period
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
 #operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
@@ -195,14 +196,14 @@ def ceval(cobject,
         filename=cache.hasExactObject(cobject) 
         if filename :
             clogger.info("Object found in cache: %s"%cobject.crs)
-            
             if format=='file' : return filename
             else: return cread(filename)
         it,altperiod=cache.hasIncludingObject(cobject)
         if it :
-            clogger.info("Including object found in cache : %s"%it.crs)
+            clogger.info("Including object found in cache : %s"%(it.crs))
+            clogger.info("Selecting "+`cobject`+" out of it")
             # Just select (if necessary for the user) the portion relevant to the request
-            return(ceval_select(it,cobject,userflags,format,deep))
+            return(ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list))
         #
         it,comp_period=cache.hasBeginObject(cobject) 
         if it : 
@@ -211,7 +212,7 @@ def ceval(cobject,
             begcrs=it.crs
             # Turn object for begin in complement object for end, and eval it
             it.setperiod(comp_period)
-            ceval(it,userflags,format,deep)
+            ceval(it,userflags,format,deep,derived_list,recurse_list)
             if (format == 'file') :
                 return cache.complement(begcrs,it.crs,cobject.crs)
             else :
@@ -275,7 +276,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     dict_invalues=dict()
     sizes=[]
     for op in scriptCall.operands :
-        inValue=ceval(op,userflags=script.flags,format='file',deep=deep,recurse_list=recurse_list)
+        inValue=ceval(op,userflags=script.flags,format='file',deep=deep,
+                      recurse_list=recurse_list)
         if inValue is None or inValue is "" : return None
         if isinstance(inValue,list) : size=len(inValue)
         else : size=1
@@ -332,7 +334,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
             subdict["period_iso_%d"%i]='"'+timePeriod(op).iso()+'"'
             subdict["domain_%d"%i]='"'+domainOf(op)+'"'
-    clogger.debug("Ssubdict for operands is "+`subdict`)
+    clogger.debug("subdict for operands is "+`subdict`)
     # substituion is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
     #
@@ -349,7 +351,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
                                                          format=script.outputFormat)
     # Account for script call parameters
-    for p in scriptCall.parameters : subdict[p]=scriptCall.parameters[p]
+    for p in scriptCall.parameters : 
+        #clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
+        subdict[p]=scriptCall.parameters[p]
+        if p=="period" :
+            subdict["period_iso"]=init_period(scriptCall.parameters[p]).iso()
     if 'crs' not in scriptCall.parameters : subdict["crs"]=opscrs
 
     # Substitute all args, with special case of NCL convention for passing args
@@ -440,7 +446,7 @@ def varOf(cobject) :
     else : clogger.error("Unkown class for argument "+`cobject`)
 
                   
-def ceval_select(includer,included,userflags,format,deep) :
+def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_list) :
     """ Extract object INCLUDED from (existing) object INCLUDER,
     taking into account the capability of the user process (USERFLAGS)
     and the required delivering FORMAT(file or object)
@@ -450,10 +456,11 @@ def ceval_select(includer,included,userflags,format,deep) :
             clogger.debug("TBD - should do smthg smart when user can select time or domain")
             #includer.setperiod(included.period)
         incperiod=timePeriod(included)
-        extract=capply('select',includer, period=incperiod)
-        objfile=ceval(extract,format='file',deep=deep)
+	clogger.debug("extract sub period %s out of %s"%(`incperiod`,includer.crs))
+        extract=capply('select',includer, period=`incperiod`)
+        objfile=ceval(extract,userflags,'file',deep,derived_list,recurse_list)
 	if objfile :
-            crs=includer.buildcrs(`incperiod`)
+            crs=includer.buildcrs(incperiod)
             return(cache.rename(objfile,crs))
         else :
             clogger.critical("Cannot evaluate "+`extract`)

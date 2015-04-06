@@ -21,3 +21,4 @@ box["nino28"]=[-150,-130,-5,5]
 dg_nino28=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981", domain=box["nino28"])
 
 
+if (cfile(dg_nino28) is None) : exit(1)

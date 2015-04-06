@@ -19,3 +19,4 @@ dg2=ds(experiment="AMIPV6ALB2G", variable="rst", period="1980")
 dgr2=regrid(dg,dg2)
 ncview(dgr2)
 
+if (cfile(dgr2) is None) : exit(1)

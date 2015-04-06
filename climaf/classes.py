@@ -136,7 +136,7 @@ class cdataset(cobject):
         self.fileVarName=self.variable
         if (self.experiment is None or self.period is None or 
             self.variable is None) :
-            clog.error("experiment(%s) and period(%s) and variable(%s) "
+            clogger.error("experiment(%s) and period(%s) and variable(%s) "
                        "must be set explicilty or using cdefault"%
                        (experiment,`period`,variable))
             return

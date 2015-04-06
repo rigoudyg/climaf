@@ -37,3 +37,5 @@ saFile=cfile(sa)
 # Looking at the result
 print saFile
 os.system("ncdump -h "+saFile)
+
+if (saFile is None) : exit(1)

@@ -54,3 +54,4 @@ l=rst.baseFiles()
 rst_file=cfile(rst)
 
 
+if (rstfile is None) : exit(1)

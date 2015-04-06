@@ -39,8 +39,9 @@ my_file=cfile(tas1pc)
 print my_file
 
 # Check file size and content
-import os
+import os 
 os.system("ls -al "+my_file)
 #os.system("type ncdump && ncdump -h "+my_file)
 
+if (myfile is None) : exit(1)
 

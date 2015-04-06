@@ -35,3 +35,5 @@ print(tos.baseFiles())
 # Remap Ocean data to atmospheric grid. Use remapbil because default remapcon2 option needs cell areas
 tos_on_tas_grid=regrid(tos,tas, option="remapbil")
 ncview(tos_on_tas_grid)
+
+if (cfile(tosçon_tas_grid) is None) : exit(1)

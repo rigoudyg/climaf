@@ -188,7 +188,7 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
             rep.extend(selectExampleFiles(experiment, frequency, variable, period, urls))
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
-                                           realm, table, period, rip, version, urls))
+                                           period, rip, version, urls)) #realm, table, period, rip, version, urls))
         elif (org == "OCMIP5_Ciclad") :
             rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
                                                variable, period, urls))

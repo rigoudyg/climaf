@@ -36,3 +36,4 @@ derive('crest','minus','rst','rstcs')
 my_file=cfile(creShortTop)
 print my_file
 
+if (my_file is None) : exit(1)

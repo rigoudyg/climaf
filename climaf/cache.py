@@ -186,6 +186,7 @@ def hasIncludingObject(cobject) :
     def ds_period_difference(includer,included):
         if includer.buildcrs("") == included.buildcrs("") :
             return includer.period.includes(included.period)
+    clogger.debug("search for including object for "+`cobject`)
     return hasMatchingObject(cobject,ds_period_difference)
 
 def hasBeginObject(cobject) :

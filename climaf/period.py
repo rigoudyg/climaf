@@ -27,9 +27,11 @@ class cperiod():
         
     #
     def __repr__(self):
-        return "%04d%02d%02d-%04d%02d%02d"%(
-              self.start.year,self.start.month,self.start.day,
-              self.end.year,self.end.month,self.end.day)
+        return self.pr()
+        #return "%04d%02d%02d-%04d%02d%02d"%(
+        #      self.start.year,self.start.month,self.start.day,
+        #      self.end.year,self.end.month,self.end.day)
+    
     #
     def iso(self):
         """ Return isoformat(start)-isoformat(end), (with inclusive end, and 1 minute accuracy)
@@ -135,6 +137,7 @@ def init_period(dates) :
             eday=1 ; ehour=0 
         eminute = 0
     else:
+        clogger.debug("len(end)=%d"%len(end))
         if len(start) != len(end) :
             clogger.error("Must have same numer of digits for start and end dates")
             return None
@@ -166,22 +169,16 @@ def init_period(dates) :
             if (ehour > 23) :
                 ehour=0
                 eday=eday+1
+        elif (len(end)==12 ) :
+            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10]) ; eminute=int(end[10:12])
     #
     if not done :
         try :
+            #print "try:%d %02d %02d %02d %02d"%(eyear,emonth,eday,ehour,eminute)
             e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
         except:
             clogger.error("period end string %s is not a date"%end)
             return None
-    # yearstart=False
-    # if len(end) < 6 :
-    #     eyear+=1
-    #     yearstart=True
-    # if len(end) < 8 and (not yearstart) : emonth+=1
-    # if (emonth > 12) :
-    #     emonth=1
-    #     eyear+=1
-    #
     if s < e :
         return cperiod(s,e,None)
     else :
