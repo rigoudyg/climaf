@@ -37,6 +37,9 @@ cdefault("model","*")
 cdefault("rip","r1i1p1")
 cdefault("frequency","monthly")
 cdefault("domain","global")
+cdefault("table","*")
+cdefault("realm","*")
+cdefault("version","last")
 #cdefault("variable","tas")
 
 
@@ -70,7 +73,8 @@ class cdataset(cobject):
     #def __init__(self,project=None,model=None,experiment=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self,project=None, experiment=None, period=None, variable=None, 
-                 model=None, rip=None,frequency=None,domain=None,version=None) :
+                 model=None, rip=None,frequency=None,domain=None,version=None,
+                 realm=None, table=None) :
         """
         Create a CLIMAF dataset. 
         
@@ -132,6 +136,8 @@ class cdataset(cobject):
         self.frequency=  cdefault("frequency") if frequency is None else frequency
         self.domain=     cdefault("domain")    if domain    is None else domain
         self.variable=   cdefault("variable")  if variable  is None else variable
+        self.realm=      cdefault("realm")     if realm     is None else realm
+        self.table=      cdefault("table")     if table     is None else table
         self.version=    cdefault("version")   if version   is None else version
         self.fileVarName=self.variable
         if (self.experiment is None or self.period is None or 
@@ -158,7 +164,7 @@ class cdataset(cobject):
 	if type(self.domain) is list : sdomain=`self.domain`
 	else : sdomain=self.domain
         return "ds('"+self.project+s+self.model+s+self.experiment+s+self.rip+s+`period`+s+\
-                  self.frequency+s+sdomain+s+self.variable+"')"
+                  self.frequency+s+sdomain+s+self.variable+s+self.realm+s+self.table+"')"
 
     def isLocal(self) :
         return(dataloc.isLocal(project=self.project, model=self.model, \
@@ -337,6 +343,8 @@ def ds(*args,**kwargs) :
     period=init_period(fields[4]) 
     frequency=fields[5]
     domain=fields[6]
+    realm=fields[7]
+    table=fields[8]
     # domain may be the string representation of a list of corner coordinates, 
     # let us try to evaluate it
     try :

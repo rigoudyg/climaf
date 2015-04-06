@@ -164,7 +164,7 @@ def isLocal(project, model, experiment, frequency) :
             if re.findall(".*:.*",l) : rep=False
     return rep
 
-def selectLocalFiles(project, model, experiment, frequency, variable, period, rip="r1i1p1", version="last"):
+def selectLocalFiles(project, model, experiment, frequency, variable, period, rip="r1i1p1", version="last", realm="*", table="*"):
     """
     Returns the shortest list of (local) files which include the data for the dataset
     
@@ -188,7 +188,7 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
             rep.extend(selectExampleFiles(experiment, frequency, variable, period, urls))
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
-                                           period, rip, version, urls)) #realm, table, period, rip, version, urls))
+                                           realm, table, period, rip, version, urls))
         elif (org == "OCMIP5_Ciclad") :
             rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
                                                variable, period, urls))
@@ -401,7 +401,8 @@ def selectExampleFiles(experiment, frequency, variable, period, urls) :
     return rep
                         
 
-def selectCmip5DrsFiles(project, model, experiment, frequency, variable, period, rip, version, urls) :
+def selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
+                        realm, table, period, rip, version, urls) :
     # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
     # We use wildcards for : lab, realm and MIP_table
@@ -415,7 +416,7 @@ def selectCmip5DrsFiles(project, model, experiment, frequency, variable, period,
     for l in urls :
         pattern1=l+"/"+project+"/merge"
         if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
-        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/*/*/"+rip
+        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+rip
         # Get version directories list
         ldirs=glob.glob(patternv)
         #print "looking at "+patternv+ " gives:" +`ldirs`
@@ -529,5 +530,6 @@ def test2() :
 
 if __name__ == "__main__":
     test2()
+
 
 
