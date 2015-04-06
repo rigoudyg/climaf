@@ -18,7 +18,7 @@ if [[ $(uname -n) == lx* || $(uname -n) == sx* ]]; then
     [ $(whoami) = senesi ] && scripts=$scripts" em_data.py"
 elif [[ $(uname -n) == ciclad* ]]; then 
     # Ciclad
-    scripts=$scripts" cmip5drs.py ocmip_ciclad.py"
+    scripts=$scripts"  ocmip_ciclad.py"
 fi
 
 # Cleaning script

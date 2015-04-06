@@ -84,4 +84,4 @@ See the full, extended table at :ref:`contents`
    API
    howto
    contributing
-
+   news

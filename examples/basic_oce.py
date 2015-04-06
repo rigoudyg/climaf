@@ -16,13 +16,13 @@ from climaf.site_settings import *
 cdef("frequency","monthly") ;  cdef("project","CMIP5")
 
 # Choose a model and define your dataset 
-if onCiclad : cdef ("model","IPSL-CM5-LR")
+if onCiclad : cdef ("model","IPSL-CM5A-LR")
 else :
     if atCNRM : cdef ("model","CNRM-CM5")
     else :
         print("I do not know how to find CMIP5 data on this machine")
         exit(0)
-tos=ds( experiment="historical", variable="tos", period="186001-186002")
+tos=ds( experiment="historical", variable="tos", period="186001")
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
