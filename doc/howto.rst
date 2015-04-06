@@ -20,6 +20,7 @@ See :doc:`installing`
 
 See :ref:`examples`
 
+.. _my_data:
 
 ..describe where my data is
 ---------------------------
@@ -28,9 +29,11 @@ If your data is organized after one of the organization scheme known to CliMAF, 
 
   >>> dataloc(project="GEOMIP", organization="CMIP5_DRS", url=['/tmp/data','~/data/CMIP5'])
 
+If this is not the case, you will most probably be happy with the 'generic' type of organization, which allows to describe the file hierarchy for your data using templates with keyowrds, such as in::
 
-See the section on data access in :ref:`examples` for finding the
-relevant data organization name, and see also function :py:class:`~climaf.dataloc.dataloc` for reference.
+  >>> dataloc(project="MY_PROJECT", organization="generic", url=["/home/stephane/data/MY_PROJECT/${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc"]
+
+See examples in the section on data access at :ref:`examples` ; see function :py:class:`~climaf.dataloc.dataloc` for reference.
 
 
 .. _how_to_online_help:
@@ -145,7 +148,7 @@ Once happy with the result, please contribute your work for a merge in next CliM
 ..define a new data organization scheme
 ---------------------------------------
 
-TBD 
+To be described. But please see the 'generic' data organization in :ref:`my_data`
 
 
 
