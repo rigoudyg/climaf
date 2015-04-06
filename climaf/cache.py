@@ -221,14 +221,14 @@ def complement(crsb, crse, crs) :
         register(filet,crs)
         return filet
 
-def cdrop(crs) :
+def cdrop(crs, rm=True) :
     """ Deletes a cached file for a given CliMAF Reference Syntax expression, if it exists
 
     Returns None if it does not exists, False if delete is unsuccessful, True if OK    """
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
         try :
-            os.remove(crs2filename[crs])
+            if rm : rm.remove(crs2filename[crs])
             crs2filename.pop(crs)
             return True
         except:

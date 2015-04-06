@@ -6,7 +6,6 @@ merged in a single file, for efficiency purpose.
 
 """
 # S.Senesi - oct 2014
-import sys; sys.path.append("/home/stephane/Bureau/climaf")
 from climaf.api import *
 # Tell CliMAF how verbose it should be (levels : CRITICAL, ERROR, WARNING, INFO, DEBUG)
 import logging ; clog(logging.ERROR)  

@@ -22,14 +22,14 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 # Created : S.Senesi - 2014
 
 
-import os, os.path, logging
+import os, os.path, shutil, logging
 
 import climaf, climaf.cache
 from climaf.classes   import cdefault as cdef,cdataset,ds #,cperiod
 from climaf.driver    import ceval,varOf #,cfile,cobj 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
-from climaf.cache     import creset as craz, csync as csave , cdump
+from climaf.cache     import creset as craz, csync as csave , cdump, cdrop
 from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
 
@@ -41,24 +41,39 @@ climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()
 
 # Commodity functions
-def cfile(object,deep=None) :
+def cfile(object,target=None,ln=None,deep=None) :
     """
-    Provide the filename for a CliMAF object. Launch computation if needed.
+    Provide the filename for a CliMAF object, or copy this file to target. Launch computation if needed. 
 
     Args:
-      object (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
+      object (CliMAF object) : either a dataset or a 'compound' object (e.g. the result of a CliMAF operator)
+      target (str, optional) : name of the destination file or link; CliMAF will anyway store the result
+       in its cache; 
+      ln (logical, optional) : if True, target is created as a symlink to the CLiMAF cache file
       deep (logical, optional) : governs the use of cached values when computing the object
       
-        - if missing, or None : use cache as much as possible
-        - False : make a shallow computation, i.e. do not use cached values for top level operation
+        - if missing, or None : use cache as much as possible (speed up the computation)
+        - False : make a shallow computation, i.e. do not use cached values for the 
+          top level operation
         - True  : make a deep computation, i.e. do not use any cached value
 
-    Returns: a filename in CliMAF cache; the file contains the object's value
+    Returns: 
+      - if 'target' is provided : returns this filename if computation is successful ('target' contains the result), and None otherwise; 
+      - else : returns the filename in CliMAF cache, which contains the result (and None if failure)
 
 
     """
-    clogger.debug("cfile called on"+str(object))  #LV
-    return climaf.driver.ceval(object,format='file',deep=deep)
+    clogger.debug("cfile called on"+str(object))  
+    result=climaf.driver.ceval(object,format='file',deep=deep)
+    if target is None : return result
+    else :
+        if result is not None :
+            if ln :
+                os.remove(os.path.expanduser(target))
+                os.symlink(result,os.path.expanduser(target))
+            else :
+                shutil.copyfile(result,os.path.expanduser(target))
+        return target
 
 def cshow(obj) :
     """ 

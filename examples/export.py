@@ -1,8 +1,7 @@
-# How to export CliMAF results as NetCDF files or Numpy Masked Arrays, when
-# you are sure that you cannot go further using CliMAF
+# How to export CliMAF results as NetCDF files or Numpy Masked Arrays
+#####################################################################
 
 from climaf.api import *
-import os
 
 # Define data location for an experiment, as concisely as possible
 dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
@@ -16,10 +15,21 @@ dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
 # Compute its space_average using a CliMAF standard operator based on a script based on CDO 
 sa=space_average(dg)
 
+# Computing and exporting a CliMAF object as a NetCDF file
+#----------------------------------------------------------
+# Just requiring the filename if CliMAF cache 
+saFile=cfile(sa)
+# Requiring a copy the result as some other place
+saFile=cfile(sa,"~/tmp/space_average.nc")
+# Requiring a symbolic link to CliMAF cache result 
+saFile=cfile(sa,"~/tmp/space_average_link.nc")
+
+# Looking at the result
+print saFile
+os.system("ncdump -h "+saFile)
+
 # Computing and exporting a CliMAF object as a NumPy Masked Array
 #----------------------------------------------------------------
-saMA=cexport(sa,format="MaskedArray")
-# Shortcut :
 saMA=cMA(sa)
 
 # Looking at the result
@@ -28,14 +38,5 @@ type(saMA)
 saMA.shape
 saMA.data
 
-# Computing and exporting a CliMAF object as a NetCDF file
-#----------------------------------------------------------
-saFile=cexport(sa,format="NetCDF")
-# Shortcut :
-saFile=cfile(sa)
-
-# Looking at the result
-print saFile
-os.system("ncdump -h "+saFile)
-
+# next line is only for systematic tests purpose
 if (saFile is None) : exit(1)
