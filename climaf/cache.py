@@ -283,7 +283,8 @@ def cdump():
     
     """
     for crs in crs2filename :
-        print "%s : %s"%(crs2filename[crs][-30:],crs)
+        #print "%s : %s"%(crs2filename[crs][-30:],crs)
+        print "%s : %s"%(crs2filename[crs],crs)
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ class A_basic(unittest.TestCase):
     def test_1_print_dataset(self):
         pdg=`self.dg`
         print pdg
-        expected="ds('*.*.AMIPV6ALB2G.r1i1p1.19800101-19820101.monthly.global.tas')"
+        expected="ds('*.*.AMIPV6ALB2G.r1i1p1.1980-1981.monthly.global.tas')"
         print expected
         self.assertEqual(pdg,expected, 
                          'Issue printing a very basic dataset')
@@ -35,7 +35,7 @@ class A_basic(unittest.TestCase):
         sd=`sdev`
         actual=sd
         print "actual=",sd
-        expected="mean_and_sdev(ds('*.*.AMIPV6ALB2G.r1i1p1.19800101-19820101.monthly.global.tas')).sdev"
+        expected="mean_and_sdev(ds('*.*.AMIPV6ALB2G.r1i1p1.1980-1981.monthly.global.tas')).sdev"
         print "expected=",expected
         self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
 
@@ -46,7 +46,7 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_sdev",self.dg) # Main output is the return value of applying the script
         sdev=mean.sdev         # Secondary output 'sdev' is a 'property' of main output
         fil=cfile(sdev)
-        expected=climaf.cache.currentCache+'/69/7.nc'
+        expected=climaf.cache.currentCache+'/49/c.nc'
         print "actual=",fil
         print "expected=",expected
         self.assertEqual(fil,expected,"Issue evaluating script application as a file")

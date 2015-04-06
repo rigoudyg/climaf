@@ -5,7 +5,7 @@
 # S.Senesi 08/2014 : created
 
 import re, datetime
-from clogging import clogger
+from climaf.clogging import clogger
 
 class cperiod():
     """
@@ -28,10 +28,9 @@ class cperiod():
     #
     def __repr__(self):
         return self.pr()
-        #return "%04d%02d%02d-%04d%02d%02d"%(
-        #      self.start.year,self.start.month,self.start.day,
-        #      self.end.year,self.end.month,self.end.day)
-    
+        #return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
+        #      self.start.year,self.start.month,self.start.day,self.start.hour,self.start.minute,
+        #      self.end.year,self.end.month,self.end.day,self.end.hour,self.end.minute))
     #
     def iso(self):
         """ Return isoformat(start)-isoformat(end), (with inclusive end, and 1 minute accuracy)
@@ -41,9 +40,44 @@ class cperiod():
         return "%s,%s"%(self.start.isoformat(),endproxy.isoformat())
     #
     def pr(self) :
-        return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
-              self.start.year,self.start.month,self.start.day,self.start.hour,self.start.minute,
-              self.end.year,self.end.month,self.end.day,self.end.hour,self.end.minute))
+        if (self.start.minute != 0 or self.start.minute != 0):
+            return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
+                    self.start.year,self.start.month,self.start.day,self.start.hour,self.start.minute,
+                    self.end.year,self.end.month,self.end.day,self.end.hour,self.end.minute))
+        elif (self.start.hour != 0 or self.end.hour != 0 ):
+            return("%04d%02d%02d%02d-%04d%02d%02d%02d"%(\
+                    self.start.year,self.start.month,self.start.day,self.start.hour,
+                    self.end.year,self.end.month,self.end.day,self.end.hour))
+        elif (self.start.day != 1 or self.end.day != 1 ):
+            if (self.end.day != 1 ): 
+                d=self.end.day -1
+                m=self.end.month
+                y=self.end.year
+            else : 
+                end=self.end - datetime.timedelta(1)
+                y=end.year ; m=end.month; d=end.day
+            if (self.start.year,self.start.month,self.start.day)== (y,m,d) :
+                return("%04d%02d%02d"%(y,m,d))
+            else:
+                return("%04d%02d%02d-%04d%02d%02d"%(\
+                    self.start.year,self.start.month,self.start.day,
+                    y,m,d))
+        elif (self.start.month != 1 or self.end.month != 1 ):
+            if (self.end.month != 1 ): 
+                m=self.end.month -1
+                y=self.end.year
+            else : 
+                m=12
+                y=self.end.year-1
+            if self.start.year==y and self.start.month==m :
+                return("%04d%02d"%(self.start.year,self.start.month))
+            else:
+                return("%04d%02d-%04d%02d"%(self.start.year,self.start.month,y, m))
+        else :
+            if self.start.year != self.end.year-1 : 
+                return("%04d-%04d"%(self.start.year, self.end.year-1))
+            else:
+                return("%04d"%(self.start.year))
     #
     def hasFullYear(self,year):
         return( int(year) >= self.start.year and int(year) < self.end.year) 
@@ -137,7 +171,7 @@ def init_period(dates) :
             eday=1 ; ehour=0 
         eminute = 0
     else:
-        clogger.debug("len(end)=%d"%len(end))
+        #clogger.debug("len(end)=%d"%len(end))
         if len(start) != len(end) :
             clogger.error("Must have same numer of digits for start and end dates")
             return None
@@ -147,7 +181,7 @@ def init_period(dates) :
             eminute=int(end[10:12])
         if (len(end)==4 ) : eyear=int(end[0:4])+1 ; emonth=1 ; eday=1 ; ehour=0 
         elif (len(end)==6 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=1 ; ehour=0
+            eyear=int(end[0:4]) ; emonth=int(end[4:6])+1 ; eday=1 ; ehour=0
             if (emonth > 12) :
                 emonth=1
                 eyear=eyear+1
