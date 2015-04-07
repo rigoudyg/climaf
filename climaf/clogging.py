@@ -9,14 +9,15 @@ def log_l():
     
 clogger=log_l()
 
-def clog(arg) :
+def clog(level) :
     """
     Sets the verbosity level for CliMAF log messages on stderr.
 
-    Among : logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
+    Args:
+     level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
 
     """
-    clogger.setLevel(arg) 
+    clogger.setLevel(level) 
     exist_stream_handler=False
     for h in clogger.handlers :
         if type(h) is logging.StreamHandler :
@@ -33,22 +34,23 @@ def clog(arg) :
         clogger.addHandler(console)
 
 
-def clog_file(argf) :
+def clog_file(level) :
     """
     Sets the verbosity level for CliMAF log messages on file climaf.log
 
-    Among : logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
+   Args:
+     level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
     """
     exist_file_handler=False
     for h in clogger.handlers :
         if type(h) is logging.FileHandler :
             #print "il existe deja un FileHandler => on change le niveau d informations", h
-            h.setLevel(argf)
+            h.setLevel(level)
             exist_file_handler=True    
             
     if exist_file_handler==False:
         #print "ajout d un FileHandler"
         fh = logging.FileHandler('climaf.log',mode='w') 
-        fh.setLevel(argf)
+        fh.setLevel(level)
         fh.setFormatter(formatter)
         clogger.addHandler(fh)

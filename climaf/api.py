@@ -35,7 +35,7 @@ import climaf.standard_operators
 
 clog(logging.ERROR)
 clog_file(logging.ERROR)
-#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``
+#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()

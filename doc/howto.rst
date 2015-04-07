@@ -55,6 +55,10 @@ Under the Python shell, all relevant CliMAF functions and variables are auto-doc
 
     >>> help(cscript)
 
+ - get help on a CliMAF operator (say ``regrid``) by::
+
+    >>> help(regrid)
+
 
 .. _how_to_list_operators:
 
@@ -75,8 +79,19 @@ You may then ask for on-line help for any of the scripts , as e.g. ::
 ..tune CliMAF verbosity level
 ------------------------------
 
-CliMAF uses the Python logging package :py:mod:`logging` for informing about work done, at varied verbosity levels. Function :py:func:`clog` is a shortcut for setting the severity level; possible arguments are : ``logging.DEBUG``, ``logging.INFO``, ``logging.WARNING``, ``logging.CRITICAL`` (from  the most to the less verbose level). Type ``help(clog)``
+CliMAF uses the Python logging package :py:mod:`logging` for informing
+about work done, at varied verbosity levels. There are two logging
+streams : one going to screen (or stderr), the other going to file
+``climaf.log``
 
+
+Function :py:func:`~climaf.clogging.clog` is a shortcut for setting the severity level
+for the first one; possible arguments are : ``logging.DEBUG``,
+``logging.INFO``, ``logging.WARNING``, ``logging.CRITICAL`` (from the
+most to the less verbose level). Type ``help(clog)``
+
+
+Function :py:func:`~climaf.clogging.clog_file` does the same for the logging on file
 
 .. _how_to_report_an_issue:
 
