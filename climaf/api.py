@@ -41,6 +41,7 @@ climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()
 
 from driver import cpage #LV
+import subprocess
 
 # Commodity functions
 def cfile(object,target=None,ln=None,deep=None) :
