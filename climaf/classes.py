@@ -355,6 +355,60 @@ def ds(*args,**kwargs) :
     return cdataset(project=project,model=model,experiment=experiment,rip=rip,period=period,\
              frequency=frequency,domain=domain,variable=variable)
 
+class cproject():
+    def __init__(self,name, separator=".", *args) :
+        """
+        A 'cproject' is the definition of a set of attributes, or facets, which 
+        values completely define a 'dataset' as managed by CliMAF.
+
+        For instance, cproject CMIP5 , after his Data Reference Syntax, has attributes : 
+        experiment, model, rip, variable, frequency, realm, table, version
+
+        The args provide the attribute names.
+
+        CliMAF anyway enforces attributes : project, experiment, period, domain
+
+        The attributes list, as composed of those ienforced by CliMAF
+        and those provided by args, defines the Reference Syntax for
+        datasets in the cproject; for instance, a datset in a cproject
+        declared as ::
+
+        >>> cproject("MINE","myfreq",separator="_")
+
+        will hase dataset syntax based on the pattern:
+
+        project_experiment_period_domain_myfreq
+
+        such as::
+
+        MINE_hist_[1980-1999]_global_decadal
+
+        while an example for cproject CMIP5 could be::
+
+        CMIP5.historical.[1980].global.monthly
+
+        The attributes list should include all facets which are useful
+        for distinguishing datastes for each other , and for computing
+        datafile pathnames in the 'generic' organization (see
+        :ref:class:`~climaf.dataloc.dataloc`)
+
+        """
+        if name in cprojects : clogger.warning("Redefining project %s"%name)
+        self.project=name
+        #
+        self.facets=[]
+        forced=['project','experiment', 'period', 'domain']
+        for f in forced : self.facets.append(f)
+        for a in args : 
+            print "looking at a="+a
+            if not a in forced : self.facets.append(a)
+        #
+        self.pattern=""
+        # Build the pattern for the datasets CRS for this cproject
+        for f in self.facets : self.pattern += "${%s}."%f
+        self.pattern=self.pattern[:-1]
+        cprojects[name]=self
+
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV
 #    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
