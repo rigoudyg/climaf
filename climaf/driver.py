@@ -553,3 +553,11 @@ def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
+
+#LV
+class cpage() :
+    def __init__(self, taille_x, taille_y, figll, orientation):
+        self.taille_x=taille_x
+        self.taille_y=taille_y
+        self.figll=figll
+        self.orientation=orientation
