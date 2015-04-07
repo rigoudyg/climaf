@@ -85,3 +85,4 @@ See the full, extended table at :ref:`contents`
    howto
    contributing
    news
+   community

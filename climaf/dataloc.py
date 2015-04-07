@@ -41,18 +41,18 @@ class dataloc():
            - OBS4MIPS_CNRM : Obs4MIPS data managed by VDR on CNRM's Lustre
            - OBS_CAMI : Reference observation set managed by VDR and ASTER on CNRM's Lustre
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
+           - generic : a data organization described by the user, using patterns such as described for 
+             :py:func:`~climaf.dataloc.selectGenericFiles`
            - example : the data included in CliMAF package
 
            Please ask the CliMAF dev team for implementing further organizations. 
            It is quite quick for data which are on the filesystem. Organizations 
            considered for future implementations are :
 
-           - generic data organization described by the user using patterns such as described for 
-             :py:func:`~climaf.dataloc.selectGenericFiles`
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
            
-         - the set of attributes which define the experiments which data are 
+         - the set of attribute values which which experiment's data are 
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
@@ -253,7 +253,7 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
       if applicable (otherwise the assumption is that the whole year -resp. month or day- is
       included in the file
 
-    - wildcards '?' and '*' for matching respectively one and any number of charcacters
+    - wildcards '?' and '*' for matching respectively one and any number of characters
 
 
     """
@@ -265,18 +265,18 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
         d=dict(project=project, model=model, experiment=experiment, frequency=frequency,
                variable=variable, rip=rip, version=version, realm=realm, table=table)
         template=template.safe_substitute(d)
-        print "template after attributes replace : "+template
+        #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
         for k in dt : temp2=temp2.replace(k,dt[k])
-        print "template with date wildcards : "+temp2
+        #print "template with date wildcards : "+temp2
         lfiles=glob.glob(temp2)
         #
         # Analyze all filenames
         for f in lfiles :
-            print "looking at file"+f
+            #print "looking at file"+f
             # Construct regexp for extracting dates from filename
             dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
                     YYYYMMDD="([0-9]{10})")
@@ -315,7 +315,7 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
                 # Filter against variable 
                 if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
                     # Should check time period in the file if not regexp
-                    print "appending "+f
+                    #print "appending "+f
                     rep.append(f)
     return rep
 
