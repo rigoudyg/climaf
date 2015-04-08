@@ -69,7 +69,7 @@ class A_basic(unittest.TestCase):
 
 
 def skipUnless_CNRM_Lustre():
-    if os.path.exists('/cnrm'):
+    if os.path.exists('/cnrm/aster'):
         return lambda func: func
     return unittest.skip("because CNRM's Lustre not available")
 

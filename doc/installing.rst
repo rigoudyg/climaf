@@ -11,7 +11,7 @@ repository; this will also copy some data allowing for testing the installation 
   cd climaf
   export PYTHONPATH=$PYTHONPATH:$(pwd)
   cd testing
-  test_install.sh 
+  ./test_install.sh 
 
 After successful installation, for running CliMAF, you will :
 
