@@ -25,7 +25,7 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 import os, os.path, shutil, logging
 
 import climaf, climaf.cache
-from climaf.classes   import cdefault as cdef,cdataset,ds #,cperiod
+from climaf.classes   import cdefault as cdef,cdataset,ds,cproject #,cperiod
 from climaf.driver    import ceval,varOf #,cfile,cobj 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive

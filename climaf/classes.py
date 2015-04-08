@@ -135,20 +135,18 @@ class cdataset(cobject):
         # Register facets values
         err=False
         self.kvp=dict()
-        for facet in projects[self.project].facets :
+        for facet in cprojects[self.project].facets :
             if facet in kwargs : val=kwargs[facet]
             else: val=cdefault(facet)
             if val is None :
                 clogger.error("Project %s needs facet %s"%(self.project,facet))
                 err=True
-            self.kvp[facet]=value
+            self.kvp[facet]=val
             #self.__set__(facet,val)
-            else :
-                return None
         #
         # Check for typing or user's logic errors
         for facet in kwargs :
-            if not facet in projects[self.project].facets :
+            if not facet in cprojects[self.project].facets :
                 clogger.error("Project %s doesn't have facet %s"%(self.project,facet))
                 err=True
         #
@@ -168,11 +166,11 @@ class cdataset(cobject):
         
     def buildcrs(self,period=None):
         # Note : function 'ds' (far below) must be modified when buildcrs is modified
-        crs_template=string.Template(projects[self.project].crs)
+        crs_template=string.Template(cprojects[self.project].crs)
         dic=self.kvp
-        if period is not None : dic('period')=period
-	if type(dic['domain']) is list : dic('domain')=`dic('domain')`
-        rep="ds('"string.template.safe_substitute(crs_template,dic)+")"
+        if period is not None : dic['period']=period
+	if type(dic['domain']) is list : dic['domain']=`dic('domain')`
+        rep="ds('%s')"%string.template.safe_substitute(crs_template,dic)
         return rep
 
     def isLocal(self) :
@@ -331,38 +329,32 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
 
 def ds(*args,**kwargs) :
     """
-    Returns a dataset from its full Climate Reference Syntax.
+    Returns a dataset from its full Climate Reference Syntax string.
 
     Also a shortcut for :py:meth:`~climaf.classes.cdataset`, when used with with only keywords arguments
 
     """
     # Note : muts be kept phased with self.crs defined in cdataset.init(), both for
     # function name and CRS syntax
-    if len(args) > 1 :
-        clogger.error("must provide 0 or 1 positional arguments, not "+len(args))
+    if len(args) >1 :
+        clogger.error("must provide either 0 or 1 positional arguments, not "+len(args))
         return None
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
-    # TBD : improve flexibility for provided CRS (i.e. optional fields) by analyzing w.r.t. known values
-    fields=crs.split(".")
-    project=fields[0]
-    model=fields[1]
-    experiment=fields[2]
-    rip=fields[3]
-    period=init_period(fields[4]) 
-    frequency=fields[5]
-    domain=fields[6]
-    realm=fields[7]
-    table=fields[8]
-    # domain may be the string representation of a list of corner coordinates, 
-    # let us try to evaluate it
-    try :
-        domain=eval(domain)
-    except :
-        pass
-    variable=fields[7]
-    return cdataset(project=project,model=model,experiment=experiment,rip=rip,period=period,\
-             frequency=frequency,domain=domain,variable=variable)
+    results=[]
+    for cproj in cprojects : 
+        dataset = cproj.crs2ds(crs) 
+        if (dataset) : result.append(dataset)
+    if len(results) > 1 :
+        clooger.error("CRS expressions %s is ambiguous"%crs)
+        return None
+    elif len(results) == 0 :
+        clooger.error("CRS expressions %s is not valid for any project in %s"%(crs,`cprojects`))
+        return None
+    else : return results[0]
+
+#: List of declared projects (type is cproject)
+cprojects=dict()
 
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
@@ -416,8 +408,30 @@ class cproject():
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
-        for f in self.facets : self.crs += "${%s}%s"%(f,self.separator)
+        for f in self.facets : 
+            self.crs += "${%s}%s"%(f,self.separator)
         self.crs=self.crs[:-1]
+    def __repr__(self):
+        return self.crs
+    def crs2ds(crs) :
+        """ 
+        Try to interpret a string as the CRS of a dataset for the current cproject
+        Return the dataset if OK
+        """
+        fields=crs.split(self.separator)
+        if len(fields) == len(self.facets) :
+            if fields[0] == self.project :
+                kvp=dict()
+                for i,f in enumerate(self.facets) : kvp[f]=fields[i]
+                try :
+                    kvp['period']=init_period(kvp['period'])
+                    # domain may be the string representation of a list of corner coordinates, 
+                    # let us try to evaluate it
+                    kvp['domain']=eval(kvp['domain'])
+                except:
+                    return
+                return cdataset(kvp)
+
 
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV
