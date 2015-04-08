@@ -73,8 +73,7 @@ class cdataset(cobject):
     #def __init__(self,project=None,model=None,experiment=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self,project=None, experiment=None, period=None, variable=None, 
-                 model=None, rip=None,frequency=None,domain=None,version=None,
-                 realm=None, table=None) :
+                 domain=None,*kwargs) :
         """
         Create a CLIMAF dataset. 
         
@@ -126,29 +125,39 @@ class cdataset(cobject):
         
         
         """
-        # Should check following initializations w.r.t. relevant regexps
-        self.project=    cdefault("project")   if project   is None else project
-        self.model=      cdefault("model")     if model     is None else model
-        self.experiment= cdefault("experiment")if experiment is None else experiment
-        self.rip=        cdefault("rip")       if rip       is None else rip
-        self.period=     cdefault("period")    if period    is None else period
-        if (isinstance(self.period,str)) : self.period=init_period(self.period)
-        self.frequency=  cdefault("frequency") if frequency is None else frequency
-        self.domain=     cdefault("domain")    if domain    is None else domain
-        self.variable=   cdefault("variable")  if variable  is None else variable
-        self.realm=      cdefault("realm")     if realm     is None else realm
-        self.table=      cdefault("table")     if table     is None else table
-        self.version=    cdefault("version")   if version   is None else version
-        self.fileVarName=self.variable
-        if (self.experiment is None or self.period is None or 
-            self.variable is None) :
-            clogger.error("experiment(%s) and period(%s) and variable(%s) "
-                       "must be set explicilty or using cdefault"%
-                       (experiment,`period`,variable))
-            return
         #
+        if 'project' in kwargs : self.project=kwargs['project']
+        else : self.project= cdefault("project")   
+        if project is None :
+            clogger.error("Must provide a project (Can use cdef)")
+            return 
+        #
+        # Register facets values
+        err=False
+        self.kvp=dict()
+        for facet in projects[self.project].facets :
+            if facet in kwargs : val=kwargs[facet]
+            else: val=cdefault(facet)
+            if val is None :
+                clogger.error("Project %s needs facet %s"%(self.project,facet))
+                err=True
+            self.kvp[facet]=value
+            #self.__set__(facet,val)
+            else :
+                return None
+        #
+        # Check for typing or user's logic errors
+        for facet in kwargs :
+            if not facet in projects[self.project].facets :
+                clogger.error("Project %s doesn't have facet %s"%(self.project,facet))
+                err=True
+        #
+        if err : return None
+        if ('period' in self.kvp) : self.kvp['period']=init_period(self.kvp['period'])
+        #
+        # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
-        # Some more stuff for looking for data location and organization for this very experiment
+        # 
         self.register()
 
     def setperiod(self,period) :
@@ -158,13 +167,13 @@ class cdataset(cobject):
         self.register()
         
     def buildcrs(self,period=None):
-        if period is None : period=self.period
         # Note : function 'ds' (far below) must be modified when buildcrs is modified
-        s= "."
-	if type(self.domain) is list : sdomain=`self.domain`
-	else : sdomain=self.domain
-        return "ds('"+self.project+s+self.model+s+self.experiment+s+self.rip+s+`period`+s+\
-                  self.frequency+s+sdomain+s+self.variable+s+self.realm+s+self.table+"')"
+        crs_template=string.Template(projects[self.project].crs)
+        dic=self.kvp
+        if period is not None : dic('period')=period
+	if type(dic['domain']) is list : dic('domain')=`dic('domain')`
+        rep="ds('"string.template.safe_substitute(crs_template,dic)+")"
+        return rep
 
     def isLocal(self) :
         return(dataloc.isLocal(project=self.project, model=self.model, \
@@ -356,7 +365,7 @@ def ds(*args,**kwargs) :
              frequency=frequency,domain=domain,variable=variable)
 
 class cproject():
-    def __init__(self,name, separator=".", *args) :
+    def __init__(self,name,  *args, **kwargs) :
         """
         A 'cproject' is the definition of a set of attributes, or facets, which 
         values completely define a 'dataset' as managed by CliMAF.
@@ -366,18 +375,18 @@ class cproject():
 
         The args provide the attribute names.
 
-        CliMAF anyway enforces attributes : project, experiment, period, domain
+        CliMAF anyway enforces attributes : project, experiment, variable, period, domain
 
         The attributes list, as composed of those ienforced by CliMAF
         and those provided by args, defines the Reference Syntax for
         datasets in the cproject; for instance, a datset in a cproject
         declared as ::
 
-        >>> cproject("MINE","myfreq",separator="_")
+        >>> cproject("MINE","myfreq","myfacet")
 
         will hase dataset syntax based on the pattern:
 
-        project_experiment_period_domain_myfreq
+        project.experiment.variable.period.domain.myfreq
 
         such as::
 
@@ -397,17 +406,18 @@ class cproject():
         self.project=name
         #
         self.facets=[]
-        forced=['project','experiment', 'period', 'domain']
+        forced=['project','experiment', 'variable', 'period', 'domain']
         for f in forced : self.facets.append(f)
         for a in args : 
-            print "looking at a="+a
             if not a in forced : self.facets.append(a)
         #
-        self.pattern=""
-        # Build the pattern for the datasets CRS for this cproject
-        for f in self.facets : self.pattern += "${%s}."%f
-        self.pattern=self.pattern[:-1]
+        self.separator="."
+        if "separator" in kwargs : self.separator=kwargs['separator']
         cprojects[name]=self
+        self.crs=""
+        # Build the pattern for the datasets CRS for this cproject
+        for f in self.facets : self.crs += "${%s}%s"%(f,self.separator)
+        self.crs=self.crs[:-1]
 
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV
