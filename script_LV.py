@@ -1,7 +1,7 @@
 from climaf.api import *
 clog(logging.INFO)
 clog_file(logging.INFO)
-dataloc(experiment="AMIPV6ALB2G", organization="EM",url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+dataloc(experiment="AMIPV6ALB2G", organization="example",url=[cpath+"/../examples/data/AMIPV6ALB2G"])
 
 cdef("frequency","monthly")
 cdef("period","1980-1981")
@@ -9,7 +9,7 @@ cdef("period","1980-1981")
 tas_ds=ds(experiment="AMIPV6ALB2G", variable="tas")
 tas_ds
 
-tas_ds.contributingFiles()
+tas_ds.baseFiles()
 #craz() # Clear CliMAF file cache for enforcing actual computation
 cfile(tas_ds)
 #cfile(ds(experiment="AMIPV6ALB2G", variable="tas"))

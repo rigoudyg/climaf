@@ -144,26 +144,56 @@ def cfilePage(*args, **kwargs) :
         if len(obj_cpage.figll[i])!=3 :
             clogger.error("cpage.figll must have 3 dimensions in each sublist, pb for sublist %d" % (i+1))
             return(None)
-
+        
+#modif 8/04/15
     #calcul des figures avec cfile
     figfilesll=[]
     for liste in obj_cpage.figll :
         print liste
         listfig=[]
         for fig in liste :
-            fic=cfile(fig)
-            listfig.append(fic)
+            print "figure", fig
+            if fig is not None:
+                fic=cfile(fig)
+                listfig.append(fic)
+            else:
+#                listfig.append(fig)
+                listfig.append('canvas:None')
         figfilesll.append(listfig)
 
     #construction d un tableau contenant la fig ou le mot cle 'canvas:None' en cas de 'blanc'
+#    tab_fig=[]
+#    for i in range(len(figfilesll)):
+#        for j in range(len(figfilesll[i])):
+#            if figfilesll[i][j] is None:
+#                tab_fig.append('canvas:None')
+#            else:
+#                tab_fig.append(figfilesll[i][j])  
+#    print tab_fig
     tab_fig=[]
     for i in range(len(figfilesll)):
         for j in range(len(figfilesll[i])):
-            if figfilesll[i][j] is None:
-                tab_fig.append('canvas:None')
-            else:
-                tab_fig.append(figfilesll[i][j])  
-    print tab_fig                
+            tab_fig.append(figfilesll[i][j])  
+    print "tab de fig", tab_fig
+    
+#fin modif 8/04/15
+
+#    figfilesll=[]
+#    for liste in obj_cpage.figll :
+#        print "liste", liste
+##        listfig=[]
+#        for fig in liste :
+#            print "figure", fig
+#            if fig is not None:
+#                fic=cfile(fig)
+#                figfilesll.append(fic)
+##                listfig.append(fic)
+#            else:
+##                listfig.append(fig)
+#                figfilesll.append('canvas:None')
+#                
+##        figfilesll.append(listfig)
+#    print "liste de liste de figs", figfilesll
 
     #construction d un tableau 'd echelle' pour chaque fig
     largeur_page=800.
@@ -183,22 +213,35 @@ def cfilePage(*args, **kwargs) :
     #600x396+180+450  
     #160x396+10+800
     #600x396+180+850
-    
+#modif 8/04    
     #nouvelle num coherente avec INPUT
     scale_fig=("%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3),"%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3))
 
     print scale_fig
-    
+#modif 8/04
+    scale_fig_test=[]
+    scale_fig_test.append(["%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3)])
+    scale_fig_test.append(["%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3)])
+
+    print scale_fig_test
+            
     #mise en page attention corriger ordre des figs
     #ici remplacer 800*1200 par les variables
     comm=subprocess.Popen(["convert", "-size", "800x1200", "xc:white", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     comm.wait()
-   
+
+#modif 8/04   
     for i in range(len(tab_fig)):
         print i, scale_fig[i], tab_fig[i]
         comm=subprocess.Popen(["composite", "-geometry", scale_fig[i], tab_fig[i], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         comm.wait()
-
+#modif 8/04
+    for i in range(len(figfilesll)):
+        for j in range(len(figfilesll[i])):
+            print i, j, scale_fig_test[i][j], figfilesll[i][j]
+            comm=subprocess.Popen(["composite", "-geometry", scale_fig_test[i][j], figfilesll[i][j], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            comm.wait()
+            
     #i=j=0
     #comm=subprocess.Popen(["convert", "-size", "800x1200", "xc:white", figfilesll[i][j+1], "-geometry", "600x396+180+50", "-composite", figfilesll[i][j+2], "-geometry", "160x396+10+400", "-composite", figfilesll[i+1][j], "-geometry", "160x396+10+800", "-composite", figfilesll[i+1][j+1], "-geometry", "600x396+180+450", "-composite", figfilesll[i+1][j+2], "-geometry", "600x396+180+850", "-composite", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #comm.wait()
