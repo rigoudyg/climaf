@@ -19,6 +19,7 @@ def setNewUniqueCache(path) :
     """
     global currentCache
     global cachedirs
+    global cacheIndexFileName
     
     cachedirs=[ path ] # The list of cache directories
     crs2filename=dict()  # The index associating filenames to CRS expressions
@@ -228,7 +229,7 @@ def cdrop(crs, rm=True) :
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
         try :
-            if rm : rm.remove(crs2filename[crs])
+            if rm : os.remove(crs2filename[crs])
             crs2filename.pop(crs)
             return True
         except:
