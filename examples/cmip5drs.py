@@ -43,5 +43,9 @@ import os
 os.system("ls -al "+my_file)
 #os.system("type ncdump && ncdump -h "+my_file)
 
+# Access a fixed field
+sftlf=ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
+files=sftlf.baseFiles()
+
 if (my_file is None) : exit(1)
 
