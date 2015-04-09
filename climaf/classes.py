@@ -6,9 +6,10 @@
  """
 # Created : S.Senesi - 2014
 
-import re
+import re, string
+
 import dataloc
-from period import init_period,cperiod
+from period import init_period, cperiod
 from clogging import clogger
 
 #: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
@@ -72,8 +73,7 @@ class cobject():
 class cdataset(cobject):
     #def __init__(self,project=None,model=None,experiment=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
-    def __init__(self,project=None, experiment=None, period=None, variable=None, 
-                 domain=None,*kwargs) :
+    def __init__(self,**kwargs) :
         """
         Create a CLIMAF dataset. 
         
@@ -126,12 +126,15 @@ class cdataset(cobject):
         
         """
         #
+        self.crs=""
         if 'project' in kwargs : self.project=kwargs['project']
         else : self.project= cdefault("project")   
-        if project is None :
+        if self.project is None :
             clogger.error("Must provide a project (Can use cdef)")
             return 
-        #
+        elif self.project not in cprojects :
+            clogger.error("Dataset's project %s has not been described by a call to cproject()"%self.project)
+            return
         # Register facets values
         err=False
         self.kvp=dict()
@@ -170,7 +173,7 @@ class cdataset(cobject):
         dic=self.kvp
         if period is not None : dic['period']=period
 	if type(dic['domain']) is list : dic['domain']=`dic('domain')`
-        rep="ds('%s')"%string.template.safe_substitute(crs_template,dic)
+        rep="ds('%s')"%crs_template.safe_substitute(dic)
         return rep
 
     def isLocal(self) :
@@ -207,15 +210,8 @@ class cdataset(cobject):
 
     def baseFiles(self):
         """ Returns the list of (local) files which include the data for the dataset
-        
-        Method : depending on the data organization, select the relevant files for the
-        requested period and variable
-        Implicitly assumes that organization is the same for all 
-        
         """
-        return(dataloc.selectLocalFiles(project=self.project, model=self.model, \
-                 experiment=self.experiment, frequency=self.frequency,\
-                 variable=self.variable, period=self.period, version=self.version))
+        return(dataloc.selectLocalFiles(**self.kvp))
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
         in files (rather than being a derived, virtual variable)

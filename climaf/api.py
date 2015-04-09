@@ -39,6 +39,8 @@ clog_file(logging.ERROR)
 cpath=os.path.abspath(climaf.__path__[0]) 
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()
+climaf.standard_projects.init_standard_projects()
+import climaf.site_settings
 
 # Commodity functions
 def cfile(object,target=None,ln=None,deep=None) :

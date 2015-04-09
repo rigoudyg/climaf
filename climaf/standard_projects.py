@@ -8,14 +8,18 @@ from climaf.classes import cproject, cprojects
 
 def init_standard_projects():
     """ 
-    Define CliMAF standard projects : CMIP5, EM, OCMIP5_Ciclad, OBS4MIPS
-    Invoked by standard CliMAF setup
+    Define attributes (above experiment, variable, domain, period ) for CliMAF 
+    standard projects : CMIP5, EM, OCMIP5_Ciclad, OBS4MIPS, OBS_CAMI
 
-    The cprojects list also show in variable 'cprojects'
+    Invoked by standard CliMAF API setup
+
+    The cprojects list also show in variable :ref:`~climaf.classes.cprojects`
     """
-    cprojects=dict()
     cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
     cproject("OCMIP5"                ,"frequency"                          )
-    cproject("EM"                    ,"frequency"                          )
-    cproject("OBS_CAMI"                                                    )
     cproject("OBS4MIPS"              ,"frequency"                          )
+    cproject("OBS_CAMI"                                                    )
+    cproject("EM"                    ,"frequency"                          )
+    cproject("example"               ,"frequency"                          )
+
+

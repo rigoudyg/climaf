@@ -1,7 +1,7 @@
 """
 Standard site settings for working with CliMAF.
 
-Currently tuned for dealing with CMIP5 data access a CNRM or IPSL
+Currently tuned for dealing with CMIP5 data access a CNRM or IPSL's Ciclad
 
 """
 

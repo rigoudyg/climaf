@@ -164,19 +164,27 @@ def isLocal(project, model, experiment, frequency) :
             if re.findall(".*:.*",l) : rep=False
     return rep
 
-def selectLocalFiles(project, model, experiment, frequency, variable, period, rip="r1i1p1", version="last", realm="*", table="*"):
+def selectLocalFiles(**kwargs):
     """
-    Returns the shortest list of (local) files which include the data for the dataset
+    Returns the shortest list of (local) files which include the data for the list of 
+    (facet,value) pairs provided
     
-    Method : depending on the data organization, select the relevant files for the
-    requested period and variable, using datalocations indexed by :py:func:`dataloc`, and based
-    on the datafiles organization for the corresponding datasets; each organization has a
-    corresponding filename search function sur as :py:func:`selectCmip5DrsFiles`
+    Method : 
+    
+    - use datalocations indexed by :py:func:`dataloc` to identifiy data organization 
+    and data store urls for these (facet,value) pairs
+    - derive relevant filenames search function such as as :py:func:`selectCmip5DrsFiles` 
+    from data organization scheme
+    - pass urls and relevant facet values to the filenames search function
 
     Known organizations are documented with :py:class:`~dataloc`
     
     """
     rep=[]
+    if not "model" in kwargs : model="*"
+    project=kwargs['project']
+    experiment=kwargs['experiment']
+    frequency=kwargs['frequency']
     ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency)
     clogger.debug("locs="+ `ofu`)
     if ( len(ofu) == 0 ) :
@@ -197,8 +205,7 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
         elif (org == "OBS_CAMI") :
             rep.extend(selectCamiObsFiles(model, frequency, variable, period, urls))
         elif (org == "generic") :
-            rep.extend(selectGenericFiles(experiment, variable, period, urls, project,model, 
-                                          frequency,  rip, version))
+            rep.extend(selectGenericFiles(urls, **kwargs))
         else :
             clogger.error("cannot process organization "+org+ \
                              " for experiment "+experiment+" and model "+model+\
@@ -221,15 +228,13 @@ def selectLocalFiles(project, model, experiment, frequency, variable, period, ri
 # u="/home/stephane/Bureau/climaf/examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
 # selectGenericFiles(experiment="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
-def selectGenericFiles(experiment, variable, period, urls, project="*",
-                       model="*", frequency="*", rip="*", version="*",
-                       realm="*", table="*"):
+def selectGenericFiles(urls, **kwargs):
     """
     Allow to describe a ``generic`` file organization : the list of files returned 
     by this function is composed of files which :
 
     - match the patterns in ``url`` once these patterns are instantiated by 
-      the other argument's values, and 
+      the values in kwargs, and 
 
      - contain the ``variable`` provided as argument
 
@@ -262,9 +267,7 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
         template=Template(l)
         #
         # Instantiate keywords in pattern with attributes values
-        d=dict(project=project, model=model, experiment=experiment, frequency=frequency,
-               variable=variable, rip=rip, version=version, realm=realm, table=table)
-        template=template.safe_substitute(d)
+        template=template.safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
@@ -311,9 +314,9 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
             if (not regexp):
                 clogger.warning("Cannot yet filter on time with file content. TBD")
             # Filter file time period against required period
-            if (fperiod and period.intersects(fperiod)) or not regexp :
+            if (fperiod and kwargs['period'].intersects(fperiod)) or not regexp :
                 # Filter against variable 
-                if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                if (l.find("${variable}")>=0) or fileHasVar(f,kwargs['variable']) : 
                     # Should check time period in the file if not regexp
                     #print "appending "+f
                     rep.append(f)
@@ -503,30 +506,10 @@ def selectCamiObsFiles(instrument, frequency, variable, period, urls):
     return rep
 
 
-def cliproc_listfiles(loc,variable,period):
-    rep=[]
-    if (loc.frequency == "monthly") :
-        for l in loc.urls :
-            for realm in ["A","L"] :
-                dir=l+"/"+loc.experiment+"/"+realm
-                if os.path.exists(dir) :
-                    lfiles= os.listdir(dir)
-                    for f in lfiles :
-                        year=re.sub(r'^.*([0-9]{4}).nc',r'\1',f)
-                        if year.isdigit() and period.hasFullYear(year) : rep.append(dir+"/"+f)
-    else :
-        clogger.error("cannot yet process frequency "+loc.frequency+ \
-                         " ( for experiment "+experiment+", model "+model+" , and project "+project+")")
-    return(rep)
 
 
 def test2() :
-    dataloc(experiment="SPE",organization="CLIPROC",frequency="*",url="/cnrm/aster/data1/simulations/AR5")
-    l=getlocs(experiment="SPE", frequency="monthly")
-    #print l
-    l=selectLocalFiles(None,None,"SPE","monthly",None,"1800-1800")
-    return(l)
-
+    return
 
 if __name__ == "__main__":
     test2()
