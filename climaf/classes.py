@@ -32,7 +32,7 @@ def cdefault(attribute,value=None):
 
 cdefault("project","*")
 cdefault("model","*")
-#cdefault("experiment","*")
+cdefault("experiment","*")
 #cdefault("period","197901-198012")
 cdefault("rip","r1i1p1")
 cdefault("frequency","monthly")
@@ -130,14 +130,17 @@ class cdataset(cobject):
         self.project=    cdefault("project")   if project   is None else project
         self.model=      cdefault("model")     if model     is None else model
         self.experiment= cdefault("experiment")if experiment is None else experiment
-        self.rip=        cdefault("rip")       if rip       is None else rip
-        self.period=     cdefault("period")    if period    is None else period
-        if (isinstance(self.period,str)) : self.period=init_period(self.period)
         self.frequency=  cdefault("frequency") if frequency is None else frequency
-        self.domain=     cdefault("domain")    if domain    is None else domain
-        self.variable=   cdefault("variable")  if variable  is None else variable
         self.realm=      cdefault("realm")     if realm     is None else realm
         self.table=      cdefault("table")     if table     is None else table
+        self.rip=        cdefault("rip")       if rip       is None else rip
+        self.period=     cdefault("period")    if period    is None else period
+        if (self.period=='fx' or self.table=='fx' or
+            self.rip=='r0i0p0' or self.frequency=='fx') :
+            self.period='fx'; self.table='fx'; self.rip='r0i0p0'; self.frequency='fx'
+        if (isinstance(self.period,str)) : self.period=init_period(self.period)
+        self.domain=     cdefault("domain")    if domain    is None else domain
+        self.variable=   cdefault("variable")  if variable  is None else variable
         self.version=    cdefault("version")   if version   is None else version
         self.fileVarName=self.variable
         if (self.experiment is None or self.period is None or 
@@ -208,7 +211,7 @@ class cdataset(cobject):
         """
         return(dataloc.selectLocalFiles(project=self.project, model=self.model, \
                  experiment=self.experiment, frequency=self.frequency,\
-                 variable=self.variable, period=self.period, version=self.version))
+                 variable=self.variable, period=self.period, version=self.version, rip=self.rip))
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
         in files (rather than being a derived, virtual variable)

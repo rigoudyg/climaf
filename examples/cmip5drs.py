@@ -43,5 +43,5 @@ import os
 os.system("ls -al "+my_file)
 #os.system("type ncdump && ncdump -h "+my_file)
 
-if (myfile is None) : exit(1)
+if (my_file is None) : exit(1)
 

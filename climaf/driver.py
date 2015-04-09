@@ -317,8 +317,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         infile=dict_invalues[op]
         subdict[ label ]='"'+infile+'"'
         subdict["var"]='"'+op.variable+'"'
-        subdict["period"]='"'+str(timePeriod(op))+'"'
-        subdict["period_iso"]='"'+timePeriod(op).iso()+'"'
+        per=timePeriod(op)
+        if per.fx :
+            subdict["period"]='""'
+            subdict["period_iso"]='""'
+        else:
+            subdict["period"]='"'+str(per)+'"'
+            subdict["period_iso"]='"'+per.iso()+'"'
         subdict["domain"]='"'+domainOf(op)+'"'
     i=0
     for op in scriptCall.operands :
@@ -331,8 +336,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             # Provide the name of the variable in input file if script allows for
             subdict["var_%d"%i]='"'+op.variable+'"'
             # Provide period selection if script allows for
-            subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
-            subdict["period_iso_%d"%i]='"'+timePeriod(op).iso()+'"'
+            per=timePeriod(op)
+            if per.fx :
+                subdict["period_%d"%i]='""'
+                subdict["period_iso_%d"%i]='""'
+            else :
+                subdict["period_%d"%i]='"'+str(per)+'"'
+                subdict["period_iso_%d"%i]='"'+per.iso()+'"'
             subdict["domain_%d"%i]='"'+domainOf(op)+'"'
     clogger.debug("subdict for operands is "+`subdict`)
     # substituion is deffered after scriptcall parameters evaluation, which may

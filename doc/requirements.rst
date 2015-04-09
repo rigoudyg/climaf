@@ -3,6 +3,7 @@
 Requirements
 ------------
 
+- Python version 2.x
 - `ImageMagick <http://www.imagemagick.org/>`_ (modules : convert,  identify) ; this is usually included in Linux distributions
 - `nco <http://nco.sourceforge.net/>`_ (ncatted, ncdump, ncwa, ncrcat) 
 - `cdo <https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html>`_

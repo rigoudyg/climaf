@@ -63,11 +63,11 @@ class dataloc():
 
          - Declaring that all IPSLCM-Z-HR data for project PRE_CMIP6 are stored under a single root path and folllows organization named CMIP6_DRS::
             
-            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
             
          - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
             
-            >>> cdataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
@@ -265,29 +265,29 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
         d=dict(project=project, model=model, experiment=experiment, frequency=frequency,
                variable=variable, rip=rip, version=version, realm=realm, table=table)
         template=template.safe_substitute(d)
-        #print "template after attributes replace : "+template
+        # print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
         for k in dt : temp2=temp2.replace(k,dt[k])
-        #print "template with date wildcards : "+temp2
+        # print "template with date wildcards : "+temp2
         lfiles=glob.glob(temp2)
         #
         # Analyze all filenames
         for f in lfiles :
-            #print "looking at file"+f
+            # print "looking at file"+f
             # Construct regexp for extracting dates from filename
             dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
                     YYYYMMDD="([0-9]{10})")
             regexp=None
-            #print "template before searching dates : "+template
+            # print "template before searching dates : "+template
             lkeys=dt.keys() ; lkeys.sort(reverse=True)
             for key in lkeys :
-                #print "searchin "+key+" in "+template
+                # print "searchin "+key+" in "+template
                 start=template.find(key)
                 if (start>=0 ) :
-                    #print "found "+key
+                    # print "found "+key
                     regexp=template.replace(key,dt[key],1)
                     hasEnd=False
                     start=regexp.find(key) 
@@ -300,22 +300,28 @@ def selectGenericFiles(experiment, variable, period, urls, project="*",
             fperiod=None
             if regexp :
                 regexp=regexp.replace("*",".*").replace("?",r".")
-                #print "regexp for extracting dates : "+regexp
+                # print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp,r'\1',f)
                 if hasEnd :
                     end=re.sub(regexp,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
                 else :
                     fperiod=init_period(start)
-            #print "fperiod="+`fperiod`
-            if (not regexp):
-                clogger.warning("Cannot yet filter on time with file content. TBD")
-            # Filter file time period against required period
+                #
+                # Filter file time period against required period
+            else :
+                if (frequency == 'fx' ):
+                    if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                        clogger.debug("adding fixed field :"+f)
+                        rep.append(f)
+                else :
+                    clogger.warning("Cannot yet filter files re. time using only file content. TBD")
+                    rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 # Filter against variable 
                 if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
                     # Should check time period in the file if not regexp
-                    #print "appending "+f
+                    # print "appending "+f
                     rep.append(f)
     return rep
 
@@ -419,28 +425,34 @@ def selectCmip5DrsFiles(project, model, experiment, frequency, variable,
         patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+rip
         # Get version directories list
         ldirs=glob.glob(patternv)
-        #print "looking at "+patternv+ " gives:" +`ldirs`
+        # print "looking at "+patternv+ " gives:" +`ldirs`
         for repert in ldirs :
             lversions=os.listdir(repert)
             lversions.sort()
-            #print "lversions="+`lversions`+ "while version="+version
-            cversion=version
+            # print "lversions="+`lversions`+ "while version="+version
+            cversion=version # initial guess of the version to use
             if (version == "last") :
                 if (len(lversions)== 1) : cversion=lversions[0]
                 elif (len(lversions)> 1) :
-                    if "last" in lversions : lversions=["last"]
-                    else : version=lversions[-1] # Assume that order provided by sort() is OK
-            #print "checkinv version "+`lversions`+" against"+cversion
-            if cversion in lversions :
-                lfiles=glob.glob(repert+"/"+cversion+"/"+variable+"/*.nc")
-                #print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
-                for f in lfiles :
+                    if "last" in lversions : cversion="last"
+                    else :
+                        cversion=lversions[-1] # Assume that order provided by sort() is OK
+            # print "using version "+cversion+" for requested version: "+version
+            lfiles=glob.glob(repert+"/"+cversion+"/"+variable+"/*.nc")
+            # print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
+            # print 'lfiles='+`lfiles`
+            for f in lfiles :
+                if freqd != 'fx' :
                     clogger.debug("checking period for "+ f)
                     regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
                     fileperiod=init_period(re.sub(regex,r'\1',f))
                     if fileperiod is not None : 
                         if (period.start <= fileperiod.end and period.end >= fileperiod.start) :
-                            rep.append(f) 
+                            rep.append(f)
+                else :
+                    clogger.debug("adding fixed field "+ f)
+                    rep.append(f)
+
     return rep
 
 def selectOcmip5CicladFiles(project, model, experiment, frequency, variable, period, urls):

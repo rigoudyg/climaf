@@ -90,8 +90,10 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
         self.assertEqual(files,"/cnrm/aster/data2/ESG/data1/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc", 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
-        my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/40/9.nc'
+        print `ds`
+        my_file=cfile(self.ds); print "myfile = "+my_file
+        expected=climaf.cache.currentCache+'/08/e.nc'
+        print "expected = "+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
 
     def tearDown(self):

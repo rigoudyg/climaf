@@ -15,16 +15,20 @@ class cperiod():
     Attribute 'pattern' usually provides a more condensed form
 
     """
-    def __init__(self,start,end,pattern=None) :
-        if not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
+    def __init__(self,start,end=None,pattern=None) :
+        self.fx=False
+        if start == 'fx' :
+            self.fx=True
+            self.pattern='fx'
+        elif not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
             clogger.error("issue with start or end")
             return(None)
-        self.start=start ; self.end=end ;
-        #if pattern is None :
-        self.pattern=self.__repr__()
-        #else:
-        self.pattern=pattern
-        
+        else :
+            self.start=start ; self.end=end ;
+            if pattern is None :
+                self.pattern=self.__repr__()
+            else:
+                self.pattern=pattern
     #
     def __repr__(self):
         return self.pr()
@@ -36,10 +40,14 @@ class cperiod():
         """ Return isoformat(start)-isoformat(end), (with inclusive end, and 1 minute accuracy)
         e.g. : 1980-01-01T00:00:00,1980-12-31T23:59:00
         """
+        if (self.fx) :
+            clogger.error("There is no ISO representation for period 'fx'")
+            return None
         endproxy = self.end - datetime.timedelta(0,60)  # substract 1 minute
         return "%s,%s"%(self.start.isoformat(),endproxy.isoformat())
     #
     def pr(self) :
+        if self.fx : return 'fx'
         if (self.start.minute != 0 or self.start.minute != 0):
             return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
                     self.start.year,self.start.month,self.start.day,self.start.hour,self.start.minute,
@@ -80,17 +88,26 @@ class cperiod():
                 return("%04d"%(self.start.year))
     #
     def hasFullYear(self,year):
+        if (self.fx) :
+            clogger.error("Meaningless for period 'fx'")
+            return False
         return( int(year) >= self.start.year and int(year) < self.end.year) 
     #
     def start_with(self,begin) :
         """ If period BEGIN actually begins period SELF, returns the 
         complement of BEGIN in SELF; otherwise returns None """
+        if (self.fx) :
+            clogger.error("Meaningless for period 'fx'")
+            return None
         if self.start==begin.start and self.end >= begin.end : 
             return cperiod(begin.end,self.end)
     #
     def includes(self,included) :
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
+        if (self.fx) :
+            clogger.error("Meaningless for period 'fx'")
+            return None
         if self.start <= included.start and included.end <= self.end :
             return cperiod(self.start,included.start), 
         cperiod(included.end,self.end)
@@ -99,6 +116,9 @@ class cperiod():
         """ 
         Returns the intersection of period self and period 'other' if any
         """
+        if (self.fx) :
+            clogger.error("Meaningless for period 'fx'")
+            return None
         if other :
             start=self.start
             if (other.start > start) : start=other.start
@@ -111,7 +131,8 @@ def init_period(dates) :
     Init a CliMAF 'period' object
 
     Args:
-      dates (str): must match YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]]
+      dates (str): must match YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]] , or
+        be 'fx' for fixed fields
 
     Returns:
       the corresponding CliMAF 'period' object
@@ -130,6 +151,8 @@ def init_period(dates) :
     :py:func:`~climaf.operators.cscript`
       
     """
+    
+    if (dates == 'fx' ) : return cperiod('fx')
     
     start=re.sub(r'^([0-9]{4,12}).*',r'\1',dates)
     # TBD : check that start actually matches a date
