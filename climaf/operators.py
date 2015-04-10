@@ -32,7 +32,7 @@ class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
                  doSqueezeTime=False, doSqueezeSpace=False, **kwargs):
         """
-        Declare a script or binary as a 'CliMAF operator', and define a function with the same name
+        Declare a script or binary as a 'CliMAF operator', and define a Pyhton function with the same name
 
         Args:
           name (str): name for the CliMAF operator.
@@ -185,7 +185,7 @@ class cscript():
         except :  
             clogger.error("defining %s : command %s is not executable"%\
                               (name,scriptcommand))
-                # raise ClimafException
+            # raise ClimafException
             return None
         executable=executable.replace('\n','')
         #
@@ -283,7 +283,10 @@ class cscript():
         exec 'def %s(*args,**dic) :\n  """%s""" \n  return climaf.driver.capply("%s",*args,**dic)\n '%\
             (name,doc,name) \
             in sys.modules['__main__'].__dict__
-        clogger.debug("CliMAF script %s has been declared"%name)
+        clogger.info("CliMAF script %s has been declared"%name)
+
+    def __repr__(self):
+        return "CliMAF operator : "+self.name
 
     def inputs_number(self):
         """ returns the number of distinct arguments of a script which are inputs 

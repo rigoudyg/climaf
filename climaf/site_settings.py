@@ -6,7 +6,11 @@ Currently tuned for dealing with CMIP5 data access a CNRM or IPSL's Ciclad
 """
 
 import os
+import climaf
 from climaf.api import dataloc
+from climaf.classes import cproject
+
+cpath=os.path.abspath(climaf.__path__[0]) 
 
 atCNRM=False
 onCiclad=False

@@ -14,6 +14,10 @@ can be used 'as is' after executing**::
 
 For documented standard operators see  :ref:`standard_operators` ; for the other ones, see :ref:`how_to_list_operators`
 
+cproject
+--------
+
+.. autoclass:: climaf.classes.cproject
 
 dataloc
 -------

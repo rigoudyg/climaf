@@ -77,46 +77,41 @@ class cdataset(cobject):
         """
         Create a CLIMAF dataset. 
         
-        A CLIMAF dataset is a description of what the data is and not the data itself nor a file.
-        It is essentially a set of pairs attributes-values. The list of attributes actually used 
-        to describe a dataset is defined by the 'project' it refers to. However, all projects 
-        include attributes experiment, period and variable
+        A CLIMAF dataset is a description of what the data is and not
+        the data itself nor a file.  It is essentially a set of pairs
+        attributes-values. The list of attributes actually used to
+        describe a dataset is defined by the project it refers
+        to. 
 
-        All attributes defaults to the value set by :py:func:`~climaf.classes.cdefault`
+        To display the attributes you may use for a given project, type e.g.:
 
-        For the time being, the attributes used in the string description of a dataset 
-        (its CRS) are the whole list of CMIP5_DRS attributes, with wildcards 
-        values when attribute is not applicable; this scheme should be relaxed sooner or
-        later. e.g., in a home-made 'project', the 'model' attribute could be superfluous 
+        >>> cprojects["CMIP5"]
 
-        Args:
-          project (str, optional): project attribute; should match one of the data locations declared
-           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+        For further details on projects , see
+        :py:class:`~climaf.classes.cproject`
 
-          model (str, optional): model attribute; should match one of the data locations declared
-           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+        None of the attributes are mandatory, because all attributes
+        defaults to the value set by
+        :py:func:`~climaf.classes.cdefault`
 
-          experiment (str, optional): experiment attribute ; should match one of the data locations declared
-           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
+        Some attributes have a special processing : 
+        
+        - period : see :py:func:`~climaf.period.init_period`
 
-          frequency (str, optional): frequency attribute ; should match one of the data locations declared
-           with :py:func:`~climaf.dataloc.dataloc` (even if it is only a wildcard one)
-
-          rip (str, optional): rip attribute; after CMIP5 syntax (e.g. : r1i1p1 )
-
-          domain (str, optional): domain attribute; allowed values are either 'global' or a list for latlon
-            corners ordered as in : [ latmin, latmax, lonmin, lonmax ]
+        - domain : allowed values are either 'global' or a list for
+          latlon corners ordered as in : [ latmin, latmax, lonmin,
+          lonmax ]
             
-          variable (str, optional): name of geophysical variable ; this should be :
+        - variable  name of geophysical variable ; this should be :
 
            - either a variable actually included in the datafiles, or
-           - a 'derived' variable (see  :py:func:`~climaf.operators.derive` ), or
+           - a 'derived' variable (see  :py:func:`~climaf.operators.derive` ),
+             or
            - later on (to be developped), an aliased variable name
 
-          period (str): a period, syntax as explained with :py:func:`~climaf.period.init_period`
-
-          version (str, optional): version of the data; file access functions hanlde nicely values
-            'last' and '*'
+         - triplets (frequency, rip, period, table ) in project CMIP5 : 
+           if any is 'fx' (or 'r0i0p0 for rip), the others are forced to
+           'fx' (resp. 'r0i0p0') too.
 
         Example, using no default value, and adressing some CMIP5 data ::
 
@@ -137,15 +132,21 @@ class cdataset(cobject):
             return
         # Register facets values
         err=False
-        self.kvp=dict()
+        attval=dict()
         for facet in cprojects[self.project].facets :
             if facet in kwargs : val=kwargs[facet]
             else: val=cdefault(facet)
             if val is None :
                 clogger.error("Project %s needs facet %s"%(self.project,facet))
                 err=True
-            self.kvp[facet]=val
-            #self.__set__(facet,val)
+            attval[facet]=val
+        #
+        # Special processing for CMIP5 fixed fields : handling redundancy in facets
+        if (attval['project'] == 'CMIP5'):
+            if ( attval['table']=='fx' or attval['period']=='fx' or 
+                 attval['rip']=='r0i0p0' or attval['frequency']=='fx') :
+                 attval['table']='fx' ; attval['period']='fx' 
+                 attval['rip']='r0i0p0' ; attval['frequency']='fx'
         #
         # Check for typing or user's logic errors
         for facet in kwargs :
@@ -154,17 +155,18 @@ class cdataset(cobject):
                 err=True
         #
         if err : return None
-        if ('period' in self.kvp) : self.kvp['period']=init_period(self.kvp['period'])
+        if ('period' in attval) : attval['period']=init_period(attval['period'])
         # TBD : Next lines for backward compatibility, but should re-engineer 
-        self.project   =self.kvp['project']
-        self.experiment=self.kvp['experiment']
-        self.variable= self.kvp['variable']
-        self.period    =self.kvp['period']
-        self.domain    =self.kvp['domain']
+        self.project   =attval['project']
+        self.experiment=attval['experiment']
+        self.variable= attval['variable']
+        self.period    =attval['period']
+        self.domain    =attval['domain']
         #
-        self.model    =self.kvp.get('model',"*")
-        self.frequency=self.kvp.get('frequency',"*")
+        self.model    =attval.get('model',"*")
+        self.frequency=attval.get('frequency',"*")
         #
+        self.kvp=attval
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
         # 
@@ -365,39 +367,51 @@ cprojects=dict()
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
         """
-        A 'cproject' is the definition of a set of attributes, or facets, which 
-        values completely define a 'dataset' as managed by CliMAF.
+        A 'cproject' is the definition of a set of attributes, or
+        facets, which values will completely define a 'dataset' as
+        managed by CliMAF. Its name is one of the possible keys 
+        for describing data locations (see
+        :py:class:`~climaf.dataloc.dataloc`)
 
-        For instance, cproject CMIP5 , after his Data Reference Syntax, has attributes : 
+        For instance, cproject CMIP5, after its Data Reference Syntax, 
+        has attributes : 
         experiment, model, rip, variable, frequency, realm, table, version
 
-        The args provide the attribute names.
+        Args :
+          name (string) : project name;
+            do not use the chosen separator in it (see below)
+          args (strings) : attribute names, freely chosen; do not 
+            use the chosen separator in it (see below); **CliMAF 
+            anyway will add attributes : 
+            project, experiment, variable, period, and domain**
+          kwargs (dict) : can only be used for as ``sep="."`` or 
+            ``separator="."`` for indicating the symbol separating
+            facets in the dataset syntax. Defaults to ".". 
 
-        CliMAF anyway enforces attributes : project, experiment, variable, period, domain
+        Returns : a cproject object, which string representation is
+        the pattern later used in CliMAF Refreence Syntax for
+        representing datasets in this project
 
-        The attributes list, as composed of those ienforced by CliMAF
-        and those provided by args, defines the Reference Syntax for
-        datasets in the cproject; for instance, a datset in a cproject
-        declared as ::
+        For instance, a dataset in a cproject declared as ::
 
-        >>> cproject("MINE","myfreq","myfacet")
+        >>> cproject("MINE","myfreq","myfacet",sep="_")
 
-        will hase dataset syntax based on the pattern:
+        will return ::
 
-        project.experiment.variable.period.domain.myfreq
+          ${project}_${experiment}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
 
-        such as::
+        and will datasets represented as  ::
 
-        MINE_hist_[1980-1999]_global_decadal
+          'MINE_hist_tas_[1980-1999]_global_decadal_gabu'
 
-        while an example for cproject CMIP5 could be::
+        while an example for built-in cproject CMIP5 will be::
 
-        CMIP5.historical.[1980].global.monthly
+          'CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last'
 
         The attributes list should include all facets which are useful
-        for distinguishing datastes for each other , and for computing
+        for distinguishing datasets from each other, and for computing
         datafile pathnames in the 'generic' organization (see
-        :ref:class:`~climaf.dataloc.dataloc`)
+        :py:class:`~climaf.dataloc.dataloc`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
@@ -411,6 +425,7 @@ class cproject():
         #
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
+        if "sep"       in kwargs : self.separator=kwargs['sep']
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
@@ -421,8 +436,8 @@ class cproject():
         return self.crs
     def crs2ds(crs) :
         """ 
-        Try to interpret a string as the CRS of a dataset for the current cproject
-        Return the dataset if OK
+        Try to interpret string ``crs`` as the CRS of a dataset for
+        the cproject. Return the dataset if OK
         """
         fields=crs.split(self.separator)
         if len(fields) == len(self.facets) :

@@ -25,7 +25,7 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 import os, os.path, shutil, logging
 
 import climaf, climaf.cache
-from climaf.classes   import cdefault as cdef,cdataset,ds,cproject #,cperiod
+from climaf.classes   import cdefault as cdef,cdataset,ds,cproject,cprojects 
 from climaf.driver    import ceval,varOf #,cfile,cobj 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
@@ -41,7 +41,7 @@ cpath=os.path.abspath(climaf.__path__[0])
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()
 climaf.standard_projects.init_standard_projects()
-from import climaf.site_settings import onCiclad, atCNRM
+from .site_settings import onCiclad, atCNRM
 
 # Commodity functions
 def cfile(object,target=None,ln=None,deep=None) :
