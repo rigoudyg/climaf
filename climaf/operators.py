@@ -32,7 +32,7 @@ class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
                  doSqueezeTime=False, doSqueezeSpace=False, **kwargs):
         """
-        Declare a script or binary as a 'CliMAF operator', and define a Pyhton function with the same name
+        Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
         Args:
           name (str): name for the CliMAF operator.
@@ -283,7 +283,7 @@ class cscript():
         exec 'def %s(*args,**dic) :\n  """%s""" \n  return climaf.driver.capply("%s",*args,**dic)\n '%\
             (name,doc,name) \
             in sys.modules['__main__'].__dict__
-        clogger.info("CliMAF script %s has been declared"%name)
+        clogger.debug("CliMAF script %s has been declared"%name)
 
     def __repr__(self):
         return "CliMAF operator : "+self.name
