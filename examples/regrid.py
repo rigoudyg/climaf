@@ -3,15 +3,15 @@
 #  2- to the grid of another dataset
 
 from climaf.api import *
-clog(logging.DEBUG)
+
+# 0 - define a dataset
+cdef("project","example")
+cdef("frequency","monthly")
+dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980")
 
 # 1- regrid to a named grid : use operator 'regridn'
-cdef("frequency","monthly")
-dataloc(experiment="AMIPV6ALB2G", organization="example",url=[cpath+"/../examples/data/AMIPV6ALB2G"])
-dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980")
 dgr=regridn(dg,cdogrid="r90x45")
 ncview(dgr)
-
 
 # 2- regrid to the grid of another datset (here, a trivial case : same grid) :
 # use operator 'regridn'

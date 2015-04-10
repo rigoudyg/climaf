@@ -193,7 +193,7 @@ def selectLocalFiles(**kwargs):
         if (org == "EM") :
             rep.extend(selectEmFiles(experiment, frequency, variable, period))
         elif (org == "example") :
-            rep.extend(selectExampleFiles(experiment, frequency, variable, period, urls))
+            rep.extend(selectExampleFiles(urls, **kwargs))
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
                                            realm, table, period, rip, version, urls))
@@ -323,8 +323,13 @@ def selectGenericFiles(urls, **kwargs):
     return rep
 
 
-def selectEmFiles(experiment, frequency, variable, period) :
+def selectEmFiles(*kwargs) :
     #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
+    experiment=kwargs['experiment']
+    frequency=kwargs['frequency']
+    variable=kwargs['variable']
+    period=kwargs['period']
+    #
     freqs={ "monthly" : "" , "3h" : "_3h"}
     f=frequency
     if f in freqs : f=freqs[f]
@@ -384,9 +389,9 @@ def periodOfEmFile(filename,realm,freq):
 
 
                         
-def selectExampleFiles(experiment, frequency, variable, period, urls) :
+def selectExampleFiles(urls,**kwargs) :
     rep=[]
-    if (frequency == "monthly") :
+    if (kwargs['frequency'] == "monthly") :
         for l in urls :
             for realm in ["A","L"] :
                 #dir=l+"/"+realm+"/Origin/Monthly/"+experiment
@@ -397,21 +402,31 @@ def selectExampleFiles(experiment, frequency, variable, period, urls) :
                     for f in lfiles :
                         clogger.debug("Looking at file "+f)
                         fileperiod=periodOfEmFile(f,realm,'mon')
-                        if fileperiod and fileperiod.intersects(period) :
-                            if fileHasVar(dir+"/"+f,variable) :
+                        if fileperiod and fileperiod.intersects(kwargs['period']) :
+                            if fileHasVar(dir+"/"+f,kwargs['variable']) :
                                 rep.append(dir+"/"+f)
                             #else: print "No var ",variable," in file", dir+"/"+f
     return rep
                         
 
-def selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
-                        realm, table, period, rip, version, urls) :
+def selectCmip5DrsFiles(urls, *kwargs) :
     # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
     # We use wildcards for : lab, realm and MIP_table
     # second path segment can be any string (allows for : output,output1, merge...), but if 'merge' exists, it is 
     # used alone
     # If version is 'last', tries provide version from directory 'last' if available, otherwise those of last dir
+    project=kwargs['project']
+    model=kwargs['model']
+    experiment=kwargs['experiment']
+    frequency=kwargs['frequency']
+    variable=kwargs['variable']
+    realm=kwargs['realm']
+    table=kwargs['table']
+    period=kwargs['period']
+    rip=kwargs['rip']
+    version=kwargs['version']
+    #
     rep=[]
     frequency2drs=dict({'monthly':'mon'})
     freqd=frequency

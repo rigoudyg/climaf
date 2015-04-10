@@ -35,23 +35,25 @@ A number of examples show in directory ``<install_dir>/examples`` and are also d
 Some of the examples can be run anywhere, as they use the data sample installed with CliMAF :
 
   - :download:`plotmap.py <../examples/plotmap.py>`      : basic and advanced plotting (using ncview and ncl)
-  - :download:`export.py <../examples/export.py>`        : how to 'export' results out of CliMAF
+  - :download:`basic_oce.py <../examples/basic_oce.py>`   : acces ocean data on ORCA grid in CMIP5_DRS data, and perfome some basic operations (works at CNRM and on Ciclad)
+  - :download:`export.py <../examples/export.py>`        : various ways to 'export' results out of CliMAF
   - :download:`derived.py <../examples/derived.py>`      : how to define a new geophysical variable and use it in CliMAF
   - :download:`increm.py <../examples/increm.py>`        : compute any derived variable incrementally (i.e. using new inputs as they become available)
-  - :download:`latlonbox.py <../examples/latlonbox.py>`    : define a dataset on a lat-lon box; also extract another box
+  - :download:`latlonbox.py <../examples/latlonbox.py>`    : define a dataset on a lat-lon box; also extract a box out of a dataset
   - :download:`regrid.py <../examples/regrid.py>`    : regrid some data or object to a named grid or to the grid of another object/data
   - :download:`ann_cycle.py <../examples/ann_cycle.py>`    : compute an annual cycle, using CDO
 
 .. _examples_data:
 
-Others can run only if they have access to some datasets on the local file system :
+Others show how to acces some known data sets on CNRM or IPSL file system :
  
-  - :download:`cmip5drs.py  <../examples/cmip5drs.py>`    : access data which are organized using the CMIP5 Data Reference Syntax
-  - :download:`ocmip_ciclad.py <../examples/ocmip_ciclad.py>`: access data which are organized using the OCMIP5 conventions on Ciclad
-  - :download:`obs4mips.py <../examples/obs4mips.py>`     : access OBS4MIPS data organized as at CNRM
-  - :download:`obscami.py <../examples/obscami.py>`     : access observation data organized 'a la CAMI', here at CNRM
-  - :download:`em_data.py <../examples/em_data.py>`     : access CNRM-CM data organized 'a la EM'
-  - :download:`basic_oce.py <../examples/basic_oce.py>`     : acces ocean data on ORCA grid in CMIP5_DRS data, and perfome some basic operations
-  - :download:`data_generic.py <../examples/data_generic.py>`     : using the 'generic' type of organization on various examples
+  - :download:`data_cmip5drs.py  <../examples/data_cmip5drs.py>`    : access data which are organized using the CMIP5 Data Reference Syntax 
+  - :download:`data_generic.py <../examples/data_generic.py>`     : using the 'generic' type of organization on various examples : 
+     - OCMIP5 data on Ciclad
+     - Obs4MIPS data at CNRM
+     - CAMI Obs data at CNRM
+     - example data as included in CliMAF package
+  - :download:`data_em.py <../examples/data_em.py>`     : access CNRM-CM data organized 'a la EM'
+
 
 

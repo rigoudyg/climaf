@@ -13,15 +13,15 @@ from climaf.api import *
 class A_basic(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_basic"))
-        dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+        dataloc(project="example", experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
         cdef("frequency","monthly")
-        self.dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
+        self.dg=ds(project="example", experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
         self.dir=dict()
 
     def test_1_print_dataset(self):
         pdg=`self.dg`
         print pdg
-        expected="ds('*.*.AMIPV6ALB2G.r1i1p1.1980-1981.monthly.global.tas.*.*')"
+        expected="ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')"
         print expected
         self.assertEqual(pdg,expected, 
                          'Issue printing a very basic dataset')
@@ -35,7 +35,7 @@ class A_basic(unittest.TestCase):
         sd=`sdev`
         actual=sd
         print "actual=",sd
-        expected="mean_and_sdev(ds('*.*.AMIPV6ALB2G.r1i1p1.1980-1981.monthly.global.tas.*.*')).sdev"
+        expected="mean_and_sdev(ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')).sdev"
         print "expected=",expected
         self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
 
@@ -46,7 +46,7 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_sdev",self.dg) # Main output is the return value of applying the script
         sdev=mean.sdev         # Secondary output 'sdev' is a 'property' of main output
         fil=cfile(sdev)
-        expected=climaf.cache.currentCache+'/95/3.nc'
+        expected=climaf.cache.currentCache+'/13/1.nc'
         print "actual=",fil
         print "expected=",expected
         self.assertEqual(fil,expected,"Issue evaluating script application as a file")

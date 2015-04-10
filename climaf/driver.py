@@ -67,7 +67,7 @@ def capply_script (script_name, *operands, **parameters):
         #for op in operands :
         #
         # Create one child for each output
-        defaultVariable=operands[0].variable
+        defaultVariable=varOf(operands[0])
         for outname in script.outputs :
             if outname is None :
                 rep.variable=script.outputs[None]%defaultVariable
@@ -316,7 +316,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         op=scriptCall.operands[0]
         infile=dict_invalues[op]
         subdict[ label ]='"'+infile+'"'
-        subdict["var"]='"'+op.variable+'"'
+        subdict["var"]='"'+varOf(op)+'"'
         subdict["period"]='"'+str(timePeriod(op))+'"'
         subdict["period_iso"]='"'+timePeriod(op).iso()+'"'
         subdict["domain"]='"'+domainOf(op)+'"'
@@ -329,7 +329,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             label,multiple,serie=script.inputs[i]
             subdict[ label ]='"'+infile+'"'
             # Provide the name of the variable in input file if script allows for
-            subdict["var_%d"%i]='"'+op.variable+'"'
+            subdict["var_%d"%i]='"'+varOf(op)+'"'
             # Provide period selection if script allows for
             subdict["period_%d"%i]='"'+str(timePeriod(op))+'"'
             subdict["period_iso_%d"%i]='"'+timePeriod(op).iso()+'"'
@@ -440,6 +440,8 @@ def varOf(cobject) :
     its 'variable' property, otherwise returns variable of first operand
     """
     if isinstance(cobject,classes.cdataset) : return cobject.variable
+    elif getattr(cobject,"variable",None) : 
+        return getattr(cobject,"variable",None) 
     elif isinstance(cobject,classes.ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return varOf(cobject.operands[0])

@@ -6,14 +6,13 @@ This example will work as is on CNRM's Lustre or Ciclad
 
 # S.Senesi - march 2015
 
-# Load Climaf functions
+# Load Climaf functions and site settings
+# This sets logical flags 'onCiclad' and 'atCNRM'
 from climaf.api import *
 
-# Load default settings for IPSL and CNRM. This sets logcial flags 'onCiclad' and 'atCNRM'
-from climaf.site_settings import *
-
 # Define default value for some dataset facets
-cdef("frequency","monthly") ;  cdef("project","CMIP5")
+cdef("project","CMIP5")
+cdef("frequency","monthly") 
 
 # Choose a model and define your dataset 
 if onCiclad : cdef ("model","IPSL-CM5A-LR")
@@ -22,12 +21,12 @@ else :
     else :
         print("I do not know how to find CMIP5 data on this machine")
         exit(0)
-tos=ds( experiment="historical", variable="tos", period="186001")
+tos=ds(experiment="historical", variable="tos", period="186001")
 
-# Display the basic filenames involved in the dataset (all filenames in one single string)
-# CliMAF will search them at the data location which is the most specific among all declared data locations 
-files=tos.baseFiles()
-print files
+# Display the basic filenames involved in the dataset (all filenames 
+# in one single string). CliMAF will search them at the data location 
+# which is the most specific among all declared data locations 
+print tos.baseFiles()
 
 # Let CliMAF provide the filename for the exact dataset in its disk
 # cache (select period and/or variables, aggregate files...) 
@@ -46,7 +45,6 @@ cshow(fig)
 # Select a latlon box and plot it
 tos_box=llbox(tos,latmin=40, lonmin=-30, lonmax=5, latmax=66)
 ncview(tos_box)
-
 
 # Compute a time average on 50 years - this takes  ~10s on my PC
 tos=ds( experiment="historical", variable="tos", period="1860-1909")

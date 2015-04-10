@@ -155,6 +155,15 @@ class cdataset(cobject):
         #
         if err : return None
         if ('period' in self.kvp) : self.kvp['period']=init_period(self.kvp['period'])
+        # TBD : Next lines for backward compatibility, but should re-engineer 
+        self.project   =self.kvp['project']
+        self.experiment=self.kvp['experiment']
+        self.variable= self.kvp['variable']
+        self.period    =self.kvp['period']
+        self.domain    =self.kvp['domain']
+        #
+        self.model    =self.kvp.get('model',"*")
+        self.frequency=self.kvp.get('frequency',"*")
         #
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
@@ -177,7 +186,8 @@ class cdataset(cobject):
         return rep
 
     def isLocal(self) :
-        return(dataloc.isLocal(project=self.project, model=self.model, \
+        model=getattr(self,"model","*")
+        return(dataloc.isLocal(project=self.project, model=model, \
                                experiment=self.experiment, frequency=self.frequency))
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached

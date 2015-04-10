@@ -32,6 +32,7 @@ from climaf.operators import cscript, scripts as cscripts, derive
 from climaf.cache     import creset as craz, csync as csave , cdump, cdrop
 from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
+import climaf.standard_projects
 
 clog(logging.ERROR)
 clog_file(logging.ERROR)
@@ -40,7 +41,7 @@ cpath=os.path.abspath(climaf.__path__[0])
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
 climaf.standard_operators.load_standard_operators()
 climaf.standard_projects.init_standard_projects()
-import climaf.site_settings
+from import climaf.site_settings import onCiclad, atCNRM
 
 # Commodity functions
 def cfile(object,target=None,ln=None,deep=None) :

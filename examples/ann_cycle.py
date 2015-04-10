@@ -1,11 +1,12 @@
 # Computig and plotting an annual cycle 
 
+# Load Climaf functions
 from climaf.api import *
 
-# Define a dataset
-dataloc(experiment="AMIPV6ALB2G", organization="example",
-        url=[cpath+"/../examples/data/AMIPV6ALB2G"])
-dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981", frequency="monthly")
+# Define a dataset, in the pre-dfeined 'example' project, which datafiles 
+# locations is also pre-defined
+dg=ds(project="example", experiment="AMIPV6ALB2G", variable="tas", 
+    period="1980-1981", frequency="mon")
 
 # Compute annual cycle, using swiss knife operator 'ccdo', and look at it
 anncycle=ccdo(dg,operator='ymonavg')

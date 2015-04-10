@@ -1,12 +1,11 @@
 # How to export CliMAF results as NetCDF files or Numpy Masked Arrays
 #####################################################################
 
+# Load Climaf functions and site settings
 from climaf.api import *
 
-# Define data location for an experiment, as concisely as possible
-dataloc(experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
-
 # Define a default value for one dataset facet
+cdef("project","example")
 cdef("frequency","monthly")
 
 # Define some dataset you want to study ( a number of facets take default values )
