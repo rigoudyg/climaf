@@ -110,3 +110,40 @@ if atCNRM :
     print my_file
 
 if (my_file is None) : exit(1)
+
+# Managing fiexed fields : use specific dataloc and frequency='fx
+###################################################################
+
+# If you want to access fixed fields, you must describe them as attached to a given 'model', 
+# and using frequency 'fx' , and write it as indicated below
+
+# define a pattern for accessing fixed fields (here we use a set of fixed fields from CMIP5,
+# but this is not mandatory)
+pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/piControl/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
+
+# Tell which model use that fixed fields
+dataloc(model="CNRM-CM5",frequency="fx",organization="generic", url=[pattern_fx_CNRM_CM5])
+
+# You may then use period='fx' for describing and accessing the data::
+sftlf=ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
+if atCNRM: print sftlf.baseFiles()
+
+# If a given experiment has modified fixed fields, you may write::
+pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
+dataloc(model="CNRM-CM5",experiment="LGM", frequency="fx",organization="generic",
+        url=[pattern_fx_CNRM_CM5_lgm])
+
+# You can also use URLs that include a pattern for the experiment name, if you have one set of
+# fixed fields per experiment
+
+sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", experiment="LGM")
+if atCNRM: print sftlf_lgm.baseFiles()
+
+# Note : access to fx fields for projects or experiments related to an 
+# organization=CMIP5_DRS is built-in: no additionnal dataloc() call; and version
+# used is the last one; just use frequency='fx' as for other datasets
+
+# If you need more functions related to fixed fields, please complain to 'climaf at meteo dot fr'
+
+
+if (rstfile is None) : exit(1)

@@ -228,7 +228,7 @@ def cdrop(crs, rm=True) :
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
         try :
-            if rm : rm.remove(crs2filename[crs])
+            if rm : os.remove(crs2filename[crs])
             crs2filename.pop(crs)
             return True
         except:

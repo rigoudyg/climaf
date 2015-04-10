@@ -33,7 +33,7 @@ def cdefault(attribute,value=None):
 
 cdefault("project","*")
 cdefault("model","*")
-#cdefault("experiment","*")
+cdefault("experiment","*")
 #cdefault("period","197901-198012")
 cdefault("rip","r1i1p1")
 cdefault("frequency","monthly")
