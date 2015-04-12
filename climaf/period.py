@@ -152,6 +152,10 @@ def init_period(dates) :
       
     """
     
+    #clogger.debug("analyzing  %s"%dates)
+    if not type(dates) is str :
+	clogger.error("arg is not a string : "+`dates`)
+	return None
     if (dates == 'fx' ) : return cperiod('fx')
     
     start=re.sub(r'^([0-9]{4,12}).*',r'\1',dates)
@@ -168,7 +172,7 @@ def init_period(dates) :
         return(NOne)
     #
     end=re.sub(r'.*[-_]([0-9]{4,12})$',r'\1',dates)
-    clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
+    #clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
     done=False
     if (end==dates) :
         # No string found for end of period

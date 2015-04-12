@@ -4,6 +4,10 @@
 thisdir=$(cd $(dirname $0); pwd)
 dir=$(dirname $thisdir)
 export PYTHONPATH=$dir:$PYTHONPATH
+
+# Testing a series of examples
+################################
+
 cd $dir/examples
 
 # List of scripts that can be tested anywhere (based on data installed with the package)
@@ -24,5 +28,5 @@ fi
 # Cleaning script
 scripts=$scripts" clean_cache.py"
 
-echo "tested scripts : "$scripts
+echo "tested example scripts : "$scripts
 python $thisdir/iterate_python_scripts.py -v -f $scripts

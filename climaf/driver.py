@@ -17,7 +17,7 @@ import climaf
 import classes
 import cache
 import operators
-from clogging import clogger
+from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
 
@@ -68,6 +68,7 @@ def capply_script (script_name, *operands, **parameters):
         #
         # Create one child for each output
         defaultVariable=varOf(operands[0])
+        #defaultPeriod=operands[0].period
         for outname in script.outputs :
             if outname is None :
                 rep.variable=script.outputs[None]%defaultVariable
@@ -76,12 +77,13 @@ def capply_script (script_name, *operands, **parameters):
                 son.variable=script.outputs[outname]%defaultVariable
                 rep.outputs[outname]=son
                 setattr(rep,outname,son)
-                #
-                # Check that all parameters to the call are expected by the script 
-                for para in parameters :
-                    if re.match(r".*\{"+para+r"\}",script.command) is None :
-                        clogger.error("parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command))
-                        return None
+        # Check that all parameters to the call are expected by the script 
+        for para in parameters :
+            if re.match(r".*\{"+para+r"\}",script.command) is None :
+                if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
+                    err="parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command)
+                    clogger.error(err)
+                    raise Climaf_Apply_Error(err)
     #
     return rep
 
@@ -116,9 +118,10 @@ def ceval(cobject,
     #if cobject.crs in recurse_list :
     #    clogger.critical("INTERNAL ERROR : infinite loop on object: "+cobject.crs)
     #    return None
-    recurse_list.append(cobject.crs)
+    cindent()
     if isinstance(cobject,classes.cdataset):
-        clogger.debug("Evaluating dataset " + cobject.crs)
+        recurse_list.append(cobject.crs)
+        clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + `cobject.kvp`)
         ds=cobject
         if ds.isLocal() or ds.isCached() :
             clogger.debug("Dataset %s is local or cached "%ds )
@@ -131,6 +134,7 @@ def ceval(cobject,
                 if ds.variable in derived_list :
                     clogger.error("Loop detected while evaluating derived variable "+
                                   ds.variable + " " + `derived_list`)
+                    cdedent()
                     return None
                 derived=derive_variable(ds)
                 clogger.debug("evaluating derived variable %s as %s"%\
@@ -143,6 +147,7 @@ def ceval(cobject,
                     clogger.debug("succeeded in evaluating derived variable %s as %s"%\
                                       (ds.variable,`derived`))
                     set_variable(derived_value, ds.variable, format=format)
+                cdedent()
                 return(derived_value)
             elif ((userflags.canSelectVar or ds.oneVarPerFile()) and \
                 (userflags.canSelectTime or ds.periodIsFine()) and \
@@ -152,6 +157,7 @@ def ceval(cobject,
                 #(userflags.canOffsetScale or ds.hasExactVariable()) and 
                 (format == 'file')) :
                 clogger.debug("Delivering file set or sets is OK for the target use")
+                cdedent()
                 return(ds.baseFiles()) # a single string with all filenames,
                                #or a list of such strings in case of ensembles
             else:
@@ -167,8 +173,11 @@ def ceval(cobject,
                 extract=capply('select',ds)
                 if extract is None :
                     clogger.error("Cannot access dataset" + `ds`)
+                    cdedent()
                     return None
-                return ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
+                rep=ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
+                cdedent()
+                return rep
         else :
             # else (non-local and non-cached dataset)
             #   if the user can access the dataset by one of the dataset-specific protocols
@@ -177,6 +186,7 @@ def ceval(cobject,
             clogger.debug("Dataset is remote " )
             if (userflags.canOpenDap and format == 'file' ) :
                 clogger.debug("But user can OpenDAP " )
+                cdedent()
                 return(ds.adressOf())
             else :
                 clogger.debug("Must remote read and cache " )
@@ -185,25 +195,35 @@ def ceval(cobject,
                 if (format == 'file' ) :
                     cachefile=cstore(extract)
                     clogger.debug("And provide cache file reference " )
+                    cdedent()
                     return cachefile
                 else :
                     clogger.debug("And provide in-memory object " )
+                    cdedent()
                     return(extract)
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) : 
-        clogger.debug("Evaluating compound object : " + cobject.crs)
+        #clogger.debug("Evaluating object operand %s"%`cobject`)
+        recurse_list.append(cobject.crs)
+        clogger.debug("Evaluating compound object : " + `cobject`)
         if (deep is not None) : cache.cdrop(cobject.crs)
         filename=cache.hasExactObject(cobject) 
         if filename :
             clogger.info("Object found in cache: %s"%cobject.crs)
-            if format=='file' : return filename
-            else: return cread(filename)
+            if format=='file' : 
+                cdedent()
+                return filename
+            else:
+                cdedent()
+                return cread(filename)
         it,altperiod=cache.hasIncludingObject(cobject)
         if it :
             clogger.info("Including object found in cache : %s"%(it.crs))
             clogger.info("Selecting "+`cobject`+" out of it")
             # Just select (if necessary for the user) the portion relevant to the request
-            return(ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list))
+            rep=ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list)
+            cdedent()
+            return rep
         #
         it,comp_period=cache.hasBeginObject(cobject) 
         if it : 
@@ -214,9 +234,12 @@ def ceval(cobject,
             it.setperiod(comp_period)
             ceval(it,userflags,format,deep,derived_list,recurse_list)
             if (format == 'file') :
-                return cache.complement(begcrs,it.crs,cobject.crs)
+                rep=cache.complement(begcrs,it.crs,cobject.crs)
+                cdedent()
+                return rep
             else :
                 clogger.debug("cannot yet complement except for files")
+                cdedent()
                 return(None)
         #
         clogger.info("nothing relevant found in cache for %s"%cobject.crs)
@@ -226,12 +249,21 @@ def ceval(cobject,
             # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
             if cobject.operator in operators.scripts :
                 file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
-                if ( format == 'file' ) : return (file)
-                else : return cread(file)
+                if ( format == 'file' ) : 
+                    cdedent()
+                    return (file)
+                else : 
+                    cdedent()
+                    return cread(file)
             elif cobject.operator in operators.operators :
                 obj=ceval_operator(cobject,deep)
-                if (format == 'file' ) : return(cstore(obj))
-                else : return(obj)
+                if (format == 'file' ) : 
+                    rep=cstore(obj)
+                    cdedent()
+                    return rep
+                else : 
+                    cdedent()
+                    return(obj)
             else : 
                 clogger.error("operator %s is not a script nor known operator",str(cobject.operator))
                 return(None)
@@ -240,16 +272,21 @@ def ceval(cobject,
             # Force evaluation of 'father' script
             if ceval_script(cobject.father,deep,recurse_list=recurse_list)  is not None :
                 # Re-evaluate, which should succeed using cache
-                return ceval(cobject,userflags,format,deep,recurse_list=recurse_list)
+                rep=ceval(cobject,userflags,format,deep,recurse_list=recurse_list)
+                cdedent()
+                return rep
             else :
+                cdedent()
                 clogger.error("generating script aborted for "+cobject.father.crs)
                 return None
     elif isinstance(cobject,str) :
         clogger.debug("Evaluating object from crs : %s"%cobject)
         clogger.error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
+        cdedent()
         return None
     else :
         clogger.error("argument " +`cobject`+" is not (yet) managed")
+        cdedent()
         return(None)
     # if cache.DynamicIsOn : 
     #    if hasDynamicInputs(cobject) :
@@ -526,9 +563,9 @@ def derive_variable(ds):
     op,outname,inVarNames,params=operators.derived_variables[ds.variable]
     inVars=[]
     for varname in inVarNames :
-        inVars.append(classes.cdataset(project=ds.project, model=ds.model,
-                experiment=ds.experiment, rip=ds.rip,period=ds.period, 
-                frequency=ds.frequency, domain=ds.domain, variable=varname)) 
+        dic=ds.kvp.copy()
+        dic['variable']=varname
+        inVars.append(classes.cdataset(**dic))
     father=capply(op,*inVars,**params)
     if (outname == "out"): rep=father
     else : rep=scriptChild(father,outname)
@@ -565,3 +602,6 @@ def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
+
+def Climaf_Apply_Error(Exception):
+    pass

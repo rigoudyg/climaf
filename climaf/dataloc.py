@@ -195,8 +195,7 @@ def selectLocalFiles(**kwargs):
         elif (org == "example") :
             rep.extend(selectExampleFiles(urls, **kwargs))
         elif (org == "CMIP5_DRS") :
-            rep.extend(selectCmip5DrsFiles(project, model, experiment, frequency, variable, 
-                                           realm, table, period, rip, version, urls))
+            rep.extend(selectCmip5DrsFiles(urls,**kwargs))
         elif (org == "OCMIP5_Ciclad") :
             rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
                                                variable, period, urls))
@@ -236,11 +235,11 @@ def selectGenericFiles(urls, **kwargs):
     - match the patterns in ``url`` once these patterns are instantiated by 
       the values in kwargs, and 
 
-     - contain the ``variable`` provided as argument
+     - contain the ``variable`` provided in kwargs
 
-     - match the `period`` provided as argument
+     - match the `period`` provided in kwargs
 
-    In the pattern strings, no pattern is mandatory
+    In the pattern strings, no keyword is mandatory
 
     Example :
 
@@ -263,6 +262,9 @@ def selectGenericFiles(urls, **kwargs):
 
     """
     rep=[]
+    period=kwargs['period']
+    if type(period) is str : period=init_period(period)
+    variable=kwargs['variable']
     for l in urls :
         template=Template(l)
         #
@@ -322,14 +324,14 @@ def selectGenericFiles(urls, **kwargs):
                     rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 # Filter against variable 
-                if (l.find("${variable}")>=0) or fileHasVar(f,kwargs['variable']) : 
+                if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
                     # Should check time period in the file if not regexp
                     # print "appending "+f
                     rep.append(f)
     return rep
 
 
-def selectEmFiles(*kwargs) :
+def selectEmFiles(**kwargs) :
     #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
     experiment=kwargs['experiment']
     frequency=kwargs['frequency']

@@ -4,12 +4,12 @@ def log_l():
     global formatter
     logger = logging.getLogger('')
     # create formatter
-    formatter = logging.Formatter('\n[%(funcName)-10.10s : %(filename)-10s, L. %(lineno)-4d] : %(levelname)-8s : %(message)s')
+    formatter = logging.Formatter('[%(funcName)-10.10s : %(filename)-10s, L. %(lineno)-4d] : %(levelname)-8s : %(message)s')
     return logger
     
 clogger=log_l()
 
-def clog(level) :
+def clog(level=None) :
     """
     Sets the verbosity level for CliMAF log messages on stderr.
 
@@ -17,7 +17,7 @@ def clog(level) :
      level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
 
     """
-    clogger.setLevel(level) 
+    if (level) : clogger.setLevel(level) 
     exist_stream_handler=False
     for h in clogger.handlers :
         if type(h) is logging.StreamHandler :
@@ -34,7 +34,7 @@ def clog(level) :
         clogger.addHandler(console)
 
 
-def clog_file(level) :
+def clog_file(level=None) :
     """
     Sets the verbosity level for CliMAF log messages on file climaf.log
 
@@ -45,12 +45,32 @@ def clog_file(level) :
     for h in clogger.handlers :
         if type(h) is logging.FileHandler :
             #print "il existe deja un FileHandler => on change le niveau d informations", h
-            h.setLevel(level)
+            if level : h.setLevel(level)
             exist_file_handler=True    
             
     if exist_file_handler==False:
         #print "ajout d un FileHandler"
         fh = logging.FileHandler('climaf.log',mode='w') 
-        fh.setLevel(level)
+        if level : fh.setLevel(level)
         fh.setFormatter(formatter)
         clogger.addHandler(fh)
+
+def indent():
+    """ 
+    Forces log messages to be indented by one more TAB
+    """
+    global formatter
+    form="\t"+getattr(formatter,'_fmt')
+    formatter = logging.Formatter(form)
+    clog()
+    clog_file()
+
+def dedent():
+    """ 
+    Forces log messages to be de-indented by one TAB
+    """
+    global formatter
+    form=getattr(formatter,'_fmt').replace("\t","",1)
+    formatter = logging.Formatter(form)
+    clog()
+    clog_file()

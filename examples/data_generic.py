@@ -22,7 +22,7 @@ data organization called 'generic' :
 from climaf.api import *
 
 if atCNRM :
-    # First declare project OBS_CAMI 
+    # First declare project 'CAMI_OBS'
     cproject("CAMI_OBS")
     
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
@@ -119,7 +119,8 @@ if (my_file is None) : exit(1)
 
 # define a pattern for accessing fixed fields (here we use a set of fixed fields from CMIP5,
 # but this is not mandatory)
-pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/piControl/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
+pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"
+    "CNRM-CM5/piControl/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 
 # Tell which model use that fixed fields
 dataloc(model="CNRM-CM5",frequency="fx",organization="generic", url=[pattern_fx_CNRM_CM5])
@@ -129,12 +130,13 @@ sftlf=ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
 if atCNRM: print sftlf.baseFiles()
 
 # If a given experiment has modified fixed fields, you may write::
-pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
+pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"
+    "CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 dataloc(model="CNRM-CM5",experiment="LGM", frequency="fx",organization="generic",
         url=[pattern_fx_CNRM_CM5_lgm])
 
-# You can also use URLs that include a pattern for the experiment name, if you have one set of
-# fixed fields per experiment
+# if you have one set of fixed fields per experiment, you can even use
+# URLs that include a pattern for the experiment name,
 
 sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", experiment="LGM")
 if atCNRM: print sftlf_lgm.baseFiles()
@@ -146,4 +148,3 @@ if atCNRM: print sftlf_lgm.baseFiles()
 # If you need more functions related to fixed fields, please complain to 'climaf at meteo dot fr'
 
 
-if (rstfile is None) : exit(1)

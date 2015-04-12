@@ -52,21 +52,28 @@ def cfile(object,target=None,ln=None,deep=None) :
       object (CliMAF object) : either a dataset or a 'compound' object (e.g. the result of a CliMAF operator)
       target (str, optional) : name of the destination file or link; CliMAF will anyway store the result
        in its cache; 
+
       ln (logical, optional) : if True, target is created as a symlink to the CLiMAF cache file
-      deep (logical, optional) : governs the use of cached values when computing the object
+
+      deep (logical, optional) : governs the use of cached values when computing the object:
       
         - if missing, or None : use cache as much as possible (speed up the computation)
+
         - False : make a shallow computation, i.e. do not use cached values for the 
           top level operation
+
         - True  : make a deep computation, i.e. do not use any cached value
 
     Returns: 
-      - if 'target' is provided : returns this filename if computation is successful ('target' contains the result), and None otherwise; 
+
+      - if 'target' is provided : returns this filename (or linkname) if computation is 
+        successful ('target' contains the result), and None otherwise; 
+
       - else : returns the filename in CliMAF cache, which contains the result (and None if failure)
 
 
     """
-    clogger.debug("cfile called on"+str(object))  
+    clogger.debug("cfile called on "+str(object))  
     result=climaf.driver.ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
@@ -84,7 +91,7 @@ def cshow(obj) :
     For a figure object, this will lead to display it
     ( launch computation if needed. )
     """
-    clogger.debug("cshow called on"+str(obj)) #LV
+    clogger.debug("cshow called on "+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray')
 
 def  cMA(obj,deep=None) :
@@ -109,7 +116,7 @@ def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
 
     """
-    clogger.debug("cexport called with arguments"+str(args))  #LV
+    clogger.debug("cexport called with arguments"+str(args))  
     if "format" in kwargs :
         if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc") :
             kwargs['format']="file" 

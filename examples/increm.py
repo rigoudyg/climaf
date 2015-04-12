@@ -19,9 +19,10 @@ craz()
 # Define data location for an experiment, as concisely as possible
 cdef("project","example")
 cdef("experiment","AMIPV6ALB2G")
+cdef("variable","tas")
 
 # Define a 1-year dataset and have it written to cache
-ds1=ds(variable="tas"), period="1980")
+ds1=ds(period="1980")
 cfile(ds1)
 
 print "cache index after first dataset evaluation on [1980]" 

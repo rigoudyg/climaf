@@ -1,11 +1,9 @@
-# example for 
+# example for :
 #  1- defining a dataset restricted to a lat-lon box
 #  2- applying a further, explicit extraction of a sub box
 
 # Load Climaf functions and site settings
 from climaf.api import *
-
-clog(logging.DEBUG)
 
 cdef("frequency","monthly")
 cdef("project","example")
@@ -22,6 +20,6 @@ box=dict()
 box["nino28"]=[-150,-130,-5,5]
 dg_nino28=ds(experiment="AMIPV6ALB2G", variable="tas", 
              period="1980-1981", domain=box["nino28"])
+f=cfile(dg_nino28)
 
-
-if (cfile(dg_nino28) is None) : exit(1)
+if (f is None) : exit(1)
