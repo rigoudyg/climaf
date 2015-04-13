@@ -46,6 +46,7 @@ def clog_file(level=None) :
         if type(h) is logging.FileHandler :
             #print "il existe deja un FileHandler => on change le niveau d informations", h
             if level : h.setLevel(transl(level))
+            h.setFormatter(formatter)
             exist_file_handler=True    
             
     if exist_file_handler==False:
@@ -81,4 +82,5 @@ def transl(level) :
         elif level.lower()=='critical': return logging.CRITICAL
         elif level.lower()=='info': return logging.INFO
         elif level.lower()=='warning': return logging.WARNING
+        elif level.lower()=='error': return logging.ERROR
     else : return level

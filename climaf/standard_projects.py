@@ -18,8 +18,8 @@ def init_standard_projects():
     cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
     cproject("OCMIP5"                ,"frequency"                          )
     cproject("OBS4MIPS"              ,"frequency"                          )
-    cproject("OBS_CAMI"                                                    )
-    cproject("EM"                    ,"frequency"                          )
+    cproject("CAMIOBS"                                                     , separator="_")
+    cproject("EM"                    ,"frequency",        "realm"          )
     cproject("example"               ,"frequency"                          )
 
 

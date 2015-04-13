@@ -28,6 +28,6 @@ fi
 # Cleaning script
 scripts=$scripts" clean_cache.py"
 
-echo "tested example scripts : "$scripts
-export CLIMAF_LOG=debug
+echo "tested example scripts : "$scripts 
+export CLIMAF_LOG=critical
 python $thisdir/iterate_python_scripts.py -v -f $scripts

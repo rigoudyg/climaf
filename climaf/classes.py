@@ -118,14 +118,14 @@ def cdefault(attribute,value=None):
         cdefaults[attribute]=value
 
 cdefault("project","default_project")
-cdefault("model","default_model")
+cdefault("model","*")
 cdefault("experiment","default_experiment")
 #cdefault("period","197901-198012")
 cdefault("rip","r1i1p1")
 cdefault("frequency","monthly")
 cdefault("domain","global")
-cdefault("table","default_table")
-cdefault("realm","default_realm")
+cdefault("table","*")
+cdefault("realm","*")
 cdefault("version","last")
 #cdefault("variable","tas")
 
@@ -222,7 +222,6 @@ class cdataset(cobject):
             if facet in kwargs : val=kwargs[facet]
             else: val=cdefault(facet)
             attval[facet]=val
-        #print attval
         #
         # Special processing for CMIP5 fixed fields : handling redundancy in facets
         if (attval['project'] == 'CMIP5'):
@@ -237,11 +236,10 @@ class cdataset(cobject):
                 e="Project %s needs facet %s"%(self.project,facet)
                 clogger.error(e)
                 errmsg+=" "+e
-            attval[facet]=val
         if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
         #
         for facet in kwargs :
-            clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
+            #clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
             # Facet specific processing
             if facet=='period' :
                 try : attval['period']=init_period(attval['period'])

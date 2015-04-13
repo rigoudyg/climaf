@@ -9,7 +9,7 @@ There is quite a lot of things to document here. Maybe at a later stage ....
 
 #Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
 
-import os, re, posixpath, subprocess, time
+import os, os.path, re, posixpath, subprocess, time
 from string import Template
 
 # Climaf modules
@@ -83,7 +83,7 @@ def capply_script (script_name, *operands, **parameters):
                 if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
                     err="parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command)
                     clogger.error(err)
-                    raise Climaf_Apply_Error(err)
+                    raise Climaf_Driver_Error(err)
     #
     return rep
 
@@ -207,16 +207,21 @@ def ceval(cobject,
         recurse_list.append(cobject.crs)
         clogger.debug("Evaluating compound object : " + `cobject`)
         if (deep is not None) : cache.cdrop(cobject.crs)
-        filename=cache.hasExactObject(cobject) 
+        clogger.debug("Searching cache for exact object : " + `cobject`)
+        filename=cache.hasExactObject(cobject)
+        #filename=None
         if filename :
-            clogger.info("Object found in cache: %s"%cobject.crs)
+            clogger.info("Object found in cache: %s is at %s:  "%(cobject.crs,filename))
             if format=='file' : 
                 cdedent()
                 return filename
             else:
                 cdedent()
                 return cread(filename)
+        clogger.debug("Searching cache for including object for : " + `cobject`)
         it,altperiod=cache.hasIncludingObject(cobject)
+        clogger.debug("Finished with searching cache for including object for : " + `cobject`)
+        #it=None
         if it :
             clogger.info("Including object found in cache : %s"%(it.crs))
             clogger.info("Selecting "+`cobject`+" out of it")
@@ -225,7 +230,10 @@ def ceval(cobject,
             cdedent()
             return rep
         #
+        clogger.debug("Searching cache for begin  object for : " + `cobject`)
         it,comp_period=cache.hasBeginObject(cobject) 
+        clogger.debug("Finished with searching cache for begin  object for : " + `cobject`)
+        #it=None
         if it : 
             clogger.info("partial result found in cache for %s : %s"%\
                                   (cobject.crs,it.crs))
@@ -352,6 +360,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         label,multiple,serie=script.inputs[0]
         op=scriptCall.operands[0]
         infile=dict_invalues[op]
+        if not all(map(os.path.exists,infile.split(" "))) :
+            err="Internal error : some input file does not exist among %s:"%(infile)
+            clogger.error(err)
+            raise Climaf_Driver_Error(err)
         subdict[ label ]='"'+infile+'"'
         subdict["var"]='"'+varOf(op)+'"'
         per=timePeriod(op)
@@ -366,6 +378,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     for op in scriptCall.operands :
         opscrs += op.crs+" - "
         infile=dict_invalues[op]
+        if not all(map(os.path.exists,infile.split(" "))) :
+            err="Internal error : some input file does not exist among %s:"%(infile)
+            clogger.error(err)
+            raise Climaf_Driver_Error(err)
         i+=1
         if ( i> 1 or 1 in script.inputs) :
             label,multiple,serie=script.inputs[i]
@@ -388,7 +404,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # Provide one cache filename for each output and instantiates the command accordingly
     if script.outputFormat is not None :
         # Compute a filename for each ouptut
-        # Un-named main ouput
+        # Un-named main output
         main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
                                                           format=script.outputFormat)
         subdict["out"]=main_output_filename
@@ -429,7 +445,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if ( subprocess.call(command, shell=True) == 0):
         if script.outputFormat is not None :
             # Tagging output files with their CliMAF Reference Syntax definition
-            # Un-named main ouput
+            # Un-named main output
             ok = cache.register(main_output_filename,scriptCall.crs)
             # Named outputs
             for output in scriptCall.outputs:
@@ -440,11 +456,15 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                              duration)
                 return main_output_filename
             else :
-                clogger.error("Some output missing when executing : %s. \nSee scripts.out"%template)
+                err="Some output missing when executing : %s. \nSee scripts.out"%template
+                clogger.error(err)
+                raise Climaf_Driver_Error
         else :
-            clogger.debug("script %s has no ouput"%script.name)
+            clogger.debug("script %s has no output"%script.name)
     else:
-        clogger.error("Script call failure for %s . \nSee scripts.out"%template)
+        err="Script call failure for %s . \nSee scripts.out"%template
+        clogger.error(err)
+        raise Climaf_Driver_Error
     return None
 
 
@@ -603,5 +623,6 @@ def CFlongname(varname) :
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
-def Climaf_Apply_Error(Exception):
+class Climaf_Driver_Error(Exception):
     pass
+

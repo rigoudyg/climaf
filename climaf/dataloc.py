@@ -173,8 +173,10 @@ def selectLocalFiles(**kwargs):
     
     - use datalocations indexed by :py:func:`dataloc` to identifiy data organization 
     and data store urls for these (facet,value) pairs
+
     - derive relevant filenames search function such as as :py:func:`selectCmip5DrsFiles` 
     from data organization scheme
+
     - pass urls and relevant facet values to the filenames search function
 
     Known organizations are documented with :py:class:`~dataloc`
@@ -184,17 +186,25 @@ def selectLocalFiles(**kwargs):
     if not "model" in kwargs : model="*"
     project=kwargs['project']
     experiment=kwargs['experiment']
-    frequency=kwargs['frequency']
+    variable=kwargs['variable']
+    period=kwargs['period']
+
+    if 'model' in kwargs : model=kwargs['model']
+    else : model="*"
+    if 'frequency' in kwargs : frequency=kwargs['frequency']
+    else : frequency="*"
+
     ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency)
     clogger.debug("locs="+ `ofu`)
     if ( len(ofu) == 0 ) :
         clogger.warning("no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
     for org,freq,urls in ofu :
         if (org == "EM") :
-            rep.extend(selectEmFiles(experiment, frequency, variable, period))
+            rep.extend(selectEmFiles(**kwargs))
         elif (org == "example") :
             rep.extend(selectExampleFiles(urls, **kwargs))
         elif (org == "CMIP5_DRS") :
+            clogger.error("kw="+`kwargs`)
             rep.extend(selectCmip5DrsFiles(urls,**kwargs))
         elif (org == "OCMIP5_Ciclad") :
             rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
@@ -213,7 +223,7 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for variable : %s, period : %s, and rip : %s , at these data locations %s , for model : %s, experiment : %s frequency : %s "%(variable, `period`, rip,  `urls`,model,experiment,frequency))
+            clogger.warning("no file found for variable : %s, and period : %s, at these data locations %s , for model : %s, experiment : %s frequency : %s "%(variable, `period`,  `urls`,model,experiment,frequency))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep.sort()
@@ -315,7 +325,7 @@ def selectGenericFiles(urls, **kwargs):
                 #
                 # Filter file time period against required period
             else :
-                if (frequency == 'fx' ):
+                if ( 'frequency' in kwargs and kwargs['frequency']=="fx") :
                     if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
@@ -337,13 +347,17 @@ def selectEmFiles(**kwargs) :
     frequency=kwargs['frequency']
     variable=kwargs['variable']
     period=kwargs['period']
+    realm=kwargs['realm']
     #
     freqs={ "monthly" : "" , "3h" : "_3h"}
     f=frequency
     if f in freqs : f=freqs[f]
     rep=[]
     # Must look for all realms, here identified by a single letter
-    for realm in ["A", "L", "O", "I" ] :
+    if realm=="*" : lrealm= ["A", "L", "O", "I" ]
+    else: lrealm=[ realm ]
+    for realm in lrealm :
+        clogger.debug("Looking for realm "+realm)
         # Use EM data for finding data dir
         command=["grep", "^export EM_DIRECTORY_"+realm+f+"=", os.path.expanduser("~/.em/expe_")+experiment ]
         try :
@@ -358,11 +372,12 @@ def selectEmFiles(**kwargs) :
             if os.path.exists(dir) :
                 lfiles= os.listdir(dir)
                 for fil in lfiles :
-                    clogger.debug("Looking at file "+fil)
+                    #clogger.debug("Looking at file "+fil)
                     fileperiod=periodOfEmFile(fil,realm,f)
                     if fileperiod and period.intersects(fileperiod) :
                         if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
+                    #clogger.debug("Done with Looking at file "+fil)
             else : clogger.error("Directory %s does not exist for EM experiment %s, realm %s "
                                  "and frequency %s"%(dir,experiment,realm,f))
         else :
@@ -383,8 +398,9 @@ def periodOfEmFile(filename,realm,freq):
                 speriod="%s-%d"%(year,int(year)+1)
                 return init_period(speriod)
         else:
-            clogger.error("can yet handle only "
-                          "monthly frequency for realms A and L - TBD")
+            err="can yet handle only monthly frequency for realms A and L - TBD"
+            clogger.error(err)
+            raise Climaf_Data_Error(err)
     elif (realm == 'O' or realm == 'I' ) :
         if freq=='mon' or freq=='' :
             patt=r'^.*_([0-9]{8})_*([0-9]{8})_.*nc'
@@ -392,8 +408,15 @@ def periodOfEmFile(filename,realm,freq):
             end=re.sub(patt,r'\2',filename)
             return init_period("%s-%s"%(beg,end))
         else:
-            clogger.error("Can yet handle only monthly frequency for realms O and I - TBD")
-    else: clogger.error("unexpected realm "+realm)
+            err="Can yet handle only monthly frequency for realms O and I - TBD"
+            clogger.error(err)
+            raise Climaf_Data_Error(err)
+    else:
+        err="unexpected realm "+realm
+        clogger.error(err)
+        raise Climaf_Data_Error(err)
+
+        
 
 
                         
@@ -417,7 +440,7 @@ def selectExampleFiles(urls,**kwargs) :
     return rep
                         
 
-def selectCmip5DrsFiles(urls, *kwargs) :
+def selectCmip5DrsFiles(urls, **kwargs) :
     # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
     # We use wildcards for : lab, realm and MIP_table
@@ -445,11 +468,11 @@ def selectCmip5DrsFiles(urls, *kwargs) :
         patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+rip
         # Get version directories list
         ldirs=glob.glob(patternv)
-        # print "looking at "+patternv+ " gives:" +`ldirs`
+        #print "looking at "+patternv+ " gives:" +`ldirs`
         for repert in ldirs :
             lversions=os.listdir(repert)
             lversions.sort()
-            # print "lversions="+`lversions`+ "while version="+version
+            #print "lversions="+`lversions`+ "while version="+version
             cversion=version # initial guess of the version to use
             if (version == "last") :
                 if (len(lversions)== 1) : cversion=lversions[0]
@@ -457,10 +480,10 @@ def selectCmip5DrsFiles(urls, *kwargs) :
                     if "last" in lversions : cversion="last"
                     else :
                         cversion=lversions[-1] # Assume that order provided by sort() is OK
-            # print "using version "+cversion+" for requested version: "+version
+            #print "using version "+cversion+" for requested version: "+version
             lfiles=glob.glob(repert+"/"+cversion+"/"+variable+"/*.nc")
-            # print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
-            # print 'lfiles='+`lfiles`
+            #print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
+            #print 'lfiles='+`lfiles`
             for f in lfiles :
                 if freqd != 'fx' :
                     clogger.debug("checking period for "+ f)
@@ -534,7 +557,8 @@ def selectCamiObsFiles(instrument, frequency, variable, period, urls):
                     rep.append(f)
     return rep
 
-
+class Climaf_Data_Error(Exception):
+    pass
 
 
 def test2() :

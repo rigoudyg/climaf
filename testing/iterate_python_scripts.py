@@ -37,7 +37,9 @@ for file in vfiles:
     if args.verbosity:
         print "'%s'..." %file,
 
-    ex = subprocess.Popen(["python", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ex = subprocess.Popen(["/usr/bin/python",file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Next commmand if a blocking occurs due to numerous error messages
+    #ex = subprocess.Popen(["python",file])
 
     if ex.wait()==0 : #code retour
         if args.verbosity:

@@ -21,8 +21,9 @@ class cperiod():
             self.fx=True
             self.pattern='fx'
         elif not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
-            clogger.error("issue with start or end")
-            return(None)
+            err="issue with start or end"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         else :
             self.start=start ; self.end=end ;
             if pattern is None :
@@ -41,8 +42,9 @@ class cperiod():
         e.g. : 1980-01-01T00:00:00,1980-12-31T23:59:00
         """
         if (self.fx) :
-            clogger.error("There is no ISO representation for period 'fx'")
-            return None
+            err="There is no ISO representation for period 'fx'"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         endproxy = self.end - datetime.timedelta(0,60)  # substract 1 minute
         return "%s,%s"%(self.start.isoformat(),endproxy.isoformat())
     #
@@ -89,16 +91,18 @@ class cperiod():
     #
     def hasFullYear(self,year):
         if (self.fx) :
-            clogger.error("Meaningless for period 'fx'")
-            return False
+            err="Meaningless for period 'fx'"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         return( int(year) >= self.start.year and int(year) < self.end.year) 
     #
     def start_with(self,begin) :
         """ If period BEGIN actually begins period SELF, returns the 
         complement of BEGIN in SELF; otherwise returns None """
         if (self.fx) :
-            clogger.error("Meaningless for period 'fx'")
-            return None
+            err="Meaningless for period 'fx'"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         if self.start==begin.start and self.end >= begin.end : 
             return cperiod(begin.end,self.end)
     #
@@ -106,8 +110,9 @@ class cperiod():
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
         if (self.fx) :
-            clogger.error("Meaningless for period 'fx'")
-            return None
+            err="Meaningless for period 'fx'"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         if self.start <= included.start and included.end <= self.end :
             return cperiod(self.start,included.start), 
         cperiod(included.end,self.end)
@@ -117,8 +122,9 @@ class cperiod():
         Returns the intersection of period self and period 'other' if any
         """
         if (self.fx) :
-            clogger.error("Meaningless for period 'fx'")
-            return None
+            err="Meaningless for period 'fx'"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         if other :
             start=self.start
             if (other.start > start) : start=other.start
@@ -154,8 +160,9 @@ def init_period(dates) :
     
     #clogger.debug("analyzing  %s"%dates)
     if not type(dates) is str :
-	clogger.error("arg is not a string : "+`dates`)
-	return None
+        err="arg is not a string : "+`dates`
+        clogger.error(err)
+        raise Climaf_Period_Error(err)
     if (dates == 'fx' ) : return cperiod('fx')
     
     start=re.sub(r'^([0-9]{4,12}).*',r'\1',dates)
@@ -168,8 +175,9 @@ def init_period(dates) :
     try :
         s=datetime.datetime(year=syear,month=smonth,day=sday,hour=shour,minute=sminute)
     except :
-        clogger.debug("period start string %s is not a date"%start)
-        return(NOne)
+        err="period start string %s is not a date"%start
+        clogger.error(err)
+        raise Climaf_Period_Error(err)
     #
     end=re.sub(r'.*[-_]([0-9]{4,12})$',r'\1',dates)
     #clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
@@ -200,8 +208,9 @@ def init_period(dates) :
     else:
         #clogger.debug("len(end)=%d"%len(end))
         if len(start) != len(end) :
-            clogger.error("Must have same numer of digits for start and end dates")
-            return None
+            err="Must have same numer of digits for start and end dates (%s and %s)%(start,end)"
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
         if (len(end)<12)  :
             eminute = 0
         else :
@@ -219,8 +228,9 @@ def init_period(dates) :
                     #print "trying %d %d %d %d %d"%(eyear,emonth,eday,ehour,eminute)
                     e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
                 except:
-                    clogger.error("period end string %s is not a date"%end)
-                    return None
+                    err="period end string %s is not a date"%end
+                    clogger.error(err)
+                    raise Climaf_Period_Error(err)
                 e=e+datetime.timedelta(1)
                 done=True
             else:
@@ -238,10 +248,16 @@ def init_period(dates) :
             #print "try:%d %02d %02d %02d %02d"%(eyear,emonth,eday,ehour,eminute)
             e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
         except:
-            clogger.error("period end string %s is not a date"%end)
-            return None
+            err="period end string %s is not a date"%end
+            clogger.error(err)
+            raise Climaf_Period_Error(err)
     if s < e :
         return cperiod(s,e,None)
     else :
-        clogger.error("Must have start before (or equals to) end "+`s`+`e`)
+        err="Must have start before (or equals to) end "+`s`+`e`
+        clogger.error(err)
+        raise Climaf_Period_Error(err)
 
+
+class Climaf_Period_Error(Exception):
+    pass

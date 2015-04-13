@@ -68,7 +68,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
             exit
         guess=full[0 : number - 1 ]
         existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
-        readCRS=getCRS(existing)
+        if existing : readCRS=getCRS(existing)
     rep=currentCache+"/"+prefix+stringToPath(full[0 : number - 1 ], directoryNameLength )+"."+format
     rep=os.path.expanduser(rep)
     # Create the relevant directory, so that user scripts don't have to care

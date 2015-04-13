@@ -37,9 +37,7 @@ class cscript():
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc','png' or 'None'; defaults to 'nc'
-            format should be None whene there is no saved output but only a side effect (such
-            as displaying a datset or result with ncview) with low compute cost
+          format (str): script outputs format -- either 'nc' or 'png' or 'None'; defaults to 'nc'
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
           doSqueezeTime (bool, optional): does the script degenerate/aggregate the time 
             dimension ? defaults to False
@@ -120,10 +118,16 @@ class cscript():
            call time by the period written as <date1>-<date2>, where date is
            formated as YYYYMMDD ;
 
-            - all time intervals are interpreted as [date1, date2[
+            - time intervals must be interpreted as [date1, date2[
+
             - 'period' stands for the first input_stream,
+
             - 'period_<n>' for the next ones, in the order of actual call;
 
+           - in the example above, this keyword is not used, which means that
+             CliMAF has to select the period upstream of feeding CDO with the
+             data
+         
          - **period_iso, period_iso_<digit>** : as for **period** above,
            except that the date formating fits CDO conventions : 
 
@@ -144,21 +148,20 @@ class cscript():
               feed CDO with a datafile where it has already performed the
               selection
          
-          - in the example above, this keyword is not used, which means that
-            CliMAF has to select the period upstream of feeding CDO with the
-            data
-         
          - **out, out_<word>** : CliMAF provide file names for output
-           files. Main output file must be created by the script with
-           the name provided at the location of argument ${out}; using
-           arguments like 'out_<word>' tells CliMAF that the script
-           provide some secondary output, which will be symbolically
-           known in CliMAF syntax as an attribute of the main object; by
-           default, the variable name of each output equals the name of
-           the output (except for the main ouput, which variable name is
-           supposed to be the same as for the first input); for other cases,
-           see argument \*\*kwargs to provide a format string, used to derive the
-           variable name from first input variable name as in e.g. :
+           files (if there is no such field, the script will have
+           only 'side effects', e.g. launch a viewer). Main output
+           file must be created by the script with the name provided
+           at the location of argument ${out}. Using arguments like
+           'out_<word>' tells CliMAF that the script provide some
+           secondary output, which will be symbolically known in
+           CliMAF syntax as an attribute of the main object; by
+           default, the variable name of each output equals the name
+           of the output (except for the main ouput, which variable
+           name is supposed to be the same as for the first input);
+           for other cases, see argument \*\*kwargs to provide a
+           format string, used to derive the variable name from first
+           input variable name as in e.g. :
            ``output2_var='std_dev(%s)'`` for the output labelled
            output2 (i.e. declared as '${out_output2}')
 
@@ -214,13 +217,14 @@ class cscript():
         #
         # Check that command includes an argument allowing for providing at least one output filename
         if command.find("${out") < 0 :
-            if format is not None :
-                clogger.error("(defining %s : command %d must include "+
-                              "'${out_xxx}' for specifying how CliMAF will provide the output(s) filename(s))"%\
-                                  (name,command))
-                return None
-            else: 
-                clogger.debug("defining script %s as output-less"%name)
+            format=None
+            #if format is not None :
+            #    clogger.error("(defining %s : command %d must include "+
+            #                  "'${out_xxx}' for specifying how CliMAF will provide the output(s) filename(s))"%\
+            #                      (name,command))
+            #    return None
+            #else: 
+            #    clogger.debug("defining script %s as output-less"%name)
         #
         # Search in call arguments for keywords matching "<output_name>_var" which may provide
         # format string for 'computing' outputs variable name from input variable name
@@ -228,7 +232,7 @@ class cscript():
         for p in kwargs : 
             if re.match(pattern,p):
                 outvarnames[re.findall(pattern,p)[0]]=kwargs[p]
-        clogger.debug("outvarnames = "+`outvarnames`)
+        #clogger.debug("outvarnames = "+`outvarnames`)
         #
         # Analyze outputs names , associated variable names (or format strings), and store 
         # it in attribute dict 'outputs' 
@@ -243,7 +247,7 @@ class cscript():
                     self.outputs[outname]=outname
             else:
                 self.outputs[None]="%s"
-        clogger.debug("outputs = "+`self.outputs`)
+        #clogger.debug("outputs = "+`self.outputs`)
         #
         canSelectVar=False
         if command.find("${var}") > 0 : canSelectVar=True

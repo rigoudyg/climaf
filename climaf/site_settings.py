@@ -39,8 +39,7 @@ if urls_CMIP5 :
     dataloc(project="CMIP5", organization="CMIP5_DRS", url=urls_CMIP5)
 
 
-# Declare project example and a data location for this project
-cproject("example","frequency")
+# Declare a data location for standard project example
 data_pattern_L=cpath+"/../examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
 data_pattern_A=cpath+"/../examples/data/${experiment}/A/${experiment}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])

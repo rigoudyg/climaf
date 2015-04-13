@@ -23,24 +23,25 @@ from climaf.api import *
 clog(logging.DEBUG) 
 
 if atCNRM :
-    # First declare project 'CAMI_OBS'
-    cproject("CAMI_OBS")
+    # First declare project 'CAMIOBS' - Default project attribute 'experiment' will be used to identify a data source
+    # SOme data sources have a "." in their name, hence must use another separator for this project
+    cproject("CAMIOBS",separator="_")
     
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
-    CAMI_OBS_root="/cnrm/aster/data1/UTILS/cami/V1.7/climlinks/"
+    CAMIOBS_root="/cnrm/aster/data1/UTILS/cami/V1.7/climlinks/"
     
     # Pattern for matching CAMI obs data files and their directory. 
     # We choose to use facet 'model' to carry the observation source
-    CAMI_OBS_pattern="${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc"
+    CAMIOBS_pattern="${experiment}/${variable}_1m_YYYYMM_YYYYMM_${experiment}.nc"
     
-    # Declare the CAMI_OBS pattern to be associated with a project we name OBS_CAMI
-    dataloc(project="CAMI_OBS", organization="generic", 
-            url=[CAMI_OBS_root+CAMI_OBS_pattern])
+    # Declare the CAMIOBS pattern to be associated with a project we name OBS_CAMI
+    dataloc(project="CAMIOBS", organization="generic", 
+            url=[CAMIOBS_root+CAMIOBS_pattern])
     
     # From here, you can define your dataset using these files. 
     # You need only to define the facets useful w.r.t. the patterns
     # i.e. here : model and variable
-    pr_gpcp=ds(project="CAMI_OBS", model="GPCP2.5d", variable="pr", period="1979-1980")
+    pr_gpcp=ds(project="CAMIOBS", experiment="GPCP2.5d", variable="pr", period="1979-1980")
     
     # Display the basic filenames involved in the dataset 
     pr_gpcp.baseFiles()
@@ -104,7 +105,7 @@ if atCNRM :
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
     pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean",
-              period="1979-1980", experiment="GPCP")
+              period="1979-1980", experiment="GPCP-SG")
 
     print pr_obs.baseFiles()
     my_file=cfile(pr_obs)
