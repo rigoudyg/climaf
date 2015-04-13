@@ -34,8 +34,8 @@ from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
 import climaf.standard_projects
 
-clog(logging.ERROR)
-clog_file(logging.ERROR)
+clog(os.getenv("CLIMAF_LOG","error"))
+clog(os.getenv("CLIMAF_FILE_LOG","debug"))
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 
 climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")

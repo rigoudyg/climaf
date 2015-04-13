@@ -20,6 +20,7 @@ data organization called 'generic' :
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
 from climaf.api import *
+clog(logging.DEBUG) 
 
 if atCNRM :
     # First declare project 'CAMI_OBS'
@@ -66,7 +67,7 @@ data_pattern_A=cpath+"/../examples/data/${experiment}/A/${experiment}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])
 rst=ds(project="example", experiment="AMIPV6ALB2G", variable="rst", period="1980-1981")
 l=rst.baseFiles()
-rst_file=cfile(rst)
+my_file=cfile(rst)
 
 
 #---------------------------------------------------------------
@@ -98,11 +99,11 @@ if atCNRM :
     
     cproject("OBS4MIPS","frequency")
 
-    pattern="/cnrm/vdr/DATA/Obs4MIPs/netcdf/${frequency}/"+
+    pattern="/cnrm/vdr/DATA/Obs4MIPs/netcdf/${frequency}/"+\
             "${variable}_${experiment}_*_YYYYMM-YYYYMM.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
-    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean"
+    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean",
               period="1979-1980", experiment="GPCP")
 
     print pr_obs.baseFiles()
@@ -119,18 +120,19 @@ if (my_file is None) : exit(1)
 
 # define a pattern for accessing fixed fields (here we use a set of fixed fields from CMIP5,
 # but this is not mandatory)
-pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"
+pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"+\
     "CNRM-CM5/piControl/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 
 # Tell which model use that fixed fields
 dataloc(model="CNRM-CM5",frequency="fx",organization="generic", url=[pattern_fx_CNRM_CM5])
 
 # You may then use period='fx' for describing and accessing the data::
+cdef("project","CMIP5")
 sftlf=ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
 if atCNRM: print sftlf.baseFiles()
 
 # If a given experiment has modified fixed fields, you may write::
-pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"
+pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"+\
     "CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 dataloc(model="CNRM-CM5",experiment="LGM", frequency="fx",organization="generic",
         url=[pattern_fx_CNRM_CM5_lgm])

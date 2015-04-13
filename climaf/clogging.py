@@ -17,7 +17,7 @@ def clog(level=None) :
      level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
 
     """
-    if (level) : clogger.setLevel(level) 
+    if (level) : clogger.setLevel(transl(level)) 
     exist_stream_handler=False
     for h in clogger.handlers :
         if type(h) is logging.StreamHandler :
@@ -45,13 +45,13 @@ def clog_file(level=None) :
     for h in clogger.handlers :
         if type(h) is logging.FileHandler :
             #print "il existe deja un FileHandler => on change le niveau d informations", h
-            if level : h.setLevel(level)
+            if level : h.setLevel(transl(level))
             exist_file_handler=True    
             
     if exist_file_handler==False:
         #print "ajout d un FileHandler"
         fh = logging.FileHandler('climaf.log',mode='w') 
-        if level : fh.setLevel(level)
+        if level : fh.setLevel(transl(level))
         fh.setFormatter(formatter)
         clogger.addHandler(fh)
 
@@ -74,3 +74,11 @@ def dedent():
     formatter = logging.Formatter(form)
     clog()
     clog_file()
+
+def transl(level) :
+    if type(level) is str:
+        if level.lower()=='debug': return logging.DEBUG
+        elif level.lower()=='critical': return logging.CRITICAL
+        elif level.lower()=='info': return logging.INFO
+        elif level.lower()=='warning': return logging.WARNING
+    else : return level

@@ -117,15 +117,15 @@ def cdefault(attribute,value=None):
     else :
         cdefaults[attribute]=value
 
-cdefault("project","*")
-cdefault("model","*")
-cdefault("experiment","*")
+cdefault("project","default_project")
+cdefault("model","default_model")
+cdefault("experiment","default_experiment")
 #cdefault("period","197901-198012")
 cdefault("rip","r1i1p1")
 cdefault("frequency","monthly")
 cdefault("domain","global")
-cdefault("table","*")
-cdefault("realm","*")
+cdefault("table","default_table")
+cdefault("realm","default_realm")
 cdefault("version","last")
 #cdefault("variable","tas")
 
@@ -217,17 +217,11 @@ class cdataset(cobject):
             clogger.error(err)
             raise Climaf_Dataset_Error(err)
         # Register facets values
-        errmsg=""
         attval=dict()
         for facet in cprojects[self.project].facets :
             if facet in kwargs : val=kwargs[facet]
             else: val=cdefault(facet)
-            if val is None :
-                e="Project %s needs facet %s"%(self.project,facet)
-                clogger.error(e)
-                errmsg+=" "+e
             attval[facet]=val
-        if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
         #print attval
         #
         # Special processing for CMIP5 fixed fields : handling redundancy in facets
@@ -237,13 +231,24 @@ class cdataset(cobject):
                  attval['table']='fx' ; attval['period']='fx' 
                  attval['rip']='r0i0p0' ; attval['frequency']='fx'
         #
+        errmsg=""
+        for facet in cprojects[self.project].facets :
+            if attval[facet] is None :
+                e="Project %s needs facet %s"%(self.project,facet)
+                clogger.error(e)
+                errmsg+=" "+e
+            attval[facet]=val
+        if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
+        #
         for facet in kwargs :
+            clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
             # Facet specific processing
             if facet=='period' :
-                attval[facet]=init_period(attval[facet])
+                try : attval['period']=init_period(attval['period'])
+                except : raise Climaf_Dataset_Error
             elif facet=='domain' and type(attval['domain']) is str and attval['domain'] != 'global' :
                 # May be a list
-                attval[facet]=eval(attval[facet])
+                attval['domain']=eval(attval['domain'])
             # Check for typing or user's logic errors
             if not facet in cprojects[self.project].facets :
                 e="Project %s doesn't have facet %s"%(self.project,facet)
@@ -456,12 +461,13 @@ def ds(*args,**kwargs) :
         e="must provide either 0 or 1 positional arguments, not "+len(args)
         clogger.error(e)
         raise Climaf_Dataset_Error(e)
-    #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
+    clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
     results=[]
     for cproj in cprojects : 
-        dataset = cprojects[cproj].crs2ds(crs) 
+        try : dataset = cprojects[cproj].crs2ds(crs) 
+        except Climaf_Dataset_Error: dataset=None
         if (dataset) : results.append(dataset)
     if len(results) > 1 :
         e="CRS expressions %s is ambiguous projects %s"%(crs,`cprojects.keys()`)
