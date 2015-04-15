@@ -16,10 +16,10 @@ def init_standard_projects():
     The cprojects list also show in variable :ref:`~climaf.classes.cprojects`
     """
     cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
-    cproject("OCMIP5"                ,"frequency"                          )
-    cproject("OBS4MIPS"              ,"frequency"                          )
-    cproject("CAMIOBS"                                                     , separator="_")
-    cproject("EM"                    ,"frequency",        "realm"          )
-    cproject("example"               ,"frequency"                          )
+    cproject("OCMIP5"  ,"model",      "frequency"                          )
+    cproject("OBS4MIPS",              "frequency"                          )
+    cproject("CAMIOBS" ,                                                   separator="_")
+    cproject("EM"      ,              "frequency",        "realm"          )
+    cproject("example" ,              "frequency"                          )
 
 

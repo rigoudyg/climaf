@@ -166,8 +166,6 @@ begin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MapPlot resources
-  print("lonmin=")
-  print(min(lon))
   res@mpMinLonF                = min(lon)
   res@mpMaxLonF                = max(lon)
   res@mpMinLatF                = min(lat)

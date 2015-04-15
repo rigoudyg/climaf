@@ -82,7 +82,7 @@ my_file=cfile(rst)
 #---------------------------------------------------------------
 
 if onCiclad :
-    cproject("OCMIP5_Ciclad","frequency")
+    cproject("OCMIP5_Ciclad","model","frequency")
     
     dataloc(project="OCMIP5_Ciclad", organization="generic",
             url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])

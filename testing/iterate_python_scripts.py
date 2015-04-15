@@ -35,8 +35,8 @@ else:
 
 for file in vfiles:
 
-    if args.verbosity:
-        print "'%s'..." %file,
+    if args.verbosity or args.upper_verbosity:
+        print "'%s'..." %file
 
     if args.upper_verbosity:
         ex = subprocess.Popen(["python",file])

@@ -186,7 +186,8 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for variable : %s, and period : %s, at these data locations %s , for model : %s, experiment : %s frequency : %s "%(variable, `period`,  `urls`,model,experiment,frequency))
+            clogger.warning("no file found for %s, at these"
+                            "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep.sort()
