@@ -14,7 +14,9 @@ def clog(level=None) :
     Sets the verbosity level for CliMAF log messages on stderr.
 
     Args:
-     level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
+     level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
+
+    Note : at CliMAF startup, the level is set to the value of envrionment variable $CLIMAF_LOG_LEVEL
 
     """
     if (level) : clogger.setLevel(transl(level)) 
@@ -39,7 +41,10 @@ def clog_file(level=None) :
     Sets the verbosity level for CliMAF log messages on file climaf.log
 
    Args:
-     level : among logging.DEBUG, logging.INFO, logging.WARNING, logging.CRITICAL
+     level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
+
+    Note : at CliMAF startup, the level is set to the value of envrionment variable $CLIMAF_LOGFILE_LEVEL
+
     """
     exist_file_handler=False
     for h in clogger.handlers :

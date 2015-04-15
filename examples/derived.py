@@ -13,9 +13,6 @@ It can be used to define a CliMAF dataset
 # This sets logical flags 'onCiclad' and 'atCNRM'
 from climaf.api import *
 
-# Tell CliMAF how verbose it should be (levels : CRITICAL, ERROR, WARNING, INFO, DEBUG)
-clog(logging.INFO) # default is WARNING
-
 # Set some default values
 cdef("project","example")
 cdef("experiment","AMIPV6ALB2G")
@@ -25,6 +22,7 @@ cdef("period","1980-1981")
 # 'derived') . We call it 'crest' (which stand for Cloud Radiative
 # Effect in Shortwave at Top of atmosphere), from all-sky and
 # clear-sky sortwave fluxes
+# All the other dataset attributes were ste above by cdef()
 creShortTop=ds(variable="crest")
 
 # Declare a script tht will be used in defining how to derive the new variable

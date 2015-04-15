@@ -4,7 +4,7 @@
 # Load Climaf functions and site settings
 from climaf.api import *
 
-# Define a default value for one dataset facet
+# Define a default value for two dataset facets
 cdef("project","example")
 cdef("frequency","monthly")
 

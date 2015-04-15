@@ -18,6 +18,24 @@ cprojects=dict()
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
         """
+        Declare a project and its facets/attributes in CliMAF (see below)
+
+        Args:
+          name (string) : project name
+           do not use the chosen separator in it (see below)
+          args (strings) : attribute names
+           they are free; do not use the chosen separator in it (see below); **CliMAF 
+           anyway will add attributes : 
+           project, experiment, variable, period, and domain**
+          kwargs (dict) :
+           can only be used with keyword ``sep`` or 
+           ``separator`` for indicating the symbol separating
+           facets in the dataset syntax. Defaults to ".". 
+
+        Returns : a cproject object, which string representation is
+        the pattern later used in CliMAF Refreence Syntax for
+        representing datasets in this project
+
         A 'cproject' is the definition of a set of attributes, or
         facets, which values will completely define a 'dataset' as
         managed by CliMAF. Its name is one of the possible keys 
@@ -28,22 +46,7 @@ class cproject():
         has attributes : 
         experiment, model, rip, variable, frequency, realm, table, version
 
-        Args :
-          name (string) : project name;
-            do not use the chosen separator in it (see below)
-          args (strings) : attribute names, freely chosen; do not 
-            use the chosen separator in it (see below); **CliMAF 
-            anyway will add attributes : 
-            project, experiment, variable, period, and domain**
-          kwargs (dict) : can only be used for as ``sep="."`` or 
-            ``separator="."`` for indicating the symbol separating
-            facets in the dataset syntax. Defaults to ".". 
-
-        Returns : a cproject object, which string representation is
-        the pattern later used in CliMAF Refreence Syntax for
-        representing datasets in this project
-
-        For instance, a dataset in a cproject declared as ::
+        A dataset in a cproject declared as ::
 
         >>> cproject("MINE","myfreq","myfacet",sep="_")
 
@@ -51,7 +54,7 @@ class cproject():
 
           ${project}_${experiment}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
 
-        and will datasets represented as  ::
+        and will have datasets represented as  e.g.::
 
           'MINE_hist_tas_[1980-1999]_global_decadal_gabu'
 
@@ -101,7 +104,7 @@ class cproject():
 #: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
 cdefaults=dict()
 
-def cdefault(attribute,value=None):
+def cdef(attribute,value=None):
     """
     Set or get the default value for a CliMAF dataset attributes (as e.g. 'model', 'project' ...),
     for use by next calls to :py:class:`~climaf.classes.cdataset` or to :py:func:`~climaf.classes.ds`
@@ -117,17 +120,17 @@ def cdefault(attribute,value=None):
     else :
         cdefaults[attribute]=value
 
-cdefault("project","default_project")
-cdefault("model","*")
-cdefault("experiment","default_experiment")
-#cdefault("period","197901-198012")
-cdefault("rip","r1i1p1")
-cdefault("frequency","monthly")
-cdefault("domain","global")
-cdefault("table","*")
-cdefault("realm","*")
-cdefault("version","last")
-#cdefault("variable","tas")
+cdef("project","default_project")
+cdef("model","*")
+cdef("experiment","default_experiment")
+#cdef("period","197901-198012")
+cdef("rip","r1i1p1")
+cdef("frequency","monthly")
+cdef("domain","global")
+cdef("table","*")
+cdef("realm","*")
+cdef("version","last")
+#cdef("variable","tas")
 
 
 # All CObject instances are registered in this directory :
@@ -207,7 +210,7 @@ class cdataset(cobject):
         #
         self.crs=""
         if 'project' in kwargs : self.project=kwargs['project']
-        else : self.project= cdefault("project")   
+        else : self.project= cdef("project")   
         if self.project is None :
             err="Must provide a project (Can use cdef)"
             clogger.error(err)
@@ -220,7 +223,7 @@ class cdataset(cobject):
         attval=dict()
         for facet in cprojects[self.project].facets :
             if facet in kwargs : val=kwargs[facet]
-            else: val=cdefault(facet)
+            else: val=cdef(facet)
             attval[facet]=val
         #
         # Special processing for CMIP5 fixed fields : handling redundancy in facets
@@ -259,7 +262,10 @@ class cdataset(cobject):
         self.project   =attval['project']
         self.experiment=attval['experiment']
         self.variable= attval['variable']
-        self.period    =attval['period']
+        if type(attval['period']) is str :
+            self.period    =init_period(attval['period'])
+        else:
+            self.period    =attval['period']
         self.domain    =attval['domain']
         #
         self.model    =attval.get('model',"*")
@@ -314,8 +320,9 @@ class cdataset(cobject):
         return(self.domain == 'global') 
         
     def periodHasOneFile(self) :
-        clogger.debug("always returns False, yet - TBD")
-        return(False) 
+        return(len(self.baseFiles().split(" ")) < 2)
+        #clogger.debug("always returns False, yet - TBD")
+        #return(False) 
 
     def hasOneMember(self) :
         clogger.debug("always returns True, yet - TBD")
@@ -459,7 +466,7 @@ def ds(*args,**kwargs) :
         e="must provide either 0 or 1 positional arguments, not "+len(args)
         clogger.error(e)
         raise Climaf_Dataset_Error(e)
-    clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
+    #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
     results=[]
@@ -488,13 +495,13 @@ class Climaf_Dataset_Error(Exception):
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV
 #    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
-    cdefault("project","CMIP5")
-    #cdefault("project","PR6")
-    cdefault("model","CNRM-CM5")
-    cdefault("experiment","historical")
-    cdefault("rip","r1i1p1")
-    cdefault("period","197901-198012")
-    cdefault("domain","global")
+    cdef("project","CMIP5")
+    #cdef("project","PR6")
+    cdef("model","CNRM-CM5")
+    cdef("experiment","historical")
+    cdef("rip","r1i1p1")
+    cdef("period","197901-198012")
+    cdef("domain","global")
     #
     tos=cdataset(experiment="rcp85", variable="tos", period="19790101-19790102")
     tr=ctree("operator", tos, para1="val1",para2="val2")

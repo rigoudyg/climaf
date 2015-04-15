@@ -15,7 +15,7 @@ setup (by ``import site_settings`` and ``import standard_projects``)
 from climaf.api import *
 
 # Declare facets (i.e. dataset attributes) for projet CMIP5
-# (actually, this is built-in, and not needed - see note at file top)
+# ACTUALLY, THIS IS BUILT-IN, AND NOT NEEDED - SEE NOTE AT FILE TOP
 cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
 
 # Define a list of root directories for CMIP5 data on IPLS's Ciclad file system
@@ -33,10 +33,10 @@ dataloc(project="CMIP5", organization="CMIP5_DRS",
         url=urls_CMIP5_CNRM+urls_CMIP5_Ciclad)
 
 # Define default value for some dataset facets
-cdef("frequency","monthly") ;  cdef("project","CMIP5")
+cdef("frequency","mon") ;  cdef("project","CMIP5")
 
 # Define your dataset (a number of facets take default values)
-tas1pc=ds(model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1861")
+tas1pc=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1861")
 
 # Display the basic filenames involved in the dataset (all filenames 
 # in one single string). CliMAF will search them at the data location 

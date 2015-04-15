@@ -10,9 +10,6 @@ merged in a single file, for efficiency purpose.
 # Load Climaf functions and site settings
 from climaf.api import *
 
-# Tell CliMAF how verbose it should be (levels : CRITICAL, ERROR, WARNING, INFO, DEBUG)
-import logging ; clog(logging.ERROR)  
-
 # Reset CliMAF cache content
 craz()
 

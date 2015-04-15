@@ -23,7 +23,6 @@ from climaf.period import init_period
 
 # Declares an external operator used temporarily (until internal objects and operators are handled)
 #operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
-operators.cscript('select' ,climaf.__path__[0]+'/../scripts/mcdo.sh "" ${out} ${var} ${period_iso} ${domain} ${ins} ' )
 
 def capply (climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script or function)
@@ -36,7 +35,7 @@ def capply (climaf_operator, *operands, **parameters):
         return None
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
-        clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
+        #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_script(climaf_operator, *operands, **parameters)
         op=operators.scripts[climaf_operator]
         if op.outputFormat is None : ceval(res,userflags=op.flags)
@@ -83,7 +82,8 @@ def capply_script (script_name, *operands, **parameters):
                 if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
                     err="parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command)
                     clogger.error(err)
-                    raise Climaf_Driver_Error(err)
+                    return None
+                    #raise Climaf_Driver_Error(err)
     #
     return rep
 
@@ -111,8 +111,8 @@ def ceval(cobject,
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'png' :
-        clogger.error('Allowed formats yet are : "object", "file" and "png"')
-        return None
+        err='Allowed formats yet are : "object", "file" and "png"'
+        clogger.error(err); raise Climaf_Driver_Error(err)
     #
     # Next check is too crude for dealing with use of operator 'select'
     #if cobject.crs in recurse_list :
@@ -132,10 +132,10 @@ def ceval(cobject,
             # Go to derived variable evaluation if appicable
             if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
                 if ds.variable in derived_list :
-                    clogger.error("Loop detected while evaluating derived variable "+
-                                  ds.variable + " " + `derived_list`)
                     cdedent()
-                    return None
+                    err="Loop detected while evaluating derived variable "+\
+                                  ds.variable + " " + `derived_list`
+                    clogger.error(err); raise Climaf_Driver_Error(err)
                 derived=derive_variable(ds)
                 clogger.debug("evaluating derived variable %s as %s"%\
                                   (ds.variable,`derived`))
@@ -172,9 +172,9 @@ def ceval(cobject,
                 #ds.setOffsetScale()
                 extract=capply('select',ds)
                 if extract is None :
-                    clogger.error("Cannot access dataset" + `ds`)
+                    clogger.errorerr="Cannot access dataset" + `ds`
+                    clogger.error(err); raise Climaf_Driver_Error(err)
                     cdedent()
-                    return None
                 rep=ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
                 cdedent()
                 return rep
@@ -220,7 +220,7 @@ def ceval(cobject,
                 return cread(filename)
         clogger.debug("Searching cache for including object for : " + `cobject`)
         it,altperiod=cache.hasIncludingObject(cobject)
-        clogger.debug("Finished with searching cache for including object for : " + `cobject`)
+        #clogger.debug("Finished with searching cache for including object for : " + `cobject`)
         #it=None
         if it :
             clogger.info("Including object found in cache : %s"%(it.crs))
@@ -273,8 +273,8 @@ def ceval(cobject,
                     cdedent()
                     return(obj)
             else : 
-                clogger.error("operator %s is not a script nor known operator",str(cobject.operator))
-                return(None)
+                err="operator %s is not a script nor known operator",str(cobject.operator)
+                clogger.error(err); raise Climaf_Driver_Error(err)
         else :
             # isinstance(cobject,classes.scriptChild) should be True
             # Force evaluation of 'father' script
@@ -285,23 +285,17 @@ def ceval(cobject,
                 return rep
             else :
                 cdedent()
-                clogger.error("generating script aborted for "+cobject.father.crs)
-                return None
+                err="generating script aborted for "+cobject.father.crs
+                clogger.error(err); raise Climaf_Driver_Error(err)
     elif isinstance(cobject,str) :
         clogger.debug("Evaluating object from crs : %s"%cobject)
-        clogger.error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
         cdedent()
-        return None
+        err="Evaluation from CRS is not yet implemented ( %s )"%cobject
+        clogger.error(err); raise Climaf_Driver_Error(err)
     else :
-        clogger.error("argument " +`cobject`+" is not (yet) managed")
         cdedent()
-        return(None)
-    # if cache.DynamicIsOn : 
-    #    if hasDynamicInputs(cobject) :
-    #        if hasOutdatedInputs(cobject) :
-    #          return ' Already Done'
-    #  else : return ' Not Dynamic'
-    # else : return 'Dynamic Off'
+        err="argument " +`cobject`+" is not (yet) managed"
+        clogger.error(err); raise Climaf_Driver_Error(err)
 
 
 
@@ -419,20 +413,22 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict[p]=scriptCall.parameters[p]
         if p=="period" :
             subdict["period_iso"]=init_period(scriptCall.parameters[p]).iso()
-    if 'crs' not in scriptCall.parameters : subdict["crs"]=opscrs
+    if 'crs' not in scriptCall.parameters : subdict["crs"]=opscrs.replace("'","")
 
     # Substitute all args, with special case of NCL convention for passing args
     if (script.command.split(' ')[0][-3:]=="ncl") :
         for o in subdict :
-            if isinstance(subdict[o],str) and subdict[o][0] != "\"" :
-                subdict[o]="\"" + subdict[o] + "\""
+            if isinstance(subdict[o],str) :
+                if subdict[o][0] != "\"" :
+                    subdict[o]="\"" + subdict[o] + "\""
+                subdict[o].replace("'","")
     template=template.safe_substitute(subdict)
     #
-    # Allow script call no to use all formal arguments
+    # Allow script call not to use all formal arguments
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
     if (script.command.split(' ')[0][-3:]=="ncl") :
-        template=re.sub(r'([^=\s]*=([^=\s\"]+|\"[^\"]*\"))',r"'\1'",template)
+        template=re.sub(r'([^=\s]*)=([^=\s\"]+|\"[^\"]*\")',r"\1='\2'",template)
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -462,9 +458,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         else :
             clogger.debug("script %s has no output"%script.name)
     else:
-        err="Script call failure for %s . \nSee scripts.out"%template
+        err="See scripts.out for analyzing script call failure for : %s "%template
         clogger.error(err)
-        raise Climaf_Driver_Error
+        raise Climaf_Driver_Error(err)
     return None
 
 
@@ -575,11 +571,11 @@ def derive_variable(ds):
     operators.derived_variable
     """
     if not isinstance(ds,classes.cdataset):
-        clogger.error("arg ds is not a dataset")
-        return(None)
+        err="arg is not a dataset"
+        clogger.error(err) ; raise Climaf_Driver_Error(err)
     if ds.variable not in operators.derived_variables :
-        clogger.error("%s is not a derived variable")
-        return(None)
+        err="%s is not a derived variable"%ds.variable
+        clogger.error(err) ; raise Climaf_Driver_Error(err)
     op,outname,inVarNames,params=operators.derived_variables[ds.variable]
     inVars=[]
     for varname in inVarNames :

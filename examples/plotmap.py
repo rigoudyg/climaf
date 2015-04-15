@@ -1,5 +1,4 @@
 from climaf.api import *
-clog(logging.DEBUG)
 
 # Define a dataset, using a built-in pre-defined datafile location
 ##################################################################
@@ -10,7 +9,6 @@ cfile(dg)
 
 # Compute its basic climatology using an external script
 #########################################################
-clog(logging.DEBUG)
 cscript('time_average' ,cpath+'/../scripts/mcdo.sh timavg ${out} ${var} ${period_iso} ${domain} ${ins}' )
 ta=time_average(dg)
 

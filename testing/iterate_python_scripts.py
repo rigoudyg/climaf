@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description=description, formatter_class=RawTex
 
 #declaration des arguments
 parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
+parser.add_argument("-V", "--upper_verbosity", help="set maximum verbosity", action="store_true")
 parser.add_argument("-f", "--file", nargs='+', dest='infile',
                     help="list of example filenames we want to test (by default, all python scripts"
                     " of current directory are launched)")
@@ -37,9 +38,10 @@ for file in vfiles:
     if args.verbosity:
         print "'%s'..." %file,
 
-    ex = subprocess.Popen(["/usr/bin/python",file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # Next commmand if a blocking occurs due to numerous error messages
-    #ex = subprocess.Popen(["python",file])
+    if args.upper_verbosity:
+        ex = subprocess.Popen(["python",file])
+    else: 
+        ex = subprocess.Popen(["/usr/bin/python",file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if ex.wait()==0 : #code retour
         if args.verbosity:

@@ -20,11 +20,13 @@ data organization called 'generic' :
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
 from climaf.api import *
-clog(logging.DEBUG) 
 
 if atCNRM :
+    # NOTE : THE PROJECT AND DATALOC DECLARATION BELOW ARE ACTUALLY BUILT-IN AND NOT NECESSARY
+    # They show here as an example of CliMAF felxibility
+    
     # First declare project 'CAMIOBS' - Default project attribute 'experiment' will be used to identify a data source
-    # SOme data sources have a "." in their name, hence must use another separator for this project
+    # Some data sources have a "." in their name, hence must use another separator for this project
     cproject("CAMIOBS",separator="_")
     
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
@@ -62,10 +64,14 @@ if atCNRM :
 #---------------------------------------------------------------
 
 # First declare project and its 'non-standard' attribute(s) 'frequency'
+# NOTE : THE PROJECT AND DATALOC DECLARATION BELOW ARE ACTUALLY BUILT-IN AND NOT NECESSARY
+# They show here as an example of CliMAF felxibility
 cproject("example","frequency")
 data_pattern_L=cpath+"/../examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
 data_pattern_A=cpath+"/../examples/data/${experiment}/A/${experiment}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])
+
+# Access a dataset
 rst=ds(project="example", experiment="AMIPV6ALB2G", variable="rst", period="1980-1981")
 l=rst.baseFiles()
 my_file=cfile(rst)

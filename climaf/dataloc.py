@@ -37,13 +37,9 @@ class dataloc():
            schemes is :
 
            - CMIP5_DRS : any datafile organized after the CMIP5 data reference syntax, such as on IPSL's Ciclad and CNRM's Lustre
-           - OCMIP5_Ciclad : OCMIP5 data on Ciclad
-           - OBS4MIPS_CNRM : Obs4MIPS data managed by VDR on CNRM's Lustre
-           - OBS_CAMI : Reference observation set managed by VDR and ASTER on CNRM's Lustre
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
            - generic : a data organization described by the user, using patterns such as described for 
              :py:func:`~climaf.dataloc.selectGenericFiles`
-           - example : the data included in CliMAF package
 
            Please ask the CliMAF dev team for implementing further organizations. 
            It is quite quick for data which are on the filesystem. Organizations 
@@ -133,28 +129,6 @@ def getlocs(project="*",model="*",experiment="*",frequency="*"):
     return(filtered)
 
 
-def oneVarPerFile(project="*",model="*",experiment="*",frequency="*"):
-    org,freq,llocs=getlocs(project,model,experiment,frequency)
-    if len(llocs) > 1 :
-        clogger.warning("cannot yet handle case of multiple locs "+\
-                         " for experiment "+experiment+", model "+model+" , and project "+project)
-        return(False)
-    else :
-        org=llocs[0][0]
-        if org=="EM"          : return False
-        if org=="example"     : return False
-        if org=="ESGF"        : return True
-        if org=="CMIP5_DRS"   : return True
-        if (org == "OCMIP5_Ciclad") : return True
-        if (org == "OBS4MIPS_CNRM") : return True
-        if (org == "OBS_CAMI")      : return True
-        if (org == "generic")       : return False
-        clogger.warning("cannot yet handle organization "+
-                        m.organization+ " for experiment "+experiment+
-                        ", model "+model+" , and project "+project)
-        return False
-        
-
 def isLocal(project, model, experiment, frequency) :
     ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency) 
     if (len(ofu) == 0 ) : return False
@@ -172,18 +146,17 @@ def selectLocalFiles(**kwargs):
     Method : 
     
     - use datalocations indexed by :py:func:`dataloc` to identifiy data organization 
-    and data store urls for these (facet,value) pairs
+      and data store urls for these (facet,value) pairs
 
     - derive relevant filenames search function such as as :py:func:`selectCmip5DrsFiles` 
-    from data organization scheme
+      from data organization scheme
 
     - pass urls and relevant facet values to the filenames search function
 
-    Known organizations are documented with :py:class:`~dataloc`
+    Known organizations are documented with :py:class:`~dataloc` 
     
     """
     rep=[]
-    if not "model" in kwargs : model="*"
     project=kwargs['project']
     experiment=kwargs['experiment']
     variable=kwargs['variable']
@@ -201,18 +174,8 @@ def selectLocalFiles(**kwargs):
     for org,freq,urls in ofu :
         if (org == "EM") :
             rep.extend(selectEmFiles(**kwargs))
-        elif (org == "example") :
-            rep.extend(selectExampleFiles(urls, **kwargs))
         elif (org == "CMIP5_DRS") :
-            clogger.error("kw="+`kwargs`)
             rep.extend(selectCmip5DrsFiles(urls,**kwargs))
-        elif (org == "OCMIP5_Ciclad") :
-            rep.extend(selectOcmip5CicladFiles(project, model, experiment, frequency, 
-                                               variable, period, urls))
-        elif (org == "OBS4MIPS_CNRM") :
-            rep.extend(selectObs4mipsCnrmFiles(model, frequency, variable, period, urls))
-        elif (org == "OBS_CAMI") :
-            rep.extend(selectCamiObsFiles(model, frequency, variable, period, urls))
         elif (org == "generic") :
             rep.extend(selectGenericFiles(urls, **kwargs))
         else :
@@ -443,10 +406,10 @@ def selectExampleFiles(urls,**kwargs) :
 def selectCmip5DrsFiles(urls, **kwargs) :
     # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
-    # We use wildcards for : lab, realm and MIP_table
-    # second path segment can be any string (allows for : output,output1, merge...), but if 'merge' exists, it is 
-    # used alone
-    # If version is 'last', tries provide version from directory 'last' if available, otherwise those of last dir
+    # second path segment can be any string (allows for : output,output1, merge...), 
+    # but if 'merge' exists, it is used alone
+    # If version is 'last', tries provide version from directory 'last' if available,
+    # otherwise those of last dir
     project=kwargs['project']
     model=kwargs['model']
     experiment=kwargs['experiment']
@@ -462,6 +425,7 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     frequency2drs=dict({'monthly':'mon'})
     freqd=frequency
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
+    # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
         pattern1=l+"/"+project+"/merge"
         if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
@@ -486,76 +450,17 @@ def selectCmip5DrsFiles(urls, **kwargs) :
             #print 'lfiles='+`lfiles`
             for f in lfiles :
                 if freqd != 'fx' :
-                    clogger.debug("checking period for "+ f)
+                    #clogger.debug("checking period for "+ f)
                     regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
                     fileperiod=init_period(re.sub(regex,r'\1',f))
-                    if fileperiod is not None : 
-                        if (period.start <= fileperiod.end and period.end >= fileperiod.start) :
-                            rep.append(f)
+                    if (fileperiod and period.intersects(fileperiod)) :
+                        rep.append(f)
                 else :
                     clogger.debug("adding fixed field "+ f)
                     rep.append(f)
 
     return rep
 
-def selectOcmip5CicladFiles(project, model, experiment, frequency, variable, period, urls):
-    rep=[]
-    # [/prodigfs]/OCMIP5/OUTPUT/IPSL/IPSL-CM4/CTL/mon/CACO3/CACO3_IPSL_IPSL-CM4_CTL_1860-1869.nc
-    frequency2drs=dict({'monthly':'mon', 'yearly':'yr','year':'yr'})
-    freqd=frequency
-    if frequency in frequency2drs : freqd=frequency2drs[frequency]
-    for l in urls :
-        patternv="/"+project+"/OUTPUT/*/"+model+"/"+experiment+"/"+freqd
-        ldirs=glob.glob(l+patternv)
-        for repert in ldirs :
-            lfiles=glob.glob(repert+"/"+variable+"/"+variable+"*.nc")
-            for f in lfiles :
-                clogger.debug("checking period for "+ f)
-                regex=r'^.*_([0-9]*-[0-9]*).nc$'
-                fileperiod=init_period(re.sub(regex,r'\1',f))
-                if fileperiod is not None : 
-                    if (period.start <= fileperiod.end and period.end >= fileperiod.start) :
-                        rep.append(f)
-    return rep
-
-
-def selectObs4mipsCnrmFiles(instrument, frequency, variable, period, urls):
-    rep=[]
-    # [/cnrm/vdr/DATA/Obs4MIPs/netcdf/]monthly_mean/clt_MODIS_L3_C5_200003-201109.nc
-    frequency2drs=dict({'monthly':'monthly_mean'})
-    freqd=frequency
-    if frequency in frequency2drs : freqd=frequency2drs[frequency]
-    for l in urls :
-        pattern=l+"/"+freqd+"/"+variable+"_"+instrument+"*nc"
-        clogger.debug("looking at loc "+ l+" for "+pattern)
-        lfiles=glob.glob(pattern)
-        for f in lfiles :
-            clogger.debug("checking period for "+ f)
-            regex=r'^.*_([0-9]*-[0-9]*).nc$'
-            fileperiod=init_period(re.sub(regex,r'\1',f))
-            if fileperiod is not None : 
-                if (period.start <= fileperiod.end and period.end >= fileperiod.start) :
-                    rep.append(f)
-    return rep
-
-def selectCamiObsFiles(instrument, frequency, variable, period, urls):
-    rep=[]
-    # /cnrm/aster/data1/UTILS/cami/V1.7/climlinks/CAYAN/hfls_1m_194601_199803_CAYAN.nc
-    frequency2drs=dict({'monthly':'1m'})
-    freqd=frequency
-    if frequency in frequency2drs : freqd=frequency2drs[frequency]
-    for l in urls :
-        pattern=l+"/"+instrument+"/"+variable+"_"+freqd+"_"+"*.nc"
-        clogger.debug("looking at loc "+ l+" for "+pattern)
-        lfiles=glob.glob(pattern)
-        for f in lfiles :
-            clogger.debug("checking period for "+ f)
-            regex=r'^.*_([0-9]*_[0-9]*)_'+instrument+'.nc$'
-            fileperiod=init_period(re.sub(regex,r'\1',f))
-            if fileperiod is not None : 
-                if (period.start <= fileperiod.end and period.end >= fileperiod.start) :
-                    rep.append(f)
-    return rep
 
 class Climaf_Data_Error(Exception):
     pass

@@ -19,18 +19,18 @@ derived_variables=dict()
 class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
-                 canAggregateTime=False, doSqueezeTime=False,doSqueezeSpace=False):
+                 canAggregateTime=False, commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
         self.canSelectTime=canSelectTime
         self.canSelectDomain=canSelectDomain
         self.canAggregateTime=canAggregateTime
-        self.doSqueezeTime=doSqueezeTime
-        self.doSqueezeSpace=doSqueezeSpace
+        self.commuteWithTimeConcatenation=commuteWithTimeConcatenation
+        self.commuteWithSpaceConcatenation=commuteWithSpaceConcatenation
 
 class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
-                 doSqueezeTime=False, doSqueezeSpace=False, **kwargs):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
@@ -39,10 +39,12 @@ class cscript():
           command (str): script calling sequence, according to the syntax described below.
           format (str): script outputs format -- either 'nc' or 'png' or 'None'; defaults to 'nc'
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
-          doSqueezeTime (bool, optional): does the script degenerate/aggregate the time 
-            dimension ? defaults to False
-          doSqueezeSpace (bool, optional): does the script degenerate/aggregate the space
-            dimension ? defaults to False
+          commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
+            of time periods ? set it to true, if the operator can be applied on time
+            chunks separately, in order to allow for incremental computation / time chunking;
+            defaults to False
+          commuteWithSpaceConcatenation (bool, optional): can the operation commute with concatenation
+            of space domains ? defaults to False (see commuteWithTimeConcatenation)
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).
         
@@ -132,16 +134,18 @@ class cscript():
            except that the date formating fits CDO conventions : 
 
             - date format is ISO : YYYY-MM-DDTHH:MM:SS
-            - interval is [ date1,date2_iso], where date2_iso is 1 minute before
-            date2
-            - separator between is : ,  
+
+            - interval is [date1,date2_iso], where date2_iso is 1 minute before
+              date2
+
+            - separator between dates is : ,  
 
          - **domain, domain_<digit>** : when a script can select a domain 
            in the input grid, this is declared by adding this
            keyword in the calling sequence; CliMAF will replace it by the
            domain definition if needed, as 'latmin,latmax,lonmin,lonmax' ;
            'domain' stands for first input stream, 'domain_<digit>' for the 
-           next ones:
+           next ones :
 
             - in the example above, we assume that external binary CDO is
               not tasked with selecting the domain, and that CliMAF must
@@ -167,7 +171,8 @@ class cscript():
 
            - in the example above, we just apply the convention used by CDO,
              which expects that you provide an output filename as last
-             argument on the command line
+             argument on the command line. See example mean_and_sdev in doc
+             for advanced usage.
 
          - **crs** : will be replaced by the CliMAF Reference Syntax expression
            describing the first input stream; can be useful for plot title
@@ -266,7 +271,7 @@ class cscript():
         self.command=command
         #
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-            canSelectDomain, canAggregateTime, doSqueezeTime, doSqueezeSpace )
+            canSelectDomain, canAggregateTime, commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
         scripts[name]=self
 
@@ -320,17 +325,19 @@ def derive(derivedVar, Operator, *invars, **params) :
     
     >>> cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
     
+    which means that ``minus`` uses CDO for substracting the two datasets;
     you may define cloud radiative effect at the surface ('rscre')
     using the difference of values of all-sky and clear-sky net
     radiation at the surface by::
     
     >>> derived('rscre','minus','rs','rscs')
 
-    argument 'derivedVar' may be a dictionnary, with keys=derived variable
-    names and values=scripts outputs names; example ::
+    You may then use this vvariable name at any location you would use any toher variable name
+
+    Argument 'derivedVar' may be a dictionnary, which key are derived variable
+    names and values are scripts outputs names; example ::
     
-    >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} \
-                                   ${out_l500} ${out_l850} method=${opt}')
+    >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} ${out_l500} ${out_l850} method=${opt}')
     >>> derived({z500 : 'l500' , z850 : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
     
     """

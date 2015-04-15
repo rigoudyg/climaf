@@ -35,20 +35,65 @@ do as indicated below, replacing ``<some_installation_dir>`` by :
  - ``~ssenesi/climaf`` on Ciclad
 
 
+.. _running:
+
 Running
 -------------------------
 
-From that point, for running CliMAF, you will :
+From that point, for running CliMAF, you can either :
 
-- set your PYTHONPATH , e.g. in your ``~/.profile`` file::
+- use binary ``climaf`` for launching Python while importing CliMAF :
 
-   export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
+  - set your PATH e.g. in your ``~/.profile`` file::
 
-- import ``climaf.api`` in your Python session or script, preferably as in::
+    $ export PATH=$PATH::<some_installation_dir>/climaf/bin
 
-  $ python
+  - launch CliMAF ::
 
-  >>> from climaf.api import *
-  >>> ...
+    $ climaf
+
+    >>>         (this is the Python prompt)
+
+  Notes : 
+
+   - you may also provide multiple python scripts as arguments to
+     command ``climaf``
+
+   - you may **not** (yet) use option ``-i`` as with Python, for
+     combining launching a script and getting the prompt afterwards
+
+
+- or import climaf in your python environment :
+
+  - set your PYTHONPATH , e.g. in your ``~/.profile`` file::
+
+    $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
+
+  - import ``climaf.api`` in your Python session or script, preferably as in::
+
+    $ python
+
+    >>> from climaf.api import *
+    >>> ...
 
 Please see also : :ref:`examples`
+
+Configuration file
+-------------------
+
+You may put in file ``~/.climaf`` any python code using CliMAF
+functions; this will be executed at the end of climaf.api import 
+
+Environment variables 
+------------------------
+
+CliMAF do interpret some environment variables :
+
+- CLIMAF_CACHE : a directory used for storing intermediate results,
+  and those final results which are not explicitly copied elsewhere;
+  defaults to ~/tmp/climaf_cache. 
+
+- CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
+  verbosity level on stderr (resp. on file climaf.log); defaults to
+  'error' (resp. 'info'). See :py:func:`~climaf.cache.clog` for details
+

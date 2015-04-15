@@ -3,8 +3,8 @@
 # Load Climaf functions
 from climaf.api import *
 
-# Define a dataset, in the pre-dfeined 'example' project, which datafiles 
-# locations is also pre-defined
+# Define a dataset, in the pre-dfeined 'example' project (which datafiles 
+# locations are also pre-defined)
 dg=ds(project="example", experiment="AMIPV6ALB2G", variable="tas", 
     period="1980-1981", frequency="mon")
 

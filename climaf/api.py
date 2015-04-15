@@ -3,20 +3,46 @@ CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Applica
 
 It also imports a few functions from other modules, and declares a number of 'CliMAF standard operators'
 
-Main functions are ``dataloc``, ``ds``, ``cdataset``, ``cdef``, ``cscript``, ``cfile``, ``cMA`` :
+Main functions are :
+
+- for data definition and access :
+
+ - ``cproject``: declare a project and its non-standard attributes/facets
+
  - ``dataloc`` : set data locations for a series of experiments
+
  - ``cdef``    : define some default values for datasets attributes
- - ``ds``      : define a dataset object
- - ``cscript`` : define a new CliMAF operator (this also defines a new Pyhton fucntion)
- - ``cfile``   : get the file         value of a CliMAF object (compute it)
+
+ - ``ds``      : define a dataset object (actually a front-end for ``cdataset``)
+
+ - ``derive``  : define a variable as computed from other variables
+
+- for processing the data 
+
+ - ``cscript`` : define a new CliMAF operator (this also defines a new Python function)
+
  - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
 
+- for managing/viewing results :
 
-Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
- - ``clog``    : tune verbosity
+ - ``cfile``   : get the file value of a CliMAF object (compute it)
+
+ - ``cshow``   : display a result of type 'figure'
+
  - ``cdump``   : tell what's in cache
+
+ - ``cdrop``   : delete the cached file for an object
+
  - ``craz``    : reset cache
- - ``csave``   : save cache index to disk
+
+ - ``csync``   : save cache index to disk
+
+
+- utility functions :
+
+ - ``clog``    : tune verbosity
+
+ - ``clog_file``    : tune verbosity for log file
 
 """
 # Created : S.Senesi - 2014
@@ -25,25 +51,44 @@ Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
 import os, os.path, shutil, logging
 
 import climaf, climaf.cache
-from climaf.classes   import cdefault as cdef,cdataset,ds,cproject,cprojects 
-from climaf.driver    import ceval,varOf #,cfile,cobj 
+from climaf.classes   import cdef,cdataset,ds,cproject,cprojects 
+from climaf.driver    import ceval,varOf 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
-from climaf.cache     import creset as craz, csync as csave , cdump, cdrop
+from climaf.cache     import craz, csync as csave , cdump, cdrop
 from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
 import climaf.standard_projects
 
-clog(os.getenv("CLIMAF_LOG","error"))
-clog(os.getenv("CLIMAF_FILE_LOG","debug"))
+#########################
+# CliMAF init phase
+#########################
+
+Climaf_version="0.5"
+
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 
-climaf.cache.setNewUniqueCache("~/tmp/climaf_cache")
+
+# Set default logging levels
+clog(os.getenv("CLIMAF_LOG_LEVEL","error"))
+clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL","info"))
+
 climaf.standard_operators.load_standard_operators()
 climaf.standard_projects.init_standard_projects()
 from climaf.site_settings import onCiclad, atCNRM
 
+# Read user config file
+conf_file=os.path.expanduser("~/.climaf")
+if os.path.isfile(conf_file) : execfile(conf_file, {"Climaf_version":Climaf_version })
+
+# Decide for cache location
+climaf.cache.setNewUniqueCache(os.getenv("CLIMAF_CACHE","~/tmp/climaf_cache"))
+
+
+#########################
 # Commodity functions
+#########################
+
 def cfile(object,target=None,ln=None,deep=None) :
     """
     Provide the filename for a CliMAF object, or copy this file to target. Launch computation if needed. 

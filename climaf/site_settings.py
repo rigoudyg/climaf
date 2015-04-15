@@ -23,7 +23,8 @@ if os.path.exists('/cnrm'):
     # Declare a list of root directories for CNRM-CM CMIP5 data on CNRM's Lustre file system.
     urls_CMIP5=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", 
                 "/cnrm/aster/data2/ESG/data5", "/cnrm/aster/data4/ESG/data6", 
-                "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8"]
+                "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8",
+                "/cnrm/aster/data2/ESG/vdr"]
     atCNRM=True
     
 else :

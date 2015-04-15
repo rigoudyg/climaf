@@ -29,5 +29,5 @@ fi
 scripts=$scripts" clean_cache.py"
 
 echo "tested example scripts : "$scripts 
-export CLIMAF_LOG=critical
-python $thisdir/iterate_python_scripts.py -v -f $scripts
+export CLIMAF_LOG_LEVEL=critical
+python $thisdir/iterate_python_scripts.py -V -f $scripts

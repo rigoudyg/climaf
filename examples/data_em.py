@@ -5,7 +5,7 @@ Example for CliMAF access to data organized according to CNRM-CM's 'EM' scheme
 # S.Senesi - april 2015
 
 from climaf.api import *
-dataloc(organization="EM", project="EM", url=["dummy"])
+dataloc(project="EM", organization="EM", url=["dummy"])
 
 # Define default value for some dataset facets
 cdef("frequency","monthly") ;  

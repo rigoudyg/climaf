@@ -6,6 +6,50 @@ Whats' new
 
 Changes, newest first :
 
+.. _news_0.5:
+
+- 2005/04/14 - Version 0.5 :
+
+ - Starting CliMAF :
+
+  - Binary ``climaf`` allows to launch Python and import Climaf at
+    once. See :ref:`running`
+  - File ``~/.climaf`` is read as configuration file , at the end of
+    climaf.api import
+
+ - Input data :
+
+  - A number of projects are 'standard' : CMIP5, OCMPIP5, OBS4MIPS,
+    EM, CAMIOBS, and example
+  - Data location is automatically declared for
+    CMIP5 data at CNRM and on Ciclad (in module site_settings)
+  - Discard pre-defined organizations 'OCMPI5_Ciclad', 'example',
+    etc, and replace it smart use of organization 'generic' (see
+    :download:`data_generic.py <../examples/data_generic.py>`)
+  - New projects can be defined, with project-specific
+    facets/attributes. See :py:class:`~climaf.classes.cproject`
+  - Access to fixed fields is now possible, and fixed fields may be
+    specific to a given experiment. . See examples in
+    :download:`data_generic.py <../examples/data_generic.py>`  
+    and :download:`data_cmip5drs.py <../examples/data_cmip5drs.py>`        
+
+ - Operators : 
+
+  - Explanation is available on how to know how a given operator is declared to CliMAF,
+    i.e. what is the calling sequence for the external script or binary; see 
+    :ref:`how_to_list_operators`
+  - Simplify declaration of scripts with no output (just omit ${out})
+  - plotmap : this operator now zoom on the data domain, and plot data across
+    Greenwich meridian correctly
+
+ - Running CliMAF - messages, cache, errors :
+
+  - Verbosity, and cache directory, can be set using environment
+    variables. See :ref:`running`
+  - Simplify use of function :py:func:`~climaf.clogging.clog`
+  - Log messages are indented to show recursive calls of ceval()
+  - Quite extended use of Python exceptions for error handling
+
 - 2015/04/06 : 
 
   - time period in CRS and as an argument to 'ds' is shortened unambiguously and may show only one date

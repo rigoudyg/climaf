@@ -129,8 +129,9 @@ begin
   res=True
   res@gsnFrame= False
   res@gsnDraw= False
-  res@gsnMaximize = False
-  res@gsnAddCyclic = True
+  res@gsnMaximize = True
+  ; preferabel pour plot en domaine limite :
+  res@gsnAddCyclic = False
   res@gsnSpreadColors     = True
   res@gsnSpreadColorEnd   = -2
   res@gsnLeftString     = ""
@@ -165,11 +166,13 @@ begin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MapPlot resources
-  ;res@mpMinLonF                = -180
-  ;res@mpMaxLonF                = 180
-  ;res@mpMinLatF                = -90
-  ;res@mpMaxLatF                = 90
-  res@mpCenterLonF=178
+  print("lonmin=")
+  print(min(lon))
+  res@mpMinLonF                = min(lon)
+  res@mpMaxLonF                = max(lon)
+  res@mpMinLatF                = min(lat)
+  res@mpMaxLatF                = max(lat)
+  res@mpCenterLonF=(min(lon)+max(lon))/2
 
   res@mpFillOn=True
   res@mpFillColors    = (/-1,-1,-1,-1/)
@@ -219,7 +222,6 @@ begin
   res@vpHeightF = 0.8
   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  
   res@tiMainString       = title
   res@vpXF      = 0.1
   res@vpYF      = 0.96
@@ -228,8 +230,8 @@ begin
     res@sfXArray            = lon
     res@sfYArray            = lat
     ; Pour REDU ?:
-    ;res@gsnZonalMean = False
     res@gsnAddCyclic        = False
+    ;res@gsnZonalMean = False
   end if  
   plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
   draw(plot0)

@@ -30,7 +30,7 @@ For **running CliMAF**, or running one of the Python scripts example described b
     >>> .... 
 
 
-A number of examples show in directory ``<install_dir>/examples`` and are also dowloadable using the links below; you will copy and paste the code lines to the Python shell using your favorite method. Each code line is documented by a comment which tries to bring all necessary information for letting your CliMAF expertise grow steadily. 
+A number of examples show in directory ``<climaf_dir>/examples`` and are also dowloadable using the links below; you will copy and paste the code lines to the Python shell using your favorite method. Each code line is documented by a comment which tries to bring all necessary information for letting your CliMAF expertise grow steadily. 
 
 Some of the examples can be run anywhere, as they use the data sample installed with CliMAF :
 
