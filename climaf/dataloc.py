@@ -179,9 +179,10 @@ def selectLocalFiles(**kwargs):
         elif (org == "generic") :
             rep.extend(selectGenericFiles(urls, **kwargs))
         else :
-            clogger.error("cannot process organization "+org+ \
-                             " for experiment "+experiment+" and model "+model+\
-                             " of project "+project)
+            err="cannot process organization "+org+ \
+                " for experiment "+experiment+" and model "+model+\
+                " of project "+project
+            clogger.error(err); raise Climaf_Data_Error(err)
     if (not ofu) :
         return None
     else :
