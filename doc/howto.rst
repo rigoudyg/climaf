@@ -110,7 +110,7 @@ For the time being, you may report an issue on `the CliMAF issue page on GitHub 
 ..declare my favorite script or binary as a CliMAF operator for my own use
 --------------------------------------------------------------------------
 
-Using any script in CliMAF is very easy, and you can do so for your own use only. The basics of creating a new CliMAF operator based on a script or binary are explained at :ref:`operators`. A **simple example** shows at :ref:`basic_script_example`. The detailed syntax is explained at :ref:`script_syntax`..The script can be located anywhere on the filesystem (you can quote an absolute path in the calling sequence pattern when declaring it ); at first, your script should echo each executed command, for debugging purpose;  and you may have a look at his output in file ``./scripts.out`` (in the working directory)
+Using any script in CliMAF is very easy, and you can do so for your own use only. The basics of creating a new CliMAF operator based on a script or binary are explained at :ref:`operators`. A **simple example** shows at :ref:`basic_script_example`. The detailed syntax is explained at :ref:`script_syntax`..The script can be located anywhere on the filesystem (you can quote an absolute path in the calling sequence pattern when declaring it ); at first, your script should echo each executed command, for debugging purpose;  and you may have a look at its output in file ``./scripts.out`` (in the working directory)
 
 .. _how_to_contribute_a_script:
 
@@ -122,7 +122,11 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
 #. think about a name for the corresponding CliMAF standard operator : it should not collide with existing operators (see :doc:`operators`), and should be both short and explicit; let us call it ``my_op`` for now; if the diagnostic module has more than one (main) output, also think twice about the names for the secondary outputs (`details here <script_syntax>`_) as they will also join the 'CliMAF Reference Syntax' 
 #. if you are working with a version of CliMAF that has been installed by somebody else, you should now install your own; see :doc:`installing`
 #. if your module is a script, add its code in directory ``<climaf_install_dir>/climaf/scripts``; the script filename is up to you, but should more or less ressemble or recall the name of the CliMAF operator choosen above
-#. if your module is a binary which needs some compilation, prepare a makefile for that, which ideally should be tested both with Intel and Gnu compilers (... TBD : think deeper on a tractable way to integrate binaries...)
+#. if your module is a binary which needs some compilation, prepare a
+   makefile for that, which ideally should be tested both with Intel
+   and Gnu compilers (... TBD : think deeper on a tractable way to
+   integrate binaries... please contribute to this analysis through email to 
+   ``climaf at meteo dot fr``)
 #. check twice the Climaf function call that will allow to declare the operator in CliMAF, and adapt it to the new script location, as e.g. ::
 
     >>> cscript ("my_op", cpath+"/scripts/"+"<calling sequence pattern>") 
