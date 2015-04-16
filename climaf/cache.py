@@ -1,10 +1,14 @@
-""" CliMAF cache module : stores and retrieves CliMAF objects from their CRS expression.
+"""
+
+CliMAF cache module : stores and retrieves CliMAF objects from their CRS expression.
+
+
 
 """
 # Created : S.Senesi - 2014
 
 import sys, os, os.path, re, time
-from climaf.classes import compare_trees
+from climaf.classes import compare_trees, cobject, ctree, cdataset
 
 from clogging import clogger
 
@@ -24,7 +28,7 @@ def setNewUniqueCache(path) :
     crs2filename=dict()  # The index associating filenames to CRS expressions
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
-    creset(hideError=True)
+    craz(hideError=True)
 
 #def generateUniqueFileName(expression, operator=climaf.classes.firstGenericDataSet):
 def generateUniqueFileName(expression, operator=None, format="nc"):
@@ -68,7 +72,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
             exit
         guess=full[0 : number - 1 ]
         existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
-        readCRS=getCRS(existing)
+        if existing : readCRS=getCRS(existing)
     rep=currentCache+"/"+prefix+stringToPath(full[0 : number - 1 ], directoryNameLength )+"."+format
     rep=os.path.expanduser(rep)
     # Create the relevant directory, so that user scripts don't have to care
@@ -174,7 +178,7 @@ def hasMatchingObject(cobject,ds_func) :
     if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
         import operators
-        return operators.scripts[operator].flags.doSqueezeTime 
+        return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
     for crs in crs2filename :
         co=eval(crs, sys.modules['__main__'].__dict__)
@@ -221,10 +225,34 @@ def complement(crsb, crse, crs) :
         register(filet,crs)
         return filet
 
-def cdrop(crs, rm=True) :
-    """ Deletes a cached file for a given CliMAF Reference Syntax expression, if it exists
+def cdrop(obj, rm=True) :
+    """
+    Deletes the cached file for a CliMAF object, if it exists
 
-    Returns None if it does not exists, False if delete is unsuccessful, True if OK    """
+    Args :
+     obj (cobject or string) : object to delete, or its string representation (CRS)
+     rm (bool) : for advanced use only; should we actually delete (rm)  the file, or
+       just forget it in CliMAF cache index ?
+    
+    Returns : None if object does not exists, False if failing to delete, True if OK
+
+    Example ::
+
+    >>> dg=ds(project='example', experiment='AMIPV6ALB2G', variable='tas', period='1980-1981')
+    >>> dg
+    >>> cfile(dg)
+    '/home/senesi/tmp/climaf_cache/da/c.nc'
+    >>> os.system('ls -al '+f)
+    >>> cdrop(dg)    
+    """
+    if (type(obj) is ctree ) :
+        crs=cobject.crs
+        if (type(obj) is cdataset ) :
+            crs="select("+crs+")"
+    elif type(obj) is str : crs=obj
+    else :
+        clogger.error("%s is not a CliMAF object"%`obj`)
+        return
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
         try :
@@ -260,7 +288,7 @@ def cload() :
     except:
         clogger.debug("no index file yet")
 
-def creset(hideError=False) :
+def craz(hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index
 

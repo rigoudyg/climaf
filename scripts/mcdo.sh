@@ -83,5 +83,8 @@ for out in $outs ; do
 	    fi
 	else mv $tmp3 $out ; fi
 	#ls -al $out
+    else
+	echo "Issue while selecting data from $files ">&2
+	exit 1
     fi
 done

@@ -15,4 +15,6 @@ Contents
    API
    howto
    contributing
+   news
+   future_steps
    community

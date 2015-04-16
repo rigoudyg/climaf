@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Wrapper for launching Python while letting it import climaf.api
+# either interactively or on a series of files
+
+# No python launch flag is allowed
+
+# We assume this script is located in a subdir of climaf  installation dir
+cdir=$(cd ..; pwd) 
+
+export PYTHONPATH=$PYTHONPATH:$cdir 
+
+if [ "$*" ] ; then 
+    (echo 'from climaf.api import *'; cat $*) | python 
+else
+    python -i -c 'from climaf.api import *'
+fi
+

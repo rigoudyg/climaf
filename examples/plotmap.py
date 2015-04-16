@@ -1,16 +1,14 @@
 from climaf.api import *
-clog(logging.DEBUG)
 
-# Define a dataset
-#######################
-dataloc(experiment="AMIPV6ALB2G", organization="example",url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+# Define a dataset, using a built-in pre-defined datafile location
+##################################################################
+cdef("project","example")
 cdef("frequency","monthly")
 dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
 cfile(dg)
 
 # Compute its basic climatology using an external script
 #########################################################
-clog(logging.DEBUG)
 cscript('time_average' ,cpath+'/../scripts/mcdo.sh timavg ${out} ${var} ${period_iso} ${domain} ${ins}' )
 ta=time_average(dg)
 

@@ -19,32 +19,32 @@ derived_variables=dict()
 class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
-                 canAggregateTime=False, doSqueezeTime=False,doSqueezeSpace=False):
+                 canAggregateTime=False, commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
         self.canSelectTime=canSelectTime
         self.canSelectDomain=canSelectDomain
         self.canAggregateTime=canAggregateTime
-        self.doSqueezeTime=doSqueezeTime
-        self.doSqueezeSpace=doSqueezeSpace
+        self.commuteWithTimeConcatenation=commuteWithTimeConcatenation
+        self.commuteWithSpaceConcatenation=commuteWithSpaceConcatenation
 
 class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
-                 doSqueezeTime=False, doSqueezeSpace=False, **kwargs):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False, **kwargs):
         """
-        Declare a script or binary as a 'CliMAF operator', and define a function with the same name
+        Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc','png' or 'None'; defaults to 'nc'
-            format should be None whene there is no saved output but only a side effect (such
-            as displaying a datset or result with ncview) with low compute cost
+          format (str): script outputs format -- either 'nc' or 'png' or 'None'; defaults to 'nc'
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
-          doSqueezeTime (bool, optional): does the script degenerate/aggregate the time 
-            dimension ? defaults to False
-          doSqueezeSpace (bool, optional): does the script degenerate/aggregate the space
-            dimension ? defaults to False
+          commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
+            of time periods ? set it to true, if the operator can be applied on time
+            chunks separately, in order to allow for incremental computation / time chunking;
+            defaults to False
+          commuteWithSpaceConcatenation (bool, optional): can the operation commute with concatenation
+            of space domains ? defaults to False (see commuteWithTimeConcatenation)
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).
         
@@ -120,51 +120,59 @@ class cscript():
            call time by the period written as <date1>-<date2>, where date is
            formated as YYYYMMDD ;
 
-            - all time intervals are interpreted as [date1, date2[
+            - time intervals must be interpreted as [date1, date2[
+
             - 'period' stands for the first input_stream,
+
             - 'period_<n>' for the next ones, in the order of actual call;
 
+           - in the example above, this keyword is not used, which means that
+             CliMAF has to select the period upstream of feeding CDO with the
+             data
+         
          - **period_iso, period_iso_<digit>** : as for **period** above,
            except that the date formating fits CDO conventions : 
 
             - date format is ISO : YYYY-MM-DDTHH:MM:SS
-            - interval is [ date1,date2_iso], where date2_iso is 1 minute before
-            date2
-            - separator between is : ,  
+
+            - interval is [date1,date2_iso], where date2_iso is 1 minute before
+              date2
+
+            - separator between dates is : ,  
 
          - **domain, domain_<digit>** : when a script can select a domain 
            in the input grid, this is declared by adding this
            keyword in the calling sequence; CliMAF will replace it by the
            domain definition if needed, as 'latmin,latmax,lonmin,lonmax' ;
            'domain' stands for first input stream, 'domain_<digit>' for the 
-           next ones:
+           next ones :
 
             - in the example above, we assume that external binary CDO is
               not tasked with selecting the domain, and that CliMAF must
               feed CDO with a datafile where it has already performed the
               selection
          
-          - in the example above, this keyword is not used, which means that
-            CliMAF has to select the period upstream of feeding CDO with the
-            data
-         
          - **out, out_<word>** : CliMAF provide file names for output
-           files. Main output file must be created by the script with
-           the name provided at the location of argument ${out}; using
-           arguments like 'out_<word>' tells CliMAF that the script
-           provide some secondary output, which will be symbolically
-           known in CliMAF syntax as an attribute of the main object; by
-           default, the variable name of each output equals the name of
-           the output (except for the main ouput, which variable name is
-           supposed to be the same as for the first input); for other cases,
-           see argument \*\*kwargs to provide a format string, used to derive the
-           variable name from first input variable name as in e.g. :
+           files (if there is no such field, the script will have
+           only 'side effects', e.g. launch a viewer). Main output
+           file must be created by the script with the name provided
+           at the location of argument ${out}. Using arguments like
+           'out_<word>' tells CliMAF that the script provide some
+           secondary output, which will be symbolically known in
+           CliMAF syntax as an attribute of the main object; by
+           default, the variable name of each output equals the name
+           of the output (except for the main ouput, which variable
+           name is supposed to be the same as for the first input);
+           for other cases, see argument \*\*kwargs to provide a
+           format string, used to derive the variable name from first
+           input variable name as in e.g. :
            ``output2_var='std_dev(%s)'`` for the output labelled
            output2 (i.e. declared as '${out_output2}')
 
            - in the example above, we just apply the convention used by CDO,
              which expects that you provide an output filename as last
-             argument on the command line
+             argument on the command line. See example mean_and_sdev in doc
+             for advanced usage.
 
          - **crs** : will be replaced by the CliMAF Reference Syntax expression
            describing the first input stream; can be useful for plot title
@@ -185,7 +193,7 @@ class cscript():
         except :  
             clogger.error("defining %s : command %s is not executable"%\
                               (name,scriptcommand))
-                # raise ClimafException
+            # raise ClimafException
             return None
         executable=executable.replace('\n','')
         #
@@ -214,13 +222,14 @@ class cscript():
         #
         # Check that command includes an argument allowing for providing at least one output filename
         if command.find("${out") < 0 :
-            if format is not None :
-                clogger.error("(defining %s : command %d must include "+
-                              "'${out_xxx}' for specifying how CliMAF will provide the output(s) filename(s))"%\
-                                  (name,command))
-                return None
-            else: 
-                clogger.debug("defining script %s as output-less"%name)
+            format=None
+            #if format is not None :
+            #    clogger.error("(defining %s : command %d must include "+
+            #                  "'${out_xxx}' for specifying how CliMAF will provide the output(s) filename(s))"%\
+            #                      (name,command))
+            #    return None
+            #else: 
+            #    clogger.debug("defining script %s as output-less"%name)
         #
         # Search in call arguments for keywords matching "<output_name>_var" which may provide
         # format string for 'computing' outputs variable name from input variable name
@@ -228,7 +237,7 @@ class cscript():
         for p in kwargs : 
             if re.match(pattern,p):
                 outvarnames[re.findall(pattern,p)[0]]=kwargs[p]
-        clogger.debug("outvarnames = "+`outvarnames`)
+        #clogger.debug("outvarnames = "+`outvarnames`)
         #
         # Analyze outputs names , associated variable names (or format strings), and store 
         # it in attribute dict 'outputs' 
@@ -243,7 +252,7 @@ class cscript():
                     self.outputs[outname]=outname
             else:
                 self.outputs[None]="%s"
-        clogger.debug("outputs = "+`self.outputs`)
+        #clogger.debug("outputs = "+`self.outputs`)
         #
         canSelectVar=False
         if command.find("${var}") > 0 : canSelectVar=True
@@ -262,7 +271,7 @@ class cscript():
         self.command=command
         #
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-            canSelectDomain, canAggregateTime, doSqueezeTime, doSqueezeSpace )
+            canSelectDomain, canAggregateTime, commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
         scripts[name]=self
 
@@ -284,6 +293,9 @@ class cscript():
             (name,doc,name) \
             in sys.modules['__main__'].__dict__
         clogger.debug("CliMAF script %s has been declared"%name)
+
+    def __repr__(self):
+        return "CliMAF operator : "+self.name
 
     def inputs_number(self):
         """ returns the number of distinct arguments of a script which are inputs 
@@ -313,17 +325,19 @@ def derive(derivedVar, Operator, *invars, **params) :
     
     >>> cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
     
+    which means that ``minus`` uses CDO for substracting the two datasets;
     you may define cloud radiative effect at the surface ('rscre')
     using the difference of values of all-sky and clear-sky net
     radiation at the surface by::
     
     >>> derived('rscre','minus','rs','rscs')
 
-    argument 'derivedVar' may be a dictionnary, with keys=derived variable
-    names and values=scripts outputs names; example ::
+    You may then use this vvariable name at any location you would use any toher variable name
+
+    Argument 'derivedVar' may be a dictionnary, which key are derived variable
+    names and values are scripts outputs names; example ::
     
-    >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} \
-                                   ${out_l500} ${out_l850} method=${opt}')
+    >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} ${out_l500} ${out_l850} method=${opt}')
     >>> derived({z500 : 'l500' , z850 : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
     
     """

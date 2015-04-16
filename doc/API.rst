@@ -1,7 +1,7 @@
 .. _api:
 
 -----------------------------
-Application Program Interface
+Available functions
 -----------------------------
 .. default-domain:: python
 
@@ -14,6 +14,10 @@ can be used 'as is' after executing**::
 
 For documented standard operators see  :ref:`standard_operators` ; for the other ones, see :ref:`how_to_list_operators`
 
+cproject
+--------
+
+.. autoclass:: climaf.classes.cproject
 
 dataloc
 -------
@@ -34,7 +38,7 @@ ds
 cdef
 ------
 
-.. autofunction:: climaf.classes.cdefault
+.. autofunction:: climaf.classes.cdef
 
 cscript
 ----------------------
@@ -45,6 +49,11 @@ cfile
 ------
 
 .. autofunction:: climaf.api.cfile 
+
+derive
+------
+
+.. autofunction:: climaf.operators.derive 
 
 cshow
 ------
@@ -74,9 +83,10 @@ cdump
 craz 
 ---------------------
 
-.. autofunction:: climaf.cache.creset
+.. autofunction:: climaf.cache.craz
 
-csave 
+
+csync
 ---------------------
 
 .. autofunction:: climaf.cache.csync

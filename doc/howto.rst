@@ -25,7 +25,8 @@ See :ref:`examples`
 ..describe where my data is
 ---------------------------
 
-If your data is organized after one of the organization scheme known to CliMAF, you just have to tell CliMAF about the root directories for your data. This could be as simple as::
+If your data is organized after one of the specific organization scheme known
+to CliMAF (i.e. for now ``CMPI5_DRS`` or ``EM``) , you just have to tell CliMAF about the root directories for your data. This could be as simple as::
 
   >>> dataloc(project="GEOMIP", organization="CMIP5_DRS", url=['/tmp/data','~/data/CMIP5'])
 
@@ -41,23 +42,23 @@ See examples in the section on data access at :ref:`examples` ; see function :py
 ..get on-line help 
 -------------------
 
-Under the Python shell, all relevant CliMAF functions and variables are auto-documented using Python features. Hence, you can :
+From the Python shell, all relevant CliMAF functions and variables are auto-documented using Python features. Hence, you can :
 
- - list these functions and variables by::
+- list these functions and variables by::
 
-    >>> dir(climaf.api)
+  >>> dir(climaf.api)
 
- - get the general help on functions::
+- get the general help on functions::
 
-    >>> help(climaf.api)
+  >>> help(climaf.api)
 
- - get help on a given function (say ``cscript``) by::
+- get help on a given function (say ``cscript``) by::
 
-    >>> help(cscript)
+  >>> help(cscript)
 
- - get help on a CliMAF operator (say ``regrid``) by::
+- get help on a CliMAF operator (say ``regrid``) by::
 
-    >>> help(regrid)
+  >>> help(regrid)
 
 
 .. _how_to_list_operators:
@@ -76,22 +77,25 @@ You may then ask for on-line help for any of the scripts , as e.g. ::
   >>> help(plotmap)
 
 
+You may know how the operator interfaces with Climaf by ::
+
+ >>> cscripts['plotmap'].command
+
+
 ..tune CliMAF verbosity level
 ------------------------------
 
 CliMAF uses the Python logging package :py:mod:`logging` for informing
 about work done, at varied verbosity levels. There are two logging
 streams : one going to screen (or stderr), the other going to file
-``climaf.log``
+``climaf.log`` . See function :py:func:`~climaf.clogging.clog` for
+setting the severity level for the former and function
+:py:func:`~climaf.clogging.clog_file` for the latter 
+
+Note : at CliMAF startup, the severity level is set to the value of environment
+variable $CLIMAF_LOG (resp. $CLIMAF_FILE_LOG)
 
 
-Function :py:func:`~climaf.clogging.clog` is a shortcut for setting the severity level
-for the first one; possible arguments are : ``logging.DEBUG``,
-``logging.INFO``, ``logging.WARNING``, ``logging.CRITICAL`` (from the
-most to the less verbose level). Type ``help(clog)``
-
-
-Function :py:func:`~climaf.clogging.clog_file` does the same for the logging on file
 
 .. _how_to_report_an_issue:
 
@@ -106,7 +110,7 @@ For the time being, you may report an issue on `the CliMAF issue page on GitHub 
 ..declare my favorite script or binary as a CliMAF operator for my own use
 --------------------------------------------------------------------------
 
-Using any script in CliMAF is very easy, and you can do so for your own use only. The basics of creating a new CliMAF operator based on a script or binary are explained at :ref:`operators`. A **simple example** shows at :ref:`basic_script_example`. The detailed syntax is explained at :ref:`script_syntax`..The script can be located anywhere on the filesystem (you can quote an absolute path in the calling sequence pattern when declaring it ); at first, your script should echo each executed command, for debugging purpose;  and you may have a look at his output in file ``./scripts.out`` (in the working directory)
+Using any script in CliMAF is very easy, and you can do so for your own use only. The basics of creating a new CliMAF operator based on a script or binary are explained at :ref:`operators`. A **simple example** shows at :ref:`basic_script_example`. The detailed syntax is explained at :ref:`script_syntax`..The script can be located anywhere on the filesystem (you can quote an absolute path in the calling sequence pattern when declaring it ); at first, your script should echo each executed command, for debugging purpose;  and you may have a look at its output in file ``./scripts.out`` (in the working directory)
 
 .. _how_to_contribute_a_script:
 
@@ -118,7 +122,11 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
 #. think about a name for the corresponding CliMAF standard operator : it should not collide with existing operators (see :doc:`operators`), and should be both short and explicit; let us call it ``my_op`` for now; if the diagnostic module has more than one (main) output, also think twice about the names for the secondary outputs (`details here <script_syntax>`_) as they will also join the 'CliMAF Reference Syntax' 
 #. if you are working with a version of CliMAF that has been installed by somebody else, you should now install your own; see :doc:`installing`
 #. if your module is a script, add its code in directory ``<climaf_install_dir>/climaf/scripts``; the script filename is up to you, but should more or less ressemble or recall the name of the CliMAF operator choosen above
-#. if your module is a binary which needs some compilation, prepare a makefile for that, which ideally should be tested both with Intel and Gnu compilers (... TBD : think deeper on a tractable way to integrate binaries...)
+#. if your module is a binary which needs some compilation, prepare a
+   makefile for that, which ideally should be tested both with Intel
+   and Gnu compilers (... TBD : think deeper on a tractable way to
+   integrate binaries... please contribute to this analysis through email to 
+   ``climaf at meteo dot fr``)
 #. check twice the Climaf function call that will allow to declare the operator in CliMAF, and adapt it to the new script location, as e.g. ::
 
     >>> cscript ("my_op", cpath+"/scripts/"+"<calling sequence pattern>") 
@@ -152,10 +160,17 @@ CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can e
 
 and loading the resulting file ``<climaf_install_dir>/doc/_build/html/index.html`` in your browser.
 
-Also : part of the doc (e.g. section :ref:`api` ) is built from the Python docstrings (docstrings
-at the beginning of classes, modules, functions, .....). The full
-python object path let you know where to find the corresponding file
-and docstring, in dicrectory <climaf_install_dir>/climaf
+Note : part of the doc (e.g. section :ref:`api` ) is built from the Python docstrings (strings
+at the beginning of classes, modules, functions, .....). 
+
+- This needs a Python module either ``sphinx.ext.napoleon`` or
+  ``sphinxcontrib.napoleon``. If the doc build fails complaining about
+  one of this package, you can just comment it out in file doc/conf.py.
+
+- When wanting to improve the doc for one of the Python functions or
+  classes: the full python object path let you know where to find the
+  corresponding file and docstring, in directory
+  <climaf_install_dir>/climaf
 
 Once happy with the result, please contribute your work for a merge in next CliMAF release as described at :ref:`contributing_changes`
 
@@ -163,7 +178,8 @@ Once happy with the result, please contribute your work for a merge in next CliM
 ..define a new data organization scheme
 ---------------------------------------
 
-To be described. But please see the 'generic' data organization in :ref:`my_data`
+Please see the 'generic' data organization in :ref:`my_data` . if this
+does not fit, please email to ``climaf at meteo dot fr``
 
 
 
