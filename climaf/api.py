@@ -29,7 +29,7 @@ from climaf.classes   import cdefault as cdef,cdataset,ds #,cperiod
 from climaf.driver    import ceval,varOf #,cfile,cobj 
 from climaf.dataloc   import dataloc 
 from climaf.operators import cscript, scripts as cscripts, derive
-from climaf.cache     import creset as craz, csync as csave , cdump, cdrop
+from climaf.cache     import creset as craz, csync as csave , cdump, cdrop, cls, getCRS
 from clogging         import clogger, clog, clog_file
 import climaf.standard_operators
 
