@@ -130,8 +130,6 @@ def cimport(cobject,crs) :
     else :
         clogger.error("argument is not a Masked Array nor a filename",cobject)
     
-
-
 #LV
 def cfilePage(*args, **kwargs) :
     obj_cpage=cpage(*args, **kwargs)
@@ -145,121 +143,71 @@ def cfilePage(*args, **kwargs) :
             clogger.error("cpage.figll must have 3 dimensions in each sublist, pb for sublist %d" % (i+1))
             return(None)
         
-#modif 8/04/15
-    #calcul des figures avec cfile
+    #calcul des figures avec cfile => figfilesll : liste de liste des figures calculees
     figfilesll=[]
     for liste in obj_cpage.figll :
-        print liste
+        #print liste
         listfig=[]
         for fig in liste :
-            print "figure", fig
+            #print "figure", fig
             if fig is not None:
                 fic=cfile(fig)
                 listfig.append(fic)
             else:
-#                listfig.append(fig)
-                listfig.append('canvas:None')
+                listfig.append('canvas:None') # mot cle 'canvas:None' en cas de "blanc"
         figfilesll.append(listfig)
+    print "liste de liste des figs calculees", figfilesll
 
-    #construction d un tableau contenant la fig ou le mot cle 'canvas:None' en cas de 'blanc'
-#    tab_fig=[]
-#    for i in range(len(figfilesll)):
-#        for j in range(len(figfilesll[i])):
-#            if figfilesll[i][j] is None:
-#                tab_fig.append('canvas:None')
-#            else:
-#                tab_fig.append(figfilesll[i][j])  
-#    print tab_fig
-    tab_fig=[]
-    for i in range(len(figfilesll)):
-        for j in range(len(figfilesll[i])):
-            tab_fig.append(figfilesll[i][j])  
-    print "tab de fig", tab_fig
-    
-#fin modif 8/04/15
+    #modif 8/04/15
+    #tab_fig=[]
+    #for i in range(len(figfilesll)):
+    #    for j in range(len(figfilesll[i])):
+    #        tab_fig.append(figfilesll[i][j])  
+    #print "tab de fig", tab_fig
+    #fin modif 8/04/15
 
-#    figfilesll=[]
-#    for liste in obj_cpage.figll :
-#        print "liste", liste
-##        listfig=[]
-#        for fig in liste :
-#            print "figure", fig
-#            if fig is not None:
-#                fic=cfile(fig)
-#                figfilesll.append(fic)
-##                listfig.append(fic)
-#            else:
-##                listfig.append(fig)
-#                figfilesll.append('canvas:None')
-#                
-##        figfilesll.append(listfig)
-#    print "liste de liste de figs", figfilesll
-
-    #construction d un tableau 'd echelle' pour chaque fig
+    #mise en page
     largeur_page=800.
     hauteur_page=1200.
-    
     c1=largeur_page*obj_cpage.taille_x[0]  #160
     c2=largeur_page*obj_cpage.taille_x[1]-40. #600
     l1=hauteur_page*obj_cpage.taille_y[0] #396 
     l2=hauteur_page*obj_cpage.taille_y[1]#396 
     l3=hauteur_page*obj_cpage.taille_y[2]#396 
+   
+    #modif 8/04
+    #construction d un tableau correspondant aux echelles pour chaque figure
+    #num coherente des figures avec INPUT et rajout des marges
+    #scale_fig=("%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3),"%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3))
+    #print scale_fig
+    #fin modif 8/04
 
-    #pb de num des figs
-  #  scale_fig=("%dx%d+10+0" %(c1,l1), "%dx%d+180+50" %(c2,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+180+450" %(c2,l2), "%dx%d+10+800" %(c1,l3), "%dx%d+180+850" %(c2,l3))
-    #160*396+10+0
-    #600x396+180+50
-    #160x396+10+400
-    #600x396+180+450  
-    #160x396+10+800
-    #600x396+180+850
-#modif 8/04    
-    #nouvelle num coherente avec INPUT
-    scale_fig=("%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3),"%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3))
-
-    print scale_fig
-#modif 8/04
-    scale_fig_test=[]
-    scale_fig_test.append(["%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3)])
-    scale_fig_test.append(["%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3)])
-
-    print scale_fig_test
+    #construction d une liste de listes correspondant aux echelles pour chaque figure
+    #numerotation coherente des figures avec INPUT et rajout des marges
+    scale_fig_l=[]
+    scale_fig_l.append(["%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3)])
+    scale_fig_l.append(["%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3)])
+    #print scale_fig_l
             
-    #mise en page attention corriger ordre des figs
-    #ici remplacer 800*1200 par les variables
-    comm=subprocess.Popen(["convert", "-size", "800x1200", "xc:white", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #construction de la page
+    size_page="%dx%d"%(largeur_page, hauteur_page)
+    comm=subprocess.Popen(["convert", "-size", size_page, "xc:white", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     comm.wait()
 
-#modif 8/04   
-    for i in range(len(tab_fig)):
-        print i, scale_fig[i], tab_fig[i]
-        comm=subprocess.Popen(["composite", "-geometry", scale_fig[i], tab_fig[i], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        comm.wait()
-#modif 8/04
+    #modif 8/04
+    #for i in range(len(tab_fig)):
+    #    print i, scale_fig[i], tab_fig[i]
+    #    comm=subprocess.Popen(["composite", "-geometry", scale_fig[i], tab_fig[i], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #    comm.wait()
+    #modif 8/04
+    
     for i in range(len(figfilesll)):
         for j in range(len(figfilesll[i])):
-            print i, j, scale_fig_test[i][j], figfilesll[i][j]
-            comm=subprocess.Popen(["composite", "-geometry", scale_fig_test[i][j], figfilesll[i][j], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print i, j, scale_fig_l[i][j], figfilesll[i][j]
+            comm=subprocess.Popen(["composite", "-geometry", scale_fig_l[i][j], figfilesll[i][j], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             comm.wait()
-            
-    #i=j=0
-    #comm=subprocess.Popen(["convert", "-size", "800x1200", "xc:white", figfilesll[i][j+1], "-geometry", "600x396+180+50", "-composite", figfilesll[i][j+2], "-geometry", "160x396+10+400", "-composite", figfilesll[i+1][j], "-geometry", "160x396+10+800", "-composite", figfilesll[i+1][j+1], "-geometry", "600x396+180+450", "-composite", figfilesll[i+1][j+2], "-geometry", "600x396+180+850", "-composite", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #comm.wait()
-    #print "code retour", comm.wait()
 
     return figfilesll,obj_cpage
-
-#test=('/home/vignonl/tmp/climaf_cache/04/a.png','composite_climaf.png','composite_climaf.png')
-
-#test=[[None, '/home/vignonl/tmp/climaf_cache/22/b.png', '/home/vignonl/tmp/climaf_cache/22/b.png'], ['/home/vignonl/tmp/climaf_cache/22/b.png', '/home/vignonl/tmp/climaf_cache/22/b.png', '/home/vignonl/tmp/climaf_cache/22/b.png']]
-
-
-#cfilePage([0.2,0.8],[0.33,0.33,0.33],[[None,figrm,figdm],[fig,figr,figl]],orientation="portrait")
-
-#fig1=plotmap(tas_avg,crs="title",**map_graph_attributes(varOf(tas_avg)))
-#cfilePage([0.2,0.8],[0.33,0.33,0.33],figll=[[None, fig1, fig1],[fig1,fig1,fig1]],orientation="portrait") #ok
-
-#-----
 
 #convert -size 800x1200 xc:white composite.png
 #composite -geometry 600x396+180+50 a_trim.png composite.png composite.png 
@@ -267,7 +215,5 @@ def cfilePage(*args, **kwargs) :
 #composite -geometry 160x396+10+800 fig_test.png composite.png composite.png
 #composite -geometry 600x396+180+450 a_trim.png composite.png composite.png 
 #composite -geometry 600x396+180+850 a_trim.png composite.png composite.png 
-
-#convert -size 800x1200 xc:white \( a_trim.png \) -geometry 600x396+180+50 -composite \( fig_test.png \) -geometry 160x396+10+400 -composite \( fig_test.png \) -geometry 160x396+10+800 -composite \( a_trim.png \) -geometry 600x396+180+450 -composite \( a_trim.png \) -geometry 600x396+180+850 -composite composite_onecomm.png
 
 #convert -size 800x1200 xc:white a_trim.png -geometry 600x396+180+50 -composite fig_test.png -geometry 160x396+10+400 -composite fig_test.png -geometry 160x396+10+800 -composite a_trim.png -geometry 600x396+180+450 -composite a_trim.png -geometry 600x396+180+850 -composite composite_onecomm.png
