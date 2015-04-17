@@ -142,19 +142,19 @@ def selectLocalFiles(**kwargs):
     """
     Returns the shortest list of (local) files which include the data for the list of 
     (facet,value) pairs provided
-    
+
     Method : 
     
-    - use datalocations indexed by :py:func:`dataloc` to identifiy data organization 
+    - use datalocations indexed by :py:func:`~climaf.dataloc.dataloc` to identify data organization 
       and data store urls for these (facet,value) pairs
 
-    - derive relevant filenames search function such as as :py:func:`selectCmip5DrsFiles` 
+    - check that data organization si sa known one, i.e. is one of 'generic', CMIP5_DRS' or 'EM'
+    
+    - derive relevant filenames search function such as as :py:func:`~climaf.dataloc.selectCmip5DrsFiles` 
       from data organization scheme
 
-    - pass urls and relevant facet values to the filenames search function
+    - pass urls and relevant facet values to this filenames search function
 
-    Known organizations are documented with :py:class:`~dataloc` 
-    
     """
     rep=[]
     project=kwargs['project']

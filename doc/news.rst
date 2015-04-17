@@ -10,13 +10,7 @@ Changes, newest first :
 
 - 2005/04/14 - Version 0.5.0 :
 
- - Versions : 
-
-   - For the CliMAF code : a versionning scheme is now used, which is based on
-     recommendations found at httm://semver.org. 
-
-   - Documentation : there are now multiple versions of the CliMAF documentation on ReadTheDocs;
-     look at the lower left corner
+ - A versionning scheme is now used, which is based on recommendations found at httm://semver.org. 
 
  - Starting CliMAF :
 

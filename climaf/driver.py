@@ -96,7 +96,7 @@ def capply_operator (climaf_operator, *operands, **parameters):
     
 
 def ceval(cobject,
-          userflags=operators.scriptFlags(),
+          userflags=None,
           format="MaskedArray",deep=None, derived_list=[], recurse_list=[]) :
     """ 
     Actually evaluates a CliMAF object, either as an in-memory data structure or
@@ -113,6 +113,8 @@ def ceval(cobject,
     if format != 'MaskedArray' and format != 'file' and format != 'png' :
         err='Allowed formats yet are : "object", "file" and "png"'
         clogger.error(err); raise Climaf_Driver_Error(err)
+    #
+    if userflags is None : userflags=operators.scriptFlags()
     #
     # Next check is too crude for dealing with use of operator 'select'
     #if cobject.crs in recurse_list :

@@ -231,19 +231,17 @@ def cdrop(obj, rm=True) :
 
     Args :
      obj (cobject or string) : object to delete, or its string representation (CRS)
-     rm (bool) : for advanced use only; should we actually delete (rm)  the file, or
-       just forget it in CliMAF cache index ?
+     rm (bool) : for advanced use only; should we actually delete (rm) the file, or just forget it in CliMAF cache index
     
     Returns : None if object does not exists, False if failing to delete, True if OK
 
     Example ::
 
     >>> dg=ds(project='example', experiment='AMIPV6ALB2G', variable='tas', period='1980-1981')
-    >>> dg
-    >>> cfile(dg)
-    '/home/senesi/tmp/climaf_cache/da/c.nc'
+    >>> f=cfile(dg)
     >>> os.system('ls -al '+f)
-    >>> cdrop(dg)    
+    >>> cdrop(dg)
+    
     """
     if (type(obj) is ctree ) :
         crs=cobject.crs
