@@ -10,7 +10,7 @@ Changes, newest first :
 
 - 2005/04/14 - Version 0.5.0 :
 
- - A versionning scheme is now used, which is based on recommendations found at httm://semver.org. 
+ - A versionning scheme is now used, which is based on recommendations found at http://semver.org. 
 
  - Starting CliMAF :
 

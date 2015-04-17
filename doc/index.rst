@@ -17,7 +17,7 @@ The aim of CliMAF is to allow for an actual, **easy, collaborative development o
 So, CliMAF can be described as :
 
 - an aid for handling access to common climate
-  simulation and re-analysis datafiles, and to to personnal data
+  simulations and re-analysis datafiles, and to to personnal data
   files, in a uniform way
 - a wrapper which provides you with uniform, handy, combination and caching
   features around :

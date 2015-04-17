@@ -7,15 +7,15 @@ The next developments will adress, probably in that order :
 
 - adding graphic operators : 
 
-  - verastile (and nice) curve plot, 
+  - versatile (and nice) curve plot, 
 
   - cross-sections [ in z, p, log(p)], 
 
-  - Hoevmuller diagram, 
+  - Hoevmoeller diagram, 
 
   - Taylor diagram
 
-- adding graphic functions for composing pages with individual graphs, and for building html index
+- adding graphic functions for composing pages with individual graphs, and for building html an index
 
 - cache management functions : 
 

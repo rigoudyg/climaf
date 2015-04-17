@@ -58,7 +58,7 @@ class cscript():
         
         >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
         >>> # define some dataset
-        >>> tas_ds = ds(experiment='AMIPV6', variable='tas', period='1980-1981')
+        >>> tas_ds = ds(project='example', experiment='AMIPV6', variable='tas', period='1980-1981')
         >>> # Apply operator 'mycdo' to dataset 'tas_ds', choosing a given 'operator' argument
         >>> tas_avg = mycdo(tas_ds,operator='timavg')
         

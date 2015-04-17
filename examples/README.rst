@@ -6,7 +6,10 @@
 
    This is documented at length at `Ipython notebooks <http://ipython.org/notebook.html>`_. 
 
-   **For running the example Ipython notebook**::
+   **For running the example Ipython notebook**, first launch Firefox
+   (on the same machine as the one used hereafter - you muse use ``ssh
+   -x`` if necessary ) and then execute ::
+
      
      $ cd <climaf_dir>
      $ export PYTHONPATH=$PYTHONPATH:$(pwd)

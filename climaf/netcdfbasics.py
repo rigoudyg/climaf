@@ -15,9 +15,9 @@ def varOfFile(filename) :
             if varname is None : 
                 varname=filevar
             else :
-                logging.debug("Got at least two variables (%s and %s) "+\
+                clogger.debug("Got at least two variables (%s and %s) "+\
                                   "and no direction to choose  - File is %s"%\
-                                  (varname,filevar,datafile))
+                                  (varname,filevar,filename))
                 return(None)
     fileobj.close()
     return(varname)

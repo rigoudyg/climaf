@@ -23,7 +23,7 @@ mkdir -p $tmp
 # Prepare CDO operator strings
 
 [ "$var" ] && selvar="-selname,$var" 
-[ "$period" ] && seldate="seldate,$period"
+[ "$period" ] && seldate="-seldate,$period"
 if [ "$region" ] ; then 
     latmin=$(echo $region | cut -d "," -f 1)
     latmax=$(echo $region | cut -d "," -f 2)
@@ -45,7 +45,7 @@ for out in $outs ; do
     for file in $files ; do
 	tmp2=$tmp/$(basename $file) ; rm -f $tmp2
 	if [ "$period" ] ; then 
-	    cdo $seldate $selvar $selregion $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+	    cdo ${selvar#-} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
 	    if [ "$var" ] ; then 
 		cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
@@ -75,11 +75,11 @@ for out in $outs ; do
 	    if cdo $operator $tmp3 $out ;then 
 		rm $tmp3 
 	        # Fix some issues : CDO does not discard degenerated dimensions
-		if [ $operator == fldavg  -o $operator == fldmean ] ; then 
-		    ncwa -O -a lat,lon $out $tmp3  && ncks -O -x -v lat,lon $tmp3 $out && rm $tmp3 
-		elif [ $operator == timavg ] ; then 
-		    ncwa -O -a time $out $tmp3 && ncks -O -x -v time $tmp3 $out && rm $tmp3 
-		fi
+		#if [ $operator == fldavg  -o $operator == fldmean ] ; then 
+		#    ncwa -O -a lat,lon $out $tmp3  && ncks -O -x -v lat,lon $tmp3 $out && rm $tmp3 
+		#elif [ $operator == timavg ] ; then 
+		#    ncwa -O -a time $out $tmp3 && ncks -O -x -v time $tmp3 $out && rm $tmp3 
+		#fi
 	    fi
 	else mv $tmp3 $out ; fi
 	#ls -al $out

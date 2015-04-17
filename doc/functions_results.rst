@@ -8,7 +8,12 @@ cfile : get the file value of a CliMAF object
 
 .. autofunction:: climaf.api.cfile 
 
-cshow : display a result of type 'figure'
+cMA : get the Masked Array value of a CliMAF object 
+------------------------------------------------------
+
+.. autofunction:: climaf.api.cMA
+
+cshow : dump an object or display a 'figure'
 --------------------------------------------
 
 .. autofunction:: climaf.api.cshow

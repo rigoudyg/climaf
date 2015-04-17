@@ -64,7 +64,7 @@ import climaf.standard_projects
 # CliMAF init phase
 #########################
 
-Climaf_version="0.5"
+Climaf_version="0.5.1"
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 
@@ -82,7 +82,9 @@ conf_file=os.path.expanduser("~/.climaf")
 if os.path.isfile(conf_file) : execfile(conf_file, {"Climaf_version":Climaf_version })
 
 # Decide for cache location
-climaf.cache.setNewUniqueCache(os.getenv("CLIMAF_CACHE","~/tmp/climaf_cache"))
+if onCiclad : default_cache="/data/"+os.getenv("USER")+"/climaf_cache"
+else: default_cache="~/tmp/climaf_cache"
+climaf.cache.setNewUniqueCache(os.getenv("CLIMAF_CACHE",default_cache))
 
 
 #########################
