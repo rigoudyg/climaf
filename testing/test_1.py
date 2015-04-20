@@ -27,38 +27,28 @@ class A_basic(unittest.TestCase):
                          'Issue printing a very basic dataset')
 
     def test_2_declaring_and_applying_a_script(self):
-        cscript('mean_and_sdev',
-                cpath+'/../scripts/mean_and_std.sh ${in} ${var} ${out} ${out_sdev}', 
-                sdev_var="std(%s)" ) 
-        mean=climaf.driver.capply("mean_and_sdev",self.dg) # Main output is the return value of applying the script
-        sdev=mean.sdev         # Secondary output 'sdev' is a 'property' of main output
-        sd=`sdev`
+        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
+        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
+        sd=`std`
         actual=sd
         print "actual=",sd
-        expected="mean_and_sdev(ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')).sdev"
+        expected="mean_and_std(ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')).sdev"
         print "expected=",expected
         self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
 
     def test_3_evaluating_a_script(self):
-        cscript('mean_and_sdev',
-                cpath+'/../scripts/mean_and_std.sh ${in} ${var} ${out} ${out_sdev}', 
-                sdev_var="std(%s)" ) 
-        mean=climaf.driver.capply("mean_and_sdev",self.dg) # Main output is the return value of applying the script
-        sdev=mean.sdev         # Secondary output 'sdev' is a 'property' of main output
-        fil=cfile(sdev)
-        expected=climaf.cache.currentCache+'/13/1.nc'
+        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
+        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
+        fil=cfile(std)
+        expected=climaf.cache.currentCache+'/d1/a.nc'
         print "actual=",fil
         print "expected=",expected
         self.assertEqual(fil,expected,"Issue evaluating script application as a file")
 
     def test_4_plotting(self):
-        cscript('mean_and_sdev',
-                cpath+'/../scripts/mean_and_std.sh ${in} ${var} ${out} ${out_sdev}', 
-                sdev_var="std(%s)" ) 
-        mean=climaf.driver.capply("mean_and_sdev",self.dg) # Main output is the return value of applying the script
-        sdev=mean.sdev         # Secondary output 'sdev' is a 'property' of main output
-        cscript('timeplot',cpath+'/../scripts/timeplot.sh ${in} ${out} ${var}',format="png")
-        plot1d=climaf.driver.capply("timeplot",sdev) 
+        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
+        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
+        plot1d=climaf.driver.capply("timeplot",std,crs="tas standard deviation") 
         # Have the plot displayed (this will also actually launch the script,
         cshow(plot1d)
 	os.system("sleep 3s")

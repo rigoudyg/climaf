@@ -26,7 +26,7 @@ begin
 
   ; select the time series as a 1D array, by analyzing the dimensions 
   ; and checking that dimensions other than 'time' are degenerated
-  Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
+  Var_DimNames = getvardims(fld)  ; getting dimensions from metadata
   dime=dimsizes(fld)
   rank=dimsizes(dime)
   do i=0,rank-1

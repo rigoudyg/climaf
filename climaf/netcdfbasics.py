@@ -1,3 +1,5 @@
+import re
+
 from climaf.clogging import clogger
 
 def varOfFile(filename) :
