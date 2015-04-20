@@ -206,7 +206,6 @@ def hasExactObject(cobject) :
     if cobject.crs in crs2filename :
         return (crs2filename[cobject.crs])
 
-                
 def complement(crsb, crse, crs) :
     """ Extends time period of file object of CRSB (B for 'begin')
     with file object of CRSE (E for 'end') for creating file object of
@@ -292,98 +291,92 @@ def cdump():
         #print "%s : %s"%(crs2filename[crs][-30:],crs)
         print "%s : %s"%(crs2filename[crs],crs)
 
-def cls(size=0, age=0, access=0, filtre="", notfilter="", usage=False, filename= False, count=False, remove=False, special=False):
+def clist(size="", age=0, access=0, filtre="", notfilter="", usage=False, filename= False, count=False, remove=False, special=False):
     """
-    A completer List 
+    A completer List the content of CliMAF cache according to some selection criteria
     
     """
-    crs_list=[]
-    crs2filename_list=[]
-    print crs2filename
-    for crs in crs2filename :
-        print crs
-        crs_list.append(crs)
-        crs2filename_list.append(crs2filename[crs])
-
-    print crs2filename_list
-    print "fin des test d impression"
-
-    #conversion unites attention a la division par zero
-    if size != 0 :#pr le moment hypothese de la taille en nbre octets (unite= bloc de 512 octets)
-        nb_blocs=size/512.
-    if age != 0 :#pr le moment hypothese de l age en nombre d heures (unite=bloc de 24h-1jour)
-        nb_jours=age/24.
-    if access != 0 :#pr le moment hypothese de l acces en nombre d heures (unite=bloc de 24h-1jour)
-        nb_j_acc=access/24.
+    #print "Initial content of CliMAF cache"
+    #print crs2filename
+    #print ""
+    
+    #conversion unites
+    if size is not "" :#unite par defaut = bloc de 512 octets (option b)
+        if re.search('k', size) is None and re.search('M', size) is None and re.search('G', size) is None :
+            #octets
+            #nb_blocs=size/512.
+            size=size+"c"
+    #if age != 0 :#age a donner en nombre d heures (unite=bloc de 24h-1jour) : non en nbre de j dc conversion inutile
+        #nb_jours=age/24.
+    #if access != 0 :#acces a donner en nombre d heures (unite=bloc de 24h-1jour) : non en nbre de j dc conversion inutile
+        #nb_j_acc=access/24.
 
     #commande pour la recherche sur size/age/access
     command=""
-    sortie_find=""
-    list_search_files=[]
     
-    #regarder pour sortir de la boucle des qu on est ds un cas ?
-    if size != 0 :
+    if size is not "" :
         if age != 0 :
             if access != 0 :
                 #command="find "+cpath+"/../../tmp/climaf_cache/*/* -size +"+str(int(nb_blocs))+" -ctime +"+str(int(nb_jours))+" -atime +"+str(int(nb_j_acc))+" -print"
-                command="find %s/../../tmp/climaf_cache/*/* -size +%s -ctime +%s -atime +%s -print" %(cpath, str(int(nb_blocs)), str(int(nb_jours)), str(int(nb_j_acc)))                
-                print "recherche sur size + age + access"
+                command="find %s/../../tmp/climaf_cache/*/* -size +%s -ctime +%s -atime +%s -print" %(cpath, size, str(int(age)), str(int(access)))                
+                print "find for size + age + access"
             else :
                 #command="find "+cpath+"/../../tmp/climaf_cache/*/* -size +"+str(int(nb_blocs))+" -ctime +"+str(int(nb_jours))+" -print"
-                command="find %s/../../tmp/climaf_cache/*/* -size +%s -ctime +%s -print" %(cpath, str(int(nb_blocs)), str(int(nb_jours))) 
-                print "recherche sur size + age"
+                command="find %s/../../tmp/climaf_cache/*/* -size +%s -ctime +%s -print" %(cpath, size, str(int(age))) 
+                print "find for size + age"
         elif age == 0 and access != 0 : #age=0 a preciser ?
             #command="find "+cpath+"/../../tmp/climaf_cache/*/* -size +"+str(int(nb_blocs))+" -atime +"+str(int(nb_j_acc))+" -print"
-            command="find %s/../../tmp/climaf_cache/*/* -size +%s -atime +%s -print" %(cpath, str(int(nb_blocs)), str(int(nb_j_acc)))      
-            print "recherche sur size + access"
+            command="find %s/../../tmp/climaf_cache/*/* -size +%s -atime +%s -print" %(cpath, size, str(int(access)))      
+            print "find for size + access"
         elif age ==0 and access == 0 : #age=0 a preciser ?
             #command="find "+cpath+"/../../tmp/climaf_cache/*/* -size +"+str(int(nb_blocs))+" -print"
-            command="find %s/../../tmp/climaf_cache/*/* -size +%s -print" %(cpath, str(int(nb_blocs)))
-            print "recherche sur size" 
-    elif size == 0 and age != 0 : #size=0 a preciser ?
+            command="find %s/../../tmp/climaf_cache/*/* -size +%s -print" %(cpath, size)
+            print "find for size" 
+    elif size is "" and age != 0 : #size=0 a preciser ?
         if access != 0 :
             #command="find "+cpath+"/../../tmp/climaf_cache/*/* -ctime +"+str(int(nb_jours))+" -atime +"+str(int(nb_j_acc))+" -print"
-            command="find %s/../../tmp/climaf_cache/*/* -ctime +%s -atime +%s -print" %(cpath, str(int(nb_jours)), str(int(nb_j_acc)))
-            print "recherche sur age + access"
+            command="find %s/../../tmp/climaf_cache/*/* -ctime +%s -atime +%s -print" %(cpath, str(int(age)), str(int(access)))
+            print "find for age + access"
         else:
             #command= "find "+cpath+"/../../tmp/climaf_cache/*/* -ctime +"+str(int(nb_jours))+" -print"
-            command="find %s/../../tmp/climaf_cache/*/* -ctime +%s -print" %(cpath, str(int(nb_jours)))
-            print "recherche sur age"
-    elif size == 0 and age == 0 : #size=0 a preciser ?
+            command="find %s/../../tmp/climaf_cache/*/* -ctime +%s -print" %(cpath, str(int(age)))
+            print "find for age"
+    elif size is "" and age == 0 : #size=0 a preciser ?
         if access != 0 :
             #command="find "+cpath+"/../../tmp/climaf_cache/*/* -atime +"+str(int(nb_j_acc))+" -print"
-            command="find %s/../../tmp/climaf_cache/*/* -atime +%s -print" %(cpath, str(int(nb_j_acc)))
-            print "recherche sur access"
-            
+            command="find %s/../../tmp/climaf_cache/*/* -atime +%s -print" %(cpath, str(int(access)))
+            print "find for access"
+
     print command
     
     var_find=False
-    if size != 0 or age != 0 or access != 0 :
+    if size is not "" or age != 0 or access != 0 :
         var_find=True
 
+    #construction du nouveau dictionnaire apres la recherche sur size/age/access
     #new_dict_crs2filename=dict()
+    find_find=False
     if var_find is True:
-        new_dict_crs2filename=dict()
+        sortie_find=""
+        list_search_files_after_find=[]
+        dict_after_find=dict()
+        
         sortie_find=os.popen(command).read()
         #os.system(command)
-        list_search_files=sortie_find.split('\n')
-        list_search_files.pop(-1)
-        print "liste des fichiers selon les criteres de recherche", list_search_files
 
-        list_search_files_crs=[]
-        for files in list_search_files :
-            list_search_files_crs.append(getCRS(files))
-            print "liste des crs des fichiers recherches", list_search_files_crs
+        list_search_files_after_find=sortie_find.split('\n')
+        list_search_files_after_find.pop(-1)
+        #print "liste des fichiers selon les criteres de recherche", list_search_files_after_find
 
-        for files in list_search_files :
-            new_dict_crs2filename[getCRS(files)]=files
-        print "new dico", new_dict_crs2filename
+        if list_search_files_after_find is not "":
+            find_find=True
+
+        for files in list_search_files_after_find :
+            dict_after_find[getCRS(files)]=files
+        print ""
+        print "dictionnary after find for size/age/access", dict_after_find
     #else:
     #    new_dict_crs2filename=crs2filename.copy()
-
-        print "dictionnaire apres recherche size/age/access", new_dict_crs2filename
-    #new_dict_crs2filename.keys()
-    #new_dict_crs2filename.values()
 
 #    if filtre is not "" :
 #        if len(new_dict_crs2filename) != 0 : #il y a eu une recherche sur size, age ou access qui a rendu un resu#ltat, et on va chercher le filtre ds ce resultat
@@ -420,110 +413,130 @@ def cls(size=0, age=0, access=0, filtre="", notfilter="", usage=False, filename=
     #dict_filter=dict()
     if filtre is not "" :
         dict_filter=dict()
-        dict_filter=crs2filename.copy()
-        list_crs_to_rm=[]
+        find_filter=False
+        #dict_filter=crs2filename.copy()
+        #list_crs_to_rm=[]
+        print ""
         for crs in crs2filename :
             if re.search(filtre, crs) or re.search(filtre, crs2filename[crs]):
-                print "chaine trouvee ds", crs, crs2filename[crs]
-            else:
-                list_crs_to_rm.append(crs)
-        if len(list_crs_to_rm) != 0 :
-            for crs in list_crs_to_rm :
-                del dict_filter[crs]
-            print "new dico pr filter", dict_filter
-        else:
-            print "aucun chgt apres recherche sur filter", dict_filter
+                print "string find in", crs, crs2filename[crs]
+                dict_filter[crs]=crs2filename[crs]
+                find_filter=True
+            #else:
+            #    list_crs_to_rm.append(crs)
+        #if len(list_crs_to_rm) != 0 :
+        #    for crs in list_crs_to_rm :
+        #        del dict_filter[crs]
+        #    print "dictionnary after find for filter", dict_filter
+        #else:
+        #    print "aucun chgt apres recherche sur filter", dict_filter
     #else:
     #    dict_filter=crs2filename.copy()
-        
-    #pb qui a pr consequence un chgt de methose: si le filtre est non vide et que le dico est vide
-    #dict_notfilter=dict()
+        if find_filter is True :
+            print ""
+            print "dictionnary after find for filter", dict_filter
+        else:
+            print ""
+            print "no string find for filter =>  no result"
+    
     if notfilter is not "" :
         dict_notfilter=dict()
-        dict_notfilter=crs2filename.copy()
-        list_crs_to_rm=[]
+        find_notfilter=False
+        print ""
         for crs in crs2filename :
             if re.search(notfilter, crs) is None and re.search(notfilter, crs2filename[crs]) is None:
-                print "chaine non presente ds", crs, crs2filename[crs]
-            else:
-                list_crs_to_rm.append(crs)
-        if len(list_crs_to_rm) != 0 :
-            for crs in list_crs_to_rm :
-                del dict_notfilter[crs]
-            print "new dico pr notfilter", dict_notfilter
+                print "string not find in", crs, crs2filename[crs]
+                dict_notfilter[crs]=crs2filename[crs]
+                find_notfilter=True
+        if find_notfilter is True :
+            print ""
+            print "dictionnary after find for notfilter", dict_notfilter
         else:
-            print "aucun chgt apres recherche sur notfilter", dict_notfilter
-    #else:
-    #    dict_notfilter=crs2filename.copy()
-
-    #intersection des criteres de recherche
+            print ""
+            print "all strings contain notfilter =>  no result"
+    
+    #conjonction des criteres de recherche
     dict_final=dict()
     #avec copies de dict meme sil n y a pas de recherche
     #for crs in crs2filename :
         #if crs in new_dict_crs2filename and crs in dict_filter and crs in dict_notfilter :
         #    dict_final[crs]=new_dict_crs2filename[crs]
-    if var_find is True :
-        if filtre is not "" :
-            if notfilter is not "" :
-                print "construction du dic avec dic_find, dict_filter and dict_notfilter "
+    
+    if var_find is True and find_find is True :
+        if filtre is not "" and find_filter is True :
+            if notfilter is not "" and find_notfilter is True:
+                print "creation of selection dictionnary with dic_find, dict_filter and dict_notfilter"
                 for crs in crs2filename :
-                    if crs in new_dict_crs2filename and crs in dict_filter and crs in dict_notfilter :
-                        dict_final[crs]=new_dict_crs2filename[crs]
+                    if crs in dict_after_find and crs in dict_filter and crs in dict_notfilter :
+                        dict_final[crs]=dict_after_find[crs]
             else:
-                print "construction du dic avec dic_find and dict_filter "
+                print "creation of selection dictionnary with dic_find and dict_filter"
                 for crs in crs2filename :
-                    if crs in new_dict_crs2filename and crs in dict_filter :
-                        dict_final[crs]=new_dict_crs2filename[crs]
-        elif filtre is "" and notfilter is not "" :
-            print "construction du dic avec dic_find and dict_notfilter "
+                    if crs in dict_after_find and crs in dict_filter :
+                        dict_final[crs]=dict_after_find[crs]
+        elif filtre is "" and notfilter is not "" and find_notfilter is True:
+            print "creation of selection dictionnary with dic_find and dict_notfilter"
             for crs in crs2filename :
-                if crs in new_dict_crs2filename and crs in dict_notfilter :
-                    dict_final[crs]=new_dict_crs2filename[crs]
+                if crs in dict_after_find and crs in dict_notfilter :
+                    dict_final[crs]=dict_after_find[crs]
         elif filtre is "" and notfilter is "" :
-            print "construction du dic avec dic_find"
-            dict_final=new_dict_crs2filename.copy()
-            new_dict_crs2filename.clear()
-    elif var_find is False and filtre is not "" :
-        if notfilter is not "" :
-            print "construction du dic avec dic_filter and dict_notfilter "
+            print "creation of selection dictionnary with dic_find"
+            dict_final=dict_after_find.copy()
+            dict_after_find.clear()
+    elif var_find is False and filtre is not "" and find_filter is True :
+        if notfilter is not "" and find_notfilter is True :
+            print "creation of selection dictionnary with dic_filter and dict_notfilter"
             for crs in crs2filename :
-                if crs in dic_filter and crs in dict_notfilter :
+                if crs in dict_filter and crs in dict_notfilter :
                     dict_final[crs]=dict_filter[crs]
         else:
-            print "construction du dic avec dic_filter"
-            dict_final=dic_filter.copy()
+            print "creation of selection dictionnary with dic_filter"
+            dict_final=dict_filter.copy()
             dict_filter.clear()
     elif var_find is False and filtre is "" :
-        if notfilter is not "" :
-            print "construction du dic avec dict_notfilter"
-            dict_final=dic_notfilter.copy()
+        if notfilter is not "" and find_notfilter is True :
+            print "creation of selection dictionnary with dict_notfilter"
+            dict_final=dict_notfilter.copy()
             dict_notfilter.clear()
-        else:
-            print "construction sur le dic d origine"
+        #elif notfilter is "" and (usage is True or count is True or remove is True or special is True) :
+        #    print "construction sur le dic d origine"
 
-    #dictionnaire avec les criteres de recherche appliquees 
     #new_dict_crs2filename.clear()
     #dict_filter.clear()
     #dict_notfilter.clear()
 
-    #retour de la fonction cls
+    #retour de la fonction cls sans arguments
     if var_find is True or filtre is not "" or notfilter is not "" :
-        if filename is True :
-            for crs in dict_final :
-                print "dictionnaire final", dict_final[crs]
-        else:
-            for crs in dict_final :
-                print "dictionnaire final", crs, dict_final[crs]
+        if len(dict_final) != 0 and dict_final != crs2filename :
+            print ""
+            print "Final content of CliMAF cache"
+            if filename is True :
+                for crs in dict_final :
+                    print dict_final[crs]
+            else:
+                for crs in dict_final :
+                    print crs, dict_final[crs]
+        elif len(dict_final) != 0 and dict_final == crs2filename :
+            print ""
+            print "Final content of CliMAF cache : similar to initial"
+            if filename is True :
+                for crs in dict_final :
+                    print dict_final[crs]
+            else:
+                for crs in dict_final :
+                    print "%s : %s" %(crs, dict_final[crs])
+        else :
+            print "Result for research: empty"
     else:
+        print "Initial content of CliMAF cache"
         if filename is True :
             for crs in crs2filename :
-                print "le dic est l original", crs2filename[crs]
+                print crs2filename[crs]
         else:
             for crs in crs2filename :
-                print "le dic est l original", crs, crs2filename[crs]
-      
+                print "%s : %s" %(crs,crs2filename[crs])
+    
     if usage is True :
-        print "usage est a vrai"
         if var_find is True or filtre is not "" or notfilter is not "" : #on parcoure le dic construit
             for crs in dict_final :
                 os.system("du -sh "+dict_final[crs])               
@@ -532,7 +545,6 @@ def cls(size=0, age=0, access=0, filtre="", notfilter="", usage=False, filename=
                 os.system("du -sh "+crs2filename[crs])
             
     if count is True :
-        print "count"
         if var_find is True or filtre is not "" or notfilter is not "" : #on parcoure le dic construit
             if filename is True:
                 return(dict_final[crs], len(dict_final))
@@ -545,63 +557,87 @@ def cls(size=0, age=0, access=0, filtre="", notfilter="", usage=False, filename=
                 return(len(crs2filename))
             
     if remove is True :
-        print "remove"
         if var_find is True or filtre is not "" or notfilter is not "" : #on parcoure le dic construit
             if filename is True :
                 for crs in dict_final :
-                    os.system("rm -rf "+dict_final[crs])
-                    print "%s fichier efface", dict_final[crs]
+                    #os.system("rm -rf "+dict_final[crs]) #efface le fichier mais apparait tjrs ds le cache par cdump
+                    cdrop(crs, rm=True)
+                    print "%s : removed file" %dict_final[crs]
             else:
                 for crs in dict_final :
-                    os.system("rm -rf "+dict_final[crs])
+                    #os.system("rm -rf "+dict_final[crs])
+                    cdrop(crs, rm=True)
         else: #on parcoure le dic d origine
+            list_tmp_crs=[]
+            list_tmp_crs=crs2filename.keys()
             if filename is True :
-                for crs in crs2filename :
-                    os.system("rm -rf "+crs2filename[crs])
-                    print "%s fichier efface", crs2filename[crs]
+                #for crs in crs2filename :
+                for crs in list_tmp_crs:
+                    #os.system("rm -rf "+crs2filename[crs])
+                    cdrop(crs, rm=True)
+                    print "%s : removed file" %crs2filename[crs]
             else:
-                for crs in crs2filename :
-                    os.system("rm -rf "+crs2filename[crs])
+                #for crs in crs2filename :
+                for crs in list_tmp_crs:
+                    #os.system("rm -rf "+crs2filename[crs])
+                    cdrop(crs, rm=True)
 
     if special is True :
-        print "special"
+        global dic_special
         dic_special=dict()
         if var_find is True or filtre is not "" or notfilter is not "" : #on parcoure le dic construit
             dic_special=dict_final.copy()
         else: #on parcoure le dic d origine
             dic_special=crs2filename.copy()
-        print "liste figures speciales", dic_special.values()
-        return(dic_special)
+        print "list of marked figures as 'special'", dic_special.values()
+        return(dic_special) #declarer comme var globale et enlever son effacement dans creset
+
+    dict_final.clear()
+
+def cls(**kwargs):
+    """
+    A completer 
+    
+    """
+    clist(**kwargs)
+
+def crm(**kwargs):
+    """
+    A completer 
+    
+    """
+    kwargs['remove']=True
+    clist(**kwargs)
+
+def cdu(**kwargs):
+    """
+    A completer 
+    
+    """
+    kwargs['usage']=True
+    clist(**kwargs)
 
 
+def cwc(**kwargs):
+    """
+    A completer 
+    
+    """
+    kwargs['count']=True
+    return clist(**kwargs)
 
+def rebuild():
+    result_ls_cache=os.popen("ls %s/../../tmp/climaf_cache/*/*" %cpath).read()
+    files_in_cache=result_ls_cache.split('\n')
+    files_in_cache.pop(-1)
+    #print "liste des fichiers dans le cache", files_in_cache
 
- #-------------------------------------    
-#    sortie=""
-#    list_search_files=[]
-#    if size != 0 : #pr le moment hypothese de la taille en nbre octets (unite= bloc de 512 octets)
-#        nb_blocs=size/512.
-#        os.system("find "+cpath+"/../../tmp/climaf_cache/*/* -size +"+str(int(nb_blocs))+" -print")
-#        print "apres le os system"
-#        sortie=os.popen("find /home/vignonl/tmp/climaf_cache/*/* -size +%s -print"%str(int(nb_blocs))).read()
-#        #list_search_files.append(a)
-#        #cm3=os.popen("find /home/vignonl/tmp/climaf_cache/*/* -size +%s -print"%str(int(nb_blocs)))
-#        #print cm3.read()
-#        #print list_search_files
-#    print "sortie", sortie
-#    list_search_files.append(sortie)
-#    print list_search_files
-#    if age != 0 :
-#        nb_jours=age/24. #pr le moment hypothese de l age en nombre d heures (unite=bloc de 24h-1jour)
-#        #par date de creation
-#        os.system("find "+cpath+"/../../tmp/climaf_cache/*/* -ctime +"+str(int(nb_jours))+" -print")
-#    if access != 0 :
-#        nb_j_acc=access/24. #pr le moment hypothese de l acces en nombre d heures (unite=bloc de 24h-1jour)
-#        #par date d acces aux fichiers
-#        os.system("find "+cpath+"/../../tmp/climaf_cache/*/* -atime +"+str(int(nb_j_acc))+" -print")
-    #-------------------------------------
+    #crs2filename.clear() non declaree en variable globale...
+    crs2filename=dict()
+    for files in files_in_cache:
+        crs2filename[getCRS(files)]=files
 
-
+    return(crs2filename)
 
 
 if __name__ == "__main__":
