@@ -53,7 +53,9 @@ def load_standard_operators():
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
-    cscript('timeplot'  , scriptpath+'timeplot.sh ${in} ${out} ${var} ${title}',format="png")
+    #cscript('timeplot'  , scriptpath+'timeplot.sh ${in} ${out} ${var} ${title}',format="png")
+    cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=${in} outfile=${out} '
+            'var=${var} title=${crs}',format="png")
     #
     cscript('plotmap'   , "(ncl -Q "+ scriptpath +"plotmap.ncl infile=${in} "
             "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "

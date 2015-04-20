@@ -30,7 +30,7 @@ Configuring for running without installing
 You can run CliMAF on Ciclad and at CNRM without installing it; just 
 do as indicated below, replacing ``<some_installation_dir>`` by :
 
- - ``/cnrm/aster/data1/UTILS/climaf`` at CNRM
+ - ``/cnrm/aster/data1/UTILS/climaf/current`` at CNRM
 
  - ``~ssenesi/climaf`` on Ciclad
 

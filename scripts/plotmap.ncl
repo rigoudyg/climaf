@@ -1,4 +1,4 @@
- ; Basic map plot using NCL, for use in CliMAF. 
+; Basic map plot using NCL, for use in CliMAF. 
 ; Derived from CAMI's plot_map_atmo.ncl
 ;
 ; Should be declared to CliMAF as :
@@ -8,7 +8,7 @@
 ;   plotmap(some_dataset, color="DarkBlue", min=0.0, max=50.0, delta=5.)
 ;
 ; or called directly as in :
-;   ncl plotmap.ncl infile=\"$f\" outfile=\"es.png\" cmap=\"BlueDarkRed18\" vmin=260 vmax=300 vdelta=4 plotname=\"plotname\" var=\"tas\" title=\"some_title\ scale=1. offset=0. units=\"unit\""
+;   ncl plotmap.ncl infile=\"$f\" cmap=\"BlueDarkRed18\" vmin=260 vmax=300 vdelta=4 plotname=file.png var=\"tas\" title=\"some_title\ scale=1. offset=0. units=\"unit\""
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
