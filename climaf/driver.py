@@ -456,7 +456,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             else :
                 err="Some output missing when executing : %s. \nSee scripts.out"%template
                 clogger.error(err)
-                raise Climaf_Driver_Error
+                raise Climaf_Driver_Error(err)
         else :
             clogger.debug("script %s has no output"%script.name)
     else:

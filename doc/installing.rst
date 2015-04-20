@@ -97,3 +97,10 @@ CliMAF do interpret some environment variables :
   verbosity level on stderr (resp. on file climaf.log); defaults to
   'error' (resp. 'info'). See :py:func:`~climaf.cache.clog` for details
 
+Running on Beaufix or Prolix
+------------------------------
+
+before running on M-F beaufix HPC, you must setup your nevrionment
+by::
+
+  $ module load python/2.7.5 nco ncview ncl
