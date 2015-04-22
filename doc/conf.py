@@ -34,8 +34,8 @@ extensions = [
     'sphinx.ext.autodoc'
     ,'sphinx.ext.todo'
     ,'sphinx.ext.viewcode'
-    ,'sphinx.ext.napoleon' #this one works at RTD
-    #,'sphinxcontrib.napoleon' #This one works at CNRM
+    #,'sphinx.ext.napoleon' #this one works at ??
+    ,'sphinxcontrib.napoleon' #This one works at CNRM and RTD (with 0.2.11 in req?txt)
 ]
 
 # Add any paths that contain templates here, relative to this directory.
