@@ -24,7 +24,7 @@ The main principles for a diagnostic are that :
 - the script (or function) calling sequence is registered with CliMAF
   before use, using a dedicated syntax, which allows to map CliMAF
   managed objects to script (or function) arguments (see
-  :class:py:`~climaf.operators.cscript()` , and syntax explanation below)
+  :py:class:`~climaf.operators.cscript()` , and syntax explanation below)
 
 - all type of diagnostics interface with string-like arguments on the
   command-line (or function call) for providing diagnostic computation

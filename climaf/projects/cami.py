@@ -1,5 +1,6 @@
 """
-Access observation datasets organized 'a la CAMI' at CNRM, at /cnrm/aster/data1/UTILS/cami/V1.7/climlinks/
+This module declares how to access observation datasets organized 'a la CAMI' at CNRM,
+at /cnrm/aster/data1/UTILS/cami/V1.7/climlinks/
 
 Example ::
 

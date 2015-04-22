@@ -1,5 +1,5 @@
 """
-Declare project example and its data location for standard CliMAF package
+This module declaresDeclare project example and its data location for standard CliMAF package
 
 Only one additionnal attribute : frequency (but data sample actually includes only frequency= 'mon'
 

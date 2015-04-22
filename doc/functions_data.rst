@@ -1,39 +1,15 @@
 -------------------------------------------------------------
-A package and some functions for data definition and access
+Functions for data definition and access
 -------------------------------------------------------------
 
-package ``projects`` : pre-defined projects and datasets
-===========================================================================
 
-.. automodule:: climaf.projects
+**This section is for advanced use. As a first step, you should consider using
+the built-in data data definitions described at**
+:py:mod:`~climaf.projects`. You may need to come back to this section
+for reference
 
-- CMIP5
 
-  .. automodule:: climaf.projects.cmip5
 
-- OCMIP5
-
-  .. automodule:: climaf.projects.ocmip5
-
-- EM
-
-  .. automodule:: climaf.projects.em
-
-- example
-
-  .. automodule:: climaf.projects.example
-
-- ERAI
-
-  .. automodule:: climaf.projects.erai
-
-- OBS4MIPS
-
-  .. automodule:: climaf.projects.obs4mips
-
-- CAMI
-
-  .. automodule:: climaf.projects.cami
 
 ds : define a dataset object (actually a front-end for ``cdataset``)
 ===========================================================================

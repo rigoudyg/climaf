@@ -25,8 +25,12 @@ See :ref:`examples`
 ..describe where my data is
 ---------------------------
 
+Your data organization and datafiles maybe are already known to CliMAF; this is
+the case for a number of projects and re-analyses; so, see first :py:mod:`~climaf.projects`
+
 If your data is organized after one of the specific organization scheme known
-to CliMAF (i.e. for now ``CMPI5_DRS`` or ``EM``) , you just have to tell CliMAF about the root directories for your data. This could be as simple as::
+to CliMAF (i.e. for now ``CMPI5_DRS`` or ``EM``) , but is located at
+some personal location, you just have to tell CliMAF about the root directories for your data. This could be as simple as::
 
   >>> dataloc(project="GEOMIP", organization="CMIP5_DRS", url=['/tmp/data','~/data/CMIP5'])
 

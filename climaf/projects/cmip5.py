@@ -1,5 +1,5 @@
 """
-Declare locations for searching data for projects CMIP5 for all frequencies, and where the data is
+This module declares locations for searching data for projects CMIP5 for all frequencies, and where the data is
 at CNRM and on Ciclad
 
 Attributes for CMIP5 datasets are : model,rip,frequency,table,realm,version

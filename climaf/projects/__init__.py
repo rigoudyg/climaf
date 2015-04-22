@@ -1,5 +1,5 @@
 """
-This module declares a number of 'projects', and the data location for this projects , at CNRM or on Ciclad, when they exists. It is automatically loaded when importing climaf.api or launching by ``climaf``
+This package declares a number of 'projects', and the data location for this projects , at CNRM or on Ciclad, when they exists. It is automatically loaded when importing climaf.api or launching by ``climaf``
 
 If you are under the Python prompt, type e.g. ::
 

@@ -180,6 +180,11 @@ class cscript():
            describing the first input stream; can be useful for plot title
            or legend
 
+         - **alias** : means that the script can make an on the fly re-scaling
+           and renaming of a variable. Will be replaced by a string which pattern is :
+           'new_varname,file_varname,scale,offset'. The script should then output
+           a variable new_varname = file_varname * scale + offset
+
         """
         # Check that script name do not clash with an existing symbol 
         if name in dir() and name not in scripts :
@@ -320,6 +325,8 @@ def derive(project, derivedVar, Operator, *invars, **params) :
     variable names take the values in ``*invars`` and the parameter/arguments 
     of Operator take the values in ``**params``
 
+    'project' may be the wildcard : '*'
+
     Example , assuming that operator 'minus' has been defined as ::
     
     >>> cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
@@ -329,20 +336,22 @@ def derive(project, derivedVar, Operator, *invars, **params) :
     using the difference of values of all-sky and clear-sky net
     radiation at the surface by::
     
-    >>> derived('rscre','minus','rs','rscs')
+    >>> derive('*', 'rscre','minus','rs','rscs')
 
     You may then use this variable name at any location you would use any other variable name
 
     Another example is rescaling or renaming some variable; here, let us define how variable 'ta'
     can be derived from ERAI variable 't' :
 
-    >>> derive('ERAI', 'ta','rescale', 't', scale=1., offset=0.)
+    >>> derive('erai', 'ta','rescale', 't', scale=1., offset=0.)
+
+    **However, this is not the most efficient way to do that**. See :py:func:`~climaf.classes.calias()`
 
     Expert use : argument 'derivedVar' may be a dictionnary, which key are derived variable
     names and values are scripts outputs names; example ::
     
     >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} ${out_l500} ${out_l850} method=${opt}')
-    >>> derived({'z500' : 'l500' , 'z850' : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
+    >>> derive('*', {'z500' : 'l500' , 'z850' : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
     
     """
     # Action : register the information in a dedicated dict which keys

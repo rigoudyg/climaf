@@ -1,5 +1,6 @@
 """
-Access OCMIP5 data on Ciclad.
+
+This module declares how to access OCMIP5 data on Ciclad.
 
 Use attributes 'model' and 'frequency'
 

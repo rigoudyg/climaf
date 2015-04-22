@@ -1,5 +1,5 @@
 """
-Declare locations for searching data for project OBS4MIP at CNRM (VDR),  for all frequencies, 
+This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for all frequencies, 
 
 Additional attribute for OBS4MIPS datasets  : only 'frequency'
 

@@ -84,6 +84,7 @@ See the full, extended table at :ref:`contents`
    examples
    operators
    std_operators
+   known_data
    API
    howto
    contributing

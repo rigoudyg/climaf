@@ -1,6 +1,6 @@
 """
 
-Declare project EM , which data organization is built-in
+This module declares project EM , which data organization is built-in
 
 EM (Experiment Manager) is a tool used at CNRM for moving exeperiments post-processed data
 from the HPSS to the local filesystem, and to organize it in a file hierarchy governed by a few
