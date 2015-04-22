@@ -76,6 +76,9 @@ From that point, for running CliMAF, you can either :
     >>> from climaf.api import *
     >>> ...
 
+   You may also use **CDAT** instead of Python. It is working at least
+   for CDAT version using Python from 2.6.5.
+
 Please see also : :ref:`examples`
 
 Configuration file

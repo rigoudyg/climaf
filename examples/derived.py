@@ -28,8 +28,8 @@ creShortTop=ds(variable="crest")
 # Declare a script tht will be used in defining how to derive the new variable
 cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
 
-# Say how you compute (or derive) variable 'crest' form variables 'rst' and 'rstcs'
-derive('crest','minus','rst','rstcs')
+# Say how you compute (or derive) variable 'crest' form variables 'rst' and 'rstcs', for all projects
+derive('*', 'crest','minus','rst','rstcs')
 
 # Ask for actually compute the variable as a file
 my_file=cfile(creShortTop)

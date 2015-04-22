@@ -56,8 +56,8 @@ def capply_script (script_name, *operands, **parameters):
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
         clogger.error("Operator %s is "
-	    "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
-            script_name,script.inputs_number(),len(operands), script_name ))
+                      "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
+                script_name,script.inputs_number(),len(operands), script_name ))
         return None
     rep=classes.ctree(script_name, script, *operands, **parameters)
     if rep is not None :
@@ -80,10 +80,8 @@ def capply_script (script_name, *operands, **parameters):
         for para in parameters :
             if re.match(r".*\{"+para+r"\}",script.command) is None :
                 if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
-                    err="parameter %s is not expected by  script %s (which command is : %s)"%(para,script_name,script.command)
-                    clogger.error(err)
-                    return None
-                    #raise Climaf_Driver_Error(err)
+                    raise Climaf_Driver_Error("parameter %s is not expected by  script %s"
+                                              "(which command is : %s)"%(para,script_name,script.command))
     #
     return rep
 
@@ -132,18 +130,18 @@ def ceval(cobject,
             #     'file' return the filenames
             #   else : read the data, create a cache file for that, and recurse
             # Go to derived variable evaluation if appicable
-            if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
+            #if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
+            if operators.is_derived_variable(ds.variable,ds.project) :
                 if ds.variable in derived_list :
                     cdedent()
-                    err="Loop detected while evaluating derived variable "+\
-                                  ds.variable + " " + `derived_list`
-                    clogger.error(err); raise Climaf_Driver_Error(err)
+                    raise Climaf_Driver_Error("Loop detected while evaluating"
+                         "derived variable "+ ds.variable + " " + `derived_list`)
                 derived=derive_variable(ds)
                 clogger.debug("evaluating derived variable %s as %s"%\
                                   (ds.variable,`derived`))
                 derived_value=ceval(derived, format=format, deep=deep, 
                                     userflags=userflags,
-                                    derived_list=derived_list.append(ds.variable),
+                                    derived_list=derived_list+[ds.variable],
                                     recurse_list=recurse_list)
                 if derived_value : 
                     clogger.debug("succeeded in evaluating derived variable %s as %s"%\
@@ -151,12 +149,12 @@ def ceval(cobject,
                     set_variable(derived_value, ds.variable, format=format)
                 cdedent()
                 return(derived_value)
-            elif ((userflags.canSelectVar or ds.oneVarPerFile()) and \
-                (userflags.canSelectTime or ds.periodIsFine()) and \
-                (userflags.canSelectDomain or ds.domainIsFine()) and \
-                (userflags.canAggregateTime or ds.periodHasOneFile()) and 
+            elif ((userflags.canSelectVar   or ds.oneVarPerFile()   ) and \
+                (userflags.canSelectTime    or ds.periodIsFine()    ) and \
+                (userflags.canSelectDomain  or ds.domainIsFine()    ) and \
+                (userflags.canAggregateTime or ds.periodHasOneFile()) and \
+                (userflags.canAlias         or ds.hasExactVariable()) and \
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
-                #(userflags.canOffsetScale or ds.hasExactVariable()) and 
                 (format == 'file')) :
                 clogger.debug("Delivering file set or sets is OK for the target use")
                 cdedent()
@@ -361,9 +359,15 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             clogger.error(err)
             raise Climaf_Driver_Error(err)
         subdict[ label ]='"'+infile+'"'
-        subdict["var"]='"'+varOf(op)+'"'
+        #subdict["var"]='"'+varOf(op)+'"'
+        subdict["var"]=varOf(op)
+        if op.alias :
+            filevar,scale,offset,filenameVar=op.alias
+            subdict["alias"]="%s,%s,%f,%f"%(varOf(op),filevar,scale,offset)
+            subdict["var"]=filevar
+            subdict["filenameVar"]=filenameVar
         per=timePeriod(op)
-        if per.fx :
+        if per.fx or str(per) == "" :
             subdict["period"]='""'
             subdict["period_iso"]='""'
         else:
@@ -384,6 +388,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict[ label ]='"'+infile+'"'
             # Provide the name of the variable in input file if script allows for
             subdict["var_%d"%i]='"'+varOf(op)+'"'
+            if op.alias :
+                filevar,scale,offset=op.alias
+                subdict["alias_%d"]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
+                subdict["var_%d"]=filevar
             # Provide period selection if script allows for
             per=timePeriod(op)
             if per.fx :
@@ -450,8 +458,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 ok = ok and cache.register(subdict["out_"+output],scriptCall.crs+"."+output)
             if ok : 
                 duration=time.time() - tim1
-                clogger.info(("Done in %.1g s with command:"+template) % 
-                             duration)
+                clogger.info(("Done in %g s with command:"+template) % duration)
                 return main_output_filename
             else :
                 err="Some output missing when executing : %s. \nSee scripts.out"%template
@@ -575,10 +582,10 @@ def derive_variable(ds):
     if not isinstance(ds,classes.cdataset):
         err="arg is not a dataset"
         clogger.error(err) ; raise Climaf_Driver_Error(err)
-    if ds.variable not in operators.derived_variables :
+    if not operators.is_derived_variable(ds.variable,ds.project) :
         err="%s is not a derived variable"%ds.variable
         clogger.error(err) ; raise Climaf_Driver_Error(err)
-    op,outname,inVarNames,params=operators.derived_variables[ds.variable]
+    op,outname,inVarNames,params=operators.derived_variable(ds.variable,ds.project)
     inVars=[]
     for varname in inVarNames :
         dic=ds.kvp.copy()
@@ -599,17 +606,18 @@ def set_variable(obj, varname, format) :
     long_name=CFlongname(varname)
     if (format=='file') :
         oldvarname=varOfFile(obj)
-        command="ncrename -v %s,%s %s >/dev/null 2>&1"%(oldvarname,varname,obj)
-        if ( os.system(command) != 0 ) :
-            clogger.error("Issue with changing varname to %s in %s"%(varname,obj))
-            return None
-        clogger.debug("Varname changed to %s in %s"%(varname,obj))
-        command="ncatted -a long_name,%s,o,c,%s %s"%(varname,long_name,obj)
-        if ( os.system(command) != 0 ) :
-            clogger.error("Issue with changing long_name for var %s in %s"%
-                          (varname,obj))
-            return None
-        return True
+        if (oldvarname != varname) :
+            command="ncrename -v %s,%s %s >/dev/null 2>&1"%(oldvarname,varname,obj)
+            if ( os.system(command) != 0 ) :
+                clogger.error("Issue with changing varname to %s in %s"%(varname,obj))
+                return None
+            clogger.debug("Varname changed to %s in %s"%(varname,obj))
+            command="ncatted -a long_name,%s,o,c,%s %s"%(varname,long_name,obj)
+            if ( os.system(command) != 0 ) :
+                clogger.error("Issue with changing long_name for var %s in %s"%
+                              (varname,obj))
+                return None
+            return True
     elif (format=='MaskedArray') :
         clogger.warning('TBD - Cannot yet set the varname for MaskedArray')
     else :
@@ -622,5 +630,9 @@ def CFlongname(varname) :
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
 class Climaf_Driver_Error(Exception):
-    pass
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+    def __str__(self):
+        return `self.valeur`
 

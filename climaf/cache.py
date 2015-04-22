@@ -285,7 +285,8 @@ def cload() :
         crs2filename=pickle.load(cacheIndexFile)
         cacheIndexFile.close()
     except:
-        clogger.debug("no index file yet")
+        pass
+        #clogger.debug("no index file yet")
 
 def craz(hideError=False) :
     """

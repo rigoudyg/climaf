@@ -13,7 +13,9 @@ def varOfFile(filename) :
     #import NetCDF4
     #fileobj=netCDF4.Dataset(filename)
     for filevar in fileobj.variables :
-        if (filevar not in fileobj.dimensions) and not re.findall("^time_",filevar) :
+        if ((filevar not in fileobj.dimensions) and
+            not re.findall("^time_",filevar) and
+            not re.findall("_bnds$",filevar) ):
             if varname is None : 
                 varname=filevar
             else :

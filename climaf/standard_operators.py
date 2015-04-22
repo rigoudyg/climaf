@@ -3,9 +3,10 @@ Management of CliMAF standard operators
 
 """
 
-import climaf
-scriptpath=climaf.__path__[0]+"/../scripts/" 
+from climaf import __path__ as cpath
 from climaf.operators import cscript
+
+scriptpath=cpath[0]+"/../scripts/" 
 
 def load_standard_operators():
     """ 
@@ -17,23 +18,23 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-    cscript('select' ,scriptpath+'mcdo.sh "" ${out} ${var} ${period_iso} ${domain} ${ins} ',
+    cscript('select' ,scriptpath+'mcdo.sh "${operator}" ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} ${ins}')
+            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}')
     #
     cscript('space_average',
-            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} ${ins}', 
+            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}', 
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average' ,
-            scriptpath+'mcdo.sh timavg  ${out} ${var} ${period_iso} ${domain} ${ins}' ,
+            scriptpath+'mcdo.sh timavg  ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}' ,
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox' ,
             scriptpath+'mcdo.sh ""  ${out} ${var} ${period_iso} '
-            '${latmin},${latmax},${lonmin},${lonmax} ${ins}',
+            '${latmin},${latmax},${lonmin},${lonmax} "${alias}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('regrid' ,
@@ -42,6 +43,10 @@ def load_standard_operators():
     #
     cscript('regridn' ,
             scriptpath+'regrid.sh ${in} ${cdogrid} ${out} ${option}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('rescale' ,
+            "cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}",
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('mean_and_std',

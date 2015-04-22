@@ -17,6 +17,9 @@ Main functions are :
 
  - ``derive``  : define a variable as computed from other variables
 
+ - `` calias`` : describe how a variable is derived form another, single, one, and which
+   variable name should be used in deriving data filename for this variable 
+
 - for processing the data 
 
  - ``cscript`` : define a new CliMAF operator (this also defines a new Python function)
@@ -49,16 +52,16 @@ Main functions are :
 
 
 import os, os.path, shutil, logging
-
-import climaf, climaf.cache
-from climaf.classes   import cdef,cdataset,ds,cproject,cprojects 
+#
+import climaf
+from climaf import version
+from climaf.classes   import cdef,cdataset,ds,cproject,cprojects,calias
 from climaf.driver    import ceval,varOf 
 from climaf.dataloc   import dataloc 
-from climaf.operators import cscript, scripts as cscripts, derive
+from climaf.operators import cscript, scripts as cscripts, derive, operators
 from climaf.cache     import craz, csync as csave , cdump, cdrop
 from clogging         import clogger, clog, clog_file
-import climaf.standard_operators
-import climaf.standard_projects
+import climaf.standard_operators 
 
 #########################
 # CliMAF init phase
@@ -73,13 +76,21 @@ cpath=os.path.abspath(climaf.__path__[0])
 clog(os.getenv("CLIMAF_LOG_LEVEL","error"))
 clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL","info"))
 
-climaf.standard_operators.load_standard_operators()
-climaf.standard_projects.init_standard_projects()
 from climaf.site_settings import onCiclad, atCNRM
+from climaf.projects      import *
+climaf.standard_operators.load_standard_operators()
+#print "ops="+`climaf.operators.scripts.keys()`
+
+print "climaf.version="+climaf.version
 
 # Read user config file
 conf_file=os.path.expanduser("~/.climaf")
-if os.path.isfile(conf_file) : execfile(conf_file, {"Climaf_version":Climaf_version })
+
+if os.path.isfile(conf_file) :
+    #execfile(conf_file, {"Climaf_version":Climaf_version })
+    with open(conf_file) as fobj:
+       startup_file = fobj.read()
+       exec(startup_file)
 
 # Decide for cache location
 if onCiclad : default_cache="/data/"+os.getenv("USER")+"/climaf_cache"

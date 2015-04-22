@@ -14,6 +14,7 @@ from clogging import clogger
 
 #: Dictionnary of declared projects (type is cproject)
 cprojects=dict()
+aliases=dict()
 
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
@@ -194,7 +195,7 @@ class cdataset(cobject):
 
            - or a 'derived' variable (see  :py:func:`~climaf.operators.derive` ),
              
-           - or, later on (to be developped), an aliased variable name
+           - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
         - in project CMIP5 , for triplets (frequency, rip, period, table )  : 
           if any is 'fx' (or 'r0i0p0 for rip), the others are forced to
@@ -236,7 +237,7 @@ class cdataset(cobject):
         errmsg=""
         for facet in cprojects[self.project].facets :
             if attval[facet] is None :
-                e="Project %s needs facet %s"%(self.project,facet)
+                e="Project %s needs facet %s. "%(self.project,facet)
                 clogger.error(e)
                 errmsg+=" "+e
         if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
@@ -245,8 +246,10 @@ class cdataset(cobject):
             #clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
             # Facet specific processing
             if facet=='period' :
-                try : attval['period']=init_period(attval['period'])
-                except : raise Climaf_Dataset_Error
+                if not isinstance(attval['period'],cperiod) :
+                    try :
+                        attval['period']=init_period(attval['period'])
+                    except : raise Climaf_Dataset_Error
             elif facet=='domain' and type(attval['domain']) is str and attval['domain'] != 'global' :
                 # May be a list
                 attval['domain']=eval(attval['domain'])
@@ -262,6 +265,7 @@ class cdataset(cobject):
         self.project   =attval['project']
         self.experiment=attval['experiment']
         self.variable= attval['variable']
+        self.alias=varIsAliased(self.project,self.variable) # 4-plet : filevar, scale, offset, filenameVar or None
         if type(attval['period']) is str :
             self.period    =init_period(attval['period'])
         else:
@@ -328,13 +332,22 @@ class cdataset(cobject):
         clogger.debug("always returns True, yet - TBD")
         return(True) 
 
+    def hasExactVariable(self):
+        clogger.debug("always returns False, yet - TBD")
+        return(False) 
+    
     def baseFiles(self,force=False):
         """ Returns the list of (local) files which include the data for the dataset
         Use cached value unless called with arg force=True
         """
         if force or self.files is None :
-            clogger.debug("Looking with kvp=%s"%`self.kvp`)
-            self.files=dataloc.selectLocalFiles(**self.kvp)
+            dic=self.kvp.copy()
+            if self.alias : 
+                filevar,scale,offset,filenameVar=self.alias
+                dic["variable"]=filevar
+                dic["filenameVar"]=filenameVar
+            clogger.debug("Looking with dic=%s"%`dic`)
+            self.files=dataloc.selectLocalFiles(**dic)
         return self.files
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
@@ -364,6 +377,7 @@ class ctree(cobject):
                 raise Not_A_Climaf_Object_Error(o)
         self.crs=self.buildcrs()
         self.outputs=dict()
+        self.alias=None
         self.register()
 
     def buildcrs(self, period=None) :
@@ -398,6 +412,7 @@ class scriptChild(cobject):
         self.varname=varname
         self.crs=self.buildcrs()
         self.file=None
+        self.alias=None
         self.register()
 
     def setperiod(self,period):
@@ -485,6 +500,32 @@ def ds(*args,**kwargs) :
         return None
     else : return results[0]
 
+def calias(project,variable,fileVariable,scale=1.,offset=0.,filenameVar=None) :
+    """ Declare that in 'project', 'variable' is to be computed by
+    reading 'filevar' and applying 'scale' and 'offset'; alss allows
+    to tell which variable name should be used when computing the
+    filename for this variable in this project(for optimisation
+    purpose)
+
+    Example ::
+    
+    >>> calias('erai','tas','t2m',filenameVar='2T')
+    >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    
+    """
+    if not filenameVar : filenameVar =fileVariable
+    if project not in cprojects : 
+        raise Climaf_Dataset_Error("project %s is not known"%project)
+    if project not in aliases : aliases[project]=dict()
+    aliases[project][variable]=(fileVariable,scale,offset,filenameVar)
+
+def varIsAliased(project,variable) :
+    """ 
+    Return a triplet fileVariable, scale, offset defining how to 
+    compute a 'variable' which is not in files, for the 'project'
+    """
+    if project in aliases and variable in aliases[project] :
+        return aliases[project][variable]
 
 class Not_A_Climaf_Object_Error(Exception):
     pass

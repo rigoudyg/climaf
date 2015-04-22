@@ -240,6 +240,8 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
+    if "filenameVar" in kwargs and kwargs['filenameVar'] :
+        kwargs['variable']=kwargs['filenameVar']
     for l in urls :
         template=Template(l)
         #
@@ -251,7 +253,7 @@ def selectGenericFiles(urls, **kwargs):
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
         for k in dt : temp2=temp2.replace(k,dt[k])
-        # print "template with date wildcards : "+temp2
+        clogger.debug("Globbing on : "+temp2)
         lfiles=glob.glob(temp2)
         #
         # Analyze all filenames

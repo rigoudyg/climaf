@@ -19,12 +19,14 @@ derived_variables=dict()
 class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
-                 canAggregateTime=False, commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
+                 canAggregateTime=False, canAlias=False,
+                 commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
         self.canSelectTime=canSelectTime
         self.canSelectDomain=canSelectDomain
         self.canAggregateTime=canAggregateTime
+        self.canAlias=canAlias
         self.commuteWithTimeConcatenation=commuteWithTimeConcatenation
         self.commuteWithSpaceConcatenation=commuteWithSpaceConcatenation
 
@@ -187,15 +189,13 @@ class cscript():
         #
         # Check now that script is executable
         scriptcommand=command.split(' ')[0].replace("(","")
-        try :
-            executable=subprocess.check_output('which '+scriptcommand, \
-                                                   shell=True)
-        except :  
+        ex=subprocess.Popen(['which',scriptcommand], stdout=subprocess.PIPE)
+        if ex.wait() != 0 :
             clogger.error("defining %s : command %s is not executable"%\
                               (name,scriptcommand))
             # raise ClimafException
             return None
-        executable=executable.replace('\n','')
+        executable=ex.stdout.read().replace('\n','')
         #
         # Analyze inputs field keywords and populate dict attribute 'inputs' with some properties
         self.inputs=dict()
@@ -254,11 +254,11 @@ class cscript():
                 self.outputs[None]="%s"
         #clogger.debug("outputs = "+`self.outputs`)
         #
-        canSelectVar=False
-        if command.find("${var}") > 0 : canSelectVar=True
+        canSelectVar= (command.find("${var}") > 0 )
         canAggregateTime=False
         if command.find("${ins}") > 0     or command.find("${ins_1}") > 0    :
             canAggregateTime=True
+        canAlias= (command.find("${alias}") > 0 )
         canSelectTime=False
         if command.find("${period}") > 0  or command.find("${period_1}") > 0 :
             canSelectTime=True
@@ -271,7 +271,7 @@ class cscript():
         self.command=command
         #
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-            canSelectDomain, canAggregateTime, commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
+            canSelectDomain, canAggregateTime, canAlias,commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
         scripts[name]=self
 
@@ -289,9 +289,7 @@ class cscript():
         #
         # creates a function named as requested, which will invoke
         # capply with that name and same arguments
-        exec 'def %s(*args,**dic) :\n  """%s""" \n  return climaf.driver.capply("%s",*args,**dic)\n '%\
-            (name,doc,name) \
-            in sys.modules['__main__'].__dict__
+        exec 'def %s(*args,**dic) :\n  """%s"""\n  return climaf.driver.capply("%s",*args,**dic)\n'% (name,doc,name) in sys.modules['__main__'].__dict__
         clogger.debug("CliMAF script %s has been declared"%name)
 
     def __repr__(self):
@@ -310,13 +308,14 @@ class cscript():
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 
-	canSelectTime=False, canSelectDomain=False, canAggregateTime=False ):
+	canSelectTime=False, canSelectDomain=False, canAggregateTime=False,
+        canAlias=False):
         clogger.error("Not yet developped")
 
 
-def derive(derivedVar, Operator, *invars, **params) :
+def derive(project, derivedVar, Operator, *invars, **params) :
     """
-    Define that 'derivedVar' is a derived variable, computed by
+    Define that 'derivedVar' is a derived variable in 'project', computed by
     applying 'Operator' to input streams which are datasets whose 
     variable names take the values in ``*invars`` and the parameter/arguments 
     of Operator take the values in ``**params``
@@ -332,13 +331,18 @@ def derive(derivedVar, Operator, *invars, **params) :
     
     >>> derived('rscre','minus','rs','rscs')
 
-    You may then use this vvariable name at any location you would use any toher variable name
+    You may then use this variable name at any location you would use any other variable name
 
-    Argument 'derivedVar' may be a dictionnary, which key are derived variable
+    Another example is rescaling or renaming some variable; here, let us define how variable 'ta'
+    can be derived from ERAI variable 't' :
+
+    >>> derive('ERAI', 'ta','rescale', 't', scale=1., offset=0.)
+
+    Expert use : argument 'derivedVar' may be a dictionnary, which key are derived variable
     names and values are scripts outputs names; example ::
     
     >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} ${out_l500} ${out_l850} method=${opt}')
-    >>> derived({z500 : 'l500' , z850 : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
+    >>> derived({'z500' : 'l500' , 'z850' : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
     
     """
     # Action : register the information in a dedicated dict which keys
@@ -348,20 +352,52 @@ def derive(derivedVar, Operator, *invars, **params) :
     if Operator in scripts :
         if not isinstance(derivedVar,dict) : derivedVar=dict(out=derivedVar)
         for outname in derivedVar :
-            if outname != 'out' and outname not in Operator.outvarnames :
-                clogger.error("%s is not a named  ouput for script %s"%(outname,Operator))
-                return
+            if (outname != 'out' and
+                (not getattr(Operator,"outvarnames",None)  or outname not in Operator.outvarnames )):
+                err="%s is not a named  ouput for operator %s; type help(%s)"%(outname,Operator,Operator)
+                raise Climaf_Operator_Error(err)
             s=scripts[Operator]
             if s.inputs_number() != len(invars) :
-                clogger.error("number of input variables for operator %s is %d, which is inconsistent with script declaration : %s"%(s.name,len(invars),s.command))
+                clogger.error("number of input variables for operator %s is %d, "
+                              "which is inconsistent with script declaration : %s\
+                              "%(s.name,len(invars),s.command))
                 return
             # TBD : check parameters number  ( need to build its list in cscript.init() )
-            derived_variables[derivedVar[outname]]=(Operator, outname, list(invars), params)
+            if project not in derived_variables :  derived_variables[project]=dict()
+            derived_variables[project][derivedVar[outname]]=(Operator, outname, list(invars), params)
     elif Operator in operators :
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else : 
         clogger.error("second argument must be a script or operator, already declared")
 
+def is_derived_variable(variable,project):
+    """ True if the variable is a derived variable, either in provided project
+    or in wildcard project '*'
+    """
+    rep= (project in derived_variables and variable in derived_variables[project] or \
+            "*"     in derived_variables and variable in derived_variables["*"])
+    clogger.debug("Checking if variable %s is derived for project %s : %s"%(variable,project,rep))
+    return(rep)
+    
+
+def derived_variable(variable,project):
+    """ Returns the entry defining a derived variable in requested project or in wildcard project '*'
+    """
+    if project in derived_variables and variable in derived_variables[project] :
+        rep=derived_variables[project][variable]
+    elif "*"   in derived_variables and variable in derived_variables["*"] :
+        rep=derived_variables['*'][variable]
+    else : rep=None
+    clogger.debug("Derived variable %s for project %s is %s"%(variable,project,rep))
+    return(rep)
+    
+
+class Climaf_Operator_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+    def __str__(self):
+        return `self.valeur`
 
 
 if __name__ == "__main__":

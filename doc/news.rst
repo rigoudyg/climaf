@@ -6,6 +6,20 @@ Whats' new
 
 Changes, newest first :
 
+.. _news_0.6:
+
+- 2005/04/22 - Version 0.6.0 :
+
+ - A number of 'projects' are built-in, which describe data
+   organization and data location for a number of analyses and
+   experiments datasets as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ;
+   see module :py:mod:`~climaf.projects`
+ - Variable alias and scaling are now managed, on a per-project basis. See function :py:func:`~climaf.classes.calias()`
+ - Derived variables can now be defined on a per-project basis. See function :py:func:`~climaf.operators.derive`
+ - Operator 'rescale' allows to define new variables through scaling. See :doc:`scripts/rescale`
+ - CliMAF was proved to work under a CDAT install which uses Python
+   2.6
+
 .. _news_0.5:
 
 - 2005/04/14 - Version 0.5.0 :

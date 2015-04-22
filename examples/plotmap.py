@@ -9,7 +9,7 @@ cfile(dg)
 
 # Compute its basic climatology using an external script
 #########################################################
-cscript('time_average' ,cpath+'/../scripts/mcdo.sh timavg ${out} ${var} ${period_iso} ${domain} ${ins}' )
+cscript('time_average' ,cpath+'/../scripts/mcdo.sh timavg ${out} ${var} ${period_iso} ${domain} "" ${ins}' )
 ta=time_average(dg)
 
 # A simple plotting using standard operator ncview

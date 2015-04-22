@@ -3,7 +3,7 @@ Utility functions and variables
 -----------------------------------------
 
 
-cpath : path for CliMAF instalaltion directory
+cpath : path for CliMAF installation directory
 -----------------------------------------------
 
 .. autodata:: climaf.api.cpath
