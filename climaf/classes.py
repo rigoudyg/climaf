@@ -47,6 +47,9 @@ class cproject():
         has attributes : 
         experiment, model, rip, variable, frequency, realm, table, version
 
+
+        A number of projects are built-in. See :py:mod:`~climaf.projects`
+        
         A dataset in a cproject declared as ::
 
         >>> cproject("MINE","myfreq","myfacet",sep="_")
@@ -112,6 +115,11 @@ def cdef(attribute,value=None):
 
     Theres is no actual check that 'attribute' is a valid keyword for a call to ``ds`` or ``cdateset``
 
+    Example::
+
+    >>> cdefault('project','OCMPI5')
+    >>> cdefault('frequency','monthly')
+
     """
     if value is None :
         if attribute in cdefaults.keys() :
@@ -121,17 +129,15 @@ def cdef(attribute,value=None):
     else :
         cdefaults[attribute]=value
 
-cdef("project","default_project")
-cdef("model","*")
-cdef("experiment","default_experiment")
-#cdef("period","197901-198012")
+cdef("project","P")
+cdef("model","M")
+cdef("experiment","E")
 cdef("rip","r1i1p1")
 cdef("frequency","monthly")
 cdef("domain","global")
 cdef("table","*")
 cdef("realm","*")
 cdef("version","last")
-#cdef("variable","tas")
 
 
 # All CObject instances are registered in this directory :

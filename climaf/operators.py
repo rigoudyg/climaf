@@ -1,4 +1,4 @@
-""" CliMAF handling of external scripts and binaries , and of internal operators (Python funcs)
+ """ CliMAF handling of external scripts and binaries , and of internal operators (Python funcs)
 
 """
 
@@ -59,6 +59,8 @@ class cscript():
         For introducing the syntax, please consider this example, with the following commands::
         
         >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
+        >>> # This is necessary to ease reference to the new operator (rather than write 'climaf.operators.mycdo') :
+        >>> from climaf.operators import mycdo     
         >>> # define some dataset
         >>> tas_ds = ds(project='example', experiment='AMIPV6', variable='tas', period='1980-1981')
         >>> # Apply operator 'mycdo' to dataset 'tas_ds', choosing a given 'operator' argument
@@ -196,10 +198,8 @@ class cscript():
         scriptcommand=command.split(' ')[0].replace("(","")
         ex=subprocess.Popen(['which',scriptcommand], stdout=subprocess.PIPE)
         if ex.wait() != 0 :
-            clogger.error("defining %s : command %s is not executable"%\
+            Climaf_Operator_Error("defining %s : command %s is not executable"%\
                               (name,scriptcommand))
-            # raise ClimafException
-            return None
         executable=ex.stdout.read().replace('\n','')
         #
         # Analyze inputs field keywords and populate dict attribute 'inputs' with some properties
@@ -209,32 +209,21 @@ class cscript():
             if (oc.group("n") is not None) : rank=int(oc.group("n"))
             else : rank=0
             if rank in self.inputs :
-                clogger.error("When defining %s : duplicate declaration for input #%d"%(name,rank))
-                return(None)
+                Climaf_Operator_Error("When defining %s : duplicate declaration for input #%d"%(name,rank))
             multiple=(oc.group("mult") is not None)
             serie=(oc.group("serie") is not None)
             self.inputs[rank]=(oc.group("keyw"),multiple,serie)
         if len(self.inputs)==0 : 
-            clogger.error(("When defining %s : command %s must include at least one of "+
-                          "${in} ${ins} ${min} or ${in_..} for specifying how CliMAF will provide the input filename(s)")%\
-                              (name,command))
-            return None
+            Climaf_Operator_Error("When defining %s : command %s must include at least one of "
+                                  "${in} ${ins} ${min} or ${in_..} for specifying how CliMAF will "
+                                  "provide the input filename(s)"% (name,command))
         #print self.inputs
         for i in range(len(self.inputs)) :
             if i+1 not in self.inputs and not ( i == 0 and 0  in self.inputs) :
-                clogger.error("When defining %s : error in input sequence for rank %d"%(name,i+1))
-                return(None)
+                Climaf_Operator_Error("When defining %s : error in input sequence for rank %d"%(name,i+1))
         #
-        # Check that command includes an argument allowing for providing at least one output filename
-        if command.find("${out") < 0 :
-            format=None
-            #if format is not None :
-            #    clogger.error("(defining %s : command %d must include "+
-            #                  "'${out_xxx}' for specifying how CliMAF will provide the output(s) filename(s))"%\
-            #                      (name,command))
-            #    return None
-            #else: 
-            #    clogger.debug("defining script %s as output-less"%name)
+        # Check if command includes an argument allowing for providing an output filename
+        if command.find("${out") < 0 : format=None
         #
         # Search in call arguments for keywords matching "<output_name>_var" which may provide
         # format string for 'computing' outputs variable name from input variable name
@@ -260,21 +249,17 @@ class cscript():
         #clogger.debug("outputs = "+`self.outputs`)
         #
         canSelectVar= (command.find("${var}") > 0 )
-        canAggregateTime=False
-        if command.find("${ins}") > 0     or command.find("${ins_1}") > 0    :
-            canAggregateTime=True
+        canAggregateTime=(command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
         canAlias= (command.find("${alias}") > 0 )
         canSelectTime=False
         if command.find("${period}") > 0  or command.find("${period_1}") > 0 :
             canSelectTime=True
         if command.find("${period_iso}") > 0  or command.find("${period_iso_1}") > 0 :
             canSelectTime=True
-        canSelectDomain=False
-        if command.find("${domain}") > 0  or command.find("${domain_1}") > 0 :
-            canSelectDomain=True
+        canSelectDomain=(command.find("${domain}") > 0  or command.find("${domain_1}") > 0)
+        #
         self.name=name
         self.command=command
-        #
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias,commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
@@ -294,7 +279,9 @@ class cscript():
         #
         # creates a function named as requested, which will invoke
         # capply with that name and same arguments
-        exec 'def %s(*args,**dic) :\n  """%s"""\n  return climaf.driver.capply("%s",*args,**dic)\n'% (name,doc,name) in sys.modules['__main__'].__dict__
+        defs='def %s(*args,**dic) :\n  """%s"""\n  return driver.capply("%s",*args,**dic)\n'\
+             % (name,doc,name)
+        exec defs in globals() #sys.modules['__main__'].__dict__
         clogger.debug("CliMAF script %s has been declared"%name)
 
     def __repr__(self):

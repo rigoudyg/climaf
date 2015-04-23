@@ -6,7 +6,8 @@ Available functions
 .. default-domain:: python
 
 Function names presented here are those defined by module ``climaf.api``
-and can be used 'as is' after executing::
+and can be used 'as is' (i.e. without prefixing it by the module name)
+after executing::
 
 >>> from climaf.api import *
 

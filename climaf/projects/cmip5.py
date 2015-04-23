@@ -17,6 +17,8 @@ from climaf.classes import cproject, calias
 
 cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
 
+urls_CMIP5=None
+
 if os.path.exists('/cnrm'):
     # Declare a list of root directories for CNRM-CM CMIP5 data on CNRM's Lustre file system.
     urls_CMIP5=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", 

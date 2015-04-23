@@ -1,46 +1,75 @@
 -------------------------
-Installing and/or running
+Running CliMAF
 -------------------------
 
 
-Installing
+.. _installing:
+
+Installing (or not)
 -------------------------
 
-Installing CliMAF, if necessary, is quick, through only a few commands, using CliMAF GitHub
-repository; this will also copy some data allowing for testing the installation and for running a few examples
+- If working on IPSL's Ciclad, at CNRM or on MF's Beaufix HPC machine, you do not need to install CliMAF; just 
+  do as indicated below (as e.g. in section :ref:`running_inter`), replacing ``<some_installation_dir>`` by :
 
-- if you wish or need to install :
+  - ``/cnrm/aster/data1/UTILS/climaf/current`` at CNRM
 
- - first check the listed :ref:`requirements` ;
+  - ``~senesi/climaf`` on Beaufix
 
- - execute :: 
+  - ``~ssenesi/climaf`` on Ciclad
 
-    cd some_installation_dir
-    git clone https://github.com/senesis/climaf climaf
-    cd climaf
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
-    cd testing
-    ./test_install.sh 
+
+- Installing CliMAF, if necessary, is quick, through only a few commands, using CliMAF GitHub
+  repository; this will also copy some data allowing for testing the installation and for running a few examples
+
+  - first check the listed :ref:`requirements` ;
+
+  - execute :: 
+
+     cd some_installation_dir
+     git clone https://github.com/senesis/climaf climaf
+     cd climaf
+     export PYTHONPATH=$PYTHONPATH:$(pwd)
+     cd testing
+     ./test_install.sh 
   
-  and check the installation test results
-
-Configuring for running without installing
---------------------------------------------
-
-You can run CliMAF on Ciclad and at CNRM without installing it; just 
-do as indicated below, replacing ``<some_installation_dir>`` by :
-
- - ``/cnrm/aster/data1/UTILS/climaf/current`` at CNRM
-
- - ``~ssenesi/climaf`` on Ciclad
+    and check the output of last command
 
 
-.. _running:
+.. _configuring:
 
-Running
--------------------------
+Configuring CliMAF
+---------------------
 
-From that point, for running CliMAF, you can either :
+CliMAF do interpret some environment variables :
+
+- CLIMAF_CACHE : a directory used for storing intermediate results,
+  and those final results which are not explicitly copied elsewhere;
+  defaults to ~/tmp/climaf_cache. 
+
+- CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
+  verbosity level on stderr (resp. on file climaf.log); defaults to
+  'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
+
+You may put in file ``~/.climaf`` any python code using CliMAF
+functions; this will be executed at the end of climaf import; the code 
+must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
+benefit from the intractive shortcuts defined in climaf.api (as
+described below in :ref:`running_inter`
+
+
+If running on Beaufix, you must setup your environment by::
+
+  $ module load python/2.7.5 nco ncview ncl
+
+
+.. _running_inter:
+
+Running CliMAF interactively
+-----------------------------
+
+For running CliMAF as easily as possible under the Python prompt,
+without having to know details about CliMAF functions location, and
+just mimicking one of the :ref:`examples`, you can either :
 
 - use binary ``climaf`` for launching Python while importing CliMAF :
 
@@ -48,28 +77,20 @@ From that point, for running CliMAF, you can either :
 
     $ export PATH=$PATH::<some_installation_dir>/climaf/bin
 
-  - launch CliMAF ::
+  - and then launch CliMAF ::
 
     $ climaf
 
-    >>>         (this is the Python prompt)
-
-  Notes : 
-
-   - you may also provide multiple python scripts as arguments to
-     command ``climaf``
-
-   - you may **not** (yet) use option ``-i`` as with Python, for
-     combining launching a script and getting the prompt afterwards
+    >>>         #(this is the Python prompt)
 
 
-- or import climaf in your python environment :
+- or import ``climaf.api.*`` in your python environment :
 
   - set your PYTHONPATH , e.g. in your ``~/.profile`` file::
 
     $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
 
-  - import ``climaf.api`` in your Python session or script, preferably as in::
+  - type ::
 
     $ python
 
@@ -81,29 +102,32 @@ From that point, for running CliMAF, you can either :
 
 Please see also : :ref:`examples`
 
-Configuration file
--------------------
 
-You may put in file ``~/.climaf`` any python code using CliMAF
-functions; this will be executed at the end of climaf.api import 
+Using CliMAF as a library
+-----------------------------
 
-Environment variables 
-------------------------
+If you wish to have the same facilities (shortcuts) than in interactive
+sessions, and then insert ::
 
-CliMAF do interpret some environment variables :
+>>> from climaf.api import *
 
-- CLIMAF_CACHE : a directory used for storing intermediate results,
-  and those final results which are not explicitly copied elsewhere;
-  defaults to ~/tmp/climaf_cache. 
+in each module making use of CliMAF functions. But you may prefer to
+make only explicit imports, and then use::
 
-- CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
-  verbosity level on stderr (resp. on file climaf.log); defaults to
-  'error' (resp. 'info'). See :py:func:`~climaf.cache.clog` for details
+>>> import climaf
 
-Running on Beaufix or Prolix
-------------------------------
+In that latter case: 
 
-before running on M-F beaufix HPC, you must setup your nevrionment
-by::
+- you must use fully qualified python names for climaf functions, such
+  as ``climaf.classes.ds()``; you may have a look at module climaf.api
+  to know in which module is each useful CliMAF function
 
-  $ module load python/2.7.5 nco ncview ncl
+- please note that all CliMAF operators declared using
+  e.g. :py:func:`~climaf.operators.cscript` must be prefixed with
+  "climaf.operators" as e.g. in ::
+
+>>> avg=climaf.operators.time_average(ds)
+
+
+
+ 

@@ -6,7 +6,7 @@
 # No python launch flag is allowed
 
 # We assume this script is located in a subdir of climaf  installation dir
-cdir=$(cd ..; pwd) 
+cdir=$(cd $(dirname $0)/..; pwd) 
 
 export PYTHONPATH=$PYTHONPATH:$cdir 
 

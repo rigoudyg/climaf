@@ -17,16 +17,12 @@ Example ::
 """
 
 import os
-from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
 
-cproject("OCMIP5" ,"model", "frequency" )
+import climaf
 
-
-if os.path.exists('/prodigfs') :
-    cproject("OCMIP5_Ciclad","model","frequency")
-    
-    dataloc(project="OCMIP5_Ciclad", organization="generic",
+if climaf.site_settings.onCiclad :
+    climaf.classes.cproject("OCMIP5","model","frequency")
+    climaf.dataloc.dataloc(project="OCMIP5", organization="generic",
             url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/'
                  '${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
     

@@ -6,17 +6,17 @@ Functions for managing/viewing results
 cfile : get the file value of a CliMAF object 
 ----------------------------------------------
 
-.. autofunction:: climaf.api.cfile 
+.. autofunction:: climaf.driver.cfile 
 
 cMA : get the Masked Array value of a CliMAF object 
 ------------------------------------------------------
 
-.. autofunction:: climaf.api.cMA
+.. autofunction:: climaf.driver.cMA
 
 cshow : dump an object or display a 'figure'
 --------------------------------------------
 
-.. autofunction:: climaf.api.cshow
+.. autofunction:: climaf.driver.cshow
 
 cdump : tell what's in cache
 ---------------------------------

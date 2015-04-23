@@ -29,7 +29,7 @@ def setNewUniqueCache(path) :
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
     craz(hideError=True)
-    print "Cache set to "+currentCache
+    print "cache directory set to : "+currentCache
 
 #def generateUniqueFileName(expression, operator=climaf.classes.firstGenericDataSet):
 def generateUniqueFileName(expression, operator=None, format="nc"):

@@ -9,7 +9,7 @@ There is quite a lot of things to document here. Maybe at a later stage ....
 
 #Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
 
-import os, os.path, re, posixpath, subprocess, time
+import os, os.path, re, posixpath, subprocess, time, shutil
 from string import Template
 
 # Climaf modules
@@ -623,6 +623,104 @@ def set_variable(obj, varname, format) :
     else :
         clogger.error('Cannot handle format %s'%format)
     
+# Commodity functions
+#########################
+
+def cfile(object,target=None,ln=None,deep=None) :
+    """
+    Provide the filename for a CliMAF object, or copy this file to target. Launch computation if needed. 
+
+    Args:
+      object (CliMAF object) : either a dataset or a 'compound' object (e.g. the result of a CliMAF operator)
+      target (str, optional) : name of the destination file or link; CliMAF will anyway store the result
+       in its cache; 
+
+      ln (logical, optional) : if True, target is created as a symlink to the CLiMAF cache file
+
+      deep (logical, optional) : governs the use of cached values when computing the object:
+      
+        - if missing, or None : use cache as much as possible (speed up the computation)
+
+        - False : make a shallow computation, i.e. do not use cached values for the 
+          top level operation
+
+        - True  : make a deep computation, i.e. do not use any cached value
+
+    Returns: 
+
+      - if 'target' is provided : returns this filename (or linkname) if computation is 
+        successful ('target' contains the result), and None otherwise; 
+
+      - else : returns the filename in CliMAF cache, which contains the result (and None if failure)
+
+
+    """
+    clogger.debug("cfile called on "+str(object))  
+    result=climaf.driver.ceval(object,format='file',deep=deep)
+    if target is None : return result
+    else :
+        if result is not None :
+            if ln :
+                os.remove(os.path.expanduser(target))
+                os.symlink(result,os.path.expanduser(target))
+            else :
+                shutil.copyfile(result,os.path.expanduser(target))
+        return target
+
+def cshow(obj) :
+    """ 
+    Provide the in-memory value of a CliMAF object. 
+    For a figure object, this will lead to display it
+    ( launch computation if needed. )
+    """
+    clogger.debug("cshow called on "+str(obj)) 
+    return climaf.driver.ceval(obj,format='MaskedArray')
+
+def  cMA(obj,deep=None) :
+    """
+    Provide the Masked Array value for a CliMAF object. Launch computation if needed.
+
+    Args:
+      obj (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)
+      deep (logical, optional) : governs the use of cached values when computing the object
+
+        - if missing, or None : use cache as much as possible
+        - False : make a shallow computation, i.e. do not use cached values for top level operation
+        - True  : make a deep computation, i.e. do not use any cached value
+
+    Returns: a Masked Array containing the object's value
+
+    """
+    clogger.debug("cMA called with arguments"+str(obj)) 
+    return climaf.driver.ceval(obj,format='MaskedArray',deep=deep)
+
+def cexport(*args,**kwargs) :
+    """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
+
+    """
+    clogger.debug("cexport called with arguments"+str(args))  
+    if "format" in kwargs :
+        if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc") :
+            kwargs['format']="file" 
+        if (kwargs['format']=="MA") :
+            kwargs['format']="MaskedArray" 
+    return climaf.driver.ceval(*args,**kwargs)
+
+def cimport(cobject,crs) :
+    clogger.debug("cimport called with argument",cobject)  
+    clogger.debug("should check syntax of arg 'crs' -TBD")
+    clogger.warning("cimport is not for the dummies - Playing at your own risks !")
+    import numpy, numpy.ma
+    if isinstance(cobject,numpy.ma.MaskedArray) :
+        clogger.debug("for now, use a file for importing - should revisit - TBD")
+        clogger.error("not yet implemented fro Masked Arrays - TBD")
+    elif isinstance(cobject,str) :
+        cache.register(cobject,crs)
+    else :
+        clogger.error("argument is not a Masked Array nor a filename",cobject)
+    
+
+
 
 def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 
