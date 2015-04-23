@@ -2,6 +2,8 @@
 Utility functions and variables
 -----------------------------------------
 
+.. default-domain:: python
+
 
 cpath : path for CliMAF installation directory
 -----------------------------------------------

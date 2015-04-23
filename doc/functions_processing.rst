@@ -2,6 +2,8 @@
 Functions for processing data
 --------------------------------------------------------
 
+.. default-domain:: python
+
 Standard operators
 ---------------------
 
@@ -20,7 +22,5 @@ Defining a new CliMAF operator also defines a new Python function,
 with the same name
 
 .. autoclass:: climaf.operators.cscript
-
-
 
 

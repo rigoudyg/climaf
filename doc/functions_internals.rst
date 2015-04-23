@@ -2,6 +2,7 @@
 Internal functions - presented here for their doc
 ---------------------------------------------------------
 
+.. default-domain:: python
 
 init_period
 ----------------------

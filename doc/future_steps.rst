@@ -25,13 +25,11 @@ The next developments will adress, probably in that order :
 
   - use a hierarchy of cache locations, some being shared among various users
 
-- interfacing the Drakkar's community CDFtools
+- interfacing the Drakkar community CDFtools
 
 - managing masks (e.g. for ocean, tropics, lakes, oceanic basins ...)
 
 - managing dataset ensembles
-
-- an alias feature (allow to declare that a variable can be decude by some offset and scaling from another one); however, the 'derived variable' feature, albeit sub-optimal, already allows for that; see :py:func:`~climaf.operators.derive`
 
 - chunking : automatically splitting e.g. the time dimension when processing a dataset if memory issues call for
 
@@ -41,7 +39,7 @@ The next developments will adress, probably in that order :
 
 The wish list, is the list of features wich priority is lesser; you may complement it by sending suggestions to ``climaf at meteo dot fr`` :
 
-- develop a fast remapping operator (provided there is some evidence that CDO's reampping was sub-optimal)
+- develop a fast remapping operator (provided there is some evidence that CDO reampping was sub-optimal)
 
 - add to every result file some metadata reagrding the basic data files used at the origin of all processing : creation date, version number if applicable
 

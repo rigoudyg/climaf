@@ -2,6 +2,8 @@
 Functions for data definition and access
 -------------------------------------------------------------
 
+.. default-domain:: python
+
 
 This section is for advanced use. As a first step, you should consider using
 the built-in data data definitions described at :py:mod:`~climaf.projects`. 
