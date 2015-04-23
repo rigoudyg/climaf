@@ -21,7 +21,7 @@ Changes, newest first :
  - Operator 'rescale' allows to define new variables through scaling. See :doc:`scripts/rescale`
  - CliMAF was proved to **work under a CDAT** install which uses
    Python 2.6
- - Better explain how to install CliMAf (or not), to run it or to use it as a library; see :re:`installing`
+ - Better explain how to install CliMAf (or not), to run it or to use it as a library; see :ref:`installing`
 
 .. _news_0.5:
 
