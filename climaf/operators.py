@@ -1,4 +1,6 @@
- """ CliMAF handling of external scripts and binaries , and of internal operators (Python funcs)
+"""
+
+CliMAF handling of external scripts and binaries , and of internal operators (Python funcs)
 
 """
 
