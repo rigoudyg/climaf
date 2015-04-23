@@ -5,7 +5,7 @@ Functions for processing data
 Standard operators
 ---------------------
 
-For documented standard operators see  :ref:`standard_operators` ; 
+For documented standard operators see  :ref:`standard_operators`  
 
 
 Non-standard operators

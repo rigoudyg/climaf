@@ -2,6 +2,7 @@
 Functions for managing/viewing results
 -----------------------------------------
 
+There are a few fucntions for managing CliMAF results
 
 cfile : get the file value of a CliMAF object 
 ----------------------------------------------

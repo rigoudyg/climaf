@@ -17,7 +17,7 @@ Changes, newest first :
  - **Variable alias** and **variable scaling** are now managed, on a
    per-project basis. 
    See function :py:func:`~climaf.classes.calias()`
- - Derived variables can now be defined on a per-project basis. See function :py:func:`~climaf.operators.derive`
+ - Derived variables can now be defined on a per-project basis. See function :py:func:`~climaf.operators.derive()`
  - Operator 'rescale' allows to define new variables through scaling. See :doc:`scripts/rescale`
  - CliMAF was proved to **work under a CDAT** install which uses
    Python 2.6
