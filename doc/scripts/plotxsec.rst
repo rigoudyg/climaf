@@ -1,20 +1,21 @@
-plotmap : geographical map for a one-time-step dataset
+plotxsec : Cross section plot for a one-time-step dataset
 -----------------------------------------------------------
 
-Plot a geographical map, using NCL, and allowing for tuning a number of graphic attributes
+Plot a cross section (pressure-lat or pressure-lon), using NCL, and allowing for tuning a number of graphic attributes
 
 **References** : http://www.ncl.ucar.edu
 
 **Provider / contact** : climaf at meteo dot fr
 
 **Inputs** (in the order of CliMAF call):
-  - any dataset (but only one) ; a curvilinear grid is OK
+  - a dataset 
+     - with no or singleton dimension either for latitude or for longitude
+     - with or without time dimension (first time step will be plotted)
 
-**Mandatory arguments**:
-  - ``min``, ``max`` , ``vdelta`` : min and max values and levels
-    when applying the colormap 
+**Mandatory arguments**: None
 
 **Optional arguments**:
+  - ``min``, ``max`` , ``vdelta`` : min and max values and levels when applying the colormap 
   - ``color`` : name of the Ncl colormap to use; default
     is 'BlueDarkRed18'  ; see
     e.g. https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness. 
@@ -30,10 +31,12 @@ Plot a geographical map, using NCL, and allowing for tuning a number of graphic 
 
 **Climaf call example** ::
  
-  >>> tas= .... #some dataset like e.g. of monthly mean of a low level temperature
-  >>> map=plotmap(ta,min=260, max=300, delta=4)
+  >>> january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+  >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
+  >>> plot=plotxsec(ta_zonal_mean)
+  >>> cshow(plot)
 
 **Side effects** : None
 
-**Implementation** : basic use of gsn_csm_contour_map_ce
+**Implementation** : Basic use of ncl_gsm_pres_hgt
 

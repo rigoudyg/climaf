@@ -22,6 +22,7 @@ Documented operators as of today :
 
  - graphics
     - :doc:`scripts/plotmap`
+    - :doc:`scripts/plotxsec`
     - :doc:`scripts/timeplot`
     - :doc:`scripts/ncview`
 

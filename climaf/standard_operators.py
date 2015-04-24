@@ -66,3 +66,8 @@ def load_standard_operators():
             "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
             "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}) "
             "; convert ${out} -trim ${out}", format="png")
+    #
+    cscript('plotxsec'  , "(ncl -Q "+ scriptpath +"plot_cross_section.ncl infile=${in} "
+            "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
+            "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}) 2>&1"
+            "; convert ${out} -trim ${out}", format="png")

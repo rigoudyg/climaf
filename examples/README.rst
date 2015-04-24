@@ -37,7 +37,10 @@ A number of examples show in directory ``<climaf_dir>/examples`` and are also do
 
 Some of the examples can be run anywhere, as they use the data sample installed with CliMAF :
 
-  - :download:`plotmap.py <../examples/plotmap.py>`      : basic and advanced plotting (using ncview and ncl)
+  - :download:`plotmap.py <../examples/plotmap.py>`      : basic and
+    advanced map plotting (using ncview and ncl)
+  - :download:`plot_xsection.py <../examples/plot_xsection.py>`:
+    plotting a pressure-lat or pressure-lon cross section
   - :download:`basic_oce.py <../examples/basic_oce.py>`   : acces ocean data on ORCA grid in CMIP5_DRS data, and perfome some basic operations (works at CNRM and on Ciclad)
   - :download:`export.py <../examples/export.py>`        : various ways to 'export' results out of CliMAF
   - :download:`derived.py <../examples/derived.py>`      : how to define a new geophysical variable and use it in CliMAF

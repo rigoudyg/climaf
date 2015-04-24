@@ -10,6 +10,7 @@ Changes, newest first :
 
 - 2005/04/22 - Version 0.6.0 :
 
+ - Add operator :ref:`plotxsec` for cross-section plots
  - **A number of 'projects' are built-in**, which describe data
    organization and data location for a number of analyses and
    experiments datasets as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ;
