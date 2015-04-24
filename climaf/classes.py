@@ -355,6 +355,42 @@ def ds(*args,**kwargs) :
     return cdataset(project=project,model=model,experiment=experiment,rip=rip,period=period,\
              frequency=frequency,domain=domain,variable=variable)
 
+class cpage() :
+    def __init__(self, widths_list=[], heights_list=[], fig_lines=None, orientation="portrait"):
+        self.widths_list=widths_list
+        self.heights_list=heights_list
+        self.fig_lines=fig_lines
+        self.orientation=orientation
+
+        if not self.widths_list :
+            clogger.error("widths_list must be given")
+            return(None)
+
+        if not self.heights_list :
+            clogger.error("heights_list must be given")
+            return(None)
+
+        if self.fig_lines is None :
+            clogger.error("fig_lines must be given")
+            return(None)
+
+        if len(self.fig_lines)!=len(self.heights_list) :
+            clogger.error("cpage.fig_lines must have same dimensions of cpage.heights_list")
+            return(None)
+
+        for i in range(len(self.fig_lines)):
+            if len(self.fig_lines[i])!=len(self.widths_list) :
+                #raise Exception("cpage.fig_lines must have same dimensions of cpage.widths_list in each sublist, pb for sublist %d" % (i+1))
+                clogger.error("cpage.fig_lines must have same dimensions of cpage.widths_list in each sublist, pb for sublist %d" % (i+1))
+                return(None)
+
+class Climaf_cpage_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+    def __str__(self):
+        return `self.valeur`
+
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV
 #    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)

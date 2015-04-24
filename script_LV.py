@@ -96,4 +96,5 @@ cshow(my_ncview(creShortTop))
 #clist()
 
 fig1=plotmap(tas_avg,crs="title",**map_graph_attributes(varOf(tas_avg)))
-cfilePage([0.2,0.8],[0.33,0.33,0.33],figll=[[None, fig1, fig1],[fig1,fig1,fig1]],orientation="portrait") 
+#cfilePage([0.2,0.8],[0.33,0.33,0.33],fig_lines=[[None, fig1, fig1],[fig1,fig1,fig1]],orientation="portrait") 
+cfilePage([0.2,0.8],[0.33,0.33,0.33],fig_lines=[[None, fig1], [fig1, fig1],[fig1,fig1]],orientation="portrait")

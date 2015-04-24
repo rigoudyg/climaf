@@ -9,7 +9,7 @@ There is quite a lot of things to document here. Maybe at a later stage ....
 
 #Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
 
-import os, re, posixpath, subprocess, time
+import os, re, posixpath, subprocess, time, sys
 from string import Template
 
 # Climaf modules
@@ -554,10 +554,4 @@ def CFlongname(varname) :
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
-#LV
-class cpage() :
-    def __init__(self, taille_x, taille_y, figll, orientation):
-        self.taille_x=taille_x
-        self.taille_y=taille_y
-        self.figll=figll
-        self.orientation=orientation
+        
