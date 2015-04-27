@@ -86,7 +86,7 @@ def cshow(obj) :
 
 def  cMA(obj,deep=None) :
     """
-    Provide the Masked Array value for a CliMAF object. Launch computation if needed.
+    Provide the Masked Array value for a CliMAF object. Launch computation if needed. 
 
     Args:
       obj (CliMAF object) : either a datset or a 'compound' object (like the result of a CliMAF standard operator)

@@ -426,7 +426,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     #update size new dictionnary
     len_new_dict=len(new_dict)
     
-    #research on not_pattern      
+    #research on not_pattern  
     find_not_pattern=False  
     if not_pattern:
         if len_new_dict != 0: 
