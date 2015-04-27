@@ -81,7 +81,7 @@ def cshow(obj) :
     For a figure object, this will lead to display it
     ( launch computation if needed. )
     """
-    clogger.debug("cshow called on"+str(obj)) #LV
+    clogger.debug("cshow called on"+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray')
 
 def  cMA(obj,deep=None) :
@@ -106,7 +106,7 @@ def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
 
     """
-    clogger.debug("cexport called with arguments"+str(args))  #LV
+    clogger.debug("cexport called with arguments"+str(args)) 
     if "format" in kwargs :
         if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc") :
             kwargs['format']="file" 
