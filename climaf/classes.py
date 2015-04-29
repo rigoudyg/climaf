@@ -356,44 +356,59 @@ def ds(*args,**kwargs) :
              frequency=frequency,domain=domain,variable=variable)
 
 class cpage() :
-    def __init__(self, widths_list=[], heights_list=[], fig_lines=None, orientation="portrait"):
+    def __init__(self, widths_list=[], heights_list=[], fig_lines=None, orientation=""):
+        """ Builds a CliMAF cpage object, which represents an input of 'cfilePage' function to create a page with CliMAF figures
+        
+        Args:
+        - widths_list: the list of figure widths, i.e. the width of each column
+        - heights_list: the list of figure heights, i.e. the height of each line
+        - fig_lines: a list of crs list. Each sublist of 'fig_lines' represents crs for each line 
+        - orientation (str, optional): page's orientation, either 'portrait' or 'landscape' (by default, orientation is set to 'portrait')
+
+        Example, using no default value, to create a page with 2 columns and 3 lines:
+
+          >> fig=plotmap(tas_avg,crs='title',**map_graph_attributes(varOf(tas_avg)))
+
+          cfilePage(cpage(widths_list=[0.2,0.8],heights_list=[0.33,0.33,0.33],\
+          fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='portrait'))
+
+        """
         self.widths_list=widths_list
         self.heights_list=heights_list
         self.fig_lines=fig_lines
         self.orientation=orientation
 
         if not self.widths_list :
-            clogger.error("widths_list must be given")
-            return(None)
+            raise Climaf_cpage_Error("cpage.widths_list must be given")
 
         if not self.heights_list :
-            clogger.error("heights_list must be given")
-            return(None)
+            raise Climaf_cpage_Error("cpage.heights_list must be given")
 
         if self.fig_lines is None :
-            clogger.error("fig_lines must be given")
-            return(None)
+            raise Climaf_cpage_Error("cpage.fig_lines must be given")
 
         if len(self.fig_lines)!=len(self.heights_list) :
-            clogger.error("cpage.fig_lines must have same dimensions of cpage.heights_list")
-            return(None)
+            raise Climaf_cpage_Error("cpage.fig_lines must have same dimensions of cpage.heights_list")
 
         for i in range(len(self.fig_lines)):
             if len(self.fig_lines[i])!=len(self.widths_list) :
-                #raise Exception("cpage.fig_lines must have same dimensions of cpage.widths_list in each sublist, pb for sublist %d" % (i+1))
-                clogger.error("cpage.fig_lines must have same dimensions of cpage.widths_list in each sublist, pb for sublist %d" % (i+1))
-                return(None)
+                raise Climaf_cpage_Error("cpage.fig_lines must have same dimensions of cpage.widths_list in each sublist, pb for sublist %d" % (i+1))
+
+        if not self.orientation:
+            self.orientation="portrait"
 
 class Climaf_cpage_Error(Exception):
+    """ Exception derived to exception class for CliMAF cpage error
+    
+    """
     def __init__(self, valeur):
         self.valeur = valeur
         clogger.error(self.__str__())
     def __str__(self):
         return `self.valeur`
 
+
 def test():
-#    clogger.basicConfig(level=clogger.DEBUG) #LV
-#    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
     cdefault("project","CMIP5")
     #cdefault("project","PR6")
     cdefault("model","CNRM-CM5")

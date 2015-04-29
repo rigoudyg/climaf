@@ -12,11 +12,12 @@ Main functions are ``dataloc``, ``ds``, ``cdataset``, ``cdef``, ``cscript``, ``c
  - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
 
 
-Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``:
- - ``clog``    : tune verbosity
- - ``cdump``   : tell what's in cache
- - ``craz``    : reset cache
- - ``csave``   : save cache index to disk
+Utility functions are  ``clog``, ``cdump``, ``craz``, ``csave``, ``cfilePage``:
+ - ``clog``      : tune verbosity
+ - ``cdump``     : tell what's in cache
+ - ``craz``      : reset cache
+ - ``csave``     : save cache index to disk
+ - ``cfilePage`` : build a page with CliMAF figures
 
 """
 # Created : S.Senesi - 2014
@@ -127,98 +128,73 @@ def cimport(cobject,crs) :
         cache.register(cobject,crs)
     else :
         clogger.error("argument is not a Masked Array nor a filename",cobject)
-    
-def cfilePage(*args, **kwargs) :
-    cp=cpage(*args, **kwargs)
 
-    fig_out="climaf_cpage.png"
-    page_width=800.
-    page_height=1200.
+def cfilePage(cobj) :
+    """ Builds a page with CliMAF figures, computing associated crs 
+        
+        Arg:
+        - cobj (CliMAF object): a cpage object containing :
+            - the list of figure widths, i.e. the width of each column (cobj.widths_list)
+            - the list of figure heights, i.e. the height of each line (cobj.heights_list)
+            - a list of crs list. Each sublist of 'fig_lines' represents crs for each line (cobj.fig_lines)
+            - page's orientation, either 'portrait' or 'landscape' -by default, orientation is set to 'portrait'- (cobj.orientation)
+
+        Returns the filename in CliMAF cache, which contains the result (and None if failure)
+
+        Example, using no default value, to create a page with 2 columns and 3 lines:
+
+          >> fig=plotmap(tas_avg,crs='title',**map_graph_attributes(varOf(tas_avg)))
+          
+          cfilePage(cpage(widths_list=[0.2,0.8],heights_list=[0.33,0.33,0.33],\
+          fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='portrait'))
+
+    """
+    if not isinstance(cobj,climaf.classes.cpage):
+        clogger.error("arg cobj is not a cpage object")
+        return(None)
+
+    #output figure
+    out_fig="climaf_cpage.png"
+    #out_fig=climaf.cache.generateUniqueFileName("chaine_crs_test_for_cpage",format="png")
+    #[getCRS     : cache.py  , L. 143 ] : ERROR    : file /home/vignonl/tmp/climaf_cache/75/2.png is not well formed (no CRS)
+    #out_fig=climaf.cache.generateUniqueFileName("plotmap(time_average(ds('example.*.AMIPV6ALB2G.r1i1p1.1980-1981.monthly.global.tas.*.*')), color='BlueDarkRed18', crs='titre', delta=2.0, max=30, min=-30, offset=-273.15, scale=1.0, units='C')",format="png")
+
+    #size page and creation
+    if cobj.orientation == "portrait":
+        page_width=800.
+        page_height=1200.
+    elif cobj.orientation == "landscape":
+        page_width=1200.
+        page_height=800.
     
     size_page="%dx%d"%(page_width, page_height)
-    comm=subprocess.Popen(["convert", "-size", size_page, "xc:white", fig_out], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    comm=subprocess.Popen(["convert", "-size", size_page, "xc:white", out_fig], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     comm.wait()
-    
-    x_left_margin=10. # Shift at start and end line
-    y_top_margin=10. # Initial vertical shift, for first and last line
-    x_right_margin=10. # Shift at start and end line
-    y_bot_margin=10.
+    if comm.wait()!=0 : raise climaf.classes.Climaf_cpage_Error("Page creation failed")
 
-    xmargin=20.
-    ymargin=20.
+    #margins
+    x_left_margin=10. # Left shift at start and end line
+    y_top_margin=10. # Initial vertical shift for first line
+    x_right_margin=10. # Right shift at start and end line
+    y_bot_margin=10.  # Vertical shift for last line
+    xmargin=20. # Horizontal shift between figures
+    ymargin=20. # Vertical shift between figures
 
+    #page composition
     y=y_top_margin
-    for line, rheight in zip(cp.fig_lines, cp.heights_list) :
-        height=(page_height-ymargin*(len(cp.heights_list)-1.)-y_top_margin-y_bot_margin)*rheight # Line height in pixels
+    for line, rheight in zip(cobj.fig_lines, cobj.heights_list) :
+        height=(page_height-ymargin*(len(cobj.heights_list)-1.)-y_top_margin-y_bot_margin)*rheight # Line height in pixels
         x=x_left_margin
-        for fig, rwidth in zip(line,cp.widths_list) :
-            
-            width=(page_width-xmargin*(len(cp.widths_list)-1.)-x_left_margin-x_right_margin)*rwidth # Figure width in pixels
+        
+        for fig, rwidth in zip(line, cobj.widths_list) :
+            width=(page_width-xmargin*(len(cobj.widths_list)-1.)-x_left_margin-x_right_margin)*rwidth # Figure width in pixels
             scaling="%dx%d+%d+%d" %(width,height,x,y)
-            print "scaling figure en cours", scaling
-            
-            figfile=cfile(fig) if fig else 'canvas:None'
-            print figfile
-            comm=subprocess.Popen(["composite", "-geometry", scaling, figfile, fig_out, fig_out], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print comm
+            figfile=cfile(fig) if fig else 'canvas:None' 
+            comm=subprocess.Popen(["composite", "-geometry", scaling, figfile, out_fig, out_fig], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             comm.wait()
-            print comm.wait()
-            #test code retour if comm.wait() != 0 : stop
-            
+            if comm.wait()!=0 : raise climaf.classes.Climaf_cpage_Error("Composite failed for figure %s" %fig)
             x+=width+xmargin
             
         y+=height+ymargin
 
-    return cp
-
-  ##calcul des figures avec cfile => figfilesll : liste de liste des figures calculees
-    #figfilesll=[]
-    #for liste in cp.fig_lines :
-    #    #print liste
-    #    listfig=[]
-    #    for fig in liste :
-    #        #print "figure", fig
-    #        if fig is not None:
-    #            fic=cfile(fig)
-    #            listfig.append(fic)
-    #        else:
-    #            listfig.append('canvas:None') # mot cle 'canvas:None' en cas de "blanc"
-    #    figfilesll.append(listfig)
-    #print "liste de liste des figs calculees", figfilesll
-    #
-    ##mise en page
-    #page_width=800.
-    #page_height=1200.
-    #c1=page_width*cp.widths_list[0]  #160
-    #c2=page_width*cp.widths_list[1]-40. #600
-    #l1=page_height*cp.heights_list[0] #396 
-    #l2=page_height*cp.heights_list[1]#396 
-    #l3=page_height*cp.heights_list[2]#396 
-    #
-    ##construction d une liste de listes correspondant aux echelles pour chaque figure
-    ##numerotation coherente des figures avec INPUT et rajout des marges
-    #scale_fig_l=[]
-    #scale_fig_l.append(["%dx%d+10+0" %(c1,l1), "%dx%d+10+400" %(c1,l2), "%dx%d+10+800" %(c1,l3)])
-    #scale_fig_l.append(["%dx%d+180+50" %(c2,l1), "%dx%d+180+450" %(c2,l2), "%dx%d+180+850" %(c2,l3)])
-    #print scale_fig_l
-    #        
-    ##construction de la page
-    #size_page="%dx%d"%(page_width, page_height)
-    #comm=subprocess.Popen(["convert", "-size", size_page, "xc:white", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #comm.wait()
-    #
-    #for i in range(len(figfilesll)):
-    #    for j in range(len(figfilesll[i])):
-    #        print i, j, scale_fig_l[i][j], figfilesll[i][j]
-    #        comm=subprocess.Popen(["composite", "-geometry", scale_fig_l[i][j], figfilesll[i][j], "climaf_cpage.png", "climaf_cpage.png"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #        comm.wait()
-    #return figfilesll,cp  
-
-#convert -size 800x1200 xc:white composite.png
-#composite -geometry 600x396+180+50 a_trim.png composite.png composite.png 
-#composite -geometry 160x396+10+400 fig_test.png composite.png composite.png
-#composite -geometry 160x396+10+800 fig_test.png composite.png composite.png
-#composite -geometry 600x396+180+450 a_trim.png composite.png composite.png 
-#composite -geometry 600x396+180+850 a_trim.png composite.png composite.png 
-
-#convert -size 800x1200 xc:white a_trim.png -geometry 600x396+180+50 -composite fig_test.png -geometry 160x396+10+400 -composite fig_test.png -geometry 160x396+10+800 -composite a_trim.png -geometry 600x396+180+450 -composite a_trim.png -geometry 600x396+180+850 -composite composite_onecomm.png
+    return cobj
