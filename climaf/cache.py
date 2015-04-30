@@ -8,9 +8,11 @@ CliMAF cache module : stores and retrieves CliMAF objects from their CRS express
 # Created : S.Senesi - 2014
 
 import sys, os, os.path, re, time
-from climaf.classes import compare_trees, cobject, ctree, cdataset
 
+from classes import compare_trees, cobject, ctree, cdataset
+from cmacros import crewrite
 from clogging import clogger
+import operators
 
 directoryNameLength=2
 DynamicIsOn=False
@@ -23,6 +25,7 @@ def setNewUniqueCache(path) :
     """
     global currentCache
     global cachedirs
+    global cacheIndexFileName
     
     cachedirs=[ path ] # The list of cache directories
     crs2filename=dict()  # The index associating filenames to CRS expressions
@@ -270,6 +273,7 @@ def csync() :
 
     """
     import pickle
+    global cacheIndexFileName
     cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
     pickle.dump(crs2filename,cacheIndexFile)  
     cacheIndexFile.close()
@@ -305,24 +309,17 @@ def craz(hideError=False) :
     #if os.path.exists(cacheIndexFileName) : os.remove(cacheIndexFileName)
     crs2filename=dict()
 
-def cdump():
+def cdump(use_macro=True):
     """
-    Dumps the in-memory content of CliMAF cache index
+    List the in-memory content of CliMAF cache index. Interpret it
+    using macros except if arg use_macro is False
     
     """
     for crs in crs2filename :
-        #print "%s : %s"%(crs2filename[crs][-30:],crs)
-        print "%s : %s"%(crs2filename[crs],crs)
+        if not use_macro :
+            # No interpretation by macros
+            #print "%s : %s"%(crs2filename[crs][-30:],crs)
+            print "%s : %s"%(crs2filename[crs],crs)
+        else:
+            print "%s : %s"%(crs2filename[crs],crewrite(crs))
 
-
-if __name__ == "__main__":
-    cachedirs=[ "~/tmp/climaf_cache" ]
-    e=getCRS("~/tmp/climaf_cache/test_expressionOf")
-    searchFile("test_expressionOf") 
-    stringToPath("aerzed",4)    
-    print generateUniqueFileName("azertyuiop")
-
-
-# Todo :
-
-# a function for restoring the index from directory content, in case it has not been written on disk at the end of a session, or it is broken n some other way

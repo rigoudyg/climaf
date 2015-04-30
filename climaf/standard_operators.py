@@ -18,23 +18,23 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins} ',
+    cscript('select' ,scriptpath+'mcdo.sh "${operator}" ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}')
+            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}')
     #
     cscript('space_average',
-            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}', 
+            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}', 
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average' ,
-            scriptpath+'mcdo.sh timavg  ${out} ${var} ${period_iso} ${domain} "${alias}" ${ins}' ,
+            scriptpath+'mcdo.sh timmean  ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}' ,
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox' ,
             scriptpath+'mcdo.sh ""  ${out} ${var} ${period_iso} '
-            '${latmin},${latmax},${lonmin},${lonmax} "${alias}" ${ins}',
+            '${latmin},${latmax},${lonmin},${lonmax} "${alias}" "${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('regrid' ,
@@ -58,16 +58,11 @@ def load_standard_operators():
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
-    #cscript('timeplot'  , scriptpath+'timeplot.sh ${in} ${out} ${var} ${title}',format="png")
     cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=${in} outfile=${out} '
             'var=${var} title=${crs}',format="png")
     #
-    cscript('plotmap'   , "(ncl -Q "+ scriptpath +"plotmap.ncl infile=${in} "
+    cscript('plot'     , "(ncl -Q "+ scriptpath +"gplot.ncl infile=${in} "
             "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
-            "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}) "
-            "; convert ${out} -trim ${out}", format="png")
+            "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units} "
+            "; convert ${out} -trim ${out}) ", format="png")
     #
-    cscript('plotxsec'  , "(ncl -Q "+ scriptpath +"plot_cross_section.ncl infile=${in} "
-            "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
-            "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}) 2>&1"
-            "; convert ${out} -trim ${out}", format="png")

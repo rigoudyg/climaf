@@ -20,4 +20,7 @@ from climaf.classes import cproject, calias
 
 cproject('EM' , 'frequency', 'realm' )
 dataloc(project='EM', organization='EM', url=['dummy'])
+# Ideally, one should be able to write :
+#cmissing('EM',1.e+20, realm='I')
+calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice', 'mpalb', 'snomlet', 'tmelt', 'bmelt', 'snc','sic1','sic2', 'sic3', 'sic4', 'ssi', 'ageice'], missing=1.e+20)
 

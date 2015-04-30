@@ -260,4 +260,9 @@ def init_period(dates) :
 
 
 class Climaf_Period_Error(Exception):
-    pass
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`

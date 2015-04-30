@@ -2,11 +2,13 @@
 This module declares locations for searching data for projects CMIP5 for all frequencies, and where the data is
 at CNRM and on Ciclad
 
-Attributes for CMIP5 datasets are : model,rip,frequency,table,realm,version
+Attributes for CMIP5 datasets are : model, rip, frequency, table, realm, version
+
+Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
 
 Example for a CMIP5 dataset declaration ::
 
- >>> tas1pc=ds(project='CMIP5', model='CNRM-CM5', experiment='1pctCO2', variable='tas', frequency=mon, period='1860-1861')
+ >>> tas1pc=ds(project='CMIP5', model='CNRM-CM5', experiment='1pctCO2', variable='tas', frequency='mon', period='1860-1861')
 
 
 """

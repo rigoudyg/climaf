@@ -71,12 +71,12 @@ def indent():
     clog()
     clog_file()
 
-def dedent():
+def dedent(n=1):
     """ 
-    Forces log messages to be de-indented by one TAB
+    Forces log messages to be de-indented by one or more TAB
     """
     global formatter
-    form=getattr(formatter,'_fmt').replace("\t","",1)
+    form=getattr(formatter,'_fmt').replace("\t","",n)
     formatter = logging.Formatter(form)
     clog()
     clog_file()

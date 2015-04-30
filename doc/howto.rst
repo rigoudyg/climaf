@@ -186,4 +186,16 @@ Please see the 'generic' data organization in :ref:`my_data` . if this
 does not fit, please email to ``climaf at meteo dot fr``
 
 
+.. _record:
+
+..record a CliMAF session
+--------------------------
+
+This is the same problem as recording any Python session. Just have a
+look at `this thread <http://stackoverflow.com/questions/947810/how-to-save-a-python-interactive-session/>`_
+,
+which proposes various solutions. The simplest is as simple as ::
+
+ import readline 
+ readline.write_history_file('/home/my_user/my_history') 
 

@@ -17,15 +17,13 @@ import climaf
 import classes
 import cache
 import operators
+import cmacros
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
 
-# Declares an external operator used temporarily (until internal objects and operators are handled)
-#operators.cscript('select' ,climaf.__path__[0]+'/scripts/mcdo.sh "" ${out} ${var} ${period} ${multins} ' )
-
 def capply (climaf_operator, *operands, **parameters):
-    """ Builds the object representing applying a CliMAF operator (script or function)
+    """ Builds the object representing applying a CliMAF operator (script, function or macro)
     
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
@@ -39,6 +37,11 @@ def capply (climaf_operator, *operands, **parameters):
         res=capply_script(climaf_operator, *operands, **parameters)
         op=operators.scripts[climaf_operator]
         if op.outputFormat is None : ceval(res,userflags=op.flags)
+    elif climaf_operator in cmacros.cmacros :
+        if (len(parameters) > 0) :
+            raise Climaf_Driver_Error("Macros cannot be called with keyword args")
+        clogger.debug("applying macro %s to"%climaf_operator + `opds` )
+        res=cmacros.instantiate(cmacros.cmacros[climaf_operator],*operands)
     elif climaf_operator in operators.operators :
         clogger.debug("applying operator %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_operator(climaf_operator,*operands, **parameters)
@@ -154,6 +157,7 @@ def ceval(cobject,
                 (userflags.canSelectDomain  or ds.domainIsFine()    ) and \
                 (userflags.canAggregateTime or ds.periodHasOneFile()) and \
                 (userflags.canAlias         or ds.hasExactVariable()) and \
+                (userflags.canMissing       or ds.missingIsOK())      and \
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
                 (format == 'file')) :
                 clogger.debug("Delivering file set or sets is OK for the target use")
@@ -362,10 +366,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         #subdict["var"]='"'+varOf(op)+'"'
         subdict["var"]=varOf(op)
         if op.alias :
-            filevar,scale,offset,filenameVar=op.alias
+            filevar,scale,offset,filenameVar,missing=op.alias
             subdict["alias"]="%s,%s,%f,%f"%(varOf(op),filevar,scale,offset)
             subdict["var"]=filevar
             subdict["filenameVar"]=filenameVar
+            subdict["missing"]=missing
         per=timePeriod(op)
         if per.fx or str(per) == "" :
             subdict["period"]='""'
@@ -442,8 +447,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
-             "\n\n'> scripts.out  ; "+ template+\
-             " >> scripts.out 2>&1"
+             "\n\n'> scripts.out  ; "+ template+ " >> scripts.out 2>&1"
     tim1=time.time()
     clogger.info("Launching command:"+template)
     # Timing
@@ -458,7 +462,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 ok = ok and cache.register(subdict["out_"+output],scriptCall.crs+"."+output)
             if ok : 
                 duration=time.time() - tim1
-                clogger.info(("Done in %g s with command:"+template) % duration)
+                print(("Done in %.1f s with command:"+template) % duration)
                 return main_output_filename
             else :
                 err="Some output missing when executing : %s. \nSee scripts.out"%template
@@ -467,8 +471,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         else :
             clogger.debug("script %s has no output"%script.name)
     else:
-        err="See scripts.out for analyzing script call failure for : %s "%template
-        clogger.error(err)
+        err="See above (or scripts.out) for analyzing script call failure for : %s "%template
         raise Climaf_Driver_Error(err)
     return None
 
@@ -517,7 +520,9 @@ def varOf(cobject) :
     elif isinstance(cobject,classes.ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return varOf(cobject.operands[0])
-    else : clogger.error("Unkown class for argument "+`cobject`)
+    elif isinstance(cobject,cmacros.cdummy) :
+        return "dummy"
+    else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
                   
 def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_list) :
@@ -731,6 +736,7 @@ class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
         clogger.error(self.__str__())
+        cdedent(100)
     def __str__(self):
         return `self.valeur`
 

@@ -21,8 +21,7 @@ Documented operators as of today :
     - :doc:`scripts/rescale`
 
  - graphics
-    - :doc:`scripts/plotmap`
-    - :doc:`scripts/plotxsec`
+    - :doc:`scripts/plot`
     - :doc:`scripts/timeplot`
     - :doc:`scripts/ncview`
 

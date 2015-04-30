@@ -103,20 +103,23 @@ just mimicking one of the :ref:`examples`, you can either :
 Please see also : :ref:`examples`
 
 
+.. _library:
+
 Using CliMAF as a library
 -----------------------------
 
 If you wish to have the same facilities (shortcuts) than in interactive
-sessions, and then insert ::
+sessions, then insert ::
 
 >>> from climaf.api import *
 
-in each module making use of CliMAF functions. But you may prefer to
-make only explicit imports, and then use::
+in each module making use of CliMAF functions. 
+
+But you may prefer to make only explicit imports, and then use::
 
 >>> import climaf
 
-In that latter case: 
+In that case: 
 
 - you must use fully qualified python names for climaf functions, such
   as ``climaf.classes.ds()``; you may have a look at module climaf.api
@@ -127,6 +130,10 @@ In that latter case:
   "climaf.operators" as e.g. in ::
 
 >>> avg=climaf.operators.time_average(ds)
+
+- the same applies for macros, mutatis mutandis  ::
+
+>>> avg=climaf.macros.my_macro(ds)
 
 
 

@@ -17,6 +17,7 @@ var=$1 ; shift
 period=$1 ; shift
 region=$1 ; shift
 alias=$1 ; shift
+vm=$1 ; shift
 
 tmp=~/tmp/$(basename $0)
 mkdir -p $tmp
@@ -36,6 +37,9 @@ if [ "$alias" ] ; then
     IFS=", " read var filevar scale offset <<< $alias 
     selalias=-expr,"$var=${filevar}*${scale}+${offset};"
 fi
+if [ "$vm" ] ; then 
+    setmiss="-setctomiss,$vm"
+fi
 i=0
 # Loop on the list of list of files 
 for out in $outs ; do 
@@ -45,22 +49,26 @@ for out in $outs ; do
     eval files=\$$i
     vfiles=""
 
-    # Make all selections (aliasing, time, space, variable) before applying the operator
+    # Make all selections (setmiss, aliasing, time, space, variable) before applying the operator
     for file in $files ; do
 	tmp2=$tmp/$(basename $file) ; rm -f $tmp2
-	if [ $alias ] ; then 
-	    cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+	if [ $setmiss ] ; then 
+	    cdo ${setmiss#-} $selalias ${selvar} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
-	    if [ "$period" ] ; then 
-		cdo ${selvar#-} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+	    if [ $alias ] ; then 
+		cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	    else
-		if [ "$var" ] ; then 
-		    cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
-		else 
-		    if [ "$region" ] ; then 
-			cdo ${selregion#-} $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
-		    else
-			vfiles+=" "$file ; 
+		if [ "$period" ] ; then 
+		    cdo ${selvar#-} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+		else
+		    if [ "$var" ] ; then 
+			cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
+		    else 
+			if [ "$region" ] ; then 
+			    cdo ${selregion#-} $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
+			else
+			    vfiles+=" "$file ; 
+			fi
 		    fi
 		fi
 	    fi

@@ -7,24 +7,19 @@ cdef("frequency","monthly")
 dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
 cfile(dg)
 
-# Compute its basic climatology using an external script
-#########################################################
-cscript('time_average' ,cpath+'/../scripts/mcdo.sh timavg ${out} ${var} ${period_iso} ${domain} "" ${ins}' )
+# Compute its basic climatology using a stndard operator external script
+##########################################################################
 ta=time_average(dg)
 
 # A simple plotting using standard operator ncview
 ##################################################
 # For reference, here is the declaration of oeprator 'ncview' :
 # cscript('ncview' ,'ncview ${in}' , format=None)
-
 ncview(ta)
 
-# A more sophisticated plot, using standard operator plotmap
-############################################################
-# For reference, here is the declaration of plotmap :
-# cscript('plotmap',"ncl "+ cpath +"/../scripts/plotmap.ncl infile=${in} plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} var=${var} title=${crs} scale=${scale} offset=${offset} units=${units}",format="png")
-
-map=plotmap(ta,color="BlueDarkRed18", min=260, max=300, delta=4)
+# A NCL-quality plot, using standard operator plot
+#############################################################
+map=plot(ta,crs="TAS")
 
 # Ensure figure is computed, and get its cache filename in CliMAF disk cache
 figfile=cfile(map)
@@ -38,7 +33,7 @@ def map_graph_attributes(var) :
     """ 
     Return a dictionnary with graphic attributes :
     - relevant to the geophysical variable in argument
-    - with keys adequte dor operator 'plotmap'
+    - with adequate keys for operator 'plot'
     """
     rep=dict()
     rep["min"]=0  ; rep["max"]=100 ; rep["delta"]=10.
@@ -49,7 +44,7 @@ def map_graph_attributes(var) :
     #
     return rep
     
-map2=plotmap(ta,crs="Surface temperature (tas)",**map_graph_attributes(varOf(ta)))
+map2=plot(ta,crs="Surface temperature (tas)",**map_graph_attributes(varOf(ta)))
 cshow(map2)
 
 

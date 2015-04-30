@@ -9,20 +9,20 @@ january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta", frequen
 ta_zonal_mean=ccdo(january_ta,operator="zonmean")
 
 # Plot
-plot=plotxsec(ta_zonal_mean)
-cshow(plot)
+zplot=plot(ta_zonal_mean)
+cshow(zplot)
 
 
 # Compute meridional mean
 ta_merid_mean=ccdo(january_ta,operator="mermean")
 
 # Plot
-plotm=plotxsec(ta_merid_mean)
+plotm=plot(ta_merid_mean)
 cshow(plotm)
 
 # Profile of global mean 
 ta_profile=ccdo(ta_merid_mean,operator="zonmean")
-plotp=plotxsec(ta_profile)
+plotp=plot(ta_profile)
 cshow(plotp)
 
 

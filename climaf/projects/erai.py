@@ -2,7 +2,7 @@
 
 This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM;
 
-**Also declares how to derive CMIP5 variables from the original ERAI variables set**
+**Also declares how to derive CMIP5 variables from the original ERAI variables set (aliasing)**
 
 Attributes are 'grid', and 'frequency'
 

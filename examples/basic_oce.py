@@ -39,7 +39,7 @@ os.system("ls -al "+my_file)
 #os.system("type ncdump && ncdump -h "+my_file)
 
 # Plot first time step
-fig=plotmap(tos,min=270, max=300, delta=3)
+fig=plot(tos)
 cshow(fig)
 
 # Select a latlon box and plot it

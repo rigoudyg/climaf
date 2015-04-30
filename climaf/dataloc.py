@@ -356,7 +356,7 @@ def selectEmFiles(**kwargs) :
 def periodOfEmFile(filename,realm,freq):
     """
     Return the period covered by a file handled by EM, based on filename
-    rules for EM
+    rules for EM. returns None if file frequency does not fit freq
     """
     if (realm == 'A' or realm == 'L' ) :
         if freq=='mon' or freq=='' :
@@ -369,15 +369,18 @@ def periodOfEmFile(filename,realm,freq):
             clogger.error(err)
             raise Climaf_Data_Error(err)
     elif (realm == 'O' or realm == 'I' ) :
-        if freq=='mon' or freq=='' :
-            patt=r'^.*_([0-9]{8})_*([0-9]{8})_.*nc'
-            beg=re.sub(patt,r'\1',filename)
-            end=re.sub(patt,r'\2',filename)
-            return init_period("%s-%s"%(beg,end))
+        if freq=='mon' or freq=='' : altfreq='m'
+        elif freq[0:2] =='da' : altfreq='d'
         else:
             err="Can yet handle only monthly frequency for realms O and I - TBD"
             clogger.error(err)
             raise Climaf_Data_Error(err)
+        patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8})_.*nc'
+        beg=re.sub(patt,r'\1',filename)
+        end=re.sub(patt,r'\2',filename)
+        #clogger.debug("beg=%s,end=%s,fn=%s"%(beg,end,filename))
+        if (end==filename or beg==filename) : return None
+        return init_period("%s-%s"%(beg,end))
     else:
         err="unexpected realm "+realm
         clogger.error(err)
@@ -467,7 +470,12 @@ def selectCmip5DrsFiles(urls, **kwargs) :
 
 
 class Climaf_Data_Error(Exception):
-    pass
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
 
 
 def test2() :

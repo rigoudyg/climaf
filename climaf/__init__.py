@@ -16,8 +16,10 @@ already_inited=False
 if not already_inited  : 
     already_inited=True
     #
-    from climaf import clogging, site_settings , cache, standard_operators
-    print "climaf.version="+version
+    import atexit
+    #
+    import clogging, site_settings , cache, standard_operators, cmacros
+    print "Climaf version = "+version
     #
     # Set default logging levels
     clogging.clog(os.getenv("CLIMAF_LOG_LEVEL","error"))
@@ -37,6 +39,13 @@ if not already_inited  :
     cache.setNewUniqueCache(os.getenv("CLIMAF_CACHE",default_cache))
     print "You may tune CliMAF cache location by setting $CLIMAF_CACHE before launch"
     #
-    # init dynamic CliMAF operators
+    # Init dynamic CliMAF operators
     standard_operators.load_standard_operators()
+    #
+    # Init and load macros
+    cmacros.read("~/.climaf")
+    atexit.register(cmacros.write)
+    #
+    atexit.register(cache.csync)
+
 

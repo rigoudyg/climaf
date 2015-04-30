@@ -1,5 +1,6 @@
-__doc__="""
+"""
 Example for CliMAF access to data organized according to CNRM-CM's 'EM' scheme
+
 """
 
 # S.Senesi - april 2015

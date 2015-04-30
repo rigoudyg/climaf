@@ -24,3 +24,9 @@ with the same name
 .. autoclass:: climaf.operators.cscript
 
 
+cmacro : define a macro  
+-----------------------------------------
+
+.. autofunction:: climaf.cmacros.cmacro
+
+

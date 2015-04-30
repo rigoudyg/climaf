@@ -8,21 +8,41 @@ Changes, newest first :
 
 .. _news_0.6:
 
+- 2005/04/30 - Version 0.6.1 :
+
+ - Add a **macro** feature : easy definition of a macro from a
+   compound object; you can save, edit, load... and macros are used for
+   interpreting cache content. See :py:func:`~climaf.cmacros.cmacro`
+ - Cleaner definition of CliMAF operators, in module ``operators``;
+   **this implies to execute** ``from operators import *`` **before using 
+   a user-defined operator**
+ - A **general purpose plot operator**, named ``plot``, is fine for
+   plotting 1D and 2D datasets (maps, cross-sections, profiles, but
+   not Hoevmoeller...) and replaces plotxesc and plotmap. See
+   :ref:`plot`
+ - Can **list or erase cache content using various filters** (on
+   age, size, modif date ...); disk usage can be displayed. 
+   See :py:func:`~climaf.cache.cdump()`
+ - Can cope with un-declared missing values in data files, as
+   e.g. Gelato outputs with value=1.e+20 over land, which is not the
+   declared missing value ; See :py:func:`~climaf.classes.calias()`
+ - Add : howto :py:ref:`record`
+
 - 2005/04/22 - Version 0.6.0 :
 
- - Add operator :ref:`plotxsec` for cross-section plots
+ - Add operator :doc:`scripts/plotxsec` 
  - **A number of 'projects' are built-in**, which describe data
    organization and data location for a number of analyses and
-   experiments datasets as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ;
-   see :ref:`known_datasets` 
+   experiments datasets available at one of our data centers, 
+   as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ; see :ref:`known_datasets` 
  - **Variable alias** and **variable scaling** are now managed, on a
    per-project basis. 
    See function :py:func:`~climaf.classes.calias()`
  - Derived variables can now be defined on a per-project basis. See function :py:func:`~climaf.operators.derive()`
- - Operator 'rescale' allows to define new variables through scaling. See :doc:`scripts/rescale`
  - CliMAF was proved to **work under a CDAT** install which uses
    Python 2.6
- - Better explain how to install CliMAf (or not), to run it or to use it as a library; see :ref:`installing`
+ - Better explain how to install CliMAf (or not), to run it or to use
+   it as a library; see :ref:`installing` and :ref:`library`
 
 .. _news_0.5:
 
@@ -33,7 +53,7 @@ Changes, newest first :
  - Starting CliMAF :
 
   - Binary ``climaf`` allows to launch Python and import Climaf at
-    once. See :ref:`running`
+    once. See :ref:`running_inter`
   - File ``~/.climaf`` is read as configuration file , at the end of
     climaf.api import
 
@@ -68,7 +88,7 @@ Changes, newest first :
  - Running CliMAF - messages, cache, errors :
 
   - Verbosity, and cache directory, can be set using environment
-    variables. See :ref:`running`
+    variables. See :ref:`configuring`
   - Simplify use of function :py:func:`~climaf.clogging.clog`
   - Log messages are indented to show recursive calls of ceval()
   - Quite extended use of Python exceptions for error handling

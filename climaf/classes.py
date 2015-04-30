@@ -10,10 +10,11 @@ import re, string
 
 import dataloc
 from period import init_period, cperiod
-from clogging import clogger
+from clogging import clogger, dedent
 
 #: Dictionnary of declared projects (type is cproject)
 cprojects=dict()
+#: Dictionnary of aliases
 aliases=dict()
 
 class cproject():
@@ -22,9 +23,9 @@ class cproject():
         Declare a project and its facets/attributes in CliMAF (see below)
 
         Args:
-          name (string) : project name
+          name (string) : project name; 
            do not use the chosen separator in it (see below)
-          args (strings) : attribute names
+          args (strings) : attribute names; 
            they are free; do not use the chosen separator in it (see below); **CliMAF 
            anyway will add attributes : 
            project, experiment, variable, period, and domain**
@@ -48,7 +49,8 @@ class cproject():
         experiment, model, rip, variable, frequency, realm, table, version
 
 
-        A number of projects are built-in. See :py:mod:`~climaf.projects`
+        **A number of projects are built-in**. See
+          :py:mod:`~climaf.projects`
         
         A dataset in a cproject declared as ::
 
@@ -110,8 +112,8 @@ cdefaults=dict()
 
 def cdef(attribute,value=None):
     """
-    Set or get the default value for a CliMAF dataset attributes (as e.g. 'model', 'project' ...),
-    for use by next calls to :py:class:`~climaf.classes.cdataset` or to :py:func:`~climaf.classes.ds`
+    Set or get the default value for a CliMAF dataset attribute (as e.g. 'model', 'project' ...),
+    for use by next calls to :py:class:`~climaf.classes.cdataset()` or to :py:func:`~climaf.classes.ds`
 
     Theres is no actual check that 'attribute' is a valid keyword for a call to ``ds`` or ``cdateset``
 
@@ -147,15 +149,11 @@ class cobject():
     def __init__(self):
         # crs is the string expression defining the object in the CLIMAF Reference Syntax
         self.crs="void"
-        # every object has a variable name for the main/unique file variable  
-        self.fileVarName="void"
-    def pr(self):
-        print(self.crs)
     def __str__(self):
         #return "Climaf object : "+self.crs
-        return self.crs
+        return self.buildcrs()
     def __repr__(self):
-        return self.crs
+        return self.buildcrs()
     def register(self):
         cobjects[self.crs]=self
         #clogger.debug("Object Created ; crs = %s"%(self.crs))
@@ -271,7 +269,8 @@ class cdataset(cobject):
         self.project   =attval['project']
         self.experiment=attval['experiment']
         self.variable= attval['variable']
-        self.alias=varIsAliased(self.project,self.variable) # 4-plet : filevar, scale, offset, filenameVar or None
+        # alias is a n-plet : filevar, scale, offset, filenameVar, missing
+        self.alias=varIsAliased(self.project,self.variable) 
         if type(attval['period']) is str :
             self.period    =init_period(attval['period'])
         else:
@@ -295,8 +294,7 @@ class cdataset(cobject):
         self.crs=self.buildcrs()
         self.register()
         
-    def buildcrs(self,period=None):
-        # Note : function 'ds' (far below) must be modified when buildcrs is modified
+    def buildcrs(self,period=None,crsrewrite=None):
         crs_template=string.Template(cprojects[self.project].crs)
         dic=self.kvp.copy()
         if period is not None : dic['period']=period
@@ -342,6 +340,9 @@ class cdataset(cobject):
         clogger.debug("always returns False, yet - TBD")
         return(False) 
     
+    def missingIsOK(self):
+        return self.alias.missing is None
+    
     def baseFiles(self,force=False):
         """ Returns the list of (local) files which include the data for the dataset
         Use cached value unless called with arg force=True
@@ -349,7 +350,7 @@ class cdataset(cobject):
         if force or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
-                filevar,scale,offset,filenameVar=self.alias
+                filevar,scale,offset,filenameVar,missing=self.alias
                 dic["variable"]=filevar
                 dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
@@ -386,20 +387,26 @@ class ctree(cobject):
         self.alias=None
         self.register()
 
-    def buildcrs(self, period=None) :
+    def buildcrs(self, period=None, crsrewrite=None) :
         """ Builds the CRS expression representing applying OPERATOR on OPERANDS with PARAMETERS.
         Forces period downtree if provided
+        A function for rewriting operand's CRS may be provided
         """
         # Operators are listed in alphabetical order; parameters too
         rep=self.operator+"("
+        #
         ops=[ o for o in self.operands ]
-        #ops.sort()
-        for op in ops : rep += op.buildcrs(period)+", "
+        for op in ops :
+            opcrs = op.buildcrs(period,crsrewrite)
+            if crsrewrite : opcrs=crsrewrite(opcrs)
+            rep+= opcrs + ","
+        #
         clefs=self.parameters.keys()
         clefs.sort()
-        for par in clefs : rep += par+"="+`self.parameters[par]`+", "
+        for par in clefs :
+            rep += par+"="+`self.parameters[par]`+","
         rep += ")"
-        rep=rep.replace(", )",")")
+        rep=rep.replace(",)",")")
         return rep
 
     def setperiod(self,period):
@@ -423,11 +430,14 @@ class scriptChild(cobject):
 
     def setperiod(self,period):
         self.erase()
-        self.crs=self.father.crs.buildcrs(period)+"."+self.varname
+        self.crs=self.father.crs.buildcrs(period)
+        self.crs += "."+self.varname
         self.register()
 
-    def buildcrs(self,period=None):
-        return self.father.buildcrs(period)+"."+self.varname
+    def buildcrs(self,period=None,crsrewrite=None):
+        tmp= self.father.buildcrs(period)
+        if (crsrewrite): tmp=crsrewrite(tmp)
+        return tmp+"."+self.varname
 
 def compare_trees(tree1,tree2,func,filter_on_operator=None) :
     """
@@ -506,38 +516,70 @@ def ds(*args,**kwargs) :
         return None
     else : return results[0]
 
-def calias(project,variable,fileVariable,scale=1.,offset=0.,filenameVar=None) :
-    """ Declare that in 'project', 'variable' is to be computed by
-    reading 'filevar' and applying 'scale' and 'offset'; alss allows
-    to tell which variable name should be used when computing the
-    filename for this variable in this project(for optimisation
-    purpose)
+
+def calias(project,variable,fileVariable=None,scale=1.,offset=0.,missing=None,filenameVar=None) :
+    """ Declare that in ``project``, ``variable`` is to be computed by
+    reading ``filevariable``, and applying ``scale`` and ``offset``;
+
+    Also allows to tell which variable name should be used when computing the
+    filename for this variable in this project (for optimisation
+    purpose);
+
+    And that a given constant must be interpreted as a missing value
+
+    ``variable`` may be a list. In that case, ``fileVariable`` and
+    ``filenameVar``, if provided, should be parallel lists
 
     Example ::
     
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     
     """
-    if not filenameVar : filenameVar =fileVariable
+    if not fileVariable : fileVariable =variable
+    if not filenameVar  : filenameVar =fileVariable
     if project not in cprojects : 
         raise Climaf_Dataset_Error("project %s is not known"%project)
     if project not in aliases : aliases[project]=dict()
-    aliases[project][variable]=(fileVariable,scale,offset,filenameVar)
+    if type(variable)     is not list : variable    =[variable]
+    if type(filenameVar)  is not list : filenameVar =[filenameVar]
+    if type(fileVariable) is not list : fileVariable=[fileVariable]
+    for v,fv,fnv in zip(variable,fileVariable,filenameVar) :
+        aliases[project][v]=(fv,scale,offset,fnv,missing)
 
 def varIsAliased(project,variable) :
     """ 
-    Return a triplet fileVariable, scale, offset defining how to 
+    Return a n-uplet (fileVariable, scale, offset, fileVariable, missing) defining how to 
     compute a 'variable' which is not in files, for the 'project'
     """
     if project in aliases and variable in aliases[project] :
         return aliases[project][variable]
 
+def cmissing(project,missing,*kwargs) :
+    """ Declare that in 'project', a given constant must be interpreted
+    as a missing value, for a given set of project's attributes values
+
+    Such a declaration must follow all ``calias`` declarations for the
+    same project
+    """
+    pass # to be developped  ....
+
 class Not_A_Climaf_Object_Error(Exception):
-    pass
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
 
 class Climaf_Dataset_Error(Exception):
-    pass
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
 
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) #LV

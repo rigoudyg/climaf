@@ -29,7 +29,7 @@ For **running CliMAF**, or running one of the Python scripts example described b
 
 ::
 
-    >>> import climaf.api
+    >>> from climaf.api import *
     >>> .... 
 
 
@@ -48,6 +48,8 @@ Some of the examples can be run anywhere, as they use the data sample installed 
   - :download:`latlonbox.py <../examples/latlonbox.py>`    : define a dataset on a lat-lon box; also extract a box out of a dataset
   - :download:`regrid.py <../examples/regrid.py>`    : regrid some data or object to a named grid or to the grid of another object/data
   - :download:`ann_cycle.py <../examples/ann_cycle.py>`    : compute an annual cycle, using CDO
+  - :download:`macro.py <../examples/macro.py>`    : define a
+    macro in-a-while, use it, save it, ....
 
 .. _examples_data:
 

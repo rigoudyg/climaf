@@ -51,7 +51,7 @@ Main functions are :
 # Created : S.Senesi - 2014
 
 
-import os, os.path, shutil, logging
+import os, os.path
 #
 import climaf
 
@@ -63,6 +63,7 @@ from climaf.projects import *
 #####################################################################################################################
 #
 from classes   import cdef,cdataset,ds,cproject,cprojects,calias
+from cmacros   import cmacro
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts, derive, operators
@@ -72,6 +73,9 @@ from site_settings import atCNRM, onCiclad
 
 # CliMAF standard dynamic operators
 from climaf.operators import *
+
+# CliMAF macros operators
+from climaf.cmacros import *
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 

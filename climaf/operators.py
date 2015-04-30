@@ -22,6 +22,7 @@ class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
                  canAggregateTime=False, canAlias=False,
+                 canMissing=False,
                  commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
@@ -29,6 +30,7 @@ class scriptFlags():
         self.canSelectDomain=canSelectDomain
         self.canAggregateTime=canAggregateTime
         self.canAlias=canAlias
+        self.canMissing=canMissing
         self.commuteWithTimeConcatenation=commuteWithTimeConcatenation
         self.commuteWithSpaceConcatenation=commuteWithSpaceConcatenation
 
@@ -61,7 +63,7 @@ class cscript():
         For introducing the syntax, please consider this example, with the following commands::
         
         >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
-        >>> # This is necessary to ease reference to the new operator (rather than write 'climaf.operators.mycdo') :
+        >>> # Next line is necessary to ease reference to the new operator (rather than write 'climaf.operators.mycdo') :
         >>> from climaf.operators import mycdo     
         >>> # define some dataset
         >>> tas_ds = ds(project='example', experiment='AMIPV6', variable='tas', period='1980-1981')
@@ -189,6 +191,9 @@ class cscript():
            'new_varname,file_varname,scale,offset'. The script should then output
            a variable new_varname = file_varname * scale + offset
 
+         - **missing** : means that the script can make an on-the-fly transformation
+           of a givent constant to missing values
+
         """
         # Check that script name do not clash with an existing symbol 
         if name in dir() and name not in scripts :
@@ -253,6 +258,7 @@ class cscript():
         canSelectVar= (command.find("${var}") > 0 )
         canAggregateTime=(command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
         canAlias= (command.find("${alias}") > 0 )
+        canMissing= (command.find("${missing}") > 0 )
         canSelectTime=False
         if command.find("${period}") > 0  or command.find("${period_1}") > 0 :
             canSelectTime=True
@@ -263,7 +269,8 @@ class cscript():
         self.name=name
         self.command=command
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-            canSelectDomain, canAggregateTime, canAlias,commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
+            canSelectDomain, canAggregateTime, canAlias, canAlias,\
+            commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
         scripts[name]=self
 
@@ -303,7 +310,7 @@ class cscript():
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 
 	canSelectTime=False, canSelectDomain=False, canAggregateTime=False,
-        canAlias=False):
+        canAlias=False, canMissing=False):
         clogger.error("Not yet developped")
 
 
@@ -394,6 +401,7 @@ class Climaf_Operator_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
         clogger.error(self.__str__())
+        dedent(100)
     def __str__(self):
         return `self.valeur`
 
