@@ -42,6 +42,9 @@ if not already_inited  :
     # Init dynamic CliMAF operators
     standard_operators.load_standard_operators()
     #
+    # Load cache index
+    cache.cload()
+    #
     # Init and load macros
     cmacros.read("~/.climaf")
     atexit.register(cmacros.write)

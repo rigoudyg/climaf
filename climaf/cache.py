@@ -268,11 +268,23 @@ def cdrop(obj, rm=True) :
 
 def csync() :
     """
-    Writes in-memory cache dictionnary to disk ; should be called before exit
+    Update cache dictionnary from actual cache file conents, and write it to disk
 
     """
     import pickle
     global cacheIndexFileName
+
+    #check if cache index is up to date, if it is not the function 'rebuild' is called
+    clogger.warning("Listing files present in cache")
+    files_in_cache=list_cache()
+    files_in_cache.sort()
+    index_keys=crs2filename.values()
+    index_keys.sort()
+    if files_in_cache != index_keys:
+        clogger.warning("Rebuilding cache index")
+        rebuild()  
+
+    # Save to disk
     cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
     pickle.dump(crs2filename,cacheIndexFile)  
     cacheIndexFile.close()
@@ -323,7 +335,7 @@ def cdump(use_macro=True):
 
 def list_cache():
     """
-    Return the list of files in cache directories
+    Return the list of files in cache directories, using `find`
     
     """
     files_in_cache=[]
@@ -340,8 +352,9 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     Internal function used by its front-ends : cls, crm, cdu, cwc
 
     List the content of CliMAF cache according to some search criteria and operate possibly
-    an action (usage, count or remove) on this list. If necessary, the content of CliMAF
-    cache index is updated at the beginning of the search.
+    an action (usage, count or remove) on this list.
+
+    Please consider the cost and benefit of first updating CliMAF cache index using :py:func:`csync()`
     
     Args:
      size (string, optional): n[ckMG]
@@ -387,15 +400,6 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
 
     """
-
-    #check if cache index is up to date, if it is not the function 'rebuild' is called
-    files_in_cache=list_cache()
-    files_in_cache.sort()
-    index_keys=crs2filename.values()
-    index_keys.sort()
-    if files_in_cache != index_keys:
-        clogger.info("Rebuild of index crs2filename")
-        rebuild()  
 
     #cache directories
     rep=os.path.expanduser(cachedirs[0]) #TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
@@ -453,7 +457,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if pattern :
         list_crs_to_rm=[]
         for crs in new_dict :
-            if re.search(pattern, crs) or re.search(pattern, new_dict[crs]):
+            if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs]):
                 clogger.debug("Pattern found in %s: %s"%(crs,new_dict[crs]))
                 find_pattern=True
             else:
@@ -475,7 +479,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if not_pattern:
         list_crs_to_rm=[]
         for crs in new_dict :
-            if re.search(not_pattern, crs) is None and re.search(not_pattern, new_dict[crs]) is None:
+            if re.search(not_pattern, crewrite(crs)) is None and \
+               re.search(not_pattern, new_dict[crs]) is None :
                 clogger.debug("Pattern not found in %s: %s"%(crs, new_dict[crs]))
                 find_not_pattern=True
             else:
@@ -527,6 +532,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         list_tmp_crs=new_dict.keys() if (var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys() 
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
+        return(map(crewrite,list_tmp_crs))
                 
     else: #usage, count and remove are False
         if var_find or pattern is not "" or not_pattern is not "" :
@@ -535,11 +541,12 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     print "Filtered objects :"
                 else :
                     print "Filtered objects = cache content"
-                return (new_dict.keys())
+                return (map(crewrite,new_dict.keys()))
             else : print "No matching file "    
         else:
             print "Content of CliMAF cache"
-            return (crs2filename.keys())
+            return (map(crewrite,crs2filename.keys()))
+            #return (crs2filename.keys())
 
     #TBD
     if special is True :
@@ -556,34 +563,34 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
 def cls(**kwargs):
     """
-    Return the in-memory content of CliMAF cache index. If necessary, the content of CliMAF cache index is update.
+    List CliMAF cache objects. Synonym to clist(). See :py:func:`clist`
    
     """
-    clist(**kwargs)
+    return clist(**kwargs)
 
 def crm(**kwargs):
     """
-    Remove the cache files found by 'clist()' when using same arguments.
+    Remove the cache files found by 'clist()' when using same arguments. See :py:func:`clist`
 
     """
     kwargs['remove']=True
     kwargs['usage']=False
     kwargs['count']=False
-    clist(**kwargs)
+    return clist(**kwargs)
 
 def cdu(**kwargs):
     """
-    Estimate file space usage, for each found file and total size from 'clist'
-    function. With count=True, estimate only total found files space usage.
+    Report disk usage, for files matching some criteria, as specified for :py:func:`clist`.
+    With count=True, report only total disk usage.
     
     """
     kwargs['usage']=True 
     kwargs['remove']=False
-    clist(**kwargs)
+    return clist(**kwargs)
 
 def cwc(**kwargs):
     """
-    Return the number of files found by 'clist' function with same args.
+    Report number of cache files matching some criteria, as specified for :py:func:`clist`.
     If CRS is True, also return CRS expression of found files.
 
     """
