@@ -13,6 +13,8 @@ Example for defining an EM dataset::
 
  >>> tas=ds(project='EM', experiment='GSAGNS1', variable='tas', period='1975', frequency='monthly', realm='L')
 
+ A number of Seaice fields are duly described with 1.e+20 as missing value (which is ill described in data files); see code for details
+
 """
 
 from climaf.dataloc import dataloc

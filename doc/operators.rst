@@ -38,7 +38,7 @@ The main principles for a diagnostic are that :
     - they interface with CliMAF using :
 
      - NetCDF files or OpenDAP dataset URLs (see below) for data input
-     - NetCDF files for data output
+     - NetCDF or PNG files for data output
 
     - input and output dataset filenames are provided by CliMAF as script
       arguments (at the location required by the script)

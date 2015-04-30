@@ -19,18 +19,21 @@ Changes, newest first :
  - A **general purpose plot operator**, named ``plot``, is fine for
    plotting 1D and 2D datasets (maps, cross-sections, profiles, but
    not Hoevmoeller...) and replaces plotxesc and plotmap. See
-   :ref:`plot`
+   :doc:`scripts/plot` 
  - Can **list or erase cache content using various filters** (on
    age, size, modif date ...); disk usage can be displayed. 
    See :py:func:`~climaf.cache.cdump()`
  - Can cope with un-declared missing values in data files, as
    e.g. Gelato outputs with value=1.e+20 over land, which is not the
    declared missing value ; See :py:func:`~climaf.classes.calias()`
+   and :py:mod:`~climaf.projects.em`
  - Add : howto :py:ref:`record`
+ - Cache content index is saved on exit
 
 - 2005/04/22 - Version 0.6.0 :
 
- - Add operator :doc:`scripts/plotxsec` 
+ - Add operator ``plotxsec`` (removed in 0.6.1, see
+   replacement at :doc:`scripts/plot` )
  - **A number of 'projects' are built-in**, which describe data
    organization and data location for a number of analyses and
    experiments datasets available at one of our data centers, 

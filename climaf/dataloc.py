@@ -10,7 +10,7 @@ from string import Template
 
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
-from clogging import clogger
+from clogging import clogger,dedent
 
 locs=[]
 

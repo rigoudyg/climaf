@@ -7,7 +7,7 @@ CliMAF cache module : stores and retrieves CliMAF objects from their CRS express
 """
 # Created : S.Senesi - 2014
 
-import sys, os, os.path, re, time
+import sys, os, os.path, re, time, glob
 
 from classes import compare_trees, cobject, ctree, cdataset
 from cmacros import crewrite
@@ -18,6 +18,8 @@ directoryNameLength=2
 DynamicIsOn=False
 currentCache=None
 cachedirs=None
+#: The index associating filenames to CRS expressions
+crs2filename=dict()  
 
 def setNewUniqueCache(path) :
     """ Define PATH as the sole cache to use from now. And clear it 
@@ -28,7 +30,6 @@ def setNewUniqueCache(path) :
     global cacheIndexFileName
     
     cachedirs=[ path ] # The list of cache directories
-    crs2filename=dict()  # The index associating filenames to CRS expressions
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
     craz(hideError=True)
@@ -166,7 +167,6 @@ def rename(filename,crs) :
         register(newfile,crs)
         return(newfile)
     
-
 def hasMatchingObject(cobject,ds_func) : 
 
     """ if the cache holds a file which represents an object with the
@@ -209,7 +209,6 @@ def hasExactObject(cobject) :
     if cobject.crs in crs2filename :
         return (crs2filename[cobject.crs])
 
-                
 def complement(crsb, crse, crs) :
     """ Extends time period of file object of CRSB (B for 'begin')
     with file object of CRSE (E for 'end') for creating file object of
@@ -280,7 +279,7 @@ def csync() :
 
 def cload() :
     import pickle
-    global crs2filename
+    global crs2filename #pb sans cette declaration
     if len(crs2filename) != 0 :
         clogger.critical("attempt to reset file index - would lead to inconsistency !")
         return 
@@ -300,7 +299,6 @@ def craz(hideError=False) :
       hideError (bool): if True, will not warn for non existing cache
 
     """
-    global crs2filename
     cc=os.path.expanduser(currentCache)
     if (os.path.exists(currentCache) or hideError is False) :
         os.system("rm -fR "+cc+"/*")
@@ -322,4 +320,290 @@ def cdump(use_macro=True):
             print "%s : %s"%(crs2filename[crs],crs)
         else:
             print "%s : %s"%(crs2filename[crs],crewrite(crs))
+
+def list_cache():
+    """
+    Return the list of files in cache directories
+    
+    """
+    files_in_cache=[]
+    find_return=""
+    for dir_cache in cachedirs :
+        rep=os.path.expanduser(dir_cache)
+        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' \) -print" %rep).read()
+    files_in_cache=find_return.split('\n')
+    files_in_cache.pop(-1)
+    return(files_in_cache)
+
+def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, count=False, remove=False, CRS=False, special=False):
+    """
+    Internal function used by its front-ends : cls, crm, cdu, cwc
+
+    List the content of CliMAF cache according to some search criteria and operate possibly
+    an action (usage, count or remove) on this list. If necessary, the content of CliMAF
+    cache index is updated at the beginning of the search.
+    
+    Args:
+     size (string, optional): n[ckMG]
+      Search files using n units of disk space, rounding up. Numeric arguments can be specified as `n` for greater than n.
+      The following suffixes can be used:
+        - `c'    for bytes (default)
+        - `k'    for Kilobytes (units of         1,024 bytes)
+        - `M'    for Megabytes (units of     1,048,576 bytes)
+        - `G'    for Gigabytes (units of 1,073,741,824 bytes)
+                
+     age (string, optional): n
+      Search files which status was last changed n*24 hours ago. Any fractional part is ignored,
+      so to match age='+1', a file has to have been changed at least two days ago.
+      Numeric arguments can be specified as:
+        - `+n`   for greater than n
+        - `-n`   for less than n,
+        - `n`    for exactly n.
+
+     access (int, optional): n ;
+      Search files which were last accessed n*24 hours ago. Any fractional part is ignored, so to match
+      access='1', a file has to have been accessed at least two days ago.
+      Numeric arguments can be specified as `n` for greater than n.
+
+     pattern (string, optional): Scan through crs and filenames looking for
+      the first location where the regular expression pattern produces a match. 
+
+     not_pattern (string, optional): Scan through crs and filenames looking
+      for the location where the regular expression not_pattern does not produce a match. 
+        
+     usage (bool, optional): Estimate found files space usage, for each
+      found file and total size. If count is True, estimate only total found
+      files space usage.
+
+     count (bool, optional): Return the number of found files. If CRS is True,
+      also return crs of found files.
+        
+     remove (bool, optional): Remove the found files. This argument is exclusive.
+        
+     CRS (bool, optional): if True, print also CRS expression. Only useful if count is True.
+
+
+     Return: the dictionnary corresponding to the request and associated action ( without arguments : dictionnary of CliMAF cache index)
+
+
+    """
+
+    #check if cache index is up to date, if it is not the function 'rebuild' is called
+    files_in_cache=list_cache()
+    files_in_cache.sort()
+    index_keys=crs2filename.values()
+    index_keys.sort()
+    if files_in_cache != index_keys:
+        clogger.info("Rebuild of index crs2filename")
+        rebuild()  
+
+    #cache directories
+    rep=os.path.expanduser(cachedirs[0]) #TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
+
+    #command for research on size/age/access
+    command=""
+    opt_find=""
+    if size :
+        if re.search('[kMG]', size) is None :  
+            opt_find+="-size +%sc "%size  
+        else:
+            opt_find+="-size +%s "%size
+    if age :
+        opt_find+="-ctime %s "%age
+    if access !=0 :
+        opt_find+="-atime +%s"%str(int(access))
+                
+    var_find=False
+    if size or age or access != 0 :
+        var_find=True
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' \) %s -print" %(rep, opt_find)
+        clogger.debug("Find command is :"+command)
+
+        #construction of the new dictionnary after research on size/age/access
+        new_dict=dict()
+        find_return=""
+        list_search_files_after_find=[]
+
+        find_return=os.popen(command).read()
+        list_search_files_after_find=find_return.split('\n')
+        list_search_files_after_find.pop(-1)
+        clogger.debug("List of search files: "+`list_search_files_after_find`)
+
+        # Search CRS for each found file
+        for filen in list_search_files_after_find :
+            for crs in crs2filename:
+                if crs2filename[crs]==filen:
+                    new_dict[crs]=filen
+                    
+        if len(new_dict) != 0 :
+            if new_dict != crs2filename :
+                clogger.debug("Dictionnary after find for size/age/access: "+`new_dict`)
+            else : 
+                clogger.debug("Size/age/access criteria do not lead to any filtering")
+        else :
+            clogger.debug("No file meet the size/age/access criteria")
+    else:
+        new_dict=crs2filename.copy()
+
+    #size of new dictionnary
+    len_new_dict=len(new_dict)
+
+    #filter on pattern
+    find_pattern=False
+    if pattern :
+        list_crs_to_rm=[]
+        for crs in new_dict :
+            if re.search(pattern, crs) or re.search(pattern, new_dict[crs]):
+                clogger.debug("Pattern found in %s: %s"%(crs,new_dict[crs]))
+                find_pattern=True
+            else:
+                # Do not remove now from new_dict, because we loop on it
+                list_crs_to_rm.append(crs)
+        for crs in list_crs_to_rm :
+            del new_dict[crs]
+    
+        if find_pattern :
+            clogger.debug("Dictionnary after search for pattern: "+`new_dict`)
+        elif len_new_dict!=0 :
+            clogger.debug("No string found for pattern => no result")
+       
+    #update size new dictionnary
+    len_new_dict=len(new_dict)
+    
+    #research on not_pattern  
+    find_not_pattern=False  
+    if not_pattern:
+        list_crs_to_rm=[]
+        for crs in new_dict :
+            if re.search(not_pattern, crs) is None and re.search(not_pattern, new_dict[crs]) is None:
+                clogger.debug("Pattern not found in %s: %s"%(crs, new_dict[crs]))
+                find_not_pattern=True
+            else:
+                list_crs_to_rm.append(crs)
+        for crs in list_crs_to_rm :
+            del new_dict[crs]
+        
+        if find_not_pattern :
+            clogger.debug("Dictionnary after search for not_pattern: "+`new_dict`)
+        elif  len_new_dict!=0 :
+            clogger.debug("All strings contain not_pattern => no result")
+            
+    #update size new dictionnary
+    len_new_dict=len(new_dict)
+
+    #request on new dictionnary through usage, count and remove
+    work_dic=new_dict if (var_find or pattern is not "" or not_pattern is not "") else crs2filename
+    
+    if usage is True and len_new_dict != 0 :
+        tmp=""
+        for crs in work_dic :
+            tmp+=work_dic[crs]+" "
+        res=os.popen("du -sc %s | awk '{print $1}' | tail -n1"%tmp).read() #result in Ko
+        tot_volume=float(res)
+
+        unit=["K","M","G","T"]
+        i=0
+        while tot_volume >= 1024. and i < 4:
+            tot_volume/=1024.
+            i+=1
+        
+        if count is True : # Display total volume of found files
+            print "%4.1f%s : total" %(tot_volume, unit[i])
+
+        else: #retrieve disk-usage of each found file and total volume
+            for crs in work_dic :
+                res=os.popen("du -sh %s | awk '{print $1}'"%work_dic[crs]).read().replace('\n','')
+                print "%5s : %s" %(res, crs)
+            print "%4.1f%s : total" %(tot_volume, unit[i])
+            
+    elif count is True and len_new_dict != 0 :
+        print "Number of files found:", len(work_dic)
+        if CRS is True:
+            for crs in work_dic : print crs
+        
+    elif remove is True and len_new_dict != 0 :
+        print "Removed files:"
+        list_tmp_crs=[]
+        list_tmp_crs=new_dict.keys() if (var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys() 
+        for crs in list_tmp_crs:
+            cdrop(crs, rm=True)
+                
+    else: #usage, count and remove are False
+        if var_find or pattern is not "" or not_pattern is not "" :
+            if len(new_dict) != 0 : 
+                if new_dict != crs2filename :
+                    print "Filtered objects :"
+                else :
+                    print "Filtered objects = cache content"
+                return (new_dict.keys())
+            else : print "No matching file "    
+        else:
+            print "Content of CliMAF cache"
+            return (crs2filename.keys())
+
+    #TBD
+    if special is True :
+        global dic_special
+        dic_special=dict()
+        if var_find is True or pattern is not "" or not_pattern is not "" :
+            dic_special=new_dict.copy()
+        else: 
+            dic_special=crs2filename.copy()
+        print "List of marked figures as 'special'", dic_special.values()
+        return(dic_special) #TBD: declarer comme var globale et enlever son effacement dans creset
+
+    new_dict.clear()
+
+def cls(**kwargs):
+    """
+    Return the in-memory content of CliMAF cache index. If necessary, the content of CliMAF cache index is update.
+   
+    """
+    clist(**kwargs)
+
+def crm(**kwargs):
+    """
+    Remove the cache files found by 'clist()' when using same arguments.
+
+    """
+    kwargs['remove']=True
+    kwargs['usage']=False
+    kwargs['count']=False
+    clist(**kwargs)
+
+def cdu(**kwargs):
+    """
+    Estimate file space usage, for each found file and total size from 'clist'
+    function. With count=True, estimate only total found files space usage.
+    
+    """
+    kwargs['usage']=True 
+    kwargs['remove']=False
+    clist(**kwargs)
+
+def cwc(**kwargs):
+    """
+    Return the number of files found by 'clist' function with same args.
+    If CRS is True, also return CRS expression of found files.
+
+    """
+    kwargs['count']=True
+    kwargs['remove']=False
+    kwargs['usage']=False 
+    return clist(**kwargs)
+
+def rebuild():
+    """
+    Rebuild the in-memory content of CliMAF cache index
+    
+    """
+    global crs2filename
+    
+    files_in_cache=list_cache()
+    crs2filename.clear()
+    for files in files_in_cache:
+        crs2filename[getCRS(files)]=files
+
+    return(crs2filename)
+    
 
