@@ -13,6 +13,7 @@ from classes import compare_trees, cobject, ctree, cdataset
 from cmacros import crewrite
 from clogging import clogger
 import operators
+from operator import itemgetter  
 
 directoryNameLength=2
 DynamicIsOn=False
@@ -268,7 +269,7 @@ def cdrop(obj, rm=True) :
 
 def csync() :
     """
-    Update cache dictionnary from actual cache file conents, and write it to disk
+    Update cache dictionary from actual cache file conents, and write it to disk
 
     """
     import pickle
@@ -351,14 +352,15 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     """
     Internal function used by its front-ends : cls, crm, cdu, cwc
 
-    List the content of CliMAF cache according to some search criteria and operate possibly
-    an action (usage, count or remove) on this list.
+    List the content of CliMAF cache according to some search criteria
+    and operate possibly an action (usage, count or remove) on this list.
 
-    Please consider the cost and benefit of first updating CliMAF cache index using :py:func:`csync()`
+    Please consider the cost and benefit of first updating CliMAF cache
+    index using :py:func:`csync()`
     
     Args:
      size (string, optional): n[ckMG]
-      Search files using n units of disk space, rounding up. Numeric arguments can be specified as `n` for greater than n.
+      Search files using more than n units of disk space, rounding up.
       The following suffixes can be used:
         - `c'    for bytes (default)
         - `k'    for Kilobytes (units of         1,024 bytes)
@@ -366,38 +368,48 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         - `G'    for Gigabytes (units of 1,073,741,824 bytes)
                 
      age (string, optional): n
-      Search files which status was last changed n*24 hours ago. Any fractional part is ignored,
-      so to match age='+1', a file has to have been changed at least two days ago.
+      Search files which status was last changed n*24 hours ago. Any
+      fractional part is ignored, so to match age='+1', a file has to
+      have been changed at least two days ago.
       Numeric arguments can be specified as:
         - `+n`   for greater than n
         - `-n`   for less than n,
         - `n`    for exactly n.
 
-     access (int, optional): n ;
-      Search files which were last accessed n*24 hours ago. Any fractional part is ignored, so to match
-      access='1', a file has to have been accessed at least two days ago.
-      Numeric arguments can be specified as `n` for greater than n.
+     access (int, optional): n 
+      Search files which were last accessed more than n*24 hours ago. Any
+      fractional part is ignored, so to match access='1', a file has to
+      have been accessed at least two days ago.
 
      pattern (string, optional): Scan through crs and filenames looking for
       the first location where the regular expression pattern produces a match. 
 
      not_pattern (string, optional): Scan through crs and filenames looking
-      for the location where the regular expression not_pattern does not produce a match. 
+      for the location where the regular expression not_pattern does not
+      produce a match. 
         
      usage (bool, optional): Estimate found files space usage, for each
-      found file and total size. If count is True, estimate only total found
-      files space usage.
+      found file and total size. If count is True, estimate only found
+      files total space usage.
 
      count (bool, optional): Return the number of found files. If CRS is True,
       also return crs of found files.
         
      remove (bool, optional): Remove the found files. This argument is exclusive.
         
-     CRS (bool, optional): if True, print also CRS expression. Only useful if count is True.
+     CRS (bool, optional): if True, print also CRS expression. Only useful
+      if count is True.
 
 
-     Return: the dictionnary corresponding to the request and associated action ( without arguments : dictionnary of CliMAF cache index)
+     Return: the dictionary corresponding to the request and associated action
+      (without arguments : dictionary of CliMAF cache index)
 
+     Example to search files using more than 3M of disk space, which status
+      was last changed more than 15 days ago and containing the pattern
+      '1980-1981' either in crs or filename. For found files, we want to
+      estimate only found files total space usage::
+     
+      >>> clist(size='3M', age='+15', pattern= '1980-1981', usage=True, count=True)
 
     """
 
@@ -423,7 +435,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         command="find %s -type f \( -name '*.png' -o -name '*.nc' \) %s -print" %(rep, opt_find)
         clogger.debug("Find command is :"+command)
 
-        #construction of the new dictionnary after research on size/age/access
+        #construction of the new dictionary after research on size/age/access
         new_dict=dict()
         find_return=""
         list_search_files_after_find=[]
@@ -441,7 +453,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     
         if len(new_dict) != 0 :
             if new_dict != crs2filename :
-                clogger.debug("Dictionnary after find for size/age/access: "+`new_dict`)
+                clogger.debug("Dictionary after find for size/age/access: "+`new_dict`)
             else : 
                 clogger.debug("Size/age/access criteria do not lead to any filtering")
         else :
@@ -449,7 +461,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     else:
         new_dict=crs2filename.copy()
 
-    #size of new dictionnary
+    #size of new dictionary
     len_new_dict=len(new_dict)
 
     #filter on pattern
@@ -467,11 +479,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             del new_dict[crs]
     
         if find_pattern :
-            clogger.debug("Dictionnary after search for pattern: "+`new_dict`)
+            clogger.debug("Dictionary after search for pattern: "+`new_dict`)
         elif len_new_dict!=0 :
             clogger.debug("No string found for pattern => no result")
        
-    #update size new dictionnary
+    #update size new dictionary
     len_new_dict=len(new_dict)
     
     #research on not_pattern  
@@ -489,38 +501,61 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             del new_dict[crs]
         
         if find_not_pattern :
-            clogger.debug("Dictionnary after search for not_pattern: "+`new_dict`)
+            clogger.debug("Dictionary after search for not_pattern: "+`new_dict`)
         elif  len_new_dict!=0 :
             clogger.debug("All strings contain not_pattern => no result")
             
-    #update size new dictionnary
+    #update size new dictionary
     len_new_dict=len(new_dict)
 
-    #request on new dictionnary through usage, count and remove
+    #request on new dictionary through usage, count and remove
     work_dic=new_dict if (var_find or pattern is not "" or not_pattern is not "") else crs2filename
     
     if usage is True and len_new_dict != 0 :
+        #construction of a dictionary containing crs and disk-usage associated
+        dic_usage=dict()
         tmp=""
         for crs in work_dic :
             tmp+=work_dic[crs]+" "
-        res=os.popen("du -sc %s | awk '{print $1}' | tail -n1"%tmp).read() #result in Ko
-        tot_volume=float(res)
-
-        unit=["K","M","G","T"]
-        i=0
-        while tot_volume >= 1024. and i < 4:
-            tot_volume/=1024.
-            i+=1
+        res=os.popen("du -sc %s"%tmp).read()
         
-        if count is True : # Display total volume of found files
-            print "%4.1f%s : total" %(tot_volume, unit[i])
+        regex=re.compile('([0-9]+)\t')
+        list_size=re.findall(regex,res)
+        regex2=re.compile('([0-9]+\t)')
+        str_path=regex2.sub('',res)
+        list_fig=str_path.split('\n')
+        list_fig.pop(-1)
+    
+        for fig,size in zip(list_fig,list_size): 
+            if fig!="total":
+                for crs in work_dic:
+                    if fig==work_dic[crs]:
+                        dic_usage[crs]=size 
+            else:
+                dic_usage[fig]=size
 
-        else: #retrieve disk-usage of each found file and total volume
-            for crs in work_dic :
-                res=os.popen("du -sh %s | awk '{print $1}'"%work_dic[crs]).read().replace('\n','')
-                print "%5s : %s" %(res, crs)
-            print "%4.1f%s : total" %(tot_volume, unit[i])
+        #sort of usage dictionary and units conversion
+        du_list_sort=dic_usage.items()
+        du_list_sort.sort(key=itemgetter(1),reverse=False)
+        
+        unit=["K","M","G","T"]
+        for n,pair in enumerate(du_list_sort):
+            i=0
+            flt=float(pair[1])
+            while flt >= 1024. and i < 4:
+                flt/=1024.
+                i+=1
+            du_list_sort[n]=(du_list_sort[n][0],"%6.1f%s"%(flt,unit[i]))
             
+        if count is True : # Display total volume of found files
+            for fig, size in du_list_sort:
+                if fig=="total":              
+                    print "%7s : %s" %(size,fig)  
+            
+        else: #retrieve disk-usage of each found file and total volume
+            for fig,size in du_list_sort:
+                print "%7s : %s" %(size,fig)
+        
     elif count is True and len_new_dict != 0 :
         print "Number of files found:", len(work_dic)
         if CRS is True:
@@ -546,7 +581,6 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         else:
             print "Content of CliMAF cache"
             return (map(crewrite,crs2filename.keys()))
-            #return (crs2filename.keys())
 
     #TBD
     if special is True :
@@ -564,13 +598,20 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 def cls(**kwargs):
     """
     List CliMAF cache objects. Synonym to clist(). See :py:func:`clist`
-   
+
     """
     return clist(**kwargs)
 
 def crm(**kwargs):
     """
-    Remove the cache files found by 'clist()' when using same arguments. See :py:func:`clist`
+    Remove the cache files found by 'clist()' when using same arguments.
+     See :py:func:`clist`
+
+    Example to remove files using more than 3M of disk space, which status
+     was last changed more than 15 days ago and containing the pattern
+     '1980-1981' either in crs or filename::
+     
+     >>> crm(size='3M', age='+15', pattern='1980-1981')
 
     """
     kwargs['remove']=True
@@ -580,8 +621,15 @@ def crm(**kwargs):
 
 def cdu(**kwargs):
     """
-    Report disk usage, for files matching some criteria, as specified for :py:func:`clist`.
-    With count=True, report only total disk usage.
+    Report disk usage, for files matching some criteria, as specified
+     for :py:func:`clist`. With count=True, report only total disk usage.
+
+    Example to search files using more than 3M of disk space, which status
+      was last changed more than 15 days ago and containing the pattern
+      '1980-1981' either in crs or filename. For found files, we want to
+      estimate only found files total space usage::
+     
+      >>> cdu(size='3M', age='+15', pattern= '1980-1981', count=True)
     
     """
     kwargs['usage']=True 
@@ -590,8 +638,16 @@ def cdu(**kwargs):
 
 def cwc(**kwargs):
     """
-    Report number of cache files matching some criteria, as specified for :py:func:`clist`.
-    If CRS is True, also return CRS expression of found files.
+    Report number of cache files matching some criteria, as specified
+     for :py:func:`clist`. If CRS is True, also return CRS expression
+     of found files.
+
+    Example to return the number and crs associated of files using more
+     than 3M of disk space, which status was last changed more than 15
+     days ago and containing the pattern '1980-1981' either in crs or
+     filename::
+     
+     >>> cwc(size='3M', age='+15', pattern= '1980-1981', CRS=True)
 
     """
     kwargs['count']=True
