@@ -401,7 +401,7 @@ class Climaf_Operator_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
         clogger.error(self.__str__())
-        dedent(100)
+        #clogging.dedent(100)
     def __str__(self):
         return `self.valeur`
 
