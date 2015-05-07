@@ -187,12 +187,16 @@ class cscript():
            or legend
 
          - **alias** : means that the script can make an on the fly re-scaling
-           and renaming of a variable. Will be replaced by a string which pattern is :
-           'new_varname,file_varname,scale,offset'. The script should then output
-           a variable new_varname = file_varname * scale + offset
+           and renaming of a variable. Will be replaced by a string which 
+           pattern is : 'new_varname,file_varname,scale,offset'. The script 
+           should then transform on reading as new_varname = 
+           file_varname * scale + offset
 
-         - **missing** : means that the script can make an on-the-fly transformation
-           of a givent constant to missing values
+         - **units, units_<digit>** : means that the script can set the units 
+           on-the-fly while reading one of the input streams
+
+         - **missing** : means that the script can make an on-the-fly 
+           transformation of a givent constant to missing values
 
         """
         # Check that script name do not clash with an existing symbol 

@@ -17,10 +17,10 @@ var=$1 ; shift
 period=$1 ; shift
 region=$1 ; shift
 alias=$1 ; shift
+units=$1 ; shift
 vm=$1 ; shift
 
-tmp=~/tmp/$(basename $0)
-mkdir -p $tmp
+tmp=$(mktemp -d --tmpdir climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
 
 # Prepare CDO operator strings
 
@@ -49,23 +49,29 @@ for out in $outs ; do
     eval files=\$$i
     vfiles=""
 
-    # Make all selections (setmiss, aliasing, time, space, variable) before applying the operator
+    # Make all selections (setmiss, aliasing, time, space, variable) 
+    # before applying the operator
     for file in $files ; do
 	tmp2=$tmp/$(basename $file) ; rm -f $tmp2
 	if [ $setmiss ] ; then 
-	    cdo ${setmiss#-} $selalias ${selvar} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+	    cdo ${setmiss#-} $selalias ${selvar} $selregion $seldate \
+		$file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
 	    if [ $alias ] ; then 
-		cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+		cdo ${selalias#-} ${selvar} $selregion $seldate \
+		    $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	    else
 		if [ "$period" ] ; then 
-		    cdo ${selvar#-} $selregion $seldate $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+		    cdo ${selvar#-} $selregion $seldate $file $tmp2  && \
+			[ -f $tmp2 ] && vfiles+=" "$tmp2 
 		else
 		    if [ "$var" ] ; then 
-			cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
+			cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] \
+			    && vfiles+=" "$tmp2
 		    else 
 			if [ "$region" ] ; then 
-			    cdo ${selregion#-} $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
+			    cdo ${selregion#-} $file $tmp2 && \
+				[ -f $tmp2 ] && vfiles+=" "$tmp2
 			else
 			    vfiles+=" "$file ; 
 			fi
@@ -81,26 +87,21 @@ for out in $outs ; do
 	tmp3=$tmp/$(basename $0).nc ; rm -f $tmp3
         # let us avoid single file copy followed by rm ...
 	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
-	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && rm $vfiles 
-	else
-	    mv $vfiles $tmp3
-	fi
+	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && \
+		rm $vfiles 
+	else mv $vfiles $tmp3 ; fi
+	# Chagne units before applying further operations, if applicable
+	if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
 
-	# Apply operator if requested, plus some house keeping on coordinates
+	# Apply operator if requested
 	if [ "$operator" ] ; then 
-	    if cdo $operator $tmp3 $out ;then 
-		rm $tmp3 
-	        # Fix some issues : CDO does not discard degenerated dimensions
-		#if [ $operator == fldavg  -o $operator == fldmean ] ; then 
-		#    ncwa -O -a lat,lon $out $tmp3  && ncks -O -x -v lat,lon $tmp3 $out && rm $tmp3 
-		#elif [ $operator == timavg ] ; then 
-		#    ncwa -O -a time $out $tmp3 && ncks -O -x -v time $tmp3 $out && rm $tmp3 
-		#fi
-	    fi
+	    if cdo $operator $tmp3 $out ;then rm $tmp3 ; fi
 	else mv $tmp3 $out ; fi
 	#ls -al $out
     else
 	echo "Issue while selecting data from $files ">&2
+	rm -fr $tmp
 	exit 1
     fi
 done
+rm -fr $tmp

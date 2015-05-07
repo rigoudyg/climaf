@@ -18,23 +18,23 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins} ',
+    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}')
+            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units} "${missing}" ${ins}')
     #
     cscript('space_average',
-            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}', 
+            scriptpath+'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units} "${missing}" ${ins}', 
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average' ,
-            scriptpath+'mcdo.sh timmean  ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}' ,
+            scriptpath+'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units} "${missing}" ${ins}' ,
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox' ,
-            scriptpath+'mcdo.sh ""  ${out} ${var} ${period_iso} '
-            '${latmin},${latmax},${lonmin},${lonmax} "${alias}" "${missing}" ${ins}',
+            scriptpath+'mcdo.sh ""  "${out}" "${var}" "${period_iso}" '
+            '"${latmin},${latmax},${lonmin},${lonmax}" "${alias}" "${units} "${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('regrid' ,
@@ -46,7 +46,7 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('rescale' ,
-            "cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}",
+            'cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('mean_and_std',

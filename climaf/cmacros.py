@@ -175,6 +175,18 @@ def cmatch(macro,cobj) :
     elif isinstance(cobj,scriptChild) and isinstance(macro,scriptChild) and \
            macro.varname==cobj.varname :
         return(cmatch(macro.father,cobj.father,argslist))
+    elif isinstance(cobj,cpage) and isinstance(macro,cpage) :
+        argsub=[]
+        if cobj.heights_list == macro.heights_list and \
+                cobj.widths_list == macro.widths_list and \
+                cobj.orientation == macro.orientation :
+            for mlines,lines in zip(macro.fig_lines,cobj.fig_lines) :
+                for mfig,fig in zip(mlines,lines) :
+                    if isinstance(mfig,cdummy) :
+                        argsub.append(fig)
+                    else:
+                        argsub+=cmatch(mfig,fig)
+        return argsub
     else : return []
     
     
