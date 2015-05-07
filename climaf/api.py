@@ -32,6 +32,8 @@ Main functions are :
 
  - ``cshow``   : display a result of type 'figure'
 
+ - ``cpage``   : create an array of figures
+
  - ``cdump``   : tell what's in cache
 
  - ``cdrop``   : delete the cached file for an object
@@ -62,7 +64,7 @@ from climaf.projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,calias
+from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage
 from cmacros   import cmacro
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 

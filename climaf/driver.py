@@ -171,14 +171,10 @@ def ceval(cobject,
                 ## clogger.debug(" Done with subsetting and caching data files")
                 ## cstore(extract) # extract should include the dataset def
                 ## return ceval(extract,userflags,format)
-                clogger.debug("Fetching/selection/aggregation is done using an "+
-                          "external script for now - TBD")
-                #ds.setOffsetScale()
+                clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                 extract=capply('select',ds)
                 if extract is None :
-                    clogger.errorerr="Cannot access dataset" + `ds`
-                    clogger.error(err); raise Climaf_Driver_Error(err)
-                    cdedent()
+                    raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
                 rep=ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
                 cdedent()
                 return rep
@@ -196,19 +192,18 @@ def ceval(cobject,
                 clogger.debug("Must remote read and cache " )
                 # Assume remoteRead fetches the strict minimum 
                 extract=cache.remoteRead(ds)
+                cdedent()
                 if (format == 'file' ) :
                     cachefile=cstore(extract)
                     clogger.debug("And provide cache file reference " )
-                    cdedent()
                     return cachefile
                 else :
                     clogger.debug("And provide in-memory object " )
-                    cdedent()
                     return(extract)
     #
-    elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) : 
-        #clogger.debug("Evaluating object operand %s"%`cobject`)
-        recurse_list.append(cobject.crs)
+    elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
+             isinstance(cobject,classes.cpage) : 
+        recurse_list.append(cobject.buildcrs())
         clogger.debug("Evaluating compound object : " + `cobject`)
         if (deep is not None) : cache.cdrop(cobject.crs)
         clogger.debug("Searching cache for exact object : " + `cobject`)
@@ -216,71 +211,63 @@ def ceval(cobject,
         #filename=None
         if filename :
             clogger.info("Object found in cache: %s is at %s:  "%(cobject.crs,filename))
-            if format=='file' : 
-                cdedent()
-                return filename
-            else:
-                cdedent()
-                return cread(filename)
-        clogger.debug("Searching cache for including object for : " + `cobject`)
-        it,altperiod=cache.hasIncludingObject(cobject)
-        #clogger.debug("Finished with searching cache for including object for : " + `cobject`)
-        #it=None
-        if it :
-            clogger.info("Including object found in cache : %s"%(it.crs))
-            clogger.info("Selecting "+`cobject`+" out of it")
-            # Just select (if necessary for the user) the portion relevant to the request
-            rep=ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list)
             cdedent()
-            return rep
-        #
-        clogger.debug("Searching cache for begin  object for : " + `cobject`)
-        it,comp_period=cache.hasBeginObject(cobject) 
-        clogger.debug("Finished with searching cache for begin  object for : " + `cobject`)
-        #it=None
-        if it : 
-            clogger.info("partial result found in cache for %s : %s"%\
-                                  (cobject.crs,it.crs))
-            begcrs=it.crs
-            # Turn object for begin in complement object for end, and eval it
-            it.setperiod(comp_period)
-            ceval(it,userflags,format,deep,derived_list,recurse_list)
-            if (format == 'file') :
-                rep=cache.complement(begcrs,it.crs,cobject.crs)
+            if format=='file' : return filename
+            else: return cread(filename,varOf(cobject))
+        if not isinstance(cobject,classes.cpage) :
+            clogger.debug("Searching cache for including object for : " + `cobject`)
+            it,altperiod=cache.hasIncludingObject(cobject)
+            #clogger.debug("Finished with searching cache for including object for : " + `cobject`)
+            #it=None
+            if it :
+                clogger.info("Including object found in cache : %s"%(it.crs))
+                clogger.info("Selecting "+`cobject`+" out of it")
+                # Just select (if necessary for the user) the portion relevant to the request
+                rep=ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list)
                 cdedent()
                 return rep
-            else :
-                clogger.debug("cannot yet complement except for files")
-                cdedent()
-                return(None)
+            #
+            clogger.debug("Searching cache for begin  object for : " + `cobject`)
+            it,comp_period=cache.hasBeginObject(cobject) 
+            clogger.debug("Finished with searching cache for begin  object for : " + `cobject`)
+            #it=None
+            if it : 
+                clogger.info("partial result found in cache for %s : %s"%\
+                             (cobject.crs,it.crs))
+                begcrs=it.crs
+                # Turn object for begin in complement object for end, and eval it
+                it.setperiod(comp_period)
+                ceval(it,userflags,format,deep,derived_list,recurse_list)
+                if (format == 'file') :
+                    rep=cache.complement(begcrs,it.crs,cobject.crs)
+                    cdedent()
+                    return rep
+                else :
+                    clogger.debug("cannot yet complement except for files")
+                    cdedent()
+                    return(None)
+            #
+            clogger.info("nothing relevant found in cache for %s"%cobject.crs)
         #
-        clogger.info("nothing relevant found in cache for %s"%cobject.crs)
         if deep==False : deep=None
         if isinstance(cobject,classes.ctree)  :
             # the cache doesn't have a similar tree, let us recursively eval subtrees
             # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
             if cobject.operator in operators.scripts :
                 file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
-                if ( format == 'file' ) : 
-                    cdedent()
-                    return (file)
-                else : 
-                    cdedent()
-                    return cread(file)
+                cdedent()
+                if ( format == 'file' ) : return (file)
+                else : return cread(file,varOf(cobject))
             elif cobject.operator in operators.operators :
                 obj=ceval_operator(cobject,deep)
+                cdedent()
                 if (format == 'file' ) : 
-                    rep=cstore(obj)
-                    cdedent()
-                    return rep
-                else : 
-                    cdedent()
-                    return(obj)
+                    rep=cstore(obj) ; return rep
+                else : return(obj)
             else : 
                 err="operator %s is not a script nor known operator",str(cobject.operator)
                 clogger.error(err); raise Climaf_Driver_Error(err)
-        else :
-            # isinstance(cobject,classes.scriptChild) should be True
+        elif isinstance(cobject,classes.scriptChild) :
             # Force evaluation of 'father' script
             if ceval_script(cobject.father,deep,recurse_list=recurse_list)  is not None :
                 # Re-evaluate, which should succeed using cache
@@ -291,6 +278,14 @@ def ceval(cobject,
                 cdedent()
                 err="generating script aborted for "+cobject.father.crs
                 clogger.error(err); raise Climaf_Driver_Error(err)
+        elif isinstance(cobject,classes.cpage) :
+            file=cfilePage(cobject, deep, recurse_list=recurse_list)
+            cdedent()
+            if ( format == 'file' ) : return (file)
+            else :
+                raise Climaf_Driver_Error("Cannot convert a figure file to a memory object")
+        else :
+            raise Climaf_Driver_Error("Internal logic error")
     elif isinstance(cobject,str) :
         clogger.debug("Evaluating object from crs : %s"%cobject)
         cdedent()
@@ -462,7 +457,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 ok = ok and cache.register(subdict["out_"+output],scriptCall.crs+"."+output)
             if ok : 
                 duration=time.time() - tim1
-                print(("Done in %.1f s with command:"+template) % duration)
+                print("Done in %.1f s with script computation for %s "%(duration,`scriptCall`))
+                clogger.debug("Done in %.1f s with script computation for %s (command was :%s )"%(duration,`scriptCall`,template))
                 return main_output_filename
             else :
                 err="Some output missing when executing : %s. \nSee scripts.out"%template
@@ -636,7 +632,9 @@ def cfile(object,target=None,ln=None,deep=None) :
     Provide the filename for a CliMAF object, or copy this file to target. Launch computation if needed. 
 
     Args:
+    
       object (CliMAF object) : either a dataset or a 'compound' object (e.g. the result of a CliMAF operator)
+
       target (str, optional) : name of the destination file or link; CliMAF will anyway store the result
        in its cache; 
 
@@ -651,13 +649,13 @@ def cfile(object,target=None,ln=None,deep=None) :
 
         - True  : make a deep computation, i.e. do not use any cached value
 
-    Returns: 
+    Returns:
 
-      - if 'target' is provided : returns this filename (or linkname) if computation is 
-        successful ('target' contains the result), and None otherwise; 
-
-      - else : returns the filename in CliMAF cache, which contains the result (and None if failure)
-
+       - if target is provided, returns this filename (or linkname) if computation is 
+       successful ('target' contains the result), and None otherwise;
+       
+       - if target is not provided, returns the filename in CliMAF cache, which contains the result (and None if failure)
+       
 
     """
     clogger.debug("cfile called on "+str(object))  
@@ -693,7 +691,8 @@ def  cMA(obj,deep=None) :
         - False : make a shallow computation, i.e. do not use cached values for top level operation
         - True  : make a deep computation, i.e. do not use any cached value
 
-    Returns: a Masked Array containing the object's value
+    Returns:
+      a Masked Array containing the object's value
 
     """
     clogger.debug("cMA called with arguments"+str(obj)) 
@@ -725,7 +724,66 @@ def cimport(cobject,crs) :
         clogger.error("argument is not a Masked Array nor a filename",cobject)
     
 
+def cfilePage(cobj, deep, recurse_list=None) :
+    """
+    Builds a page with CliMAF figures, computing associated crs
 
+    Args:
+     cobj (cpage object)
+     
+    Returns : the filename in CliMAF cache, which contains the result (and None if failure)
+
+    """
+    if not isinstance(cobj,classes.cpage):
+        raise Climaf_Driver_Error("cobj is not a cpage object")
+    clogger.debug("Computing figure array for cpage %s"%(cobj.crs))
+    #
+    # page size and creation
+    if cobj.orientation == "portrait":
+        page_width=800. ; page_height=1200.
+    elif cobj.orientation == "landscape":
+        page_width=1200. ; page_height=800.
+    page_size="%dx%d"%(page_width, page_height)
+    args=["convert", "-size", page_size, "xc:white"]
+    #
+    # margins
+    x_left_margin=10. # Left shift at start and end of line
+    y_top_margin=10. # Initial vertical shift for first line
+    x_right_margin=10. # Right shift at start and end of line
+    y_bot_margin=10. # Vertical shift for last line
+    xmargin=20. # Horizontal shift between figures
+    ymargin=20. # Vertical shift between figures
+    #
+    usable_height=page_height-ymargin*(len(cobj.heights_list)-1.)-y_top_margin -y_bot_margin
+    usable_width =page_width -xmargin*(len(cobj.widths_list)-1.) -x_left_margin-x_right_margin
+    #
+    # page composition
+    y=y_top_margin
+    for line, rheight in zip(cobj.fig_lines, cobj.heights_list) :
+        # Line height in pixels
+        height=usable_height*rheight 
+        x=x_left_margin
+        for fig, rwidth in zip(line, cobj.widths_list) :
+            # Figure width in pixels
+            width=usable_width*rwidth 
+            scaling="%dx%d+%d+%d" %(width,height,x,y)
+            if fig : 
+                figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
+            else : figfile='canvas:None'
+            clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
+            args.extend([figfile , "-geometry", scaling, "-composite" ])
+            x+=width+xmargin
+        y+=height+ymargin
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
+    args.append(out_fig)
+    clogger.debug("Compositing figures : %s"%`args`)
+    comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if comm.wait()!=0 :
+        raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
+    if cache.register(out_fig,cobj.crs) :
+        clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
+        return out_fig
+        
 
 def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 

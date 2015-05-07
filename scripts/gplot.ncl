@@ -3,7 +3,7 @@
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
-;load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin 
   if (.not. isvar("cmap")) then      
@@ -22,7 +22,7 @@ begin
   LABELON=False
   RASTER=True 
   
-                                ; Reading the field and its unit, setting REDU, and scaling the field
+  ; Reading the field and its unit, setting REDU, and scaling the field
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
     if isfilevar(ffile,var) then 
@@ -44,6 +44,9 @@ begin
     end if
   end if
   
+  logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarihtmic scale
+  if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
+
   ; Try to adapt to various cases, using heuristics !
   ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
 
@@ -59,7 +62,7 @@ begin
   if (rank.eq.4) then
     ; assume first dimension is time. Select first time slice before further processing
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-; NOTE : this should be done only if at least two other diemnsions have size > 1, otherwise we
+; NOTE : this should be done only if at least two other dimensions have size > 1, otherwise we
 ; should plot some Hovmoeller diagram
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ;print("Selecting first time step")
@@ -80,11 +83,8 @@ begin
   if (rank .eq. 3) then
     ; Must identify which horizontal dimension(s) is/are degenerated
     zname   = Var_DimNames(0)
-    zdim=fld&$zname$
     latname = Var_DimNames(1)
-    latdim=fld&$latname$
     lonname = Var_DimNames(2)
-    londim=fld&$lonname$
     if (dime(1) .eq. 1) then 
       ; We are plotting height-longitude
       ;print("Selecting only latitude")
@@ -92,7 +92,7 @@ begin
       delete(fld)
       fld=fldtmp
       delete(fldtmp)
-      hdim=londim
+      hdim=fld&$lonname$
     else ; dim1 ne 1
       if (dime(2) .eq. 1) then 
         ; We are plotting height-latitude
@@ -101,7 +101,7 @@ begin
         delete(fld)
         fld=fldtmp
         delete(fldtmp)
-        hdim=latdim
+        hdim= ld&$latname$
       else
         print("plotting a field with 2 horizontal dimensions")
         ;print(dime)
@@ -119,10 +119,15 @@ begin
   end if ; rk eq 3
 
   ; fld is now 2D , with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+  useLatDim=False
+  useLonDim=False
 
   if (rank .eq. 2) then
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld) 
+    if ((.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat")))) then
+      horizontal=True
+    end if
     ; analyze if last (horizontal) dimension is singleton
     if (dime(1).eq. 1) then
       ; We have a profile (either vertical or horizontal)
@@ -154,12 +159,25 @@ begin
         delete(fldtmp)
       else
         ;We have a true cross-section or a horizontal map
-        useXY=False
+        if logp  then useXY=False end if
+        if (ismissing(str_match(Var_DimNames,"lat"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
+          useLatDim=True
+          latname="lat"
+          if isfilevar(ffile,"nav_lat") then latname="nav_lat" end if
+          latdim=ffile->$latname$
+        end if
+        if (ismissing(str_match(Var_DimNames,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
+          useLonDim=True
+          lonname="lon"
+          if isfilevar(ffile,"nav_lat") then lonname="nav_lon" end if
+          londim=ffile->$lonname$
+        end if
       end if
     end if
   end if
 
   if (rank .eq. 1 ) then 
+    delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
     hdim=fld&$Var_DimNames[0]$
     vprofile=False
@@ -257,7 +275,7 @@ begin
     res@lbLabelAutoStride = True
     res@lbOrientation     = "vertical"
 
-  end if  
+  end if  ; not useXY
 
   res@tmYLLabelFontHeightF = 0.020
   res@tmXBLabelFontHeightF = 0.020
@@ -275,9 +293,7 @@ begin
   res@vpHeightF = 0.8
   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  if (.not. isvar("title")) then      
-    title=var
-  end if
+  if (.not. isvar("title")) then title=var end if
 
   res@tiMainString       = title
   res@vpXF      = 0.1
@@ -306,16 +322,28 @@ begin
     ;print(hdim)
     ;print(fld)
     if vprofile then
-      xyres@xyYStyle          = "Log"
+      if logp then 
+        xyres@xyYStyle = "Log" 
+      end if
       plot0=gsn_csm_xy(wks,fld,hdim,xyres)
     else
       plot0=gsn_csm_xy(wks,hdim,fld,xyres)
     end if
   else
     if (horizontal) then 
+      if useLatDim then 
+        ;res@trGridType          = "TriangularMesh"
+        res@sfXArray            = londim
+        res@sfYArray            = latdim
+        res@gsnAddCyclic        = False
+      end if
       plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
     else
-      plot0=gsn_csm_pres_hgt(wks,fld,res)
+      if logp then 
+        plot0=gsn_csm_pres_hgt(wks,fld,res)
+      else
+        plot0=gsn_csm_contour(wks,fld,res)
+      end if 
     end if
 
   end if

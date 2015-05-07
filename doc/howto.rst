@@ -160,7 +160,7 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
 CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be modified and improved, provided you are not afraid by looking at text files formated using the `REStructured Text syntax <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_ (and Sphinx is installed on your computer, which is often the case; check with ``which sphinx-build``). All doc files stand in directory ``<climaf_install_dir>/doc``, with quite easy-to-understand filenames. You can modify any file and test the result by typing::
 
   $ cd <climaf_install_dir>/doc
-  $ make -h html
+  $ make -k html
 
 and loading the resulting file ``<climaf_install_dir>/doc/_build/html/index.html`` in your browser.
 

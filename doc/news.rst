@@ -8,11 +8,12 @@ Changes, newest first :
 
 .. _news_0.6:
 
-- 2005/04/30 - Version 0.6.1 :
+- 2005/05/06 - Version 0.6.1 :
 
  - Add a **macro** feature : easy definition of a macro from a
    compound object; you can save, edit, load... and macros are used for
    interpreting cache content. See :py:func:`~climaf.cmacros.cmacro`
+   and an example in :download:`macro <../examples/macro.py>`.
  - Cleaner definition of CliMAF operators, in module ``operators``;
    **this implies to execute** ``from operators import *`` **before using 
    a user-defined operator**
@@ -22,7 +23,10 @@ Changes, newest first :
    :doc:`scripts/plot` 
  - Can **list or erase cache content using various filters** (on
    age, size, modif date ...); disk usage can be displayed. 
-   See :py:func:`~climaf.cache.cdump()`
+   See :py:func:`~climaf.cache.clist()`, :py:func:`~climaf.cache.cls`, :py:func:`~climaf.cache.crm`,
+   :py:func:`~climaf.cache.cdu`, :py:func:`~climaf.cache.cwc`
+ - Can create an **array of figures** using
+   :py:func:`~climaf.classes.cpage`. See example :download:`figarray <../examples/figarray.py>`.
  - Can cope with un-declared missing values in data files, as
    e.g. Gelato outputs with value=1.e+20 over land, which is not the
    declared missing value ; See :py:func:`~climaf.classes.calias()`

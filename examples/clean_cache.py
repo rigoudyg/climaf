@@ -1,3 +1,3 @@
 from climaf.api import *
-clog(logging.CRITICAL)
+clog('critical')
 craz()

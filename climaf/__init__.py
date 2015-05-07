@@ -9,7 +9,7 @@ __all__=[ "cache" , "classes", "clogging",   "dataloc" , "driver" , "netcdfbasic
           "site_settings"  , "standard_operators" , "projects" ]
 import posixpath, os
 
-version="0.6.0"
+version="0.6.1"
 
 already_inited=False
 
@@ -46,7 +46,7 @@ if not already_inited  :
     cache.cload()
     #
     # Init and load macros
-    cmacros.read("~/.climaf")
+    cmacros.read()
     atexit.register(cmacros.write)
     #
     atexit.register(cache.csync)

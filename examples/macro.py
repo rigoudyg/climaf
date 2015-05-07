@@ -34,7 +34,7 @@ from climaf.cmacros import eu_zonal_mean
 # from climaf.cmacros import *
 pr_ezm=eu_zonal_mean(pr)
 
-# You can also define a macro 'from scratch'
+# You can also define a macro 'from scratch', using ARG for arguments/parameters
 cmacro("my_macro", "ccdo(ARG,operator='timavg')")
 
 # All macros are registered in dictionnary climaf.cmacros.cmacros,

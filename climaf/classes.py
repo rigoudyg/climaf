@@ -418,7 +418,8 @@ class ctree(cobject):
 
 class scriptChild(cobject):
     def __init__(self, cobject,varname) :
-        """ Builds one of the child of a script call, which represents one output
+        """
+        Builds one of the child of a script call, which represents one output
 
         """
         self.father=cobject
@@ -564,6 +565,63 @@ def cmissing(project,missing,*kwargs) :
     same project
     """
     pass # to be developped  ....
+
+
+
+class cpage(cobject):
+    def __init__(self, widths_list=[], heights_list=[], fig_lines=None, orientation="portrait"):
+        """
+        Builds a CliMAF cpage object, which represents an array of figures
+
+        Args:
+         widths_list (list): the list of figure widths, i.e. the width of each column
+         heights_list (list): the list of figure heights, i.e. the height of each line
+         fig_line (a list of lists of figure objects): each sublist of 'fig_lines' represents a line of figures
+         orientation (str, optional): page's orientation, either 'portrait' (default) or 'landscape'
+
+        Example:
+
+         Using no default value, to create a page with 2 columns and 3 lines::
+        
+          >>> fig=plotmap(tas_avg,crs='title')
+          >>> my_page=cpage(widths_list=[0.2,0.8],heights_list=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
+
+        
+        """
+        self.widths_list=widths_list
+        self.heights_list=heights_list
+        self.fig_lines=fig_lines
+        self.orientation=orientation
+        if not self.widths_list :
+            raise Climaf_cpage_Error("widths_list must be provided")
+        if not self.heights_list :
+            raise Climaf_cpage_Error("heights_list must be provided")
+        if self.fig_lines is None :
+            raise Climaf_cpage_Error("fig_lines must be provided")
+        if not isinstance(self.fig_lines,list) :
+            raise Climaf_cpage_Error("fig_lines must be a list of lists (each representing a line of figures)")
+        if len(self.fig_lines)!=len(self.heights_list) :
+            raise Climaf_cpage_Error("fig_lines must have same size than heights_list")
+        for line in self.fig_lines:
+            if not isinstance(line,list) :
+                raise Climaf_cpage_Error("each element in fig_lines must be a list of figures")
+            if len(line)!=len(self.widths_list) :
+                raise Climaf_Dataset_Error("each line in fig_lines must have same dimension as "
+                                           "widths_list; pb for sublist "+`line`)
+        self.crs=self.buildcrs()
+        
+    def buildcrs(self,crsrewrite=None):
+        rep="cpage("+`self.widths_list`+","+`self.heights_list`+",["
+        for line in self.fig_lines :
+            rep+="["
+            for f in line :
+                if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
+                else : rep+=`None`+","
+            rep+=" ],"; 
+        rep+="], orientation='"+self.orientation+"')"
+        rep=rep.replace(",]","]")
+        rep=rep.replace(", ]","]")
+        return rep
 
 class Not_A_Climaf_Object_Error(Exception):
     def __init__(self, valeur):

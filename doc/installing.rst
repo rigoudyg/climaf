@@ -69,7 +69,9 @@ Running CliMAF interactively
 
 For running CliMAF as easily as possible under the Python prompt,
 without having to know details about CliMAF functions location, and
-just mimicking one of the :ref:`examples`, you can either :
+just mimicking one of the :ref:`examples`, please first make sur you
+have write permission in the current directory (used for some log
+files); then, you can either :
 
 - use binary ``climaf`` for launching Python while importing CliMAF :
 

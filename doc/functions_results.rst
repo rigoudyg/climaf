@@ -4,7 +4,7 @@ Functions for managing/viewing results
 
 .. default-domain:: python
 
-There are a few fucntions for managing CliMAF results
+There are a few functions for managing CliMAF results
 
 cfile : get the file value of a CliMAF object 
 ----------------------------------------------
@@ -21,10 +21,36 @@ cshow : dump an object or display a 'figure'
 
 .. autofunction:: climaf.driver.cshow
 
-cdump : tell what's in cache
+cpage : create an array of figures
+--------------------------------------------
+
+.. autoclass:: climaf.classes.cpage
+
+
+clist : tell what's in cache, and much more
+-------------------------------------------
+
+.. autofunction:: climaf.cache.clist
+
+cls : tell what's in cache
 ---------------------------------
 
-.. autofunction:: climaf.cache.cdump
+.. autofunction:: climaf.cache.cls
+
+crm : remove some files from cache
+-------------------------------------
+
+.. autofunction:: climaf.cache.crm
+
+cdu : disk cache usage
+---------------------------------
+
+.. autofunction:: climaf.cache.cdu
+
+cwc : count some files in cache
+---------------------------------
+
+.. autofunction:: climaf.cache.cwc
 
 craz : reset cache
 ---------------------

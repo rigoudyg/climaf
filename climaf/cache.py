@@ -232,11 +232,13 @@ def cdrop(obj, rm=True) :
     """
     Deletes the cached file for a CliMAF object, if it exists
 
-    Args :
+    Args:
      obj (cobject or string) : object to delete, or its string representation (CRS)
+
      rm (bool) : for advanced use only; should we actually delete (rm) the file, or just forget it in CliMAF cache index
     
-    Returns : None if object does not exists, False if failing to delete, True if OK
+    Returns:
+     None if object does not exists, False if failing to delete, True if OK
 
     Example ::
 
@@ -246,10 +248,9 @@ def cdrop(obj, rm=True) :
     >>> cdrop(dg)
     
     """
-    if (type(obj) is ctree ) :
-        crs=cobject.crs
-        if (type(obj) is cdataset ) :
-            crs="select("+crs+")"
+    if (isinstance(obj,cobject) ):
+        crs=`obj`
+        if (isinstance(obj, cdataset) ) : crs="select("+crs+")"
     elif type(obj) is str : crs=obj
     else :
         clogger.error("%s is not a CliMAF object"%`obj`)
@@ -263,26 +264,28 @@ def cdrop(obj, rm=True) :
         except:
             return False
     else :
-        clogger.error("%s is not cached"%crs)
+        clogger.info("%s is not cached"%crs)
         return None
 
-def csync() :
+def csync(update=False) :
     """
-    Update cache dictionnary from actual cache file conents, and write it to disk
+    Write cache dictionnary to disk
+    If arg `update` is True, first updates dictionnary from actual cache file content
 
     """
     import pickle
     global cacheIndexFileName
 
     #check if cache index is up to date, if it is not the function 'rebuild' is called
-    clogger.warning("Listing files present in cache")
-    files_in_cache=list_cache()
-    files_in_cache.sort()
-    index_keys=crs2filename.values()
-    index_keys.sort()
-    if files_in_cache != index_keys:
-        clogger.warning("Rebuilding cache index")
-        rebuild()  
+    if update :
+        clogger.warning("Listing files present in cache")
+        files_in_cache=list_cache()
+        files_in_cache.sort()
+        index_keys=crs2filename.values()
+        index_keys.sort()
+        if files_in_cache != index_keys:
+            clogger.warning("Rebuilding cache index")
+            rebuild()  
 
     # Save to disk
     cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
@@ -292,6 +295,7 @@ def csync() :
 def cload() :
     import pickle
     global crs2filename #pb sans cette declaration
+
     if len(crs2filename) != 0 :
         clogger.critical("attempt to reset file index - would lead to inconsistency !")
         return 
@@ -302,6 +306,17 @@ def cload() :
     except:
         pass
         #clogger.debug("no index file yet")
+    #
+    for crs in crs2filename :
+        # We may have some crs inherited from past sessions and for which
+        # some operator may have become non-standard
+        try :
+            eval(crs, sys.modules['__main__'].__dict__)
+        except:
+            clogger.warning("Inconsistent cache object discarded : %s"%crs)
+            crs2filename.pop(crs)
+            break
+
 
 def craz(hideError=False) :
     """
@@ -311,6 +326,7 @@ def craz(hideError=False) :
       hideError (bool): if True, will not warn for non existing cache
 
     """
+    global crs2filename
     cc=os.path.expanduser(currentCache)
     if (os.path.exists(currentCache) or hideError is False) :
         os.system("rm -fR "+cc+"/*")
@@ -331,6 +347,7 @@ def cdump(use_macro=True):
             #print "%s : %s"%(crs2filename[crs][-30:],crs)
             print "%s : %s"%(crs2filename[crs],crs)
         else:
+            # Must update for new macros
             print "%s : %s"%(crs2filename[crs],crewrite(crs))
 
 def list_cache():
@@ -347,33 +364,37 @@ def list_cache():
     files_in_cache.pop(-1)
     return(files_in_cache)
 
-def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, count=False, remove=False, CRS=False, special=False):
+def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, count=False,
+          remove=False, CRS=False, special=False):
     """
-    Internal function used by its front-ends : cls, crm, cdu, cwc
+    Internal function used by its front-ends : :py:func:`~climaf.cache.cls`, :py:func:`~climaf.cache.crm`,
+    :py:func:`~climaf.cache.cdu`, :py:func:`~climaf.cache.cwc`
 
     List the content of CliMAF cache according to some search criteria and operate possibly
     an action (usage, count or remove) on this list.
 
-    Please consider the cost and benefit of first updating CliMAF cache index using :py:func:`csync()`
+    Please consider the cost and benefit of first updating CliMAF cache index (by scanning
+    files on disk) using :py:func:`csync()`
     
     Args:
-     size (string, optional): n[ckMG]
+     size (string, optional): n[ckMG]; 
       Search files using n units of disk space, rounding up. Numeric arguments can be specified as `n` for greater than n.
       The following suffixes can be used:
-        - `c'    for bytes (default)
-        - `k'    for Kilobytes (units of         1,024 bytes)
-        - `M'    for Megabytes (units of     1,048,576 bytes)
-        - `G'    for Gigabytes (units of 1,073,741,824 bytes)
-                
-     age (string, optional): n
-      Search files which status was last changed n*24 hours ago. Any fractional part is ignored,
-      so to match age='+1', a file has to have been changed at least two days ago.
+
+        - "c"    for bytes (default)
+        - "k"    for Kilobytes (units of         1,024 bytes)
+        - "M"    for Megabytes (units of     1,048,576 bytes)
+        - "G"    for Gigabytes (units of 1,073,741,824 bytes)
+
+     age (string, optional): Number of 24h periods. Search files which status was last changed n*24 hours ago.
+      Any fractional part is ignored, so to match age='+1', a file has to have been changed at least two days ago.
       Numeric arguments can be specified as:
+      
         - `+n`   for greater than n
         - `-n`   for less than n,
         - `n`    for exactly n.
 
-     access (int, optional): n ;
+     access (int, optional): number of 24h periods ;
       Search files which were last accessed n*24 hours ago. Any fractional part is ignored, so to match
       access='1', a file has to have been accessed at least two days ago.
       Numeric arguments can be specified as `n` for greater than n.
@@ -396,7 +417,9 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
      CRS (bool, optional): if True, print also CRS expression. Only useful if count is True.
 
 
-     Return: the dictionnary corresponding to the request and associated action ( without arguments : dictionnary of CliMAF cache index)
+    Return:
+      the dictionnary corresponding to the request and associated action ( or dictionnary
+      of CliMAF cache index if no argument is provided)
 
 
     """
@@ -563,14 +586,14 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
 def cls(**kwargs):
     """
-    List CliMAF cache objects. Synonym to clist(). See :py:func:`clist`
+    List CliMAF cache objects. Synonym to clist(). See :py:func:`~climaf.cache.clist`
    
     """
     return clist(**kwargs)
 
 def crm(**kwargs):
     """
-    Remove the cache files found by 'clist()' when using same arguments. See :py:func:`clist`
+    Remove the cache files found by 'clist()' when using same arguments. See :py:func:`~climaf.cache.clist`
 
     """
     kwargs['remove']=True
@@ -580,7 +603,7 @@ def crm(**kwargs):
 
 def cdu(**kwargs):
     """
-    Report disk usage, for files matching some criteria, as specified for :py:func:`clist`.
+    Report disk usage, for files matching some criteria, as specified for :py:func:`~climaf.cache.clist`.
     With count=True, report only total disk usage.
     
     """
@@ -590,7 +613,7 @@ def cdu(**kwargs):
 
 def cwc(**kwargs):
     """
-    Report number of cache files matching some criteria, as specified for :py:func:`clist`.
+    Report number of cache files matching some criteria, as specified for :py:func:`~climaf.cache.clist`.
     If CRS is True, also return CRS expression of found files.
 
     """
