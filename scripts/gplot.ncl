@@ -377,6 +377,4 @@ begin
   status_exit(0)
   
 end
-zplotl=plot(ta_zonal_mean,crs='title',linp=1)
-cshow(zplotl)
 

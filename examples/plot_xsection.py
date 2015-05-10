@@ -1,5 +1,6 @@
 #import sys; sys.path.append("/home/stephane/Bureau/climaf")
 from climaf.api import *
+craz()
 
 # Define a 3D dataset, using a pre-defined data set
 ##################################################################

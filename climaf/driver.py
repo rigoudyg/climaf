@@ -112,8 +112,7 @@ def ceval(cobject,
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'png' :
-        err='Allowed formats yet are : "object", "file" and "png"'
-        clogger.error(err); raise Climaf_Driver_Error(err)
+	raise Climaf_Driver_Error('Allowed formats yet are : "object", "file" and "png"')
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -265,8 +264,7 @@ def ceval(cobject,
                     rep=cstore(obj) ; return rep
                 else : return(obj)
             else : 
-                err="operator %s is not a script nor known operator",str(cobject.operator)
-                clogger.error(err); raise Climaf_Driver_Error(err)
+                raise Climaf_Driver_Error("operator %s is not a script nor known operator",str(cobject.operator))
         elif isinstance(cobject,classes.scriptChild) :
             # Force evaluation of 'father' script
             if ceval_script(cobject.father,deep,recurse_list=recurse_list)  is not None :
@@ -275,9 +273,7 @@ def ceval(cobject,
                 cdedent()
                 return rep
             else :
-                cdedent()
-                err="generating script aborted for "+cobject.father.crs
-                clogger.error(err); raise Climaf_Driver_Error(err)
+                raise Climaf_Driver_Error("generating script aborted for "+cobject.father.crs)
         elif isinstance(cobject,classes.cpage) :
             file=cfilePage(cobject, deep, recurse_list=recurse_list)
             cdedent()
@@ -287,13 +283,9 @@ def ceval(cobject,
             raise Climaf_Driver_Error("Internal logic error")
     elif isinstance(cobject,str) :
         clogger.debug("Evaluating object from crs : %s"%cobject)
-        cdedent()
-        err="Evaluation from CRS is not yet implemented ( %s )"%cobject
-        clogger.error(err); raise Climaf_Driver_Error(err)
+        raise Climaf_Driver_Error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
     else :
-        cdedent()
-        err="argument " +`cobject`+" is not (yet) managed"
-        clogger.error(err); raise Climaf_Driver_Error(err)
+        raise Climaf_Driver_Error("argument " +`cobject`+" is not (yet) managed"
 
 
 
@@ -377,9 +369,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         opscrs += op.crs+" - "
         infile=dict_invalues[op]
         if not all(map(os.path.exists,infile.split(" "))) :
-            err="Internal error : some input file does not exist among %s:"%(infile)
-            clogger.error(err)
-            raise Climaf_Driver_Error(err)
+            raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         i+=1
         if ( i> 1 or 1 in script.inputs) :
             label,multiple,serie=script.inputs[i]
@@ -429,20 +419,21 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if 'crs' not in scriptCall.parameters : 
 	subdict["crs"]=opscrs.replace("'","")
     #
-    # Substitute all args, with special case of NCL convention for passing args
-    if (script.command.split(' ')[0][-3:]=="ncl") :
-        for o in subdict :
-            if isinstance(subdict[o],str) and len(subdict[o])>0 :
-                if subdict[o][0] != "\"" :
-                    subdict[o]="\"" + subdict[o] + "\""
-                subdict[o].replace("'","")
+    # Substitute all args
     template=template.safe_substitute(subdict)
     #
-    # Allow script call not to use all formal arguments
+    # Allowing for some formal parameters to be missing in the actual call:
+    #
+    # Discard remaining substrings looking like :
+    #  some_word=\"${some_keyword}\"     , or:
+    #  \"${some_keyword}\"
+    template=re.sub(r'(\w*=)?(\\\")?\$\{\w*\}(\\\")?',r"",template)
+    #
+    # Discard remaining substrings looking like :
+    #  some_word=${some_keyword}          , or
+    #  ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
-    if (script.command.split(' ')[0][-3:]=="ncl") :
-        template=re.sub(r'([^=\s]*)=([^=\s\"]+|\"[^\"]*\")',r"\1='\2'",template)
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -588,11 +579,9 @@ def derive_variable(ds):
     operators.derived_variable
     """
     if not isinstance(ds,classes.cdataset):
-        err="arg is not a dataset"
-        clogger.error(err) ; raise Climaf_Driver_Error(err)
+        raise Climaf_Driver_Error("arg is not a dataset")
     if not operators.is_derived_variable(ds.variable,ds.project) :
-        err="%s is not a derived variable"%ds.variable
-        clogger.error(err) ; raise Climaf_Driver_Error(err)
+        raise Climaf_Driver_Error("%s is not a derived variable"%ds.variable)
     op,outname,inVarNames,params=operators.derived_variable(ds.variable,ds.project)
     inVars=[]
     for varname in inVarNames :
