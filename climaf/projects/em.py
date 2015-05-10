@@ -18,9 +18,10 @@ Example for defining an EM dataset::
 """
 
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
+from climaf.classes import cproject, calias, cfreqs
 
 cproject('EM' , 'frequency', 'realm' )
+cfreqs('EM',{'monthly':'mon' , 'daily':'day1' })
 dataloc(project='EM', organization='EM', url=['dummy'])
 # Ideally, one should be able to write :
 #cmissing('EM',1.e+20, realm='I')

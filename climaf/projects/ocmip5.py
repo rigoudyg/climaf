@@ -18,11 +18,13 @@ Example ::
 
 import os
 
-import climaf
+from climaf.dataloc import dataloc
+from climaf.classes import cproject, calias, cfreqs
+from climaf.site_settings import onCiclad
 
-if climaf.site_settings.onCiclad :
-    climaf.classes.cproject("OCMIP5","model","frequency")
-    climaf.dataloc.dataloc(project="OCMIP5", organization="generic",
+if onCiclad :
+    cproject("OCMIP5","model","frequency")
+    dataloc(project="OCMIP5", organization="generic",
             url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/'
                  '${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
-    
+    cfreqs('OCMIP5',{'monthly':'mon' })

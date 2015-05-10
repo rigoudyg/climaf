@@ -8,6 +8,7 @@ Handles a database of attributes for describing organization and location of dat
 import os, os.path, re, string, glob, subprocess
 from string import Template
 
+import classes
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
@@ -140,18 +141,21 @@ def isLocal(project, model, experiment, frequency) :
 
 def selectLocalFiles(**kwargs):
     """
-    Returns the shortest list of (local) files which include the data for the list of 
-    (facet,value) pairs provided
+    Returns the shortest list of (local) files which include the data
+    for the list of (facet,value) pairs provided
 
     Method : 
     
-    - use datalocations indexed by :py:func:`~climaf.dataloc.dataloc` to identify data organization 
-      and data store urls for these (facet,value) pairs
+    - use datalocations indexed by :py:func:`~climaf.dataloc.dataloc` to 
+      identify data organization and data store urls for these (facet,value) 
+      pairs
 
-    - check that data organization si sa known one, i.e. is one of 'generic', CMIP5_DRS' or 'EM'
+    - check that data organization si sa known one, i.e. is one of 'generic', 
+      CMIP5_DRS' or 'EM'
     
-    - derive relevant filenames search function such as as :py:func:`~climaf.dataloc.selectCmip5DrsFiles` 
-      from data organization scheme
+    - derive relevant filenames search function such as as :
+      py:func:`~climaf.dataloc.selectCmip5DrsFiles` from data
+      organization scheme
 
     - pass urls and relevant facet values to this filenames search function
 
@@ -172,17 +176,24 @@ def selectLocalFiles(**kwargs):
     if ( len(ofu) == 0 ) :
         clogger.warning("no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
     for org,freq,urls in ofu :
+        kwargs2=kwargs.copy()
+        # Convert normalized frequency to project-specific frequency if applicable
+        if "frequency" in kwargs and project in classes.frequencies :
+            normfreq=kwargs2['frequency'] 
+            if nomrfreq in classes.frequencies[project]: 
+                kwargs2['frequency']=classes.frequencies[project][normfreq]
+        #
+        # Call organization-specific routine
         if (org == "EM") :
-            rep.extend(selectEmFiles(**kwargs))
+            rep.extend(selectEmFiles(**kwargs2))
         elif (org == "CMIP5_DRS") :
-            rep.extend(selectCmip5DrsFiles(urls,**kwargs))
+            rep.extend(selectCmip5DrsFiles(urls,**kwargs2))
         elif (org == "generic") :
-            rep.extend(selectGenericFiles(urls, **kwargs))
+            rep.extend(selectGenericFiles(urls, **kwargs2))
         else :
-            err="cannot process organization "+org+ \
+            raise Climaf_Data_Error("cannot process organization "+org+ \
                 " for experiment "+experiment+" and model "+model+\
-                " of project "+project
-            clogger.error(err); raise Climaf_Data_Error(err)
+                " of project "+project)
     if (not ofu) :
         return None
     else :
@@ -224,13 +235,14 @@ def selectGenericFiles(urls, **kwargs):
     In the pattern strings, the keywords that can be used in addition to the argument
     names (e.g. ${model}) are:
     
-    - ${variable} : use it if the files are split by variable and filenames do include 
-      the variable name, as this speed up the search
+    - ${variable} : use it if the files are split by variable and 
+      filenames do include the variable name, as this speed up the search
 
-    - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of the period covered by 
-      each file, if this is applicable in the file naming; use a second time for end date,
-      if applicable (otherwise the assumption is that the whole year -resp. month or day- is
-      included in the file
+    - YYYY, YYYYMM, YYYYMMDD : use it for indicating the start date of
+      the period covered by each file, if this is applicable in the
+      file naming; use a second time for end date, if applicable
+      (otherwise the assumption is that the whole year -resp. month or
+      day- is included in the file
 
     - wildcards '?' and '*' for matching respectively one and any number of characters
 
@@ -372,7 +384,7 @@ def periodOfEmFile(filename,realm,freq):
         if freq=='mon' or freq=='' : altfreq='m'
         elif freq[0:2] =='da' : altfreq='d'
         else:
-            err="Can yet handle only monthly frequency for realms O and I - TBD"
+            err="Can yet handle only monthly and daily frequency for realms O and I - TBD"
             clogger.error(err)
             raise Climaf_Data_Error(err)
         patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8})_.*nc'

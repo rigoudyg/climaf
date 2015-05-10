@@ -15,8 +15,11 @@ from clogging import clogger, dedent
 #: Dictionnary of declared projects (type is cproject)
 cprojects=dict()
 
-#: Dictionnary of aliases
+#: Dictionnary of aliases dictionaries
 aliases=dict()
+
+#: Dictionnary of frequency names dictionaries
+frequencies=dict()
 
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
@@ -73,6 +76,13 @@ class cproject():
         for distinguishing datasets from each other, and for computing
         datafile pathnames in the 'generic' organization (see
         :py:class:`~climaf.dataloc.dataloc`)
+
+        A project can be declared as having non-standard variable
+        names, or variabels that should undergo re-scaling (see
+        :py:ref:`~climaf.classes.calias`)
+
+        A project can be declared as having non-standard frequency names (this is 
+        used when accessing datafiles). see :py:ref:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
@@ -517,6 +527,24 @@ def ds(*args,**kwargs) :
         raise Climaf_Classes_Error(e)
         return None
     else : return results[0]
+
+def cfreqs(project,dic) :
+    """ 
+    Allow to declare a dictionary specific to ``project`` for matching
+    ``normalized`` frequency values to project-specific frequency values
+
+    Normalized frequency values are : decadal, yearly, monthly, daily, 6h, 3h, fx
+
+    When defining a dataset, any reference to a non-standard
+    frequency will be left unchanged both in the datset's CRS and
+    when trying to access corresponding datafiles
+    
+    Examples::
+
+    >>> cfreqs('CMIP5',{'monthly':'mon' , 'daily':'day' })
+    """
+    #
+    frequencies[project]=dic
 
 
 def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,missing=None,filenameVar=None) :

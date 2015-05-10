@@ -6,15 +6,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 begin 
-  if (.not. isvar("cmap")) then      
-    cmap="BlueDarkRed18"
-  end if
-  if (.not. isvar("scale")) then      
-    scale=1.0
-  end if
-  if (.not. isvar("offset")) then      
-    offset=0.0
-  end if
+  if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
+  if (.not. isvar("scale")) then scale=1.0 end if
+  if (.not. isvar("offset")) then offset=0.0 end if
   ;print("plotting cross section "+plotname+ " from "+infile)
   
   type="png"
@@ -25,8 +19,7 @@ begin
   ; Reading the field and its unit, setting REDU, and scaling the field
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
-    if isfilevar(ffile,var) then 
-      fld = ffile->$var$
+    if isfilevar(ffile,var) then fld = ffile->$var$
     else
       print("File "+infile+" does not include variable "+var)
       status_exit(1)
@@ -37,14 +30,11 @@ begin
   end if
   
   if (.not. isvar("units")) then 
-    if ( isatt(fld,"units")) then
-      units=fld@units
-    else
-      units="None"
-    end if
+    if ( isatt(fld,"units")) then units=fld@units else units="None" end if
   end if
   
   logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarihtmic scale
+
   if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
 
   ; Try to adapt to various cases, using heuristics !
@@ -79,15 +69,15 @@ begin
   
   useXY=False
   horizontal=False  
-
   if (rank .eq. 3) then
     ; Must identify which horizontal dimension(s) is/are degenerated
     zname   = Var_DimNames(0)
     latname = Var_DimNames(1)
     lonname = Var_DimNames(2)
+    zdim=fld&$zname$
     if (dime(1) .eq. 1) then 
-      ; We are plotting height-longitude
-      ;print("Selecting only latitude")
+      ;print("We are plotting height-longitude")
+      ;print("Selecting sole latitude")
       fldtmp=fld(:,0,:)
       delete(fld)
       fld=fldtmp
@@ -95,13 +85,13 @@ begin
       hdim=fld&$lonname$
     else ; dim1 ne 1
       if (dime(2) .eq. 1) then 
-        ; We are plotting height-latitude
-        ;print("Selecting only longitude")
+        print("We are plotting height-latitude")
+        ;print("Selecting sole longitude")
         fldtmp=fld(:,:,0)
         delete(fld)
         fld=fldtmp
         delete(fldtmp)
-        hdim= ld&$latname$
+        hdim= fld&$latname$
       else
         print("plotting a field with 2 horizontal dimensions")
         ;print(dime)
@@ -125,9 +115,12 @@ begin
   if (rank .eq. 2) then
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld) 
-    if ((.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat")))) then
+    if (isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) ) then
       horizontal=True
     end if
+    ;if (isatt(fld!0,"axis") .and. ismissing(str_match(fld!0@axis,"Z")))
+    ;  horizontal=True
+    ;end if
     ; analyze if last (horizontal) dimension is singleton
     if (dime(1).eq. 1) then
       ; We have a profile (either vertical or horizontal)
@@ -160,13 +153,13 @@ begin
       else
         ;We have a true cross-section or a horizontal map
         if logp  then useXY=False end if
-        if (ismissing(str_match(Var_DimNames,"lat"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
+        if (ismissing(str_match(Var_DimNames,"lat"))) .and. isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
           useLatDim=True
           latname="lat"
           if isfilevar(ffile,"nav_lat") then latname="nav_lat" end if
           latdim=ffile->$latname$
         end if
-        if (ismissing(str_match(Var_DimNames,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
+        if (ismissing(str_match(Var_DimNames,"lon"))) .and. isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
           useLonDim=True
           lonname="lon"
           if isfilevar(ffile,"nav_lat") then lonname="nav_lon" end if
@@ -183,7 +176,7 @@ begin
     vprofile=False
     useXY=True
     if ((str_match(dim,"lat") .eq. "missing") .and. (str_match(dim,"lon") .eq. "missing")) then
-      ; print("we have a vprofile")
+      print("We have a vertical profile")
       vprofile=True
     end if
   end if
@@ -227,7 +220,6 @@ begin
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ContourPlot resources
   if (.not. useXY  ) then 
-    res@gsnAddCyclic = True
     res@gsnSpreadColors     = True
     res@gsnSpreadColorEnd   = -2
     res@gsnLeftString     = ""
@@ -241,6 +233,11 @@ begin
       res@cnMaxLevelValF = vmax
       res@cnLevelSpacingF = vdelta
     end if
+    if ( isvar("levels") ) then
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        ;nbl=dimsizes(levels)
+        res@cnLevels=(/250,260,270/)
+    end if 
 
     res@cnLinesOn=False
     res@cnLineLabelsOn = False
@@ -260,6 +257,23 @@ begin
       res@cnRasterModeOn=True
     end if
 
+    if (isvar("proj")) then 
+      prj = getSubString( proj,0,1 )
+      if ( prj .eq. "NH" .or. prj .eq. "SH" ) then
+        res@gsnPolar=prj
+        lenproj = strlen(proj)
+        minlat = 50
+        if ( lenproj .ge. 3 ) then minlat = tofloat( getSubString(proj,2,lenproj-1) ) end if
+        if ( prj .eq. "SH" ) then
+          res@mpMaxLatF=-minlat
+          delete(res@mpMinLatF)
+        end if
+        if ( prj .eq. "NH" ) then
+          res@mpMinLatF=minlat
+          delete(res@mpMaxLatF)
+        end if 
+      end if
+    end if
   
     res@lbLabelBarOn =True
     if power10.ge.4 then
@@ -302,28 +316,26 @@ begin
   if useXY then 
     xyres = True
     xyres@vpXF = 0.08
-    xyres@vpWidthF = .10
-    xyres@vpHeightF = .26
+    xyres@vpWidthF = 0.45
+    xyres@vpHeightF = 0.45
     xyres@tmXBLabelFontHeightF = 0.008
     xyres@tmYLLabelFontHeightF = 0.008
     xyres@gsnDraw = False
     xyres@gsnFrame = False
     xyres@txFontHeightF = 0.010
-    ;xyres@xyLineThicknesses = (/ 2.0, 3.0/)
-    ;xyres@xyLineColors = (/"red", "black"/)
-    ;if vprofile then
-    ;  xyres@trYReverse        = True                       ; reverse Y-axis
-    ;end if
+    xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
+    xyres@xyLineColors = "black" ; (/"red", "black"/)
     if type.eq."png" then
       xyres@tmXBLabelFontThicknessF = 3.0
       xyres@tmYLLabelFontThicknessF = 3.0
       xyres@txFontThicknessF = 3.0
     end if
-    ;print(hdim)
-    ;print(fld)
     if vprofile then
+      xyres@trYReverse = True ; reverse Y-axis
       if logp then 
         xyres@xyYStyle = "Log" 
+        ;delete(xyres@tmYLMode)
+        set_pres_hgt_axes(hdim,xyres,True)
       end if
       plot0=gsn_csm_xy(wks,fld,hdim,xyres)
     else
@@ -331,17 +343,29 @@ begin
     end if
   else
     if (horizontal) then 
+      res@gsnAddCyclic = True
       if useLatDim then 
         ;res@trGridType          = "TriangularMesh"
         res@sfXArray            = londim
         res@sfYArray            = latdim
         res@gsnAddCyclic        = False
       end if
-      plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
+      if (isvar("proj")) then 
+        print("using gsn_csm_contour_map_ce")
+        plot0=gsn_csm_contour_map(wks,fld(:,:),res)
+      else 
+        print("using gsn_csm_contour_map_ce")
+        plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
+      end if 
     else
       if logp then 
+        print("using gsn_csm_pres_hgt")
         plot0=gsn_csm_pres_hgt(wks,fld,res)
       else
+        print("using gsn_csm_contour")
+        ; useless :
+        ;res@sfYArray            = zdim
+        res@trYReverse        = True ; reverse Y-axis
         plot0=gsn_csm_contour(wks,fld,res)
       end if 
     end if
@@ -353,3 +377,6 @@ begin
   status_exit(0)
   
 end
+zplotl=plot(ta_zonal_mean,crs='title',linp=1)
+cshow(zplotl)
+

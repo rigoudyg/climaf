@@ -22,7 +22,7 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units} "${missing}" ${ins}')
+            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
     #
     cscript('space_average',
             scriptpath+'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units} "${missing}" ${ins}', 
@@ -64,5 +64,5 @@ def load_standard_operators():
     cscript('plot'     , "(ncl -Q "+ scriptpath +"gplot.ncl infile=${in} "
             "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
             "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units} "
-            "; convert ${out} -trim ${out}) ", format="png")
+            "linp=${linp} levels=${levels} proj=${proj}; convert ${out} -trim ${out}) ", format="png")
     #
