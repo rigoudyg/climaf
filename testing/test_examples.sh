@@ -12,17 +12,18 @@ cd $dir/examples
 
 # List of scripts that can be tested anywhere (based on data installed with the package, or a test is done)
 scripts="clean_cache.py data_generic.py plotmap.py basic_oce.py latlonbox.py ann_cycle.py derived.py \
-         export.py increm.py regrid.py latlonbox.py figarray.py macro.py plot_timeseries.py plot_xsection.py "
+         export.py increm.py regrid.py latlonbox.py macro.py plot_timeseries.py plot_xsection.py "
 
 # Add some scripts, depending on the data available at each site
 if [[ $(uname -n) == lx* || $(uname -n) == sx* ]]; then 
     # CNRM
-    scripts=$scripts" data_cmip5drs.py "
+    scripts=$scripts" data_cmip5drs.py figarray.py"
     # Add scripts depending on user-configured data
     [ $(whoami) = senesi ] && scripts=$scripts" data_em.py seaice.py"
 elif [[ $(uname -n) == ciclad* ]]; then 
     # Ciclad
     scripts=$scripts" data_cmip5drs.py "
+    # figarray does not work yet there, due to convert canvas:None
 fi
 
 # Cleaning script

@@ -64,7 +64,7 @@ from climaf.projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage
+from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage,cfreqs
 from cmacros   import cmacro
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 

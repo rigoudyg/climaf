@@ -82,16 +82,19 @@ my_file=cfile(rst)
 #---------------------------------------------------------------
 
 if onCiclad :
-    cproject("OCMIP5_Ciclad","model","frequency")
     
-    dataloc(project="OCMIP5_Ciclad", organization="generic",
-            url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
+    # These definitions are now built-in :
+    #cproject("OCMIP5","model","frequency")
+    #cfreqs('OCMIP5',{'monthly':'mon' })
+    
+    #dataloc(project="OCMIP5_Ciclad", organization="generic",
+    #        url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/'
+    #             '${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
     
     cdef("model","IPSL-CM4") 
-    cdef("frequency","monthly") # Must use the right shortcut for the project, not "monthly"
+    cdef("frequency","monthly")
     
-    cactl=ds(project="OCMIP5_Ciclad", experiment="CTL", 
-             variable="CACO3", period="1860-1861")
+    cactl=ds(project="OCMIP5", experiment="CTL", variable="CACO3", period="1860-1861")
     print cactl.baseFiles()
 
     my_file=cfile(cactl)
