@@ -79,10 +79,10 @@ class cproject():
 
         A project can be declared as having non-standard variable
         names, or variabels that should undergo re-scaling (see
-        :py:ref:`~climaf.classes.calias`)
+        :py:func:`~climaf.classes.calias`)
 
         A project can be declared as having non-standard frequency names (this is 
-        used when accessing datafiles). see :py:ref:`~climaf.classes.cfreqs`)
+        used when accessing datafiles). see :py:func:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
@@ -410,8 +410,7 @@ class ctree(cobject):
         self.parameters=parameters
         for o in operands :
             if not isinstance(o,cobject) :
-                clogger.error(" __init__ : operand "+`o`+" is not a CliMAF object")
-                raise Climaf_Classes_Error(o)
+                raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
         self.alias=None

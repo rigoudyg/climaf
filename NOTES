@@ -1,3 +1,17 @@
+Pour profils verticaux en log(p) :
+     - mettre des tick marks en pression aux niveaux standard
+     - ajouter le titre
+
+Notes sur jokers dans dataset 
+   - * 
+       veut dire tous (ensemble)
+       applicable à rip ou model. 
+       Suppose de parcourir de suite pour savoir la liste
+   - ? 
+       veut dire : je ne sais pas lequel, mais un seul . 
+       Applicable à rip, table, realm, version. 
+       Suppose de parcourir pour vérifier l'unicité
+
 Romain :
   - plot de n moyennes zonales de pr pour multiples modèles - avec légende
   - coupes de moyennes zonales : deux sources, et biais  (interpolation verticale OK avec cdo (au moins sur du 3D))

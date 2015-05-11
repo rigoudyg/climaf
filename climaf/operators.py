@@ -297,7 +297,8 @@ class cscript():
         # capply with that name and same arguments
         defs='def %s(*args,**dic) :\n  """%s"""\n  return driver.capply("%s",*args,**dic)\n'\
              % (name,doc,name)
-        exec defs in globals() #sys.modules['__main__'].__dict__
+        exec defs in globals() #
+        exec "from climaf.operators import %s"%name in sys.modules['__main__'].__dict__
         clogger.debug("CliMAF script %s has been declared"%name)
 
     def __repr__(self):

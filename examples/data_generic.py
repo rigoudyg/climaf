@@ -88,7 +88,7 @@ if onCiclad :
             url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
     
     cdef("model","IPSL-CM4") 
-    cdef("frequency","mon") # Must use the right shortcut for the project, not "monthly"
+    cdef("frequency","monthly") # Must use the right shortcut for the project, not "monthly"
     
     cactl=ds(project="OCMIP5_Ciclad", experiment="CTL", 
              variable="CACO3", period="1860-1861")
@@ -110,7 +110,7 @@ if atCNRM :
             "${variable}_${experiment}_*_YYYYMM-YYYYMM.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
-    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean",
+    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly",
               period="1979-1980", experiment="GPCP-SG")
 
     print pr_obs.baseFiles()

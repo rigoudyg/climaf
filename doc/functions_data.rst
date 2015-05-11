@@ -52,9 +52,14 @@ derive : define a variable as computed from other variables
 
 .. autofunction:: climaf.operators.derive 
 
-calias : define a variable as computed from another, single, variable
---------------------------------------------------------------------------
+calias : define a variable as computed, in a project,  from another, single, variable
+----------------------------------------------------------------------------------------
 
 .. autofunction:: climaf.classes.calias
 
+
+cfreqs : declare non-standard frequency names, for a project
+--------------------------------------------------------------------------
+
+.. autofunction:: climaf.classes.cfreqs
 

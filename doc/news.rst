@@ -14,30 +14,28 @@ Changes, newest first :
    compound object; you can save, edit, load... and macros are used for
    interpreting cache content. See :py:func:`~climaf.cmacros.cmacro`
    and an example in :download:`macro <../examples/macro.py>`.
- - Cleaner definition of CliMAF operators, in module ``operators``;
-   **this implies to execute** ``from operators import *`` **before using 
-   a user-defined operator**
  - A **general purpose plot operator**, named ``plot``, is fine for
    plotting 1D and 2D datasets (maps, cross-sections, profiles, but
    not Hoevmoeller...) and replaces plotxesc and plotmap. It allows
-   for setting explicit levels, stereopolar projection ... See
-   :doc:`scripts/plot`
+   for setting explicit levels in palette, stereopolar projection,
+   vertical coordinate ... See :doc:`scripts/plot`
  - Can **list or erase cache content using various filters** (on
    age, size, modif date ...); disk usage can be displayed. 
    See :py:func:`~climaf.cache.clist()`, :py:func:`~climaf.cache.cls`, :py:func:`~climaf.cache.crm`,
    :py:func:`~climaf.cache.cdu`, :py:func:`~climaf.cache.cwc`
  - Can create an **array of figures** using
    :py:func:`~climaf.classes.cpage`. See example :download:`figarray <../examples/figarray.py>`.
- - Can cope with un-declared missing values in data files, as
+ - Can **cope with un-declared missing values in data files**, as
    e.g. Gelato outputs with value=1.e+20 over land, which is not the
    declared missing value ; See :py:func:`~climaf.classes.calias()`
    and :py:mod:`~climaf.projects.em`
  - When declaring data re-scaling, can declare units of the result (see 
-   :py:ref:`~climaf.classes.calias`) 
- - Can declare correspondance between project-specific frequency name 
-   and normalized names (see :py:ref:`~climaf.classes.cfreqs`)
- - Add : howto :py:ref:`record`
+   :py:func:`~climaf.classes.calias`) 
+ - Can declare correspondance between **project-specific frequency names** 
+   and normalized names (see :py:func:`~climaf.classes.cfreqs`).
+ - Add : howto :ref:`record`
  - Cache content index is saved on exit
+ - Add an example of **seaice data handling and plotting**. See :download:`seaice.py <../examples/seaice.py>`
 
 - 2005/04/22 - Version 0.6.0 :
 

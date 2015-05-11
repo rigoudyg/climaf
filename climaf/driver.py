@@ -76,8 +76,8 @@ def capply_script (script_name, *operands, **parameters):
         if isinstance(op,classes.cens ):
             raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
     # 
-    print "op(0)="+`operands[0]`
-    print "script=%s , script.flags.commuteWithEnsemble="%script_name+`script.flags.commuteWithEnsemble`
+    #print "op(0)="+`operands[0]`
+    #print "script=%s , script.flags.commuteWithEnsemble="%script_name+`script.flags.commuteWithEnsemble`
     if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
         # Must iterate on members
         reps=[]
@@ -88,7 +88,7 @@ def capply_script (script_name, *operands, **parameters):
         print "labels="+`operands[0].labels`
         return(classes.cens(*reps,labels=operands[0].labels))
     else: 
-        return(maketree(script_name, script, operands, **parameters))
+        return(maketree(script_name, script, *operands, **parameters))
             
 def maketree(script_name, script, *operands, **parameters):
     rep=classes.ctree(script_name, script, *operands, **parameters)
@@ -371,14 +371,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if (varOf(op) != filevar) or scale != 1.0 or offset != 0. :
                 subdict["alias"]="%s,%s,%f,%f"%(varOf(op),filevar,scale,offset)
                 subdict["var"]=filevar
-            subdict["units"]=units if units else ""
+            if units : subdict["units"]=units 
             subdict["filenameVar"]=filenameVar
             subdict["missing"]=missing
         per=timePeriod(op)
-        if per.fx or str(per) == "" :
-            subdict["period"]=""
-            subdict["period_iso"]=""
-        else:
+        if not per.fx and str(per) != "" :
             subdict["period"]=str(per)
             subdict["period_iso"]=per.iso()
         subdict["domain"]=domainOf(op)
@@ -399,15 +396,12 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if (varOf(op) != filevar) or (scale != 1.0) or (offset != 0.) :
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
                     subdict["var_%d"%i]=filevar
-		subdict["units_%d"%i]=units if units else ""
+		if units : subdict["units_%d"%i]=units 
 		subdict["filenameVar_%d"%i]=filenameVar
 		subdict["missing_%d"%i]=missing
             # Provide period selection if script allows for
             per=timePeriod(op)
-            if per.fx :
-                subdict["period_%d"%i]=''
-                subdict["period_iso_%d"%i]=''
-            else :
+            if not per.fx and per != "":
                 subdict["period_%d"%i]=str(per)
                 subdict["period_iso_%d"%i]=per.iso()
             subdict["domain_%d"%i]=domainOf(op)
@@ -439,18 +433,21 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #
     # Substitute all args
     template=template.safe_substitute(subdict)
+    #print "stage 1, template="+template
     #
     # Allowing for some formal parameters to be missing in the actual call:
     #
     # Discard remaining substrings looking like :
-    #  some_word=\"${some_keyword}\"     , or:
-    #  \"${some_keyword}\"
-    template=re.sub(r'(\w*=)?(\\\")?\$\{\w*\}(\\\")?',r"",template)
+    #  some_word='"${some_keyword}"'     , or:
+    #  '"${some_keyword}"'
+    template=re.sub(r'(\w*=)?(\'\")?\$\{\w*\}(\"\')?',r"",template)
+    #print "stage 2, template="+template
     #
     # Discard remaining substrings looking like :
     #  some_word=${some_keyword}          , or
     #  ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
+    #print "stage 3, template="+template
     #
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables

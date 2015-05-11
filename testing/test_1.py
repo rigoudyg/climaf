@@ -71,7 +71,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
         # Declare a list of root directories for CMIP5 data on CNRM's Lustre file system.
         urls_CMIP5_CNRM=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", "/cnrm/aster/data2/ESG/data5",
                          "/cnrm/aster/data4/ESG/data6", "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8"]
-        dataloc(organization="CMIP5_DRS", url=urls_CMIP5_CNRM)
+        dataloc(project="CMIP5", organization="CMIP5_DRS", url=urls_CMIP5_CNRM)
         cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 

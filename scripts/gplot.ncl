@@ -235,8 +235,7 @@ begin
     end if
     if ( isvar("levels") ) then
         res@cnLevelSelectionMode = "ExplicitLevels"
-        ;nbl=dimsizes(levels)
-        res@cnLevels=(/250,260,270/)
+        res@cnLevels=tofloat(str_split(levels," "))
     end if 
 
     res@cnLinesOn=False
@@ -262,15 +261,15 @@ begin
       if ( prj .eq. "NH" .or. prj .eq. "SH" ) then
         res@gsnPolar=prj
         lenproj = strlen(proj)
-        minlat = 50
+        minlat = 50.
         if ( lenproj .ge. 3 ) then minlat = tofloat( getSubString(proj,2,lenproj-1) ) end if
         if ( prj .eq. "SH" ) then
           res@mpMaxLatF=-minlat
-          delete(res@mpMinLatF)
+          ;delete(res@mpMinLatF)
         end if
         if ( prj .eq. "NH" ) then
           res@mpMinLatF=minlat
-          delete(res@mpMaxLatF)
+          ;delete(res@mpMaxLatF)
         end if 
       end if
     end if
@@ -291,12 +290,14 @@ begin
 
   end if  ; not useXY
 
-  res@tmYLLabelFontHeightF = 0.020
-  res@tmXBLabelFontHeightF = 0.020
+  if (.not. isvar("proj")) then 
+    res@tmYLLabelFontHeightF = 0.020
+    res@tmXBLabelFontHeightF = 0.020
   
-  if type.eq."png" then
-    res@tmYLLabelFontThicknessF=2.0
-    res@tmXBLabelFontThicknessF=2.0
+    if type.eq."png" then
+      res@tmYLLabelFontThicknessF=2.0
+      res@tmXBLabelFontThicknessF=2.0
+    end if
   end if
   
   res@tiMainFont=22 

@@ -23,11 +23,11 @@ tuning a number of graphic attributes
     the dataset
   - colormap and its interpretation :
 
-   - ``color`` : name of the Ncl colormap to use; default
-     is 'BlueDarkRed18'  ; see
-     e.g. https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness. 
+   - ``color`` : name of the Ncl colormap to use; default is 'BlueDarkRed18'  ; see e.g. 
+     https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness. 
    - ``min``, ``max`` , ``vdelta`` : min and max values and levels when applying the colormap 
-   - ``levels`` : list of levels used when applyng colomap e.g. lin="260,270,280,290"
+   - ``levels`` : list of levels used when applyng colomap
+     e.g. lin="260 270 280 290"
 
   - ``scale``, ``offset`` : for scaling the input field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
@@ -43,22 +43,22 @@ tuning a number of graphic attributes
  
   - A map ::
 
-   >>> surface_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
-   >>> plot_map=plot(surface_ta,crs='A Map')
-   >>> cshow(plot_map)
+     >>> surface_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
+     >>> plot_map=plot(surface_ta,crs='A Map')
+     >>> cshow(plot_map)
 
   - A cross-section ::
 
-   >>> january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
-   >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
-   >>> plot_cross=plot(ta_zonal_mean,crs='A cross-section')
-   >>> cshow(plot_cross)
+     >>> january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+     >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
+     >>> plot_cross=plot(ta_zonal_mean,crs='A cross-section')
+     >>> cshow(plot_cross)
 
   - A profile ::
 
-   >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")
-   >>> plot_profile=plot(ta_profile,crs='A profile',linp=1)
-   >>> cshow(plot_profile)
+     >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")
+     >>> plot_profile=plot(ta_profile,crs='A profile',linp=1)
+     >>> cshow(plot_profile)
 
 **Side effects** : None
 
