@@ -14,8 +14,12 @@ from clogging import clogger, dedent
 
 #: Dictionnary of declared projects (type is cproject)
 cprojects=dict()
-#: Dictionnary of aliases
+
+#: Dictionnary of aliases dictionaries
 aliases=dict()
+
+#: Dictionnary of frequency names dictionaries
+frequencies=dict()
 
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
@@ -72,6 +76,13 @@ class cproject():
         for distinguishing datasets from each other, and for computing
         datafile pathnames in the 'generic' organization (see
         :py:class:`~climaf.dataloc.dataloc`)
+
+        A project can be declared as having non-standard variable
+        names, or variabels that should undergo re-scaling (see
+        :py:ref:`~climaf.classes.calias`)
+
+        A project can be declared as having non-standard frequency names (this is 
+        used when accessing datafiles). see :py:ref:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
@@ -219,11 +230,11 @@ class cdataset(cobject):
         if self.project is None :
             err="Must provide a project (Can use cdef)"
             clogger.error(err)
-            raise Climaf_Dataset_Error(err)
+            raise Climaf_Classes_Error(err)
         elif self.project not in cprojects :
             err="Dataset's project %s has not been described by a call to cproject()"%self.project
             clogger.error(err)
-            raise Climaf_Dataset_Error(err)
+            raise Climaf_Classes_Error(err)
         # Register facets values
         attval=dict()
         for facet in cprojects[self.project].facets :
@@ -244,7 +255,7 @@ class cdataset(cobject):
                 e="Project %s needs facet %s. "%(self.project,facet)
                 clogger.error(e)
                 errmsg+=" "+e
-        if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
+        if errmsg != "" : raise Climaf_Classes_Error(errmsg)
         #
         for facet in kwargs :
             #clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
@@ -253,7 +264,7 @@ class cdataset(cobject):
                 if not isinstance(attval['period'],cperiod) :
                     try :
                         attval['period']=init_period(attval['period'])
-                    except : raise Climaf_Dataset_Error
+                    except : raise Climaf_Classes_Error
             elif facet=='domain' and type(attval['domain']) is str and attval['domain'] != 'global' :
                 # May be a list
                 attval['domain']=eval(attval['domain'])
@@ -264,7 +275,7 @@ class cdataset(cobject):
                 errmsg+=" "+e
         #print "Done with init_period in cdataset, period="+`attval["period"]`
         #
-        if errmsg != "" : raise Climaf_Dataset_Error(errmsg)
+        if errmsg != "" : raise Climaf_Classes_Error(errmsg)
         # TBD : Next lines for backward compatibility, but should re-engineer 
         self.project   =attval['project']
         self.experiment=attval['experiment']
@@ -350,7 +361,7 @@ class cdataset(cobject):
         if force or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
-                filevar,scale,offset,filenameVar,missing=self.alias
+                filevar,scale,offset,units,filenameVar,missing=self.alias
                 dic["variable"]=filevar
                 dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
@@ -381,7 +392,7 @@ class ctree(cobject):
         for o in operands :
             if not isinstance(o,cobject) :
                 clogger.error(" __init__ : operand "+`o`+" is not a CliMAF object")
-                raise Not_A_Climaf_Object_Error(o)
+                raise Climaf_Classes_Error(o)
         self.crs=self.buildcrs()
         self.outputs=dict()
         self.alias=None
@@ -497,28 +508,46 @@ def ds(*args,**kwargs) :
     if len(args) >1 :
         e="must provide either 0 or 1 positional arguments, not "+len(args)
         clogger.error(e)
-        raise Climaf_Dataset_Error(e)
+        raise Climaf_Classes_Error(e)
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
     results=[]
     for cproj in cprojects : 
         try : dataset = cprojects[cproj].crs2ds(crs) 
-        except Climaf_Dataset_Error: dataset=None
+        except Climaf_Classes_Error: dataset=None
         if (dataset) : results.append(dataset)
     if len(results) > 1 :
         e="CRS expressions %s is ambiguous projects %s"%(crs,`cprojects.keys()`)
         clogger.error(e)
-        raise Climaf_Dataset_Error(e)
+        raise Climaf_Classes_Error(e)
     elif len(results) == 0 :
         e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
         clogger.error(e)
-        raise Climaf_Dataset_Error(e)
+        raise Climaf_Classes_Error(e)
         return None
     else : return results[0]
 
+def cfreqs(project,dic) :
+    """ 
+    Allow to declare a dictionary specific to ``project`` for matching
+    ``normalized`` frequency values to project-specific frequency values
 
-def calias(project,variable,fileVariable=None,scale=1.,offset=0.,missing=None,filenameVar=None) :
+    Normalized frequency values are : decadal, yearly, monthly, daily, 6h, 3h, fx
+
+    When defining a dataset, any reference to a non-standard
+    frequency will be left unchanged both in the datset's CRS and
+    when trying to access corresponding datafiles
+    
+    Examples::
+
+    >>> cfreqs('CMIP5',{'monthly':'mon' , 'daily':'day' })
+    """
+    #
+    frequencies[project]=dic
+
+
+def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,missing=None,filenameVar=None) :
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
 
@@ -541,18 +570,20 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,missing=None,fi
     if not fileVariable : fileVariable =variable
     if not filenameVar  : filenameVar =fileVariable
     if project not in cprojects : 
-        raise Climaf_Dataset_Error("project %s is not known"%project)
+        raise Climaf_Classes_Error("project %s is not known"%project)
     if project not in aliases : aliases[project]=dict()
     if type(variable)     is not list : variable    =[variable]
     if type(filenameVar)  is not list : filenameVar =[filenameVar]
     if type(fileVariable) is not list : fileVariable=[fileVariable]
-    for v,fv,fnv in zip(variable,fileVariable,filenameVar) :
-        aliases[project][v]=(fv,scale,offset,fnv,missing)
+    if type(units)        is not list : units    =[units]
+    for v,u,fv,fnv in zip(variable,units,fileVariable,filenameVar) :
+        aliases[project][v]=(fv,scale,offset,u,fnv,missing)
 
 def varIsAliased(project,variable) :
     """ 
-    Return a n-uplet (fileVariable, scale, offset, fileVariable, missing) defining how to 
-    compute a 'variable' which is not in files, for the 'project'
+    Return a n-uplet (fileVariable, scale, offset, filevarName,
+    missing) defining how to compute a 'variable' which is not in
+    files, for the 'project'
     """
     if project in aliases and variable in aliases[project] :
         return aliases[project][variable]
@@ -564,20 +595,25 @@ def cmissing(project,missing,*kwargs) :
     Such a declaration must follow all ``calias`` declarations for the
     same project
     """
-    pass # to be developped  ....
+    pass # TBD 
 
 
 
 class cpage(cobject):
-    def __init__(self, widths_list=[], heights_list=[], fig_lines=None, orientation="portrait"):
+    def __init__(self, widths_list=[], heights_list=[], 
+                 fig_lines=None, orientation="portrait"):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
         Args:
-         widths_list (list): the list of figure widths, i.e. the width of each column
-         heights_list (list): the list of figure heights, i.e. the height of each line
-         fig_line (a list of lists of figure objects): each sublist of 'fig_lines' represents a line of figures
-         orientation (str, optional): page's orientation, either 'portrait' (default) or 'landscape'
+         widths_list (list): the list of figure widths, i.e. the width 
+           of each column
+         heights_list (list): the list of figure heights, i.e. the height 
+           of each line
+         fig_line (a list of lists of figure objects): each sublist 
+          of 'fig_lines' represents a line of figures
+         orientation (str, optional): page's orientation, either 'portrait' 
+          (default) or 'landscape'
 
         Example:
 
@@ -606,7 +642,7 @@ class cpage(cobject):
             if not isinstance(line,list) :
                 raise Climaf_cpage_Error("each element in fig_lines must be a list of figures")
             if len(line)!=len(self.widths_list) :
-                raise Climaf_Dataset_Error("each line in fig_lines must have same dimension as "
+                raise Climaf_Classes_Error("each line in fig_lines must have same dimension as "
                                            "widths_list; pb for sublist "+`line`)
         self.crs=self.buildcrs()
         
@@ -623,15 +659,7 @@ class cpage(cobject):
         rep=rep.replace(", ]","]")
         return rep
 
-class Not_A_Climaf_Object_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-    def __str__(self):
-        return `self.valeur`
-
-class Climaf_Dataset_Error(Exception):
+class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
         clogger.error(self.__str__())

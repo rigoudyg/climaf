@@ -8,7 +8,7 @@ Changes, newest first :
 
 .. _news_0.6:
 
-- 2005/05/06 - Version 0.6.1 :
+- 2005/05/11 - Version 0.6.1 :
 
  - Add a **macro** feature : easy definition of a macro from a
    compound object; you can save, edit, load... and macros are used for
@@ -19,8 +19,9 @@ Changes, newest first :
    a user-defined operator**
  - A **general purpose plot operator**, named ``plot``, is fine for
    plotting 1D and 2D datasets (maps, cross-sections, profiles, but
-   not Hoevmoeller...) and replaces plotxesc and plotmap. See
-   :doc:`scripts/plot` 
+   not Hoevmoeller...) and replaces plotxesc and plotmap. It allows
+   for setting explicit levels, stereopolar projection ... See
+   :doc:`scripts/plot`
  - Can **list or erase cache content using various filters** (on
    age, size, modif date ...); disk usage can be displayed. 
    See :py:func:`~climaf.cache.clist()`, :py:func:`~climaf.cache.cls`, :py:func:`~climaf.cache.crm`,
@@ -31,6 +32,10 @@ Changes, newest first :
    e.g. Gelato outputs with value=1.e+20 over land, which is not the
    declared missing value ; See :py:func:`~climaf.classes.calias()`
    and :py:mod:`~climaf.projects.em`
+ - When declaring data re-scaling, can declare units of the result (see 
+   :py:ref:`~climaf.classes.calias`) 
+ - Can declare correspondance between project-specific frequency name 
+   and normalized names (see :py:ref:`~climaf.classes.cfreqs`)
  - Add : howto :py:ref:`record`
  - Cache content index is saved on exit
 

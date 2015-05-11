@@ -205,7 +205,7 @@ def hasBeginObject(cobject) :
 
 def hasExactObject(cobject) :
     # First read index from file if it is yet empty
-    if len(crs2filename.keys()) == 0 : cload()
+    # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
     if cobject.crs in crs2filename :
         return (crs2filename[cobject.crs])
 
@@ -248,6 +248,8 @@ def cdrop(obj, rm=True) :
     >>> cdrop(dg)
     
     """
+    global crs2filename
+
     if (isinstance(obj,cobject) ):
         crs=`obj`
         if (isinstance(obj, cdataset) ) : crs="select("+crs+")"
@@ -257,12 +259,11 @@ def cdrop(obj, rm=True) :
         return
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
-        try :
-            if rm : os.remove(crs2filename[crs])
-            crs2filename.pop(crs)
-            return True
-        except:
-            return False
+        fil=crs2filename.pop(crs)
+        if rm : os.remove(fil)
+        return True
+        #except:
+        #    return False
     else :
         clogger.info("%s is not cached"%crs)
         return None
@@ -278,12 +279,12 @@ def csync(update=False) :
 
     #check if cache index is up to date, if it is not the function 'rebuild' is called
     if update :
-        clogger.warning("Listing files present in cache")
-        files_in_cache=list_cache()
-        files_in_cache.sort()
-        index_keys=crs2filename.values()
-        index_keys.sort()
-        if files_in_cache != index_keys:
+        clogger.warning("Listing crs from files present in cache")
+        crs_in_cache=list_cache()
+        crs_in_cache.sort()
+        crs_in_index=crs2filename.values()
+        crs_in_index.sort()
+        if crs_in_index != crs_in_cache:
             clogger.warning("Rebuilding cache index")
             rebuild()  
 

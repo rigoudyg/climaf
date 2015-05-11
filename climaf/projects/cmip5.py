@@ -8,16 +8,19 @@ Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip
 
 Example for a CMIP5 dataset declaration ::
 
- >>> tas1pc=ds(project='CMIP5', model='CNRM-CM5', experiment='1pctCO2', variable='tas', frequency='mon', period='1860-1861')
+ >>> tas1pc=ds(project='CMIP5', model='CNRM-CM5', experiment='1pctCO2', variable='tas', frequency='monthly', period='1860-1861')
 
 
 """
 
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
+from climaf.classes import cproject, calias, cfreqs
 
 cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
+
+# Freqency alias
+cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })
 
 urls_CMIP5=None
 

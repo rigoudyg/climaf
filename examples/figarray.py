@@ -1,3 +1,4 @@
+import sys; sys.path.append("/home/stephane/Bureau/climaf")
 # How to build a an array of figures using cpage()
 from climaf.api import *
 
