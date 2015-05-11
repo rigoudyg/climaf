@@ -44,5 +44,6 @@ cshow(profplot)
 
 
 # Newt line is used for systematic test suite
-fig=cfile(plot) ; if (fig  is None) : exit(1)
+fig=cfile(profplot) 
+if (fig  is None) : exit(1)
 
