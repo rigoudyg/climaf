@@ -11,9 +11,12 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 """
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
+from climaf.classes import cproject, calias, cfreqs
 
 cproject("OBS4MIPS", "frequency" )
+
+# Frequency alias
+cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
 
 if os.path.exists('/cnrm'):
     cproject("OBS4MIPS","frequency")

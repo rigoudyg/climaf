@@ -19,7 +19,7 @@ from climaf.classes import cproject, calias, cfreqs
 
 cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
 
-# Freqency alias
+# Frequency alias
 cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })
 
 urls_CMIP5=None

@@ -131,11 +131,11 @@ In that case:
   e.g. :py:func:`~climaf.operators.cscript` must be prefixed with
   "climaf.operators" as e.g. in ::
 
->>> avg=climaf.operators.time_average(ds)
+   >>> avg=climaf.operators.time_average(ds)
 
 - the same applies for macros, mutatis mutandis  ::
 
->>> avg=climaf.macros.my_macro(ds)
+   >>> avg=climaf.macros.my_macro(ds)
 
 
 

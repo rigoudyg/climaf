@@ -33,7 +33,7 @@ dataloc(project="CMIP5", organization="CMIP5_DRS",
         url=urls_CMIP5_CNRM+urls_CMIP5_Ciclad)
 
 # Define default value for some dataset facets
-cdef("frequency","mon") ;  cdef("project","CMIP5")
+cdef("frequency","monthly") ;  cdef("project","CMIP5")
 
 # Define your dataset (a number of facets take default values)
 tas1pc=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1861")

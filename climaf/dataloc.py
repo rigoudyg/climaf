@@ -16,7 +16,7 @@ from clogging import clogger,dedent
 locs=[]
 
 class dataloc():
-    def __init__(self,organization, url, project="*",model="*", experiment="*", 
+    def __init__(self,organization=None, url=None, project="*",model="*", experiment="*", 
                  realm="*", table="*", frequency="*", rip="*"):
         """
         Create an entry in the data locations dictionnary for an ensemble of datasets.
@@ -180,7 +180,7 @@ def selectLocalFiles(**kwargs):
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies :
             normfreq=kwargs2['frequency'] 
-            if nomrfreq in classes.frequencies[project]: 
+            if normfreq in classes.frequencies[project]: 
                 kwargs2['frequency']=classes.frequencies[project][normfreq]
         #
         # Call organization-specific routine
@@ -328,7 +328,7 @@ def selectEmFiles(**kwargs) :
     period=kwargs['period']
     realm=kwargs['realm']
     #
-    freqs={ "monthly" : "" , "3h" : "_3h"}
+    freqs={ "mon" : "" , "3h" : "_3h"}
     f=frequency
     if f in freqs : f=freqs[f]
     rep=[]
@@ -338,7 +338,10 @@ def selectEmFiles(**kwargs) :
     for realm in lrealm :
         clogger.debug("Looking for realm "+realm)
         # Use EM data for finding data dir
-        command=["grep", "^export EM_DIRECTORY_"+realm+f+"=", os.path.expanduser("~/.em/expe_")+experiment ]
+        freq_for_em=f
+        if realm == 'I' : freq_for_em=""  # This is a special case ...
+        command=["grep", "^export EM_DIRECTORY_"+realm+freq_for_em+"=",
+                 os.path.expanduser(os.getenv("EM_HOME"))+"/expe_"+experiment ]
         try :
             ex = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except :
@@ -377,16 +380,12 @@ def periodOfEmFile(filename,realm,freq):
                 speriod="%s-%d"%(year,int(year)+1)
                 return init_period(speriod)
         else:
-            err="can yet handle only monthly frequency for realms A and L - TBD"
-            clogger.error(err)
-            raise Climaf_Data_Error(err)
+                raise Climaf_Data_Error("can yet handle only monthly frequency for realms A and L - TBD")
     elif (realm == 'O' or realm == 'I' ) :
-        if freq=='mon' or freq=='' : altfreq='m'
+        if freq=='monthly' or freq=='mon' or freq=='' : altfreq='m'
         elif freq[0:2] =='da' : altfreq='d'
         else:
-            err="Can yet handle only monthly and daily frequency for realms O and I - TBD"
-            clogger.error(err)
-            raise Climaf_Data_Error(err)
+            raise Climaf_Data_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8})_.*nc'
         beg=re.sub(patt,r'\1',filename)
         end=re.sub(patt,r'\2',filename)
@@ -394,9 +393,7 @@ def periodOfEmFile(filename,realm,freq):
         if (end==filename or beg==filename) : return None
         return init_period("%s-%s"%(beg,end))
     else:
-        err="unexpected realm "+realm
-        clogger.error(err)
-        raise Climaf_Data_Error(err)
+        raise Climaf_Data_Error("unexpected realm "+realm)
 
         
 

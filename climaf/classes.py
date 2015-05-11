@@ -79,10 +79,10 @@ class cproject():
 
         A project can be declared as having non-standard variable
         names, or variabels that should undergo re-scaling (see
-        :py:ref:`~climaf.classes.calias`)
+        :py:func:`~climaf.classes.calias`)
 
         A project can be declared as having non-standard frequency names (this is 
-        used when accessing datafiles). see :py:ref:`~climaf.classes.cfreqs`)
+        used when accessing datafiles). see :py:func:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
@@ -228,13 +228,9 @@ class cdataset(cobject):
         if 'project' in kwargs : self.project=kwargs['project']
         else : self.project= cdef("project")   
         if self.project is None :
-            err="Must provide a project (Can use cdef)"
-            clogger.error(err)
-            raise Climaf_Classes_Error(err)
+            raise Climaf_Classes_Error("Must provide a project (Can use cdef)")
         elif self.project not in cprojects :
-            err="Dataset's project %s has not been described by a call to cproject()"%self.project
-            clogger.error(err)
-            raise Climaf_Classes_Error(err)
+            raise Climaf_Classes_Error("Dataset's project %s has not been described by a call to cproject()"%self.project)
         # Register facets values
         attval=dict()
         for facet in cprojects[self.project].facets :
@@ -377,6 +373,29 @@ class cdataset(cobject):
                         %(self.variable,self.crs))
         return(False)
 
+class cens(cobject):
+    def __init__(self, *members, **kwargs ) :
+        """ 
+        Create an ensemble from a series of objects, plus a list of labels
+        """
+        if kwargs.keys() != [ "labels" ] :
+            raise Climaf_Classes_Error("Only kwargs 'label' is allowed")
+        labels=kwargs["labels"]
+        if not labels : 
+            raise Climaf_Classes_Error("Must provide a list of labels for members")
+        if len(labels) != len(members) :
+            raise Climaf_Classes_Error("Must provide as many labels as members")
+        self.members=members
+        self.labels=labels
+        self.crs=self.buildcrs()
+        self.register()
+
+    def buildcrs(self) :
+        rep="cens("
+        for m in self.members : rep+=`m`+","
+        rep+="labels="+`self.labels`+")"
+        return rep
+
 class ctree(cobject):
     def __init__(self, climaf_operator, script, *operands, **parameters ) :
         """ Builds the tree of a composed object, including a dict for outputs.
@@ -391,8 +410,7 @@ class ctree(cobject):
         self.parameters=parameters
         for o in operands :
             if not isinstance(o,cobject) :
-                clogger.error(" __init__ : operand "+`o`+" is not a CliMAF object")
-                raise Climaf_Classes_Error(o)
+                raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
         self.alias=None
