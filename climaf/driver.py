@@ -35,6 +35,7 @@ def capply (climaf_operator, *operands, **parameters):
     if climaf_operator in operators.scripts :
         #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_script(climaf_operator, *operands, **parameters)
+        # Evaluate object right now if there is no output to manage
         op=operators.scripts[climaf_operator]
         if op.outputFormat is None : ceval(res,userflags=op.flags)
     elif climaf_operator in cmacros.cmacros :
@@ -51,46 +52,64 @@ def capply (climaf_operator, *operands, **parameters):
 
 def capply_script (script_name, *operands, **parameters):
     """ Create object for application of a script to OPERANDS with keyword PARAMETERS."""
-
+    
     if script_name not in operators.scripts :
-        clogger.error("Script %s is not know. Consider declaring it with function 'cscript'",
-                      script_name)
-        return None
+        raise Climaf_Driver_Error("Script %s is not know. Consider declaring it "
+                                  "with function 'cscript'", script_name)
     script=operators.scripts[script_name]
     if len(operands) != script.inputs_number() : 
-        clogger.error("Operator %s is "
-                      "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
+        raise Climaf_Driver_Error("Operator %s is "
+                                  "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
                 script_name,script.inputs_number(),len(operands), script_name ))
-        return None
-    rep=classes.ctree(script_name, script, *operands, **parameters)
-    if rep is not None :
-        #
-        # TBD Analyze script inputs cardinality vs actual arguments
-        #for op in operands :
-        #
-        # Create one child for each output
-        defaultVariable=varOf(operands[0])
-        #defaultPeriod=operands[0].period
-        for outname in script.outputs :
-            if outname is None :
-                rep.variable=script.outputs[None]%defaultVariable
-            else :
-                son=classes.scriptChild(rep,outname)
-                son.variable=script.outputs[outname]%defaultVariable
-                rep.outputs[outname]=son
-                setattr(rep,outname,son)
-        # Check that all parameters to the call are expected by the script 
-        for para in parameters :
-            if re.match(r".*\{"+para+r"\}",script.command) is None :
-                if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
-                    raise Climaf_Driver_Error("parameter %s is not expected by  script %s"
-                                              "(which command is : %s)"%(para,script_name,script.command))
     #
+    # Check that all parameters to the call are expected by the script 
+    for para in parameters :
+        if re.match(r".*\{"+para+r"\}",script.command) is None :
+            if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
+                raise Climaf_Driver_Error("parameter %s is not expected by  script %s"
+                                          "(which command is : %s)"%(para,script_name,script.command))
+    #
+    # Check that only first operand can be an ensemble
+    opscopy=[ o for o in operands ]
+    opscopy.remove(opscopy[0])
+    for op in opscopy  :
+        if isinstance(op,classes.cens ):
+            raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
+    # 
+    print "op(0)="+`operands[0]`
+    print "script=%s , script.flags.commuteWithEnsemble="%script_name+`script.flags.commuteWithEnsemble`
+    if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
+        # Must iterate on members
+        reps=[]
+        for member in operands[0].members :
+            clogger.debug("processing member "+`member`)
+            reps.append(maketree(script_name, script, member, *opscopy, **parameters))
+        print "len(rep)="+`len(reps)`
+        print "labels="+`operands[0].labels`
+        return(classes.cens(*reps,labels=operands[0].labels))
+    else: 
+        return(maketree(script_name, script, operands, **parameters))
+            
+def maketree(script_name, script, *operands, **parameters):
+    rep=classes.ctree(script_name, script, *operands, **parameters)
+    # TBD Analyze script inputs cardinality vs actual arguments
+    # Create one child for each output
+    defaultVariable=varOf(operands[0])
+        #defaultPeriod=operands[0].period
+    for outname in script.outputs :
+        if outname is None :
+            rep.variable=script.outputs[None]%defaultVariable
+        else :
+            son=classes.scriptChild(rep,outname)
+            son.variable=script.outputs[outname]%defaultVariable
+            rep.outputs[outname]=son
+            setattr(rep,outname,son)
     return rep
 
 def capply_operator (climaf_operator, *operands, **parameters):
-    """ Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
-
+    """ 
+    Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
+    
     """
     clogger.error("Not yet developped - TBD")
     return None
@@ -103,7 +122,7 @@ def ceval(cobject,
     Actually evaluates a CliMAF object, either as an in-memory data structure or
     as a string of filenames (which either represent a superset or exactly includes
     the desired data)
-
+    
     - with arg deep=True , re-evaluates all components
     - with arg deep=False, re-evaluates top level operation
     - without arg deep   , use cached values as far as possible
@@ -135,7 +154,6 @@ def ceval(cobject,
             #if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
             if operators.is_derived_variable(ds.variable,ds.project) :
                 if ds.variable in derived_list :
-                    cdedent()
                     raise Climaf_Driver_Error("Loop detected while evaluating"
                          "derived variable "+ ds.variable + " " + `derived_list`)
                 derived=derive_variable(ds)
@@ -285,7 +303,7 @@ def ceval(cobject,
         clogger.debug("Evaluating object from crs : %s"%cobject)
         raise Climaf_Driver_Error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
     else :
-        raise Climaf_Driver_Error("argument " +`cobject`+" is not (yet) managed"
+        raise Climaf_Driver_Error("argument " +`cobject`+" is not (yet) managed")
 
 
 
@@ -509,6 +527,7 @@ def varOf(cobject) :
     its 'variable' property, otherwise returns variable of first operand
     """
     if isinstance(cobject,classes.cdataset) : return cobject.variable
+    elif isinstance(cobject,classes.cens) : return varOf(cobject.members[0])
     elif getattr(cobject,"variable",None) : 
         return getattr(cobject,"variable",None) 
     elif isinstance(cobject,classes.ctree) :

@@ -377,16 +377,12 @@ def periodOfEmFile(filename,realm,freq):
                 speriod="%s-%d"%(year,int(year)+1)
                 return init_period(speriod)
         else:
-            err="can yet handle only monthly frequency for realms A and L - TBD"
-            clogger.error(err)
-            raise Climaf_Data_Error(err)
+                raise Climaf_Data_Error("can yet handle only monthly frequency for realms A and L - TBD")
     elif (realm == 'O' or realm == 'I' ) :
         if freq=='mon' or freq=='' : altfreq='m'
         elif freq[0:2] =='da' : altfreq='d'
         else:
-            err="Can yet handle only monthly and daily frequency for realms O and I - TBD"
-            clogger.error(err)
-            raise Climaf_Data_Error(err)
+            raise Climaf_Data_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8})_.*nc'
         beg=re.sub(patt,r'\1',filename)
         end=re.sub(patt,r'\2',filename)
@@ -394,9 +390,7 @@ def periodOfEmFile(filename,realm,freq):
         if (end==filename or beg==filename) : return None
         return init_period("%s-%s"%(beg,end))
     else:
-        err="unexpected realm "+realm
-        clogger.error(err)
-        raise Climaf_Data_Error(err)
+        raise Climaf_Data_Error("unexpected realm "+realm)
 
         
 

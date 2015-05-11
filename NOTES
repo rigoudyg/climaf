@@ -1,0 +1,22 @@
+Romain :
+  - plot de n moyennes zonales de pr pour multiples modèles - avec légende
+  - coupes de moyennes zonales : deux sources, et biais  (interpolation verticale OK avec cdo (au moins sur du 3D))
+  - plot de box : deux sources, et biais, avec éventuellement un champ vectoriel en sus (sauf sur le biais)
+Masques, lié à CDFtools
+CDFtools
+
+Le multi-plot-1D permet d'attaquer les ensembles, en douceur
+
+
+Sélection de région :
+ - par boite en flottants : implicitement lat-lon; ca ne dépend pas de la grille, au 1° ordre (cf infra)
+ - par boite en entiers : implicitement en indices; donc ca dépend de la grille
+ - par nom : peut se référer à une boite (mais ambiguïté possible !); peut aussi se référer à un polygone; mais pbs de nommage commun (contrôlé); 
+
+Que faire pour une boite latlon et une grille avec projection, ou curvi-lineaire ? Suppose-t-on projection préalable ? Mais à quelle résolution ? (Ca pose plus de pbs qu'une grille non-structurée). On peut aussi etre pragmatique : prendre des intervalles d'indices qui permettent d'avoir (au moins) toute la boite lat-lon.
+
+Posons que la sélection 'de base' de région de CliMAF sert surtout à économiser dans les transferts et calculs, et doit être explicite (pas par nom)
+
+
+
+

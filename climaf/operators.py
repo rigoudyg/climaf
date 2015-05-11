@@ -22,7 +22,7 @@ class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
                  canAggregateTime=False, canAlias=False,
-                 canMissing=False,
+                 canMissing=False, commuteWithEnsemble=True,
                  commuteWithTimeConcatenation=False,commuteWithSpaceConcatenation=False):
         self.canOpendap=canOpendap
         self.canSelectVar=canSelectVar
@@ -31,6 +31,7 @@ class scriptFlags():
         self.canAggregateTime=canAggregateTime
         self.canAlias=canAlias
         self.canMissing=canMissing
+	self.commuteWithEnsemble=commuteWithEnsemble
         self.commuteWithTimeConcatenation=commuteWithTimeConcatenation
         self.commuteWithSpaceConcatenation=commuteWithSpaceConcatenation
 
@@ -263,6 +264,7 @@ class cscript():
         canAggregateTime=(command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
         canAlias= (command.find("${alias}") > 0 )
         canMissing= (command.find("${missing}") > 0 )
+        commuteWithEnsemble= (command.find("${multin}") <= 0 ) and (command.find("${multins}") <= 0 )
         canSelectTime=False
         if command.find("${period}") > 0  or command.find("${period_1}") > 0 :
             canSelectTime=True
@@ -273,7 +275,8 @@ class cscript():
         self.name=name
         self.command=command
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
-            canSelectDomain, canAggregateTime, canAlias, canAlias,\
+            canSelectDomain, canAggregateTime, canAlias, canMissing,\
+            commuteWithEnsemble,\
             commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
         self.outputFormat=format
         scripts[name]=self
@@ -314,7 +317,7 @@ class cscript():
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 
 	canSelectTime=False, canSelectDomain=False, canAggregateTime=False,
-        canAlias=False, canMissing=False):
+        canAlias=False, canMissing=False, commuteWithEnsemble=False):
         clogger.error("Not yet developped")
 
 
@@ -363,8 +366,8 @@ def derive(project, derivedVar, Operator, *invars, **params) :
         for outname in derivedVar :
             if (outname != 'out' and
                 (not getattr(Operator,"outvarnames",None)  or outname not in Operator.outvarnames )):
-                err="%s is not a named  ouput for operator %s; type help(%s)"%(outname,Operator,Operator)
-                raise Climaf_Operator_Error(err)
+                raise Climaf_Operator_Error("%s is not a named  ouput for operator %s; type help(%s)"%\
+                   (outname,Operator,Operator))
             s=scripts[Operator]
             if s.inputs_number() != len(invars) :
                 clogger.error("number of input variables for operator %s is %d, "

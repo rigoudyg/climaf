@@ -1,0 +1,19 @@
+tester l'accès aux data des 'projects' avec fréquences normalisées
+verifier l'accès aux data daily pour seaice
+
+levels explicites : trouver le str_split adhoc
+tester 'plot' avec grille ORCA
+Pour profils verticaux en log(p) :
+     - mettre des tick marks en pression aux niveaux standard
+     - ajouter le titre
+
+
+Notes sur jokers dans dataset 
+   - * 
+       veut dire tous (ensemble)
+       applicable à rip ou model. 
+       Suppose de parcourir de suite pour savoir la liste
+   - ? 
+       veut dire : je ne sais pas lequel, mais un seul . 
+       Applicable à rip, table, realm, version. 
+       Suppose de parcourir pour vérifier l'unicité
