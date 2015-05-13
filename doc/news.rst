@@ -6,9 +6,18 @@ Whats' new
 
 Changes, newest first :
 
+.. _news_0.7:
+
+- 2015/05/20 - Version 0.7 :
+
+ - Handle **explicitly defined objects ensembles** (see
+   :py:class:`~climaf.classes.cens`) and **explicit dataset ensembles**
+   (see :py:func:`~climaf.classes.eds`. See also examples in
+   :download:`ensemble.py <../examples/ensemble.py>`.
+
 .. _news_0.6:
 
-- 2005/05/11 - Version 0.6.1 :
+- 2015/05/11 - Version 0.6.1 :
 
  - Add a **macro** feature : easy definition of a macro from a
    compound object; you can save, edit, load... and macros are used for
@@ -37,7 +46,7 @@ Changes, newest first :
  - Cache content index is saved on exit
  - Add an example of **seaice data handling and plotting**. See :download:`seaice.py <../examples/seaice.py>`
 
-- 2005/04/22 - Version 0.6.0 :
+- 2015/04/22 - Version 0.6.0 :
 
  - Add operator ``plotxsec`` (removed in 0.6.1, see
    replacement at :doc:`scripts/plot` )
@@ -56,7 +65,7 @@ Changes, newest first :
 
 .. _news_0.5:
 
-- 2005/04/14 - Version 0.5.0 :
+- 2015/04/14 - Version 0.5.0 :
 
  - A versionning scheme is now used, which is based on recommendations found at http://semver.org. 
 

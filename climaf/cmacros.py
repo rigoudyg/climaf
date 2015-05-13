@@ -62,26 +62,21 @@ def cmacro(name,cobj,lobjects=[]):
      >>> january_ta=ds(project='example',experiment='AMIPV6ALB2G',variable='ta',frequency='monthly',period='198001')
      >>> ta_europe=llbox(january_ta,latmin=40,latmax=60,lonmin=-15,lonmax=25)
      >>> ta_ezm=ccdo(ta_europe,operator='zonmean')
-     >>> fig_ezm=plotxsec(ta_ezm)
+     >>> fig_ezm=plot(ta_ezm)
      >>> #
      >>> # Using this result as an example, define a macro named 'eu_cross_section',
      >>> # which arguments will be the datasets involved in this result
      >>> cmacro('eu_cross_section',fig_ezm)
      >>> #
-     >>> # You can of course apply a macro to other dataset(s), 
+     >>> # You can of course apply a macro to another dataset(s) (even here to a 2D variable)
      >>> pr=ds(project='example',experiment='AMIPV6ALB2G', variable='pr', frequency='monthly', period='198001')
-     >>> pr_ezm=climaf.cmacros.eu_zonal_mean(pr)
-     >>> #
-     >>> # A simpler way to use it ; first import the macro
-     >>> from climaf.cmacros import eu_zonal_mean
-     >>> # or :
-     >>> from climaf.cmacros import *
-     >>> pr_ezm=eu_zonal_mean(pr)
+     >>> pr_ezm=eu_cross_section(pr)
      >>> #
      >>> # All macros are registered in dictionnary climaf.cmacros.cmacros,
      >>> # which is imported by climaf.api; you can list it by :
      >>> cmacros
 
+    Note : macros are automatically saved in file ~/.climaf.macros, and can be edited
 
     See also much more explanations in the example at :download:`macro.py <../examples/macro.py>`
     """
@@ -115,6 +110,7 @@ def cmacro(name,cobj,lobjects=[]):
         defs='def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n'\
               % (name,doc,name)
         exec defs in globals() 
+        exec "from climaf.macros import %s"%name in sys.modules['__main__'].__dict__
         clogger.debug("Macro %s has been declared"%name)
 
     return rep

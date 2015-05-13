@@ -26,12 +26,6 @@ cmacro("eu_cross_section",fig_ezm)
 # You can of course use a macro on other dataset(s), 
 pr=ds(project='example',experiment="AMIPV6ALB2G", variable="pr",
               frequency='monthly', period="198001")
-pr_ezm=climaf.cmacros.eu_zonal_mean(pr)
-
-# A simpler way to use it : first import the macro
-from climaf.cmacros import eu_zonal_mean
-# or :
-# from climaf.cmacros import *
 pr_ezm=eu_zonal_mean(pr)
 
 # You can also define a macro 'from scratch', using ARG for arguments/parameters

@@ -23,10 +23,20 @@ with the same name
 
 .. autoclass:: climaf.operators.cscript
 
-
 cmacro : define a macro  
 -----------------------------------------
 
 .. autofunction:: climaf.cmacros.cmacro
+
+cens : define an ensemble of objects
+---------------------------------------------------
+
+.. autoclass:: climaf.classes.cens
+
+
+eds : define an ensemble of datasets
+---------------------------------------------------
+
+.. autofunction:: climaf.classes.eds
 
 

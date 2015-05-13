@@ -15,16 +15,20 @@ Main functions are :
 
  - ``ds``      : define a dataset object (actually a front-end for ``cdataset``)
 
+ - ``eds``     : define an ensemble dataset object (actually a front-end for ``cens``)
+
  - ``derive``  : define a variable as computed from other variables
 
  - `` calias`` : describe how a variable is derived form another, single, one, and which
-   variable name should be used in deriving data filename for this variable 
+   variable name should be used in deriving data filename for this variable
 
 - for processing the data 
 
  - ``cscript`` : define a new CliMAF operator (this also defines a new Python function)
 
  - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
+
+ - ``cens``    : define an ensemble of objects 
 
 - for managing/viewing results :
 
@@ -64,7 +68,7 @@ from climaf.projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage,cfreqs
+from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage,cfreqs,cens,eds
 from cmacros   import cmacro
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 

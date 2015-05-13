@@ -193,14 +193,14 @@ def hasMatchingObject(cobject,ds_func) :
 
 def hasIncludingObject(cobject) :
     def ds_period_difference(includer,included):
-        if includer.buildcrs("") == included.buildcrs("") :
+        if includer.buildcrs(period="") == included.buildcrs(period="") :
             return includer.period.includes(included.period)
     clogger.debug("search for including object for "+`cobject`)
     return hasMatchingObject(cobject,ds_period_difference)
 
 def hasBeginObject(cobject) :
     def ds_period_begins(begin,longer):
-        if longer.buildcrs("") == begin.buildcrs("") :
+        if longer.buildcrs(period="") == begin.buildcrs(period="") :
             return longer.period.start_with(begin.period)
     return hasMatchingObject(cobject,ds_period_begins)
 
@@ -626,11 +626,11 @@ def cls(**kwargs):
 def crm(**kwargs):
     """
     Remove the cache files found by 'clist()' when using same arguments.
-     See :py:func:``~climaf.cache.clist`
+    See :py:func:`~climaf.cache.clist`
 
     Example to remove files using more than 3M of disk space, which status
-     was last changed more than 15 days ago and containing the pattern
-     '1980-1981' either in crs or filename::
+    was last changed more than 15 days ago and containing the pattern
+    '1980-1981' either in crs or filename::
      
      >>> crm(size='3M', age='+15', pattern='1980-1981')
 
@@ -643,12 +643,12 @@ def crm(**kwargs):
 def cdu(**kwargs):
     """
     Report disk usage, for files matching some criteria, as specified
-     for :py:func:``~climaf.cache.clist`. With count=True, report only total disk usage.
+    for :py:func:`~climaf.cache.clist`. With count=True, report only total disk usage.
 
     Example to search files using more than 3M of disk space, which status
-      was last changed more than 15 days ago and containing the pattern
-      '1980-1981' either in crs or filename. For found files, we want to
-      estimate only found files total space usage::
+    was last changed more than 15 days ago and containing the pattern '1980-1981'
+    either in crs or filename. For found files, we want to
+    estimate only found files total space usage::
      
       >>> cdu(size='3M', age='+15', pattern= '1980-1981', count=True)
     
@@ -660,13 +660,13 @@ def cdu(**kwargs):
 def cwc(**kwargs):
     """
     Report number of cache files matching some criteria, as specified
-     for :py:func:``~climaf.cache.clist`. If CRS is True, also return CRS expression
-     of found files.
+    for :py:func:`~climaf.cache.clist`. If CRS is True, also return CRS expression
+    of found files.
 
     Example to return the number and crs associated of files using more
-     than 3M of disk space, which status was last changed more than 15
-     days ago and containing the pattern '1980-1981' either in crs or
-     filename::
+    than 3M of disk space, which status was last changed more than 15
+    days ago and containing the pattern '1980-1981' either in crs or
+    filename::
      
      >>> cwc(size='3M', age='+15', pattern= '1980-1981', CRS=True)
 

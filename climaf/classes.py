@@ -34,9 +34,13 @@ class cproject():
            anyway will add attributes : 
            project, experiment, variable, period, and domain**
           kwargs (dict) :
-           can only be used with keyword ``sep`` or 
-           ``separator`` for indicating the symbol separating
-           facets in the dataset syntax. Defaults to ".". 
+           can only be used with keywords :
+
+            - ``sep`` or ``separator`` for indicating the symbol separating
+              facets in the dataset syntax. Defaults to ".".
+            - ``ensemble`` for declaring a list of attribute
+              names which are allowed for defining an ensemble in
+              this project ('experiment' is automatically allowed)
 
         Returns : a cproject object, which string representation is
         the pattern later used in CliMAF Refreence Syntax for
@@ -53,8 +57,7 @@ class cproject():
         experiment, model, rip, variable, frequency, realm, table, version
 
 
-        **A number of projects are built-in**. See
-          :py:mod:`~climaf.projects`
+        **A number of projects are built-in**. See :py:mod:`~climaf.projects`
         
         A dataset in a cproject declared as ::
 
@@ -103,6 +106,11 @@ class cproject():
         for f in self.facets : 
             self.crs += "${%s}%s"%(f,self.separator)
         self.crs=self.crs[:-1]
+        # Create an attribute hodling the list of facets which are allowed
+        # for defining an ensemble, and put a first facet there
+        self.attributes_for_ensemble=['experiment']
+        if 'ensemble' in kwargs :
+            self.attributes_for_ensemble.extend(kwargs["ensemble"])
     def __repr__(self):
         return self.crs
     def crs2ds(self,crs) :
@@ -172,6 +180,62 @@ class cobject():
         del(cobjects[self.crs])
         clogger.debug("Object deleted ; crs = %s"%(self.crs))
 
+def processDatasetArgs(**kwargs) :
+    """
+    Perfom basic checks on kwargs for functions cdataset and eds
+    regarding the project where the dataset is defined
+    Also complement with default values as handled by cdef()
+    """
+    if 'project' in kwargs : project=kwargs['project']
+    else : project= cdef("project")
+    if project is None :
+        raise Climaf_Classes_Error("Must provide a project (Can use cdef)")
+    elif project not in cprojects :
+        raise Climaf_Classes_Error("Dataset's project %s has not "
+                                   "been described by a call to cproject()"%self.project)
+    attval=dict()
+    attval["project"]=project
+    #
+    # Register facets values
+    attval=dict()
+    for facet in cprojects[project].facets :
+        if facet in kwargs : val=kwargs[facet]
+        else: val=cdef(facet)
+        attval[facet]=val
+    #
+    # Special processing for CMIP5 fixed fields : handling redundancy in facets
+    if (attval['project'] == 'CMIP5'):
+        if ( attval['table']=='fx' or attval['period']=='fx' or 
+             attval['rip']=='r0i0p0' or attval['frequency']=='fx') :
+            attval['table']='fx' ; attval['period']='fx' 
+            attval['rip']='r0i0p0' ; attval['frequency']='fx'
+    #
+    errmsg=""
+    for facet in cprojects[project].facets :
+        if attval[facet] is None :
+            e="Project %s needs facet %s. "%(project,facet)
+            errmsg+=" "+e
+    if errmsg != "" : raise Climaf_Classes_Error(errmsg)
+    #
+    for facet in kwargs :
+        # Facet specific processing
+        if facet=='period' :
+            if not isinstance(attval['period'],cperiod) :
+                try :
+                    attval['period']=init_period(attval['period'])
+                except :
+                    raise Climaf_Classes_Error("Cannot interpret period for %s"%`attval['period']`)
+        elif facet=='domain' and not type(attval['domain']) is str :
+            # May be a list
+            attval['domain']=eval(attval['domain'])
+        # Check for typing or user's logic errors
+        if not facet in cprojects[project].facets :
+            e="Project %s doesn't have facet %s"%(project,facet)
+            errmsg+=" "+e
+    if errmsg != "" : raise Climaf_Classes_Error(errmsg)
+    return attval
+
+
 class cdataset(cobject):
     #def __init__(self,project=None,model=None,experiment=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
@@ -192,8 +256,8 @@ class cdataset(cobject):
         For further details on projects , see
         :py:class:`~climaf.classes.cproject`
 
-        None of the attributes are mandatory, because all attributes
-        defaults to the value set by
+        None of the project's attributes are mandatory arguments, because
+        all attributes defaults to the value set by
         :py:func:`~climaf.classes.cdefault`
 
         Some attributes have a special format or processing : 
@@ -218,76 +282,27 @@ class cdataset(cobject):
 
         Example, using no default value, and adressing some CMIP5 data ::
 
-          >>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
-              rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+          >>>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
+          >>>           rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
         
         
         """
         #
-        self.crs=""
-        if 'project' in kwargs : self.project=kwargs['project']
-        else : self.project= cdef("project")   
-        if self.project is None :
-            raise Climaf_Classes_Error("Must provide a project (Can use cdef)")
-        elif self.project not in cprojects :
-            raise Climaf_Classes_Error("Dataset's project %s has not been described by a call to cproject()"%self.project)
-        # Register facets values
-        attval=dict()
-        for facet in cprojects[self.project].facets :
-            if facet in kwargs : val=kwargs[facet]
-            else: val=cdef(facet)
-            attval[facet]=val
+        attval=processDatasetArgs(**kwargs)
         #
-        # Special processing for CMIP5 fixed fields : handling redundancy in facets
-        if (attval['project'] == 'CMIP5'):
-            if ( attval['table']=='fx' or attval['period']=='fx' or 
-                 attval['rip']=='r0i0p0' or attval['frequency']=='fx') :
-                 attval['table']='fx' ; attval['period']='fx' 
-                 attval['rip']='r0i0p0' ; attval['frequency']='fx'
-        #
-        errmsg=""
-        for facet in cprojects[self.project].facets :
-            if attval[facet] is None :
-                e="Project %s needs facet %s. "%(self.project,facet)
-                clogger.error(e)
-                errmsg+=" "+e
-        if errmsg != "" : raise Climaf_Classes_Error(errmsg)
-        #
-        for facet in kwargs :
-            #clogger.debug("facet=%s, period=%s,kw=%s"%(facet,attval['period'],`kwargs`))
-            # Facet specific processing
-            if facet=='period' :
-                if not isinstance(attval['period'],cperiod) :
-                    try :
-                        attval['period']=init_period(attval['period'])
-                    except : raise Climaf_Classes_Error
-            elif facet=='domain' and type(attval['domain']) is str and attval['domain'] != 'global' :
-                # May be a list
-                attval['domain']=eval(attval['domain'])
-            # Check for typing or user's logic errors
-            if not facet in cprojects[self.project].facets :
-                e="Project %s doesn't have facet %s"%(self.project,facet)
-                clogger.error(e)
-                errmsg+=" "+e
-        #print "Done with init_period in cdataset, period="+`attval["period"]`
-        #
-        if errmsg != "" : raise Climaf_Classes_Error(errmsg)
         # TBD : Next lines for backward compatibility, but should re-engineer 
-        self.project   =attval['project']
+        self.project=attval["project"]
         self.experiment=attval['experiment']
         self.variable= attval['variable']
         # alias is a n-plet : filevar, scale, offset, filenameVar, missing
-        self.alias=varIsAliased(self.project,self.variable) 
-        if type(attval['period']) is str :
-            self.period    =init_period(attval['period'])
-        else:
-            self.period    =attval['period']
+        self.period    =attval['period']
         self.domain    =attval['domain']
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
         #
         self.kvp=attval
+        self.alias=varIsAliased(self.project,self.variable) 
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
         # 
@@ -374,27 +389,114 @@ class cdataset(cobject):
         return(False)
 
 class cens(cobject):
-    def __init__(self, *members, **kwargs ) :
-        """ 
-        Create an ensemble from a series of objects, plus a list of labels
+    def __init__(self, labels=None, *members ) :
         """
-        if kwargs.keys() != [ "labels" ] :
-            raise Climaf_Classes_Error("Only kwargs 'label' is allowed")
-        labels=kwargs["labels"]
+        Create a CliMAF object of class ``cens`` , i.e. an
+        ensemble of objects, with a list of labels attached
+
+        In some cases, ensemble of datasets from the same project
+        can also be built easily using :py:func:`~climaf.classes.cdataset()`
+
+        When applying an operator to an ensemble, CliMAF will know,
+        from operator's declaration (see
+        :py:func:`~climaf.operators.cscript()`), whether the operator
+        'wishes' to get the ensemble or, on the reverse, is not
+        'ensemble-capable' :
+
+         - if the operator is ensemble-capable it will deliver it :
+
+           - if it is a script : with a string composed  by
+             concatenating the corresponding input files; it will
+             also provide the labels list to the script if its
+             declaration calls for it
+             (see :py:func:`~climaf.operators.cscript()`)
+           - if it is a Python function : with the list of
+             corresponding objects
+
+         - if the operator is 'ensemble-dumb', CliMAF will loop
+           applying it on each member, and will form a new ensemble
+           with the results.
+
+        ``labels`` must be a list of strings, which describe what is
+        basically different among members. They are usually used by
+        plot scripts to provide a caption allowing to identify each
+        dataset/object e.g using varied colors. The labels list is
+        propagated across operators application.
+
+        Example:
+        
+        >>> cdef('project','example'); cdef('experiment',"AMIPV6ALB2G");
+        >>> cdef('variable','tas');cdef('frequency','monthly')
+        >>> #
+        >>> ds1980=ds(period="1980")
+        >>> ds1981=ds(period="1981")
+        >>> #
+        >>> cens(['1980',1981'],ds1980,ds1981)
+        >>> ncview(cens)  # will launch ncview once per member
+        
+        """
         if not labels : 
             raise Climaf_Classes_Error("Must provide a list of labels for members")
+        if isinstance(labels,cobject) :
+            raise Climaf_Classes_Error("First argument must be the list of labels for members")
+        if not all(map(lambda x : isinstance(x,str), labels)):
+            raise Climaf_Classes_Error("All labels must be strings")
         if len(labels) != len(members) :
             raise Climaf_Classes_Error("Must provide as many labels as members")
+        if not all(map(lambda x : isinstance(x,cobject), members)):
+            raise Climaf_Classes_Error("All members must be CliMAF objects")
         self.members=members
         self.labels=labels
         self.crs=self.buildcrs()
         self.register()
 
-    def buildcrs(self) :
-        rep="cens("
-        for m in self.members : rep+=`m`+","
-        rep+="labels="+`self.labels`+")"
+    def buildcrs(self,crsrewrite=None,period=None) :
+        rep="cens("+`self.labels`+","
+        for m in self.members : rep+=m.buildcrs(crsrewrite=crsrewrite)+","
+        rep=rep+","
+        rep=rep.replace(",)",")")
         return rep
+
+
+def eds(**kwargs):
+    """
+    Create a dataset ensemble using the same calling sequence as
+    :py:func:`~climaf.classes.cdataset`, except that one of the facets
+    is a list, for defining the nsemble members; this facet must be among
+    the facets authorized for ensemble in the (single) project involved
+
+    Example::
+
+    >>> cdef("frequency","monthly") ;  cdef("project","CMIP5"); cdef("model","CNRM-CM5")
+    >>> cdef("variable","tas"); cdef("period","1860")
+    >>> ens=eds(experiment="historical", rip=["r1i1p1","r2i1p1"])
+
+    """
+    attval=processDatasetArgs(**kwargs)
+    # Check that any facet/attribute of type 'list' (for defining an
+    # ensemble) is OK for the project, and that there is at most one
+    nlist=0
+    listattr=None
+    for attr in attval :
+        clogger.debug("Looking at attr %s for ensemble"%attr)
+        if isinstance(attval[attr], list) and attr != "domain":
+            if not attr in cprojects[attval["project"]].attributes_for_ensemble :
+                raise Climaf_Classes_Error("Attribute %s cannot be used for ensemble"%attr)
+            clogger.debug("Attr %s is used for an ensemble"%attr)
+            nlist+=1
+            listattr=attr
+    if nlist != 1 :
+        raise Climaf_Classes_Error("Must ask for an ensemble on exactly one attribute")
+    #
+    # Create an ensemble of datasets if applicable
+    labels=[]; members=[]
+    for member in attval[listattr] :
+        attval2=attval.copy()
+        attval2[listattr]=member
+        members.append(cdataset(**attval2))
+        labels.append(member)
+    return cens(labels,*members)
+
 
 class ctree(cobject):
     def __init__(self, climaf_operator, script, *operands, **parameters ) :
@@ -413,10 +515,9 @@ class ctree(cobject):
                 raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
-        self.alias=None
         self.register()
 
-    def buildcrs(self, period=None, crsrewrite=None) :
+    def buildcrs(self, crsrewrite=None, period=None) :
         """ Builds the CRS expression representing applying OPERATOR on OPERANDS with PARAMETERS.
         Forces period downtree if provided
         A function for rewriting operand's CRS may be provided
@@ -426,7 +527,7 @@ class ctree(cobject):
         #
         ops=[ o for o in self.operands ]
         for op in ops :
-            opcrs = op.buildcrs(period,crsrewrite)
+            opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
             if crsrewrite : opcrs=crsrewrite(opcrs)
             rep+= opcrs + ","
         #
@@ -442,7 +543,7 @@ class ctree(cobject):
         """ modifies the period for all datasets of a tree"""
         self.erase()
         for op in self.operands : op.setperiod(period)
-        self.crs=self.buildcrs(period)
+        self.crs=self.buildcrs(period=period)
         self.register()
 
 class scriptChild(cobject):
@@ -455,17 +556,16 @@ class scriptChild(cobject):
         self.varname=varname
         self.crs=self.buildcrs()
         self.file=None
-        self.alias=None
         self.register()
 
     def setperiod(self,period):
         self.erase()
-        self.crs=self.father.crs.buildcrs(period)
+        self.crs=self.father.crs.buildcrs(period=period)
         self.crs += "."+self.varname
         self.register()
 
     def buildcrs(self,period=None,crsrewrite=None):
-        tmp= self.father.buildcrs(period)
+        tmp= self.father.buildcrs(period=period)
         if (crsrewrite): tmp=crsrewrite(tmp)
         return tmp+"."+self.varname
 
@@ -664,7 +764,7 @@ class cpage(cobject):
                                            "widths_list; pb for sublist "+`line`)
         self.crs=self.buildcrs()
         
-    def buildcrs(self,crsrewrite=None):
+    def buildcrs(self,crsrewrite=None,period=None):
         rep="cpage("+`self.widths_list`+","+`self.heights_list`+",["
         for line in self.fig_lines :
             rep+="["

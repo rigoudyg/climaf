@@ -84,9 +84,7 @@ def capply_script (script_name, *operands, **parameters):
         for member in operands[0].members :
             clogger.debug("processing member "+`member`)
             reps.append(maketree(script_name, script, member, *opscopy, **parameters))
-        print "len(rep)="+`len(reps)`
-        print "labels="+`operands[0].labels`
-        return(classes.cens(*reps,labels=operands[0].labels))
+        return(classes.cens(operands[0].labels,*reps))
     else: 
         return(maketree(script_name, script, *operands, **parameters))
             
@@ -219,11 +217,14 @@ def ceval(cobject,
                     return(extract)
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
-             isinstance(cobject,classes.cpage) : 
+             isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cens) : 
         recurse_list.append(cobject.buildcrs())
         clogger.debug("Evaluating compound object : " + `cobject`)
+        #################################################################
         if (deep is not None) : cache.cdrop(cobject.crs)
+        #
         clogger.debug("Searching cache for exact object : " + `cobject`)
+        #################################################################
         filename=cache.hasExactObject(cobject)
         #filename=None
         if filename :
@@ -231,8 +232,10 @@ def ceval(cobject,
             cdedent()
             if format=='file' : return filename
             else: return cread(filename,varOf(cobject))
-        if not isinstance(cobject,classes.cpage) :
+        if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cens) :
+            #
             clogger.debug("Searching cache for including object for : " + `cobject`)
+            ########################################################################
             it,altperiod=cache.hasIncludingObject(cobject)
             #clogger.debug("Finished with searching cache for including object for : " + `cobject`)
             #it=None
@@ -245,6 +248,7 @@ def ceval(cobject,
                 return rep
             #
             clogger.debug("Searching cache for begin  object for : " + `cobject`)
+            ########################################################################
             it,comp_period=cache.hasBeginObject(cobject) 
             clogger.debug("Finished with searching cache for begin  object for : " + `cobject`)
             #it=None
@@ -259,16 +263,15 @@ def ceval(cobject,
                     rep=cache.complement(begcrs,it.crs,cobject.crs)
                     cdedent()
                     return rep
-                else :
-                    clogger.debug("cannot yet complement except for files")
-                    cdedent()
-                    return(None)
+                else : raise Climaf_Driver_Error("cannot yet complement except for files")
             #
             clogger.info("nothing relevant found in cache for %s"%cobject.crs)
         #
         if deep==False : deep=None
         if isinstance(cobject,classes.ctree)  :
+            #
             # the cache doesn't have a similar tree, let us recursively eval subtrees
+            ##########################################################################
             # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
             if cobject.operator in operators.scripts :
                 file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
@@ -297,6 +300,12 @@ def ceval(cobject,
             cdedent()
             if ( format == 'file' ) : return (file)
             else : return cread(file)
+        elif isinstance(cobject,classes.cens) :
+            rep=[]
+            for member in cobject.members :
+                rep.append(ceval(member,userflags,format,deep,recurse_list=recurse_list))
+            if (format=="file") : return(reduce(lambda x,y : x+" "+y, rep))
+            else : return rep
         else :
             raise Climaf_Driver_Error("Internal logic error")
     elif isinstance(cobject,str) :
@@ -325,36 +334,14 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     for op in scriptCall.operands :
         inValue=ceval(op,userflags=script.flags,format='file',deep=deep,
                       recurse_list=recurse_list)
-        if inValue is None or inValue is "" : return None
+        if inValue is None or inValue is "" :
+            raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
+                                      %(scriptCall.script,`op`))
         if isinstance(inValue,list) : size=len(inValue)
         else : size=1
         sizes.append(size)
         dict_invalues[op]=inValue
-    # Check consistency regarding number of members , considering that input data is either a string with
-    # multiple files (which together cover a time period and are
-    # called a 'set' of files) or a list of such strings/sets (if the
-    # input data is an ensemble); we check that either all input
-    # streams have the same number of members (i.e. the lists of files
-    # sets have the same size among all input data streams ) or all
-    # but one are single member ensembles (i.e.  only one is a list)
-    # nbSize1=0
-    # nbSizeMax=0
-    # rank=0
-    # for s in sizes : 
-    #     if (s == 1)          : nbSize1 += 1
-    #     if (s == max(sizes)) : 
-    #         nbSizeMax += 1
-    #         maxRank=rank
-    #     rank += 1
-    #     if (s != 1) and (s != max(sizes)) :
-    #       clogger.error("Cannot mix ensemble sizes : size of ensemble # %d is not 1 nor equals to max ensemble size (%d) in %s"%\
-    #                         (rank,max(sizes),scriptCall.crs))
-    #       return(None)
-    # if ( nbSizeMax != 1 ) :
-    #     if ( nbSizeMax != len(sizes)) :
-    #       clogger.error("Cannot mix ensemble sizes : more than one operands has a size > 1, while some have size 1 in %s"%scriptCall.crs)
-    #       return(None)
-
+    #
     # Replace input data placeholders with filenames
     subdict=dict()
     opscrs=""
@@ -366,14 +353,18 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
         subdict["var"]=varOf(op)
-        if op.alias :
+        if isinstance(op,classes.cdataset) and op.alias :
             filevar,scale,offset,units,filenameVar,missing=op.alias
             if (varOf(op) != filevar) or scale != 1.0 or offset != 0. :
                 subdict["alias"]="%s,%s,%f,%f"%(varOf(op),filevar,scale,offset)
                 subdict["var"]=filevar
             if units : subdict["units"]=units 
-            subdict["filenameVar"]=filenameVar
-            subdict["missing"]=missing
+            if missing : subdict["missing"]=missing
+        if isinstance(op,classes.cens) :
+            if not multiple :
+                raise Climaf_Driver_Error("Script %s 's input #%s cannot accept ensemble %s"\
+                                          %(scriptCall.script,0,`op`))
+            subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
         per=timePeriod(op)
         if not per.fx and str(per) != "" :
             subdict["period"]=str(per)
@@ -391,14 +382,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict[ label ]=infile
             # Provide the name of the variable in input file if script allows for
             subdict["var_%d"%i]=varOf(op)
-            if op.alias :
+            if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
                 if (varOf(op) != filevar) or (scale != 1.0) or (offset != 0.) :
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
                     subdict["var_%d"%i]=filevar
 		if units : subdict["units_%d"%i]=units 
-		subdict["filenameVar_%d"%i]=filenameVar
-		subdict["missing_%d"%i]=missing
+		if missing : subdict["missing_%d"%i]=missing
             # Provide period selection if script allows for
             per=timePeriod(op)
             if not per.fx and per != "":
@@ -496,6 +486,9 @@ def timePeriod(cobject) :
     elif isinstance(cobject,classes.scriptChild) :
         clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
         return timePeriod(cobject.father)
+    elif isinstance(cobject,classes.cens) :
+        clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
+        return timePeriod(cobject.members[0])
     else : clogger.error("unkown class for argument "+`cobject`)
                   
 def domainOf(cobject) :
@@ -517,6 +510,9 @@ def domainOf(cobject) :
     elif isinstance(cobject,classes.scriptChild) :
         clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
         return domainOf(cobject.father)
+    elif isinstance(cobject,classes.cens) :
+        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
+        return domainOf(cobject.members[0])
     else : clogger.error("Unkown class for argument "+`cobject`)
                   
 def varOf(cobject) :
@@ -549,7 +545,7 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
         extract=capply('select',includer, period=`incperiod`)
         objfile=ceval(extract,userflags,'file',deep,derived_list,recurse_list)
 	if objfile :
-            crs=includer.buildcrs(incperiod)
+            crs=includer.buildcrs(incperiod=incperiod)
             return(cache.rename(objfile,crs))
         else :
             clogger.critical("Cannot evaluate "+`extract`)
@@ -664,7 +660,7 @@ def cfile(object,target=None,ln=None,deep=None) :
     Returns:
 
        - if target is provided, returns this filename (or linkname) if computation is 
-       successful ('target' contains the result), and None otherwise;
+         successful ('target' contains the result), and None otherwise;
        
        - if target is not provided, returns the filename in CliMAF cache, which contains the result (and None if failure)
        
@@ -674,6 +670,8 @@ def cfile(object,target=None,ln=None,deep=None) :
     result=climaf.driver.ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
+        if (instance(object,climaf.classes.cens)) :
+            raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is not None :
             if ln :
                 os.remove(os.path.expanduser(target))
