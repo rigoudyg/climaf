@@ -8,4 +8,4 @@ dg=ds(project="example", frequency="monthly", experiment="AMIPV6ALB2G", variable
 #########################################################
 ta=space_average(dg)
 
-cshow(timeplot(ta,crs="AMIPV6"))
+cshow(timeplot(ta,title="AMIPV6"))

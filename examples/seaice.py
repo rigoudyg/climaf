@@ -39,20 +39,26 @@ import os
 os.system("ls -al "+my_file)
 os.system("type ncdump && ncdump -h "+my_file)
 
-# Stereopolar plot with explicit levels. See othe rplot arguments in on-line help
-# as e.g. help(plot)
-fig1=plot(sic,crs="Sic 198310 2",proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99")
+# Stereopolar plot with explicit levels. See other plot arguments in on-line help : 'help(plot)'
+fig1=plot(sic,title="Sic 198310 2",proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1)
 cshow(fig1)
 
+# Create a dictionnary in order to simplify the way to provide constant plot args :
+pa=dict(proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1)
+
+# Mask part of the SIC field
+masked_sic=ccdo(sic,operator='setrtomiss,99,100')
+figm=plot(masked_sic,title="mask above 0.99",**pa)
+cshow(figm)
+          
 # Remap Sea Ice data to atmospheric grid. Use default option (remapbil)
 tas=ds(project="EM", experiment="GSAGNS1", variable="tas", period="1975", realm="L")
 sic_on_tas_grid=regrid(sic,tas)
-fig2=plot(sic_on_tas_grid,crs="regridded_sic")
+fig2=plot(sic_on_tas_grid,title="regridded_sic",**pa)
 cshow(fig2)
 
-
-# Access to daily data
-sicd=ds(experiment="NG89", variable="sic", period="198303", realm="I", frequency='daily')
+# Access daily data
+sicd=ds(experiment="NG89", variable="sic", period="198303-198304", realm="I", frequency='daily')
 print sicd.baseFiles()
 
 

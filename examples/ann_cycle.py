@@ -20,7 +20,7 @@ space_average=ccdo(extract,operator='fldavg')
 ncview(space_average)
 
 # Creating a figure with standard operator timeplot
-fig_avg=timeplot(space_average, crs="Annual cycle")
+fig_avg=timeplot(space_average, title="Annual cycle")
 
 # Get the figure computed, and get its filename in CliMAF file cache
 figfile=cfile(fig_avg)

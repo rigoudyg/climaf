@@ -12,7 +12,6 @@ begin
   ;print("plotting cross section "+plotname+ " from "+infile)
   
   type="png"
-  LINEON=False
   LABELON=False
   RASTER=True 
   
@@ -36,6 +35,20 @@ begin
   logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarihtmic scale
 
   if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
+  if (.not. isvar("contours")) then contours=0 end if
+  LINEON=False
+  if (contours .ne. 0 ) then LINEON=True 
+  end if
+  
+  if isvar("domain") then
+    if ( .not. (domain .eq. "" .or. domain .eq. "land" .or. domain .eq. "ocean")) then
+      print("Wrong domain option '"+domain+"' . Only 'ocean' and 'land' are allowed")
+      status_exit(2)
+    end if
+  else
+    domain=""
+  end if
+      
 
   ; Try to adapt to various cases, using heuristics !
   ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
@@ -236,6 +249,7 @@ begin
     if ( isvar("levels") ) then
         res@cnLevelSelectionMode = "ExplicitLevels"
         res@cnLevels=tofloat(str_split(levels," "))
+        delete(levels)
     end if 
 
     res@cnLinesOn=False
@@ -251,10 +265,17 @@ begin
       res@cnLineLabelsOn=True
     end if   
     if (RASTER) then
-      res@cnLinesOn=False
-      res@cnLineLabelsOn=False
+      if (.not. LINEON) then 
+        res@cnLinesOn=False
+        res@cnLineLabelsOn=False
+      end if
       res@cnRasterModeOn=True
     end if
+
+    res@mpFillDrawOrder="PostDraw"
+    if domain .eq. "land"  then res@mpOceanFillColor="gray" end if
+    if domain .eq. "ocean" then res@mpLandFillColor="gray" end if
+
 
     if (isvar("proj")) then 
       prj = getSubString( proj,0,1 )
@@ -352,7 +373,7 @@ begin
         res@gsnAddCyclic        = False
       end if
       if (isvar("proj")) then 
-        print("using gsn_csm_contour_map_ce")
+        print("using gsn_csm_contour_map")
         plot0=gsn_csm_contour_map(wks,fld(:,:),res)
       else 
         print("using gsn_csm_contour_map_ce")

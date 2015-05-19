@@ -34,9 +34,4 @@ cens : define an ensemble of objects
 .. autoclass:: climaf.classes.cens
 
 
-eds : define an ensemble of datasets
----------------------------------------------------
-
-.. autofunction:: climaf.classes.eds
-
 

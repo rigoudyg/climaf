@@ -19,7 +19,7 @@ ta=time_average(dg)
 
 # A NCL-quality plot, using standard operator plot
 #############################################################
-map=plot(ta,crs="TAS")
+map=plot(ta,title="TAS")
 
 # Ensure figure is computed, and get its cache filename in CliMAF disk cache
 figfile=cfile(map)
@@ -44,7 +44,7 @@ def map_graph_attributes(var) :
     #
     return rep
     
-map2=plot(ta,crs="Surface temperature (tas)",**map_graph_attributes(varOf(ta)))
+map2=plot(ta,title="Surface temperature (tas)",**map_graph_attributes(varOf(ta)))
 cshow(map2)
 
 

@@ -59,10 +59,11 @@ def load_standard_operators():
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
     cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
-            'var=\'\"${var}\"\' title=\'\"${crs}\"\'',format="png")
+            'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
     #
     cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' title=\'\"${crs}\"\' scale=${scale} offset=${offset} units=\'\"${units}\"\' '
-            'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\'; convert ${out} -trim ${out}) ', format="png")
+            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} units=\'\"${units}\"\' '
+            'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} domain=\'\"${domain}\"\'; '
+            'convert ${out} -trim ${out}) ', format="png")
     #

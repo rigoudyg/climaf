@@ -14,6 +14,12 @@ Changes, newest first :
    :py:class:`~climaf.classes.cens`) and **explicit dataset ensembles**
    (see :py:func:`~climaf.classes.eds`. See also examples in
    :download:`ensemble.py <../examples/ensemble.py>`.
+ - Special keyword ``crs`` is replaced by keyowrd ``title`` : the
+   value of CRS expression for an object is provided to script-based
+   operators as argument ``title``, if no value is provided by the
+   user
+ - Operator ``plot`` has new arguments : ``contours`` for adding
+   contour lines, ``domain`` for greying out land or ocean
 
 .. _news_0.6:
 

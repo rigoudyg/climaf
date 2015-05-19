@@ -7,7 +7,7 @@ cdef("period","198001")
 tas=ds(project="example", experiment="AMIPV6ALB2G", variable="tas")
 
 # Define a figure
-fig1=plot(tas,crs="title")
+fig1=plot(tas,title="title")
 
 # Trigger computation of fig1 as a cached file
 cfile(fig1)

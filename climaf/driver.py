@@ -66,7 +66,7 @@ def capply_script (script_name, *operands, **parameters):
     for para in parameters :
         if re.match(r".*\{"+para+r"\}",script.command) is None :
             if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
-                raise Climaf_Driver_Error("parameter %s is not expected by  script %s"
+                raise Climaf_Driver_Error("parameter '%s' is not expected by script %s"
                                           "(which command is : %s)"%(para,script_name,script.command))
     #
     # Check that only first operand can be an ensemble
@@ -417,9 +417,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict[p]=scriptCall.parameters[p]
         if p=="period" :
             subdict["period_iso"]=init_period(scriptCall.parameters[p]).iso()
-    # Provide crs if not provided by the user
-    if 'crs' not in scriptCall.parameters : 
-	subdict["crs"]=opscrs.replace("'","")
+    subdict["crs"]=opscrs.replace("'","")
+    # Provide crs as title if title not provided by the user
+    if 'title' not in scriptCall.parameters : 
+	subdict["title"]=subdict["crs"]
     #
     # Substitute all args
     template=template.safe_substitute(subdict)

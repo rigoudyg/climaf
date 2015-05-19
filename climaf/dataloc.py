@@ -377,7 +377,7 @@ def periodOfEmFile(filename,realm,freq):
         if freq=='mon' or freq=='' :
             year=re.sub(r'^.*([0-9]{4}).nc',r'\1',filename)
             if year.isdigit(): 
-                speriod="%s-%d"%(year,int(year)+1)
+                speriod="%s01-%s12"%(year,year)
                 return init_period(speriod)
         else:
                 raise Climaf_Data_Error("can yet handle only monthly frequency for realms A and L - TBD")

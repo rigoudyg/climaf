@@ -17,7 +17,7 @@ ds : define a dataset object (actually a front-end for ``cdataset``)
 
 .. autofunction:: climaf.classes.ds
 
-cdataset
+cdataset :: define a dataset object 
 --------------------------------------------------------------------------
 
 .. autoclass:: climaf.classes.cdataset
@@ -27,15 +27,20 @@ cdef : define some default values for datasets attributes
 
 .. autofunction:: climaf.classes.cdef
 
-cprojects : list of known projects
---------------------------------------------------------------------------
+eds : define an ensemble of datasets
+---------------------------------------------------
 
-.. autodata:: climaf.classes.cdefaults
+.. autofunction:: climaf.classes.eds
 
 cproject : declare a new project and its non-standard attributes/facets
 --------------------------------------------------------------------------
 
 .. autoclass:: climaf.classes.cproject
+
+cprojects : list of known projects
+--------------------------------------------------------------------------
+
+.. autodata:: climaf.classes.cdefaults
 
 dataloc : describe data locations for a series of experiments
 --------------------------------------------------------------------------

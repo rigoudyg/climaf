@@ -37,19 +37,18 @@ A number of examples show in directory ``<climaf_dir>/examples`` and are also do
 
 Some of the examples can be run anywhere, as they use the data sample installed with CliMAF :
 
-  - :download:`plotmap.py <../examples/plotmap.py>`      : basic and
-    advanced map plotting (using ncview and ncl)
+  - :download:`plotmap.py <../examples/plotmap.py>`      : basic and advanced map plotting (using ncview and ncl)
   - :download:`plot_xsection.py <../examples/plot_xsection.py>`:
     plotting a pressure-lat or pressure-lon cross section
   - :download:`basic_oce.py <../examples/basic_oce.py>`   : acces ocean data on ORCA grid in CMIP5_DRS data, and perfome some basic operations (works at CNRM and on Ciclad)
   - :download:`export.py <../examples/export.py>`        : various ways to 'export' results out of CliMAF
   - :download:`derived.py <../examples/derived.py>`      : how to define a new geophysical variable and use it in CliMAF
   - :download:`increm.py <../examples/increm.py>`        : compute any derived variable incrementally (i.e. using new inputs as they become available)
-  - :download:`latlonbox.py <../examples/latlonbox.py>`    : define a dataset on a lat-lon box; also extract a box out of a dataset
-  - :download:`regrid.py <../examples/regrid.py>`    : regrid some data or object to a named grid or to the grid of another object/data
-  - :download:`ann_cycle.py <../examples/ann_cycle.py>`    : compute an annual cycle, using CDO
-  - :download:`macro.py <../examples/macro.py>`    : define a
-    macro in-a-while, use it, save it, ....
+  - :download:`latlonbox.py <../examples/latlonbox.py>`  : define a dataset on a lat-lon box; also extract a box out of a dataset
+  - :download:`regrid.py <../examples/regrid.py>`        : regrid some data or object to a named grid or to the grid of another object/data
+  - :download:`ann_cycle.py <../examples/ann_cycle.py>`  : compute an annual cycle, using CDO
+  - :download:`macro.py <../examples/macro.py>`          : define a macro in-a-while, use it, save it, ....
+  - :download:`ensemble.py <../examples/ensemble.py>`    : how to create ensembles and compute with it
 
 .. _examples_data:
 
