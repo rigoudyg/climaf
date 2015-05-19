@@ -14,4 +14,4 @@ Otherwise, the details should show below :
 
 """
 
-__all__=[ "example", "cami", "cmip5", "ocmip5" , "obs4mips" , "em" , "erai" ]
+__all__=[ "example", "cami", "cmip5", "ocmip5" , "obs4mips" , "em" , "erai", "erai-land", "gpcc", "gpcp", "ceres", "cruts3"]
