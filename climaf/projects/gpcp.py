@@ -18,18 +18,20 @@ Example of an 'gpcp' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
+from climaf.site_settings import atCNRM
 
-cproject('gpcp','grid', 'frequency')  # grid writes as '1d', '2.5d', 'T42' or 'T127'
+if atCNRM:
+    cproject('gpcp','grid', 'frequency')  # grid writes as '1d', '2.5d', 'T42' or 'T127'
 
-root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
-patmonth=root+"_mean/gpcp/${variable}_gpcp.${grid}.nc"
-patday  =root+"/gpcp/${variable}_gpcp.${grid}.nc"
-dataloc(project='gpcp', organization='generic', url=[patmonth,patday])
+    root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
+    patmonth=root+"_mean/gpcp/${variable}_gpcp.${grid}.nc"
+    patday  =root+"/gpcp/${variable}_gpcp.${grid}.nc"
+    dataloc(project='gpcp', organization='generic', url=[patmonth,patday])
+    
+    
+    # Defining alias and derived variables for GPCP, together with filenames
+    ##############################################################################
 
-
-# Defining alias and derived variables for GPCP, together with filenames
-##############################################################################
-
-#calias("gpcp",'pr'    ,'precip', scale=1./86400.,filenameVar='pr')   #monthly
-calias("gpcp",'pr'    ,'PREC' , scale=1./86400.,filenameVar='prec') #daily
-#voir pour creer un sous dictionnaire au dict aliases pour la variable 'pr', qui est calculee soit a partir de 'precip' si on est dans le cas mensuel, soit a partir de 'PREC' si on est dans le cas journalier.
+    calias("gpcp",'pr'    ,'precip', scale=1./86400.,filenameVar='pr')   #monthly
+    #calias("gpcp",'pr'    ,'PREC' , scale=1./86400.,filenameVar='prec') #daily
+    #voir pour creer un sous dictionnaire au dict aliases pour la variable 'pr', qui est calculee soit a partir de 'precip' si on est dans le cas mensuel, soit a partir de 'PREC' si on est dans le cas journalier.

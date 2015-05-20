@@ -396,7 +396,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 subdict["period_iso_%d"%i]=per.iso()
             subdict["domain_%d"%i]=domainOf(op)
     clogger.debug("subdict for operands is "+`subdict`)
-    # substituion is deffered after scriptcall parameters evaluation, which may
+    # substitution is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
@@ -442,13 +442,28 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
-    command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
-             "\n\n'> scripts.out  ; "+ template+ " >> scripts.out 2>&1"
+    #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
+    #         "\n\n'> scripts.out  ; "+ template+ " >> scripts.out 2>&1"
+
+    command=subprocess.Popen(template, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    
+    logfile=open('last.out', 'w')
+    logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
+    command_std=""
+    for line in command.stdout:
+        command_std+=line
+        logfile.write(line)
+    logfile.close()
+    
+    command.wait()
+    
     tim1=time.time()
     clogger.info("Launching command:"+template)
     # Timing
     # TBD : Should use process.check_output and display stderr when exit is non-0
-    if ( subprocess.call(command, shell=True) == 0):
+
+    #if ( subprocess.call(command, shell=True) == 0):
+    if ( command.wait() == 0 ):
         if script.outputFormat is not None :
             # Tagging output files with their CliMAF Reference Syntax definition
             # Un-named main output
@@ -465,14 +480,25 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                               "%s (command was :%s )"%\
                                   (duration,`scriptCall`,template))
                 return main_output_filename
-            else :
+            else :                
                 raise Climaf_Driver_Error("Some output missing when executing "
-                                          ": %s. \n See scripts.out"%template)
+                                          ": %s. \n See last.out"%template)
+            
         else :
             clogger.debug("script %s has no output"%script.name)
     else:
-        raise Climaf_Driver_Error("See above (or scripts.out) for analyzing "
-                                  "script call failure for : %s "%template)
+        
+        clogger.debug("Full script output:\n"+command_std)
+       
+        comm2=subprocess.Popen(["tail", "-n", "10", "last.out"], stdout=subprocess.PIPE)
+        clogger.info("Last lines of script output:\n"+comm2.stdout.read())
+
+        raise Climaf_Driver_Error("Script failure for : %s. More details either in file ./last.out or by re-runing with clog(\"debug\")" %template)
+
+        #raise Climaf_Driver_Error("See above (or scripts.out <=> clog('debug')) for analyzing "
+        #                          "script call failure for : %s "%template)
+
+
     return None
 
 
