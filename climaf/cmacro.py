@@ -28,7 +28,7 @@ class cdummy(cobject):
     def buildcrs(self,period=None,crsrewrite=None):
         return('ARG')
 
-def cmacro(name,cobj,lobjects=[]):
+def macro(name,cobj,lobjects=[]):
     """
 
     Define a CliMAF macro from a CliMAF compound object.
@@ -72,7 +72,7 @@ def cmacro(name,cobj,lobjects=[]):
      >>> pr=ds(project='example',experiment='AMIPV6ALB2G', variable='pr', frequency='monthly', period='198001')
      >>> pr_ezm=eu_cross_section(pr)
      >>> #
-     >>> # All macros are registered in dictionnary climaf.cmacros.cmacros,
+     >>> # All macros are registered in dictionnary climaf.cmacro.cmacros,
      >>> # which is imported by climaf.api; you can list it by :
      >>> cmacros
 
@@ -82,7 +82,7 @@ def cmacro(name,cobj,lobjects=[]):
     """
     if isinstance(cobj,str) :
         # Next line used for interpreting macros's CRS
-        exec("ARG=climaf.cmacros.cdummy()", sys.modules['__main__'].__dict__)
+        exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
         cobj=eval(cobj, sys.modules['__main__'].__dict__)
     domatch=False
     for o in lobjects :
@@ -97,7 +97,7 @@ def cmacro(name,cobj,lobjects=[]):
     elif isinstance(cobj,scriptChild) :
         rep=scriptChild(cmacro(None,cobj.father),cobj.varname)
     elif isinstance(cobj,cpage) :
-        rep=cpage(cobj.widths_list, cobj.heights_list,
+        rep=cpage(cobj.widths, cobj.heights,
                   [ map(cmacro, [ None for fig in line ], line) for line in cobj.fig_lines ] ,
                   cobj.orientation)
     elif cobj is None : return None
@@ -126,7 +126,7 @@ def crewrite(crs,alsoAtTop=True):
     to second subtreesecond 
     """
     # Next line used for interpreting macros's CRS
-    exec("ARG=climaf.cmacros.cdummy()", sys.modules['__main__'].__dict__)
+    exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
     co=eval(crs, sys.modules['__main__'].__dict__)
     if isinstance(co,ctree) or isinstance(co,scriptChild) or isinstance(co,cpage) :
@@ -173,8 +173,8 @@ def cmatch(macro,cobj) :
         return(cmatch(macro.father,cobj.father,argslist))
     elif isinstance(cobj,cpage) and isinstance(macro,cpage) :
         argsub=[]
-        if cobj.heights_list == macro.heights_list and \
-                cobj.widths_list == macro.widths_list and \
+        if cobj.heights == macro.heights and \
+                cobj.widths == macro.widths and \
                 cobj.orientation == macro.orientation :
             for mlines,lines in zip(macro.fig_lines,cobj.fig_lines) :
                 for mfig,fig in zip(mlines,lines) :

@@ -21,7 +21,7 @@ cmacro("eu_zonal_mean",ta_ezm)
 
 # Also design a figure and define the corresponding macro
 fig_ezm=plot(ta_ezm)
-cmacro("eu_cross_section",fig_ezm)
+macro("eu_cross_section",fig_ezm)
 
 # You can of course use a macro on other dataset(s), 
 pr=ds(project='example',experiment="AMIPV6ALB2G", variable="pr",
@@ -29,22 +29,22 @@ pr=ds(project='example',experiment="AMIPV6ALB2G", variable="pr",
 pr_ezm=eu_zonal_mean(pr)
 
 # You can also define a macro 'from scratch', using ARG for arguments/parameters
-cmacro("my_macro", "ccdo(ARG,operator='timavg')")
+macro("my_macro", "ccdo(ARG,operator='timavg')")
 
 # All macros are registered in dictionnary climaf.cmacros.cmacros,
 # which is imported by climaf.api :
 cmacros
 
 # You can also look at how the macros do use macros (esp. eu_cross_section)
-climaf.cmacros.show()
+climaf.cmacro.show()
 
 # How to remove a macro
-cmacros.pop("my_macro")
+cmacro.pop("my_macro")
 
 # Save the macros in default location (~/.climaf.macros) (you may
 # provide a filename as argument - the default file is loaded automatically
 # when importing climaf)
-climaf.cmacros.write()
+climaf.cmacro.write()
 
 # Look at the external representation of the macros. 
 print "\nContent of ~/.climaf.macros :"
@@ -52,7 +52,7 @@ import os ; os.system("cat ~/.climaf.macros")
 
 # Using that example, you can also write and load macros from any file
 # having a similar syntax (here, we use the default location) 
-climaf.cmacros.read("~/.climaf")
+climaf.cmacro.read("~/.climaf")
 
 # Trigger the computation of some results, in order to populate the cache 
 cfile(fig_ezm)

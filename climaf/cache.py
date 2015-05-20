@@ -1,6 +1,6 @@
 """
 
-CliMAF cache module : stores and retrieves CliMAF objects from their CRS expression.
+CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS expression.
 
 
 
@@ -10,13 +10,11 @@ CliMAF cache module : stores and retrieves CliMAF objects from their CRS express
 import sys, os, os.path, re, time, glob
 
 from classes import compare_trees, cobject, ctree, cdataset
-from cmacros import crewrite
+from cmacro  import crewrite
 from clogging import clogger
 import operators
 from operator import itemgetter  
 
-directoryNameLength=2
-DynamicIsOn=False
 currentCache=None
 cachedirs=None
 #: The index associating filenames to CRS expressions
@@ -36,7 +34,6 @@ def setNewUniqueCache(path) :
     craz(hideError=True)
     print "cache directory set to : "+currentCache
 
-#def generateUniqueFileName(expression, operator=climaf.classes.firstGenericDataSet):
 def generateUniqueFileName(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
     expression and the set of cache directories currently listed in cache.cachedirs 
@@ -52,6 +49,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
     Exits if uniqueness is unachievable (quite unexpectable !) """
     #
     import hashlib
+    directoryNameLength=2
     #
     if format==None : return ""
     prefix=""
@@ -309,15 +307,14 @@ def cload() :
         pass
         #clogger.debug("no index file yet")
     #
-    for crs in crs2filename :
+    for crs in crs2filename.copy() :
         # We may have some crs inherited from past sessions and for which
         # some operator may have become non-standard
         try :
             eval(crs, sys.modules['__main__'].__dict__)
         except:
-            clogger.warning("Inconsistent cache object discarded : %s"%crs)
+            clogger.warning("Inconsistent cache object is skipped : %s"%crs)
             crs2filename.pop(crs)
-            break
 
 
 def craz(hideError=False) :
