@@ -17,13 +17,20 @@ Example for defining an EM dataset::
 
 """
 
-from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs
+from climaf.site_settings import atCNRM
 
-cproject('EM' , 'frequency', 'realm' )
-cfreqs('EM',{'monthly':'mon' , 'daily':'day1' })
-dataloc(project='EM', organization='EM', url=['dummy'])
-# Ideally, one should be able to write :
-#cmissing('EM',1.e+20, realm='I')
-calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice', 'mpalb', 'snomlet', 'tmelt', 'bmelt', 'snc','sic1','sic2', 'sic3', 'sic4', 'ssi', 'ageice'], missing=1.e+20)
+if atCNRM :
+
+    from climaf.dataloc import dataloc
+    from climaf.classes import cproject, calias, cfreqs
+    
+    cproject('EM' , 'frequency', 'realm' )
+    cfreqs('EM',{'monthly':'mon' , 'daily':'day1' })
+    dataloc(project='EM', organization='EM', url=['dummy'])
+
+    # Ideally, one should be able to write :
+    #cmissing('EM',1.e+20, realm='I')
+    calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice', 'mpalb', 'snomlet',
+                  'tmelt', 'bmelt', 'snc','sic1','sic2', 'sic3', 'sic4', 'ssi', 'ageice'],
+           missing=1.e+20)
 

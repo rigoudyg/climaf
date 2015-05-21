@@ -7,8 +7,6 @@ There is quite a lot of things to document here. Maybe at a later stage ....
 
 # Created : S.Senesi - 2014
 
-#Multi pour : ds.adressOF, cache.remoteRead, cstore, cache.cdrop, cache.hasIncludingTree, ceval_select, ceval_operator...
-
 import os, os.path, re, posixpath, subprocess, time, shutil
 from string import Template
 
@@ -17,7 +15,7 @@ import climaf
 import classes
 import cache
 import operators
-import cmacros
+import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
@@ -29,8 +27,7 @@ def capply (climaf_operator, *operands, **parameters):
     """
     res=None
     if operands is None or operands[0] is None :
-        clogger.debug("Operands is None")
-        return None
+        raise Climaf_Driver_Error("Operands is None")
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
         #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
@@ -38,11 +35,11 @@ def capply (climaf_operator, *operands, **parameters):
         # Evaluate object right now if there is no output to manage
         op=operators.scripts[climaf_operator]
         if op.outputFormat is None : ceval(res,userflags=op.flags)
-    elif climaf_operator in cmacros.cmacros :
+    elif climaf_operator in cmacro.cmacros :
         if (len(parameters) > 0) :
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
         clogger.debug("applying macro %s to"%climaf_operator + `opds` )
-        res=cmacros.instantiate(cmacros.cmacros[climaf_operator],*operands)
+        res=cmacro.instantiate(cmacro.cmacros[climaf_operator],*operands)
     elif climaf_operator in operators.operators :
         clogger.debug("applying operator %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_operator(climaf_operator,*operands, **parameters)
@@ -66,7 +63,8 @@ def capply_script (script_name, *operands, **parameters):
     for para in parameters :
         if re.match(r".*\{"+para+r"\}",script.command) is None :
             if re.match(r".*\{"+para+r"_iso\}",script.command) is None :
-                raise Climaf_Driver_Error("parameter '%s' is not expected by script %s"
+                if para != 'member_label' :
+                    raise Climaf_Driver_Error("parameter '%s' is not expected by script %s"
                                           "(which command is : %s)"%(para,script_name,script.command))
     #
     # Check that only first operand can be an ensemble
@@ -81,9 +79,11 @@ def capply_script (script_name, *operands, **parameters):
     if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
         # Must iterate on members
         reps=[]
-        for member in operands[0].members :
+        for member,label in zip(operands[0].members,operands[0].labels) :
             clogger.debug("processing member "+`member`)
-            reps.append(maketree(script_name, script, member, *opscopy, **parameters))
+            params=parameters.copy()
+            params["member_label"]=label
+            reps.append(maketree(script_name, script, member, *opscopy, **params))
         return(classes.cens(operands[0].labels,*reps))
     else: 
         return(maketree(script_name, script, *operands, **parameters))
@@ -364,7 +364,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if not multiple :
                 raise Climaf_Driver_Error("Script %s 's input #%s cannot accept ensemble %s"\
                                           %(scriptCall.script,0,`op`))
-            subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
+            #subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
+            subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
         per=timePeriod(op)
         if not per.fx and str(per) != "" :
             subdict["period"]=str(per)
@@ -418,9 +419,18 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         if p=="period" :
             subdict["period_iso"]=init_period(scriptCall.parameters[p]).iso()
     subdict["crs"]=opscrs.replace("'","")
-    # Provide crs as title if title not provided by the user
-    if 'title' not in scriptCall.parameters : 
-	subdict["title"]=subdict["crs"]
+    #
+    print "subdict="+`subdict`
+    # Combine CRS and possibly member_label to provide/complement title 
+    if 'title' not in subdict :
+        if 'member_label' in subdict :
+            subdict["title"]=subdict['member_label']
+        else:
+            subdict["title"]=subdict["crs"]
+    else: 
+        if 'member_label' in subdict :
+            subdict["title"]=subdict["title"]+" "+subdict['member_label']
+            subdict.pop('member_label')
     #
     # Substitute all args
     template=template.safe_substitute(subdict)
@@ -553,7 +563,7 @@ def varOf(cobject) :
     elif isinstance(cobject,classes.ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return varOf(cobject.operands[0])
-    elif isinstance(cobject,cmacros.cdummy) :
+    elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
@@ -791,22 +801,22 @@ def cfilePage(cobj, deep, recurse_list=None) :
     xmargin=20. # Horizontal shift between figures
     ymargin=20. # Vertical shift between figures
     #
-    usable_height=page_height-ymargin*(len(cobj.heights_list)-1.)-y_top_margin -y_bot_margin
-    usable_width =page_width -xmargin*(len(cobj.widths_list)-1.) -x_left_margin-x_right_margin
+    usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
+    usable_width =page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
     y=y_top_margin
-    for line, rheight in zip(cobj.fig_lines, cobj.heights_list) :
+    for line, rheight in zip(cobj.fig_lines, cobj.heights) :
         # Line height in pixels
         height=usable_height*rheight 
         x=x_left_margin
-        for fig, rwidth in zip(line, cobj.widths_list) :
+        for fig, rwidth in zip(line, cobj.widths) :
             # Figure width in pixels
             width=usable_width*rwidth 
             scaling="%dx%d+%d+%d" %(width,height,x,y)
             if fig : 
                 figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
-            else : figfile='canvas:None'
+            else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
             args.extend([figfile , "-geometry", scaling, "-composite" ])
             x+=width+xmargin

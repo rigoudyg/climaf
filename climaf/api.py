@@ -62,26 +62,20 @@ import os, os.path
 import climaf
 
 # Declare standard projects and standard data locations
-from climaf.projects import *
+from projects import *
 
 #####################################################################################################################
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
 from classes   import cdef,cdataset,ds,cproject,cprojects,calias,cpage,cfreqs,cens,eds
-from cmacros   import cmacro
+from cmacro    import macro
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts, derive, operators
 from cache     import craz, csync as csave , cdump, cdrop,  clist, cls, crm, cdu, cwc
 from clogging  import clogger, clog, clog_file
 from site_settings import atCNRM, onCiclad
-
-# CliMAF standard dynamic operators
-from climaf.operators import *
-
-# CliMAF macros operators
-from climaf.cmacros import *
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 

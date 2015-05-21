@@ -25,9 +25,9 @@ if atCNRM:
 
     root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
     patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}YYYY-YYYY.nc"   #for original grid
-    patmonth2=root+"_mean/erai/erai_???_mm_${variable}.${grid}.YYYY-YYYY.nc" #for other grids write e.g. as : grid ='T42' or 'T127'
+    patmonth2=root+"_mean/erai/erai_???_mm_${variable}.${grid}.YYYY-YYYY.nc" #for other grids e.g. : grid ='T42' or 'T127'
     patday1=root+"/erai/ei_${variable}${grid}YYYY-YYYY.nc"   #for original grid
-    patday2=root+"/erai/ei_${variable}_${grid}_YYYY-YYYY.nc" #for other grids write e.g. as : grid ='T42' or 'T127'
+    patday2=root+"/erai/ei_${variable}_${grid}_YYYY-YYYY.nc" #for other grids e.g.: grid ='T42' or 'T127'
     dataloc(project='erai', organization='generic', url=[patmonth1,patmonth2,patday1,patday2])
 
 
@@ -69,15 +69,16 @@ if atCNRM:
     calias("erai",'rsscs'  ,'ssrc',filenameVar='SSRC')
     calias("erai",'rlscs'  ,'strc',filenameVar='STRC')
     calias("erai",'pr','tp',filenameVar='TP')
-    #derive("erai",'pr','add','prl','prc')
-    calias("erai",'snm', 'smlt', scale=1000./(86400.*31.),filenameVar='SMLT') #snm est en kg.m-2.s-1 et smlt en "m of water equivalent"
+    #snm est en kg.m-2.s-1 et smlt en "m of water equivalent" , supposement par mois
+    calias("erai",'snm', 'smlt', scale=1000./(86400.*31.),filenameVar='SMLT') 
 
     # Some additional daily fields
     calias("erai",'v850'   ,'v850',filenameVar='V850')
     calias("erai",'u850'   ,'u850',filenameVar='U850')
     calias("erai",'v200'   ,'v200',filenameVar='V200')
     calias("erai",'u200'   ,'u200',filenameVar='U200')
-    calias("erai",'sfcWind','fg10',filenameVar='10FG') #sfcWind:="Near-Surface Wind Speed" et fg10:="10 metre wind gust"
+    # For sfcWind, need to define a derived variable, from 10U and 10V
+    #calias("erai",'sfcWind','fg10',filenameVar='10FG') #sfcWind:="Near-Surface Wind Speed" et fg10:="10 metre wind gust"
     calias("erai",'hus'    ,'q',filenameVar='Q60')
     calias("erai",'zg'     ,'z', scale=1./9.81, filenameVar='Z500') 
     

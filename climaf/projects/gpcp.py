@@ -4,7 +4,7 @@ This module declares GPCP data organization and specifics, as managed by Sophie 
 
 **Also declares how to derive CMIP5 variables from the original GPCP variables set (aliasing)**
 
-Attributes are 'grid', and 'frequency'
+Attributes are 'grid', and 'frequency'. For now, only frequency 'monthly' is made available (wait for a fix in data naming).
 
 Various grids are available. Grids write e.g. as : grid='1d', grid ='2.5d', grid ='T42' and grid ='T127'
 
@@ -12,9 +12,10 @@ Example of an 'gpcp' project dataset declaration ::
 
  >>> cdef('project','gpcp')
  >>> d=ds(variable='pr',period='198001',grid='2.5d', frequency='monthly')
- >>> d2=ds(variable='pr',period='198001',grid='1d',frequency='daily')
  
 """
+
+# >>> d2=ds(variable='pr',period='198001',grid='1d',frequency='daily')
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
@@ -32,6 +33,6 @@ if atCNRM:
     # Defining alias and derived variables for GPCP, together with filenames
     ##############################################################################
 
-    calias("gpcp",'pr'    ,'precip', scale=1./86400.,filenameVar='pr')   #monthly
+    calias("gpcp",'pr'    ,'precip', scale=1./(31.*86400.),filenameVar='pr')   #monthly
     #calias("gpcp",'pr'    ,'PREC' , scale=1./86400.,filenameVar='prec') #daily
     #voir pour creer un sous dictionnaire au dict aliases pour la variable 'pr', qui est calculee soit a partir de 'precip' si on est dans le cas mensuel, soit a partir de 'PREC' si on est dans le cas journalier.

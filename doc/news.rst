@@ -12,14 +12,19 @@ Changes, newest first :
 
  - Handle **explicitly defined objects ensembles** (see
    :py:class:`~climaf.classes.cens`) and **explicit dataset ensembles**
-   (see :py:func:`~climaf.classes.eds`. See also examples in
-   :download:`ensemble.py <../examples/ensemble.py>`.
+   (see :py:func:`~climaf.classes.eds`. Operators which are not
+   ensemble-capable will be automagically looped over members. See  
+   examples in :download:`ensemble.py <../examples/ensemble.py>`.
+ - New standard operator ``lines`` for plotting profiles or other xy 
+   curves for ensembles; see :doc:`scripts/lines`
+ - Standard operator ``plot`` has new arguments : ``contours`` for
+   adding contour lines, ``domain`` for greying out land or ocean
  - Special keyword ``crs`` is replaced by keyowrd ``title`` : the
    value of CRS expression for an object is provided to script-based
-   operators as argument ``title``, if no value is provided by the
-   user
- - Operator ``plot`` has new arguments : ``contours`` for adding
-   contour lines, ``domain`` for greying out land or ocean
+   operators under keyword ``title``, if no title value is provided
+   when invoking the operator. Scripts can also independanlty use
+   keyword ``crs`` for getting the CRS value
+ - cpage keywords changed : widths_lits -> widths, heights_list -> heights
 
 .. _news_0.6:
 

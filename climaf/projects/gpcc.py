@@ -31,15 +31,8 @@ if atCNRM:
     # Defining alias and derived variables for GPCC, together with filenames
     ##############################################################################
 
-    calias("gpcc",'pr'       ,'GPCC' ,scale=1./86400. ,filenameVar='GPCC')
-    #ou
-    #calias("gpcc",'prAdjust ,'GPCC' ,scale=1./86400. ,filenameVar='GPCC')
-    #GPCC:="GPCC full data reanalysis monthly-mean precipitations" 
-    #pr:="precipitation"
-    #prAdjust:="Bias-Corrected Precipitation"
+    calias("gpcc",'pr'       ,'GPCC' ,scale=1./86400. ,filenameVar='GPCC',units="kg.m-2.s-1")
 
-    calias("gpcc",'site'    ,'NSTA'  ,filenameVar='GPCC') 
+    #calias("gpcc",'site'    ,'NSTA'  ,filenameVar='GPCC') 
     #NSTA:="Number of stations available for a specific analysis grid in a specific month" 
-    #site:="an integer assigned to each of 119 stations (standard) and 73 stations (aquaplanet)"
-    #rien dans '.xls' correspondant au nombre de stations, juste au numero...
 

@@ -18,10 +18,10 @@ Documented operators as of today :
     - :doc:`scripts/regridn`
     - :doc:`scripts/time_average`
     - :doc:`scripts/space_average`
-    - :doc:`scripts/rescale`
 
  - graphics
     - :doc:`scripts/plot`
+    - :doc:`scripts/lines`
     - :doc:`scripts/timeplot`
     - :doc:`scripts/ncview`
 
