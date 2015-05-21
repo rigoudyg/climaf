@@ -39,7 +39,7 @@ projects.erai
 projects.erai-land
 -----------------------------------------------------------
 
-.. automodule:: climaf.projects.erai-land
+.. automodule:: climaf.projects.erai_land
 
 projects.ceres
 -----------------------------------------------------------

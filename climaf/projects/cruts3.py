@@ -37,7 +37,7 @@ if atCNRM:
     #pet:="potential evapotranspiration"; units="mm/day" 
     #evspsbl:="water_evaporation_flux" en kg.m-2.s-1
 
-    calias("cruts3",'pr'    ,'pr'  ,scale=1./(86400.*31.),filenameVar='pr', units="kg.m-2.s-1") 
+    calias("cruts3",'pr'    ,'pr'  ,scale=1./(86400.*30.3),filenameVar='pr', units="kg.m-2.s-1") 
     #pr:="precipitation"; units="mm" 
     #pr[CMIP5]:="precipitation" en kg.m-2.s-1
 

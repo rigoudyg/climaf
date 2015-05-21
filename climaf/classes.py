@@ -394,8 +394,8 @@ class cens(cobject):
         Create a CliMAF object of class ``cens`` , i.e. an
         ensemble of objects, with a list of labels attached
 
-        In some cases, ensemble of datasets from the same project
-        can also be built easily using :py:func:`~climaf.classes.cdataset()`
+        In some cases, ensembles of datasets from the same project
+        can also be built easily using :py:func:`~climaf.classes.eds()`
 
         When applying an operator to an ensemble, CliMAF will know,
         from operator's declaration (see

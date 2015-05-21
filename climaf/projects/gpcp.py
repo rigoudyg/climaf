@@ -33,6 +33,6 @@ if atCNRM:
     # Defining alias and derived variables for GPCP, together with filenames
     ##############################################################################
 
-    calias("gpcp",'pr'    ,'precip', scale=1./(31.*86400.),filenameVar='pr')   #monthly
+    calias("gpcp",'pr'    ,'precip', scale=1./(30.3*86400.),filenameVar='pr')   #monthly
     #calias("gpcp",'pr'    ,'PREC' , scale=1./86400.,filenameVar='prec') #daily
     #voir pour creer un sous dictionnaire au dict aliases pour la variable 'pr', qui est calculee soit a partir de 'precip' si on est dans le cas mensuel, soit a partir de 'PREC' si on est dans le cas journalier.

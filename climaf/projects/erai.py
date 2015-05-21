@@ -70,7 +70,7 @@ if atCNRM:
     calias("erai",'rlscs'  ,'strc',filenameVar='STRC')
     calias("erai",'pr','tp',filenameVar='TP')
     #snm est en kg.m-2.s-1 et smlt en "m of water equivalent" , supposement par mois
-    calias("erai",'snm', 'smlt', scale=1000./(86400.*31.),filenameVar='SMLT') 
+    calias("erai",'snm', 'smlt', scale=1000./(86400.*30.3),filenameVar='SMLT') 
 
     # Some additional daily fields
     calias("erai",'v850'   ,'v850',filenameVar='V850')
