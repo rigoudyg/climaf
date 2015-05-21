@@ -1,0 +1,54 @@
+
+
+stdout and stderr of script call :
+	 climaf/../scripts/mcdo.sh "" "/home/vignonl/tmp/climaf_cache/17/1.nc" "precip" "1980-01-01T00:00:00,1980-01-31T23:59:00" "" "pr,precip,0.000012,0.000000" "" "" /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
+
++ operator=
++ shift
++ outs=/home/vignonl/tmp/climaf_cache/17/1.nc
++ shift
++ var=precip
++ shift
++ period=1980-01-01T00:00:00,1980-01-31T23:59:00
++ shift
++ region=
++ shift
++ alias=pr,precip,0.000012,0.000000
++ shift
++ units=
++ shift
++ vm=
++ shift
+++ mktemp -d --tmpdir climaf_mcdo_XXXXXX
++ tmp=/tmp/climaf_mcdo_2OkrXo
++ '[' precip ']'
++ selvar=-selname,precip
++ '[' 1980-01-01T00:00:00,1980-01-31T23:59:00 ']'
++ seldate=-seldate,1980-01-01T00:00:00,1980-01-31T23:59:00
++ '[' '' ']'
++ '[' pr,precip,0.000012,0.000000 ']'
++ IFS=', '
++ read var filevar scale offset
++ selalias='-expr,pr=precip*0.000012+0.000000;'
++ '[' '' ']'
++ i=0
++ for out in '$outs'
++ i=1
++ eval 'files=$1'
+++ files=/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
++ vfiles=
++ for file in '$files'
+++ basename /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
++ tmp2=/tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
++ rm -f /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
++ '[' ']'
++ '[' pr,precip,0.000012,0.000000 ']'
++ cdo 'expr,pr=precip*0.000012+0.000000;' -selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
+cdo expr: Started child process "selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe1.1)".
+cdo(2) selname: Started child process "seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe2.1)".
+climaf/../scripts/mcdo.sh : ligne 54 : 28729 Erreur de segmentation  cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2
++ '[' '' ']'
++ echo 'Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc '
+Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
++ rm -fr /tmp/climaf_mcdo_2OkrXo
++ exit 1
