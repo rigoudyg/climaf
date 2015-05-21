@@ -10,7 +10,7 @@ Example of a path : /prodigfs/OCMIP5/OUTPUT/IPSL/IPSL-CM4/CTL/mon/CACO3/CACO3_IP
 Example ::
 
     >>> cdef('model','IPSL-CM4') 
-    >>> cdef('frequency','mon') 
+    >>> cdef('frequency','monthly') 
     >>> cactl=ds(project='OCMIP5_Ciclad', experiment='CTL', variable='CACO3', period='1860-1861')
 
 

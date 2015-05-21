@@ -1,4 +1,4 @@
-plot : map, cross-section and profile plot 
+lines : plot multiple profiles (along p, lat, lon..) 
 -------------------------------------------------------------
 
 Plot a series of xy curves (along lat, lon or pressure/z_index ) for

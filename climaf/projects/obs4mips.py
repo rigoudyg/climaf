@@ -5,7 +5,7 @@ Additional attribute for OBS4MIPS datasets  : only 'frequency'
 
 Example for an OBS4MIPS CMIP5 dataset declaration ::
 
- >>> pr_obs=ds(project='OBS4MIPS', variable='pr', frequency='monthly_mean', period='1979-1980', experiment='GPCP-SG')
+ >>> pr_obs=ds(project='OBS4MIPS', variable='pr', frequency='monthly', period='1979-1980', experiment='GPCP-SG')
 
 
 """
