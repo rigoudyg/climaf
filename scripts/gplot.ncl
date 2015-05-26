@@ -376,6 +376,7 @@ begin
         print("using gsn_csm_contour_map")
         plot0=gsn_csm_contour_map(wks,fld(:,:),res)
       else 
+        res@mpFillOn=False
         print("using gsn_csm_contour_map_ce")
         plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
       end if 

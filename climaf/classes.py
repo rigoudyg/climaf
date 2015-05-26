@@ -6,7 +6,7 @@
  """
 # Created : S.Senesi - 2014
 
-import re, string
+import re, string, copy
 
 import dataloc
 from period import init_period, cperiod
@@ -197,11 +197,11 @@ def processDatasetArgs(**kwargs) :
     attval["project"]=project
     #
     # Register facets values
-    attval=dict()
     for facet in cprojects[project].facets :
         if facet in kwargs : val=kwargs[facet]
         else: val=cdef(facet)
         attval[facet]=val
+        #print "initalizing facet %s with value"%(facet,val)
     #
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
@@ -217,7 +217,8 @@ def processDatasetArgs(**kwargs) :
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
     #
-    for facet in kwargs :
+    #print "kw="+`kwargs`
+    for facet in attval :
         # Facet specific processing
         if facet=='period' :
             if not isinstance(attval['period'],cperiod) :
@@ -225,14 +226,20 @@ def processDatasetArgs(**kwargs) :
                     attval['period']=init_period(attval['period'])
                 except :
                     raise Climaf_Classes_Error("Cannot interpret period for %s"%`attval['period']`)
-        elif facet=='domain' and not type(attval['domain']) is str :
-            # May be a list
-            attval['domain']=eval(attval['domain'])
+            #else :
+            #    print "%s is a cperiod"%`attval['period']`
+        #elif facet=='domain' and not type(attval['domain']) is str :
+        #    # May be a list
+        #    attval['domain']=eval(attval['domain'])
         # Check for typing or user's logic errors
         if not facet in cprojects[project].facets :
             e="Project %s doesn't have facet %s"%(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
+    if not isinstance(attval['period'],cperiod) :
+        Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
+    #else :
+    #    print "at end of  process, period %s is a cperiod :"%`cperiod`
     return attval
 
 
@@ -363,7 +370,9 @@ class cdataset(cobject):
         return(False) 
     
     def missingIsOK(self):
-        return self.alias.missing is None
+        if (alias is None) : return True
+        filevar,scale,offset,units,filenameVar,missing=self.alias
+        return missing is None
     
     def baseFiles(self,force=False):
         """ Returns the list of (local) files which include the data for the dataset
@@ -505,6 +514,8 @@ class ctree(cobject):
         """
         self.operator=climaf_operator
         self.script=script
+        import copy
+        self.flags=copy.copy(script.flags)
         self.operands=operands
         if "period" in parameters :
             p=parameters["period"]
@@ -582,7 +593,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
     
     Returns that common value : func(leave1,leave2)) or None
     
-    FUNC cannot not return None as a valid value
+    FUNC cannot return None as a valid value
     """
     if isinstance(tree1,cdataset) and isinstance(tree2,cdataset):
         return func(tree1,tree2)

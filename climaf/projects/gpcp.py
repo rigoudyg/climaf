@@ -1,28 +1,30 @@
 """
 
-This module declares GPCP data organization and specifics, as managed by Sophie T. at CNRM;
+This module declares GPCP data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
-**Also declares how to derive CMIP5 variables from the original GPCP variables set (aliasing)**
+**Also declares how to derive CMIP5 variables from the original GPCP variables set (aliasing/scaling)**
 
-Attributes are 'grid', and 'frequency'. For now, only frequency 'monthly' is made available (wait for a fix in data naming).
+Attributes are 'grid', and 'frequency'. 
 
 Various grids are available. Grids write e.g. as : grid='1d', grid ='2.5d', grid ='T42' and grid ='T127'
+
+Only two variables are available : the original 'precip' (mm/day) and pr (kg m-2 s-1)
 
 Example of an 'gpcp' project dataset declaration ::
 
  >>> cdef('project','gpcp')
  >>> d=ds(variable='pr',period='198001',grid='2.5d', frequency='monthly')
+ >>> d2=ds(variable='pr',period='198001',grid='1d',frequency='daily')
  
 """
 
-# >>> d2=ds(variable='pr',period='198001',grid='1d',frequency='daily')
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('gpcp','grid', 'frequency')  # grid writes as '1d', '2.5d', 'T42' or 'T127'
+    cproject('gpcp','grid', 'frequency', separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'
 
     root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
     patmonth=root+"_mean/gpcp/${variable}_gpcp.${grid}.nc"
@@ -33,6 +35,8 @@ if atCNRM:
     # Defining alias and derived variables for GPCP, together with filenames
     ##############################################################################
 
-    calias("gpcp",'pr'    ,'precip', scale=1./(30.3*86400.),filenameVar='pr')   #monthly
-    #calias("gpcp",'pr'    ,'PREC' , scale=1./86400.,filenameVar='prec') #daily
-    #voir pour creer un sous dictionnaire au dict aliases pour la variable 'pr', qui est calculee soit a partir de 'precip' si on est dans le cas mensuel, soit a partir de 'PREC' si on est dans le cas journalier.
+    # Original data is mm/day
+    calias("gpcp",'precip'    ,'precip', filenameVar='pr')   
+    # Compute in SI
+    calias("gpcp",'pr'    ,'precip', scale=1./86400.,units="kg m-2 s-1", filenameVar='pr')   
+    

@@ -17,17 +17,18 @@ scripts="clean_cache.py data_generic.py plotmap.py basic_oce.py latlonbox.py ann
 # Add some scripts, depending on the data available at each site
 if [[ $(uname -n) == lx* || $(uname -n) == sx* ]]; then 
     # CNRM
-    scripts=$scripts" data_cmip5drs.py figarray.py"
+    scripts=$scripts" data_cmip5drs.py figarray.py ensemble.py data_obs.py"
     # Add scripts depending on user-configured data
     [ $(whoami) = senesi ] && scripts=$scripts" data_em.py seaice.py"
 elif [[ $(uname -n) == ciclad* ]]; then 
     # Ciclad
-    scripts=$scripts" data_cmip5drs.py "
+    scripts=$scripts" data_cmip5drs.py ensemble.py"
     # figarray does not work yet there, due to convert canvas:None
 fi
 
 # Cleaning script
 scripts=$scripts" clean_cache.py"
+#scripts="clean_cache.py seaice.py clean_cache.py"
 
 echo "tested example scripts : "$scripts 
 export CLIMAF_LOG_LEVEL=critical

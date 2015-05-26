@@ -1,15 +1,14 @@
 """
 
-This module declares CERES data organization and specifics, as managed by Sophie T. at CNRM;
+This module declares CERES data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
-**Also declares how to derive CMIP5 variables from the original CERES variables set**
-
-No attributes 
+No attributes in addition to standard ones; and 'experiment' is not used
+Version of dataset is implicitly the latest, through symbolic links managed by Sophie. Please
+complain to climaf at cnrm dot fr if this does not fit the needs
 
 Example of a 'ceres' project dataset declaration ::
 
- >>> cdef('project','ceres')
- >>> d=ds(variable='rlds',period='198001')
+ >>> d=ds('project='ceres, variable='rlds',period='198001',domain=[40.,60.,-10.,+20.])
 
 """
 

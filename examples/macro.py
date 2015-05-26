@@ -17,7 +17,7 @@ ta_ezm=ccdo(ta_europe,operator="zonmean")
 
 # Using this result as an example, define a macro named "eu_zonal_mean",
 # which arguments will be the datasets involved in this result
-cmacro("eu_zonal_mean",ta_ezm)
+macro("eu_zonal_mean",ta_ezm)
 
 # Also design a figure and define the corresponding macro
 fig_ezm=plot(ta_ezm)
@@ -39,7 +39,7 @@ cmacros
 climaf.cmacro.show()
 
 # How to remove a macro
-cmacro.pop("my_macro")
+cmacros.pop("my_macro")
 
 # Save the macros in default location (~/.climaf.macros) (you may
 # provide a filename as argument - the default file is loaded automatically

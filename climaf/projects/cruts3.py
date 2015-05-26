@@ -1,6 +1,6 @@
 """
 
-This module declares CRUTS3 data organization and specifics, as managed by Sophie T. at CNRM;
+This module declares CRUTS3 data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original CRUTS3 variables set**
 
@@ -33,11 +33,11 @@ if atCNRM:
 
     calias("cruts3",'clt'   ,'cld'  ,filenameVar='cld') 
     
-    calias("cruts3",'evspsbl','pet' ,scale=1./86400. ,filenameVar='pet',units="kg.m-2.s-1")
+    calias("cruts3",'evspsbl','pet' ,scale=1./86400. ,filenameVar='pet',units="kg m-2 s-1")
     #pet:="potential evapotranspiration"; units="mm/day" 
     #evspsbl:="water_evaporation_flux" en kg.m-2.s-1
 
-    calias("cruts3",'pr'    ,'pr'  ,scale=1./(86400.*30.3),filenameVar='pr', units="kg.m-2.s-1") 
+    calias("cruts3",'pr'    ,'pr'  ,scale=1./(86400.*30.3),filenameVar='pr', units="kg m-2 s-1") 
     #pr:="precipitation"; units="mm" 
     #pr[CMIP5]:="precipitation" en kg.m-2.s-1
 

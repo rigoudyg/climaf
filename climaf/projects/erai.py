@@ -1,6 +1,6 @@
 """
 
-This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM;
+This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original ERAI variables set (aliasing)**
 
@@ -38,7 +38,7 @@ if atCNRM:
 
     calias("erai",'sic'    ,'ci'  ,filenameVar='CI')
     calias("erai",'tos'    ,'sst' ,filenameVar='SSTK')
-    calias("erai",'zg'     ,'z'   ,filenameVar='Z')
+    calias("erai",'z'      ,'z'   ,filenameVar='Z')
     calias("erai",'ta'     ,'t'   ,filenameVar='T')
     calias("erai",'ua'     ,'u'   ,filenameVar='U')
     calias("erai",'va'     ,'v'   ,filenameVar='V')
@@ -70,7 +70,7 @@ if atCNRM:
     calias("erai",'rlscs'  ,'strc',filenameVar='STRC')
     calias("erai",'pr','tp',filenameVar='TP')
     #snm est en kg.m-2.s-1 et smlt en "m of water equivalent" , supposement par mois
-    calias("erai",'snm', 'smlt', scale=1000./(86400.*30.3),filenameVar='SMLT') 
+    calias("erai",'snm', 'smlt', scale=1000./(86400.*30.3),units="kg m-2 s-1", filenameVar='SMLT') 
 
     # Some additional daily fields
     calias("erai",'v850'   ,'v850',filenameVar='V850')
@@ -80,6 +80,7 @@ if atCNRM:
     # For sfcWind, need to define a derived variable, from 10U and 10V
     #calias("erai",'sfcWind','fg10',filenameVar='10FG') #sfcWind:="Near-Surface Wind Speed" et fg10:="10 metre wind gust"
     calias("erai",'hus'    ,'q',filenameVar='Q60')
-    calias("erai",'zg'     ,'z', scale=1./9.81, filenameVar='Z500') 
+    #calias("erai",'z500'   ,'z', scale=1./9.81, units="m", filenameVar='Z500') 
+    calias("erai",'z500'   ,'z'   , filenameVar='Z500') 
     
     # To do : either read specific files for hurs and huss or provide a CliMAF operator

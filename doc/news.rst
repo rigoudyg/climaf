@@ -21,7 +21,8 @@ Changes, newest first :
    adding contour lines, ``domain`` for greying out land or ocean; see :doc:`scripts/plot`
  - **Extended access to observation data** as managed by VDR at CNRM :
    GPCC, GPCP, ERAI, ERAI-LAND, CRUTS3, CERES (in addition to
-   OBS4MIPS, and CAMI); see :ref:`known_datasets`
+   OBS4MIPS, and CAMI); see :ref:`known_datasets` and examples in 
+   :download:`data_obs.py <../examples/data_obs.py>`.
  - Special keyword ``crs`` is replaced by keyword ``title`` : the
    value of CRS expression for an object is provided to script-based
    operators under keyword ``title``, if no title value is provided
