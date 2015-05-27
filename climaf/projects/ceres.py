@@ -3,6 +3,7 @@
 This module declares CERES data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
 No attributes in addition to standard ones; and 'experiment' is not used
+
 Version of dataset is implicitly the latest, through symbolic links managed by Sophie. Please
 complain to climaf at cnrm dot fr if this does not fit the needs
 

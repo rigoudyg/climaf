@@ -40,13 +40,13 @@ begin
   if (contours .ne. 0 ) then LINEON=True 
   end if
   
-  if isvar("domain") then
-    if ( .not. (domain .eq. "" .or. domain .eq. "land" .or. domain .eq. "ocean")) then
-      print("Wrong domain option '"+domain+"' . Only 'ocean' and 'land' are allowed")
+  if isvar("mask") then
+    if ( .not. (mask .eq. "" .or. mask .eq. "land" .or. mask .eq. "ocean")) then
+      print("Wrong mask option '"+mask+"' . Only 'ocean' and 'land' are allowed")
       status_exit(2)
     end if
   else
-    domain=""
+    mask=""
   end if
       
 
@@ -273,8 +273,8 @@ begin
     end if
 
     res@mpFillDrawOrder="PostDraw"
-    if domain .eq. "land"  then res@mpOceanFillColor="gray" end if
-    if domain .eq. "ocean" then res@mpLandFillColor="gray" end if
+    if mask .eq. "land"  then res@mpOceanFillColor="gray" end if
+    if mask .eq. "ocean" then res@mpLandFillColor="gray" end if
 
 
     if (isvar("proj")) then 
