@@ -40,13 +40,13 @@ begin
   if (contours .ne. 0 ) then LINEON=True 
   end if
   
-  if isvar("mask") then
-    if ( .not. (mask .eq. "" .or. mask .eq. "land" .or. mask .eq. "ocean")) then
-      print("Wrong mask option '"+mask+"' . Only 'ocean' and 'land' are allowed")
+  if isvar("focus") then
+    if ( .not. (focus .eq. "" .or. focus .eq. "land" .or. focus .eq. "ocean")) then
+      print("Wrong focus option '"+focus+"' . Only 'ocean' and 'land' are allowed")
       status_exit(2)
     end if
   else
-    mask=""
+    focus=""
   end if
       
 
@@ -166,18 +166,23 @@ begin
       else
         ;We have a true cross-section or a horizontal map
         if logp  then useXY=False end if
-        if (ismissing(str_match(Var_DimNames,"lat"))) .and. isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
-          useLatDim=True
-          latname="lat"
-          if isfilevar(ffile,"nav_lat") then latname="nav_lat" end if
-          latdim=ffile->$latname$
+        latname="lat"
+        if (ismissing(str_match(Var_DimNames,"lat"))) then
+          if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
+            useLatDim=True
+            if isfilevar(ffile,"nav_lat") then latname="nav_lat" end if
+          end if
         end if
-        if (ismissing(str_match(Var_DimNames,"lon"))) .and. isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
-          useLonDim=True
-          lonname="lon"
-          if isfilevar(ffile,"nav_lat") then lonname="nav_lon" end if
-          londim=ffile->$lonname$
+        latdim=ffile->$latname$
+        ;
+        lonname="lon"
+        if (ismissing(str_match(Var_DimNames,"lon"))) then 
+          if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
+            useLonDim=True
+            if isfilevar(ffile,"nav_lat") then lonname="nav_lon" end if
+          end if
         end if
+        londim=ffile->$lonname$
       end if
     end if
   end if
@@ -272,10 +277,23 @@ begin
       res@cnRasterModeOn=True
     end if
 
+    res@mpFillColors    = (/-1,-1,-1,-1/)
+    res@mpPerimOn = False
+    res@mpGeophysicalLineThicknessF = 2
+    res@mpFillOn=False
     res@mpFillDrawOrder="PostDraw"
-    if mask .eq. "land"  then res@mpOceanFillColor="gray" end if
-    if mask .eq. "ocean" then res@mpLandFillColor="gray" end if
-
+    if (focus .eq. "land")  then 
+      print("Greying out oceans")
+      res@mpFillOn=True
+      res@mpLandFillColor=-1
+      res@mpInlandWaterFillColor = -1 
+      res@mpOceanFillColor="grey" 
+    end if
+    if (focus .eq. "ocean") then 
+      res@mpFillOn=True
+      res@mpLandFillColor="grey" 
+    end if
+    
 
     if (isvar("proj")) then 
       prj = getSubString( proj,0,1 )
@@ -293,6 +311,12 @@ begin
           ;delete(res@mpMaxLatF)
         end if 
       end if
+    else
+      res@mpMinLonF                = min(londim)
+      res@mpMaxLonF                = max(londim)
+      res@mpMinLatF                = min(latdim)
+      res@mpMaxLatF                = max(latdim)
+      res@mpCenterLonF=(min(londim)+max(londim))/2
     end if
   
     res@lbLabelBarOn =True
@@ -365,7 +389,7 @@ begin
     end if
   else
     if (horizontal) then 
-      res@gsnAddCyclic = True
+      res@gsnAddCyclic = False
       if useLatDim then 
         ;res@trGridType          = "TriangularMesh"
         res@sfXArray            = londim
@@ -376,7 +400,6 @@ begin
         print("using gsn_csm_contour_map")
         plot0=gsn_csm_contour_map(wks,fld(:,:),res)
       else 
-        res@mpFillOn=False
         print("using gsn_csm_contour_map_ce")
         plot0=gsn_csm_contour_map_ce(wks,fld(:,:),res)
       end if 

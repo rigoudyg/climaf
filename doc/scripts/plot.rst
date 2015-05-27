@@ -39,7 +39,7 @@ tuning a number of graphic attributes
   - ``linp`` : set it to 1 for getting a vertical axis with index-linear spacing 
   - ``proj`` : use it to request a stereopolar projection, as e.g. :
     "NH","SH60"...
-  - ``mask``: set it to 'land' (resp. 'ocean') if you want to plot
+  - ``focus``: set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean)
 
 **Outputs** :
