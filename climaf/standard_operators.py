@@ -18,23 +18,23 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
+    cscript('select' ,scriptpath+'mcdo.sh "${operator}" ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
+            scriptpath+'mcdo.sh ${operator} ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}')
     #
     cscript('space_average',
-            scriptpath+'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}', 
+            scriptpath+'mcdo.sh fldmean ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}', 
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average' ,
-            scriptpath+'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}' ,
+            scriptpath+'mcdo.sh timmean  ${out} ${var} ${period_iso} ${domain} "${alias}" "${missing}" ${ins}' ,
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox' ,
-            scriptpath+'mcdo.sh ""  "${out}" "${var}" "${period_iso}" '
-            '"${latmin},${latmax},${lonmin},${lonmax}" "${alias}" "${units}" "${missing}" ${ins}',
+            scriptpath+'mcdo.sh ""  ${out} ${var} ${period_iso} '
+            '${latmin},${latmax},${lonmin},${lonmax} "${alias}" "${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('regrid' ,
@@ -46,7 +46,7 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('rescale' ,
-            'cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}',
+            "cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}",
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('mean_and_std',
@@ -58,16 +58,18 @@ def load_standard_operators():
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
-    cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
+    cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=${in} outfile=${out} '
+            'var=${var} title=${crs}',format="png")
     #
-    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
-            'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} units=\'\"${units}\"\' '
-            'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} domain=\'\"${domain}\"\' && '
-            'convert ${out} -trim ${out}) ', format="png")
+    cscript('plot'     , "(ncl -Q "+ scriptpath +"gplot.ncl infile=${in} "
+            "plotname=${out} cmap=${color} vmin=${min} vmax=${max} vdelta=${delta} "
+            "var=${var} title=${crs} scale=${scale} offset=${offset} units=${units} "
+            "; convert ${out} -trim ${out}) ", format="png")
     #
-    cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
-            'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
-            'convert ${out} -trim ${out}) ', format="png")
+    # Operators CDFTools
+    #
+    cscript('cdfmean',
+            'cdfmean ${in} ${var} ${pos_grid} imin=${imin} imax=${imax} jmin=${jmin} jmax=${jmax} kmin=${kmin} kmax=${kmax} ${opt}; mv cdfmean.nc ${out}') #effacer .txt
+    #user: cdfmean(.., opt='-full')
+    #
+    

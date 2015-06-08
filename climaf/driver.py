@@ -326,8 +326,27 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script=operators.scripts[scriptCall.operator]
+    print "ICI LV1 - scriptCall", scriptCall
+    print "ICI LV2 - scriptCall.operator", scriptCall.operator
+    print "ICI LV3 - operators.scripts[scriptCall.operator]", operators.scripts[scriptCall.operator]
+
+    #plot_map
+    #plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV1 - scriptCall plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV2 - scriptCall.operator plot
+    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : plot
+    #ICI LV1 - scriptCall select(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV2 - scriptCall.operator select
+    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : select
+    print "ICI LV4 operands", scriptCall.operands 
+    print "ICI LV5 operands[0]", scriptCall.operands[0]
+    print "ICI LV6 operands[1]", scriptCall.operands[1]
     template=Template(script.command)
 
+    print "ICI LV7 template", template
+    print "ICI LV8 scripts inputs", script.inputs
+    print "ICI LV9 parameters", scriptCall.parameters
+    
     # Evaluate input data 
     dict_invalues=dict()
     sizes=[]
@@ -450,6 +469,20 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #print "stage 3, template="+template
     #
+
+    #fixedfields
+    # lt,ll=script.fixedfields #return target, link
+     #for t,l in zip(lt,ll):
+        #faire un subsitute sur un mini dico avec safe_subsitute
+        #ou 
+        #model=operand[0].model
+        #experiment=experiment[0].experiment
+         #model=scriptCall.operands[0].model
+         #experiment=scriptCall.operands[0].experiment
+        
+        #puis faire un ln -s puis rm
+    
+    
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -466,7 +499,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     logfile.close()
     
     command.wait()
-    
+
     tim1=time.time()
     clogger.info("Launching command:"+template)
     # Timing
