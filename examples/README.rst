@@ -61,7 +61,9 @@ Others show how to acces some known data sets on CNRM or IPSL file system :
      - CAMI Obs data at CNRM
      - example data as included in CliMAF package
   - :download:`data_em.py <../examples/data_em.py>`     : access CNRM-CM data organized 'a la EM'
-  - :download:`seaice.py <../examples/seaice.py>`)      : access and
-    plot ORCA1-grid Sea-ice data, with control on levels and projection  
+  - :download:`seaice.py <../examples/seaice.py>`       : access and
+    plot ORCA1-grid sea-ice data, with control on levels and projection  
+  - :download:`data_obs <../examples/data_obs.py>`)      : access
+    observation data sets as handled at CNRM by VDR
 
 

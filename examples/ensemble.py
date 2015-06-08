@@ -55,7 +55,9 @@ ens.labels.append("r3i1p1")
 cscript("ensavg","cdo ensavg ${mmin} ${out}")
 average=ensavg(ens)
 
+# A standard operator :
+#cscript("minus","cdo sub ${in_1} ${in_2} ${out}")
+
 # Compute anomalies wrt to ensemble mean
-cscript("minus","cdo sub ${in_1} ${in_2} ${out}")
 anomalies=minus(ens,average)
 cshow(cpage([0.5,0.5],[0.5,0.5],plot(anomalies,title='tas')))

@@ -167,12 +167,12 @@ def rename(filename,crs) :
         return(newfile)
     
 def hasMatchingObject(cobject,ds_func) : 
-
-    """ if the cache holds a file which represents an object with the
+    """
+    If the cache holds a file which represents an object with the
     same nodes as COBJECT and which leaves/datasets, when paired with
-    those of COBJECT and applying ds_func, returns an identical not
-    None value for all pairs, then returns its filename, its CRS and
-    this value (for the first one in dict crs2filename
+    those of COBJECT and applying ds_func, returns an identical (and not
+    None) value for all pairs, then returns its filename, its CRS and
+    this value (for the first one in dict crs2filename)
 
     Can be applied for finding same object with included or including
     time-period

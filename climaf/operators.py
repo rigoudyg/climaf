@@ -268,7 +268,6 @@ class cscript():
         #
         self.name=name
         self.command=command
-        self.fixedfields=None #LV
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canAlias,\
             commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
@@ -307,11 +306,6 @@ class cscript():
             if e != old : ls.append(e)
             old=e
         return(len(ls))
-
-#LV
-def fixed_fields(name, target, link):
-    scripts[name].fixedfields=(target, link)
-    return target, link
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 

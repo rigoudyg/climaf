@@ -40,11 +40,11 @@ os.system("ls -al "+my_file)
 os.system("type ncdump && ncdump -h "+my_file)
 
 # Stereopolar plot with explicit levels. See other plot arguments in on-line help : 'help(plot)'
-fig1=plot(sic,title="Sic 198310 2",proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1)
+fig1=plot(sic,title="Sic 198310 2",proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1, focues="ocean")
 cshow(fig1)
 
 # Create a dictionnary in order to simplify the way to provide constant plot args :
-pa=dict(proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1)
+pa=dict(proj="NH70",levels="0.1 10 30 60 80 90 95 97 98 99", contours=1,focus="ocean")
 
 # Mask part of the SIC field
 masked_sic=ccdo(sic,operator='setrtomiss,99,100')

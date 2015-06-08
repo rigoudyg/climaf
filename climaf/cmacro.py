@@ -93,7 +93,7 @@ def macro(name,cobj,lobjects=[]):
     elif isinstance(cobj,ctree) :
         rep=ctree(cobj.operator, cobj.script,
                   *cobj.operands, **cobj.parameters)
-        rep.operands = map(cmacro,[ None for o in rep.operands],rep.operands)
+        rep.operands = map(macro,[ None for o in rep.operands],rep.operands)
     elif isinstance(cobj,scriptChild) :
         rep=scriptChild(cmacro(None,cobj.father),cobj.varname)
     elif isinstance(cobj,cpage) :
@@ -110,7 +110,7 @@ def macro(name,cobj,lobjects=[]):
         defs='def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n'\
               % (name,doc,name)
         exec defs in globals() 
-        exec "from climaf.macros import %s"%name in sys.modules['__main__'].__dict__
+        exec "from climaf.cmacro import %s"%name in sys.modules['__main__'].__dict__
         clogger.debug("Macro %s has been declared"%name)
 
     return rep
@@ -133,7 +133,7 @@ def crewrite(crs,alsoAtTop=True):
         if alsoAtTop :
             for m in cmacros :
                 clogger.debug("looking at macro : "+m+"="+`cmacros[m]`+\
-                           " \ncompared to : "+`cmacro(None,co)`)
+                           " \ncompared to : "+`macro(None,co)`)
                 argl=cmatch(cmacros[m],co)
                 if len(argl) > 0 :
                     rep=m+"("
@@ -204,7 +204,7 @@ def read(filename=macroFilename):
     if macros_texts :
         for m in macros_texts :
             clogger.debug("loading macro %s"%m)
-            cmacro(m,macros_texts[m])
+            macro(m,macros_texts[m])
 
 
 def write(filename=macroFilename) :

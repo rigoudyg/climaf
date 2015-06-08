@@ -63,9 +63,9 @@ begin
           coord=Var_DimNames(dim)
           ax=fld&$coord$
         end if
-        printVarSummary(fld)
-        printVarSummary(ndtooned(fld))
-        printVarSummary(vec)
+        ;printVarSummary(fld)
+        ;printVarSummary(ndtooned(fld))
+        ;printVarSummary(vec)
         vec(i,:)=ndtooned(fld)
       end if
     end do ; loop on dimensions

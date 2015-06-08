@@ -14,7 +14,7 @@ cfile(fig1)
 
 #########################################################################
 # Define page1 as a figure array
-page1=cpage(widths_list=[0.2,0.8],heights_list=[0.33,0.33,0.33],
+page1=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33],
                 fig_lines=[[None, fig1],[fig1, fig1],[fig1,fig1]])
 #########################################################################
 

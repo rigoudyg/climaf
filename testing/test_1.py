@@ -48,7 +48,7 @@ class A_basic(unittest.TestCase):
     def test_4_plotting(self):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        plot1d=climaf.driver.capply("timeplot",std,crs="tas standard deviation") 
+        plot1d=climaf.driver.capply("timeplot",std,title="tas standard deviation") 
         # Have the plot displayed (this will also actually launch the script,
         cshow(plot1d)
 	os.system("sleep 3s")
