@@ -9,7 +9,7 @@ __all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver",
           "operators", "period", "standard_operators" , "projects" ,"cmacro"]
 import posixpath, os, sys
 
-version="0.6.1"
+version="0.7"
 
 already_inited=False
 

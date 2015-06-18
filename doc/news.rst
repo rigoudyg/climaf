@@ -15,16 +15,20 @@ Changes, newest first :
    (see :py:func:`~climaf.classes.eds`. Operators which are not
    ensemble-capable will be automagically looped over members. See  
    examples in :download:`ensemble.py <../examples/ensemble.py>`.
- - New standard operator ``lines`` for plotting profiles or other xy 
-   curves for ensembles; see :doc:`scripts/lines`
+ - New standard operator ``lines`` for **plotting profiles or other xy 
+   curves for ensembles**; see :doc:`scripts/lines`
  - Standard operator ``plot`` has new arguments : ``contours`` for
-   adding contour lines, ``domain`` for greying out land or ocean
- - Special keyword ``crs`` is replaced by keyowrd ``title`` : the
+   adding contour lines, ``domain`` for greying out land or ocean; see :doc:`scripts/plot`
+ - **Extended access to observation data** as managed by VDR at CNRM :
+   GPCC, GPCP, ERAI, ERAI-LAND, CRUTS3, CERES (in addition to
+   OBS4MIPS, and CAMI); see :ref:`known_datasets` and examples in 
+   :download:`data_obs.py <../examples/data_obs.py>`.
+ - Special keyword ``crs`` is replaced by keyword ``title`` : the
    value of CRS expression for an object is provided to script-based
    operators under keyword ``title``, if no title value is provided
    when invoking the operator. Scripts can also independanlty use
    keyword ``crs`` for getting the CRS value
- - cpage keywords changed : widths_lits -> widths, heights_list -> heights
+ - cpage keywords changed : widths_list -> widths, heights_list -> heights
 
 .. _news_0.6:
 

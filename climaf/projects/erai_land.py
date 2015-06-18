@@ -1,12 +1,16 @@
 """
 
-This module declares ERA Interim land data organization and specifics, as managed by Sophie T. at CNRM;
+This module declares ERA Interim land data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original ERAI-land variables set**
 
 Attribute is 'grid'
 
 Various grids are available. Original grid writes as : grid='_'. Other grids write e.g. as : grid ='T127'
+
+Most variables for ERAI-LAND have no CMIP5 counterpart : only CIMP5
+'snd' is aliased to ERAI-LAND 'sd'; see doc for the other, original,
+ERAI-LAND variables
 
 Example of an 'erai_land' project dataset declaration ::
 
@@ -23,7 +27,7 @@ from climaf.site_settings import atCNRM
 if atCNRM:
     cproject('erai-land','grid')  # no grid writes as '_' , otherwise as e.g. 'T127'
 
-    root="/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/erai-land/erai_???_mm_ ${variable}"
+    root="/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/erai-land/erai_???_mm_${variable}"
     suffix="YYYY-YYYY.nc"
     #
     url_erai_land1=root+"${grid}"+suffix   #for original grid

@@ -37,10 +37,10 @@ cproject : declare a new project and its non-standard attributes/facets
 
 .. autoclass:: climaf.classes.cproject
 
-cprojects : list of known projects
+cprojects : dictionnary of known projects
 --------------------------------------------------------------------------
 
-.. autodata:: climaf.classes.cdefaults
+.. autodata:: climaf.classes.cprojects
 
 dataloc : describe data locations for a series of experiments
 --------------------------------------------------------------------------

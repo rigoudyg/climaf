@@ -16,7 +16,7 @@ from climaf.api import *
 
 # Declare facets (i.e. dataset attributes) for projet CMIP5
 # ACTUALLY, THIS IS BUILT-IN, AND NOT NEEDED - SEE NOTE AT FILE TOP
-cproject("CMIP5"   ,"model","rip","frequency","table","realm","version")
+p=cproject("CMIP5" ,"model","rip","frequency","table","realm","version", ensemble=["model","rip"])
 
 # Define a list of root directories for CMIP5 data on IPLS's Ciclad file system
 urls_CMIP5_Ciclad=["/prodigfs/esg"]

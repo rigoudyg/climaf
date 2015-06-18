@@ -156,8 +156,16 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
 .. _how_to_improve_doc:
 
 ..contribute to improve CliMAF documentation
---------------------------------------------
-CliMAF documentation is built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be modified and improved, provided you are not afraid by looking at text files formated using the `REStructured Text syntax <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_ (and Sphinx is installed on your computer, which is often the case; check with ``which sphinx-build``). All doc files stand in directory ``<climaf_install_dir>/doc``, with quite easy-to-understand filenames. You can modify any file and test the result by typing::
+-------------------------------------------- CliMAF documentation is
+built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be
+modified and improved, provided you are not afraid by looking at text
+files formated using the `REStructured Text syntax
+<http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_ (check
+that Sphinx is installed with ``which sphinx-build``)
+
+All doc files stand in directory ``<climaf_install_dir>/doc``, with
+quite easy-to-understand filenames. You can modify any file and test
+the result by typing::
 
   $ cd <climaf_install_dir>/doc
   $ make -k html
@@ -169,7 +177,10 @@ at the beginning of classes, modules, functions, .....).
 
 - This needs a Python module either ``sphinx.ext.napoleon`` or
   ``sphinxcontrib.napoleon``. If the doc build fails complaining about
-  one of this package, you can just comment it out in file doc/conf.py.
+  one of this package, you can just comment it out in file
+  doc/conf.py, near line 38, and un-comment the other one. If none of
+  these two packages is available at your site, you will not be able
+  to build the doc.
 
 - When wanting to improve the doc for one of the Python functions or
   classes: the full python object path let you know where to find the

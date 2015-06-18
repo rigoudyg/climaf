@@ -26,7 +26,8 @@ cdef("period","1980-1981")
 creShortTop=ds(variable="crest")
 
 # Declare a script tht will be used in defining how to derive the new variable
-cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
+# Actually, this is a standard operator
+#cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
 
 # Say how you compute (or derive) variable 'crest' form variables 'rst' and 'rstcs', for all projects
 derive('*', 'crest','minus','rst','rstcs')

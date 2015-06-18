@@ -1,18 +1,19 @@
 #!/bin/bash
-# Applies a cdo OPERATOR without arg to a number of list of FILES, 
+# Applies a cdo OPERATOR without arg to a list of FILES, 
 # selecting a variable VAR and a PERIOD and a REGION in the files
 #
-# Puts results in OUT (assumed to be a string have the right number of filenames in it)
+# Puts results in file OUT 
 # Exit with non-0 status if any problem
 # PERIOD and/or VAR and/or REGION can be empty, in which case filtering will not occur
 # OPERATOR can be empty, in which case processing will not occur
+# ALIAS, LISIING, UNITS  .....
 
 # Lack of variable VAR in some file(s) is not considered an error
 # Having no data for the PERIOD is not considered an error
 
 set -x 
 operator=$1 ; shift
-outs=$1 ; shift
+out=$1 ; shift
 var=$1 ; shift
 period=$1 ; shift
 region=$1 ; shift
@@ -21,6 +22,10 @@ units=$1 ; shift
 vm=$1 ; shift
 
 tmp=$(mktemp -d --tmpdir climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
+
+# For the time being, must use NetCDF3 file format chained CDO
+# operations because NetCDF4 is not threadsafe at CNRM
+CDO="cdo -f nc"
 
 # Prepare CDO operator strings
 
@@ -40,68 +45,63 @@ fi
 if [ "$vm" ] ; then 
     setmiss="-setctomiss,$vm"
 fi
-i=0
-# Loop on the list of list of files 
-for out in $outs ; do 
-    i=$((i+1))
 
-    # 'files' is the next list of filenames (listed in a single string)
-    eval files=\$$i
-    vfiles=""
+# 'files' is the list of input filenames
+files=$1
+vfiles=""
 
-    # Make all selections (setmiss, aliasing, time, space, variable) 
-    # before applying the operator
-    for file in $files ; do
-	tmp2=$tmp/$(basename $file) ; rm -f $tmp2
-	if [ $setmiss ] ; then 
-	    cdo ${setmiss#-} $selalias ${selvar} $selregion $seldate \
+# Make all selections (setmiss, aliasing, time, space, variable) 
+# before applying the operator
+for file in $files ; do
+    tmp2=$tmp/$(basename $file) ; rm -f $tmp2
+    if [ $setmiss ] ; then 
+	$CDO ${setmiss#-} $selalias ${selvar} $selregion $seldate \
+	    $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+    else
+	if [ $alias ] ; then 
+	    $CDO ${selalias#-} ${selvar} $selregion $seldate \
 		$file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
-	    if [ $alias ] ; then 
-		cdo ${selalias#-} ${selvar} $selregion $seldate \
-		    $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
+	    if [ "$period" ] ; then 
+		$CDO ${selvar#-} $selregion $seldate $file $tmp2  && \
+		    [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	    else
-		if [ "$period" ] ; then 
-		    cdo ${selvar#-} $selregion $seldate $file $tmp2  && \
-			[ -f $tmp2 ] && vfiles+=" "$tmp2 
-		else
-		    if [ "$var" ] ; then 
-			cdo ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] \
-			    && vfiles+=" "$tmp2
-		    else 
-			if [ "$region" ] ; then 
-			    cdo ${selregion#-} $file $tmp2 && \
-				[ -f $tmp2 ] && vfiles+=" "$tmp2
-			else
-			    vfiles+=" "$file ; 
-			fi
+		if [ "$var" ] ; then 
+		    $CDO ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] \
+			&& vfiles+=" "$tmp2
+		else 
+		    if [ "$region" ] ; then 
+			$CDO ${selregion#-} $file $tmp2 && \
+			    [ -f $tmp2 ] && vfiles+=" "$tmp2
+		    else
+			vfiles+=" "$file ; 
 		    fi
 		fi
 	    fi
 	fi
-    done
-
-    # Then, assemble all datafiles in a single one before applying the operator 
-    # (because it may be non-linear in time - e.g. eigenvectors )
-    if [ "$vfiles" ] ; then 
-	tmp3=$tmp/$(basename $0).nc ; rm -f $tmp3
-        # let us avoid single file copy followed by rm ...
-	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
-	    cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && \
-		rm $vfiles 
-	else mv $vfiles $tmp3 ; fi
-	# Chagne units before applying further operations, if applicable
-	if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
-
-	# Apply operator if requested
-	if [ "$operator" ] ; then 
-	    if cdo $operator $tmp3 $out ;then rm $tmp3 ; fi
-	else mv $tmp3 $out ; fi
-	#ls -al $out
-    else
-	echo "Issue while selecting data from $files ">&2
-	rm -fr $tmp
-	exit 1
     fi
 done
+
+# Then, assemble all datafiles in a single one before applying the operator 
+# (because it may be non-linear in time - e.g. eigenvectors )
+if [ "$vfiles" ] ; then 
+    tmp3=$tmp/$(basename $0).nc ; rm -f $tmp3
+    # let us avoid single file copy followed by rm ...
+    if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
+	cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && \
+	    rm $vfiles 
+    else mv $vfiles $tmp3 ; fi
+    # Chagne units before applying further operations, if applicable
+    if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
+    
+    # Apply operator if requested
+    if [ "$operator" ] ; then 
+	cdo $operator $tmp3 $out && rm $tmp3 || exit 1
+    else mv $tmp3 $out ; fi
+else
+    echo "Issue while selecting data from $files ">&2
+    rm -fr $tmp
+    exit 1
+fi
+
 rm -fr $tmp
