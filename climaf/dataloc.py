@@ -12,6 +12,7 @@ import classes
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
+from operator import itemgetter
 
 locs=[]
 
@@ -264,7 +265,10 @@ def selectGenericFiles(urls, **kwargs):
         # Construct a pattern for globbing dates
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        for k in dt : temp2=temp2.replace(k,dt[k])
+        lkeys_tmp=dt.keys()
+        lkeys_tmp.sort(reverse=True)
+        for k in lkeys_tmp: temp2=temp2.replace(k,dt[k])
+        #for k in dt : temp2=temp2.replace(k,dt[k]) #LV
         clogger.debug("Globbing on : "+temp2)
         lfiles=glob.glob(temp2)
         #
@@ -273,7 +277,7 @@ def selectGenericFiles(urls, **kwargs):
             # print "looking at file"+f
             # Construct regexp for extracting dates from filename
             dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
-                    YYYYMMDD="([0-9]{10})")
+                    YYYYMMDD="([0-9]{8})")
             regexp=None
             # print "template before searching dates : "+template
             lkeys=dt.keys() ; lkeys.sort(reverse=True)
@@ -284,7 +288,7 @@ def selectGenericFiles(urls, **kwargs):
                     # print "found "+key
                     regexp=template.replace(key,dt[key],1)
                     hasEnd=False
-                    start=regexp.find(key) 
+                    start=regexp.find(key)
                     if (start >=0 ) :
                         hasEnd=True
                         regexp=regexp.replace(key,dt[key],1)
@@ -296,6 +300,8 @@ def selectGenericFiles(urls, **kwargs):
                 regexp=regexp.replace("*",".*").replace("?",r".")
                 # print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp,r'\1',f)
+                if start==f:
+                    raise Climaf_Data_Error("Start period not found") #? LV
                 if hasEnd :
                     end=re.sub(regexp,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))

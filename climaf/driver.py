@@ -333,7 +333,31 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script=operators.scripts[scriptCall.operator]
+    print "ICI LV1 - scriptCall", scriptCall
+    print "ICI LV2 - scriptCall.operator", scriptCall.operator
+    print "ICI LV3 - operators.scripts[scriptCall.operator]", operators.scripts[scriptCall.operator]
+
+    #plot_map
+    #plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV1 - scriptCall plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV2 - scriptCall.operator plot
+    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : plot
+    #ICI LV1 - scriptCall select(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
+    #ICI LV2 - scriptCall.operator select
+    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : select
+    print "ICI LV4 operands", scriptCall.operands 
+    print "ICI LV5 operands[0]", scriptCall.operands[0]
+    #print "ICI LV6 operands[1]", scriptCall.operands[1]
+    print "ICI LV6 operands[0].model", scriptCall.operands[0].model
+    print "ICI LV6 operands[0].experiment", scriptCall.operands[0].experiment
     template=Template(script.command)
+
+    print "ICI LV7 template", template
+    print "ICI LV8 scripts inputs", script.inputs
+    print "ICI LV9 parameters", scriptCall.parameters
+    print "ICI LV10 script.name" , script.name
+    print "ICI LV10 script.command" , script.command
+    print "ICI LV10 script.fixedfields" , script.fixedfields
 
     # Evaluate input data 
     dict_invalues=dict()
@@ -457,6 +481,21 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #  ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
+    #fixedfields LV
+    if script.fixedfields is not None :
+        lt,ll=script.fixedfields  #return target/source, link/dest
+        subdict_ff=dict()
+        subdict_ff["model"]=scriptCall.operands[0].model
+        subdict_ff["experiment"]=scriptCall.operands[0].experiment
+        subdict_ff["project"]=scriptCall.operands[0].project 
+        for t,l in zip(lt,ll):
+            # Replace input data placeholders with filenames for fixed fields
+            template_ff_target=Template(t)
+            # Substitute all args
+            template_ff_target=template_ff_target.substitute(subdict_ff)
+            # symlink
+            os.system("ln -s "+template_ff_target+" "+l)
+        
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -476,18 +515,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         logfile.write(line)
     logfile.close()
     
-<<<<<<< variant A
     command.wait()
 
-    tim1=time.time()
-    clogger.info("Launching command:"+template)
-    # Timing
-    # TBD : Should use process.check_output and display stderr when exit is non-0
-
-    #if ( subprocess.call(command, shell=True) == 0):
->>>>>>> variant B
-####### Ancestor
-    command.wait()
+    #fixedfields LV: rm symlink
+    if script.fixedfields is not None :
+        lt,ll=script.fixedfields  #return target/source, link/dest
+        for l in ll:
+            os.system("rm -rf "+l)  
     
     tim1=time.time()
     clogger.info("Launching command:"+template)
@@ -495,7 +529,6 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # TBD : Should use process.check_output and display stderr when exit is non-0
 
     #if ( subprocess.call(command, shell=True) == 0):
-======= end
     if ( command.wait() == 0 ):
         if script.outputFormat is not None :
             # Tagging output files with their CliMAF Reference Syntax definition
