@@ -333,31 +333,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script=operators.scripts[scriptCall.operator]
-    print "ICI LV1 - scriptCall", scriptCall
-    print "ICI LV2 - scriptCall.operator", scriptCall.operator
-    print "ICI LV3 - operators.scripts[scriptCall.operator]", operators.scripts[scriptCall.operator]
-
-    #plot_map
-    #plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
-    #ICI LV1 - scriptCall plot(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
-    #ICI LV2 - scriptCall.operator plot
-    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : plot
-    #ICI LV1 - scriptCall select(ds('example.AMIPV6ALB2G.tas.198001.global.monthly'))
-    #ICI LV2 - scriptCall.operator select
-    #ICI LV3 - operators.scripts[scriptCall.operator] CliMAF operator : select
-    print "ICI LV4 operands", scriptCall.operands 
-    print "ICI LV5 operands[0]", scriptCall.operands[0]
-    #print "ICI LV6 operands[1]", scriptCall.operands[1]
-    print "ICI LV6 operands[0].model", scriptCall.operands[0].model
-    print "ICI LV6 operands[0].experiment", scriptCall.operands[0].experiment
     template=Template(script.command)
-
-    print "ICI LV7 template", template
-    print "ICI LV8 scripts inputs", script.inputs
-    print "ICI LV9 parameters", scriptCall.parameters
-    print "ICI LV10 script.name" , script.name
-    print "ICI LV10 script.command" , script.command
-    print "ICI LV10 script.fixedfields" , script.fixedfields
 
     # Evaluate input data 
     dict_invalues=dict()
