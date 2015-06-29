@@ -53,4 +53,4 @@ by : in project 'erai', standard variable 'clt' is read from data variable 'tcc'
 
 """
 
-__all__=[ "example", "cami", "cmip5", "ocmip5" , "obs4mips" , "em" , "erai", "erai_land", "gpcc", "gpcp", "ceres", "cruts3","nemo"]
+__all__=[ "example", "cami", "cmip5", "ocmip5" , "obs4mips" , "em" , "erai", "erai_land", "gpcc", "gpcp", "ceres", "cruts3", "nemo"]
