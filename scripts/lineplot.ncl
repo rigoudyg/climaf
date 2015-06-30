@@ -23,6 +23,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl" ;LV
 
 begin
   files=str_split(infile," ")
@@ -62,6 +63,43 @@ begin
           vec=new((/n,dime(dim)/),float)
           coord=Var_DimNames(dim)
           ax=fld&$coord$
+	  
+	  ;choix 1: affiche 198100 au 1er tick => decaler l affichage
+	  ;au 2eme tick ou changer de solution
+	  testlv=cd_calendar(ax,1) ;YYYYMM - opt=2 <=> YYYYMMDD
+	  print(testlv)
+
+	  ;ou
+	  ;testlv=cd_calendar(ax,0) ;return array dimsizes(time)x6
+	  ;year=tointeger(testlv(:,0)) ;tointeger utile pr utiliser sprinti
+	  ;month=tointeger(testlv(:,1))
+	  ;day=tointeger(testlv(:,2))
+	  ;hour=tointeger(testlv(:,3))
+	  ;mn=tointeger(testlv(:,4))
+	  ;sec=testlv(:,5)
+	  ;print("year"+year+"month"+month+"day"+day+"hour"+hour+"mn"+mn+"sec"+sec)
+	  
+	  ;time_test=(/2207, 2237, 2267, 2297, 2328, 2358, 2389, 2420, \
+	  ;2450, 2481, 2511, 2542/)
+	  ;time_test@units="days since 1975-01-01 00:00:00"
+	  ;utc_date=cd_calendar(time_test, 0)
+	  ;year=utc_date(:,0)
+	  ;month=utc_date(:,1)	  
+	  ;day=utc_date(:,2)
+	  ;hour=utc_date(:,3)
+	  ;mn=utc_date(:,4)
+	  ;sec=utc_date(:,5)
+	  ;print("year"+year+"month"+month+"day"+day+"hour"+hour+"mn"+mn+"sec"+sec)
+	  ;ou	  
+	  ;year:=tointeger(utc_date(:,0)) 	
+	  ;month:=tointeger(utc_date(:,1))
+	  ;day:=tointeger(utc_date(:,2))    
+	  ;date_str=sprinti("%0.4i ",year) + sprinti("%0.2i ",month) + sprinti("%0.2i ",day)  
+	  ;print(date_str)     
+	  ;ou YYYYMMDD
+	  ;utc_date:=cd_calendar(time_test, 2) 
+	  ;print(utc_date)                     
+	  
         end if
         ;printVarSummary(fld)
         ;printVarSummary(ndtooned(fld))
@@ -75,7 +113,7 @@ begin
       status_exit(1)
     end if 
 
-  end do ; loop on files
+  end do ; loop on files  
 
   res=True
   if isvar("thickness") then 
@@ -117,9 +155,18 @@ begin
   res@vpWidthF    = 0.7        ; Make plots wider
   res@vpHeightF   = 0.5
 
+  ;LV choix 1
+  res@trXMinF=testlv(0) 
+
+  ;time axis labels LV choix 2
+  ;restick = True
+  ;restick@ttmFormat="%N/%Y" ; ou %c %Y pour le mois abrege puis l annee
+  ;time_axis_labels(ax,res,restick)
+
   ; Just plot
   wks   = gsn_open_wks ("png",plotname)             ; open workstation
   ;
+
   if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
     if (ax@positive .eq. "down") then 
       res@trYReverse = True ; reverse Y-axis
@@ -130,6 +177,8 @@ begin
     end if
     plot = gsn_csm_xy(wks,vec,ax,res)
   else
-    plot = gsn_csm_xy (wks,ax,vec,res) ; create plot
+    ;plot = gsn_csm_xy (wks,ax,vec,res) ; create plot 
+    ;plot = gsn_csm_xy (wks,ax,vec,res) ; create plot choix 2 (unchanged)
+    plot = gsn_csm_xy (wks,testlv,vec,res) ; create plot choix 1
   end if
 end
