@@ -90,7 +90,7 @@ def load_standard_operators():
     #cdftransport : case where VT file must be given 
     #
     cscript('cdftransport',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file; (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}; cdo selname,vtrp climaf_transports.nc ${out}; cdo selname,htrp climaf_transports.nc htrp.nc; cdo selname,strp climaf_transports.nc strp.nc; rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt')
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file; (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}; cdo selname,vtrp climaf_transports.nc ${out}; cdo selname,htrp climaf_transports.nc ${out_htrp}; cdo selname,strp climaf_transports.nc strp.nc; rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt', htrp_var='toto')
     #
     #2 "bugs"
     #1: necessite en premier un executable donc jai mis temporairement un echo
@@ -113,7 +113,7 @@ def load_standard_operators():
     #cdfsections -non teste au vu du bug 2-
     #
     cscript('cdfsections',
-            'cdfsections ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${lat3} ${lon3} ${n2} ${lat4} ${lon4} ${n3} ${opt}; mv section.nc ${out}; rm -f section.nc')
+            'cdfsections ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}; mv section.nc ${out}; rm -f section.nc')
     #
     #2 "pbs" hors CliMAF:
     #1: necessite de remplacer dans 'cdfsections.f90',les variables: "vosaline" par cn_vosaline, "votemper" par cn_votemper et "vomecrty" par cn_vomecrty
@@ -140,14 +140,14 @@ def load_standard_operators():
 
     #
     #cdfstd
-    #
+    #ins cdfmoystd
     cscript('cdfstd',
             'cdfstd ${opt} ${in_1} ${in_2}; mv cdfstd.nc ${out}; rm -f cdfstd.nc')
     #
     #Pb 1: comment faire vu que le nombre de fichiers IN (et donc de variables) n est pas fixe pour cet operateur ? Ou comment rendre un fichier IN optionnel ? Car ${in_1} ${in_2} signifie qu on ne peut donner qu exactement 2 variables en entree.
     #Remarque importante pour l'integration dans Climaf: si c'est le meme fichier, cdfstd calcule de la meme facon que s il ne l avait qu une fois en argument (donc utilisation d un cdo merge inutile).
     #Faire 2 operateurs pr le cas ou l argument -save est utilise => cdfmoy.nc ?
-    #Creer une sortie ${out_cdfmoy} - a voir
+    #Creer une sortie ${out_cdfmoystd} - a voir
 
     #1 bug idem que cdfheatc:
     #pb avec les fichiers IN. Si un fichier IN ne contient pas de data pour la variable 'time_counter', le resultat est faux: il contient des zeros pour les variables calculees.
