@@ -201,16 +201,16 @@ begin
     
 
   units=units
-  fld=fld*scale+offset
+  fld=fld*tofloat(scale)+tofloat(offset)
   
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
     power10=floattoint(log10(dim_max(ndtooned(fld))))
     if power10.ge.4 then
       fld=fld/10^power10
-      vmin=vmin/10^power10
-      vmax=vmax/10^power10
-      vdelta=vdelta/10^power10
+      vmin=tofloat(vmin/10^power10)
+      vmax=tofloat(vmax/10^power10)
+      vdelta=tofloat(vdelta/10^power10)
     end if
   else
     power10=0

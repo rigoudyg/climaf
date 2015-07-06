@@ -8,6 +8,25 @@ Changes, newest first :
 
 .. _news_0.7:
 
+- 2015/06/03 - Version 0.8 :
+ - Function :py:func:`~climaf.driver.cfile` can create hard links :
+   the same datafile (or inode) exists with two filenames (one in
+   CliMAF cache, one which is yours), but disk usage is counted only
+   for one datafile, and you may remove any of the two file(name)s
+   when you want.
+ - When creating a symlink between a CliMAF cache file and another
+   filename with function :py:func:`~climaf.driver.cfile` : the
+   symlink source file is now you filename; hence, no risk that some
+   CliMAF command does erase it 'in your back'; and CliMAf will nicely
+   handle broken symlinks, when you erase 'your' files
+ - scripts argument 'labels' now uses '$' as a separator
+ - fixes 
+  - check that no dataset attribute include the separator defined for
+    corresponding project
+  - fix issues at startup when reading cache index
+
+.. _news_0.7:
+
 - 2015/05/20 - Version 0.7 :
 
  - Handle **explicitly defined objects ensembles** (see

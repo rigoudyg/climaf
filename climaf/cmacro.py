@@ -16,9 +16,6 @@ from clogging import clogger, dedent
 #: Dictionnary of macros
 cmacros=dict()
 
-#: Filename for storing macros
-macroFilename="~/.climaf.macros"
-
 class cdummy(cobject):
     def __init__(self):
         """
@@ -49,12 +46,12 @@ def macro(name,cobj,lobjects=[]):
       of the macro
 
     Returns:
-      a macro; the returned value is usualy not used asis; a python
-      function is also defined in module cmacros, and you may import it
-      and use it in the same way as a CliMAF operator. All the datasets
-      involved in ``cobj`` become arguments of the macro, which
-      allows you to re-do the same computations and easily define
-      objects similar to ``cobjs``
+      a macro; the returned value is usualy not used 'as is' : a
+      python function is also defined in module cmacros and in main
+      namespace, and you may use it in the same way as a CliMAF
+      operator. All the datasets involved in ``cobj`` become arguments
+      of the macro, which allows you to re-do the same computations
+      and easily define objects similar to ``cobjs``
 
     Example::
 
@@ -81,9 +78,11 @@ def macro(name,cobj,lobjects=[]):
     See also much more explanations in the example at :download:`macro.py <../examples/macro.py>`
     """
     if isinstance(cobj,str) :
+        s=cobj
         # Next line used for interpreting macros's CRS
-        exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
+        exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
         cobj=eval(cobj, sys.modules['__main__'].__dict__)
+        #print "string %s was interpreted as %s"%(s,cobj)
     domatch=False
     for o in lobjects :
         domatch = domatch or cobj==o or \
@@ -128,7 +127,11 @@ def crewrite(crs,alsoAtTop=True):
     # Next line used for interpreting macros's CRS
     exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
-    co=eval(crs, sys.modules['__main__'].__dict__)
+    try :
+        co=eval(crs, sys.modules['__main__'].__dict__)
+    except:
+        clogger.debug("Issue when rewriting %s"%crs)
+        return(crs)
     if isinstance(co,ctree) or isinstance(co,scriptChild) or isinstance(co,cpage) :
         if alsoAtTop :
             for m in cmacros :
@@ -186,7 +189,7 @@ def cmatch(macro,cobj) :
     else : return []
     
     
-def read(filename=macroFilename):
+def read(filename):
     """
     Read macro dictionnary from filename, and add it to cmacros[]
     """
@@ -203,11 +206,11 @@ def read(filename=macroFilename):
         clogger.info("Issue reading macro file %s ", filename)
     if macros_texts :
         for m in macros_texts :
-            clogger.debug("loading macro %s"%m)
-            macro(m,macros_texts[m])
+            clogger.debug("loading macro %s=%s"%(m,macros_texts[m]))
+            macro(str(m),str(macros_texts[m]))
 
 
-def write(filename=macroFilename) :
+def write(filename) :
     """
     Writes macros dictionnary to disk ; should be called before exit
 
