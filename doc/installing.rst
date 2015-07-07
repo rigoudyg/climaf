@@ -5,8 +5,8 @@ Installing / running
 
 .. _installing:
 
-Installing (or not)
--------------------------
+Installing (or using an installed version, at CNRM or IPSL)
+-----------------------------------------------------------
 
 - If working on IPSL's Ciclad, at CNRM or on MF's Beaufix HPC machine, you do not need to install CliMAF; just 
   do as indicated below (as e.g. in section :ref:`running_inter`), replacing ``<some_installation_dir>`` by :
@@ -77,13 +77,17 @@ files); then, you can either :
 
   - set your PATH e.g. in your ``~/.profile`` file::
 
-    $ export PATH=$PATH::<some_installation_dir>/climaf/bin
+    $ export PATH=$PATH:<some_installation_dir>/climaf/bin
 
   - and then launch CliMAF ::
 
     $ climaf
 
     >>>         #(this is the Python prompt)
+
+  - you may of course also directly type ::  
+
+    $ <some_installation_dir>/climaf/bin/climaf
 
 
 - or import ``climaf.api.*`` in your python environment :
@@ -104,6 +108,30 @@ files); then, you can either :
 
 Please see also : :ref:`examples`
 
+
+.. _backend:
+
+Using CliMAF as a back end in your scripts 
+--------------------------------------------
+
+Binary ``climaf`` described above (and located in ``<some_installation_dir>/climaf/bin``) can
+be used with a string argument which is a series of valid CliMAF
+commands. It will then run silently in the background (up to the point
+where an error occurs) and may be used e.g. to get the filename for a
+result handled by CliMAF in its cache. 
+
+As an example, if your CliMAF startup file (see :ref:`configuring`) does import the necessary
+modules for defining function ``season.clim``, you may write::
+
+ $ climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980'))"
+
+or even:: 
+
+ $ file=$(climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980'))")
+
+
+This can be handy for letting CliMAF handle your climatology files in
+its cache
 
 .. _library:
 

@@ -7,7 +7,7 @@ from __future__ import print_function
 # Created : S.Senesi - 2014
 
 __all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators" , "projects" ,"cmacro"]
+          "operators", "period", "standard_operators" , "projects" ,"cmacro","html"]
 
 version="0.7"
 
