@@ -49,6 +49,8 @@ Some of the examples can be run anywhere, as they use the data sample installed 
   - :download:`ann_cycle.py <../examples/ann_cycle.py>`  : compute an annual cycle, using CDO
   - :download:`macro.py <../examples/macro.py>`          : define a macro in-a-while, use it, save it, ....
   - :download:`ensemble.py <../examples/ensemble.py>`    : how to create ensembles and compute with it
+  - :download:`index_html.py <../examples/index_html.py>`: how to
+    create an html index including mutliple tables of links to figures, possibly with thumbnails
 
 .. _examples_data:
 

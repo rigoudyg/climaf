@@ -13,7 +13,7 @@ import sys, os
 from classes import cobject, cdataset, ctree, scriptChild, cpage
 from clogging import clogger, dedent
 
-#: Dictionnary of macros
+#: Dictionary of macros
 cmacros=dict()
 
 class cdummy(cobject):
@@ -69,7 +69,7 @@ def macro(name,cobj,lobjects=[]):
      >>> pr=ds(project='example',experiment='AMIPV6ALB2G', variable='pr', frequency='monthly', period='198001')
      >>> pr_ezm=eu_cross_section(pr)
      >>> #
-     >>> # All macros are registered in dictionnary climaf.cmacro.cmacros,
+     >>> # All macros are registered in dictionary climaf.cmacro.cmacros,
      >>> # which is imported by climaf.api; you can list it by :
      >>> cmacros
 
@@ -191,7 +191,7 @@ def cmatch(macro,cobj) :
     
 def read(filename):
     """
-    Read macro dictionnary from filename, and add it to cmacros[]
+    Read macro dictionary from filename, and add it to cmacros[]
     """
     import json
     global cmacros
@@ -212,7 +212,7 @@ def read(filename):
 
 def write(filename) :
     """
-    Writes macros dictionnary to disk ; should be called before exit
+    Writes macros dictionary to disk ; should be called before exit
 
     """
     import json

@@ -4,7 +4,8 @@ CliMAF module ``hmtl`` defines functions for building some html index
 giving acces to figure files, through links bearing a label or through
 thumbnails, and organized in tables. It eases iterating over lines and
 columns in tables. **See an example in** :download:`index_html.py
-<../examples/index_html.py>`
+<../examples/index_html.py>` and :download:`its screen dump
+<../doc/html_index.png>`
 
 """
 
@@ -72,8 +73,8 @@ def html_close_table() :
 def html_table_lines(func,dic,*args,**thumb) :
     """ Returns text for multiple lines of a table, by iterating
     calls to :py:func:`~climaf.html.html_table_lines` . dic is a
-    dictionnary which keys are provided as first argument of the
-    calls, and values as last argument. Dictionnary argument thumb is
+    dictionary which keys are provided as first argument of the
+    calls, and values as last argument. Dictionary argument thumb is
     forwarded too.
     """
     rep=""
@@ -87,7 +88,7 @@ def html_table_line(func,*args,**thumb) :
     Create the html text for a line of table cells , which
     each includes an HREF link to an image file, and a label or thumbnail
     bearing this link. Last arg is a title for first column. But
-    last argument, is a dictionnary which keys are
+    last argument, is a dictionary which keys are
     the labels and which values are tuples of arguments (or single
     values) to pass to the function for computing the filename. 
     Other arguments (except last and but last) are also passed to
@@ -105,7 +106,7 @@ def html_table_line(func,*args,**thumb) :
       <TD ALIGN=RIGHT><A HREF='/root/dirB/B.png'>labelB</a> </TD>
       
     If func is None, a function like 'foo' above is used If last
-    argument is a list, it is turned into a dictionnary with value=key
+    argument is a list, it is turned into a dictionary with value=key
     Values are not necessary tuples Dict argument thumb may include
     key 'thumbnail', in which case thumbnails will be generated (with
     the size being dict value)
@@ -132,7 +133,7 @@ def html_table_line(func,*args,**thumb) :
     dic=largs.pop()
     if not isinstance(dic,dict) :
         if not isinstance(dic,list) :
-            print "Issue with dictionnary : got `dic` "
+            print "Issue with dictionary : got `dic` "
             return
         else :
             dic=dict(zip(dic,dic))

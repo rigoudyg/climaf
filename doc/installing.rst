@@ -1,7 +1,6 @@
-----------------------------
-Installing / running 
-----------------------------
-
+---------------------------------
+Installing, configuring, using 
+---------------------------------
 
 .. _installing:
 
@@ -40,24 +39,25 @@ Installing (or using an installed version, at CNRM or IPSL)
 Configuring CliMAF
 ---------------------
 
-CliMAF do interpret some environment variables :
+- CliMAF do interpret some environment variables :
 
-- CLIMAF_CACHE : a directory used for storing intermediate results,
-  and those final results which are not explicitly copied elsewhere;
-  defaults to ~/tmp/climaf_cache. 
+ - CLIMAF_CACHE : a directory used for storing intermediate results,
+   and those final results which are not explicitly copied elsewhere;
+   defaults to ~/tmp/climaf_cache. 
 
-- CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
-  verbosity level on stderr (resp. on file climaf.log); defaults to
-  'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
+ - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
+   verbosity level on stderr (resp. on file climaf.log); defaults to
+   'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
 
-You may put in file ``~/.climaf`` any python code using CliMAF
+- Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
 functions; this will be executed at the end of climaf import; the code 
 must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
 benefit from the intractive shortcuts defined in climaf.api (as
-described below in :ref:`running_inter`
+described below in :ref:`running_inter`)
 
+- Environment :
 
-If running on Beaufix, you must setup your environment by::
+  - If running on Beaufix, you must setup your environment by::
 
   $ module load python/2.7.5 nco ncview ncl
 
@@ -123,11 +123,11 @@ result handled by CliMAF in its cache.
 As an example, if your CliMAF startup file (see :ref:`configuring`) does import the necessary
 modules for defining function ``season.clim``, you may write::
 
- $ climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980'))"
+ $ climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980-1999'))"
 
 or even:: 
 
- $ file=$(climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980'))")
+ $ file=$(climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980-1999'))")
 
 
 This can be handy for letting CliMAF handle your climatology files in

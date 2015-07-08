@@ -37,7 +37,7 @@ cproject : declare a new project and its non-standard attributes/facets
 
 .. autoclass:: climaf.classes.cproject
 
-cprojects : dictionnary of known projects
+cprojects : dictionary of known projects
 --------------------------------------------------------------------------
 
 .. autodata:: climaf.classes.cprojects

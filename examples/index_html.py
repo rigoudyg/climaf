@@ -32,7 +32,7 @@ def my_slice(var,exp,period,season) :
 index=""
 experiment='AMIPV6ALB2G'
 period="1980"
-index += html_header("CliMAF ATLAS of "+experiment+" for"+period) 
+index += html_header("CliMAF ATLAS of "+experiment+" for "+period) 
 index += html_section("Example of Section level 1 header ",level=1)
 index += html_section("Example of Section level 2 header ",level=2)
 index += html_section("Example of Section level 3 header ",level=3)

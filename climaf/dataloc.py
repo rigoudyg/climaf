@@ -19,7 +19,7 @@ class dataloc():
     def __init__(self,organization=None, url=None, project="*",model="*", experiment="*", 
                  realm="*", table="*", frequency="*", rip="*"):
         """
-        Create an entry in the data locations dictionnary for an ensemble of datasets.
+        Create an entry in the data locations dictionary for an ensemble of datasets.
 
         Args:
           project (str,optional): project name
@@ -30,7 +30,7 @@ class dataloc():
            those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
-        Each entry in the dictionnary allows to store :
+        Each entry in the dictionary allows to store :
         
          - a list of path or URLS, which are root paths for
            finding some sets of datafiles which share a file organization scheme
@@ -53,7 +53,7 @@ class dataloc():
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
-        wildcard value; when using the dictionnary, the most specific
+        wildcard value; when using the dictionary, the most specific
         entries will be used (whic means : the entry (or entries) with the lowest number of wildcards)
 
         Example :

@@ -291,9 +291,9 @@ def cdrop(obj, rm=True) :
 
 def csync(update=False) :
     """
-    Write cache dictionnary to disk
+    Write cache dictionary to disk
 
-    If arg `update` is True, first updates dictionnary from actual 
+    If arg `update` is True, first updates dictionary from actual 
     cache file content
     """
     import pickle

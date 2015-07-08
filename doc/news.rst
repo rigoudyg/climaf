@@ -4,17 +4,25 @@
 Whats' new
 ------------
 
+.. |indx| image:: html_index.png 
+  :scale: 13%
+
+.. _screen_dump: ../../html_index.png 
+
 Changes, newest first :
 
 .. _news_0.8:
 
 - 2015/07/08 - Version 0.8 :
 
- - Package html allows to **easily create an html index**, which includes
+
+ - Package climaf.html allows to **easily create an html index**, which includes
    tables of links (or thumbnails) to image files; iterating on
-   e.g. seasons and variables is handled by CliMAF. See an example in 
-   :download:`index_html.py <../examples/index_html.py>`. See also the
-   :py:mod:`~climaf.html` package documentation
+   e.g. seasons and variables is handled by CliMAF. See :
+
+   - a screen_dump for such an index : |indx| 
+   - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
+   - the package documentation : :py:mod:`climaf.html`
  - Binary ``climaf`` can be used as a **back end** in your scripts,
    feeding it with a string argument. See :ref:`backend`
  - Function :py:func:`~climaf.driver.cfile` can create **hard links** :

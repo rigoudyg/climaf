@@ -399,7 +399,7 @@ def derive(project, derivedVar, Operator, *invars, **params) :
     **However, this is not the most efficient way to do that**. 
     See :py:func:`~climaf.classes.calias()`
 
-    Expert use : argument 'derivedVar' may be a dictionnary, which
+    Expert use : argument 'derivedVar' may be a dictionary, which
     keys are derived variable names and values are scripts outputs
     names; example ::
     

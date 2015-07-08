@@ -13,13 +13,13 @@ import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
 
-#: Dictionnary of declared projects (type is cproject)
+#: Dictionary of declared projects (type is cproject)
 cprojects=dict()
 
-#: Dictionnary of aliases dictionaries
+#: Dictionary of aliases dictionaries
 aliases=dict()
 
-#: Dictionnary of frequency names dictionaries
+#: Dictionary of frequency names dictionaries
 frequencies=dict()
 
 class cproject():
@@ -127,7 +127,7 @@ class cproject():
                 return cdataset(**kvp)
 
 
-#: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
+#: Dictionary storing user-default values for dataset attributes, used when defining a new dataset 
 cdefaults=dict()
 
 def cdef(attribute,value=None):

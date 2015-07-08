@@ -317,7 +317,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     """ Actually applies a CliMAF-declared script on a script_call object 
     
     Prepare operands as fiels and build command from operands and parameters list
-    Assumes that scripts are described in dictionnary 'scripts'  by templates as
+    Assumes that scripts are described in dictionary 'scripts'  by templates as
     documented in operators.cscript
     
     Returns a CLiMAF cache data filename
