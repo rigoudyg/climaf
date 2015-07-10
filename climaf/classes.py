@@ -62,7 +62,7 @@ class cproject():
         
         A dataset in a cproject declared as ::
 
-        >>> cproject("MINE","myfreq","myfacet",sep="_")
+        >>> cproject('MINE','myfreq','myfacet',sep='_')
 
         will return ::
 
@@ -81,22 +81,32 @@ class cproject():
         datafile pathnames in the 'generic' organization (see
         :py:class:`~climaf.dataloc.dataloc`)
 
+        A default value for a given facet can be specified, by providing a tuple
+        (facet_name,default_value) instead of the facet name. This default value is
+        however of lower priority than the value set using :py:func:`cdef`
+
         A project can be declared as having non-standard variable
-        names, or variabels that should undergo re-scaling (see
-        :py:func:`~climaf.classes.calias`)
+        names, or variables that should undergo re-scaling; see
+        :py:func:`~climaf.classes.calias`
 
         A project can be declared as having non-standard frequency names (this is 
-        used when accessing datafiles). see :py:func:`~climaf.classes.cfreqs`)
+        used when accessing datafiles); see :py:func:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
         self.project=name
         #
         self.facets=[]
+        self.facet_defaults=dict()
         forced=['project','experiment', 'variable', 'period', 'domain']
         for f in forced : self.facets.append(f)
-        for a in args : 
-            if not a in forced : self.facets.append(a)
+        for a in args :
+            if isinstance(a,tuple) :
+                facet_name,facet_default=a
+                self.facet_defaults[facet_name]=facet_default
+            else :
+                facet_name=a
+            if not facet_name in forced : self.facets.append(facet_name)
         #
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
@@ -126,46 +136,46 @@ class cproject():
                 for i,f in enumerate(self.facets) : kvp[f]=fields[i]
                 return cdataset(**kvp)
 
-
-#: Dictionary storing user-default values for dataset attributes, used when defining a new dataset 
-cdefaults=dict()
-
-def cdef(attribute,value=None):
+def cdef(attribute,value=None, project=None):
     """
-    Set or get the default value for a CliMAF dataset attribute (as
-    e.g. 'model', 'project' ...), for use by next calls to
-    :py:class:`~climaf.classes.cdataset()` or to
+    Set or get the default value for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'experiment' ...), for use by
+    next calls to :py:class:`~climaf.classes.cdataset()` or to
     :py:func:`~climaf.classes.ds`
 
-    Theres is no actual check that 'attribute' is a valid keyword for
+    Argument 'project' allows to restrict the use/query of the default
+    value to the context of the given 'project'. On can also set the
+    (global) default value for attribute 'project'
+
+    There is no actual check that 'attribute' is a valid keyword for
     a call to ``ds`` or ``cdataset``
 
     Example::
 
     >>> cdefault('project','OCMPI5')
-    >>> cdefault('frequency','monthly')
-
+    >>> cdefault('frequency','monthly',project='OCMPI5')
     """
+    
+    if project not in cprojects :
+        raise Climaf_Classes_Error("project '%s' has not yet been declared"%project)
+    if attribute == 'project' : project=None
+    #
+    if project and not attribute in cprojects[project].facets :
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'"%(project,attribute))
     if value is None :
-        if attribute in cdefaults.keys() :
-            return cdefaults[attribute]
-        else:
-            return None
+        rep=cprojects[project].facet_defaults.get(attribute,None)
+        if not rep :
+            rep=cprojects[None].facet_defaults.get(attribute,"N/A")
+        return rep
     else :
-        cdefaults[attribute]=value
+        cprojects[project].facet_defaults[attribute]=value
+            
 
-cdef("project","P")
-cdef("model","M")
-cdef("experiment","E")
-cdef("rip","r1i1p1")
-cdef("frequency","monthly")
+cproject(None)
 cdef("domain","global")
-cdef("table","*")
-cdef("realm","*")
-cdef("version","last")
 
 
-# All CObject instances are registered in this directory :
+# All Cobject instances are registered in this directory :
 cobjects=dict()
 
 class cobject():
@@ -189,7 +199,8 @@ def processDatasetArgs(**kwargs) :
     """
     Perfom basic checks on kwargs for functions cdataset and eds
     regarding the project where the dataset is defined
-    Also complement with default values as handled by cdef()
+    Also complement with default values as handled by the
+    project's definition and by cdef()
     """
     if 'project' in kwargs : project=kwargs['project']
     else : project= cdef("project")
@@ -197,7 +208,7 @@ def processDatasetArgs(**kwargs) :
         raise Climaf_Classes_Error("Must provide a project (Can use cdef)")
     elif project not in cprojects :
         raise Climaf_Classes_Error(
-            "Dataset's project %s has not "
+            "Dataset's project '%s' has not "
             "been described by a call to cproject()"%project)
     attval=dict()
     attval["project"]=project
@@ -206,14 +217,19 @@ def processDatasetArgs(**kwargs) :
     # Register facets values
     for facet in cprojects[project].facets :
         if facet in kwargs : val=kwargs[facet]
-        else: val=cdef(facet)
+        else:
+            if facet in cprojects[project].facet_defaults :
+                val=cprojects[project].facet_defaults[facet]
+            else:
+                if cdef(facet) is not None : val=cdef(facet)
+                else : val="N/A"
         attval[facet]=val
         if val :
             if val.find(sep) >= 0 :
                 Climaf_Classes_Error(
-                    "You cannot use character %s in attributes because "
-                    "it is the declared separator for project %s. "
-                    "See help(cproject) for changing it,if needed"%(sep,project))
+                    "You cannot use character '%s' in attributes because "
+                    "it is the declared separator for project '%s'. "
+                    "See help(cproject) for changing it, if needed"%(sep,project))
         #print "initalizing facet %s with value"%(facet,val)
     #
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
@@ -226,7 +242,8 @@ def processDatasetArgs(**kwargs) :
     errmsg=""
     for facet in cprojects[project].facets :
         if attval[facet] is None :
-            e="Project %s needs facet %s. "%(project,facet)
+            e="Project '%s' needs facet '%s'. You may use cdef() for setting a default value"\
+               %(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
     #
@@ -249,10 +266,8 @@ def processDatasetArgs(**kwargs) :
             e="Project %s doesn't have facet %s"%(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
-    if not isinstance(attval['period'],cperiod) :
+    if 'period' in attval and not isinstance(attval['period'],cperiod) :
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
-    #else :
-    #    print "at end of  process, period %s is a cperiod :"%`cperiod`
     return attval
 
 
@@ -641,9 +656,7 @@ def ds(*args,**kwargs) :
     # cdataset.init(), both for
     # function name and CRS syntax
     if len(args) >1 :
-        e="must provide either 0 or 1 positional arguments, not "+len(args)
-        clogger.error(e)
-        raise Climaf_Classes_Error(e)
+        raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]

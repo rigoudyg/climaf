@@ -59,7 +59,6 @@ def html_open_table(title="",titles=None,spacing=5):
     if titles is not None :
         rep+=' <TR>\n <TH ALIGN=LEFT> '+title+' </TH> \n'
         dic=titles.keys()
-        print dic
         for label in dic :
             rep+='<TD ALIGN=RIGHT>'+label+'</TD>\n'
         rep+='</TR> \n'

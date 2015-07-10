@@ -252,10 +252,16 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
+    mustHaveVariable=False
     if "filenameVar" in kwargs and kwargs['filenameVar'] :
         kwargs['variable']=kwargs['filenameVar']
+        mustHaveVariable=True
     for l in urls :
         template=Template(l)
+        # There is no use to look for files which path is not specific
+        # to the required variable when we know it should
+        if l.find("${variable}") < 0 and mustHaveVariable :
+            continue
         #
         # Instantiate keywords in pattern with attributes values
         template=template.safe_substitute(**kwargs)

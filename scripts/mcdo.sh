@@ -29,8 +29,22 @@ CDO="cdo -f nc"
 
 # Prepare CDO operator strings
 
+timefix ()
+{
+    # Check if the time axis for a data file should be fixed, based solely on its name, 
+    # and hence echoes the relevant CDO syntax (to be inserted in a CDO pipe) for fixing it
+    file=$1
+    # Case for IPSL Seasonal cycle files, such as 
+    # .../SIMULATIONS/p86mart/IGCM_OUT/IPSLCM6/DEVT/piControl/O1T04V04/ICE/Analyse/SE/O1T04V04_SE_1850_1859_1M_icemod.nc 
+    if [[ $file =~ IGCM_OUT.*SE/.*_SE_.*([0-9]{4})_[0-9]{4}_1M.*nc ]] ; then 
+	echo -settaxis,${BASH_REMATCH[1]}-01-16:12:00:00,1mon
+    fi
+}
+
+seldatebase="-seldate,$period"
+
 [ "$var" ] && selvar="-selname,$var" 
-[ "$period" ] && seldate="-seldate,$period"
+
 if [ "$region" ] ; then 
     latmin=$(echo $region | cut -d "," -f 1)
     latmax=$(echo $region | cut -d "," -f 2)
@@ -38,6 +52,7 @@ if [ "$region" ] ; then
     lonmax=$(echo $region | cut -d "," -f 4)
     selregion="-sellonlatbox,$lonmin,$lonmax,$latmin,$latmax"
 fi
+
 if [ "$alias" ] ; then 
     IFS=", " read var filevar scale offset <<< $alias 
     selalias=-expr,"$var=${filevar}*${scale}+${offset};"
@@ -54,24 +69,28 @@ vfiles=""
 # before applying the operator
 for file in $files ; do
     tmp2=$tmp/$(basename $file) ; rm -f $tmp2
+    # If needed, transform date selection command in (time fix + date selection)
+    seldate=$seldatebase
+    [ $seldate] && seldate=$seldatebase" "$(timefix $file) 
+    #
     if [ $setmiss ] ; then 
-	$CDO ${setmiss#-} $selalias ${selvar} $selregion $seldate \
+	$CDO ${setmiss#-} $selalias $selregion $seldate ${selvar} \
 	    $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
     else
 	if [ $alias ] ; then 
-	    $CDO ${selalias#-} ${selvar} $selregion $seldate \
+	    $CDO ${selalias#-} $selregion $seldate ${selvar} \
 		$file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
-	    if [ "$period" ] ; then 
-		$CDO ${selvar#-} $selregion $seldate $file $tmp2  && \
+	    if [ "$region" ] ; then 
+		$CDO ${selregion#-} $seldate $selvar $file $tmp2  && \
 		    [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	    else
-		if [ "$var" ] ; then 
-		    $CDO ${selvar#-} $selregion $file $tmp2 && [ -f $tmp2 ] \
+		if [ $period ] ; then 
+		    $CDO ${seldate#-} ${selvar} $file $tmp2 && [ -f $tmp2 ] \
 			&& vfiles+=" "$tmp2
 		else 
-		    if [ "$region" ] ; then 
-			$CDO ${selregion#-} $file $tmp2 && \
+		    if [ "$var" ] ; then 
+			$CDO ${selvar#-} $file $tmp2 && \
 			    [ -f $tmp2 ] && vfiles+=" "$tmp2
 		    else
 			vfiles+=" "$file ; 
@@ -81,6 +100,7 @@ for file in $files ; do
 	fi
     fi
 done
+
 
 # Then, assemble all datafiles in a single one before applying the operator 
 # (because it may be non-linear in time - e.g. eigenvectors )

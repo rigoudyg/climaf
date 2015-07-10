@@ -24,7 +24,7 @@ if atCNRM :
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
     
-    cproject('EM' , 'frequency', 'realm' )
+    cproject('EM' , ('frequency','monthly'), ('realm','*') )
     cfreqs('EM',{'monthly':'mon' , 'daily':'day1' })
     dataloc(project='EM', organization='EM', url=['dummy'])
 

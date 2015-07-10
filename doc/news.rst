@@ -35,6 +35,9 @@ Changes, newest first :
    symlink source file is now 'your' filename**; hence, no risk that some
    CliMAF command does erase it 'in your back'; and CliMAf will nicely
    handle broken symlinks, when you erase 'your' files
+ - **default values for facets** are now handled on a per-project
+   basis. See :py:func:`~climaf.classes.cdef()` and
+   :py:class:`~climaf.classes.cdataset()`. 
  - scripts argument 'labels' now uses '$' as a separator
  - fixes :
 

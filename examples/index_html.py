@@ -1,14 +1,16 @@
 """
-Generate an html index of figures using the filenames returned by CliMAF
-for figures in its cache, including :
+Generate an html index of figures using the filenames for figures computed by CliMAF
+and stored in CliMAF's cache, including :
   - some paragraph titles formatting 
   - a small table giving access to figure files through html links
 """
 
 from climaf.api import *
-from climaf.html import html_header, html_section, html_open_table,\
-     html_table_line, html_table_lines, html_close_table, html_trailer
+from climaf.html import * #html_header, html_section, html_open_table, html_table_line, html_table_lines, html_close_table, html_trailer
 
+# Some global variables for the atlas
+experiment='AMIPV6ALB2G'
+period="1980"
 
 # First : a function which provides a figure filename based on a few args.
 # Here it provides it for a zonal mean of seasonal average for a given experiment,
@@ -30,16 +32,15 @@ def my_slice(var,exp,period,season) :
 # of a table of links (or thumbnails) to figure files
 
 index=""
-experiment='AMIPV6ALB2G'
-period="1980"
 index += html_header("CliMAF ATLAS of "+experiment+" for "+period) 
 index += html_section("Example of Section level 1 header ",level=1)
 index += html_section("Example of Section level 2 header ",level=2)
 index += html_section("Example of Section level 3 header ",level=3)
 index += html_section("Meridional profiles (level 4)", level=4, key="Slice")
 
-# Define a table . Begin with an optional dict providing labels for column titles
-# (and for links, possibly - see below)
+# Define a table of html links . Begin with an optional dict providing labels 
+# for column titles (and for links, possibly - see below)
+
 seasons_labels={'Year':'ANN', 'Winter':'DJF', 'Spring': 'MAM','Summer': 'JJA','Fall': 'SON'}
 index += html_open_table(title='variable',titles=seasons_labels,spacing=5)
 

@@ -21,7 +21,7 @@ from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('erai','grid', 'frequency')  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127' 
+    cproject('erai',('grid','_'), ('frequency','monthly'))  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127' 
 
     root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
     patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}YYYY-YYYY.nc"   #for original grid

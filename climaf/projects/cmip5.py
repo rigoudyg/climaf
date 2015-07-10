@@ -17,7 +17,9 @@ import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
 
-p=cproject("CMIP5" ,"model","rip","frequency","table","realm","version", ensemble=["model","rip"])
+p=cproject("CMIP5" ,"model",("rip","r1i1p1"),("frequency","monthly"),
+           ("table","*"),("realm","*"),("version","last"),
+           ensemble=["model","rip"])
 
 # Frequency alias
 cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })

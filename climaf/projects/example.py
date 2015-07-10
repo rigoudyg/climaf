@@ -18,7 +18,7 @@ from climaf.classes import cproject, calias, cfreqs
 from climaf import __path__ as cpath
 cpath=os.path.abspath(cpath[0]) 
 
-cproject("example" , "frequency" )
+cproject("example" , ("frequency","monthly") )
 cfreqs('example',{'monthly':'mon' })
 
 data_pattern_L=cpath+"/../examples/data/${experiment}/L/${experiment}SFXYYYY.nc"

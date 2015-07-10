@@ -15,7 +15,7 @@ if os.path.exists('/cnrm'):
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
 
-    cproject("OBS4MIPS","frequency")
+    cproject("OBS4MIPS",("frequency","monthly"))
     # Frequency alias
     cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
     #

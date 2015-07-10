@@ -21,7 +21,7 @@ from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
 
-def capply (climaf_operator, *operands, **parameters):
+def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
     
     Returns results as a list of CliMAF objects and stores them if auto-store is on
