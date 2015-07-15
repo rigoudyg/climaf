@@ -27,7 +27,6 @@ fi
 
 # Cleaning script
 scripts=$scripts" clean_cache.py"
-scripts=" clean_cache.py index_html.py"
 
 echo "tested example scripts : "$scripts 
 export CLIMAF_LOG_LEVEL=critical
