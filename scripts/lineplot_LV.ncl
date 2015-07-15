@@ -155,7 +155,6 @@ begin
       print(ymdhms0dim)
       print(nt)
       if ymdhms0(nt-1,0) .ne. ymdhms0(0,0) then ;year changes
-        ;print("ici")
         print(abs(ymdhms0(nt-1,0)-ymdhms0(0,0)))
         if (abs(ymdhms0(nt-1,0)-ymdhms0(0,0)) .lt. 1) then
           restick@ttmFormat="%c";"%N/%y" 
