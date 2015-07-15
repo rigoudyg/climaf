@@ -18,7 +18,8 @@ Changes, newest first :
 
  - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
    facet/attribute 'experiment' was renamed 'simulation'**. It is used
-   it for hosting CMIP5's facet/attribute 'rip'. All 'projects' and
+   it for hosting either CMIP5's facet/attribute 'rip', or for 'EXPID'
+   at CNRM, or for JobName at IPSL. All 'projects' and
    examples have been changed accordingly. A facet 'experiment' was
    added to project CMIP5 (for hosting the 'CMIP5 controlled' experiment name)
  - Package climaf.html allows to **easily create an html index**, which includes
