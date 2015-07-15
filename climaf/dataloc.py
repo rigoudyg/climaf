@@ -16,15 +16,15 @@ from clogging import clogger,dedent
 locs=[]
 
 class dataloc():
-    def __init__(self,organization=None, url=None, project="*",model="*", experiment="*", 
-                 realm="*", table="*", frequency="*", rip="*"):
+    def __init__(self,organization=None, url=None, project="*",model="*", simulation="*", 
+                 realm="*", table="*", frequency="*"):
         """
         Create an entry in the data locations dictionary for an ensemble of datasets.
 
         Args:
           project (str,optional): project name
           model (str,optional): model name
-          experiment (str,optional): exepriment name
+          simulation (str,optional): simulation name
           frequency (str,optional): frequency
           organization (str): name of the organization type, among 
            those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
@@ -49,7 +49,7 @@ class dataloc():
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
            
-         - the set of attribute values which which experiment's data are 
+         - the set of attribute values which which simulation's data are 
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
@@ -62,9 +62,9 @@ class dataloc():
             
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
             
-         - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
+         - and declaring an exception for one simulation (here, both location and organization are supposed to be different)::
             
-            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
@@ -72,7 +72,7 @@ class dataloc():
         """
         self.project=project
         self.model=model
-        self.experiment=experiment
+        self.simulation=simulation
         self.frequency=frequency
         self.organization=organization
         if (isinstance(url,list)) : self.urls=url
@@ -91,14 +91,14 @@ class dataloc():
     def __ne__(self, other):
         return not self.__eq__(other)        
     def __str__(self):
-        return self.model+self.project+self.experiment+self.frequency+self.organization+`self.urls`
+        return self.model+self.project+self.simulation+self.frequency+self.organization+`self.urls`
     def pr(self):
         print "For model "+self.model+" of project "+ self.project +\
-              " for experiment "+self.experiment+" and freq "+self.frequency +\
+              " for simulation "+self.simulation+" and freq "+self.frequency +\
               " locations are : " + `self.urls` + " and org is :" + self.organization
 
  
-def getlocs(project="*",model="*",experiment="*",frequency="*"):
+def getlocs(project="*",model="*",simulation="*",frequency="*"):
     """ Returns the list of org,freq,url triples which may match the 
     list of given attributes values (allowing for wildcards '*') and which have 
     the lowest number of wildcards (*) in attributes 
@@ -112,8 +112,8 @@ def getlocs(project="*",model="*",experiment="*",frequency="*"):
             if ( loc.project == "*" or project=="*" ) : stars+=1
             if ( loc.model == "*" or model==loc.model ) :
                 if ( loc.model == "*" or model=="*" ) : stars+=1
-                if ( loc.experiment == "*" or experiment==loc.experiment ) :
-                    if ( loc.experiment == "*" or experiment=="*" ) : stars+=1
+                if ( loc.simulation == "*" or simulation==loc.simulation ) :
+                    if ( loc.simulation == "*" or simulation=="*" ) : stars+=1
                     if ( loc.frequency == "*" or frequency==loc.frequency ) :
                         if ( loc.frequency == "*" or frequency=="*" ) : stars+=1
                         rep.append((loc.organization,loc.frequency,loc.urls,stars))
@@ -130,8 +130,8 @@ def getlocs(project="*",model="*",experiment="*",frequency="*"):
     return(filtered)
 
 
-def isLocal(project, model, experiment, frequency) :
-    ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency) 
+def isLocal(project, model, simulation, frequency) :
+    ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency) 
     if (len(ofu) == 0 ) : return False
     rep=True
     for org,freq,llocs in ofu :
@@ -162,7 +162,7 @@ def selectLocalFiles(**kwargs):
     """
     rep=[]
     project=kwargs['project']
-    experiment=kwargs['experiment']
+    simulation=kwargs['simulation']
     variable=kwargs['variable']
     period=kwargs['period']
 
@@ -171,10 +171,10 @@ def selectLocalFiles(**kwargs):
     if 'frequency' in kwargs : frequency=kwargs['frequency']
     else : frequency="*"
 
-    ofu=getlocs(project=project, model=model, experiment=experiment, frequency=frequency)
+    ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
     clogger.debug("locs="+ `ofu`)
     if ( len(ofu) == 0 ) :
-        clogger.warning("no datalocation found for %s %s %s %s "%(project, model, experiment, frequency))
+        clogger.warning("no datalocation found for %s %s %s %s "%(project, model, simulation, frequency))
     for org,freq,urls in ofu :
         kwargs2=kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
@@ -192,13 +192,13 @@ def selectLocalFiles(**kwargs):
             rep.extend(selectGenericFiles(urls, **kwargs2))
         else :
             raise Climaf_Data_Error("cannot process organization "+org+ \
-                " for experiment "+experiment+" and model "+model+\
+                " for simulation "+simulation+" and model "+model+\
                 " of project "+project)
     if (not ofu) :
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for %s, at these"
+            clogger.warning("no file found for %s, at these "
                             "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -210,8 +210,8 @@ def selectLocalFiles(**kwargs):
     # Assemble filenames in one single string
     return(string.join(rep))
 
-# u="/home/stephane/Bureau/climaf/examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
-# selectGenericFiles(experiment="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
+# u="/home/stephane/Bureau/climaf/examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
+# selectGenericFiles(simulation="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
 def selectGenericFiles(urls, **kwargs):
     """
@@ -229,7 +229,7 @@ def selectGenericFiles(urls, **kwargs):
 
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
     /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
@@ -328,7 +328,7 @@ def selectGenericFiles(urls, **kwargs):
 
 def selectEmFiles(**kwargs) :
     #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
-    experiment=kwargs['experiment']
+    simulation=kwargs['simulation']
     frequency=kwargs['frequency']
     variable=kwargs['variable']
     period=kwargs['period']
@@ -347,12 +347,12 @@ def selectEmFiles(**kwargs) :
         freq_for_em=f
         if realm == 'I' : freq_for_em=""  # This is a special case ...
         command=["grep", "^export EM_DIRECTORY_"+realm+freq_for_em+"=",
-                 os.path.expanduser(os.getenv("EM_HOME"))+"/expe_"+experiment ]
+                 os.path.expanduser(os.getenv("EM_HOME"))+"/expe_"+simulation ]
         try :
             ex = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except :
             clogger.error("Issue getting archive_location for "+
-                          experiment+" for realm "+realm+" with: "+`command`)
+                          simulation+" for realm "+realm+" with: "+`command`)
             break
         if ex.wait()==0 :
             dir=ex.stdout.read().split("=")[1].replace('"',"").replace("\n","")
@@ -366,11 +366,11 @@ def selectEmFiles(**kwargs) :
                         if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
                     #clogger.debug("Done with Looking at file "+fil)
-            else : clogger.error("Directory %s does not exist for EM experiment %s, realm %s "
-                                 "and frequency %s"%(dir,experiment,realm,f))
+            else : clogger.error("Directory %s does not exist for EM simulation %s, realm %s "
+                                 "and frequency %s"%(dir,simulation,realm,f))
         else :
             clogger.info("No archive location found for "+
-                          experiment+" for realm "+realm+" with: "+`command`)
+                          simulation+" for realm "+realm+" with: "+`command`)
     return rep
 
 
@@ -410,7 +410,7 @@ def selectExampleFiles(urls,**kwargs) :
     if (kwargs['frequency'] == "monthly") :
         for l in urls :
             for realm in ["A","L"] :
-                #dir=l+"/"+realm+"/Origin/Monthly/"+experiment
+                #dir=l+"/"+realm+"/Origin/Monthly/"+simulation
                 dir=l+"/"+realm
                 clogger.debug("Looking at dir "+dir)
                 if os.path.exists(dir) :
@@ -434,13 +434,13 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     # otherwise those of last dir
     project=kwargs['project']
     model=kwargs['model']
-    experiment=kwargs['experiment']
+    simulation=kwargs['simulation']
     frequency=kwargs['frequency']
     variable=kwargs['variable']
     realm=kwargs['realm']
     table=kwargs['table']
     period=kwargs['period']
-    rip=kwargs['rip']
+    simulation=kwargs['simulation']
     version=kwargs['version']
     #
     rep=[]
@@ -451,7 +451,7 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     for l in urls :
         pattern1=l+"/"+project+"/merge"
         if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
-        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+rip
+        patternv=pattern1+"/*/"+model+"/"+simulation+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
         #print "looking at "+patternv+ " gives:" +`ldirs`

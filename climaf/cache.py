@@ -260,7 +260,7 @@ def cdrop(obj, rm=True) :
 
     Example ::
 
-    >>> dg=ds(project='example', experiment='AMIPV6ALB2G', variable='tas', period='1980-1981')
+    >>> dg=ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
     >>> f=cfile(dg)
     >>> os.system('ls -al '+f)
     >>> cdrop(dg)

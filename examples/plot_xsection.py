@@ -4,7 +4,7 @@ craz()
 
 # Define a 3D dataset, using a pre-defined data set
 ##################################################################
-january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
 
 # plot map for first level
 map=plot(january_ta,title='January')
@@ -37,7 +37,7 @@ gplotl=plot(ta_profile, title="TA profile, lin(p)",linp=1)
 cshow(gplotl)
 
 # Plot horizontal profile : Meridional profile of zonal tas mean
-jtas=ds(project='example',experiment="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
+jtas=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
 tas_profile=ccdo(jtas,operator="zonmean")
 profplot=plot(tas_profile, title="Meridional tas profile")
 cshow(profplot)

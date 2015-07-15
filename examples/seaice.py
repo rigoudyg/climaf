@@ -22,7 +22,7 @@ cdef("frequency","monthly") ;
 cdef("project","EM")
 
 # Define your dataset (a number of facets take default values)
-sic=ds(experiment="NG89", variable="sic", period="198310", realm="I")
+sic=ds(simulation="NG89", variable="sic", period="198310", realm="I")
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
@@ -52,13 +52,13 @@ figm=plot(masked_sic,title="mask above 0.99",**pa)
 cshow(figm)
           
 # Remap Sea Ice data to atmospheric grid. Use default option (remapbil)
-tas=ds(project="EM", experiment="GSAGNS1", variable="tas", period="1975", realm="L")
+tas=ds(project="EM", simulation="GSAGNS1", variable="tas", period="1975", realm="L")
 sic_on_tas_grid=regrid(sic,tas)
 fig2=plot(sic_on_tas_grid,title="regridded_sic",**pa)
 cshow(fig2)
 
 # Access daily data
-sicd=ds(experiment="NG89", variable="sic", period="198303-198304", realm="I", frequency='daily')
+sicd=ds(simulation="NG89", variable="sic", period="198303-198304", realm="I", frequency='daily')
 print sicd.baseFiles()
 
 

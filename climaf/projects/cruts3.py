@@ -17,7 +17,7 @@ Example of an 'cruts3' project dataset declaration ::
 """
 
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
+from climaf.classes import cproject, calias, cdef
 from climaf.site_settings import atCNRM
 
 if atCNRM:

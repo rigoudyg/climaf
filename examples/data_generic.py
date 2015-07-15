@@ -25,7 +25,7 @@ if atCNRM :
     # NOTE : THE PROJECT AND DATALOC DECLARATION BELOW ARE ACTUALLY BUILT-IN AND NOT NECESSARY
     # They show here as an example of CliMAF felxibility
     
-    # First declare project 'CAMIOBS' - Default project attribute 'experiment' will be used to identify a data source
+    # First declare project 'CAMIOBS' - Default project attribute 'simulation' will be used to identify a data source
     # Some data sources have a "." in their name, hence must use another separator for this project
     cproject("CAMIOBS",separator="_")
     
@@ -34,7 +34,7 @@ if atCNRM :
     
     # Pattern for matching CAMI obs data files and their directory. 
     # We choose to use facet 'model' to carry the observation source
-    CAMIOBS_pattern="${experiment}/${variable}_1m_YYYYMM_YYYYMM_${experiment}.nc"
+    CAMIOBS_pattern="${simulation}/${variable}_1m_YYYYMM_YYYYMM_${simulation}.nc"
     
     # Declare the CAMIOBS pattern to be associated with a project we name OBS_CAMI
     dataloc(project="CAMIOBS", organization="generic", 
@@ -43,7 +43,7 @@ if atCNRM :
     # From here, you can define your dataset using these files. 
     # You need only to define the facets useful w.r.t. the patterns
     # i.e. here : model and variable
-    pr_gpcp=ds(project="CAMIOBS", experiment="GPCP2.5d", variable="pr", period="1979-1980")
+    pr_gpcp=ds(project="CAMIOBS", simulation="GPCP2.5d", variable="pr", period="1979-1980")
     
     # Display the basic filenames involved in the dataset 
     pr_gpcp.baseFiles()
@@ -65,14 +65,14 @@ if atCNRM :
 
 # First declare project and its 'non-standard' attribute(s) 'frequency'
 # NOTE : THE PROJECT AND DATALOC DECLARATION BELOW ARE ACTUALLY BUILT-IN AND NOT NECESSARY
-# They show here as an example of CliMAF felxibility
+# They show here as an example of CliMAF flexibility
 cproject("example","frequency")
-data_pattern_L=cpath+"/../examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
-data_pattern_A=cpath+"/../examples/data/${experiment}/A/${experiment}PLYYYY.nc"
+data_pattern_L=cpath+"/../examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
+data_pattern_A=cpath+"/../examples/data/${simulation}/A/${simulation}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])
 
 # Access a dataset
-rst=ds(project="example", experiment="AMIPV6ALB2G", variable="rst", period="1980-1981")
+rst=ds(project="example", simulation="AMIPV6ALB2G", variable="rst", period="1980-1981")
 l=rst.baseFiles()
 my_file=cfile(rst)
 
@@ -88,8 +88,8 @@ if onCiclad :
     #cfreqs('OCMIP5',{'monthly':'mon' })
     
     #dataloc(project="OCMIP5_Ciclad", organization="generic",
-    #        url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/${frequency}/'
-    #             '${variable}/${variable}_*_${model}_${experiment}_YYYY-YYYY.nc'])
+    #        url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${simulation}/${frequency}/'
+    #             '${variable}/${variable}_*_${model}_${simulation}_YYYY-YYYY.nc'])
     
     cdef("model","IPSL-CM4") 
     cdef("frequency","monthly")
@@ -144,11 +144,11 @@ if atCNRM: print sftlf.baseFiles()
 # If a given experiment has modified fixed fields, you may write::
 pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"+\
     "CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
-dataloc(model="CNRM-CM5",experiment="LGM", frequency="fx",organization="generic",
+dataloc(model="CNRM-CM5",simulation="LGM", frequency="fx",organization="generic",
         url=[pattern_fx_CNRM_CM5_lgm])
 
-# if you have one set of fixed fields per experiment, you can even use
-# URLs that include a pattern for the experiment name,
+# if you have one set of fixed fields per simulation/experiment, you can even use
+# URLs that include a pattern for the simulation name,
 
 sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", experiment="LGM")
 if atCNRM: print sftlf_lgm.baseFiles()

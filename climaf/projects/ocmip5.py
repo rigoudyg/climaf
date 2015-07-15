@@ -23,7 +23,7 @@ from climaf.classes import cproject, calias, cfreqs
 from climaf.site_settings import onCiclad
 
 if onCiclad :
-    cproject("OCMIP5","model",("frequency","monthly"),ensemble=["model"])
+    cproject("OCMIP5","model","experiment",("frequency","monthly"),ensemble=["model"])
     #
     # Declare which facets can be used for defining an ensemble
     #

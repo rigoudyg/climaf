@@ -10,7 +10,7 @@ from climaf.api import *
 
 # First use and combine CliMAF operators to get some interesting
 # result using some dataset(s)
-january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta",
+january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta",
               frequency='monthly', period="198001")
 ta_europe=llbox(january_ta,latmin=40,latmax=60,lonmin=-15,lonmax=25)
 ta_ezm=ccdo(ta_europe,operator="zonmean")
@@ -24,7 +24,7 @@ fig_ezm=plot(ta_ezm)
 macro("eu_cross_section",fig_ezm)
 
 # You can of course use a macro on other dataset(s), 
-pr=ds(project='example',experiment="AMIPV6ALB2G", variable="pr",
+pr=ds(project='example',simulation="AMIPV6ALB2G", variable="pr",
               frequency='monthly', period="198001")
 pr_ezm=eu_zonal_mean(pr)
 

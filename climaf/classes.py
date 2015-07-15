@@ -33,7 +33,7 @@ class cproject():
           args (strings) : attribute names; 
            they are free; do not use the chosen separator in it (see below); **CliMAF 
            anyway will add attributes : 
-           project, experiment, variable, period, and domain**
+           project, simulation, variable, period, and domain**
           kwargs (dict) :
            can only be used with keywords :
 
@@ -41,7 +41,7 @@ class cproject():
               facets in the dataset syntax. Defaults to ".".
             - ``ensemble`` for declaring a list of attribute
               names which are allowed for defining an ensemble in
-              this project ('experiment' is automatically allowed)
+              this project ('simulation' is automatically allowed)
 
         Returns : a cproject object, which string representation is
         the pattern later used in CliMAF Refreence Syntax for
@@ -55,7 +55,7 @@ class cproject():
 
         For instance, cproject CMIP5, after its Data Reference Syntax, 
         has attributes : 
-        experiment, model, rip, variable, frequency, realm, table, version
+        experiment, model, rip (here called simulation), variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
@@ -66,7 +66,7 @@ class cproject():
 
         will return ::
 
-          ${project}_${experiment}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
+          ${project}_${simulation}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
 
         and will have datasets represented as  e.g.::
 
@@ -98,7 +98,7 @@ class cproject():
         #
         self.facets=[]
         self.facet_defaults=dict()
-        forced=['project','experiment', 'variable', 'period', 'domain']
+        forced=['project','simulation', 'variable', 'period', 'domain']
         for f in forced : self.facets.append(f)
         for a in args :
             if isinstance(a,tuple) :
@@ -119,7 +119,7 @@ class cproject():
         self.crs=self.crs[:-1]
         # Create an attribute hodling the list of facets which are allowed
         # for defining an ensemble, and put a first facet there
-        self.attributes_for_ensemble=['experiment']
+        self.attributes_for_ensemble=['simulation']
         if 'ensemble' in kwargs :
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
     def __repr__(self):
@@ -139,7 +139,7 @@ class cproject():
 def cdef(attribute,value=None, project=None):
     """
     Set or get the default value for a CliMAF dataset attribute
-    or facet (such as e.g. 'model', 'experiment' ...), for use by
+    or facet (such as e.g. 'model', 'simulation' ...), for use by
     next calls to :py:class:`~climaf.classes.cdataset()` or to
     :py:func:`~climaf.classes.ds`
 
@@ -272,7 +272,7 @@ def processDatasetArgs(**kwargs) :
 
 
 class cdataset(cobject):
-    #def __init__(self,project=None,model=None,experiment=None,period=None,
+    #def __init__(self,project=None,model=None,simulation=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self,**kwargs) :
         """
@@ -311,14 +311,14 @@ class cdataset(cobject):
              
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
-        - in project CMIP5 , for triplets (frequency, rip, period, table )  : 
-          if any is 'fx' (or 'r0i0p0 for rip), the others are forced to
+        - in project CMIP5 , for triplets (frequency, simulation, period, table )  : 
+          if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
           'fx' (resp. 'r0i0p0') too.
 
         Example, using no default value, and adressing some CMIP5 data ::
 
           >>>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
-          >>>           rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+          >>>           simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
         
         
         """
@@ -327,7 +327,7 @@ class cdataset(cobject):
         #
         # TBD : Next lines for backward compatibility, but should re-engineer 
         self.project=attval["project"]
-        self.experiment=attval['experiment']
+        self.simulation=attval['simulation']
         self.variable= attval['variable']
         # alias is a n-plet : filevar, scale, offset, filenameVar, missing
         self.period    =attval['period']
@@ -362,7 +362,7 @@ class cdataset(cobject):
     def isLocal(self) :
         model=getattr(self,"model","*")
         return(dataloc.isLocal(project=self.project, model=model, \
-                               experiment=self.experiment, frequency=self.frequency))
+                               simulation=self.simulation, frequency=self.frequency))
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached
         
@@ -372,7 +372,7 @@ class cdataset(cobject):
         return rep
 
     def oneVarPerFile(self):
-        locs=dataloc.getlocs(project=self.project, model=self.model, experiment=self.experiment, \
+        locs=dataloc.getlocs(project=self.project, model=self.model, simulation=self.simulation, \
                              frequency=self.frequency)
         return(all([org for org,freq,url in locs]))
     
@@ -462,7 +462,7 @@ class cens(cobject):
 
         Example:
         
-        >>> cdef('project','example'); cdef('experiment',"AMIPV6ALB2G");
+        >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
         >>> cdef('variable','tas');cdef('frequency','monthly')
         >>> #
         >>> ds1980=ds(period="1980")
@@ -506,7 +506,7 @@ def eds(**kwargs):
 
     >>> cdef("frequency","monthly") ;  cdef("project","CMIP5"); cdef("model","CNRM-CM5")
     >>> cdef("variable","tas"); cdef("period","1860")
-    >>> ens=eds(experiment="historical", rip=["r1i1p1","r2i1p1"])
+    >>> ens=eds(experiment="historical", simulation=["r1i1p1","r2i1p1"])
 
     """
     attval=processDatasetArgs(**kwargs)
@@ -649,7 +649,7 @@ def ds(*args,**kwargs) :
     when used with with only keywords arguments. Example ::
 
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
-              rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+              simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
     # Note : muts be kept phased with self.crs defined in 
@@ -887,7 +887,7 @@ def test():
     #cdef("project","PR6")
     cdef("model","CNRM-CM5")
     cdef("experiment","historical")
-    cdef("rip","r1i1p1")
+    cdef("simulation","r1i1p1")
     cdef("period","197901-198012")
     cdef("domain","global")
     #

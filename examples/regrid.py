@@ -7,7 +7,7 @@ from climaf.api import *
 # 0 - define a dataset
 cdef("project","example")
 cdef("frequency","monthly")
-dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980")
+dg=ds(simulation="AMIPV6ALB2G", variable="tas", period="1980")
 
 # 1- regrid to a named grid : use operator 'regridn'
 dgr=regridn(dg,cdogrid="r90x45")
@@ -15,7 +15,7 @@ ncview(dgr)
 
 # 2- regrid to the grid of another datset (here, a trivial case : same grid) :
 # use operator 'regridn'
-dg2=ds(experiment="AMIPV6ALB2G", variable="rst", period="1980")
+dg2=ds(simulation="AMIPV6ALB2G", variable="rst", period="1980")
 dgr2=regrid(dg,dg2)
 ncview(dgr2)
 

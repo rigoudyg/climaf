@@ -9,15 +9,15 @@ from climaf.api import *
 from climaf.html import * #html_header, html_section, html_open_table, html_table_line, html_table_lines, html_close_table, html_trailer
 
 # Some global variables for the atlas
-experiment='AMIPV6ALB2G'
+simulation='AMIPV6ALB2G'
 period="1980"
 
 # First : a function which provides a figure filename based on a few args.
-# Here it provides it for a zonal mean of seasonal average for a given experiment,
+# Here it provides it for a zonal mean of seasonal average for a given simulation,
 # variable and period. Computation will occur only for data not already in CliMAF cache
 
 def my_slice(var,exp,period,season) :
-    dats=ds(project='example',experiment=exp, variable=var, frequency='monthly', period=period)
+    dats=ds(project='example',simulation=exp, variable=var, frequency='monthly', period=period)
     zonal_mean=ccdo(dats,operator="zonmean")
     if season != "ANN" :
         months={ "DJF":"12,1,2" , "MAM" : "3,4,5" , "JJA":"6,7,8", "SON":"9,10,11" }
@@ -32,7 +32,7 @@ def my_slice(var,exp,period,season) :
 # of a table of links (or thumbnails) to figure files
 
 index=""
-index += html_header("CliMAF ATLAS of "+experiment+" for "+period) 
+index += html_header("CliMAF ATLAS of "+simulation+" for "+period) 
 index += html_section("Example of Section level 1 header ",level=1)
 index += html_section("Example of Section level 2 header ",level=2)
 index += html_section("Example of Section level 3 header ",level=3)
@@ -54,7 +54,7 @@ index += html_open_table(title='variable',titles=seasons_labels,spacing=5)
 #   - Last arg is a title (for the first, leftmost column).
 #  There will be one html link (and one table column) per label in the dictionary
 
-index += html_table_line(my_slice,'tas',experiment, period, seasons_labels,"tas - surface temperature")
+index += html_table_line(my_slice,'tas',simulation, period, seasons_labels,"tas - surface temperature")
 
 # Function hmtl_table_lines also accepts keyword argument thumbnail, for getting a thumbnail
 # rather than a label for the link - See below
@@ -73,7 +73,7 @@ vars={
 # over the dictionnary presented as fist arg, passing it dict keys as first arg 
 # and dict values as last arg (in line with the call example above)
 # Here, additionnaly, we ask for thumbnail images
-index += html_table_lines(my_slice,vars,experiment,period,seasons_labels,thumbnail=60) 
+index += html_table_lines(my_slice,vars,simulation,period,seasons_labels,thumbnail=60) 
 
 # That's all folk. Just close the table, the html document, and write it to file
 index += html_close_table()

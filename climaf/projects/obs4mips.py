@@ -1,11 +1,12 @@
 """
-This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for all frequencies; see file:///cnrm/vdr/DATA/Obs4MIPs/doc/
+This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for
+all frequencies; see file:///cnrm/vdr/DATA/Obs4MIPs/doc/
 
-Additional attribute for OBS4MIPS datasets  : only 'frequency'
+Additional attribute for OBS4MIPS datasets  : 'experiment' and 'frequency'
 
 Example for an OBS4MIPS CMIP5 dataset declaration ::
 
- >>> pr_obs=ds(project='OBS4MIPS', variable='pr', frequency='monthly', period='1979-1980', experiment='GPCP-SG')
+ >>> pr_obs=ds(project='OBS4MIPS', variable='pr', experiment='GPCP-SG', frequency='monthly', period='1979-1980')
 
 
 """
@@ -15,7 +16,7 @@ if os.path.exists('/cnrm'):
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
 
-    cproject("OBS4MIPS",("frequency","monthly"))
+    cproject("OBS4MIPS","experiment",("frequency","monthly"))
     # Frequency alias
     cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
     #

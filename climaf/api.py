@@ -9,7 +9,7 @@ Main functions are :
 
  - ``cproject``: declare a project and its non-standard attributes/facets
 
- - ``dataloc`` : set data locations for a series of experiments
+ - ``dataloc`` : set data locations for a series of simulations
 
  - ``cdef``    : define some default values for datasets attributes
 
