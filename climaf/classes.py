@@ -152,8 +152,8 @@ def cdef(attribute,value=None, project=None):
 
     Example::
 
-    >>> cdefault('project','OCMPI5')
-    >>> cdefault('frequency','monthly',project='OCMPI5')
+    >>> cdef('project','OCMPI5')
+    >>> cdef('frequency','monthly',project='OCMPI5')
     """
     
     if project not in cprojects :
@@ -291,7 +291,7 @@ class cdataset(cobject):
 
         None of the project's attributes are mandatory arguments, because
         all attributes defaults to the value set by
-        :py:func:`~climaf.classes.cdefault` (which also applies if
+        :py:func:`~climaf.classes.cdef` (which also applies if
         providing a None value for an attribute)
 
         Some attributes have a special format or processing : 

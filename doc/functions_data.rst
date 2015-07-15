@@ -47,10 +47,10 @@ dataloc : describe data locations for a series of experiments
 
 .. autoclass:: climaf.dataloc.dataloc
 
-cdefaults: list of default values
+cdefault: set or get a default value for some data attribute/facet
 --------------------------------------------------------------------------
 
-.. autodata:: climaf.classes.cdefaults
+.. autofunction:: climaf.classes.cdef
 
 derive : define a variable as computed from other variables
 --------------------------------------------------------------------------

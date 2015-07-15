@@ -16,11 +16,11 @@ Changes, newest first :
 - 2015/07/08 - Version 0.8 :
 
 
- - **A CHANGE BREAKING BACKWARD COMPATIBILITY** : Default
-   facet/attribute 'experiment' was renamed 'simulation'. It is used
+ - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
+   facet/attribute 'experiment' was renamed 'simulation'**. It is used
    it for hosting CMIP5's facet/attribute 'rip'. All 'projects' and
-   examples have been changed accordingly. A facet 'experiment' wa
-   added to project CMIP5
+   examples have been changed accordingly. A facet 'experiment' was
+   added to project CMIP5 (for hosting the 'CMIP5 controlled' experiment name)
  - Package climaf.html allows to **easily create an html index**, which includes
    tables of links (or thumbnails) to image files; iterating on
    e.g. seasons and variables is handled by CliMAF. See :

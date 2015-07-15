@@ -31,7 +31,8 @@ Installing (or using an installed version, at CNRM or IPSL)
      cd testing
      ./test_install.sh 
   
-    and check the output of last command
+    and check the output of last command. Contact 'climaf at meteo dot
+    fr' in case of problem at that stage
 
 
 .. _configuring:
@@ -50,16 +51,16 @@ Configuring CliMAF
    'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
 
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
-functions; this will be executed at the end of climaf import; the code 
-must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
-benefit from the intractive shortcuts defined in climaf.api (as
-described below in :ref:`running_inter`)
+  functions; this will be executed at the end of climaf import; the code 
+  must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
+  benefit from the intractive shortcuts defined in climaf.api (as
+  described below in :ref:`running_inter`)
 
 - Environment :
 
   - If running on Beaufix, you must setup your environment by::
 
-  $ module load python/2.7.5 nco ncview ncl
+    $ module load python/2.7.5 nco ncview ncl
 
 
 .. _running_inter:

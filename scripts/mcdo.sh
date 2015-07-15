@@ -71,7 +71,7 @@ for file in $files ; do
     tmp2=$tmp/$(basename $file) ; rm -f $tmp2
     # If needed, transform date selection command in (time fix + date selection)
     seldate=$seldatebase
-    [ $seldate] && seldate=$seldatebase" "$(timefix $file) 
+    [ "$seldate" ] && seldate=$seldatebase" "$(timefix $file) 
     #
     if [ $setmiss ] ; then 
 	$CDO ${setmiss#-} $selalias $selregion $seldate ${selvar} \
