@@ -167,6 +167,9 @@ begin
         ;We have a true cross-section or a horizontal map
         if logp  then useXY=False end if
         latname="lat"
+        if .not. ismissing(str_match(Var_DimNames,"latitude"))
+          latname="latitude"
+        end if
         if (ismissing(str_match(Var_DimNames,"lat"))) then
           if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
             useLatDim=True
@@ -176,6 +179,9 @@ begin
         latdim=ffile->$latname$
         ;
         lonname="lon"
+        if .not. ismissing(str_match(Var_DimNames,"longitude"))
+          lonname="longitude"
+        end if
         if (ismissing(str_match(Var_DimNames,"lon"))) then 
           if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
             useLonDim=True

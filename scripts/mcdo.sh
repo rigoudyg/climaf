@@ -41,7 +41,7 @@ timefix ()
     fi
 }
 
-seldatebase="-seldate,$period"
+[ "$period" ] && seldatebase="-seldate,$period"
 
 [ "$var" ] && selvar="-selname,$var" 
 

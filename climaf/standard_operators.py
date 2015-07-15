@@ -37,8 +37,7 @@ def load_standard_operators():
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox' ,
-            scriptpath+'mcdo.sh ""  "${out}" "${var}" "${period_iso}" '
-            '"${latmin},${latmax},${lonmin},${lonmax}" "${alias}" "${units}" "${missing}" ${ins}',
+            scriptpath+'mcdo.sh ""  "${out}" "${var}" "${period_iso}" "${latmin},${latmax},${lonmin},${lonmax}" "${alias}" "${units}" "${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('regrid' ,

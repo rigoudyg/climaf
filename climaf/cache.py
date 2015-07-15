@@ -192,14 +192,14 @@ def hasMatchingObject(cobject,ds_func) :
         import operators
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
-    for crs in crs2filename :
+    for crs in crs2filename.copy() :
         co=eval(crs, sys.modules['__main__'].__dict__)
         altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
         if altperiod :
-            if os.path.exists(co) :
+            if os.path.exists(crs2filename[crs]) :
                 return co,altperiod
             else :
-                clogger.debug("Removing %s from cache index, because file is missing")
+                clogger.debug("Removing %s from cache index, because file is missing",crs)
                 crs2filename.pop(crs)
     return None,None
 

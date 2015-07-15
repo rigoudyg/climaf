@@ -216,20 +216,18 @@ def processDatasetArgs(**kwargs) :
     #
     # Register facets values
     for facet in cprojects[project].facets :
-        if facet in kwargs : val=kwargs[facet]
-        else:
-            if facet in cprojects[project].facet_defaults :
-                val=cprojects[project].facet_defaults[facet]
-            else:
-                if cdef(facet) is not None : val=cdef(facet)
-                else : val="N/A"
+        if facet in kwargs and kwargs[facet] : val=kwargs[facet]
+        else: val=cdef(facet,project=project)
         attval[facet]=val
         if val :
-            if val.find(sep) >= 0 :
-                Climaf_Classes_Error(
-                    "You cannot use character '%s' in attributes because "
-                    "it is the declared separator for project '%s'. "
-                    "See help(cproject) for changing it, if needed"%(sep,project))
+            if isinstance(val,list) : listval=val
+            else : listval=[val]
+            for lval in listval :
+                if isinstance(lval,str) and lval.find(sep) >= 0 :
+                    Climaf_Classes_Error(
+                        "You cannot use character '%s' when setting '%s=%s' because "
+                        "it is the declared separator for project '%s'. "
+                        "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
         #print "initalizing facet %s with value"%(facet,val)
     #
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
@@ -293,7 +291,8 @@ class cdataset(cobject):
 
         None of the project's attributes are mandatory arguments, because
         all attributes defaults to the value set by
-        :py:func:`~climaf.classes.cdefault`
+        :py:func:`~climaf.classes.cdefault` (which also applies if
+        providing a None value for an attribute)
 
         Some attributes have a special format or processing : 
         
@@ -411,7 +410,7 @@ class cdataset(cobject):
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
                 dic["variable"]=filevar
-                dic["filenameVar"]=filenameVar
+                if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
             self.files=dataloc.selectLocalFiles(**dic)
         return self.files
@@ -630,7 +629,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             if filter_on_operator :
                 if filter_on_operator(tree1.operator): return None
             if tree1.parameters == tree2.parameters :
-                return(reduce(lambda(a,b) : a if `a`==`b` else None, 
+                return(reduce(lambda a,b : a if `a`==`b` else None, 
                    [ compare_trees(op1,op2,func,filter_on_operator) 
                      for op1,op2 in zip(tree1.operands, tree2.operands) ]))
     elif isinstance(tree1,scriptChild) and isinstance(tree2,scriptChild):
@@ -715,15 +714,15 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     
     """
-    if not fileVariable : fileVariable =variable
-    if not filenameVar  : filenameVar =fileVariable
+    if not fileVariable : fileVariable = variable
+    if not filenameVar  : filenameVar  = None
     if project not in cprojects : 
         raise Climaf_Classes_Error("project %s is not known"%project)
     if project not in aliases : aliases[project]=dict()
-    if type(variable)     is not list : variable    =[variable]
-    if type(filenameVar)  is not list : filenameVar =[filenameVar]
-    if type(fileVariable) is not list : fileVariable=[fileVariable]
-    if type(units)        is not list : units    =[units]
+    if type(variable)     is not list : variable    = [variable]
+    if type(filenameVar)  is not list : filenameVar = [filenameVar]
+    if type(fileVariable) is not list : fileVariable= [fileVariable]
+    if type(units)        is not list : units       = [units]
     for v,u,fv,fnv in zip(variable,units,fileVariable,filenameVar) :
         aliases[project][v]=(fv,scale,offset,u,fnv,missing)
 

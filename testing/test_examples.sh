@@ -23,15 +23,14 @@ if [[ $(uname -n) == lx* || $(uname -n) == sx* ]]; then
 elif [[ $(uname -n) == ciclad* ]]; then 
     # Ciclad
     scripts=$scripts" data_cmip5drs.py ensemble.py"
-    # figarray does not work yet there, due to convert canvas:None
 fi
 
 # Cleaning script
 scripts=$scripts" clean_cache.py"
-#scripts="clean_cache.py seaice.py clean_cache.py"
 
 echo "tested example scripts : "$scripts 
 export CLIMAF_LOG_LEVEL=critical
+#export CLIMAF_LOG_LEVEL=debug
 
 python $thisdir/iterate_python_scripts.py -V -f $scripts
 #for s in $scripts ; do cdat $s ; done

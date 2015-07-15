@@ -24,7 +24,7 @@ cshow(zplotl)
 
 # Compute meridional mean and plot it 
 ta_merid_mean=ccdo(january_ta,operator="mermean")
-mplot=plot(ta_merid_mean,title="Merdional mean")
+mplot=plot(ta_merid_mean,title="Meridional mean")
 cshow(mplot)
 
 # Profile of global mean 

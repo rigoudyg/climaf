@@ -42,10 +42,10 @@ climaf.cmacro.show()
 cmacros.pop("my_macro")
 
 # Save the macros in some location (provide a filename)
-# Default is ~/.climaf.macros, and is used for
+# Value ~/.climaf.macros is used for
 #   - automatically saving macros at end of CliMAF sessions
 #   - automatically reading macros at start of CliMAF sessions
-climaf.cmacro.write()
+climaf.cmacro.write("~/.climaf.macros")
 
 # Look at the external representation of the macros. 
 print "\nContent of ~/.climaf.macros :"
