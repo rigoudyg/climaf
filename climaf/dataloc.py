@@ -440,7 +440,7 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     realm=kwargs['realm']
     table=kwargs['table']
     period=kwargs['period']
-    simulation=kwargs['simulation']
+    experiment=kwargs['experiment']
     version=kwargs['version']
     #
     rep=[]
@@ -451,7 +451,7 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     for l in urls :
         pattern1=l+"/"+project+"/merge"
         if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
-        patternv=pattern1+"/*/"+model+"/"+simulation+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
+        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
         #print "looking at "+patternv+ " gives:" +`ldirs`

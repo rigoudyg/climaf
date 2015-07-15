@@ -233,9 +233,9 @@ def processDatasetArgs(**kwargs) :
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
         if ( attval['table']=='fx' or attval['period']=='fx' or 
-             attval['rip']=='r0i0p0' or attval['frequency']=='fx') :
+             attval['simulation']=='r0i0p0' or attval['frequency']=='fx') :
             attval['table']='fx' ; attval['period']='fx' 
-            attval['rip']='r0i0p0' ; attval['frequency']='fx'
+            attval['simulation']='r0i0p0' ; attval['frequency']='fx'
     #
     errmsg=""
     for facet in cprojects[project].facets :

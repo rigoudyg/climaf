@@ -94,7 +94,7 @@ if onCiclad :
     cdef("model","IPSL-CM4") 
     cdef("frequency","monthly")
     
-    cactl=ds(project="OCMIP5", experiment="CTL", variable="CACO3", period="1860-1861")
+    cactl=ds(project="OCMIP5", simulation="CTL", variable="CACO3", period="1860-1861")
     print cactl.baseFiles()
 
     my_file=cfile(cactl)
@@ -110,11 +110,11 @@ if atCNRM :
     cproject("OBS4MIPS","frequency")
 
     pattern="/cnrm/vdr/DATA/Obs4MIPs/netcdf/${frequency}/"+\
-            "${variable}_${experiment}_*_YYYYMM-YYYYMM.nc"
+            "${variable}_${simulation}_*_YYYYMM-YYYYMM.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
-    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly",
-              period="1979-1980", experiment="GPCP-SG")
+    pr_obs=ds(project="OBS4MIPS", variable="pr", frequency="monthly_mean",
+              period="1979-1980", simulation="GPCP-SG")
 
     print pr_obs.baseFiles()
     my_file=cfile(pr_obs)
@@ -150,7 +150,7 @@ dataloc(model="CNRM-CM5",simulation="LGM", frequency="fx",organization="generic"
 # if you have one set of fixed fields per simulation/experiment, you can even use
 # URLs that include a pattern for the simulation name,
 
-sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", experiment="LGM")
+sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", simulation="LGM")
 if atCNRM: print sftlf_lgm.baseFiles()
 
 # Note : access to fx fields for projects or experiments related to an 
