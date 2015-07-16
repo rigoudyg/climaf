@@ -10,7 +10,7 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl lineplot.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. thickness=.. linp=1 realXaxis=1 format=...
+; ncl lineplot.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. thickness=.. linp=1 realXaxis=1 fmt=...
 
 ; infile, plotname and var are mandatory
 ; infile : a string holding the series of filenames, separated by whitespaces
@@ -36,7 +36,6 @@ begin
   ;LV
   ;read data
   filesLV=addfiles(files,"r")
-  ;print(filesLV)
 
   ; just for extraction of min and max x-range (so for case where realXaxis is on)
   fldLV=filesLV[:]->$var$
@@ -49,10 +48,10 @@ begin
     if dime(dim) .gt. 1 then
       coordLV=Var_DimNamesLV(dim)
       print(coordLV)
-          ;inutile (addfiles convertit si les unites en temps sont differentes)
-          ;if (all(filesLV[:]&$coordLV$@standard_name .eq. "time")) then  
-          ;  print("tous les axes des x sont des temps")
-          ;  fldLV&$coordLV$ = cd_convert(fldLV&$coordLV$, filesLV[0]->$var$&$coordLV$@units)
+      ;inutile (addfiles convertit si les unites en temps sont differentes)
+      ;if (all(filesLV[:]&$coordLV$@standard_name .eq. "time")) then  
+        ;  print("tous les axes des x sont des temps")
+        ;  fldLV&$coordLV$ = cd_convert(fldLV&$coordLV$, filesLV[0]->$var$&$coordLV$@units)
 
       if (.not. all(filesLV[:]&$coordLV$@standard_name .eq. "time")) then
         first_file_axis_name=filesLV[0]->$var$&$coordLV$@standard_name
@@ -62,9 +61,8 @@ begin
           status_exit(1)
         end if        
       end if
-      
+     
       ;tester si l option realXaxis is on
-      ;if isvar("realXaxis") then
       if realXaxis .eq. 1 then
         all_Xaxis=fldLV&$coordLV$
       end if
@@ -80,13 +78,15 @@ begin
   res=True
   res@gsnDraw          = False 
   res@gsnFrame         = False 
-  ;res@gsnMaximize = True
 
   ;tester si l option realXaxis is on
   if realXaxis .eq. 1 then
     res@trXMinF=min(all_Xaxis); 1800 
     res@trXMaxF=max(all_Xaxis);2600
   end if
+
+  res@trYMinF=min(fldLV) 
+  res@trYMaxF=max(fldLV)
   
   ;les options suivantes n ont pas d impact pr le moment - a tester legend //overlay_7.ncl & xy_32.ncl (plus semblable)
   ;si ds les arguments, le titre est apres l argument realXaxis, les thicks posent un pb... a voir
@@ -118,12 +118,11 @@ begin
   res@pmLegendHeightF        = 0.15                  ; height of legend.
   ;res@pmLegendOrthogonalPosF = -0.08                 ; move up slightly 
   res@lgLabelFontHeightF     = .011                  ; change font height
-  res@lgPerimOn              = True                ; no box around
+  res@lgPerimOn              = False                ; no box around
   ;res@lgItemOrder            = (/1,0/)               ; reverse legend
+
   ;ne fonctionne pas car il faut les mettre avant chaque trace de courbe, juste apres xyLineColors => creation de tab_labels: ok mais les positions sont pas encore au point
-  ;if ( isvar("labels")) then 
-  ;  res@xyExplicitLegendLabels=str_split(labels,"$")
-  ;end if
+ 
   if ( isvar("labels")) then
     tab_labels=str_split(labels,"$")
   end if
@@ -149,6 +148,7 @@ begin
       restick@ttmFormat=fmt  
     else
       ymdhms0 = cd_calendar(all_Xaxis,0)
+      ;testlv=cd_calendar(ax,1) ;YYYYMM - opt=2 <=> YYYYMMDD
       ymdhms0dim = dimsizes(ymdhms0)
       nt = ymdhms0dim(0)
       print(ymdhms0)
@@ -178,9 +178,7 @@ begin
     time_axis_labels(filesLV[0]->$var$&$coordLV$,res,restick) 
     print(filesLV[0]->$var$&$coordLV$)
   end if
-  ;  testlv=cd_calendar(ax,1) ;YYYYMM - opt=2 <=> YYYYMMDD
-  ;  print(testlv)
-
+ 
   wks = gsn_open_wks ("png",plotname)             ; open workstation
 
   do i=0, n-1 
@@ -233,7 +231,8 @@ begin
         if (i .eq. 0 ) then 
           print(ax)
           print(fld)
-          res@pmLegendParallelPosF   = 0.15
+          res@pmLegendParallelPosF   = 0.5;0.15
+          res@pmLegendOrthogonalPosF = -0.1    
           if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
             if (ax@positive .eq. "down") then 
               res@trYReverse = True ; reverse Y-axis
@@ -252,7 +251,12 @@ begin
         else
           print(ax)
           print(fld)
-          res@pmLegendParallelPosF   = 0.81
+          res@pmLegendParallelPosF   = 0.85;0.5;0.15 ;0.81
+          res@pmLegendOrthogonalPosF = -0.1;tmp: 0.
+          
+          ;ici iterer iter_lg
+          ; si >4 changer res@pmLegendParallelPosF a 0.15 + ..*i
+
           if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
             if (ax@positive .eq. "down") then 
               res@trYReverse = True ; reverse Y-axis
@@ -280,7 +284,9 @@ begin
     end if 
     
   end do ; loop on files  
-  
+
+
+
   draw(plot)
   frame(wks)
 
