@@ -18,8 +18,11 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
+    #       commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #tmp  export CLIMAF_FIX_NEMO_TIME='on'
+    cscript('select' ,'/mnt/nfs/d3/aster/data3/aster/senesi/dev/climaf/scripts/mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)    
     #
     cscript('ccdo',
             scriptpath+'mcdo.sh ${operator} "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
@@ -70,7 +73,7 @@ def load_standard_operators():
             'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
     #
-    # Operators CDFTools
+    # CDFTools operators 
     #
     #cdfmean
     #
@@ -90,68 +93,36 @@ def load_standard_operators():
     #cdftransport : case where VT file must be given 
     #
     cscript('cdftransport',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file; (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}; cdo selname,vtrp climaf_transports.nc ${out}; cdo selname,htrp climaf_transports.nc ${out_htrp}; cdo selname,strp climaf_transports.nc strp.nc; rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt', htrp_var='toto')
+            scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} ${imin} ${imax} ${jmin} ${jmax} "${opt1}" "${opt2}" ${out} ')
     #
-    #2 "bugs"
-    #1: necessite en premier un executable donc jai mis temporairement un echo
-    #2: bug avec les fichiers outputs ${out_word}, quand ce sera resolu faire:
-    #cdo selname,htrp climaf_transports.nc ${out_htrp}; cdo selname,strp climaf_transports.nc ${out_strp}; rm -f climaf_transports.nc'
+    #sans appel du script 'cdftransport.sh' et avec les ${out_var} a tester
+    #cscript('cdftransport',
+    #        'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file; (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}; cdo selname,vtrp climaf_transports.nc ${out}; cdo selname,htrp climaf_transports.nc ${out_htrp}; cdo selname,strp climaf_transports.nc ${out_strp}; rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt', htrp_var="var_htrp", strp_var="var_strp")
           
     #
     #cdfheatc 
     #
     cscript('cdfheatc',
             'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file')
-    #
-    #2 "bugs"
-    #1: necessite en premier un executable donc jai mis temporairement un echo
-    #2: pb avec le fichier IN. Quand on le scinde en fichiers mono-variables (en utilisant cdo selname), comme la variable 'time_counter' du fichier IN ne contient pas de data, 'cdo selname' la remplace par 't_ave_01month' => pb...
-    #Car 'cdfheatc' a besoin de la var 'time_counter' dans le fichier .nc IN (meme si elle ne contient pas de data) alors que 'cdo selname' a besoin de data dans la variable temporelle pr extraire des data... Il prend donc la var ayant des data.
-    #Donc il faut: soit des data dans la var 'time_counter', soit remplacer cn_t='time_counter' par cn_t='t_ave_01month' dans modcdfnames.f90 (pr que la var lue dans les fichiers nc soit 't_ave_01month' et non 'time_counter').
-
+   
     # 
-    #cdfsections -non teste au vu du bug 2-
+    #cdfsections -non teste car quelles variables faut-il dans les fichiers U, V et T ? (et bug hors CliMAF)-
     #
     cscript('cdfsections',
             'cdfsections ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}; mv section.nc ${out}; rm -f section.nc')
-    #
-    #2 "pbs" hors CliMAF:
-    #1: necessite de remplacer dans 'cdfsections.f90',les variables: "vosaline" par cn_vosaline, "votemper" par cn_votemper et "vomecrty" par cn_vomecrty
-    #2: un pb persiste hors CliMAF: La variable 'time_counter' est presente dans les fichiers U et V (entete et data) mais pas dans T (entete mais pas de data).
 
     #
     #cdfmxlheatc
     #
     cscript('cdfmxlheatc',
             'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file')
-    #
-    #1 "contrainte":
-    #Dans 'cdfmxlheatc.f90', la mixed_layer souhaitee est 'cn_somxl010' mais elle n est pas disponible.
-    #Dans 'modcdfnames.f90', il y en a 2 possibles: cn_somxl010='somxl010' ou cn_somxlt02='somxlt02'. Dans le fichier IN nc, la variable est 'omlmax'.
-    #Donc:
-    #dans 'modcdfnames.f90': remplacer cn_somxlt02='somxlt02' par  cn_somxlt02='omlmax' (car le fichier nc contient la variable 'omlmax')
-    #dans 'cdfmxlheatc.f90': remplacer 'cn_somxl010' par 'cn_somxlt02'.
-    #
-    #2 bugs idem que cdfheatc:
-    #1: necessite en premier un executable donc jai mis temporairement un echo
-    #2:pb avec le fichier IN. Quand on le scinde en fichiers mono-variables (en utilisant cdo selname), comme la variable 'time_counter' du fichier IN ne contient pas de data, 'cdo selname' la remplace par 't_ave_01month' => pb...
-    #Car 'cdfmxlheatc' a besoin de la var 'time_counter' dans le fichier .nc IN (meme si elle ne contient pas de data) alors que 'cdo selname' a besoin de data dans la variable temporelle pr extraire des data... Il prend donc la var ayant des data.
-    #Donc il faut: soit des data dans la var 'time_counter', soit remplacer cn_t='time_counter' par cn_t='t_ave_01month' dans modcdfnames.f90 (pr que la var lue dans les fichiers nc soit 't_ave_01month' et non 'time_counter').
 
     #
     #cdfstd
-    #ins cdfmoystd
-    cscript('cdfstd',
-            'cdfstd ${opt} ${in_1} ${in_2}; mv cdfstd.nc ${out}; rm -f cdfstd.nc')
     #
-    #Pb 1: comment faire vu que le nombre de fichiers IN (et donc de variables) n est pas fixe pour cet operateur ? Ou comment rendre un fichier IN optionnel ? Car ${in_1} ${in_2} signifie qu on ne peut donner qu exactement 2 variables en entree.
-    #Remarque importante pour l'integration dans Climaf: si c'est le meme fichier, cdfstd calcule de la meme facon que s il ne l avait qu une fois en argument (donc utilisation d un cdo merge inutile).
-    #Faire 2 operateurs pr le cas ou l argument -save est utilise => cdfmoy.nc ?
-    #Creer une sortie ${out_cdfmoystd} - a voir
-
-    #1 bug idem que cdfheatc:
-    #pb avec les fichiers IN. Si un fichier IN ne contient pas de data pour la variable 'time_counter', le resultat est faux: il contient des zeros pour les variables calculees.
-    #Si on utilise le calcul de cdfstd hors Climaf, le resultat est ok meme si la variable 'time_counter' ne contient pas de data. Car 'cdfstd' a besoin de la var 'time_counter' dans le fichier .nc IN (meme si elle ne contient pas de data) alors que Climaf (qui doit utiliser 'cdo selname' pr l'extraction des donnees) a besoin de data dans la variable temporelle pr extraire des data... sans data, il doit faire une extraction fausse.
-    #Donc il faut: soit des data dans la var 'time_counter', soit remplacer cn_t='time_counter' par cn_t='t_ave_01month' (present dans les fichiers nc ne contenant pas de data pour 'time_counter') dans modcdfnames.f90 (pr que la var lue dans les fichiers nc soit 't_ave_01month' et non 'time_counter'). En sachant que ces deux variables sont sans doute differentes...
-    # => fonctionne pour les fichiers contenant des data pour time_counter
-    
+    cscript('cdfstd',
+            'cdfstd ${opt} ${ins}; mv cdfstd.nc ${out}; rm -f cdfstd.nc')
+    #
+    cscript('cdfstdmoy',
+            'cdfstd -save ${opt} ${ins}; mv cdfmoy.nc ${out}; rm -f cdfmoy.nc')
+    #
