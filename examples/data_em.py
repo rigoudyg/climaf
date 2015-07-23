@@ -12,7 +12,7 @@ dataloc(project="EM", organization="EM", url=["dummy"])
 cdef("frequency","monthly") ;  
 
 # Define your dataset (a number of facets take default values)
-tas=ds(project="EM", experiment="GSAGNS1", variable="tas", period="1975", realm="L")
+tas=ds(project="EM", simulation="GSAGNS1", variable="tas", period="1975", realm="L")
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations 
@@ -30,7 +30,7 @@ os.system("ls -al "+my_file)
 #os.system("type ncdump && ncdump -h "+my_file)
 
 # Test access to Ocean data
-tos=ds(project="EM", experiment="CSU260a", variable="tos", period="213001", realm="O")
+tos=ds(project="EM", simulation="CSU260a", variable="tos", period="213001", realm="O")
 print(tos.baseFiles())
 
 # Remap Ocean data to atmospheric grid. Use remapbil because default remapcon2 option needs cell areas

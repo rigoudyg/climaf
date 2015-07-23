@@ -167,6 +167,9 @@ begin
         ;We have a true cross-section or a horizontal map
         if logp  then useXY=False end if
         latname="lat"
+        if .not. ismissing(str_match(Var_DimNames,"latitude"))
+          latname="latitude"
+        end if
         if (ismissing(str_match(Var_DimNames,"lat"))) then
           if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
             useLatDim=True
@@ -176,6 +179,9 @@ begin
         latdim=ffile->$latname$
         ;
         lonname="lon"
+        if .not. ismissing(str_match(Var_DimNames,"longitude"))
+          lonname="longitude"
+        end if
         if (ismissing(str_match(Var_DimNames,"lon"))) then 
           if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
             useLonDim=True
@@ -201,16 +207,16 @@ begin
     
 
   units=units
-  fld=fld*scale+offset
+  fld=fld*tofloat(scale)+tofloat(offset)
   
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
     power10=floattoint(log10(dim_max(ndtooned(fld))))
     if power10.ge.4 then
       fld=fld/10^power10
-      vmin=vmin/10^power10
-      vmax=vmax/10^power10
-      vdelta=vdelta/10^power10
+      vmin=tofloat(vmin/10^power10)
+      vmax=tofloat(vmax/10^power10)
+      vdelta=tofloat(vdelta/10^power10)
     end if
   else
     power10=0

@@ -12,7 +12,7 @@ CNRM's Lustre, using the pre-defined 'projects' : gpcp, gpcc, erai, erai-land, c
 from climaf.api import *
 
 if not atCNRM :
-    print "This exaple script access data available only at CNRM"
+    print "This example script access data available only at CNRM"
     exit(0)
 
 # Playing with GPCP data
@@ -81,7 +81,6 @@ f=timeplot(tcru_yga,title="Tempe CRUTS3")
 
 # CERES
 ###########################
-from climaf.api import *
 rlut=ds(project='ceres', variable='rlut',period='2001-2013')
 # Compute annual cycle
 rlut_cycle=ccdo(rlut,operator='ymonavg')

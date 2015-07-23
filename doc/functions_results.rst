@@ -27,6 +27,26 @@ cpage : create an array of figures
 .. autoclass:: climaf.classes.cpage
 
 
+html : create an html index, with tables of links to figures
+------------------------------------------------------------
+
+.. automodule:: climaf.html
+
+.. autofunction:: climaf.html.html_header
+
+.. autofunction:: climaf.html.html_section
+
+.. autofunction:: climaf.html.html_open_table
+
+.. autofunction:: climaf.html.html_table_line
+
+.. autofunction:: climaf.html.html_table_lines
+
+.. autofunction:: climaf.html.html_close_table
+
+.. autofunction:: climaf.html.html_trailer
+
+
 clist : tell what's in cache, and much more
 -------------------------------------------
 

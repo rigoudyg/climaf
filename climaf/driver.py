@@ -4,10 +4,11 @@ CliMAF driver
 There is quite a lot of things to document here. Maybe at a later stage ....
 
 """
+from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-import os, os.path, re, posixpath, subprocess, time, shutil, copy
+import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
 
 # Climaf modules
@@ -20,7 +21,7 @@ from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
 
-def capply (climaf_operator, *operands, **parameters):
+def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
     
     Returns results as a list of CliMAF objects and stores them if auto-store is on
@@ -191,13 +192,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 extract=capply('select',ds)
                 if extract is None :
                     raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
-                rep=ceval(extract,userflags=userflags,format=format,deep=deep,recurse_list=recurse_list)
-                userflags.canSelectVar=False
-                userflags.canSelectTime=False
-                userflags.canSelectDomain=False
-                userflags.canAlias=False
-                userflags.canMissing=False
-                userflags.canSelectTime=False
+                rep=ceval(extract,userflags=userflags,format=format)
+                userflags.unset_selectors()
                 cdedent()
                 return rep
         else :
@@ -212,16 +208,10 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return(ds.adressOf())
             else :
                 clogger.debug("Must remote read and cache " )
-                # Assume remoteRead fetches the strict minimum 
-                extract=cache.remoteRead(ds)
+                rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
+                userflags.unset_selectors()
                 cdedent()
-                if (format == 'file' ) :
-                    cachefile=cstore(extract)
-                    clogger.debug("And provide cache file reference " )
-                    return cachefile
-                else :
-                    clogger.debug("And provide in-memory object " )
-                    return(extract)
+                return rep
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
              isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cens) : 
@@ -327,7 +317,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     """ Actually applies a CliMAF-declared script on a script_call object 
     
     Prepare operands as fiels and build command from operands and parameters list
-    Assumes that scripts are described in dictionnary 'scripts'  by templates as
+    Assumes that scripts are described in dictionary 'scripts'  by templates as
     documented in operators.cscript
     
     Returns a CLiMAF cache data filename
@@ -372,8 +362,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 subdict["missing"]=missing
         if isinstance(op,classes.cens) :
             if not multiple :
-                raise Climaf_Driver_Error("Script %s 's input #%s cannot accept ensemble %s"\
-                                          %(scriptCall.script,0,`op`))
+                raise Climaf_Driver_Error(
+                    "Script %s 's input #%s cannot accept ensemble %s"\
+                        %(scriptCall.script,0,`op`))
             #subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
             subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
         per=timePeriod(op)
@@ -488,7 +479,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if ok : 
                 duration=time.time() - tim1
                 print("Done in %.1f s with script computation for %s "%\
-                          (duration,`scriptCall`))
+                          (duration,`scriptCall`),file=sys.stderr)
                 clogger.debug("Done in %.1f s with script computation for "
                               "%s (command was :%s )"%\
                                   (duration,`scriptCall`,template))
@@ -670,7 +661,7 @@ def set_variable(obj, varname, format) :
 # Commodity functions
 #########################
 
-def cfile(object,target=None,ln=None,deep=None) :
+def cfile(object,target=None,ln=None,hard=None,deep=None) :
     """
     Provide the filename for a CliMAF object, or copy this file to target. Launch computation if needed. 
 
@@ -678,10 +669,16 @@ def cfile(object,target=None,ln=None,deep=None) :
     
       object (CliMAF object) : either a dataset or a 'compound' object (e.g. the result of a CliMAF operator)
 
-      target (str, optional) : name of the destination file or link; CliMAF will anyway store the result
-       in its cache; 
+      target (str, optional) : name of the destination file in case you really need another
+       filename; CliMAF will then anyway also store the result in its cache,  either as a copy
+       (default), or a sym- or a hard-link (see below); 
 
-      ln (logical, optional) : if True, target is created as a symlink to the CLiMAF cache file
+      ln (logical, optional) : if True, CliMAF cache file is created as a symlink to the target;
+       this allows to cross filesystem boundaries, while still saving disk space (wrt to a copy);
+       CliMAF will manage the broken link cases (at the expense of a new computation)
+
+      hard (logical, optional) : if True, CliMAF cache file is created as a hard link to the target;
+       this allows to save disk space, but does not allow to cross filesystem boundaries
 
       deep (logical, optional) : governs the use of cached values when computing the object:
       
@@ -697,7 +694,8 @@ def cfile(object,target=None,ln=None,deep=None) :
        - if target is provided, returns this filename (or linkname) if computation is 
          successful ('target' contains the result), and None otherwise;
        
-       - if target is not provided, returns the filename in CliMAF cache, which contains the result (and None if failure)
+       - if target is not provided, returns the filename in CliMAF cache, which contains
+         the result (and None if failure)
        
 
     """
@@ -705,14 +703,30 @@ def cfile(object,target=None,ln=None,deep=None) :
     result=climaf.driver.ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
+        target=os.path.abspath(os.path.expanduser(target))
         if (isinstance(object,climaf.classes.cens)) :
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is not None :
-            if ln :
-                os.remove(os.path.expanduser(target))
-                os.symlink(result,os.path.expanduser(target))
+            if ln or hard :
+                if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
+                elif ln :
+                    if not os.path.samefile(result,target):
+                        shutil.move(result,target)
+                        if os.path.exists(result) : os.remove(result)
+                        os.symlink(target,result)
+                else:
+                    # Must create hard link
+                    # If result is a link, follow links for finding source of hard link
+                    source=os.readlink(result)
+                    if (source == target):
+                        # This is a case where the file had already been symlinked to the same target name
+                        shutil.move(source,result)
+                        os.link(result,target)
+                    else :
+                        if os.path.exists(target) : os.remove(target)
+                        os.link(source,target)
             else :
-                shutil.copyfile(result,os.path.expanduser(target))
+                shutil.copyfile(result,target)
         return target
 
 def cshow(obj) :

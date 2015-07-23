@@ -8,8 +8,9 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 # Created : S.Senesi - 2014
 
 import sys, os, os.path, re, time, glob
+import pickle
 
-from classes import compare_trees, cobject, ctree, cdataset
+from classes import compare_trees, cobject, ctree, cdataset, cprojects, guess_projects
 from cmacro  import crewrite
 from clogging import clogger
 import operators
@@ -32,7 +33,6 @@ def setNewUniqueCache(path) :
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
     craz(hideError=True)
-    print "cache directory set to : "+currentCache
 
 def generateUniqueFileName(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
@@ -97,13 +97,22 @@ def stringToPath(name, length) :
     return rep
 
 def searchFile(path):
-    """ Search for first occurrence of PATH as a path in all directories listed in CACHEDIRS"""
+    """ Search for first occurrence of PATH as a path in all 
+    directories listed in CACHEDIRS
+    """
     for cdir in cachedirs :
         candidate=os.path.expanduser(cdir+"/"+path)        
-        if os.path.exists(candidate): return candidate
+        if os.path.lexists(candidate):
+            # If this is a broken link, delete it ~ silently and return None
+            if not os.path.exists(candidate):
+                clogger.debug("Broken link for %s was deleted"%candidate)
+                os.remove(candidate)
+                return None
+            return candidate
 
 def register(filename,crs):
-    """ Adds in FILE a metadata named CRS_def and with value CRS. Records this FILE in dict crs2filename
+    """ Adds in FILE a metadata named CRS_def and with value CRS. 
+    Records this FILE in dict crs2filename
 
     Silently skip non-existing files
     """
@@ -183,10 +192,15 @@ def hasMatchingObject(cobject,ds_func) :
         import operators
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
-    for crs in crs2filename :
+    for crs in crs2filename.copy() :
         co=eval(crs, sys.modules['__main__'].__dict__)
         altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
-        if altperiod : return co,altperiod
+        if altperiod :
+            if os.path.exists(crs2filename[crs]) :
+                return co,altperiod
+            else :
+                clogger.debug("Removing %s from cache index, because file is missing",crs)
+                crs2filename.pop(crs)
     return None,None
 
 def hasIncludingObject(cobject) :
@@ -206,7 +220,12 @@ def hasExactObject(cobject) :
     # First read index from file if it is yet empty
     # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
     if cobject.crs in crs2filename :
-        return (crs2filename[cobject.crs])
+        f=crs2filename[cobject.crs]
+        if os.path.exists(f) :
+            return f
+        else :
+            clogger.debug("Dropping cobject.crs from cache index, because file si missing")
+            crs2filename.pop(cobject.crs)
 
 def complement(crsb, crse, crs) :
     """ Extends time period of file object of CRSB (B for 'begin')
@@ -241,7 +260,7 @@ def cdrop(obj, rm=True) :
 
     Example ::
 
-    >>> dg=ds(project='example', experiment='AMIPV6ALB2G', variable='tas', period='1980-1981')
+    >>> dg=ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
     >>> f=cfile(dg)
     >>> os.system('ls -al '+f)
     >>> cdrop(dg)
@@ -259,24 +278,29 @@ def cdrop(obj, rm=True) :
     if crs in crs2filename :
         clogger.info("discarding cached value for "+crs)
         fil=crs2filename.pop(crs)
-        if rm : os.remove(fil)
-        return True
-        #except:
-        #    return False
+        if rm :
+            try :
+                os.remove(fil)
+                return True
+            except:
+                clogger.warning("When trying to remove %s : file does not exist in cache"%crs)
+                return False
     else :
         clogger.info("%s is not cached"%crs)
         return None
 
 def csync(update=False) :
     """
-    Write cache dictionnary to disk
-    If arg `update` is True, first updates dictionnary from actual cache file content
+    Write cache dictionary to disk
 
+    If arg `update` is True, first updates dictionary from actual 
+    cache file content
     """
     import pickle
     global cacheIndexFileName
 
-    #check if cache index is up to date, if it is not the function 'rebuild' is called
+    # check if cache index is up to date; if not the 
+    # function 'rebuild' is called
     if update :
         clogger.warning("Listing crs from files present in cache")
         crs_in_cache=list_cache()
@@ -293,12 +317,11 @@ def csync(update=False) :
     cacheIndexFile.close()
 
 def cload() :
-    import pickle
-    global crs2filename #pb sans cette declaration
+    global crs2filename 
 
     if len(crs2filename) != 0 :
-        clogger.critical("attempt to reset file index - would lead to inconsistency !")
-        return 
+        Climaf_Driver_Error(
+            "attempt to reset file index - would lead to inconsistency !")
     try :
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "r")
         crs2filename=pickle.load(cacheIndexFile)
@@ -307,16 +330,31 @@ def cload() :
         pass
         #clogger.debug("no index file yet")
     #
+    inconsistents=[]
     for crs in crs2filename.copy() :
         # We may have some crs inherited from past sessions and for which
         # some operator may have become non-standard
         try :
             eval(crs, sys.modules['__main__'].__dict__)
         except:
-            clogger.warning("Inconsistent cache object is skipped : %s"%crs)
+            #clogger.debug("Inconsistent cache object is skipped : %s"%crs)
             crs2filename.pop(crs)
-
-
+            inconsistents.append(crs)
+    # Analyze projects of inconsistent cache objects
+    projects=set()
+    for crs in inconsistents : 
+        ps=guess_projects(crs)
+        for p in ps :
+            if p not in cprojects : projects.add(p)
+    if projects :
+        clogger.error( 
+            "The cache has %d objects for non-declared projects %s.\n"
+            "For using it, consider including relevant project(s) "
+            "declaration(s) in ~/.climaf and restarting CliMAF.\n"
+            "You can also declare these projects right now and call 'csync(True)'\n"
+            "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
+                (len(inconsistents),`list(projects)`))
+        
 def craz(hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index

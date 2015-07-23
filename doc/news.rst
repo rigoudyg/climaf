@@ -4,7 +4,52 @@
 Whats' new
 ------------
 
+.. |indx| image:: html_index.png 
+  :scale: 13%
+
+.. _screen_dump: ../../html_index.png 
+
 Changes, newest first :
+
+.. _news_0.8:
+
+- 2015/07/08 - Version 0.8 :
+
+
+ - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
+   facet/attribute 'experiment' was renamed 'simulation'**. It is used
+   it for hosting either CMIP5's facet/attribute 'rip', or for 'EXPID'
+   at CNRM, or for JobName at IPSL. All 'projects' and
+   examples have been changed accordingly. A facet 'experiment' was
+   added to project CMIP5 (for hosting the 'CMIP5 controlled' experiment name)
+ - Package climaf.html allows to **easily create an html index**, which includes
+   tables of links (or thumbnails) to image files; iterating on
+   e.g. seasons and variables is handled by CliMAF. See :
+
+   - a screen_dump for such an index : |indx| 
+   - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
+   - the package documentation : :py:mod:`climaf.html`
+ - Binary ``climaf`` can be used as a **back end** in your scripts,
+   feeding it with a string argument. See :ref:`backend`
+ - Function :py:func:`~climaf.driver.cfile` can create **hard links** :
+   the same datafile will (or inode) exists with two filenames (one in
+   CliMAF cache, one which is yours), while disk usage is counted only
+   for one datafile; you may remove any of the two file(name)s
+   as you want, without disturbing accessing the data with the other filename.
+ - When creating a symlink between a CliMAF cache file and another
+   filename with function :py:func:`~climaf.driver.cfile` : **the
+   symlink source file is now 'your' filename**; hence, no risk that some
+   CliMAF command does erase it 'in your back'; and CliMAf will nicely
+   handle broken symlinks, when you erase 'your' files
+ - **default values for facets** are now handled on a per-project
+   basis. See :py:func:`~climaf.classes.cdef()` and
+   :py:class:`~climaf.classes.cdataset()`. 
+ - scripts argument 'labels' now uses '$' as a separator
+ - fixes :
+
+  - check that no dataset attribute include the separator defined for
+    corresponding project
+  - fix issues at startup when reading cache index
 
 .. _news_0.7:
 

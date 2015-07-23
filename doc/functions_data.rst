@@ -37,7 +37,7 @@ cproject : declare a new project and its non-standard attributes/facets
 
 .. autoclass:: climaf.classes.cproject
 
-cprojects : dictionnary of known projects
+cprojects : dictionary of known projects
 --------------------------------------------------------------------------
 
 .. autodata:: climaf.classes.cprojects
@@ -47,10 +47,10 @@ dataloc : describe data locations for a series of experiments
 
 .. autoclass:: climaf.dataloc.dataloc
 
-cdefaults: list of default values
+cdefault: set or get a default value for some data attribute/facet
 --------------------------------------------------------------------------
 
-.. autodata:: climaf.classes.cdefaults
+.. autofunction:: climaf.classes.cdef
 
 derive : define a variable as computed from other variables
 --------------------------------------------------------------------------

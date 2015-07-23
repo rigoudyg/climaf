@@ -13,9 +13,9 @@ from climaf.api import *
 class A_basic(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_basic"))
-        #dataloc(project="example", experiment="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+        #dataloc(project="example", simulation="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
         cdef("frequency","monthly")
-        self.dg=ds(project="example", experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
+        self.dg=ds(project="example", simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
         self.dir=dict()
 
     def test_1_print_dataset(self):

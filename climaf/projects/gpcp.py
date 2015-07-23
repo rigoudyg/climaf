@@ -24,7 +24,7 @@ from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('gpcp','grid', 'frequency', separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'
+    cproject('gpcp','grid', ('frequency','monthly'), separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'
 
     root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
     patmonth=root+"_mean/gpcp/${variable}_gpcp.${grid}.nc"

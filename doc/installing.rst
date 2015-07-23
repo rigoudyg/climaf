@@ -1,12 +1,11 @@
-----------------------------
-Installing / running 
-----------------------------
-
+---------------------------------
+Installing, configuring, using 
+---------------------------------
 
 .. _installing:
 
-Installing (or not)
--------------------------
+Installing (or using an installed version, at CNRM or IPSL)
+-----------------------------------------------------------
 
 - If working on IPSL's Ciclad, at CNRM or on MF's Beaufix HPC machine, you do not need to install CliMAF; just 
   do as indicated below (as e.g. in section :ref:`running_inter`), replacing ``<some_installation_dir>`` by :
@@ -32,7 +31,8 @@ Installing (or not)
      cd testing
      ./test_install.sh 
   
-    and check the output of last command
+    and check the output of last command. Contact 'climaf at meteo dot
+    fr' in case of problem at that stage
 
 
 .. _configuring:
@@ -40,26 +40,27 @@ Installing (or not)
 Configuring CliMAF
 ---------------------
 
-CliMAF do interpret some environment variables :
+- CliMAF do interpret some environment variables :
 
-- CLIMAF_CACHE : a directory used for storing intermediate results,
-  and those final results which are not explicitly copied elsewhere;
-  defaults to ~/tmp/climaf_cache. 
+ - CLIMAF_CACHE : a directory used for storing intermediate results,
+   and those final results which are not explicitly copied elsewhere;
+   defaults to ~/tmp/climaf_cache. 
 
-- CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
-  verbosity level on stderr (resp. on file climaf.log); defaults to
-  'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
+ - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
+   verbosity level on stderr (resp. on file climaf.log); defaults to
+   'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
 
-You may put in file ``~/.climaf`` any python code using CliMAF
-functions; this will be executed at the end of climaf import; the code 
-must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
-benefit from the intractive shortcuts defined in climaf.api (as
-described below in :ref:`running_inter`
+- Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
+  functions; this will be executed at the end of climaf import; the code 
+  must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
+  benefit from the intractive shortcuts defined in climaf.api (as
+  described below in :ref:`running_inter`)
 
+- Environment :
 
-If running on Beaufix, you must setup your environment by::
+  - If running on Beaufix, you must setup your environment by::
 
-  $ module load python/2.7.5 nco ncview ncl
+    $ module load python/2.7.5 nco ncview ncl
 
 
 .. _running_inter:
@@ -77,13 +78,17 @@ files); then, you can either :
 
   - set your PATH e.g. in your ``~/.profile`` file::
 
-    $ export PATH=$PATH::<some_installation_dir>/climaf/bin
+    $ export PATH=$PATH:<some_installation_dir>/climaf/bin
 
   - and then launch CliMAF ::
 
     $ climaf
 
     >>>         #(this is the Python prompt)
+
+  - you may of course also directly type ::  
+
+    $ <some_installation_dir>/climaf/bin/climaf
 
 
 - or import ``climaf.api.*`` in your python environment :
@@ -104,6 +109,30 @@ files); then, you can either :
 
 Please see also : :ref:`examples`
 
+
+.. _backend:
+
+Using CliMAF as a back end in your scripts 
+--------------------------------------------
+
+Binary ``climaf`` described above (and located in ``<some_installation_dir>/climaf/bin``) can
+be used with a string argument which is a series of valid CliMAF
+commands. It will then run silently in the background (up to the point
+where an error occurs) and may be used e.g. to get the filename for a
+result handled by CliMAF in its cache. 
+
+As an example, if your CliMAF startup file (see :ref:`configuring`) does import the necessary
+modules for defining function ``season.clim``, you may write::
+
+ $ climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980-1999'))"
+
+or even:: 
+
+ $ file=$(climaf "print cfile(season.clim('CNRM-CM','PRE6.2T127Cr2E','pr','JJAS','1980-1999'))")
+
+
+This can be handy for letting CliMAF handle your climatology files in
+its cache
 
 .. _library:
 

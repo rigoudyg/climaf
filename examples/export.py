@@ -9,7 +9,7 @@ cdef("project","example")
 cdef("frequency","monthly")
 
 # Define some dataset you want to study ( a number of facets take default values )
-dg=ds(experiment="AMIPV6ALB2G", variable="tas", period="1980-1981")
+dg=ds(simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
 
 # Compute its space_average using a CliMAF standard operator based on a script based on CDO 
 sa=space_average(dg)

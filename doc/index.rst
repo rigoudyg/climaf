@@ -27,8 +27,7 @@ So, CliMAF can be described as :
 
 - a way to share advanced climate diagnostic modules 
 - an actual repository for such modules
-- and (to be developped) a visualisation engine for the corresponding
-  results
+- and a visualisation engine for the corresponding results
 
 
 Description 

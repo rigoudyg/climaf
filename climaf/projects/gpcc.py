@@ -31,7 +31,7 @@ if atCNRM:
     # Defining alias and derived variables for GPCC, together with filenames
     ##############################################################################
 
-    calias("gpcc",'pr'       ,'GPCC' ,scale=1./86400. ,filenameVar='GPCC',missing=1.e+20, units="kg m-2 s-1")
+    calias("gpcc",'pr'       ,'GPCC' ,scale=1./86400. ,missing=1.e+20, units="kg m-2 s-1")
 
     #calias("gpcc",'GPCC'    ,'GPCC' ,                                   ,units="mm/day")
     #NSTA:="Number of stations available for a specific analysis grid in a specific month" 

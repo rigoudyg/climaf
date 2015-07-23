@@ -13,9 +13,9 @@ from climaf.api import *
 # Reset CliMAF cache content
 craz()
 
-# Define data location for an experiment, as concisely as possible
+# Define data location for an simulation, as concisely as possible
 cdef("project","example")
-cdef("experiment","AMIPV6ALB2G")
+cdef("simulation","AMIPV6ALB2G")
 cdef("variable","tas")
 
 # Define a 1-year dataset and have it written to cache

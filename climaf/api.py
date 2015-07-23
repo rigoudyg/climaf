@@ -9,7 +9,7 @@ Main functions are :
 
  - ``cproject``: declare a project and its non-standard attributes/facets
 
- - ``dataloc`` : set data locations for a series of experiments
+ - ``dataloc`` : set data locations for a series of simulations
 
  - ``cdef``    : define some default values for datasets attributes
 
@@ -73,7 +73,7 @@ from cmacro    import macro,cmacros
 from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts, derive, operators
-from cache     import craz, csync as csave , cdump, cdrop,  clist, cls, crm, cdu, cwc
+from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
 from clogging  import clogger, clog, clog_file
 from site_settings import atCNRM, onCiclad
 
