@@ -310,8 +310,14 @@ class cscript():
     
 #LV
 def fixed_fields(name, target, link):
-    scripts[name].fixedfields=(target, link)
-    return target, link
+    if not isinstance(name,list):
+        namelist=list()
+        namelist.append(name)
+    else:
+        namelist=name
+    for name_op in namelist:
+        scripts[name_op].fixedfields=(target, link)
+        #return target, link
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 

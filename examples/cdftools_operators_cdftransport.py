@@ -21,6 +21,14 @@ cdef("frequency","monthly")
 # for heat and salt transport) are defined
 cdef("project","NEMO")
 
+tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
+lpath='/cnrm/aster/data3/aster/vignonl/code/climaf/'
+
+# How to get required files for cdftransport
+fixed_fields('cdftransport',
+             target=[tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
+             link=[lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+
 # Define dataset with uo ("uo" in .nc <=> "vozocrtx" for cdftools),
 # vo ("vo" in .nc <=> "vomecrty" for cdftools), vt (:=vomevt), vs (:=vomevs),
 # ut (:=vozout), us (:=vozous) for heat and salt transport
@@ -31,9 +39,10 @@ d4=ds(experiment="PRE6CPLCr2alb", variable="vomevs", period="199807",grid='VT')
 d5=ds(experiment="PRE6CPLCr2alb", variable="vozout", period="199807",grid='VT')
 d6=ds(experiment="PRE6CPLCr2alb", variable="vozous", period="199807",grid='VT')
 
-# How to get required files for cdftransport
-fixed_fields('cdftransport',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
-# Compute the transport accross specified section
+# Compute the transports accross specified section
 my_cdftransport=cdftransport(d3,d4,d5,d6,d1,d2,imin=117,imax=117,jmin=145,jmax=147,opt2='-full')
 cfile(my_cdftransport)
+cfile(my_cdftransport.htrp)
+cfile(my_cdftransport.strp)
+
+#diff= transports("PRE6CPLCr2alb","199807") - transports("PRE6CPL_toto","199810") 

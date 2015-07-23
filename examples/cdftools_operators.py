@@ -1,19 +1,22 @@
 # Examples for some operators cdftools:
 #
 # - cdfmean =>
-#    * cdfmean : computes the mean value of the field, 2D or 3D (output: excluded profile)
-#    * cdfmean_profile : vertical profile of horizontal means for 3D fields (output: excluded mean value)
-#    * cdfvar : compute the spatial variance, 2D or 3D (output: excluded mean value, profile and variance of profile)
-#    * cdfvar_profile : vertical profile of spatial variance (output: excluded mean value, profile and variance)
+#    * ccdfmean : computes the mean value of the field, 2D or 3D (output: excluded profile)
+#    * ccdfmean_profile : vertical profile of horizontal means for 3D fields (output: excluded mean value)
+#    * ccdfvar : compute the spatial variance, 2D or 3D (output: excluded mean value, profile and profile of variance)
+#    * ccdfvar_profile : vertical profile of spatial variance (output: excluded mean value, profile and variance)
 #
-# - cdfheatc (computes the heat content in the specified area)
+# - ccdfheatc (computes the heat content in the specified area)
 #
-# - cdfmxlheatc (computed the heat content in the mixed layer)
+# - ccdfmxlheatc (computed the heat content in the mixed layer)
 #
 # - cdfstd =>
-#    * cdfstd : compute the standard deviation of given variables
-#    * cdfstdmoy : compute the mean value of the field, in addition to the standard deviation
-
+#    * ccdfstd : compute the standard deviation of given variables
+#    * ccdfstdmoy : compute the mean value of the field, in addition to the standard deviation
+#
+# - cdfsections (computes temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang
+#                along a section made of Nsec linear segments)
+#
 
 from climaf.api import *
 from climaf.operators import *
@@ -28,49 +31,41 @@ cdef("project","EM")
 # cdfmean  IN-file IN-var T|U|V|F|W [imin imax jmin jmax kmin kmax]
 #        ... [-full] [-var] [-zeromean] 
 #
-# CliMAF usage (cdfmean, cdfmean_profile, cdfvar, cdfvar_profile) :
+# CliMAF usage (ccdfmean, ccdfmean_profile, ccdfvar, ccdfvar_profile) :
 #
+
+tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
+#tpath='/cnrm/aster/data3/aster/vignonl/${project}/'
+lpath='/cnrm/aster/data3/aster/vignonl/code/climaf/'
+
+# How to get required files for all cdftools binaries
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc','ccdfmxlheatc'],
+             target=[tpath+'ORCA1_mesh_mask.nc',tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
+             link=[lpath+'mask.nc',lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
 
 # For example, define dataset with sea water velocity ("uo")
 d1=ds(experiment="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 
-# How to get required files for cdfmean
-fixed_fields('cdfmean',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
-#fixed_fields('cdfmean',target=['/cnrm/aster/data3/aster/vignonl/${experiment}/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/vignonl/${project}/ORCA1_mesh_hgr.nc', '/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/climaf/mesh_zgr.nc'])
-
 # Compute some mean values
-my_cdfmean=cdfmean(d1,pos_grid='U')
+my_cdfmean=ccdfmean(d1,pos_grid='U')
 cfile(my_cdfmean)
 
-my_cdfmean2=cdfmean(d1,pos_grid='U',opt='-full')
+my_cdfmean2=ccdfmean(d1,pos_grid='U',opt='-full')
 cfile(my_cdfmean2)
 
-my_cdfmean3=cdfmean(d1,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+my_cdfmean3=ccdfmean(d1,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfmean3)
 
-
-# How to get required files for cdfmean_profile
-fixed_fields('cdfmean_profile',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
 # Compute vertical profile
-my_cdfmean_prof=cdfmean_profile(d1,pos_grid='U')
+my_cdfmean_prof=ccdfmean_profile(d1,pos_grid='U')
 cfile(my_cdfmean_prof)
 
-
-# How to get required files for cdfvar
-fixed_fields('cdfvar',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
 # Compute spatial variance
-my_cdfvar=cdfvar(d1,pos_grid='U')
+my_cdfvar=ccdfvar(d1,pos_grid='U')
 cfile(my_cdfvar)
 
-
-# How to get required files for cdfvar_profile
-fixed_fields('cdfvar_profile',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
 # Compute vertical profile of spatial variance
-my_cdfvar_prof=cdfvar_profile(d1,pos_grid='U')
+my_cdfvar_prof=ccdfvar_profile(d1,pos_grid='U')
 cfile(my_cdfvar_prof)
 
 
@@ -82,7 +77,7 @@ cfile(my_cdfvar_prof)
 # cdfheatc  T-file ...
 #     ... [imin imax jmin jmax kmin kmax] [-full] 
 #
-# CliMAF usage :
+# CliMAF usage (ccdfheatc) :
 #
 
 # Define dataset with salinity ("so" in .nc <=> "vosaline" for cdftools)
@@ -90,11 +85,8 @@ cfile(my_cdfvar_prof)
 d2=ds(experiment="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
 d3=ds(experiment="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
 
-# How to get required files for cdfheatc
-fixed_fields('cdfheatc',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_hgr.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_hgr.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
 # Compute the heat content in the specified area
-my_cdfheatc=cdfheatc(d2,d3,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+my_cdfheatc=ccdfheatc(d2,d3,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfheatc)
 
 
@@ -105,7 +97,7 @@ cfile(my_cdfheatc)
 # CDFtools usage :
 # cdfmxlheatc T-file [-full]
 #
-# CliMAF usage :
+# CliMAF usage (ccdfmxlheatc) :
 #
 
 # Define dataset with temperature ("thetao" in .nc <=> "votemper" for cdftools)
@@ -113,11 +105,8 @@ cfile(my_cdfheatc)
 d4=ds(experiment="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
 d5=ds(experiment="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")
 
-# How to get required files for cdfmxlheatc
-fixed_fields('cdfmxlheatc',target=['/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_mask.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_mesh_zgr.nc'], link=['/cnrm/aster/data3/aster/vignonl/code/climaf/mask.nc','/cnrm/aster/data3/aster/vignonl/code/climaf/mesh_zgr.nc'])
-
 # Compute the heat content in the mixed layer
-my_cdfmxlheatc=cdfmxlheatc(d4,d5)
+my_cdfmxlheatc=ccdfmxlheatc(d4,d5)
 cfile(my_cdfmxlheatc)
 
 
@@ -128,17 +117,43 @@ cfile(my_cdfmxlheatc)
 # CDFtools usage :
 # cdfstd [-save] [-spval0] [-nomissincl] [-stdopt] list_of files
 #
-# CliMAF usage (cdfstd, cdfstdmoy) : **mono-variable**
+# CliMAF usage (ccdfstd, ccdfstdmoy) : **mono-variable**
 #
 
 # For example, define dataset with mld ("omlmax") for period "199807-199810"
 d6=ds(experiment="PRE6CPLCr2alb", variable="omlmax", period="199807-199810", realm="O")
 
 # Compute the standard deviation of variable "omlmax"
-my_cdfstd=cdfstd(d6)
+my_cdfstd=ccdfstd(d6)
 cfile(my_cdfstd)
 
 # Compute the mean value and standard deviation of "uo" field (sea water velocity)
-my_cdfstd_moy=cdfstdmoy(d1)
+my_cdfstd_moy=ccdfstdmoy(d1)
 cfile(my_cdfstd_moy)
 
+
+#----------------
+#  cdfsections 
+#----------------
+#
+# CDFtools usage :
+# cdfsections  Ufile Vfile Tfile larf lorf Nsec lat1 lon1 lat2 lon2 n1
+#               [ lat3 lon3 n2 ] [ lat4 lon4 n3 ] ....
+#
+# CliMAF usage (ccdfsections) :
+#
+
+# Define dataset with temperature ("thetao" in .nc <=> "votemper" for cdftools),
+#
+#mld ("omlmax" in .nc <=> "somxlt02" for cdftools)
+#
+ds1=ds(experiment="PRE6CPLCr2alb", variable="so", period="199807", realm="O")      #<=> d2
+ds2=ds(experiment="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")  #<=> d3 & d4
+ds3=ds(experiment="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")  #<=> d5
+ds4=ds(experiment="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")      #<=> d1
+ds5=ds(experiment="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
+
+# Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang 
+# along a section made of Nsec linear segments
+my_cdfsections=ccdfsections(ds1,ds2,ds3,ds4,ds5,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
+cfile(my_cdfsections)

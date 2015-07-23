@@ -1,54 +1,103 @@
 
 
 stdout and stderr of script call :
-	 climaf/../scripts/mcdo.sh "" "/home/vignonl/tmp/climaf_cache/17/1.nc" "precip" "1980-01-01T00:00:00,1980-01-31T23:59:00" "" "pr,precip,0.000012,0.000000" "" "" /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
+	 /mnt/nfs/d3/aster/data3/aster/senesi/dev/climaf/scripts/mcdo.sh "" "/home/vignonl/tmp/climaf_cache/ff/e.nc" "rhopoto" "1998-07-01T00:00:00,1998-07-31T23:59:00" "" "" "" "" /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc 
 
 + operator=
 + shift
-+ outs=/home/vignonl/tmp/climaf_cache/17/1.nc
++ out=/home/vignonl/tmp/climaf_cache/ff/e.nc
 + shift
-+ var=precip
++ var=rhopoto
 + shift
-+ period=1980-01-01T00:00:00,1980-01-31T23:59:00
++ period=1998-07-01T00:00:00,1998-07-31T23:59:00
 + shift
 + region=
 + shift
-+ alias=pr,precip,0.000012,0.000000
++ alias=
 + shift
 + units=
 + shift
 + vm=
 + shift
 ++ mktemp -d --tmpdir climaf_mcdo_XXXXXX
-+ tmp=/tmp/climaf_mcdo_2OkrXo
-+ '[' precip ']'
-+ selvar=-selname,precip
-+ '[' 1980-01-01T00:00:00,1980-01-31T23:59:00 ']'
-+ seldate=-seldate,1980-01-01T00:00:00,1980-01-31T23:59:00
++ tmp=/tmp/climaf_mcdo_RmDKnE
++ CDO='cdo -f nc'
++ '[' 1998-07-01T00:00:00,1998-07-31T23:59:00 ']'
++ seldatebase=-seldate,1998-07-01T00:00:00,1998-07-31T23:59:00
++ '[' rhopoto ']'
++ [[ rhopoto != multi_* ]]
++ selvar=-selname,rhopoto
 + '[' '' ']'
-+ '[' pr,precip,0.000012,0.000000 ']'
-+ IFS=', '
-+ read var filevar scale offset
-+ selalias='-expr,pr=precip*0.000012+0.000000;'
 + '[' '' ']'
-+ i=0
-+ for out in '$outs'
-+ i=1
-+ eval 'files=$1'
-++ files=/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
++ '[' '' ']'
++ files=/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
 + vfiles=
++ vfiles_are_original=0
 + for file in '$files'
-++ basename /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
-+ tmp2=/tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
-+ rm -f /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
+++ basename /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
++ tmp2=/tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
++ rm -f /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
++ seldate=-seldate,1998-07-01T00:00:00,1998-07-31T23:59:00
++ '[' -seldate,1998-07-01T00:00:00,1998-07-31T23:59:00 ']'
+++ clim_timefix /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ file=/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ [[ /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc =~ IGCM_OUT.*SE/.*_SE_.*([0-9]{4})_[0-9]{4}_1M.*nc ]]
++ seldate='-seldate,1998-07-01T00:00:00,1998-07-31T23:59:00 '
++ '[' on '!=' no ']'
+++ nemo_timefix /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ file=/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ out=
+++ [[ /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc =~ .*1[md].*grid_T_table2.2.nc ]]
+++ ncdump -h /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ grep -E -q '(float t_ave_01month|t_ave_00086400 )'
+++ var2rename=
+++ [[ /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc =~ .*1m.*grid_T_table2.2.nc ]]
+++ var2rename=t_ave_01month
+++ [[ /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc =~ .*1d.*grid_T_table2.2.nc ]]
+++ '[' t_ave_01month ']'
+++ '[' '!' -w /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc ']'
++++ basename /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ out=/tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ rm -f /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ ncks -3 /cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ ncrename -v t_ave_01month,time_counter /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+ncrename: In total renamed 0 attributes, 0 dimensions, 0 groups, and 1 variable
+++ '[' /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc ']'
+++ echo /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
++ file=/tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
 + '[' ']'
-+ '[' pr,precip,0.000012,0.000000 ']'
-+ cdo 'expr,pr=precip*0.000012+0.000000;' -selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
-cdo expr: Started child process "selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe1.1)".
-cdo(2) selname: Started child process "seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe2.1)".
-climaf/../scripts/mcdo.sh : ligne 54 : 28729 Erreur de segmentation  cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2
++ '[' ']'
 + '[' '' ']'
-+ echo 'Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc '
-Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
-+ rm -fr /tmp/climaf_mcdo_2OkrXo
-+ exit 1
++ '[' 1998-07-01T00:00:00,1998-07-31T23:59:00 ']'
++ cdo -f nc seldate,1998-07-01T00:00:00,1998-07-31T23:59:00 -selname,rhopoto /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+cdo seldate: Started child process "selname,rhopoto /tmp/climaf_mcdo_RmDKnE/renamed_PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc (pipe1.1)".
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (cdfScanVarAttributes) : NetCDF: Variable not found - t_ave_01month
+Warning (find_time_vars) : Found more than one time variable, skipped variable t_t_max_01month!
+cdo(2) selname: Processed 4439568 values from 13 variables over 1 timestep ( 0.10s )
+cdo seldate: Processed 4439568 values from 1 variable over 1 timestep ( 0.10s )
++ '[' -f /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc ']'
++ vfiles+=' /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc'
++ '[' ' /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc' ']'
+++ basename /mnt/nfs/d3/aster/data3/aster/senesi/dev/climaf/scripts/mcdo.sh
++ tmp3=/tmp/climaf_mcdo_RmDKnE/mcdo.sh.nc
++ rm -f /tmp/climaf_mcdo_RmDKnE/mcdo.sh.nc
+++ echo /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc
+++ wc -w
++ '[' 1 -gt 1 ']'
++ '[' 0 -eq 1 ']'
++ mv /tmp/climaf_mcdo_RmDKnE/PRE6CPLCr2alb_1m_19980701_19980731_grid_T_table2.2.nc /tmp/climaf_mcdo_RmDKnE/mcdo.sh.nc
++ '[' '' ']'
++ '[' '' ']'
++ mv /tmp/climaf_mcdo_RmDKnE/mcdo.sh.nc /home/vignonl/tmp/climaf_cache/ff/e.nc
++ rm -fr /tmp/climaf_mcdo_RmDKnE

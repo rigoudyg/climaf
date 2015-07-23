@@ -23,7 +23,7 @@ cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file
 (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}
 
 cdo selname,vtrp climaf_transports.nc ${out}
-cdo selname,htrp climaf_transports.nc ${out}
+cdo selname,htrp climaf_transports.nc htrp.nc
 cdo selname,strp climaf_transports.nc strp.nc
 
 rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt
