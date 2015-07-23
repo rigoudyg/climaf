@@ -34,9 +34,14 @@ extensions = [
     'sphinx.ext.autodoc'
     ,'sphinx.ext.todo'
     ,'sphinx.ext.viewcode'
-    ,'sphinx.ext.napoleon' #this one works at RTD
-    #,'sphinxcontrib.napoleon' #This one works at CNRM 
-]
+    ]
+
+from climaf.site_settings import atCNRM,onCiclad
+if atCNRM or onCiclad :
+    #This one works at CNRM 
+    extensions.append('sphinxcontrib.napoleon')
+else:
+    extensions.append('sphinx.ext.napoleon') #this one works at RTD
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -59,7 +64,8 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 # built documents.
 #
 # The short X.Y version.
-version = '0.7'
+from climaf import version
+#version = '0.8'
 # The full version, including alpha/beta/rc tags.
 release = version
 

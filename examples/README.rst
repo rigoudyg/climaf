@@ -35,6 +35,11 @@ For **running CliMAF**, or running one of the Python scripts example described b
 
 A number of examples show in directory ``<climaf_dir>/examples`` and are also dowloadable using the links below; you will copy and paste the code lines to the Python shell using your favorite method. Each code line is documented by a comment which tries to bring all necessary information for letting your CliMAF expertise grow steadily. 
 
+.. |indx| image:: html_index.png 
+  :scale: 13%
+
+
+
 Some of the examples can be run anywhere, as they use the data sample installed with CliMAF :
 
   - :download:`plotmap.py <../examples/plotmap.py>`      : basic and advanced map plotting (using ncview and ncl)
@@ -49,6 +54,10 @@ Some of the examples can be run anywhere, as they use the data sample installed 
   - :download:`ann_cycle.py <../examples/ann_cycle.py>`  : compute an annual cycle, using CDO
   - :download:`macro.py <../examples/macro.py>`          : define a macro in-a-while, use it, save it, ....
   - :download:`ensemble.py <../examples/ensemble.py>`    : how to create ensembles and compute with it
+  - :download:`index_html.py <../examples/index_html.py>`: create an
+    :download:`html index <html_index.png>` including multiple tables of links to figures, possibly
+    with thumbnails. 
+
 
 .. _examples_data:
 
@@ -63,7 +72,7 @@ Others show how to acces some known data sets on CNRM or IPSL file system :
   - :download:`data_em.py <../examples/data_em.py>`     : access CNRM-CM data organized 'a la EM'
   - :download:`seaice.py <../examples/seaice.py>`       : access and
     plot ORCA1-grid sea-ice data, with control on levels and projection  
-  - :download:`data_obs <../examples/data_obs.py>`)      : access
+  - :download:`data_obs <../examples/data_obs.py>`      : access
     observation data sets as handled at CNRM by VDR
 
 

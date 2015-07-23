@@ -3,12 +3,12 @@
 
 from climaf.api import *
 
-# Basic example : superimpose zonal profiles of tas for various periods of same experiment
+# Basic example : superimpose zonal profiles of tas for various periods of same simulation
 ############################################################################################
 
-# Define some objects. here, they are datasets for the same experiment but distinct periods
-j0=ds(project='example',experiment="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1980")
-j1=ds(project='example',experiment="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1981")
+# Define some objects. here, they are datasets for the same simulation but distinct periods
+j0=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1980")
+j1=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1981")
 
 # Create an ensemble out of various objects. The list of labels must stand first
 e2=cens(['1980','1981'],j0,j1)
@@ -33,8 +33,7 @@ cdef("frequency","monthly") ;  cdef("project","CMIP5");
 cdef("model","CNRM-CM5") ; cdef("variable","tas"); 
 
 # Create an ensemble of datasets , more easily, with 'eds'; labels are automatic
-ens=eds(experiment="historical", period="1860", rip=["r1i1p1","r2i1p1"])
-
+ens=eds(experiment="historical", period="1860", simulation=["r1i1p1","r2i1p1"])
 # The member labels are added to the 'title' value when looping a
 # non-ensemble-capable script on ensemble members :
 multiplot=plot(ens, title='tas')
@@ -47,7 +46,7 @@ page=cpage([1],[0.5,0.5],multiplot)
 cshow(page)
 
 # Add a member to an ensemble
-member=ds(experiment="historical", period="1860", rip="r3i1p1")
+member=ds(experiment="historical", period="1860", simulation="r3i1p1")
 ens.members.append(member)
 ens.labels.append("r3i1p1")
 

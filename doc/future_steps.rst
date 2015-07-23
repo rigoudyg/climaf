@@ -6,15 +6,11 @@ The next developments will adress, possibly in that order :
 - adding graphic operators or features : 
 
   - vectors on scalar fields
-  - fine tuning intervals in color scheme
-  - polar stereographic projection
   - Hoevmoeller diagram
   - Taylor diagram
 
-- adding a function for building an html index of figures
 - interfacing the Drakkar community CDFtools
 - managing masks (e.g. for ocean, tropics, lakes, oceanic basins ...)
-- managing dataset ensembles
 - handling geographical domains which are lists of locations
 - chunking : automatically splitting e.g. the time dimension when processing a dataset (provided memory issues actually call for that)
 - further cache management functions : 
@@ -27,6 +23,6 @@ The wish list, is the list of features wich priority is lesser; you may compleme
 
 - use CliMAF as a data browser 
 - develop a fast remapping operator (provided there is some evidence that CDO reampping was sub-optimal)
-- add to every result file some metadata reagrding the basic data files used at the origin of all processing : creation date, version number if applicable
+- add to every result file some metadata regarding the basic data files used at the origin of all processing : creation date, version number if applicable
 - a built-in arithmetics on datasets
 - manage operators which provide multi-variable NetCDF files

@@ -5,7 +5,7 @@ Only one additionnal attribute : frequency (but data sample actually includes on
 
 Example of an 'example' dataset definition ::
 
- >>> dg=ds(project='example', experiment='AMIPV6ALB2G', variable='tas', period='1980-1981', frequency='monthly')
+ >>> dg=ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981', frequency='monthly')
 
 
 """
@@ -18,9 +18,9 @@ from climaf.classes import cproject, calias, cfreqs
 from climaf import __path__ as cpath
 cpath=os.path.abspath(cpath[0]) 
 
-cproject("example" , "frequency" )
+cproject("example" , ("frequency","monthly") )
 cfreqs('example',{'monthly':'mon' })
 
-data_pattern_L=cpath+"/../examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
-data_pattern_A=cpath+"/../examples/data/${experiment}/A/${experiment}PLYYYY.nc"
+data_pattern_L=cpath+"/../examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
+data_pattern_A=cpath+"/../examples/data/${simulation}/A/${simulation}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])

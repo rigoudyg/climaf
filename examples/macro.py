@@ -10,7 +10,7 @@ from climaf.api import *
 
 # First use and combine CliMAF operators to get some interesting
 # result using some dataset(s)
-january_ta=ds(project='example',experiment="AMIPV6ALB2G", variable="ta",
+january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta",
               frequency='monthly', period="198001")
 ta_europe=llbox(january_ta,latmin=40,latmax=60,lonmin=-15,lonmax=25)
 ta_ezm=ccdo(ta_europe,operator="zonmean")
@@ -24,11 +24,11 @@ fig_ezm=plot(ta_ezm)
 macro("eu_cross_section",fig_ezm)
 
 # You can of course use a macro on other dataset(s), 
-pr=ds(project='example',experiment="AMIPV6ALB2G", variable="pr",
+pr=ds(project='example',simulation="AMIPV6ALB2G", variable="pr",
               frequency='monthly', period="198001")
 pr_ezm=eu_zonal_mean(pr)
 
-# You can also define a macro 'from scratch', using ARG for arguments/parameters
+# You can also define a macro 'from scratch', using ARG for dataset arguments/parameters
 macro("my_macro", "ccdo(ARG,operator='timavg')")
 
 # All macros are registered in dictionnary climaf.cmacros.cmacros,
@@ -41,18 +41,19 @@ climaf.cmacro.show()
 # How to remove a macro
 cmacros.pop("my_macro")
 
-# Save the macros in default location (~/.climaf.macros) (you may
-# provide a filename as argument - the default file is loaded automatically
-# when importing climaf)
-climaf.cmacro.write()
+# Save the macros in some location (provide a filename)
+# Value ~/.climaf.macros is used for
+#   - automatically saving macros at end of CliMAF sessions
+#   - automatically reading macros at start of CliMAF sessions
+climaf.cmacro.write("~/.climaf.macros")
 
 # Look at the external representation of the macros. 
 print "\nContent of ~/.climaf.macros :"
 import os ; os.system("cat ~/.climaf.macros")
 
-# Using that example, you can also write and load macros from any file
-# having a similar syntax (here, we use the default location) 
-climaf.cmacro.read("~/.climaf")
+# Using that example, you can also write macros to and load macros from 
+# any file, using the macro syntax (here, we use the default location) 
+climaf.cmacro.read("~/.climaf.macros")
 
 # Trigger the computation of some results, in order to populate the cache 
 cfile(fig_ezm)

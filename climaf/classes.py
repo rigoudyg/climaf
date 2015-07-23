@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 """ 
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver
  This is a first protoype, where the interpreter is Python itself
@@ -12,13 +13,13 @@ import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
 
-#: Dictionnary of declared projects (type is cproject)
+#: Dictionary of declared projects (type is cproject)
 cprojects=dict()
 
-#: Dictionnary of aliases dictionaries
+#: Dictionary of aliases dictionaries
 aliases=dict()
 
-#: Dictionnary of frequency names dictionaries
+#: Dictionary of frequency names dictionaries
 frequencies=dict()
 
 class cproject():
@@ -32,7 +33,7 @@ class cproject():
           args (strings) : attribute names; 
            they are free; do not use the chosen separator in it (see below); **CliMAF 
            anyway will add attributes : 
-           project, experiment, variable, period, and domain**
+           project, simulation, variable, period, and domain**
           kwargs (dict) :
            can only be used with keywords :
 
@@ -40,7 +41,7 @@ class cproject():
               facets in the dataset syntax. Defaults to ".".
             - ``ensemble`` for declaring a list of attribute
               names which are allowed for defining an ensemble in
-              this project ('experiment' is automatically allowed)
+              this project ('simulation' is automatically allowed)
 
         Returns : a cproject object, which string representation is
         the pattern later used in CliMAF Refreence Syntax for
@@ -54,18 +55,18 @@ class cproject():
 
         For instance, cproject CMIP5, after its Data Reference Syntax, 
         has attributes : 
-        experiment, model, rip, variable, frequency, realm, table, version
+        experiment, model, rip (here called simulation), variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
         
         A dataset in a cproject declared as ::
 
-        >>> cproject("MINE","myfreq","myfacet",sep="_")
+        >>> cproject('MINE','myfreq','myfacet',sep='_')
 
         will return ::
 
-          ${project}_${experiment}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
+          ${project}_${simulation}_${variable}_${period}_${domain}_${myfreq}_${myfacet}
 
         and will have datasets represented as  e.g.::
 
@@ -80,22 +81,32 @@ class cproject():
         datafile pathnames in the 'generic' organization (see
         :py:class:`~climaf.dataloc.dataloc`)
 
+        A default value for a given facet can be specified, by providing a tuple
+        (facet_name,default_value) instead of the facet name. This default value is
+        however of lower priority than the value set using :py:func:`cdef`
+
         A project can be declared as having non-standard variable
-        names, or variabels that should undergo re-scaling (see
-        :py:func:`~climaf.classes.calias`)
+        names, or variables that should undergo re-scaling; see
+        :py:func:`~climaf.classes.calias`
 
         A project can be declared as having non-standard frequency names (this is 
-        used when accessing datafiles). see :py:func:`~climaf.classes.cfreqs`)
+        used when accessing datafiles); see :py:func:`~climaf.classes.cfreqs`)
 
         """
         if name in cprojects : clogger.warning("Redefining project %s"%name)
         self.project=name
         #
         self.facets=[]
-        forced=['project','experiment', 'variable', 'period', 'domain']
+        self.facet_defaults=dict()
+        forced=['project','simulation', 'variable', 'period', 'domain']
         for f in forced : self.facets.append(f)
-        for a in args : 
-            if not a in forced : self.facets.append(a)
+        for a in args :
+            if isinstance(a,tuple) :
+                facet_name,facet_default=a
+                self.facet_defaults[facet_name]=facet_default
+            else :
+                facet_name=a
+            if not facet_name in forced : self.facets.append(facet_name)
         #
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
@@ -108,7 +119,7 @@ class cproject():
         self.crs=self.crs[:-1]
         # Create an attribute hodling the list of facets which are allowed
         # for defining an ensemble, and put a first facet there
-        self.attributes_for_ensemble=['experiment']
+        self.attributes_for_ensemble=['simulation']
         if 'ensemble' in kwargs :
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
     def __repr__(self):
@@ -125,48 +136,52 @@ class cproject():
                 for i,f in enumerate(self.facets) : kvp[f]=fields[i]
                 return cdataset(**kvp)
 
-
-#: Dictionnary storing user-default values for dataset attributes, used when defining a new dataset 
-cdefaults=dict()
-
-def cdef(attribute,value=None):
+def cdef(attribute,value=None, project=None):
     """
-    Set or get the default value for a CliMAF dataset attribute (as e.g. 'model', 'project' ...),
-    for use by next calls to :py:class:`~climaf.classes.cdataset()` or to :py:func:`~climaf.classes.ds`
+    Set or get the default value for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...), for use by
+    next calls to :py:class:`~climaf.classes.cdataset()` or to
+    :py:func:`~climaf.classes.ds`
 
-    Theres is no actual check that 'attribute' is a valid keyword for a call to ``ds`` or ``cdateset``
+    Argument 'project' allows to restrict the use/query of the default
+    value to the context of the given 'project'. On can also set the
+    (global) default value for attribute 'project'
+
+    There is no actual check that 'attribute' is a valid keyword for
+    a call to ``ds`` or ``cdataset``
 
     Example::
 
-    >>> cdefault('project','OCMPI5')
-    >>> cdefault('frequency','monthly')
-
+    >>> cdef('project','OCMPI5')
+    >>> cdef('frequency','monthly',project='OCMPI5')
     """
+    
+    if project not in cprojects :
+        raise Climaf_Classes_Error("project '%s' has not yet been declared"%project)
+    if attribute == 'project' : project=None
+    #
+    if project and not attribute in cprojects[project].facets :
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'"%(project,attribute))
     if value is None :
-        if attribute in cdefaults.keys() :
-            return cdefaults[attribute]
-        else:
-            return None
+        rep=cprojects[project].facet_defaults.get(attribute,None)
+        if not rep :
+            rep=cprojects[None].facet_defaults.get(attribute,"N/A")
+        return rep
     else :
-        cdefaults[attribute]=value
+        cprojects[project].facet_defaults[attribute]=value
+            
 
-cdef("project","P")
-cdef("model","M")
-cdef("experiment","E")
-cdef("rip","r1i1p1")
-cdef("frequency","monthly")
+cproject(None)
 cdef("domain","global")
-cdef("table","*")
-cdef("realm","*")
-cdef("version","last")
 
 
-# All CObject instances are registered in this directory :
+# All Cobject instances are registered in this directory :
 cobjects=dict()
 
 class cobject():
     def __init__(self):
-        # crs is the string expression defining the object in the CLIMAF Reference Syntax
+        # crs is the string expression defining the object 
+        # in the CLIMAF Reference Syntax
         self.crs="void"
     def __str__(self):
         #return "Climaf object : "+self.crs
@@ -184,36 +199,49 @@ def processDatasetArgs(**kwargs) :
     """
     Perfom basic checks on kwargs for functions cdataset and eds
     regarding the project where the dataset is defined
-    Also complement with default values as handled by cdef()
+    Also complement with default values as handled by the
+    project's definition and by cdef()
     """
     if 'project' in kwargs : project=kwargs['project']
     else : project= cdef("project")
     if project is None :
         raise Climaf_Classes_Error("Must provide a project (Can use cdef)")
     elif project not in cprojects :
-        raise Climaf_Classes_Error("Dataset's project %s has not "
-                                   "been described by a call to cproject()"%project)
+        raise Climaf_Classes_Error(
+            "Dataset's project '%s' has not "
+            "been described by a call to cproject()"%project)
     attval=dict()
     attval["project"]=project
+    sep=cprojects[project].separator
     #
     # Register facets values
     for facet in cprojects[project].facets :
-        if facet in kwargs : val=kwargs[facet]
-        else: val=cdef(facet)
+        if facet in kwargs and kwargs[facet] : val=kwargs[facet]
+        else: val=cdef(facet,project=project)
         attval[facet]=val
+        if val :
+            if isinstance(val,list) : listval=val
+            else : listval=[val]
+            for lval in listval :
+                if isinstance(lval,str) and lval.find(sep) >= 0 :
+                    Climaf_Classes_Error(
+                        "You cannot use character '%s' when setting '%s=%s' because "
+                        "it is the declared separator for project '%s'. "
+                        "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
         #print "initalizing facet %s with value"%(facet,val)
     #
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
         if ( attval['table']=='fx' or attval['period']=='fx' or 
-             attval['rip']=='r0i0p0' or attval['frequency']=='fx') :
+             attval['simulation']=='r0i0p0' or attval['frequency']=='fx') :
             attval['table']='fx' ; attval['period']='fx' 
-            attval['rip']='r0i0p0' ; attval['frequency']='fx'
+            attval['simulation']='r0i0p0' ; attval['frequency']='fx'
     #
     errmsg=""
     for facet in cprojects[project].facets :
         if attval[facet] is None :
-            e="Project %s needs facet %s. "%(project,facet)
+            e="Project '%s' needs facet '%s'. You may use cdef() for setting a default value"\
+               %(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
     #
@@ -236,15 +264,13 @@ def processDatasetArgs(**kwargs) :
             e="Project %s doesn't have facet %s"%(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
-    if not isinstance(attval['period'],cperiod) :
+    if 'period' in attval and not isinstance(attval['period'],cperiod) :
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
-    #else :
-    #    print "at end of  process, period %s is a cperiod :"%`cperiod`
     return attval
 
 
 class cdataset(cobject):
-    #def __init__(self,project=None,model=None,experiment=None,period=None,
+    #def __init__(self,project=None,model=None,simulation=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self,**kwargs) :
         """
@@ -265,7 +291,8 @@ class cdataset(cobject):
 
         None of the project's attributes are mandatory arguments, because
         all attributes defaults to the value set by
-        :py:func:`~climaf.classes.cdefault`
+        :py:func:`~climaf.classes.cdef` (which also applies if
+        providing a None value for an attribute)
 
         Some attributes have a special format or processing : 
         
@@ -283,14 +310,14 @@ class cdataset(cobject):
              
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
-        - in project CMIP5 , for triplets (frequency, rip, period, table )  : 
-          if any is 'fx' (or 'r0i0p0 for rip), the others are forced to
+        - in project CMIP5 , for triplets (frequency, simulation, period, table )  : 
+          if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
           'fx' (resp. 'r0i0p0') too.
 
         Example, using no default value, and adressing some CMIP5 data ::
 
           >>>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
-          >>>           rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+          >>>           simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
         
         
         """
@@ -299,7 +326,7 @@ class cdataset(cobject):
         #
         # TBD : Next lines for backward compatibility, but should re-engineer 
         self.project=attval["project"]
-        self.experiment=attval['experiment']
+        self.simulation=attval['simulation']
         self.variable= attval['variable']
         # alias is a n-plet : filevar, scale, offset, filenameVar, missing
         self.period    =attval['period']
@@ -334,7 +361,7 @@ class cdataset(cobject):
     def isLocal(self) :
         model=getattr(self,"model","*")
         return(dataloc.isLocal(project=self.project, model=model, \
-                               experiment=self.experiment, frequency=self.frequency))
+                               simulation=self.simulation, frequency=self.frequency))
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached
         
@@ -344,7 +371,7 @@ class cdataset(cobject):
         return rep
 
     def oneVarPerFile(self):
-        locs=dataloc.getlocs(project=self.project, model=self.model, experiment=self.experiment, \
+        locs=dataloc.getlocs(project=self.project, model=self.model, simulation=self.simulation, \
                              frequency=self.frequency)
         return(all([org for org,freq,url in locs]))
     
@@ -383,7 +410,7 @@ class cdataset(cobject):
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
                 dic["variable"]=filevar
-                dic["filenameVar"]=filenameVar
+                if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
             self.files=dataloc.selectLocalFiles(**dic)
         return self.files
@@ -434,7 +461,7 @@ class cens(cobject):
 
         Example:
         
-        >>> cdef('project','example'); cdef('experiment',"AMIPV6ALB2G");
+        >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
         >>> cdef('variable','tas');cdef('frequency','monthly')
         >>> #
         >>> ds1980=ds(period="1980")
@@ -478,7 +505,7 @@ def eds(**kwargs):
 
     >>> cdef("frequency","monthly") ;  cdef("project","CMIP5"); cdef("model","CNRM-CM5")
     >>> cdef("variable","tas"); cdef("period","1860")
-    >>> ens=eds(experiment="historical", rip=["r1i1p1","r2i1p1"])
+    >>> ens=eds(experiment="historical", simulation=["r1i1p1","r2i1p1"])
 
     """
     attval=processDatasetArgs(**kwargs)
@@ -602,22 +629,14 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             if filter_on_operator :
                 if filter_on_operator(tree1.operator): return None
             if tree1.parameters == tree2.parameters :
-                return(reduce(lambda(a,b) : a if `a`==`b` else None, 
+                return(reduce(lambda a,b : a if `a`==`b` else None, 
                    [ compare_trees(op1,op2,func,filter_on_operator) 
                      for op1,op2 in zip(tree1.operands, tree2.operands) ]))
     elif isinstance(tree1,scriptChild) and isinstance(tree2,scriptChild):
         if tree1.name==tree2.name :
-            return compare_trees(tree1.father,tree2.father,func,filter_on_operator)
+            return compare_trees(tree1.father,tree2.father,
+                                 func,filter_on_operator)
 
-
-    #
-
-# def genericDataSets(expression, pattern=None) :
-#     """ Identifies the basic datasets in EXPRESSION and returns them
-#     as generic Datasets (i.e. without period nor domain information).
-#     """
-    
-#     # TBC : take care of exceptions, and remove period and domain info, and upgrade to non-basic datasets
 
 def ds(*args,**kwargs) :
     """
@@ -625,19 +644,18 @@ def ds(*args,**kwargs) :
 
      >>> ds('CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last')
 
-    Also a shortcut for :py:meth:`~climaf.classes.cdataset`, when used with with only 
-    keywords arguments. Example ::
+    Also a shortcut for :py:meth:`~climaf.classes.cdataset`, 
+    when used with with only keywords arguments. Example ::
 
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
-              rip='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+              simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
-    # Note : muts be kept phased with self.crs defined in cdataset.init(), both for
+    # Note : muts be kept phased with self.crs defined in 
+    # cdataset.init(), both for
     # function name and CRS syntax
     if len(args) >1 :
-        e="must provide either 0 or 1 positional arguments, not "+len(args)
-        clogger.error(e)
-        raise Climaf_Classes_Error(e)
+        raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
@@ -647,12 +665,11 @@ def ds(*args,**kwargs) :
         except Climaf_Classes_Error: dataset=None
         if (dataset) : results.append(dataset)
     if len(results) > 1 :
-        e="CRS expressions %s is ambiguous projects %s"%(crs,`cprojects.keys()`)
+        e="CRS expressions %s is ambiguous among projects %s"%(crs,`cprojects.keys()`)
         clogger.error(e)
         raise Climaf_Classes_Error(e)
     elif len(results) == 0 :
         e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
-        clogger.error(e)
         raise Climaf_Classes_Error(e)
         return None
     else : return results[0]
@@ -662,7 +679,8 @@ def cfreqs(project,dic) :
     Allow to declare a dictionary specific to ``project`` for matching
     ``normalized`` frequency values to project-specific frequency values
 
-    Normalized frequency values are : decadal, yearly, monthly, daily, 6h, 3h, fx
+    Normalized frequency values are : 
+      decadal, yearly, monthly, daily, 6h, 3h, fx
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
@@ -696,15 +714,15 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     
     """
-    if not fileVariable : fileVariable =variable
-    if not filenameVar  : filenameVar =fileVariable
+    if not fileVariable : fileVariable = variable
+    if not filenameVar  : filenameVar  = None
     if project not in cprojects : 
         raise Climaf_Classes_Error("project %s is not known"%project)
     if project not in aliases : aliases[project]=dict()
-    if type(variable)     is not list : variable    =[variable]
-    if type(filenameVar)  is not list : filenameVar =[filenameVar]
-    if type(fileVariable) is not list : fileVariable=[fileVariable]
-    if type(units)        is not list : units    =[units]
+    if type(variable)     is not list : variable    = [variable]
+    if type(filenameVar)  is not list : filenameVar = [filenameVar]
+    if type(fileVariable) is not list : fileVariable= [fileVariable]
+    if type(units)        is not list : units       = [units]
     for v,u,fv,fnv in zip(variable,units,fileVariable,filenameVar) :
         aliases[project][v]=(fv,scale,offset,u,fnv,missing)
 
@@ -765,17 +783,21 @@ class cpage(cobject):
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
-            raise Climaf_Classes_Error("fig_lines must be an ensemble or a list "
-                                       "of lists (each representing a line of figures)")
+            raise Climaf_Classes_Error(
+                "fig_lines must be an ensemble or a list "
+                "of lists (each representing a line of figures)")
         if isinstance(fig_lines,list) :
             if len(fig_lines)!=len(self.heights) :
-                raise Climaf_Classes_Error("fig_lines must have same size than heights")
+                raise Climaf_Classes_Error(
+                    "fig_lines must have same size than heights")
             for line in fig_lines:
                 if not isinstance(line,list) :
-                    raise Climaf_Classes_Error("each element in fig_lines must be a list of figures")
+                    raise Climaf_Classes_Error(
+                        "each element in fig_lines must be a list of figures")
                 if len(line)!=len(self.widths) :
-                    raise Climaf_Classes_Error("each line in fig_lines must have same dimension as "
-                                           "widths; pb for sublist "+`line`)
+                    raise Climaf_Classes_Error(
+                        "each line in fig_lines must have same dimension as "
+                        "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
             figs=list(fig_lines.members)
@@ -802,6 +824,53 @@ class cpage(cobject):
         rep=rep.replace(", ]","]")
         return rep
 
+        
+def guess_projects(crs) :
+    """
+    Return the list of projects involved in the datasets involved in a 
+    CRS expression. 
+    """
+    def guess_project(crs) :
+        """
+        Guess which is the project name for a dataset's crs, with minimum 
+        assumption on the separator used in the project
+        """
+        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^"
+                    r",",r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        counts=dict()
+        for sep in separators : counts[sep]=crs.count(sep)
+        # Assume that the highest count gives the right separator
+        max=0
+        for key in counts : 
+            if counts[key] >= max : 
+                max=counts[key]
+                sep=key
+        return(crs[1:crs.find(sep)])
+    return map(guess_project,re.findall(r"ds\(([^)]*)",crs))
+    
+def browse_tree(cobj,func,results):
+    """ Browse a CliMAF object's tree, accumulating in 'results' the 
+    values returned by 'func' on each tree node or leave (if they are 
+    not None)
+    """
+    if isinstance(cobj,cdataset) or isinstance(cobj,cdummy) :
+        res=func(cobj)
+        if res : partial.append(res)
+    elif isinstance(cobj,ctree) :
+        res=func(cobj.operator)
+        if res : partial.append(res)
+        for op in cobj.operands : browse_tree(op,func,partial)
+    elif isinstance(cobj,scriptChild) :
+        browse_tree(cobj.father,func,partial)
+    elif isinstance(cobj,cpage) :
+        for line in cobj.fig_lines :
+            map(lambda x : browse_tree(x,func,partial), line)
+    elif cobj is None : return 
+    else :
+        clogger.error("Cannot yet handle object :%s", `cobj`)
+        return
+
+
 class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
@@ -817,7 +886,7 @@ def test():
     #cdef("project","PR6")
     cdef("model","CNRM-CM5")
     cdef("experiment","historical")
-    cdef("rip","r1i1p1")
+    cdef("simulation","r1i1p1")
     cdef("period","197901-198012")
     cdef("domain","global")
     #

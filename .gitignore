@@ -10,3 +10,7 @@ examples/.ipynb_checkpoints
 /README.html
 /doc/climaf.log
 climaf.log
+/climaf/last.out
+/examples/last.out
+examples/romain/
+

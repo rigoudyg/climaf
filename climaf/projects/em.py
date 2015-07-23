@@ -11,7 +11,7 @@ file, which may include shared experiments
 
 Example for defining an EM dataset::
 
- >>> tas=ds(project='EM', experiment='GSAGNS1', variable='tas', period='1975', frequency='monthly', realm='L')
+ >>> tas=ds(project='EM', simulation='GSAGNS1', variable='tas', period='1975', frequency='monthly', realm='L')
 
  A number of Seaice fields are duly described with 1.e+20 as missing value (which is ill described in data files); see code for details
 
@@ -24,7 +24,7 @@ if atCNRM :
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
     
-    cproject('EM' , 'frequency', 'realm' )
+    cproject('EM' , ('frequency','monthly'), ('realm','*') )
     cfreqs('EM',{'monthly':'mon' , 'daily':'day1' })
     dataloc(project='EM', organization='EM', url=['dummy'])
 

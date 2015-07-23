@@ -4,7 +4,7 @@ from climaf.api import *
 # Define a dataset with one single time step
 cdef("frequency","monthly")
 cdef("period","198001")
-tas=ds(project="example", experiment="AMIPV6ALB2G", variable="tas")
+tas=ds(project="example", simulation="AMIPV6ALB2G", variable="tas")
 
 # Define a figure
 fig1=plot(tas,title="title")

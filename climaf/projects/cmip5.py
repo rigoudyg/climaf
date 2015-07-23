@@ -2,7 +2,7 @@
 This module declares locations for searching data for projects CMIP5 for all frequencies, and where the data is
 at CNRM and on Ciclad
 
-Attributes for CMIP5 datasets are : model, rip, frequency, table, realm, version
+Attributes for CMIP5 datasets are : model, rip (called simulation), frequency, table, realm, version
 
 Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
 
@@ -15,9 +15,12 @@ Example for a CMIP5 dataset declaration ::
 
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs
+from climaf.classes import cproject, calias, cfreqs,cdef
 
-p=cproject("CMIP5" ,"model","rip","frequency","table","realm","version", ensemble=["model","rip"])
+p=cproject("CMIP5" ,"model","experiment", ("frequency","monthly"),
+           ("table","*"),("realm","*"),("version","last"),
+           ensemble=["model","simulation"])
+cdef("simulation","r1i1p1",project="CMIP5")
 
 # Frequency alias
 cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })

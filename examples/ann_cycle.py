@@ -5,7 +5,7 @@ from climaf.api import *
 
 # Define a dataset, in the pre-dfeined 'example' project (which datafiles 
 # locations are also pre-defined)
-dg=ds(project="example", experiment="AMIPV6ALB2G", variable="tas", 
+dg=ds(project="example", simulation="AMIPV6ALB2G", variable="tas", 
     period="1980-1981", frequency="monthly")
 
 # Compute annual cycle, using swiss knife operator 'ccdo', and look at it

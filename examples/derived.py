@@ -15,7 +15,7 @@ from climaf.api import *
 
 # Set some default values
 cdef("project","example")
-cdef("experiment","AMIPV6ALB2G")
+cdef("simulation","AMIPV6ALB2G")
 cdef("period","1980-1981")
 
 # Define some dataset with a new, virtual, variable (also called
