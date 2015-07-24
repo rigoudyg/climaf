@@ -68,11 +68,11 @@ def load_standard_operators():
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
             'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} units=\'\"${units}\"\' '
             'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
+            'convert ${out} -trim ${out}) ', format="png")        
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
-            'convert ${out} -trim ${out}) ', format="png")
             'convert ${out} -trim ${out}) ', format="png")
     
     #
@@ -90,18 +90,14 @@ def load_standard_operators():
             'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt')
     #    
     cscript('ccdfvar_profile',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt') 
-
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt')
+    
     #
     # cdftransport : case where VT file must be given 
     #
     cscript('ccdftransport',
-            scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} ${imin} ${imax} ${jmin} ${jmax} "${opt1}" "${opt2}" ${out} ')
-    #
-    #sans appel du script 'cdftransport.sh' et avec les ${out_var} a tester
-    #cscript('ccdftransport',
-    #        'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} ${in_4} $tmp_file; (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} $tmp_file ${in_5} ${in_6} ${opt2}; cdo selname,vtrp climaf_transports.nc ${out}; cdo selname,htrp climaf_transports.nc ${out_htrp}; cdo selname,strp climaf_transports.nc ${out_strp}; rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt', htrp_var="var_htrp", strp_var="var_strp")
-          
+            scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} ${imin} ${imax} ${jmin} ${jmax} "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}')
+    
     #
     # cdfheatc 
     #
@@ -112,8 +108,10 @@ def load_standard_operators():
     # cdfsections 
     #
     cscript('ccdfsections',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} $tmp_file; cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}; cdo selname,Uorth section.nc ${out}; cdo selname,Utang section.nc Utang.nc; cdo selname,sig0 section.nc sig0.nc; cdo selname,sig1 section.nc sig1.nc; cdo selname,sig2 section.nc sig2.nc; cdo selname,sig4 section.nc sig4.nc; rm -f section.nc')
-
+            scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${opt}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}') 
+    #cscript('ccdfsections',
+    #        'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} $tmp_file; cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}; cdo selname,Uorth section.nc ${out}; cdo selname,Utang section.nc ${out_Utang}; cdo selname,vosaline section.nc ${out_so}; cdo selname,votemper section.nc ${out_thetao}; cdo selname,sig0 section.nc ${out_sig0}; cdo selname,sig1 section.nc ${out_sig1}; cdo selname,sig2 section.nc ${out_sig2}; cdo selname,sig4 section.nc ${out_sig4}; rm -f section.nc $tmp_file')
+    
     #
     # cdfmxlheatc
     #
@@ -121,11 +119,16 @@ def load_standard_operators():
             'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file')
 
     #
-    #cdfstd
+    # cdfstd
     #
     cscript('ccdfstd',
             'cdfstd ${opt} ${ins}; mv cdfstd.nc ${out}; rm -f cdfstd.nc')
     #
     cscript('ccdfstdmoy',
             'cdfstd -save ${opt} ${ins}; mv cdfmoy.nc ${out}; rm -f cdfmoy.nc')
+    
+    #
+    # cdfvT
+    #
+    cscript('ccdfvT', 'cdfvT ${in_1} ${in_2} ${in_3} ${in_4}; mv vt.nc ${out}; rm -f vt.nc')
     #

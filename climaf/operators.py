@@ -296,7 +296,7 @@ class cscript():
                 if (outname in outvarnames) : 
                     self.outputs[outname]=outvarnames[outname]
                 else :
-                    self.outputs[outname]=outname
+                    self.outputs[outname]="%s"#outname
             else:
                 self.outputs[None]="%s"
         #clogger.debug("outputs = "+`self.outputs`)

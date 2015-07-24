@@ -453,7 +453,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         lt,ll=script.fixedfields  #return target/source, link/dest
         subdict_ff=dict()
         subdict_ff["model"]=scriptCall.operands[0].model
-        subdict_ff["experiment"]=scriptCall.operands[0].experiment
+        subdict_ff["simulation"]=scriptCall.operands[0].simulation
         subdict_ff["project"]=scriptCall.operands[0].project 
         for t,l in zip(lt,ll):
             # Replace input data placeholders with filenames for fixed fields
@@ -505,6 +505,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             for output in scriptCall.outputs:
                 ok = ok and cache.register(subdict["out_"+output],\
                                            scriptCall.crs+"."+output)
+                if ok :
+                    set_variable(subdict["out_"+output], output, 'file')
             if ok : 
                 duration=time.time() - tim1
                 print("Done in %.1f s with script computation for %s "%\
