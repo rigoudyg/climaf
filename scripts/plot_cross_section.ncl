@@ -21,12 +21,16 @@ begin
   LINEON=False
   LABELON=False
   RASTER=True 
-  
-                                ; Reading the field and its unit, setting REDU, and scaling the field
+
+  ; Reading the field and its unit, setting REDU, and scaling the field
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
-    if isfilevar(ffile,var) then 
-      fld = ffile->$var$
+    if isfilevar(ffile,var) then
+      if (getfilevartypes(ffile,var) .eq. "short") then
+        fld = short2flt( ffile->$var$ )
+      else
+        fld = ffile->$var$
+      end if
     else
       print("File "+infile+" does not include variable "+var)
       status_exit(1)
