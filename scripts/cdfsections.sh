@@ -3,7 +3,7 @@
 # Applies cdfsections operator of cdftools (which computes temperature, salinity, 
 # sig0, sig1, sig2, sig4, Uorth, Utang along a section made of Nsec linear segments)
 # to IN with a list of arguments LARF, LORF, NSEC, LAT1, LON1, LAT2, LON2, N1
-# and other optional arguments OPT
+# and other optional arguments MORE_POINTS
 # Output fields are OUT and OUT_VAR
 
 set -x
@@ -21,7 +21,7 @@ lon1=$1 ; shift
 lat2=$1 ; shift
 lon2=$1 ; shift
 n1=$1 ; shift
-opt=$1 ; shift
+more_points=$1 ; shift
 out=$1 ; shift
 out_Utang=$1 ; shift
 out_so=$1 ; shift
@@ -35,7 +35,7 @@ tmp_file=$(mktemp /tmp/tmp_file.XXXXXX)
 
 cdo merge ${in_1} ${in_2} ${in_3} $tmp_file
 
-cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}
+cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${more_points}
 
 cdo selname,Uorth section.nc ${out}
 cdo selname,Utang section.nc ${out_Utang}

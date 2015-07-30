@@ -1,81 +1,52 @@
 
 
 stdout and stderr of script call :
-	 climaf/../scripts/cdfsections.sh /home/vignonl/tmp/climaf_cache/6a/8.nc /home/vignonl/tmp/climaf_cache/72/d.nc /home/vignonl/tmp/climaf_cache/c7/d.nc /home/vignonl/tmp/climaf_cache/f4/4.nc /home/vignonl/tmp/climaf_cache/ad/0.nc 48.0 125.0 1 50.0 127.0 50.5 157.5 20 "" /home/vignonl/tmp/climaf_cache/9a/e.nc /home/vignonl/tmp/climaf_cache/8d/0.nc /home/vignonl/tmp/climaf_cache/d8/c.nc /home/vignonl/tmp/climaf_cache/5f/c.nc /home/vignonl/tmp/climaf_cache/55/e.nc /home/vignonl/tmp/climaf_cache/de/d.nc /home/vignonl/tmp/climaf_cache/4a/8.nc /home/vignonl/tmp/climaf_cache/93/b.nc
+	 cdfstd -save  /home/vignonl/tmp/climaf_cache/f4/4.nc; mv cdfstd.nc /home/vignonl/tmp/climaf_cache/50/4.nc; mv cdfmoy.nc /home/vignonl/tmp/climaf_cache/bb/f.nc ; rm -f cdfstd.nc cdfmoy.nc
 
-+ in_1=/home/vignonl/tmp/climaf_cache/6a/8.nc
-+ shift
-+ in_2=/home/vignonl/tmp/climaf_cache/72/d.nc
-+ shift
-+ in_3=/home/vignonl/tmp/climaf_cache/c7/d.nc
-+ shift
-+ in_4=/home/vignonl/tmp/climaf_cache/f4/4.nc
-+ shift
-+ in_5=/home/vignonl/tmp/climaf_cache/ad/0.nc
-+ shift
-+ larf=48.0
-+ shift
-+ lorf=125.0
-+ shift
-+ Nsec=1
-+ shift
-+ lat1=50.0
-+ shift
-+ lon1=127.0
-+ shift
-+ lat2=50.5
-+ shift
-+ lon2=157.5
-+ shift
-+ n1=20
-+ shift
-+ opt=
-+ shift
-+ out=/home/vignonl/tmp/climaf_cache/9a/e.nc
-+ shift
-+ out_Utang=/home/vignonl/tmp/climaf_cache/8d/0.nc
-+ shift
-+ out_so=/home/vignonl/tmp/climaf_cache/d8/c.nc
-+ shift
-+ out_thetao=/home/vignonl/tmp/climaf_cache/5f/c.nc
-+ shift
-+ out_sig0=/home/vignonl/tmp/climaf_cache/55/e.nc
-+ shift
-+ out_sig1=/home/vignonl/tmp/climaf_cache/de/d.nc
-+ shift
-+ out_sig2=/home/vignonl/tmp/climaf_cache/4a/8.nc
-+ shift
-+ out_sig4=/home/vignonl/tmp/climaf_cache/93/b.nc
-+ shift
-++ mktemp /tmp/tmp_file.XXXXXX
-+ tmp_file=/tmp/tmp_file.PviB3B
-+ cdo merge /home/vignonl/tmp/climaf_cache/6a/8.nc /home/vignonl/tmp/climaf_cache/72/d.nc /home/vignonl/tmp/climaf_cache/c7/d.nc /tmp/tmp_file.PviB3B
-cdo merge: Processed 8984840 values from 3 variables over 3 timesteps ( 0.17s )
-+ cdfsections /home/vignonl/tmp/climaf_cache/f4/4.nc /home/vignonl/tmp/climaf_cache/ad/0.nc /tmp/tmp_file.PviB3B 48.0 125.0 1 50.0 127.0 50.5 157.5 20
- /tmp/tmp_file.PviB3B
-   -> dimensions of arrays : ( 362, 292,  42,   1)
- /home/vignonl/tmp/climaf_cache/f4/4.nc
-   -> dimensions of arrays : ( 362, 292,  42,   1)
- /home/vignonl/tmp/climaf_cache/ad/0.nc
-   -> dimensions of arrays : ( 362, 292,  42,   1)
- ********** total number of points  :          20
-*** Section    1 =  2156.39km
-     - from (lat,lon) = ( 50.00,127.00) to ( 50.50,157.50)
-     - angle / equateur (deg) =  0.939190924    
-+ cdo selname,Uorth section.nc /home/vignonl/tmp/climaf_cache/9a/e.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,Utang section.nc /home/vignonl/tmp/climaf_cache/8d/0.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,vosaline section.nc /home/vignonl/tmp/climaf_cache/d8/c.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,votemper section.nc /home/vignonl/tmp/climaf_cache/5f/c.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,sig0 section.nc /home/vignonl/tmp/climaf_cache/55/e.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,sig1 section.nc /home/vignonl/tmp/climaf_cache/de/d.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,sig2 section.nc /home/vignonl/tmp/climaf_cache/4a/8.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ cdo selname,sig4 section.nc /home/vignonl/tmp/climaf_cache/93/b.nc
-cdo selname: Processed 840 values from 10 variables over 1 timestep ( 0.00s )
-+ rm -f section.nc /tmp/tmp_file.PviB3B
+ npiglo =          362
+ npjglo =          292
+ npk    =           42
+  nvars =           5
+  Working with uo          42
+ level            1
+ level            2
+ level            3
+ level            4
+ level            5
+ level            6
+ level            7
+ level            8
+ level            9
+ level           10
+ level           11
+ level           12
+ level           13
+ level           14
+ level           15
+ level           16
+ level           17
+ level           18
+ level           19
+ level           20
+ level           21
+ level           22
+ level           23
+ level           24
+ level           25
+ level           26
+ level           27
+ level           28
+ level           29
+ level           30
+ level           31
+ level           32
+ level           33
+ level           34
+ level           35
+ level           36
+ level           37
+ level           38
+ level           39
+ level           40
+ level           41
+ level           42

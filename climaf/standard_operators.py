@@ -108,9 +108,9 @@ def load_standard_operators():
     # cdfsections 
     #
     cscript('ccdfsections',
-            scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${opt}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}') 
+            scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}') 
     #cscript('ccdfsections',
-    #        'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} $tmp_file; cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${opt}; cdo selname,Uorth section.nc ${out}; cdo selname,Utang section.nc ${out_Utang}; cdo selname,vosaline section.nc ${out_so}; cdo selname,votemper section.nc ${out_thetao}; cdo selname,sig0 section.nc ${out_sig0}; cdo selname,sig1 section.nc ${out_sig1}; cdo selname,sig2 section.nc ${out_sig2}; cdo selname,sig4 section.nc ${out_sig4}; rm -f section.nc $tmp_file')
+    #        'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} ${in_3} $tmp_file; cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${more_points}; cdo selname,Uorth section.nc ${out}; cdo selname,Utang section.nc ${out_Utang}; cdo selname,vosaline section.nc ${out_so}; cdo selname,votemper section.nc ${out_thetao}; cdo selname,sig0 section.nc ${out_sig0}; cdo selname,sig1 section.nc ${out_sig1}; cdo selname,sig2 section.nc ${out_sig2}; cdo selname,sig4 section.nc ${out_sig4}; rm -f section.nc $tmp_file')
     
     #
     # cdfmxlheatc
@@ -125,7 +125,7 @@ def load_standard_operators():
             'cdfstd ${opt} ${ins}; mv cdfstd.nc ${out}; rm -f cdfstd.nc')
     #
     cscript('ccdfstdmoy',
-            'cdfstd -save ${opt} ${ins}; mv cdfmoy.nc ${out}; rm -f cdfmoy.nc')
+            'cdfstd -save ${opt} ${ins}; mv cdfstd.nc ${out}; mv cdfmoy.nc ${out_moy} ; rm -f cdfstd.nc cdfmoy.nc')
     
     #
     # cdfvT

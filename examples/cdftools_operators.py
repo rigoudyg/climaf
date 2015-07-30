@@ -134,7 +134,7 @@ cfile(my_cdfstd)
 # Compute the mean value and standard deviation of "uo" field (sea water velocity)
 my_cdfstd_moy=ccdfstdmoy(d1)
 cfile(my_cdfstd_moy)
-
+cfile(my_cdfstd_moy.moy)
 
 #----------------
 #  cdfsections 
@@ -153,7 +153,7 @@ cfile(my_cdfstd_moy)
 # sea water x velocity ("uo") and sea water y velocity ("vo")
 ds1=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")      #<=> d2
 ds2=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")  #<=> d3 & d4
-ds3=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")  #<=> d5 #changer 'omlmax' par 'rhopoto' (bug avec ncrename pour le moment)
+ds3=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")  #<=> d5 #change 'omlmax' by 'rhopoto' (bug with ncrename caused by data pre-processing; ok with 'good' data)
 ds4=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")      #<=> d1
 ds5=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
@@ -168,6 +168,9 @@ cfile(my_cdfsections.sig0)
 cfile(my_cdfsections.sig1)
 cfile(my_cdfsections.sig2)
 cfile(my_cdfsections.sig4)
+
+my_cdfsections2=ccdfsections(ds1,ds2,ds3,ds4,ds5,larf=48.0,lorf=305.0,Nsec=2,lat1=49.0,lon1=307.0,lat2=50.5,lon2=337.5,n1=20,more_points='40.3 305.1 50')
+cfile(my_cdfsections2)
 
 
 #----------------
