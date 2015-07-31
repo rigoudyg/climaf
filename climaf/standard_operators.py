@@ -71,7 +71,7 @@ def load_standard_operators():
             'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
     #
-    cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot_LV.ncl infile=\'\"${mmin}\"\' '
+    cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} realXaxis=${realXaxis} fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")

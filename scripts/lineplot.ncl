@@ -1,28 +1,68 @@
 ; Plotting any series of data vectors from A SERIES of NetCDF file, 
 ; for the same variable (indicated by arg "var")
 
-; Check on first file that only one dimension is not a singleton.
+; Check on all files that only one dimension is not a singleton
 
 ; Do not assume that all datasets have the same dimensions set
 
-; But assume that all data vectors have the same size and coordinate
-;   array (take the first one as ref.)
+; Do not assume that all data vectors have the same size and coordinate
+; array (take the first one as ref. to aligne time axis to the same origin, 
+; or take the union of all time periods)
+
+; Tick marks are smartly adapted to the time period duration
 
 ; Usage:
 ;;;;;;;;;;
-; ncl lineplot.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. thickness=.. linp=1
-
-; infile, plotname and var are mandatory
+; ncl lineplot.ncl infile=.. plotname=.. var=.. realXaxis=1 title=.. labels=.. colors=.. thickness=.. linp=1 fmt=..
+;
+; infile, plotname, var and realXaxis are mandatory
+;
 ; infile : a string holding the series of filenames, separated by whitespaces
+;
+; realXaxis : an integer (0 or 1) which determines time axis when datasets 
+; does not cover the same time period; 
+;    - realXaxis=0 : time axis will be aligned to the same origin (take the 
+;                    first file as ref.)
+;    - realXaxis=1 : time axis will be the union of all time periods
+;
 ; colors : a string holding a series of color NCL names, separated by whitespaces
+;
 ; thickness : the common thickness (defaults to 2.0)
+;
 ; If argument linp=1 and data is a vertical profile, do not plot it in log(p) 
+;
+; fmt: a string specifying the format of the tick labels. This string is parsed 
+; as follows: the '%' acts as the escape character. The single character after 
+; every '%' is formatted according to the rule:
+;    Y => 4-digit year (e.g., 2007).
+;    y => 2-digit year (e.g., 07).
+;    C => CAPITAL month abbreviation (e.g., JUN).
+;    c => Small month abbreviation (e.g., Jun).
+;    F => CAPITAL full month (e.g., JUNE).
+;    f => Small full month (e.g., June).
+;    N => 2-digit month (e.g., 06).
+;    n => 1 or 2 digit month (e.g., 6 for June, 12 for December).
+;    D => 2-digit day (e.g., 04).
+;    d => 1 or 2 digit day (e.g., 4)
+;    H => 2-digit hour (e.g., 09).
+;    h => 1 or 2 digit hour (e.g., 9 or 11).
+;    M => 2 digit minute (e.g., 08).
+;    m => 1 or 2 digit minute (e.g., 07 or 56).
+;    S => 2 digit second (e.g., 02).
+;    s => 1 or 2 digit second (e.g., 2 or 23).
+; Any character at any other place in the format string is drawn as is.
+; NOTE: a '%' can be drawn using "%%". In case fmt is absent, a minimal 
+; algorithm exists which tries to determine the format string depending
+; on the length and values of the date-time.
+; For more details, see:
+; https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
 
-; First version : S.Sénési - may 2015
+; Second version : L.Vignon - july 2015
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl" 
 
 begin
   files=str_split(infile," ")
@@ -31,14 +71,156 @@ begin
     print("Some file cannot be accessed")
     status_exit(2)
   end if
-  ;
+  
+  ;---Read all data
+  all_files=addfiles(files,"r")
+
+  ;---Extraction of min and max x-range 
+  all_fld=all_files[:]->$var$
+  ;print(all_fld)
+  Var_DimNames = getvardims(all_fld)  ; getting dimensions from metadata
+  dime=dimsizes(all_fld)
+  coord=""
+  do dim=0,dimsizes(dime)-1
+    if dime(dim) .gt. 1 then
+      coord=Var_DimNames(dim)
+      ;
+      ; useless (addfiles: if the aggregated time coordinate has different units in the individual aggregated
+      ; files, the values are adjusted to conform to the units of the first file in the aggregation)
+      ;if (all(all_files[:]&$coord$@standard_name .eq. "time")) then  
+      ;  all_fld&$coord$ = cd_convert(all_fld&$coord$, all_files[0]->$var$&$coord$@units)
+      ;
+      ; check if all X axis are "time" else NCL sets first file attributes to other files
+      if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
+        first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
+        if (.not. all(all_files[:]&$coord$@standard_name .eq. first_file_axis_name)) then
+          print("Files have not same axis for variable "+coord)
+          status_exit(1)
+        end if        
+      end if
+      ; data vector for X axis
+      if realXaxis .eq. 1 then
+        Xaxis=all_fld&$coord$             ; take union of all time periods
+      else
+        Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
+      end if      
+    end if
+  end do
+
+  ;---Resources for "left" variable
+  res=True
+  res@gsnDraw          = False   ; Will draw later, after overlaying
+  res@gsnFrame         = False   ; all plots
+ 
+  res@vpWidthF    = 0.7          ; Make plots wider
+  res@vpHeightF   = 0.5
+
+  res@trXMinF=min(Xaxis)
+  res@trXMaxF=max(Xaxis)
+  res@trYMinF=min(all_fld) 
+  res@trYMaxF=max(all_fld) 
+
+  ;---Thickness
+  if isvar("thickness") then 
+    res@xyLineThicknessF     = thickness 
+  else
+    res@xyLineThicknessF     = 2.0      ; default is 1
+  end if
+  res@xyMonoDashPattern      = True     ; force all solid lines
+
+  ;---Set resources for colors and labels
+  colornames=new(n, string)
+  if n .le. 9 then
+    stdcolors=(/"black","red","blue","yellow","green","orange","purple","violet","grey"/)
+  else
+    stdcolors=new(n, string)
+    stdcolors(0:8)=(/"black","red","blue","yellow","green","orange","purple","violet","grey"/)
+    do i=0,(n-9)-1 stdcolors(i+9)=stdcolors(i) end do
+  end if
+ 
+  do i=0,n-1 colornames(i)=stdcolors(i) end do
+  if isvar("colors") then 
+    tab=str_split(colors," ")
+    do i=0,dimsizes(tab)-1 
+      colornames(i)=tab(i) 
+    end do
+  end if 
+  if (isvar("labels")) then
+    tab_labels=str_split(labels,"$")
+  end if
+  
+  ;---Titles
+  if .not. isvar("title") then title="title" end if
+  res@tiMainString     = title                    ; add title
+  
+  ;---Resources for legend
+  res@pmLegendDisplayMode    = "Always"              ; turn on legend
+  res@pmLegendWidthF         = 0.12                  ; Change width and
+  res@pmLegendHeightF        = 0.15                  ; height of legend.
+  res@lgLabelFontHeightF     = .011                  ; change font height
+  res@lgPerimOn              = False                 ; no box around
+  ;res@lgItemOrder           = (/1,0/)               ; reverse legend
+
+  ;---linp
+  logp=True
+  if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
+  
+  ;--------------------------------------------------
+  ; The time_axis_label function adds additional
+  ; resources to "res" to produce nicely-formatted
+  ; time labels on X axis. This function only works
+  ; if you have a time "units" recognized by the
+  ; cd_calendar function.
+  ;---------------------------------------------------
+  restick = True
+    
+  if (isvar("fmt")) then
+    restick@ttmFormat=fmt  
+  else
+    ymdhms = cd_calendar(Xaxis,0) ;return array of dimension dimsizes(Xaxis) x 6 and of type float
+    ;ymdhms(:,0) <=> years, ymdhms(:,1) <=> months, etc
+    ymdhms_dim = dimsizes(ymdhms)
+    nt = ymdhms_dim(0)
+
+    if ymdhms(nt-1,0) .ne. ymdhms(0,0) then ;year changes
+
+      if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 1) then ;2 years 
+        ;(by default, 'time_axis_labels' sets "%c%y")
+        restick@ttmNumTicks=8      ; approximate number of tick labels
+        restick@ttmMajorStride=3   ; number of timesteps desired between major tickmarks 
+        restick@ttmMinorStride=1   ; number of timesteps desired between minor tickmarks
+        restick@ttmFormat="%N/%y"         
+      else if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 9) then ;10 years 
+        ;(by default, 'time_axis_labels' sets "%Y")
+        restick@ttmNumTicks=12
+        restick@ttmMajorStride=12
+        restick@ttmMinorStride=3
+        restick@ttmFormat="%N/%y" 
+      end if
+      end if
+
+    end if
+
+  end if
+
+  time_axis_labels(Xaxis,res,restick)
+
+  ;---Open workstation
+  wks = gsn_open_wks ("png",plotname) 
+
+  ;xvalue=new(3, float)        ; for res@pmLegendParallelPosF
+  ;xvalue=(/0.15,0.5,0.85/)   
+  ;yvalue=new(4, float)        ; for res@pmLegendOrthogonalPosF  
+  ;yvalue=(/-0.1,0.,0.1,0.2/)
+
+  ;---Create n plots
   do i=0, n-1 
 
     ; Read variable
-    ffile=addfile(files(i),"r")
-    if isfilevar(ffile,var) then 
+    ffile=all_files[i]
+    if isfilevar(ffile,var) then
       if (getfilevartypes(ffile,var) .eq. "short") then
-        fld = short2flt( ffile->$var$ ) 
+        fld = short2flt( ffile->$var$ )
       else
         fld = ffile->$var$
       end if
@@ -47,93 +229,91 @@ begin
       status_exit(1)
     end if
 
-     ; Search and extract relevant vector
-    Var_DimNames = getvardims(fld)  ; getting dimensions from metadata
-    dime=dimsizes(fld)
+    ; Search and extract relevant vector
+    Var_DimNames:= getvardims(fld)  ; getting dimensions from metadata
+    dime:=dimsizes(fld)
     rank=dimsizes(dime)
     found=False
-    coord=""
+    coord:=""
+    
     do dim=0,rank-1
       ;print("analyzing "+Var_DimNames(dim))
       if dime(dim) .gt. 1 then 
+       
         if found then
-          print("There is more than one non-singleton dim for file "+f+ " :"+coord+ Var_DimNames(dim))
+          print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+ Var_DimNames(dim))
           status_exit(1)
         end if 
         found=True
-        ; if processing first line/file : allocate multi-line array, and store coordinate array in 'ax'
-        if (i .eq. 0 ) then 
-          vec=new((/n,dime(dim)/),float)
-          coord=Var_DimNames(dim)
-          ax=fld&$coord$
+
+        coord=Var_DimNames(dim)
+        ;print(coord)
+        ; Store coordinate in 'ax'
+        if realXaxis .eq. 1 then
+          ax:=fld&$coord$
+        else
+          ; Take first file as reference for x axis if realXaxis=0
+          if (i .eq. 0 ) then 
+            ax=fld&$coord$
+          end if
         end if
-        ;printVarSummary(fld)
-        ;printVarSummary(ndtooned(fld))
-        ;printVarSummary(vec)
-        vec(i,:)=ndtooned(fld)
-      end if
+      
+        ; Create plot
+        res@xyLineColor = colornames(i)
+        res@xyExplicitLegendLabels = tab_labels(i)
+        
+        if (i .eq. 0) then 
+          res@pmLegendParallelPosF   = 0.15 ;xvalue(0) 
+          res@pmLegendOrthogonalPosF = -0.1 ;yvalue(0)      ; move up slightly 
+
+          if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
+            if (ax@positive .eq. "down") then 
+              res@trYReverse = True ; reverse Y-axis
+            end if
+            if logp then 
+              res@xyYStyle = "Log" 
+              set_pres_hgt_axes(ax,res,True)
+            end if
+            plot = gsn_csm_xy(wks,ndtooned(fld),ax,res)
+          else
+            plot = gsn_csm_xy(wks,ax,ndtooned(fld),res)
+          end if
+
+        else
+          res@pmLegendParallelPosF   = 0.15+0.35*(tointeger(i/4.)) ;xvalue(tointeger(i/4.)) 
+          res@pmLegendOrthogonalPosF = -0.1+0.1*(mod(i,4.))        ;yvalue(mod(i,4.)) 
+          
+          if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
+            if (ax@positive .eq. "down") then 
+              res@trYReverse = True ; reverse Y-axis
+            end if
+            if logp then 
+              res@xyYStyle = "Log" 
+              set_pres_hgt_axes(ax,res,True)
+            end if
+            over = gsn_csm_xy(wks,ndtooned(fld),ax,res)
+          else
+            over = gsn_csm_xy(wks,ax,ndtooned(fld),res)
+          end if
+
+          ;---Overlay one plot on the other
+          overlay(plot,over)
+        end if ; condition 'if' on files
+       
+      end if 
     end do ; loop on dimensions
 
     if .not. found then 
-      print("There is no non-sigleton dim for file "+f)
+      print("There is no non-sigleton dim for file "+ffile)
       status_exit(1)
     end if 
+    
+  end do ; loop on files  
 
-  end do ; loop on files
+  draw(plot) ; This will draw all n plots
+  frame(wks)
 
-  res=True
-  if isvar("thickness") then 
-    res@xyLineThicknessF       = thickness 
-  else
-    res@xyLineThicknessF       = 2.0      ; default is 1
-  end if
-  res@xyMonoDashPattern      = True     ; force all solid lines
-  
-  colornames=new(n, string)
-  stdcolors=(/"black","red","blue","yellow","green","orange","purple","violet","grey"/)
-  do i=0,n-1 colornames(i)=stdcolors(i) end do
-  if isvar("colors") then 
-    tab=str_split(colors," ")
-    do i=0,dimsizes(tab)-1 
-      colornames(i)=tab(i) 
-    end do
-  end if 
-  res@xyLineColors=colornames
-  
-  if .not. isvar("title") then title="title" end if
-  res@tiMainString     = title                    ; add title
-  
-;---Resources for legend
-  res@pmLegendDisplayMode    = "Always"              ; turn on legend
-  res@pmLegendWidthF         = 0.12                  ; Change width and
-  res@pmLegendHeightF        = 0.15                  ; height of legend.
-  ;res@pmLegendOrthogonalPosF = -0.08                 ; move up slightly 
-  res@lgLabelFontHeightF     = .011                  ; change font height
-  res@lgPerimOn              = True                 ; no box around
-  ;res@lgItemOrder            = (/1,0/)               ; reverse legend
-  if ( isvar("labels")) then 
-    res@xyExplicitLegendLabels=str_split(labels,"$")
-  end if
-
-  logp=True
-  if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
-
-  res@vpWidthF    = 0.7        ; Make plots wider
-  res@vpHeightF   = 0.5
-
-  ; Just plot
-  wks   = gsn_open_wks ("png",plotname)             ; open workstation
-  ;
-  if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
-    if (ax@positive .eq. "down") then 
-      res@trYReverse = True ; reverse Y-axis
-    end if
-    if logp then 
-      res@xyYStyle = "Log" 
-      set_pres_hgt_axes(ax,res,True)
-    end if
-    plot = gsn_csm_xy(wks,vec,ax,res)
-  else
-    plot = gsn_csm_xy (wks,ax,vec,res) ; create plot
-  end if
 end
+
+
+
