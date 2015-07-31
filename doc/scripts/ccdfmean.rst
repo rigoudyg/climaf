@@ -8,14 +8,14 @@ assuming its usage is::
  cdfmean  IN-file IN-var T|U|V|F|W **[imin imax jmin jmax kmin kmax]** 
  ... **[-full]** [-var] [-zeromean]
 
-CliMAF optional arguments are the ones in bold type.
+CliMAF optional arguments are the ones surrounded with '**'.
 
 If a spatial window is specified, the mean value is computed only in this
 window. See also:
- 
-  - :doc:`ccdfmean_profile` for getting a horizontal mean
+
+  - :doc:`ccdfmean_profile <ccdfmean_profile>` for getting a horizontal mean
     for each level for 3D fields 
-  - :doc:`ccdfvar` to compute the spatial variance of the variable
+  - :doc:`ccdfvar<ccdfvar>` to compute the spatial variance of the variable
 
 **References** : http://www.drakkar-ocean.eu/tools
 
@@ -34,10 +34,8 @@ window. See also:
   - ``imin``, ``imax``, ``jmin``, ``jmax``,  ``kmin``, ``kmax`` : for
     defining spatial windows 
 
-  - ``opt`` : may be used to pass key :
-
-    - ``-full`` : compute the mean for full steps, instead of default
-      partial steps 
+  - ``opt`` : may be used to pass key ``-full`` (compute the mean for
+    full steps, instead of default partial steps)
 
 **Required files**: Files mesh_hgr.nc, mesh_zgr.nc, mask.nc must be in
 the current directory (use function 'fixed_fields' for that; see
@@ -49,14 +47,11 @@ example below).
 
 **Climaf call example**:: 
 
-  >>> from climaf.api import *
-  >>> cdef("frequency","monthly") 
-  >>> cdef("project","EM")
   >>> # How to get required files for cdftools cdfmean binary
   >>> fixed_fields('ccdfmean',
-  ('mask.nc','/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
-  ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
-  ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
+   ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
+   ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
+   ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
   >>> d1=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
   >>> my_cdfmean=ccdfmean(d1,pos_grid='U')
   >>> cfile(my_cdfmean) # to compute the mean value and get a filename with the result 

@@ -31,18 +31,33 @@ Documented operators as of today :
  - example for two outputs :
     - :doc:`scripts/mean_and_std`
 
+.. _ancre: 
+
  - CDFTools operators; we wrap some operators using similar names: 
-    - :doc:`scripts/ccdfmean`
-    - :doc:`scripts/ccdfmean_profile`
-    - :doc:`scripts/ccdfvar`
-    - :doc:`scripts/ccdfvar_profile`
-    - :doc:`scripts/ccdftransport`
-    - :doc:`scripts/ccdfheatc`
-    - :doc:`scripts/ccdfmxlheatc`
+    - operators based on cdfmean:
+
+      - :doc:`scripts/ccdfmean`
+      - :doc:`scripts/ccdfmean_profile`
+      - :doc:`scripts/ccdfvar`
+      - :doc:`scripts/ccdfvar_profile`
+	
+    - operators dealing heat content:
+	  
+      - :doc:`scripts/ccdfheatc`
+      - :doc:`scripts/ccdfmxlheatc`
+
+    - operators dealing transport:
+
+      - :doc:`scripts/ccdftransport`
+      - :doc:`scripts/ccdfvT`
+
+    - operators based on cdfstd:
+
+      - :doc:`scripts/ccdfstd`
+      - :doc:`scripts/ccdfstdmoy`
+   
     - :doc:`scripts/ccdfsections`
-    - :doc:`scripts/ccdfstd`
-    - :doc:`scripts/ccdfstdmoy`
-    - :doc:`scripts/ccdfvT`
+    
 
 .. |sk| image:: swiss_knife_50.png
 

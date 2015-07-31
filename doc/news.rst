@@ -11,6 +11,15 @@ Whats' new
 
 Changes, newest first :
 
+.. _news_0.9:
+
+- 2015/07/31 - Version 0.9 :
+
+ - Interface to Drakkar CDFTools: CliMAF interface to the following
+   Drakkar CDFTools : cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
+   cdfsections, cdfstd, cdfvT (see :ref:`CDFTools operators <ancre>`)
+
+
 .. _news_0.8:
 
 - 2015/07/08 - Version 0.8 :
