@@ -1,13 +1,52 @@
 
 
 stdout and stderr of script call :
-	 cdfstd -save  /home/vignonl/tmp/climaf_cache/f4/4.nc; mv cdfstd.nc /home/vignonl/tmp/climaf_cache/50/4.nc; mv cdfmoy.nc /home/vignonl/tmp/climaf_cache/bb/f.nc ; rm -f cdfstd.nc cdfmoy.nc
+	 /mnt/nfs/d3/aster/data3/aster/vignonl/code/climaf/climaf/../scripts/cdftransport.sh /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc 117 117 145 147 "" "-full" /home/vignonl/tmp/climaf_cache/25/a.nc /home/vignonl/tmp/climaf_cache/4d/1.nc /home/vignonl/tmp/climaf_cache/8f/2.nc
 
- npiglo =          362
- npjglo =          292
- npk    =           42
-  nvars =           5
-  Working with uo          42
++ in_1=/home/vignonl/tmp/climaf_cache/2d/c.nc
++ shift
++ in_2=/home/vignonl/tmp/climaf_cache/8d/4.nc
++ shift
++ in_3=/home/vignonl/tmp/climaf_cache/bd/7.nc
++ shift
++ in_4=/home/vignonl/tmp/climaf_cache/a3/f.nc
++ shift
++ in_5=/home/vignonl/tmp/climaf_cache/22/5.nc
++ shift
++ in_6=/home/vignonl/tmp/climaf_cache/30/e.nc
++ shift
++ imin=117
++ shift
++ imax=117
++ shift
++ jmin=145
++ shift
++ jmax=147
++ shift
++ opt1=
++ shift
++ opt2=-full
++ shift
++ out=/home/vignonl/tmp/climaf_cache/25/a.nc
++ shift
++ out_htrp=/home/vignonl/tmp/climaf_cache/4d/1.nc
++ shift
++ out_strp=/home/vignonl/tmp/climaf_cache/8f/2.nc
++ shift
+++ mktemp /tmp/tmp_file.XXXXXX
++ tmp_file=/tmp/tmp_file.rmGFLS
++ cdo merge /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /tmp/tmp_file.rmGFLS
+cdo merge: Processed 17758272 values from 4 variables over 4 timesteps ( 0.32s )
++ echo climaf
++ echo 117,117,145,147
++ echo EOF
++ cdftransport /tmp/tmp_file.rmGFLS /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc -full
+ npiglo =         362
+ npjglo =         292
+ npk    =          42
+ npt    =           1
+ Limits :  
+           1          41   0.00000000       5200.59863    
  level            1
  level            2
  level            3
@@ -49,4 +88,26 @@ stdout and stderr of script call :
  level           39
  level           40
  level           41
- level           42
+  Give name of section (EOF to finish)
+  Give iimin, iimax, ijmin, ijmax 
+ climaf
+ IMIN IMAX JMIN JMAX         117         117         145         147
+FROM (LON LAT):  -171.00   -0.50 TO (LON LAT)  -171.00    0.17
+   0.00000000       5200.59863    
+  Mass transport :   -3.7973460776367189       SV
+  Heat transport :   0.34574611279465023       PW
+  Salt transport :   -125.03108284375000       kT/s
+  Give name of section (EOF to finish)
+    
+  Overall transports (sum of all legs done so far)
+   0.00000000       5200.59863    
+  Mass transport :   -3.7973460776367189       SV
+  Heat transport :   0.34574611279465023       PW
+  Salt transport :   -125.03108284375000       kT/s
++ cdo selname,vtrp climaf_transports.nc /home/vignonl/tmp/climaf_cache/25/a.nc
+cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
++ cdo selname,htrp climaf_transports.nc /home/vignonl/tmp/climaf_cache/4d/1.nc
+cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
++ cdo selname,strp climaf_transports.nc /home/vignonl/tmp/climaf_cache/8f/2.nc
+cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
++ rm -f climaf_transports.nc /tmp/tmp_file.rmGFLS section_trp.dat htrp.txt vtrp.txt strp.txt
