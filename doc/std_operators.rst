@@ -31,7 +31,7 @@ Documented operators as of today :
  - example for two outputs :
     - :doc:`scripts/mean_and_std`
 
- - CDFTools operators:
+ - CDFTools operators; we wrap some operators using similar names: 
     - :doc:`scripts/ccdfmean`
     - :doc:`scripts/ccdfmean_profile`
     - :doc:`scripts/ccdfvar`

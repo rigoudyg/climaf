@@ -1,4 +1,4 @@
-# Example for cdftransport operator of cdftools:
+# Example for cdftools cdftransport operator :
 # - computes the transports accross a section
 
 #----------------
@@ -14,8 +14,9 @@
 #
 
 from climaf.api import *
-from climaf.operators import fixed_fields
-cdef("frequency","monthly")
+
+if not atCNRM:
+    return
 
 # Declare "NEMO" project, where VT-files (netcdf file with mean values
 # of vt, vs, ut, us for heat and salt transport) are defined
@@ -23,25 +24,29 @@ from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
-if atCNRM:
-    cproject('NEMO','grid','table',separator='&')
+cproject('NEMO','grid','table',separator='&')
 
-    root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_"
-    root2="/cnrm/aster/data3/aster/chevalli/Monitoring/PRE6/SORTIE/PRE6/PRE6CPLCr2alb/MONITOR/VT/PRE6CPLCr2alb_1m_"
-    suffix="YYYYMMDD_YYYYMMDD"
-    url_nemo1=root1+suffix+"_${grid}_${table}.nc"
-    url_nemo2=root2+suffix+"_${grid}.nc"   #grid='VT'
-    dataloc(project='NEMO', organization='generic', url=[url_nemo1,url_nemo2])
+root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_"
+root2="/cnrm/aster/data3/aster/chevalli/Monitoring/PRE6/SORTIE/PRE6/PRE6CPLCr2alb/MONITOR/VT/PRE6CPLCr2alb_1m_"
+suffix="YYYYMMDD_YYYYMMDD"
+url_nemo1=root1+suffix+"_${grid}_${table}.nc"
+url_nemo2=root2+suffix+"_${grid}.nc"   #grid='VT'
+dataloc(project='NEMO', organization='generic', url=[url_nemo1,url_nemo2])
 
 # Use "NEMO" project
 cdef("project","NEMO")
+cdef("frequency","monthly")
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-lpath='/cnrm/aster/data3/aster/vignonl/code/climaf/'
 
 # How to get required files for cdftransport
+# fixed_fields('ccdftransport',
+#             target=[tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
+#             link=[lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+
 fixed_fields('ccdftransport',
-             target=[tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
-             link=[lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+             ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
+             ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
+             ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 
 # Define dataset with uo ("uo" in .nc <=> "vozocrtx" for cdftools),
 # vo ("vo" in .nc <=> "vomecrty" for cdftools), vt (:=vomevt), vs (:=vomevs),

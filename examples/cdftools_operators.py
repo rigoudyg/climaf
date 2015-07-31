@@ -23,7 +23,10 @@
 
 #export CLIMAF_FIX_NEMO_TIME='on'
 from climaf.api import *
-from climaf.operators import fixed_fields
+
+if not atCNRM:
+    return
+
 cdef("frequency","monthly") 
 cdef("project","EM")
 
@@ -40,12 +43,16 @@ cdef("project","EM")
 
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 #tpath='/cnrm/aster/data3/aster/vignonl/${project}/'
-lpath='/cnrm/aster/data3/aster/vignonl/code/climaf/'
 
 # How to get required files for all cdftools binaries
+# fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc','ccdfmxlheatc'],
+#             target=[tpath+'ORCA1_mesh_mask.nc',tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
+#             link=[lpath+'mask.nc',lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+
 fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc','ccdfmxlheatc'],
-             target=[tpath+'ORCA1_mesh_mask.nc',tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
-             link=[lpath+'mask.nc',lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+             ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
+             ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
+             ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 
 # For example, define dataset with sea water x velocity ("uo")
 d1=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")

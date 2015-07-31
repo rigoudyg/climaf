@@ -359,15 +359,26 @@ class cscript():
         return(len(ls))
     
 #LV
-def fixed_fields(name, target, link):
+#def fixed_fields(name, target, link):
+#    if not isinstance(name,list):
+#        namelist=list()
+#        namelist.append(name)
+#    else:
+#        namelist=name
+#    for name_op in namelist:
+#        scripts[name_op].fixedfields=(target, link)
+#        #return target, link
+        
+def fixed_fields(name, *paths):
     if not isinstance(name,list):
         namelist=list()
         namelist.append(name)
     else:
         namelist=name
+        
     for name_op in namelist:
-        scripts[name_op].fixedfields=(target, link)
-        #return target, link
+        scripts[name_op].fixedfields=paths
+
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 

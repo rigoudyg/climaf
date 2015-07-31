@@ -450,19 +450,35 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #
     #fixedfields LV
     if script.fixedfields is not None :
-        lt,ll=script.fixedfields  #return target/source, link/dest
+#        lt,ll=script.fixedfields  #return target/source, link/dest
+
         subdict_ff=dict()
         subdict_ff["model"]=scriptCall.operands[0].model
         subdict_ff["simulation"]=scriptCall.operands[0].simulation
         subdict_ff["project"]=scriptCall.operands[0].project 
-        for t,l in zip(lt,ll):
-            # Replace input data placeholders with filenames for fixed fields
-            template_ff_target=Template(t)
+
+#        for t,l in zip(lt,ll):
+#            # Replace input data placeholders with filenames for fixed fields
+#            template_ff_target=Template(t)
+#            # Substitute all args
+#            template_ff_target=template_ff_target.substitute(subdict_ff)
+#            # symlink
+#            os.system("ln -s "+template_ff_target+" "+l)
+            
+        l=script.fixedfields #return paths: (linkname, targetname)
+        files_exist=dict()
+        for ll,lt in l:
+            #Replace input data placeholders with filenames for fixed fields
+            template_ff_target=Template(lt)
             # Substitute all args
             template_ff_target=template_ff_target.substitute(subdict_ff)
             # symlink
-            os.system("ln -s "+template_ff_target+" "+l)
-        
+            files_exist[ll]=False
+            if os.path.isfile(ll):      
+                files_exist[ll]=True
+            else:
+                os.system("ln -s "+template_ff_target+" "+ll)   
+            
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -485,10 +501,17 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     command.wait()
 
     #fixedfields LV: rm symlink
+#    if script.fixedfields is not None :
+#        lt,ll=script.fixedfields  #return target/source, link/dest
+#        for l in ll:
+#            os.system("rm -f "+l)
+
     if script.fixedfields is not None :
-        lt,ll=script.fixedfields  #return target/source, link/dest
-        for l in ll:
-            os.system("rm -rf "+l)  
+        l=script.fixedfields  #return paths: (linkname, targetname)
+        for ll,lt in l:
+            if files_exist[ll] == False:
+                os.system("rm -f "+ll)  
+
     
     tim1=time.time()
     clogger.info("Launching command:"+template)

@@ -1,7 +1,7 @@
 
 
 stdout and stderr of script call :
-	 /mnt/nfs/d3/aster/data3/aster/vignonl/code/climaf/climaf/../scripts/cdftransport.sh /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc 117 117 145 147 "" "-full" /home/vignonl/tmp/climaf_cache/25/a.nc /home/vignonl/tmp/climaf_cache/4d/1.nc /home/vignonl/tmp/climaf_cache/8f/2.nc
+	 climaf/../scripts/cdftransport.sh /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc 117 117 145 147 "" "-full" /home/vignonl/tmp/climaf_cache/25/a.nc /home/vignonl/tmp/climaf_cache/4d/1.nc /home/vignonl/tmp/climaf_cache/8f/2.nc
 
 + in_1=/home/vignonl/tmp/climaf_cache/2d/c.nc
 + shift
@@ -34,13 +34,13 @@ stdout and stderr of script call :
 + out_strp=/home/vignonl/tmp/climaf_cache/8f/2.nc
 + shift
 ++ mktemp /tmp/tmp_file.XXXXXX
-+ tmp_file=/tmp/tmp_file.rmGFLS
-+ cdo merge /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /tmp/tmp_file.rmGFLS
++ tmp_file=/tmp/tmp_file.yV5wvH
++ cdo merge /home/vignonl/tmp/climaf_cache/2d/c.nc /home/vignonl/tmp/climaf_cache/8d/4.nc /home/vignonl/tmp/climaf_cache/bd/7.nc /home/vignonl/tmp/climaf_cache/a3/f.nc /tmp/tmp_file.yV5wvH
 cdo merge: Processed 17758272 values from 4 variables over 4 timesteps ( 0.32s )
 + echo climaf
 + echo 117,117,145,147
 + echo EOF
-+ cdftransport /tmp/tmp_file.rmGFLS /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc -full
++ cdftransport /tmp/tmp_file.yV5wvH /home/vignonl/tmp/climaf_cache/22/5.nc /home/vignonl/tmp/climaf_cache/30/e.nc -full
  npiglo =         362
  npjglo =         292
  npk    =          42
@@ -110,4 +110,4 @@ cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
 cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
 + cdo selname,strp climaf_transports.nc /home/vignonl/tmp/climaf_cache/8f/2.nc
 cdo selname: Processed 1 value from 11 variables over 1 timestep ( 0.00s )
-+ rm -f climaf_transports.nc /tmp/tmp_file.rmGFLS section_trp.dat htrp.txt vtrp.txt strp.txt
++ rm -f climaf_transports.nc /tmp/tmp_file.yV5wvH section_trp.dat htrp.txt vtrp.txt strp.txt
