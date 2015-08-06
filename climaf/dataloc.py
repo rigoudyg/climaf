@@ -19,18 +19,18 @@ class dataloc():
     def __init__(self,organization=None, url=None, project="*",model="*", simulation="*", 
                  realm="*", table="*", frequency="*"):
         """
-        Create an entry in the data locations dictionary for an ensemble of datasets.
+        Create an entry in the data locations dictionnary for an ensemble of datasets.
 
         Args:
           project (str,optional): project name
           model (str,optional): model name
-          simulation (str,optional): simulation name
+          experiment (str,optional): exepriment name
           frequency (str,optional): frequency
           organization (str): name of the organization type, among 
            those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
-        Each entry in the dictionary allows to store :
+        Each entry in the dictionnary allows to store :
         
          - a list of path or URLS, which are root paths for
            finding some sets of datafiles which share a file organization scheme
@@ -49,11 +49,11 @@ class dataloc():
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
            
-         - the set of attribute values which which simulation's data are 
+         - the set of attribute values which which experiment's data are 
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
-        wildcard value; when using the dictionary, the most specific
+        wildcard value; when using the dictionnary, the most specific
         entries will be used (whic means : the entry (or entries) with the lowest number of wildcards)
 
         Example :
@@ -62,9 +62,9 @@ class dataloc():
             
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
             
-         - and declaring an exception for one simulation (here, both location and organization are supposed to be different)::
+         - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
             
-            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
@@ -162,9 +162,9 @@ def selectLocalFiles(**kwargs):
     """
     rep=[]
     project=kwargs['project']
-    simulation=kwargs['simulation']
     variable=kwargs['variable']
     period=kwargs['period']
+    simulation=kwargs['simulation']
 
     if 'model' in kwargs : model=kwargs['model']
     else : model="*"
@@ -198,7 +198,7 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for %s, at these "
+            clogger.warning("no file found for %s, at these"
                             "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -210,8 +210,8 @@ def selectLocalFiles(**kwargs):
     # Assemble filenames in one single string
     return(string.join(rep))
 
-# u="/home/stephane/Bureau/climaf/examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
-# selectGenericFiles(simulation="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
+# u="/home/stephane/Bureau/climaf/examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
+# selectGenericFiles(experiment="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
 def selectGenericFiles(urls, **kwargs):
     """
@@ -229,7 +229,7 @@ def selectGenericFiles(urls, **kwargs):
 
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
     /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
@@ -252,34 +252,45 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
-    mustHaveVariable=False
     if "filenameVar" in kwargs and kwargs['filenameVar'] :
         kwargs['variable']=kwargs['filenameVar']
-        mustHaveVariable=True
     for l in urls :
         template=Template(l)
-        # There is no use to look for files which path is not specific
-        # to the required variable when we know it should
-        if l.find("${variable}") < 0 and mustHaveVariable :
-            continue
         #
         # Instantiate keywords in pattern with attributes values
         template=template.safe_substitute(**kwargs)
-        #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        for k in dt : temp2=temp2.replace(k,dt[k])
+        lkeys=dt.keys() ; lkeys.sort(reverse=True)
+        for k in lkeys : temp2=temp2.replace(k,dt[k])
         clogger.debug("Globbing on : "+temp2)
         lfiles=glob.glob(temp2)
         #
         # Analyze all filenames
-        for f in lfiles :
-            # print "looking at file"+f
+        # --> We want to keep all the files that (in order) contain:
+	#        - 1/ the variable name
+	#        - 2/ the filenameVar pattern
+	#        - 3/ if none of those conditions occurs, we loop on all the files found with the globbing
+        matching_lfiles=[]
+	# -- Step 1/ Matching the variable name in the file name
+        for f in lfiles:
+            if '_'+variable in f:
+               matching_lfiles.append(f)
+	# -- Step 2/ If we didn't find the variable, try to find the filenameVar pattern
+        if len(matching_lfiles)==0:
+           for f in lfiles:
+             if 'filenameVar' in kwargs and kwargs['filenameVar'] in f:
+               matching_lfiles.append(f)
+	# -- Step 3/ If step 1 and 2 are not successful, take the complete list of files to try to find the variable
+        if len(matching_lfiles)==0:
+            matching_lfiles=lfiles
+
+        for f in matching_lfiles :
             # Construct regexp for extracting dates from filename
             dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
-                    YYYYMMDD="([0-9]{10})")
+                    YYYYMMDD="([0-9]{8})")
             regexp=None
             # print "template before searching dates : "+template
             lkeys=dt.keys() ; lkeys.sort(reverse=True)
@@ -319,7 +330,10 @@ def selectGenericFiles(urls, **kwargs):
                     rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 # Filter against variable 
-                if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                if (l.find("${variable}")>=0):
+                    rep.append(f)
+                    break
+                if f not in rep and fileHasVar(f,variable) :
                     # Should check time period in the file if not regexp
                     # print "appending "+f
                     rep.append(f)
@@ -366,7 +380,7 @@ def selectEmFiles(**kwargs) :
                         if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
                     #clogger.debug("Done with Looking at file "+fil)
-            else : clogger.error("Directory %s does not exist for EM simulation %s, realm %s "
+            else : clogger.error("Directory %s does not exist for EM experiment %s, realm %s "
                                  "and frequency %s"%(dir,simulation,realm,f))
         else :
             clogger.info("No archive location found for "+
@@ -434,13 +448,13 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     # otherwise those of last dir
     project=kwargs['project']
     model=kwargs['model']
-    simulation=kwargs['simulation']
     frequency=kwargs['frequency']
     variable=kwargs['variable']
+    experiment=kwargs['experiment']
     realm=kwargs['realm']
     table=kwargs['table']
     period=kwargs['period']
-    experiment=kwargs['experiment']
+    simulation=kwargs['simulation']
     version=kwargs['version']
     #
     rep=[]
