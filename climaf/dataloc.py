@@ -270,7 +270,8 @@ def selectGenericFiles(urls, **kwargs):
         # Construct a pattern for globbing dates
         temp2=template
         dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        for k in dt : temp2=temp2.replace(k,dt[k])
+        lkeys=dt.keys() ; lkeys.sort(reverse=True)
+        for k in lkeys : temp2=temp2.replace(k,dt[k])
         clogger.debug("Globbing on : "+temp2)
         lfiles=glob.glob(temp2)
         #
@@ -279,7 +280,7 @@ def selectGenericFiles(urls, **kwargs):
             # print "looking at file"+f
             # Construct regexp for extracting dates from filename
             dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
-                    YYYYMMDD="([0-9]{10})")
+                    YYYYMMDD="([0-9]{8})")
             regexp=None
             # print "template before searching dates : "+template
             lkeys=dt.keys() ; lkeys.sort(reverse=True)

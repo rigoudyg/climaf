@@ -4,6 +4,8 @@
 Whats' new
 ------------
 
+Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
+
 .. |indx| image:: html_index.png 
   :scale: 13%
 
@@ -44,6 +46,12 @@ Changes, newest first :
  - **default values for facets** are now handled on a per-project
    basis. See :py:func:`~climaf.classes.cdef()` and
    :py:class:`~climaf.classes.cdataset()`. 
+ - climatology files, which have a somewhat intricated time axis
+   (e.g. monthly averages over a 10 year period) can now be handled
+   with CliMAF regular time axis management, on the fly, by modifying 
+   the basic data selection script: it can
+   enforce a reference time axis by intepreting the data filename. See
+   function timefix() near line 30 in :download:`mcdo.sh <../scripts/mcdo.sh>` 
  - scripts argument 'labels' now uses '$' as a separator
  - fixes :
 

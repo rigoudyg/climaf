@@ -474,8 +474,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             ok = cache.register(main_output_filename,scriptCall.crs)
             # Named outputs
             for output in scriptCall.outputs:
-                ok = ok and cache.register(subdict["out_"+output],\
-                                           scriptCall.crs+"."+output)
+                ok = ok and \
+                     cache.register(subdict["out_"+output], scriptCall.crs+"."+output)
             if ok : 
                 duration=time.time() - tim1
                 print("Done in %.1f s with script computation for %s "%\
@@ -587,7 +587,7 @@ def cread(datafile,varname=None):
     elif re.findall(".nc$",datafile) :
         clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
-        if varname is None: return(None)
+        if varname is None: raise Climaf_Driver_Error("")
         from Scientific.IO.NetCDF import NetCDFFile as ncf
         fileobj=ncf(datafile)
         #import netCDF4
@@ -641,6 +641,8 @@ def set_variable(obj, varname, format) :
     long_name=CFlongname(varname)
     if (format=='file') :
         oldvarname=varOfFile(obj)
+        if not oldvarname : 
+            raise Climaf_Driver_Error("Cannot set variable name for a multi-variable dataset")
         if (oldvarname != varname) :
             command="ncrename -v %s,%s %s >/dev/null 2>&1"%(oldvarname,varname,obj)
             if ( os.system(command) != 0 ) :

@@ -86,7 +86,7 @@ class cproject():
         however of lower priority than the value set using :py:func:`cdef`
 
         A project can be declared as having non-standard variable
-        names, or variables that should undergo re-scaling; see
+        names in datafiles, or variables that should undergo re-scaling; see
         :py:func:`~climaf.classes.calias`
 
         A project can be declared as having non-standard frequency names (this is 
