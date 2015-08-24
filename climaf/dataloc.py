@@ -19,18 +19,18 @@ class dataloc():
     def __init__(self,organization=None, url=None, project="*",model="*", simulation="*", 
                  realm="*", table="*", frequency="*"):
         """
-        Create an entry in the data locations dictionnary for an ensemble of datasets.
+        Create an entry in the data locations dictionary for an ensemble of datasets.
 
         Args:
           project (str,optional): project name
           model (str,optional): model name
-          experiment (str,optional): exepriment name
+          simulation (str,optional): simulation name
           frequency (str,optional): frequency
           organization (str): name of the organization type, among 
            those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
           url (list of strings): list of URLS for the data root directories
 
-        Each entry in the dictionnary allows to store :
+        Each entry in the dictionary allows to store :
         
          - a list of path or URLS, which are root paths for
            finding some sets of datafiles which share a file organization scheme
@@ -49,11 +49,11 @@ class dataloc():
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
            
-         - the set of attribute values which which experiment's data are 
+         - the set of attribute values which which simulation's data are 
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
-        wildcard value; when using the dictionnary, the most specific
+        wildcard value; when using the dictionary, the most specific
         entries will be used (whic means : the entry (or entries) with the lowest number of wildcards)
 
         Example :
@@ -62,9 +62,9 @@ class dataloc():
             
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
             
-         - and declaring an exception for one experiment (here, both location and organization are supposed to be different)::
+         - and declaring an exception for one simulation (here, both location and organization are supposed to be different)::
             
-            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', experiment='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
@@ -162,9 +162,9 @@ def selectLocalFiles(**kwargs):
     """
     rep=[]
     project=kwargs['project']
+    simulation=kwargs['simulation']
     variable=kwargs['variable']
     period=kwargs['period']
-    simulation=kwargs['simulation']
 
     if 'model' in kwargs : model=kwargs['model']
     else : model="*"
@@ -210,8 +210,8 @@ def selectLocalFiles(**kwargs):
     # Assemble filenames in one single string
     return(string.join(rep))
 
-# u="/home/stephane/Bureau/climaf/examples/data/${experiment}/L/${experiment}SFXYYYY.nc"
-# selectGenericFiles(experiment="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
+# u="/home/stephane/Bureau/climaf/examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
+# selectGenericFiles(simulation="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
 def selectGenericFiles(urls, **kwargs):
     """
@@ -229,7 +229,7 @@ def selectGenericFiles(urls, **kwargs):
 
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', experiment='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
     /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
@@ -259,6 +259,7 @@ def selectGenericFiles(urls, **kwargs):
         #
         # Instantiate keywords in pattern with attributes values
         template=template.safe_substitute(**kwargs)
+        #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template
@@ -269,10 +270,11 @@ def selectGenericFiles(urls, **kwargs):
         lfiles=glob.glob(temp2)
         #
         # Analyze all filenames
-        # --> We want to keep all the files that (in order) contain:
-	#        - 1/ the variable name
-	#        - 2/ the filenameVar pattern
-	#        - 3/ if none of those conditions occurs, we loop on all the files found with the globbing
+        # --> We want to keep all the filenames got by globbing which contain:
+	#        - 1/ the variable name,
+	#        - 2/ otherwise, the filenameVar pattern
+	#        - 3/ otherwise, all filenames
+        # It is enough that one file match one condition for stopping with the other conditions
         matching_lfiles=[]
 	# -- Step 1/ Matching the variable name in the file name
         for f in lfiles:
@@ -380,7 +382,7 @@ def selectEmFiles(**kwargs) :
                         if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
                     #clogger.debug("Done with Looking at file "+fil)
-            else : clogger.error("Directory %s does not exist for EM experiment %s, realm %s "
+            else : clogger.error("Directory %s does not exist for simulation %s, realm %s "
                                  "and frequency %s"%(dir,simulation,realm,f))
         else :
             clogger.info("No archive location found for "+
@@ -448,13 +450,13 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     # otherwise those of last dir
     project=kwargs['project']
     model=kwargs['model']
+    simulation=kwargs['simulation']
     frequency=kwargs['frequency']
     variable=kwargs['variable']
-    experiment=kwargs['experiment']
     realm=kwargs['realm']
     table=kwargs['table']
     period=kwargs['period']
-    simulation=kwargs['simulation']
+    experiment=kwargs['experiment']
     version=kwargs['version']
     #
     rep=[]
