@@ -4,19 +4,27 @@ ccdfsections : computes some variables (Uorth, Utang,...) along a section made o
 Computes temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang
 along a section made of Nsec linear segments (see output
 attributes). Output variables are a function of X(km), depth(m) and
-time.  
+time. 
+
+This is the wrapping around the native cdfsections operator assuming
+its usage is::   
+
+ cdfsections  Ufile Vfile Tfile larf lorf Nsec lat1 lon1 lat2 lon2 n1
+ ... **[ lat3 lon3 n2 ]** **[ lat4 lon4 n3 ]** .... 
+
+CliMAF optional arguments are the ones surrounded with '**'.
 
 **References** : http://www.drakkar-ocean.eu/tools
 
-**Provider / contact** : climaf at meteo dot fr
+**Provider / contact** : climaf at meteo dot fr for the wrapping
 
 **Inputs** (in the order of CliMAF call): 5 datasets
 
-  - a dataset with salinity ([T-file])
-  - a dataset with temperature ([T-file])
-  - a dataset with sea water potential density ([T-file])
-  - a dataset with zonal velocity component ([U-file])
-  - a dataset with meridional velocity component ([V-file])
+  - a dataset with salinity [T-file]
+  - a dataset with temperature [T-file]
+  - a dataset with sea water potential density [T-file]
+  - a dataset with zonal velocity component [U-file]
+  - a dataset with meridional velocity component [V-file]
 
 **Mandatory arguments**:
 
@@ -32,25 +40,19 @@ time.
 
 **Optional arguments**: [ lat3 lon3 n2 ] [ lat4 lon4 n3 ] ....
 
-  - ``lat3``, ``lat4``, ... : extrema latitudes of the segments
-    (from -90 to 90) 
-  - ``lon3``, ``lon4``, ... : extrema latitudes of the segments (from 0
-    to 360)  
-  - ``n2``, ``n3``, ... : number of output points on each segment 
-  - use by " more_points='lat3 lon3 n2 ...' "
-  (you have to give Nsec+1 values of lati/loni and Nsec values of ni)
+  - ``more_points`` may be used to pass following keys :
+
+    - ``lat3``, ``lat4``, ... : extrema latitudes of the segments
+      (from -90 to 90)  
+    - ``lon3``, ``lon4``, ... : extrema latitudes of the segments
+      (from 0 to 360)   
+    - ``n2``, ``n3``, ... : number of output points on each segment 
+    (you have to give Nsec+1 values of lati/loni and Nsec values of ni)
 
 It is recommended to put a lot of points on each section if the aim is
 to compute X-integrations along the section (10 x the model
 resolution).
    
-NB : sections cannot cross the Greenwich line !!
-
-NB : Not yet tested north of 60°N.
-
-NB : require a large amount of memory !
--> reduce domain size with  ncks -d  if insufficient memory error.
-
 **Required files**: None
 
 **Outputs**:
@@ -67,11 +69,8 @@ NB : require a large amount of memory !
      - ``sig2`` : field potential density sigma 2
      - ``sig4`` : field potential density sigma 4
 
-**Climaf call example**::
+**Climaf call example**:: 
 
-  >>> from climaf.api import *
-  >>> cdef("frequency","monthly") 
-  >>> cdef("project","EM")
   >>> d1=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O") # dataset with salinity
   >>> d2=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
   >>> d3=ds(simulation="PRE6CPLCr2alb", variable="rhopoto", period="199807", realm="O") # dataset with sea water potential density 
@@ -91,8 +90,4 @@ NB : require a large amount of memory !
   >>> cfile(my_cdfsections2)
 
 **Implementation**: The operator is implemented as a script which
-calls a binary using cdfsections cdftools operator.
-
-**CliMAF call sequence pattern** (for reference)::
-  
-  >>> scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}'
+calls a binary using cdftools cdfsections operator.

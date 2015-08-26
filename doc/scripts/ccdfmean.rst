@@ -25,7 +25,7 @@ window. See also:
 
   - any dataset (but only one)
 
-**Mandatory arguments**: 
+**Mandatory argument**: 
 
   - ``pos_grid`` : position of cdfvar on the C-grid : T|U|V|F|W
   

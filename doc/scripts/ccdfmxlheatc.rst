@@ -1,11 +1,18 @@
 ccdfmxlheatc : computes the heat content in the mixed layer 
 --------------------------------------------------------------
 
-Computes the heat content in the mixed layer (Joules/m2).
+Computes the heat content in the mixed layer (Joules/m2). This is the
+wrapping around the native cdfmxlheatc operator assuming its usage
+is:: 
+
+ cdfmxlheatc T-file **[-full]**
+
+CliMAF optional argument is the only argument available, surrounded
+with '**'. 
 
 **References** : http://www.drakkar-ocean.eu/tools
 
-**Provider / contact** : climaf at meteo dot fr
+**Provider / contact** : climaf at meteo dot fr for the wrapping
 
 **Inputs** (in the order of CliMAF call): 
 
@@ -14,38 +21,28 @@ Computes the heat content in the mixed layer (Joules/m2).
 
 **Mandatory arguments**: None
 
-**Optional arguments**:
+**Optional argument**:
 
-  - ``-full`` : for full step configurations, default is partial step
-    (use by opt='-full')  
+  - ``opt`` : may be used to pass key ``-full`` (for full step
+    configurations, default is partial step)    
 
 **Required files**: Files mesh_zgr.nc, mask.nc must be in the current
-directory.  
+directory (use function 'fixed_fields' for that; see example below).   
 
 **Outputs**:
 
   - main output : a netcdf file (variable : somxlheatc (Joules/m2))
 
-**Climaf call example**::
+**Climaf call example**:: 
 
-  >>> from climaf.api import *
-  >>> from climaf.operators import fixed_fields
-  >>> cdef("frequency","monthly") 
-  >>> cdef("project","EM")
-  >>> # How to get required files for cdfmxlheatc cdftools binary
-  >>> tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-  >>> lpath='/cnrm/aster/data3/aster/vignonl/code/climaf/'
+  >>> # How to get required files for cdftools cdfmxlheatc binary
   >>> fixed_fields('ccdfmxlheatc',
-             target=[tpath+'ORCA1_mesh_mask.nc',tpath+'ORCA1_mesh_hgr.nc',tpath+'ORCA1_mesh_zgr.nc'],
-             link=[lpath+'mask.nc',lpath+'mesh_hgr.nc',lpath+'mesh_zgr.nc'])
+   ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
+   ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
   >>> d1=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
   >>> d2=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O") # dataset with mld
   >>> my_cdfmxlheatc=ccdfmxlheatc(d1,d2)
   >>> cfile(my_cdfmxlheatc) # to compute the heat content in the mixed layer and get a filename with the result 
 
 **Implementation**: The operator is implemented as a binary using
-cdfmxlheatc cdftools operator. 
-
-**CliMAF call sequence pattern** (for reference)::
-  
-  >>> 'tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file'
+cdftools cdfmxlheatc operator.  
