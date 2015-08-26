@@ -42,7 +42,7 @@ cprojects : dictionary of known projects
 
 .. autodata:: climaf.classes.cprojects
 
-dataloc : describe data locations for a series of experiments
+dataloc : describe data locations for a series of simulations
 --------------------------------------------------------------------------
 
 .. autoclass:: climaf.dataloc.dataloc

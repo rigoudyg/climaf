@@ -55,7 +55,7 @@ class cproject():
 
         For instance, cproject CMIP5, after its Data Reference Syntax, 
         has attributes : 
-        experiment, model, rip (here called simulation), variable, frequency, realm, table, version
+        model, simulation (used for rip), experiment, variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
@@ -766,7 +766,7 @@ class cpage(cobject):
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
-          >>> fig=plotmap(tas_avg,crs='title')
+          >>> fig=plot(tas_avg,crs='title')
           >>> my_page=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
 
         

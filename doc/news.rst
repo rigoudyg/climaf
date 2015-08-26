@@ -20,10 +20,11 @@ Changes, newest first :
 
  - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
    facet/attribute 'experiment' was renamed 'simulation'**. It is used
-   it for hosting either CMIP5's facet/attribute 'rip', or for 'EXPID'
-   at CNRM, or for JobName at IPSL. All 'projects' and
-   examples have been changed accordingly. A facet 'experiment' was
-   added to project CMIP5 (for hosting the 'CMIP5 controlled' experiment name)
+   for hosting either CMIP5's facet/attribute 'rip', or for 'EXPID' at
+   CNRM, or for JobName at IPSL. All 'projects' and examples have been
+   changed accordingly. A facet 'experiment' was added to project
+   CMIP5 (for hosting the 'CMIP5-controlled-vocabulary' experiment
+   name)
  - Package climaf.html allows to **easily create an html index**, which includes
    tables of links (or thumbnails) to image files; iterating on
    e.g. seasons and variables is handled by CliMAF. See :
@@ -120,7 +121,7 @@ Changes, newest first :
    replacement at :doc:`scripts/plot` )
  - **A number of 'projects' are built-in**, which describe data
    organization and data location for a number of analyses and
-   experiments datasets available at one of our data centers, 
+   simulations datasets available at one of our data centers, 
    as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ; see :ref:`known_datasets` 
  - **Variable alias** and **variable scaling** are now managed, on a
    per-project basis. 
@@ -159,7 +160,7 @@ Changes, newest first :
     examples in :download:`data_generic.py
     <../examples/data_generic.py>`).
   - Access to fixed fields is now possible, and fixed fields may be
-    specific to a given experiment. . See examples in
+    specific to a given simulation. . See examples in
     :download:`data_generic.py <../examples/data_generic.py>`  
     and :download:`data_cmip5drs.py <../examples/data_cmip5drs.py>`        
     
