@@ -23,9 +23,9 @@ tuning a number of graphic attributes
     the dataset
   - colormap and its interpretation :
 
-   - ``color`` : name of the Ncl colormap to use; default is 'BlueDarkRed18'  ; see e.g. 
+   - ``cmap`` : name of the Ncl colormap to use; default is 'BlueDarkRed18'  ; see e.g. 
      https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness. 
-   - ``min``, ``max`` , ``vdelta`` : min and max values and levels
+   - ``min``, ``max`` , ``delta`` : min and max values and levels
      when applying the colormap, or 
    - ``levels`` : list of levels used when applyng colomap
      e.g. lin="260 270 280 290"

@@ -1,38 +1,5 @@
 
 
 stdout and stderr of script call :
-	 (ncl -Q climaf/../scripts/lineplot_LV.ncl infile='"/home/vignonl/tmp/climaf_cache/a4/0.nc /home/vignonl/tmp/climaf_cache/d8/1.nc /home/vignonl/tmp/climaf_cache/04/1.nc /home/vignonl/tmp/climaf_cache/87/a.nc /home/vignonl/tmp/climaf_cache/3b/d.nc /home/vignonl/tmp/climaf_cache/0a/0.nc /home/vignonl/tmp/climaf_cache/31/d.nc /home/vignonl/tmp/climaf_cache/86/1.nc /home/vignonl/tmp/climaf_cache/0d/6.nc /home/vignonl/tmp/climaf_cache/73/1.nc"' plotname='"/home/vignonl/tmp/climaf_cache/e5/0.png"' var='"tas"' title='"surface temp global average"'  labels='"1960$1961$1962$1963$1964$1965$1966$1967$1968$1969"'     realXaxis=1 fmt='"%c"'  && convert /home/vignonl/tmp/climaf_cache/e5/0.png -trim /home/vignonl/tmp/climaf_cache/e5/0.png) 
+	 (ncl -Q climaf/../scripts/lineplot.ncl infile='"/home/vignonl/tmp/climaf_cache/a4/0.nc /home/vignonl/tmp/climaf_cache/d8/1.nc /home/vignonl/tmp/climaf_cache/04/1.nc /home/vignonl/tmp/climaf_cache/87/a.nc /home/vignonl/tmp/climaf_cache/3b/d.nc /home/vignonl/tmp/climaf_cache/0a/0.nc /home/vignonl/tmp/climaf_cache/31/d.nc /home/vignonl/tmp/climaf_cache/86/1.nc /home/vignonl/tmp/climaf_cache/0d/6.nc /home/vignonl/tmp/climaf_cache/73/1.nc"' plotname='"/home/vignonl/tmp/climaf_cache/9b/b.png"' var='"tas"' title='"surface temp global average"'  labels='"1960$1961$1962$1963$1964$1965$1966$1967$1968$1969"'    T_axis='"tweaked"'   && convert /home/vignonl/tmp/climaf_cache/9b/b.png -trim /home/vignonl/tmp/climaf_cache/9b/b.png) 
 
-
-
-Variable: stdcolors (subsection)
-Type: string
-Total Size: 8 bytes
-            1 values
-Number of Dimensions: 1
-Dimensions and sizes:	[1]
-Coordinates: 
-Number Of Attributes: 1
-  _FillValue :	missing
-(0)	black
-
-
-Variable: stdcolors
-Type: string
-Total Size: 80 bytes
-            10 values
-Number of Dimensions: 1
-Dimensions and sizes:	[10]
-Coordinates: 
-Number Of Attributes: 1
-  _FillValue :	missing
-(0)	black
-(1)	red
-(2)	blue
-(3)	yellow
-(4)	green
-(5)	orange
-(6)	purple
-(7)	violet
-(8)	grey
-(9)	black

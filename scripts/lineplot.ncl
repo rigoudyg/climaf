@@ -13,17 +13,17 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl lineplot.ncl infile=.. plotname=.. var=.. realXaxis=1 title=.. labels=.. colors=.. thickness=.. linp=1 fmt=..
+; ncl lineplot.ncl infile=.. plotname=.. var=.. T_axis="real" title=.. labels=.. colors=.. thickness=.. linp=1 fmt=..
 ;
-; infile, plotname, var and realXaxis are mandatory
+; infile, plotname and var are mandatory
 ;
 ; infile : a string holding the series of filenames, separated by whitespaces
 ;
-; realXaxis : an integer (0 or 1) which determines time axis when datasets 
+; T_axis : a string ("real" or "tweaked") which determines time axis when datasets
 ; does not cover the same time period; 
-;    - realXaxis=0 : time axis will be aligned to the same origin (take the 
-;                    first file as ref.)
-;    - realXaxis=1 : time axis will be the union of all time periods
+;    - T_axis="real"    : time axis will be the union of all time periods
+;    - T_axis="tweaked" : time axis will be aligned to the same origin (take the 
+;                         first file as ref.) 
 ;
 ; colors : a string holding a series of color NCL names, separated by whitespaces
 ;
@@ -31,32 +31,13 @@
 ;
 ; If argument linp=1 and data is a vertical profile, do not plot it in log(p) 
 ;
-; fmt: a string specifying the format of the tick labels. This string is parsed 
+; fmt : a string specifying the format of the tick labels. This string is parsed 
 ; as follows: the '%' acts as the escape character. The single character after 
-; every '%' is formatted according to the rule:
-;    Y => 4-digit year (e.g., 2007).
-;    y => 2-digit year (e.g., 07).
-;    C => CAPITAL month abbreviation (e.g., JUN).
-;    c => Small month abbreviation (e.g., Jun).
-;    F => CAPITAL full month (e.g., JUNE).
-;    f => Small full month (e.g., June).
-;    N => 2-digit month (e.g., 06).
-;    n => 1 or 2 digit month (e.g., 6 for June, 12 for December).
-;    D => 2-digit day (e.g., 04).
-;    d => 1 or 2 digit day (e.g., 4)
-;    H => 2-digit hour (e.g., 09).
-;    h => 1 or 2 digit hour (e.g., 9 or 11).
-;    M => 2 digit minute (e.g., 08).
-;    m => 1 or 2 digit minute (e.g., 07 or 56).
-;    S => 2 digit second (e.g., 02).
-;    s => 1 or 2 digit second (e.g., 2 or 23).
-; Any character at any other place in the format string is drawn as is.
-; NOTE: a '%' can be drawn using "%%". In case fmt is absent, a minimal 
-; algorithm exists which tries to determine the format string depending
-; on the length and values of the date-time.
-; For more details, see:
+; every '%' is formatted according to the rule described here:
 ; https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
-
+; In case fmt is absent, a minimal algorithm exists which tries to determine the 
+; format string depending on the length and values of the date-time.
+;
 ; Second version : L.Vignon - july 2015
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
@@ -76,6 +57,8 @@ begin
   all_files=addfiles(files,"r")
 
   ;---Extraction of min and max x-range 
+  if (.not. isvar("T_axis")) then T_axis="real" end if
+
   all_fld=all_files[:]->$var$
   ;print(all_fld)
   Var_DimNames = getvardims(all_fld)  ; getting dimensions from metadata
@@ -99,7 +82,7 @@ begin
         end if        
       end if
       ; data vector for X axis
-      if realXaxis .eq. 1 then
+      if ( T_axis .eq. "real" ) then
         Xaxis=all_fld&$coord$             ; take union of all time periods
       else
         Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
@@ -249,10 +232,10 @@ begin
         coord=Var_DimNames(dim)
         ;print(coord)
         ; Store coordinate in 'ax'
-        if realXaxis .eq. 1 then
+        if ( T_axis .eq. "real" ) then
           ax:=fld&$coord$
         else
-          ; Take first file as reference for x axis if realXaxis=0
+          ; Take first file as reference for X axis if T_axis .eq. "tweaked"
           if (i .eq. 0 ) then 
             ax=fld&$coord$
           end if
