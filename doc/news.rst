@@ -13,6 +13,18 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.9:
+
+- 2015/07/31 - Version 0.9 :
+
+ - Operator 'lines' is smarter re.time axis: (see
+   :doc:`scripts/lines`)
+
+   - Tick marks are smartly adapted to the time period duration. 
+   - When datasets does not cover the same time period, the user can
+     choose wether time axis will be aligned to the same origin or
+     just be the union of all time periods 
+
 .. _news_0.8:
 
 - 2015/08/27 - Version 0.8 :

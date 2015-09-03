@@ -72,5 +72,6 @@ def load_standard_operators():
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
+            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
+            'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")

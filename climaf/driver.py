@@ -484,7 +484,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                               "%s (command was :%s )"%\
                                   (duration,`scriptCall`,template))
                 return main_output_filename
-            else :
+            else :                
                 raise Climaf_Driver_Error("Some output missing when executing "
                                           ": %s. \n See last.out"%template)
         else :
