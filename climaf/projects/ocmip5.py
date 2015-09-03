@@ -11,7 +11,7 @@ Example ::
 
     >>> cdef('model','IPSL-CM4') 
     >>> cdef('frequency','monthly') 
-    >>> cactl=ds(project='OCMIP5_Ciclad', experiment='CTL', variable='CACO3', period='1860-1861')
+    >>> cactl=ds(project='OCMIP5_Ciclad', simulation='CTL', variable='CACO3', period='1860-1861')
 
 
 """
