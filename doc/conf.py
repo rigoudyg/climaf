@@ -37,11 +37,11 @@ extensions = [
     ]
 
 from climaf.site_settings import atCNRM,onCiclad
-if atCNRM or onCiclad :
+#if atCNRM or onCiclad :
     #This one works at CNRM 
-    extensions.append('sphinxcontrib.napoleon')
-else:
-    extensions.append('sphinx.ext.napoleon') #this one works at RTD
+extensions.append('sphinxcontrib.napoleon')
+#else:
+#    extensions.append('sphinx.ext.napoleon') #this one works at RTD
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
