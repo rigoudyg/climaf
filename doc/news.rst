@@ -25,9 +25,20 @@ Changes, newest first :
      choose wether time axis will be aligned to the same origin or
      just be the union of all time periods 
 
+ - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
+   cdfsections, cdfstd, cdfvT; you need to have a patched version of
+   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>`
+   
+
+ - CliMAF can provide fixed fields to operators, which path may
+   depend on project and simulation of operator's first operand 
+   (see  :py:func:`~climaf.operators.fixed_fields()`)
+
  - Fixes :
  
   - datasets of type 'short' are correctly read
+  - operator's secondary output variables are duly renamed, according
+    to the name given to operator's the secondary output
 
 .. _news_0.8:
 

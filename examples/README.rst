@@ -75,4 +75,13 @@ Others show how to acces some known data sets on CNRM or IPSL file system :
   - :download:`data_obs <../examples/data_obs.py>`      : access
     observation data sets as handled at CNRM by VDR
 
+.. _examples_operators:
+
+If you have Cdftools installed, you may use it through CliMAF :
+
+  - :download:`cdftools.py  <../examples/cdftools.py>`   : easy access to basic Cdftools operators
+  - :download:`cdftransport.py  <../examples/cdftransport.py>`   : computing transport is a little more tricky
+    
+
+
 

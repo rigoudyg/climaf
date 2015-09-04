@@ -448,6 +448,24 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #  ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
+    # Link the fixed fields meeded by the script/operator
+    if script.fixedfields is not None :
+        subdict_ff=dict()
+        subdict_ff["model"]=scriptCall.operands[0].model
+        subdict_ff["simulation"]=scriptCall.operands[0].simulation
+        subdict_ff["project"]=scriptCall.operands[0].project 
+        l=script.fixedfields #return paths: (linkname, targetname)
+        files_exist=dict()
+        for ll,lt in l:
+            #Replace input data placeholders with filenames for fixed fields
+            template_ff_target=Template(lt).substitute(subdict_ff)
+            # symlink
+            files_exist[ll]=False
+            if os.path.isfile(ll):      
+                files_exist[ll]=True
+            else:
+                os.system("ln -s "+template_ff_target+" "+ll)   
+            
     # Launch script using command, and check termination 
     #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
     #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
@@ -457,7 +475,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     clogger.info("Launching command:"+template)
     #
     command=subprocess.Popen(template, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    command.wait()
+    repcom=command.wait()
     #
     logfile=open('last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
@@ -467,15 +485,24 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         logfile.write(line)
     logfile.close()
     
-    if ( command.wait() == 0 ):
+    # Clean fixed fields symbolic links
+    if script.fixedfields is not None :
+        l=script.fixedfields  #return paths: (linkname, targetname)
+        for ll,lt in l:
+            if files_exist[ll] == False:
+                os.system("rm -f "+ll)  
+
+    if ( repcom == 0 ):
         if script.outputFormat is not None :
             # Tagging output files with their CliMAF Reference Syntax definition
             # Un-named main output
             ok = cache.register(main_output_filename,scriptCall.crs)
             # Named outputs
             for output in scriptCall.outputs:
-                ok = ok and \
-                     cache.register(subdict["out_"+output], scriptCall.crs+"."+output)
+                ok = ok and cache.register(subdict["out_"+output],\
+                                           scriptCall.crs+"."+output)
+                if ok :
+                    set_variable(subdict["out_"+output], output, 'file')
             if ok : 
                 duration=time.time() - tim1
                 print("Done in %.1f s with script computation for %s "%\

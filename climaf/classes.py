@@ -698,9 +698,9 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
 
-    Also allows to tell which variable name should be used when computing the
-    filename for this variable in this project (for optimisation
-    purpose);
+    Arg ``filenameVar`` allows to tell which fake variable name should be
+    used when computing the filename for this variable in this project
+    (for optimisation purpose);
 
     And that a given constant must be interpreted as a missing value
 

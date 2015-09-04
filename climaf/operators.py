@@ -296,7 +296,7 @@ class cscript():
                 if (outname in outvarnames) : 
                     self.outputs[outname]=outvarnames[outname]
                 else :
-                    self.outputs[outname]=outname
+                    self.outputs[outname]="%s"#outname
             else:
                 self.outputs[None]="%s"
         #clogger.debug("outputs = "+`self.outputs`)
@@ -314,6 +314,7 @@ class cscript():
         #
         self.name=name
         self.command=command
+        self.fixedfields=None #LV
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\
@@ -356,6 +357,39 @@ class cscript():
             if e != old : ls.append(e)
             old=e
         return(len(ls))
+    
+        
+def fixed_fields(operator, *paths):
+    """
+    Declare than an operator (or a list of) needs fixed fields. CliMAF will
+    provide them to the operator through symbolic links at execution time
+
+    Parameters:
+      operator (string of list of strings) : name of the CliMAF operator.
+      paths (couples) : a number of couples composed of the filename as expected
+        by the operator
+        and a path for the data; the path  may uses placeholders : ${model}, ${project}
+        and ${simulation}, which will be replaced by the corresponding facet
+        values for the first operand.
+
+    Returns:
+      None
+
+    Example:
+       >>> fixed_fields('ccdftransport',
+        ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
+        ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
+
+    """
+    if not isinstance(operator,list):
+        namelist=list()
+        namelist.append(operator)
+    else:
+        namelist=operator
+        
+    for name_op in namelist:
+        scripts[name_op].fixedfields=paths
+
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 

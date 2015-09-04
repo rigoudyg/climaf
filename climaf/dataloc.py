@@ -12,6 +12,7 @@ import classes
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
+from operator import itemgetter
 
 locs=[]
 
@@ -303,7 +304,7 @@ def selectGenericFiles(urls, **kwargs):
                     # print "found "+key
                     regexp=template.replace(key,dt[key],1)
                     hasEnd=False
-                    start=regexp.find(key) 
+                    start=regexp.find(key)
                     if (start >=0 ) :
                         hasEnd=True
                         regexp=regexp.replace(key,dt[key],1)
@@ -315,6 +316,8 @@ def selectGenericFiles(urls, **kwargs):
                 regexp=regexp.replace("*",".*").replace("?",r".")
                 # print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp,r'\1',f)
+                if start==f:
+                    raise Climaf_Data_Error("Start period not found") #? LV
                 if hasEnd :
                     end=re.sub(regexp,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
