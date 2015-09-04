@@ -96,11 +96,17 @@ def maketree(script_name, script, *operands, **parameters):
     defaultVariable=varOf(operands[0])
         #defaultPeriod=operands[0].period
     for outname in script.outputs :
-        if outname is None :
-            rep.variable=script.outputs[None]%defaultVariable
+        if outname is None  or outname=='' :
+            if "%s" in script.outputs[''] :
+                rep.variable=script.outputs['']%defaultVariable
+            else:
+                rep.variable=script.outputs['']
         else :
             son=classes.scriptChild(rep,outname)
-            son.variable=script.outputs[outname]%defaultVariable
+            if "%s" in script.outputs[outname] :
+                son.variable=script.outputs[outname]%defaultVariable
+            else:
+                son.variable=script.outputs[outname]
             rep.outputs[outname]=son
             setattr(rep,outname,son)
     return rep
@@ -351,10 +357,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict[ label ]=infile
         #if scriptCall.flags.canSelectVar :
         subdict["var"]=varOf(op)
-        if isinstance(op,classes.cdataset) and op.alias and scriptCall.flags.canAlias:
+        if isinstance(op,classes.cdataset) and op.alias:
             filevar,scale,offset,units,filenameVar,missing=op.alias
-            #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
-            if ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
+            if scriptCall.flags.canAlias and "," not in varOf(op) :
+                #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
                 subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),filevar,scale,offset)
                 subdict["var"]=filevar
             if units : subdict["units"]=units 
@@ -387,7 +393,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["var_%d"%i]=varOf(op)
             if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
-                if (varOf(op) != filevar) or (scale != 1.0) or (offset != 0.) :
+                if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
+                       "," not in varOf(op):
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
                     subdict["var_%d"%i]=filevar
 		if units : subdict["units_%d"%i]=units 
@@ -448,7 +455,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     #  ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
-    # Link the fixed fields meeded by the script/operator
+    # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None :
         subdict_ff=dict()
         subdict_ff["model"]=scriptCall.operands[0].model

@@ -78,6 +78,7 @@ def load_standard_operators():
             'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")
 
+
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :
@@ -106,8 +107,13 @@ def load_cdftools_operators():
     #
     # cdftransport : case where VT file must be given 
     #
+    #cscript('ccdftransport',
+    #        scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
+     #       canSelectVar=True)
+    
     cscript('ccdftransport',
-            scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} ${imin} ${imax} ${jmin} ${jmax} "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}')
+            scriptpath+'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
+            canSelectVar=True)
     
     #
     # cdfheatc 
@@ -136,7 +142,7 @@ def load_cdftools_operators():
             'cdfstd -save ${opt} ${ins}; mv cdfstd.nc ${out}; mv cdfmoy.nc ${out_moy} ; rm -f cdfstd.nc cdfmoy.nc')
     
     #
-    # cdfvT
+    # cdfvT ; a bit tricky about naming the output
     #
-    cscript('ccdfvT', 'cdfvT ${in_1} ${in_2} ${in_3} ${in_4}; mv vt.nc ${out}; rm -f vt.nc')
+    cscript('ccdfvT', 'cdfvT ${in_1} ${in_2} ${in_3} ${in_4} -o ${out}', _var="vomevt,vomevs,vozout,vozous", canSelectVar=True)
     #

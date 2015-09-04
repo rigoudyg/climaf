@@ -111,6 +111,8 @@ class cproject():
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
         if "sep"       in kwargs : self.separator=kwargs['sep']
+        if self.separator=="," :
+            raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
@@ -336,7 +338,12 @@ class cdataset(cobject):
         self.frequency=attval.get('frequency',"*")
         #
         self.kvp=attval
-        self.alias=varIsAliased(self.project,self.variable) 
+        self.alias=varIsAliased(self.project,self.variable)
+        #
+        if ("," in self.variable and self.alias) :
+            filevar,scale,offset,units,filenameVar,missing=self.alias
+            if (filevar != self.variable or scale != 1. or offset != 0 or missing ) :
+                raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
         # 
@@ -393,6 +400,8 @@ class cdataset(cobject):
         return(True) 
 
     def hasExactVariable(self):
+        # Assume that group variable do not need aliasing
+        if ("," in self.variable) : return True
         clogger.debug("always returns False, yet - TBD")
         return(False) 
     
@@ -835,8 +844,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^"
-                    r",",r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

@@ -21,12 +21,9 @@ so this options are not considered.
 
 **Provider / contact** : climaf at meteo dot fr for the wrapping 
 
-**Inputs** (in the order of CliMAF call): 6 datasets
+**Inputs** (in the order of CliMAF call): 3 datasets
 
-  - a dataset with mean values of vt for heat and salt transport [VT-file]
-  - a dataset with mean values of vs for heat and salt transport [VT-file]
-  - a dataset with mean values of ut for heat and salt transport [VT-file]
-  - a dataset with mean values of us for heat and salt transport [VT-file]
+  - a dataset with mean values of vt,vs,ut,us for heat and salt transports [VT-file]
   - a dataset with the zonal velocity component [U-file]
   - a dataset with the meridional velocity component [V-file] 
     
@@ -75,19 +72,16 @@ below).
   >>> fixed_fields('ccdftransport',
    ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="vomevt", period="199807",grid='VT') # dataset with vt
-  >>> d2=ds(simulation="PRE6CPLCr2alb", variable="vomevs", period="199807",grid='VT') # dataset with vs
-  >>> d3=ds(simulation="PRE6CPLCr2alb", variable="vozout", period="199807",grid='VT') # dataset with ut
-  >>> d4=ds(simulation="PRE6CPLCr2alb", variable="vozous", period="199807",grid='VT') # dataset with us
-  >>> d5=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807",grid='grid_U',table='table2.3') # dataset with zonal velocity component
-  >>> d6=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807",grid='grid_V',table='table2.3') # dataset with meridional velocity component
-  >>> my_cdftransport=ccdftransport(d1,d2,d3,d4,d5,d6,imin=117,imax=117,jmin=145,jmax=147,opt1='-test u v',opt2='-full')
+  >>> dx=ds(simulation="PRE6CPLCr2alb", variable="vomevt,vomevs,vozout,vozous", period="199807",grid='VT') # dataset with vt
+  >>> du=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807",grid='grid_U',table='table2.3') # dataset with zonal velocity component
+  >>> dv=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807",grid='grid_V',table='table2.3') # dataset with meridional velocity component
+  >>> my_cdftransport=ccdftransport(dx,du,dv,imin=117,imax=117,jmin=145,jmax=147,opt1='-test u v',opt2='-full')
   >>> cfile(my_cdftransport) # computes the transports accross specified section
   >>> htrp_var=my_cdftransport.htrp # htrp_var receives operator output named "htrp", namely the field heat transport
   >>> strp_var=my_cdftransport.strp # strp_var receives operator output named "strp", namely the field salt transport
 
-**Implementation**: The operator is implemented as a script which
-calls a binary using cdftools cdftransport operator.
+**Implementation**: The operator is implemented as a wrapper script which
+calls a  Cdftools binary 'cdftransport'.
     
 **Shortcomings**:
  - computes only one section by launch

@@ -338,7 +338,7 @@ def selectGenericFiles(urls, **kwargs):
                 if (l.find("${variable}")>=0):
                     rep.append(f)
                     break
-                if f not in rep and fileHasVar(f,variable) :
+                if f not in rep and ( fileHasVar(f,variable) or ("," in variable)):
                     # Should check time period in the file if not regexp
                     # print "appending "+f
                     rep.append(f)

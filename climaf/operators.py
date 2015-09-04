@@ -44,7 +44,8 @@ class scriptFlags():
 
 class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
-                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False, **kwargs):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
+                 canSelectVar=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
@@ -289,7 +290,7 @@ class cscript():
         # Analyze outputs names , associated variable names 
         # (or format strings), and store it in attribute dict 'outputs' 
         self.outputs=dict()
-        it=re.finditer(r"\${out(_(?P<outname>[\w-]*))?}",command)
+        it=re.finditer(r"\${out(_(?P<outname>[\w-]*)?)?}",command)
         for occ in it :
             outname=occ.group("outname") 
             if outname is not None :
@@ -299,9 +300,10 @@ class cscript():
                     self.outputs[outname]="%s"#outname
             else:
                 self.outputs[None]="%s"
+                self.outputs['']="%s"
         #clogger.debug("outputs = "+`self.outputs`)
         #
-        canSelectVar= (command.find("${var}") > 0 )
+        canSelectVar= canSelectVar or (command.find("${var}") > 0 )
         canAggregateTime=(command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
         canAlias= (command.find("${alias}") > 0 )
         canMissing= (command.find("${missing}") > 0 )
