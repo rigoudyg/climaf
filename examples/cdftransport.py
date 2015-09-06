@@ -49,7 +49,7 @@ fixed_fields('ccdftransport',
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 
 # Compute transport
-trsp=ccdftransport(dx,duo,dvo)
+trsp=ccdftransport(dx,duo,dvo,imin=117,imax=117,jmin=145,jmax=147)
 
 # Create files for the various cdftransport outputs
 cfile(my_cdftransport)
@@ -60,7 +60,7 @@ cfile(my_cdftransport.strp)
 dso=ds(variable="so")
 dtho=ds(variable="thetao")
 dx2=ccdfvT(duo,dvo,dso,dtho)
-trsp2=ccdftransport(dx2,duo,dvo)
+trsp2=ccdftransport(dx2,duo,dvo,imin=117,imax=117,jmin=145,jmax=147)
 
 # A possible trick 
 dut=ccdo(dx,operator="selname,vozout")

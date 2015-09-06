@@ -22,7 +22,7 @@ Installing (or using an installed version, at CNRM or IPSL)
 
   - first check the listed :ref:`requirements` ;
 
-  - execute :: 
+  - execute:: 
 
      cd some_installation_dir
      git clone https://github.com/senesis/climaf climaf
@@ -30,9 +30,15 @@ Installing (or using an installed version, at CNRM or IPSL)
      export PYTHONPATH=$PYTHONPATH:$(pwd)
      cd testing
      ./test_install.sh 
+
+
   
     and check the output of last command. Contact 'climaf at meteo dot
     fr' in case of problem at that stage
+
+   - for getting the development version, you may rather execute::
+
+     git clone -b dev https://github.com/senesis/climaf climaf
 
 
 .. _configuring:
@@ -49,6 +55,9 @@ Configuring CliMAF
  - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
    verbosity level on stderr (resp. on file climaf.log); defaults to
    'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
+
+ - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will automatic fix  CNRM’s Nemo old data time_axis issues. This adresses the wrong time coordinate variable t_ave_01month and t_ave_00086400. This will add processing cost
+
 
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
   functions; this will be executed at the end of climaf import; the code 
