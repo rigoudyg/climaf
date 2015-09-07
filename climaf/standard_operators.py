@@ -64,13 +64,35 @@ def load_standard_operators():
     cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
             'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
     #
-    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
+#    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
+#            'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
+#            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+#            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
+#            ' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
+#            'convert ${out} -trim ${out}) ', format="png")
+
+    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot_LV.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} units=\'\"${units}\"\' '
-            'linp=${linp} levels=\'\"${levels}\"\' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
+            'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
+            ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
+    #
+
+    
+
+    
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
             'convert ${out} -trim ${out}) ', format="png")
+
+
+
+    cscript('test_plot'     , '(ncl -Q '+ scriptpath +'test_LV.ncl infile=\'\"${in}\"\' '
+            ' infile2=\'\"${in_2}\"\' plotname=\'\"${out}\"\' '
+            ' var=\'\"${var}\"\'  var2=\'\"${var_2}\"\' && ' 
+            ' convert ${out} -trim ${out}) ', format="png")
+# mettre var signifie que le script est capable d aller extraire la variable sinon c climaf qui le fait
+#(et donc on ne met pas var=)

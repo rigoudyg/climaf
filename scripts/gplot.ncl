@@ -32,7 +32,7 @@ begin
     if ( isatt(fld,"units")) then units=fld@units else units="None" end if
   end if
   
-  logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarihtmic scale
+  logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarithmic scale
 
   if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
   if (.not. isvar("contours")) then contours=0 end if
@@ -48,8 +48,7 @@ begin
   else
     focus=""
   end if
-      
-
+     
   ; Try to adapt to various cases, using heuristics !
   ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
 
@@ -61,7 +60,7 @@ begin
     print(Var_DimNames)
     status_exit(1)
   end if
-
+  
   if (rank.eq.4) then
     ; assume first dimension is time. Select first time slice before further processing
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -191,21 +190,25 @@ begin
         londim=ffile->$lonname$
       end if
     end if
+    delete(dime)
+    dime=dimsizes(fld)
+    rank=dimsizes(dime)
   end if
-
+ 
   if (rank .eq. 1 ) then 
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
-    hdim=fld&$Var_DimNames[0]$
+    ;hdim=fld&$Var_DimNames[0]$
+    hdim=fld&$Var_DimNames(0)$
     vprofile=False
     useXY=True
-    if ((str_match(dim,"lat") .eq. "missing") .and. (str_match(dim,"lon") .eq. "missing")) then
+    ;if ((str_match(dim,"lat") .eq. "missing") .and. (str_match(dim,"lon") .eq. "missing")) then
+    if ( ismissing(str_match(dim,"lat")) .and. ismissing(str_match(dim,"lon")) ) then
       print("We have a vertical profile")
       vprofile=True
     end if
   end if
-    
-
+ 
   units=units
   fld=fld*tofloat(scale)+tofloat(offset)
   
@@ -236,7 +239,7 @@ begin
   res@gsnFrame= False
   res@gsnDraw= False
   res@gsnMaximize = True
-  ; preferabel pour plot en domaine limite :
+  ; preferable pour plot en domaine limite :
   res@gsnLeftString     = ""
   ;res@gsnRightString    = ""
   ;res@gsnCenterString   = ""
@@ -299,7 +302,6 @@ begin
       res@mpFillOn=True
       res@mpLandFillColor="grey" 
     end if
-    
 
     if (isvar("proj")) then 
       prj = getSubString( proj,0,1 )
