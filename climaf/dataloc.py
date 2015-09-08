@@ -283,7 +283,7 @@ def selectGenericFiles(urls, **kwargs):
 
         # Construct regexp for extracting dates from filename
         regexp=None
-        print "template before searching dates : "+template
+        #print "template before searching dates : "+template
         for key in rkeys :
             #print "searchin "+key+" in "+=Template(l)
             start=template.find(key)
@@ -296,10 +296,10 @@ def selectGenericFiles(urls, **kwargs):
                     hasEnd=True
                     regexp=regexp.replace(key,dr[key],1)
                 break
-        print "regexp before searching dates : "+regexp
+        #print "regexp before searching dates : "+regexp
         #
         for f in lfiles :
-            print "processing file "+f
+            #print "processing file "+f
             #
             # Analyze file time period
             fperiod=None
@@ -314,7 +314,7 @@ def selectGenericFiles(urls, **kwargs):
                     fperiod=init_period("%s-%s"%(start,end))
                 else :
                     fperiod=init_period(start)
-                print "period for file %s is %s"%(f,fperiod)
+                #print "period for file %s is %s"%(f,fperiod)
                 #
                 # Filter file time period against required period
             else :
