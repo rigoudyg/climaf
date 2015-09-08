@@ -27,7 +27,8 @@ Changes, newest first :
 
  - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
    cdfsections, cdfstd, cdfvT; you need to have a patched version of
-   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>`
+   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
+   : :download:`cdftransport.py <../examples/cdftransport.py>` and :download:`cdftools.py <../examples/cdftools.py>` 
    
 
  - CliMAF can provide fixed fields to operators, which path may
@@ -38,7 +39,8 @@ Changes, newest first :
  
   - datasets of type 'short' are correctly read
   - operator's secondary output variables are duly renamed, according
-    to the name given to operator's the secondary output
+    to the name given to operator's the secondary output when
+    decalring it using :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 
