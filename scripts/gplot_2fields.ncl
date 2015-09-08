@@ -1,5 +1,5 @@
-; General-purpose plot using NCL, for use in CliMAF. 
-; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
+; General-purpose 2 fields plot using NCL, for use in CliMAF. 
+; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot_2fields.html
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
@@ -46,14 +46,7 @@ begin
   logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarithmic scale
 
   if (isvar("linp")) then if ((linp .eq. 1) .or. (linp .eq. -1)) then logp=False end if end if
-  ;if (.not. isvar("contours")) then contours=0 end if
-  ;LINEON=False
-  ;if (contours .ne. 0 ) then LINEON=True 
-  ;end if
-  print(isvar("contours"))
-  print("test")
-  ;print(contours)
-  
+    
   if isvar("focus") then
     if ( .not. (focus .eq. "" .or. focus .eq. "land" .or. focus .eq. "ocean")) then
       print("Wrong focus option '"+focus+"' . Only 'ocean' and 'land' are allowed")
@@ -78,11 +71,6 @@ begin
   ; Removes singleton (degenerate) dimensions from fld while preserving meta data
   new_fld=rm_single_dims(fld)
 
-  ;do dim=0,rank-1 
-  ;  if isatt(new_fld,Var_DimNames(dim)) then
-  ;    print(Var_DimNames(dim))
-  ;  end if
-  ;end do
   delete(Var_DimNames)
   Var_DimNames = getVarDimNames(new_fld)
   delete(dime)
@@ -125,7 +113,7 @@ begin
     rank=dimsizes(dime)
   end if ; rk eq 3  
      
-  ; fld is now 2D , with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+  ; fld is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
   useLatDim=False
   useLonDim=False
 
@@ -168,10 +156,6 @@ begin
   if (rank .eq. 1) then 
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
-    ;hdim=fld&$Var_DimNames[0]$ ; ancienne version pb
-    ;new
-    ;dim=Var_DimNames(0)
-    ;hdim=fld&$dim$
     hdim=fld&$Var_DimNames(0)$
     vprofile=False
     useXY=True
@@ -180,7 +164,7 @@ begin
       vprofile=True
     end if
   end if
-
+  
   units=units 
   fld=fld*tofloat(scale)+tofloat(offset)
   
@@ -200,8 +184,7 @@ begin
   ;-----------------------
   ; Auxiliary field: fld2
   ;-----------------------
-  ;tester la presence du champ auxiliaire et ne faire que ceux qui suit sil y en a un
-  ;if (aux_field) then 
+
   ; Reading the auxiliary field 
   if isfilepresent(infile2) then
     ffile2=addfile(infile2,"r")
@@ -270,13 +253,7 @@ begin
   end if ; rk eq 3  
      
   ; fld2 is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
-  ;utile ???
-  ;if (rank2 .eq. 2) then 
-  ;  ; We have a true cross-section or a horizontal map                   
-  ;  delete(Var_DimNames2)
-  ;  Var_DimNames2 = getVarDimNames(fld2)
-  ;end if
-  
+    
   if (rank2 .eq. 1) then 
     delete(Var_DimNames2)
     Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
@@ -301,7 +278,6 @@ begin
   res=True
   res@gsnFrame= False
   res@gsnDraw= False
-
   res@gsnMaximize = True
   ; preferable pour plot en domaine limite :
   res@gsnLeftString     = ""
@@ -309,16 +285,9 @@ begin
   ;res@gsnCenterString   = ""
 
   ; auxiliary field resources
-  ;if (aux_field) then
   res2=True
-  OVER=True
   res2@gsnFrame= False
   res2@gsnDraw=False
-
-  ;if (.not. OVER) then
-  ;  res2@gsnFrame= True
-  ;  res2@gsnDraw= True
-  ;end if
   res2@gsnMaximize = True
   res2@gsnLeftString = ""
 
@@ -348,25 +317,15 @@ begin
     res@cnLineLabelsOn = False
     res@cnLineLabelBackgroundColor = "white"
     res@cnInfoLabelString =""
-    ;tmp
-    ;if (LINEON) then 
-    ;  res@cnLinesOn=True
-    ;  res@gsnContourNegLineDashPattern = 1
-    ;  res@gsnContourZeroLineThicknessF = 1.5  
-    ;end if   
+
     if (LABELON) then 
       res@cnLineLabelsOn=True
     end if   
     if (RASTER) then
-      ;tmp;
-      ;if (.not. LINEON) then 
-      ;  res@cnLinesOn=False
-      ;  res@cnLineLabelsOn=False
-      ;end if
       res@cnRasterModeOn=True
     end if
-
-    if (horizontal) then ;add only map
+    
+    if (horizontal) then ; only for map
       res@mpFillColors = (/-1,-1,-1,-1/)
       res@mpPerimOn = False
       res@mpGeophysicalLineThicknessF = 2
@@ -424,39 +383,30 @@ begin
     res@lbOrientation     = "vertical"
 
     ; auxiliary field
-    ;if (aux_field) then
     res2@gsnLeftString     = ""
     res2@gsnRightString    = ""
     res2@gsnCenterString   = ""
     
     res2@cnFillOn=False
-    res2@cnLinesOn=True
     res2@cnLineLabelsOn = False
-
     res2@cnInfoLabelString = ""
 
-    ;add
+    res2@cnLinesOn=True
     res2@gsnContourNegLineDashPattern = 1
     res2@gsnContourZeroLineThicknessF = 1.5  
 
-    if ( isvar("contours") ) then ;: bug
-    ;if (LINEON) then
-      print(contours)
+    if ( isvar("contours") .and. isstring(contours)) then 
       res2@cnLevelSelectionMode = "ExplicitLevels"
       res2@cnLevels=tofloat(str_split(contours," "))
-      delete(contours)
-    else
-      
-      
+      delete(contours)     
     end if 
-    ;end if (aux_field) 
-                                
+                                    
   end if  ; not useXY
 
   if (.not. isvar("proj")) then 
     res@tmYLLabelFontHeightF = 0.020
     res@tmXBLabelFontHeightF = 0.020
-  
+    
     if type.eq."png" then
       res@tmYLLabelFontThicknessF=2.0
       res@tmXBLabelFontThicknessF=2.0
@@ -490,11 +440,10 @@ begin
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColors = "black" ; (/"red", "black"/)
     ; auxiliary field
-    ;if (aux_field) then
     xyres2 = True
     xyres2@gsnDraw = False
     xyres2@gsnFrame = False
-    ;
+    
     if type.eq."png" then
       xyres@tmXBLabelFontThicknessF = 3.0
       xyres@tmYLLabelFontThicknessF = 3.0
@@ -508,16 +457,10 @@ begin
         set_pres_hgt_axes(hdim,xyres,True)
       end if
       plot0=gsn_csm_xy(wks,fld,hdim,xyres)
-      ;if (aux_field) then
       plot1=gsn_csm_xy(wks,fld2,hdim2,xyres2)
-      ;plot1=gsn_csm_contour(wks,fld2,xyres2)
-      ;end if
     else
       plot0=gsn_csm_xy(wks,hdim,fld,xyres)
-      ;if (aux_field) then
-      ;plot1=gsn_csm_xy(wks,hdim2,fld2,xyres2)
-      plot1=gsn_csm_contour(wks,fld2,xyres2)
-      ;end if
+      plot1=gsn_csm_xy(wks,hdim2,fld2,xyres2)
     end if
   else
     if (horizontal) then 
@@ -531,46 +474,31 @@ begin
       if (isvar("proj")) then 
         print("using gsn_csm_contour_map")
         plot0=gsn_csm_contour_map(wks,fld,res)
-        ;if (aux_field) then
-        ;plot1=gsn_csm_contour_map(wks,fld2,res2)
         plot1=gsn_csm_contour(wks,fld2,res2)
-        ;end if
       else 
         print("using gsn_csm_contour_map_ce")
         plot0=gsn_csm_contour_map_ce(wks,fld,res)
-        ;if (aux_field) then
-        ;plot1=gsn_csm_contour_map_ce(wks,fld2,res2)
         plot1=gsn_csm_contour(wks,fld2,res2)
-        ;end if
       end if 
     else
       if logp then 
         print("using gsn_csm_pres_hgt")
         plot0=gsn_csm_pres_hgt(wks,fld,res)
-        ;if (aux_field) then
-        ;plot1=gsn_csm_pres_hgt(wks,fld2,res2)
-        plot1=gsn_csm_contour(wks,fld2,res2)
-        ;end if
+        plot1=gsn_csm_pres_hgt(wks,fld2,res2)
       else
         if ((isvar("linp")) .and. (linp .eq. 1)) then          
           print("using gsn_csm_contour; linp=1")
-          print(linp)
           ; useless :
           ;res@sfYArray            = zdim
           res@trYReverse        = True ; reverse Y-axis          
           plot0=gsn_csm_contour(wks,fld,res)
-          ;if (aux_field) then
           plot1=gsn_csm_contour(wks,fld2,res2)
-          ;end if
         else 
           if ((isvar("linp")) .and. (linp .eq. -1)) then  
             print("using gsn_csm_contour; linp=-1")
-            print(linp)
             res@trYReverse        = True ; reverse Y-axis
-            ;res@gsnYAxisIrregular2Log = False
             res@gsnYAxisIrregular2Linear= True
             plot0=gsn_csm_contour(wks,fld,res)
-            ;res2@trYReverse        = True ; reverse Y-axis
             res2@gsnYAxisIrregular2Linear= True
             plot1=gsn_csm_contour(wks,fld2,res2)
           end if
@@ -581,18 +509,10 @@ begin
     
   end if
 
-  ;if (aux_field) then
-  ;if (OVER) then
   overlay(plot0,plot1)      
   draw(plot0)
   frame(wks)
-  ;end
-
-  ;else
-  ;draw(plot0)
-  ;end if
-
-  ;frame(wks)
+  
   status_exit(0)
   
 end
