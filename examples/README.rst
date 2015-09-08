@@ -20,7 +20,7 @@
      # just click on "ATourOfClimaf"
 
 
-:download:`A Tour Of Climaf <../examples/ATourOfCliMAF.html>` is **a progressive but quite comprehensive tour**, which is :download:`here presented as an html page <../examples/ATourOfCliMAF.html>` , but which can also be run as an IPython notebook (see sidenote)
+:download:`A Tour Of Climaf <../examples/ATourOfCliMAF.html>` is **a progressive and but quite comprehensive tour**, which is :download:`here presented as an html page <../examples/ATourOfCliMAF.html>` , but which can also be run as an IPython notebook (see sidenote); the nootebook content is currently behind the status of CliMAF
 
 For **running CliMAF**, or running one of the Python scripts example described below, you will use a Python shell, after telling Python where the CliMAF code is:: 
 
@@ -74,5 +74,15 @@ Others show how to acces some known data sets on CNRM or IPSL file system :
     plot ORCA1-grid sea-ice data, with control on levels and projection  
   - :download:`data_obs <../examples/data_obs.py>`      : access
     observation data sets as handled at CNRM by VDR
+
+.. _examples_operators:
+
+If you have Cdftools 3.0 installed (in a flavor with some bugfixes,
+and with CMIP variable names in modcdfnames.F90 when applicable) , you may use it through CliMAF :
+
+  - :download:`cdftools.py  <../examples/cdftools.py>`   : easy access to basic Cdftools operators
+  - :download:`cdftransport.py  <../examples/cdftransport.py>`   : computing transport is a little more tricky
+    
+
 
 

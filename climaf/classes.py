@@ -55,7 +55,7 @@ class cproject():
 
         For instance, cproject CMIP5, after its Data Reference Syntax, 
         has attributes : 
-        experiment, model, rip (here called simulation), variable, frequency, realm, table, version
+        model, simulation (used for rip), experiment, variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
@@ -86,7 +86,7 @@ class cproject():
         however of lower priority than the value set using :py:func:`cdef`
 
         A project can be declared as having non-standard variable
-        names, or variables that should undergo re-scaling; see
+        names in datafiles, or variables that should undergo re-scaling; see
         :py:func:`~climaf.classes.calias`
 
         A project can be declared as having non-standard frequency names (this is 
@@ -111,6 +111,8 @@ class cproject():
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
         if "sep"       in kwargs : self.separator=kwargs['sep']
+        if self.separator=="," :
+            raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
@@ -336,7 +338,12 @@ class cdataset(cobject):
         self.frequency=attval.get('frequency',"*")
         #
         self.kvp=attval
-        self.alias=varIsAliased(self.project,self.variable) 
+        self.alias=varIsAliased(self.project,self.variable)
+        #
+        if ("," in self.variable and self.alias) :
+            filevar,scale,offset,units,filenameVar,missing=self.alias
+            if (filevar != self.variable or scale != 1. or offset != 0 or missing ) :
+                raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
         # 
@@ -393,6 +400,8 @@ class cdataset(cobject):
         return(True) 
 
     def hasExactVariable(self):
+        # Assume that group variable do not need aliasing
+        if ("," in self.variable) : return True
         clogger.debug("always returns False, yet - TBD")
         return(False) 
     
@@ -698,9 +707,9 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
 
-    Also allows to tell which variable name should be used when computing the
-    filename for this variable in this project (for optimisation
-    purpose);
+    Arg ``filenameVar`` allows to tell which fake variable name should be
+    used when computing the filename for this variable in this project
+    (for optimisation purpose);
 
     And that a given constant must be interpreted as a missing value
 
@@ -766,7 +775,7 @@ class cpage(cobject):
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
-          >>> fig=plotmap(tas_avg,crs='title')
+          >>> fig=plot(tas_avg,crs='title')
           >>> my_page=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
 
         
@@ -835,8 +844,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^"
-                    r",",r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

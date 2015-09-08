@@ -28,5 +28,11 @@ figfile=cfile(fig_avg)
 # Next command to ensure exit code is meaningful (for testing purposes)
 if figfile is None : exit(1)
 
+# Also test an operator which computed mean and standard deviation in one call
+help(mean_and_std)
+mean=mean_and_std(extract)
+# Look at output 'sdev' (which is the standard deviation)
+ncview(mean.sdev)
+
 
 

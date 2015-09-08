@@ -6,7 +6,7 @@
 # Exit with non-0 status if any problem
 # PERIOD and/or VAR and/or REGION can be empty, in which case filtering will not occur
 # OPERATOR can be empty, in which case processing will not occur
-# ALIAS, LISIING, UNITS  .....
+# ALIAS, UNITS  .....
 
 # Lack of variable VAR in some file(s) is not considered an error
 # Having no data for the PERIOD is not considered an error
@@ -23,23 +23,61 @@ vm=$1 ; shift
 
 tmp=$(mktemp -d --tmpdir climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
 
-# For the time being, must use NetCDF3 file format chained CDO
-# operations because NetCDF4 is not threadsafe at CNRM
-CDO="cdo -f nc"
 
-# Prepare CDO operator strings
-
-timefix ()
+clim_timefix ()
 {
     # Check if the time axis for a data file should be fixed, based solely on its name, 
     # and hence echoes the relevant CDO syntax (to be inserted in a CDO pipe) for fixing it
     file=$1
     # Case for IPSL Seasonal cycle files, such as 
-    # .../SIMULATIONS/p86mart/IGCM_OUT/IPSLCM6/DEVT/piControl/O1T04V04/ICE/Analyse/SE/O1T04V04_SE_1850_1859_1M_icemod.nc 
+    # ... IGCM_OUT/IPSLCM6/DEVT/piControl/O1T04V04/ICE/Analyse/SE/O1T04V04_SE_1850_1859_1M_icemod.nc 
     if [[ $file =~ IGCM_OUT.*SE/.*_SE_.*([0-9]{4})_[0-9]{4}_1M.*nc ]] ; then 
 	echo -settaxis,${BASH_REMATCH[1]}-01-16:12:00:00,1mon
     fi
 }
+
+nemo_timefix ()
+{
+    # Rename alternate time_counter variables to 'time_counter' for some kind 
+    # of Nemo outputs  (Nemo 3.2 had a bug when using IOIPSL ...)
+    # Echoes the name of a file with renamed variable (be it an unchanged file or a copy)
+    # Creates an alternate file in $tmp if no write permission and renaming is actually useful
+    file=$1
+    out=""
+    if [[ $file =~ .*1[md].*grid_T_table2.2.nc ]] ; then 
+	if ncdump -h $file  | \grep -E -q '(float t_ave_01month|t_ave_00086400 )' ; then 
+	    var2rename=""
+	    if [[ $file =~ .*1m.*grid_T_table2.2.nc ]] ; then 
+		var2rename=t_ave_01month 
+		vars2d="pbo sos tos tossq zos zoss zossq zosto"
+		vars3d="rhopoto so thetao thkcello rhopoto"
+	    fi
+	    if [[ $file =~ .*1d.*grid_T_table2.2.nc ]] ; then 
+		var2rename=t_ave_00086400 
+		vars2d="tos tossq" ; vars3d=""
+	    fi
+	    if [ "$var2rename" ] ; then 
+		out=$tmp/renamed_$(basename $file) ; rm -f $out 
+		ncks -3 $file $out 
+		ncrename -d .$var2rename,time_counter -v $var2rename,time_counter $out >&2
+		for lvar in $vars2d; do 
+		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+		done
+		for lvar in $vars3d; do 
+		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+		done
+		if [ -w $file ] ; then mv -f $out $file ; out="" ; fi
+	    fi
+	fi
+    fi
+    if [ $out ]; then echo $out ; else echo $file ; fi 
+}
+
+# For the time being, at CNRM, must use NetCDF3 file format chained CDO
+# operations because NetCDF4 is not threadsafe there
+if [ -d /cnrm ] ; then CDO="cdo -f nc" ; else CDO="cdo" ; fi
+
+# Prepare CDO operator strings
 
 [ "$period" ] && seldatebase="-seldate,$period"
 
@@ -57,13 +95,15 @@ if [ "$alias" ] ; then
     IFS=", " read var filevar scale offset <<< $alias 
     selalias=-expr,"$var=${filevar}*${scale}+${offset};"
 fi
+
 if [ "$vm" ] ; then 
     setmiss="-setctomiss,$vm"
 fi
 
 # 'files' is the list of input filenames
-files=$1
+files=$*
 vfiles=""
+vfiles_are_original=0
 
 # Make all selections (setmiss, aliasing, time, space, variable) 
 # before applying the operator
@@ -71,7 +111,10 @@ for file in $files ; do
     tmp2=$tmp/$(basename $file) ; rm -f $tmp2
     # If needed, transform date selection command in (time fix + date selection)
     seldate=$seldatebase
-    [ "$seldate" ] && seldate=$seldatebase" "$(timefix $file) 
+    [ "$seldate" ] && seldate=$seldatebase" "$(clim_timefix $file) 
+    #
+    # If requested, fix time_counter for Nemo outputs. Feature not yet tested !!
+    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file)
     #
     if [ $setmiss ] ; then 
 	$CDO ${setmiss#-} $selalias $selregion $seldate ${selvar} \
@@ -94,6 +137,7 @@ for file in $files ; do
 			    [ -f $tmp2 ] && vfiles+=" "$tmp2
 		    else
 			vfiles+=" "$file ; 
+			vfiles_are_original=1
 		    fi
 		fi
 	    fi
@@ -106,12 +150,17 @@ done
 # (because it may be non-linear in time - e.g. eigenvectors )
 if [ "$vfiles" ] ; then 
     tmp3=$tmp/$(basename $0).nc ; rm -f $tmp3
-    # let us avoid single file copy followed by rm ...
+    #
+    # Assemble all pieces in a single file, but avoid single file copy followed by rm ...
     if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
-	cdo copy $vfiles $tmp3 && [ "$var" -o "$period" -o "$region" ] && \
-	    rm $vfiles 
-    else mv $vfiles $tmp3 ; fi
-    # Chagne units before applying further operations, if applicable
+	cdo copy $vfiles $tmp3 && [ $vfiles_are_original -eq 0 ] && rm $vfiles 
+    else  # Only one file to process
+	if [ $vfiles_are_original -eq 1 ]
+	then cp $vfiles $tmp3 ; 
+	else mv $vfiles $tmp3 ; fi
+    fi
+    #
+    # Change units before applying further operations, if applicable
     if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
     
     # Apply operator if requested

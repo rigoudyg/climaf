@@ -36,7 +36,11 @@ begin
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
     if isfilevar(ffile,var) then 
-      fld = ffile->$var$
+      if (getfilevartypes(ffile,var) .eq. "short") then
+        fld = short2flt( ffile->$var$ )
+      else
+        fld = ffile->$var$
+      end if
     else
       print("File "+infile+" does not include variable "+var)
       status_exit(1)

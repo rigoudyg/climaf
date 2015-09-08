@@ -36,7 +36,7 @@ Description
 CliMAF is basically a Python-scriptable way to process NetCDF `CF compliant <http://cfconventions.org/>`_ climate model outputs which allows:
 
 - to almost *forget about accessing input data* : you refer to
-  'variables' in 'experiments', CliMAF knows a bunch of data
+  'variables' in 'simulations', CliMAF knows a bunch of data
   organization schemes, you just quote some root locations, usually in
   configuration files ; [ under development : data can also be on the
   `ESGF <http://esgf.llnl.gov/>`_ ] 
