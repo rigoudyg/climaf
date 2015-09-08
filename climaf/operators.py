@@ -285,7 +285,7 @@ class cscript():
         for p in kwargs : 
             if re.match(pattern,p):
                 outvarnames[re.findall(pattern,p)[0]]=kwargs[p]
-        #clogger.debug("outvarnames = "+`outvarnames`)
+        clogger.debug("outvarnames for script %s = %s"%(name,`outvarnames`))
         #
         # Analyze outputs names , associated variable names 
         # (or format strings), and store it in attribute dict 'outputs' 
@@ -299,8 +299,8 @@ class cscript():
                 else :
                     self.outputs[outname]="%s"#outname
             else:
-                self.outputs[None]="%s"
-                self.outputs['']="%s"
+                self.outputs[None]=outvarnames.get('',"%s")
+                self.outputs['']=outvarnames.get('',"%s")
         #clogger.debug("outputs = "+`self.outputs`)
         #
         canSelectVar= canSelectVar or (command.find("${var}") > 0 )

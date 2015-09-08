@@ -458,9 +458,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None :
         subdict_ff=dict()
-        subdict_ff["model"]=scriptCall.operands[0].model
-        subdict_ff["simulation"]=scriptCall.operands[0].simulation
-        subdict_ff["project"]=scriptCall.operands[0].project 
+        subdict_ff["model"]=modelOf(scriptCall.operands[0])
+        subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
+        subdict_ff["project"]=projectOf(scriptCall.operands[0])
         l=script.fixedfields #return paths: (linkname, targetname)
         files_exist=dict()
         for ll,lt in l:
@@ -575,17 +575,22 @@ def domainOf(cobject) :
         return domainOf(cobject.members[0])
     else : clogger.error("Unkown class for argument "+`cobject`)
                   
-def varOf(cobject) :
-    """ Returns the variable for a CliMAF object : if object is a dataset, returns
-    its 'variable' property, otherwise returns variable of first operand
+
+def varOf(cobject) : return attributeOf(cobject,"variable")
+def modelOf(cobject) : return attributeOf(cobject,"model")
+def simulationOf(cobject) : return attributeOf(cobject,"simulation")
+def projectOf(cobject) : return attributeOf(cobject,"project")
+
+def attributeOf(cobject,attrib) :
+    """ Returns the attribute for a CliMAF object : if object is a dataset, returns
+    its attribute property, otherwise returns attribute of first operand
     """
-    if isinstance(cobject,classes.cdataset) : return cobject.variable
-    elif isinstance(cobject,classes.cens) : return varOf(cobject.members[0])
-    elif getattr(cobject,"variable",None) : 
-        return getattr(cobject,"variable",None) 
+    if isinstance(cobject,classes.cdataset) : return getattr(cobject,attrib) 
+    elif isinstance(cobject,classes.cens) : return attributeOf(cobject.members[0],attrib)
+    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
     elif isinstance(cobject,classes.ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
-        return varOf(cobject.operands[0])
+        return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)

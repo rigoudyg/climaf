@@ -120,8 +120,8 @@ def register(filename,crs):
     if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
     waited=0
-    while waited < 10 and not os.path.exists(filename) :
-        time.sleep(0.3)
+    while waited < 20 and not os.path.exists(filename) :
+        time.sleep(0.1)
         waited += 1
     #time.sleep(0.5)
     if os.path.exists(filename) :

@@ -45,32 +45,43 @@ nemo_timefix ()
     file=$1
     out=""
     if [[ $file =~ .*1[md].*grid_T_table2.2.nc ]] ; then 
-	if ncdump -h $file | \grep -E -q '(float t_ave_01month|t_ave_00086400 )' ; then 
+	if ncdump -h $file  | \grep -E -q '(float t_ave_01month|t_ave_00086400 )' ; then 
 	    var2rename=""
-	    [[ $file =~ .*1m.*grid_T_table2.2.nc ]] && var2rename=t_ave_01month 
-	    [[ $file =~ .*1d.*grid_T_table2.2.nc ]] && var2rename=t_ave_00086400 
+	    if [[ $file =~ .*1m.*grid_T_table2.2.nc ]] ; then 
+		var2rename=t_ave_01month 
+		vars2d="pbo sos tos tossq zos zoss zossq zosto"
+		vars3d="rhopoto so thetao thkcello rhopoto"
+	    fi
+	    if [[ $file =~ .*1d.*grid_T_table2.2.nc ]] ; then 
+		var2rename=t_ave_00086400 
+		vars2d="tos tossq" ; vars3d=""
+	    fi
 	    if [ "$var2rename" ] ; then 
-		if [ ! -w $file ] ; then 
-		    out=$tmp/renamed_$(basename $file) ; rm -f $out
-		    ncks -3 $file $out && ncrename -v $var2rename,time_counter $out >&2
-		else
-		    ncks -3 $file && ncrename -v $var2rename,time_counter $file >&2
-		fi
+		out=$tmp/renamed_$(basename $file) ; rm -f $out 
+		ncks -3 $file $out 
+		ncrename -d .$var2rename,time_counter -v $var2rename,time_counter $out >&2
+		for lvar in $vars2d; do 
+		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+		done
+		for lvar in $vars3d; do 
+		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+		done
+		if [ -w $file ] ; then mv -f $out $file ; out="" ; fi
 	    fi
 	fi
     fi
     if [ $out ]; then echo $out ; else echo $file ; fi 
 }
 
-# For the time being, must use NetCDF3 file format chained CDO
-# operations because NetCDF4 is not threadsafe at CNRM
-CDO="cdo -f nc"
+# For the time being, at CNRM, must use NetCDF3 file format chained CDO
+# operations because NetCDF4 is not threadsafe there
+if [ -d /cnrm ] ; then CDO="cdo -f nc" ; else CDO="cdo" ; fi
 
 # Prepare CDO operator strings
 
 [ "$period" ] && seldatebase="-seldate,$period"
 
-[ "$var" ] && [[ $var != multi_* ]] && selvar="-selname,$var" 
+[ "$var" ] && selvar="-selname,$var" 
 
 if [ "$region" ] ; then 
     latmin=$(echo $region | cut -d "," -f 1)
@@ -90,7 +101,7 @@ if [ "$vm" ] ; then
 fi
 
 # 'files' is the list of input filenames
-files=$1
+files=$*
 vfiles=""
 vfiles_are_original=0
 

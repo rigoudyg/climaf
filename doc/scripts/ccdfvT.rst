@@ -35,11 +35,12 @@ There are not CliMAF optional arguments.
 
 **Climaf call example**:: 
 
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
-  >>> d2=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O") # dataset with salinity
-  >>> d3=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # dataset with zonal velocity component
-  >>> d4=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") # dataset with meridional velocity component
-  >>> my_cdfvT=ccdfvT(d1,d2,d3,d4)
+  >>> cdef("period","198807")
+  >>> dt=ds(simulation="PRE6CPLCr2alb", variable="thetao", realm="O") # dataset with temperature
+  >>> ds=ds(simulation="PRE6CPLCr2alb", variable="so", realm="O") # dataset with salinity
+  >>> du=ds(simulation="PRE6CPLCr2alb", variable="uo", realm="O") # dataset with zonal velocity component
+  >>> dv=ds(simulation="PRE6CPLCr2alb", variable="vo", realm="O") # dataset with meridional velocity component
+  >>> my_cdfvT=ccdfvT(dt,ds,du,dv)
   >>> cfile(my_cdfvT) # to compute the time average values for V.T, V.S, U.T and U.S 
 
 **Implementation**: The operator is implemented as a binary using

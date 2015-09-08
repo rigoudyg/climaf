@@ -94,10 +94,10 @@ def macro(name,cobj,lobjects=[]):
                   *cobj.operands, **cobj.parameters)
         rep.operands = map(macro,[ None for o in rep.operands],rep.operands)
     elif isinstance(cobj,scriptChild) :
-        rep=scriptChild(cmacro(None,cobj.father),cobj.varname)
+        rep=scriptChild(macro(None,cobj.father),cobj.varname)
     elif isinstance(cobj,cpage) :
         rep=cpage(cobj.widths, cobj.heights,
-                  [ map(cmacro, [ None for fig in line ], line) for line in cobj.fig_lines ] ,
+                  [ map(macro, [ None for fig in line ], line) for line in cobj.fig_lines ] ,
                   cobj.orientation)
     elif cobj is None : return None
     else :

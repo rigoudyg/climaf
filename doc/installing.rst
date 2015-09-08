@@ -38,7 +38,7 @@ Installing (or using an installed version, at CNRM or IPSL)
 
    - for getting the development version, you may rather execute::
 
-     git clone -b dev https://github.com/senesis/climaf climaf
+      git clone -b dev https://github.com/senesis/climaf climaf
 
 
 .. _configuring:

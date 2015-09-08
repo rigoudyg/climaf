@@ -29,15 +29,19 @@ calias("NEMO","thetao",filenameVar="grid_T_table2.2")
 products="vomevt,vomevs,vozout,vozous"
 calias("NEMO",products,filenameVar="VT")
 
+# How to define a single variable from a multi-variable 
+derive('NEMO','vozovt','ccdo',products,operator='selname,vozovt')
+
 # Define defaults facets for datasets 
 cdef("project","NEMO")
 cdef("frequency","monthly")
 cdef("simulation","PRE6CPLCr2alb")
-cdef("period","199807")
+cdef("period","199808-199809")
 
 # Define datasets 
 duo=ds(variable="uo")
 dvo=ds(variable="vo")
+dvo.baseFiles()
 dx=ds(variable=products)
 
 # Tell how to bring required fixed files to cdftransport
@@ -52,15 +56,16 @@ fixed_fields('ccdftransport',
 trsp=ccdftransport(dx,duo,dvo,imin=117,imax=117,jmin=145,jmax=147)
 
 # Create files for the various cdftransport outputs
-cfile(my_cdftransport)
-cfile(my_cdftransport.htrp)
-cfile(my_cdftransport.strp)
+cfile(trsp)
+cfile(trsp.htrp)
+cfile(trsp.strp)
 
 # Compute products another way, and transport 
 dso=ds(variable="so")
 dtho=ds(variable="thetao")
-dx2=ccdfvT(duo,dvo,dso,dtho)
+dx2=ccdfvT(dtho,dso,duo,dvo)
 trsp2=ccdftransport(dx2,duo,dvo,imin=117,imax=117,jmin=145,jmax=147)
 
-# A possible trick 
+# How to extract a single variable from a multi-variable dataset
 dut=ccdo(dx,operator="selname,vozout")
+

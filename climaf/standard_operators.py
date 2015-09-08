@@ -113,13 +113,13 @@ def load_cdftools_operators():
     
     cscript('ccdftransport',
             scriptpath+'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
-            canSelectVar=True)
+            _var='vtrp', canSelectVar=True)
     
     #
     # cdfheatc 
     #
     cscript('ccdfheatc',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file')
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file', _var="heatc")
    
     # 
     # cdfsections 
