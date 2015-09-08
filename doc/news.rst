@@ -15,7 +15,7 @@ Changes, newest first :
 
 .. _news_0.9:
 
-- 2015/07/31 - Version 0.9 :
+- 2015/09/08 - Version 0.9 :
 
  - Operator 'lines' is smarter re.time axis: (see
    :doc:`scripts/lines`):

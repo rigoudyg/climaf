@@ -57,12 +57,15 @@ duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 my_cdfmean=ccdfmean(duo,pos_grid='U')
 my_cdfmean2=ccdfmean(duo,pos_grid='U',opt='-full')
 my_cdfmean3=ccdfmean(duo,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+cfile(my_cdfmean3)
 
 # Compute vertical profile
 my_cdfmean_prof=ccdfmean_profile(duo,pos_grid='U')
+cfile(my_cdfmean_prof)
 
 # Compute spatial variance
 my_cdfvar=ccdfvar(duo,pos_grid='U')
+cfile(my_cdfvar)
 
 # Compute vertical profile of spatial variance
 my_cdfvar_prof=ccdfvar_profile(duo,pos_grid='U')
@@ -102,7 +105,7 @@ dmldx=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="
 
 # Compute the heat content in the mixed layer
 my_cdfmxlheatc=ccdfmxlheatc(dtho,dmldx)
-
+cfile(my_cdfmxlheatc)
 
 #-----------
 #  cdfstd
@@ -119,6 +122,7 @@ dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807-199810", r
 
 # Compute the standard deviation of variable "omlmax"
 my_cdfstd=ccdfstd(dmld)
+cfile(my_cdfstd)
 
 # Compute both the mean value and standard deviation of "uo" field (sea water velocity)
 my_cdfstd_moy=ccdfstdmoy(duo)
