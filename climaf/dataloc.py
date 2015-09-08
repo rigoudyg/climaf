@@ -253,68 +253,59 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
-    if "filenameVar" in kwargs and kwargs['filenameVar'] :
-        kwargs['variable']=kwargs['filenameVar']
+    # a dict and an ordered list of date globbing patterns
+    dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
+    lkeys=dt.keys() ; lkeys.sort(reverse=True)
+    # a dict and an ordered list for matching dates
+    dr=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})")
+    rkeys=dr.keys() ; rkeys.sort(reverse=True)
+    #
     for l in urls :
-        template=Template(l)
-        #
         # Instantiate keywords in pattern with attributes values
-        template=template.safe_substitute(**kwargs)
+        template=Template(l).safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
-        temp2=template
-        dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        lkeys=dt.keys() ; lkeys.sort(reverse=True)
+        temp2=template ; 
         for k in lkeys : temp2=temp2.replace(k,dt[k])
-        clogger.debug("Globbing on : "+temp2)
         lfiles=glob.glob(temp2)
+        clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
-        # Analyze all filenames
-        # --> We want to keep all the filenames got by globbing which contain:
-	#        - 1/ the variable name,
-	#        - 2/ otherwise, the filenameVar pattern
-	#        - 3/ otherwise, all filenames
-        # It is enough that one file match one condition for stopping with the other conditions
-        matching_lfiles=[]
-	# -- Step 1/ Matching the variable name in the file name
-        for f in lfiles:
-            if '_'+variable in f:
-               matching_lfiles.append(f)
-	# -- Step 2/ If we didn't find the variable, try to find the filenameVar pattern
-        if len(matching_lfiles)==0:
-           for f in lfiles:
-             if 'filenameVar' in kwargs and kwargs['filenameVar'] in f:
-               matching_lfiles.append(f)
-	# -- Step 3/ If step 1 and 2 are not successful, take the complete list of files to try to find the variable
-        if len(matching_lfiles)==0:
-            matching_lfiles=lfiles
+        # If unsuccessful using varname, try with filenameVar
+        if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
+            kwargs['variable']=kwargs['filenameVar']
+            template=Template(l).safe_substitute(**kwargs)
+            temp2=template
+            for k in lkeys : temp2=temp2.replace(k,dt[k])
+            #
+            lfiles=glob.glob(temp2)
+            clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
 
-        for f in matching_lfiles :
-            # Construct regexp for extracting dates from filename
-            dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
-                    YYYYMMDD="([0-9]{8})")
-            regexp=None
-            # print "template before searching dates : "+template
-            lkeys=dt.keys() ; lkeys.sort(reverse=True)
-            for key in lkeys :
-                # print "searchin "+key+" in "+template
-                start=template.find(key)
-                if (start>=0 ) :
-                    # print "found "+key
-                    regexp=template.replace(key,dt[key],1)
-                    hasEnd=False
-                    start=regexp.find(key)
-                    if (start >=0 ) :
-                        hasEnd=True
-                        regexp=regexp.replace(key,dt[key],1)
-                    break
+        # Construct regexp for extracting dates from filename
+        regexp=None
+        print "template before searching dates : "+template
+        for key in rkeys :
+            #print "searchin "+key+" in "+=Template(l)
+            start=template.find(key)
+            if (start>=0 ) :
+                #print "found "+key
+                regexp=template.replace(key,dr[key],1)
+                hasEnd=False
+                start=regexp.find(key)
+                if (start >=0 ) :
+                    hasEnd=True
+                    regexp=regexp.replace(key,dr[key],1)
+                break
+        print "regexp before searching dates : "+regexp
+        #
+        for f in lfiles :
+            print "processing file "+f
             #
             # Analyze file time period
             fperiod=None
             if regexp :
                 regexp=regexp.replace("*",".*").replace("?",r".")
-                # print "regexp for extracting dates : "+regexp
+                #print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp,r'\1',f)
                 if start==f:
                     raise Climaf_Data_Error("Start period not found") #? LV
@@ -323,6 +314,7 @@ def selectGenericFiles(urls, **kwargs):
                     fperiod=init_period("%s-%s"%(start,end))
                 else :
                     fperiod=init_period(start)
+                print "period for file %s is %s"%(f,fperiod)
                 #
                 # Filter file time period against required period
             else :
@@ -336,12 +328,20 @@ def selectGenericFiles(urls, **kwargs):
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 # Filter against variable 
                 if (l.find("${variable}")>=0):
+                    clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
-                    break
+                    continue
                 if f not in rep and ( fileHasVar(f,variable) or ("," in variable)):
                     # Should check time period in the file if not regexp
-                    # print "appending "+f
+                    clogger.debug('appending %s based on multi-var or var exists in file '%f)
                     rep.append(f)
+            else:
+                if not fperiod :
+                    clogger.debug('not appending %s because period is None '%f)
+                else:
+                    if not period.intersects(fperiod) :
+                        clogger.debug('not appending %s because period doesn t intersect %s'%(f,period))
+
     return rep
 
 
