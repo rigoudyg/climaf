@@ -642,7 +642,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
                    [ compare_trees(op1,op2,func,filter_on_operator) 
                      for op1,op2 in zip(tree1.operands, tree2.operands) ]))
     elif isinstance(tree1,scriptChild) and isinstance(tree2,scriptChild):
-        if tree1.name==tree2.name :
+        if tree1.varname==tree2.varname :
             return compare_trees(tree1.father,tree2.father,
                                  func,filter_on_operator)
 

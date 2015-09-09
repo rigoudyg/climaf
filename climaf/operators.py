@@ -290,7 +290,7 @@ class cscript():
         # Analyze outputs names , associated variable names 
         # (or format strings), and store it in attribute dict 'outputs' 
         self.outputs=dict()
-        it=re.finditer(r"\${out(_(?P<outname>[\w-]*)?)?}",command)
+        it=re.finditer(r"\${out(_(?P<outname>[\w-]*))?}",command)
         for occ in it :
             outname=occ.group("outname") 
             if outname is not None :

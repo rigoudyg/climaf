@@ -508,8 +508,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             for output in scriptCall.outputs:
                 ok = ok and cache.register(subdict["out_"+output],\
                                            scriptCall.crs+"."+output)
-                if ok :
-                    set_variable(subdict["out_"+output], output, 'file')
+                #if ok :
+                #    set_variable(subdict["out_"+output], output, 'file')
             if ok : 
                 duration=time.time() - tim1
                 print("Done in %.1f s with script computation for %s "%\
