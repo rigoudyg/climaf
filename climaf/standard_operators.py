@@ -56,7 +56,8 @@ def load_standard_operators():
     #
     cscript('mean_and_std',
             scriptpath+'mean_and_std.sh ${in} ${var} ${out} ${out_sdev}', 
-            # This tells CliMAF how to name output 'sdev' using input variable name
+            # This tells CliMAF how to compute varname for name output 'sdev' 
+	    # using input varname
             sdev_var="std(%s)" , 
             commuteWithTimeConcatenation=True)
     #
