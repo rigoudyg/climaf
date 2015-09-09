@@ -384,8 +384,7 @@ def fixed_fields(operator, *paths):
 
     """
     if not isinstance(operator,list):
-        namelist=list()
-        namelist.append(operator)
+        namelist=[operator]
     else:
         namelist=operator
         

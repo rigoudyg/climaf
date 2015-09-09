@@ -24,8 +24,10 @@
 #export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
 from climaf.api import *
 
-if not atCNRM:
-    exit
+if not atCNRM: exit(0)
+if 'cdfmean' not in cscripts :
+    print("CDFtools not available")
+    exit(0)
 
 # How to get fixed files for all cdftools binaries
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'

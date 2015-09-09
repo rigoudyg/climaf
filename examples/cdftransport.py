@@ -1,6 +1,9 @@
 from climaf.api import *
 
-if not atCNRM: exit
+if not atCNRM: exit(0)
+if 'cdfmean' not in cscripts :
+    print("CDFtools not available")
+    exit(0)
 
 # Declare "NEMO" project, both for Nemo raw outputs and for Monitoring outputs
 # (with VT-files : mean values of vt, vs, ut, us for heat and salt transport)
