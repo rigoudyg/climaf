@@ -472,9 +472,10 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
         pattern1=l+"/"+project+"/merge"
-        if not os.path.exists(pattern1) : pat_test=l+"/"+project+"/"+model
-        if os.path.exists(pat_test) : pattern1=l+"/"+project+"/*"
-        else : pattern1=l+"/"+project
+        if not os.path.exists(pattern1) :
+            pat_test=l+"/"+project+"/"+model
+            if os.path.exists(pat_test) : pattern1=l+"/"+project+"/*"
+            else : pattern1=l+"/"+project
         patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)

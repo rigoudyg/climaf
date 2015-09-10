@@ -179,7 +179,7 @@ In that case:
 
    >>> avg=climaf.operators.time_average(ds)
 
-- the same applies for macros, mutatis mutandis  ::
+- the same applies for macros, *mutatis mutandis*  ::
 
    >>> avg=climaf.macros.my_macro(ds)
 
