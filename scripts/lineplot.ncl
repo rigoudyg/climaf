@@ -74,13 +74,16 @@ begin
       ;  all_fld&$coord$ = cd_convert(all_fld&$coord$, all_files[0]->$var$&$coord$@units)
       ;
       ; check if all X axis are "time" else NCL sets first file attributes to other files
-      if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
-        first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
-        if (.not. all(all_files[:]&$coord$@standard_name .eq. first_file_axis_name)) then
-          print("Files have not same axis for variable "+coord)
-          status_exit(1)
-        end if        
-      end if
+
+      ; disabled until all sites have an advanced Ncl
+      ; if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
+      ;   first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
+      ;   if (.not. all(all_files[:]&$coord$@standard_name .eq. first_file_axis_name)) then
+      ;     print("Files have not same axis for variable "+coord)
+      ;     status_exit(1)
+      ;   end if        
+      ; end if
+
       ; data vector for X axis
       if ( T_axis .eq. "real" ) then
         Xaxis=all_fld&$coord$             ; take union of all time periods

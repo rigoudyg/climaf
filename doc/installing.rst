@@ -71,6 +71,14 @@ Configuring CliMAF
 
     $ module load python/2.7.5 nco ncview ncl
 
+  - On some systems, if CDO fails at allocating memory, you may have
+    to put e.g. in your ~/.bash_profile::
+
+    $ ulimit -s unlimited 
+
+    in csh::
+
+    $ unlimit stacksize
 
 .. _running_inter:
 

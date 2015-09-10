@@ -21,7 +21,8 @@ alias=$1 ; shift
 units=$1 ; shift
 vm=$1 ; shift
 
-tmp=$(mktemp -d --tmpdir climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
+#tmp=$(mktemp -d --tmpdir climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
+tmp=$(mktemp -d  climaf_mcdo_XXXXXX) # Option --tmpdir is not available at all sites
 
 
 clim_timefix ()
@@ -73,9 +74,9 @@ nemo_timefix ()
     if [ $out ]; then echo $out ; else echo $file ; fi 
 }
 
-# For the time being, at CNRM, must use NetCDF3 file format chained CDO
+# For the time being, at most sites, must use NetCDF3 file format chained CDO
 # operations because NetCDF4 is not threadsafe there
-if [ -d /cnrm ] ; then CDO="cdo -f nc" ; else CDO="cdo" ; fi
+if [[ $(uname -n ) == ciclad* ]] ; then CDO="cdo" ; else CDO="cdo -f nc" ; fi
 
 # Prepare CDO operator strings
 

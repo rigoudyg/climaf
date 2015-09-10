@@ -304,13 +304,13 @@ def selectGenericFiles(urls, **kwargs):
             # Analyze file time period
             fperiod=None
             if regexp :
-                regexp=regexp.replace("*",".*").replace("?",r".")
+                regexp0=regexp.replace("*",".*").replace("?",r".")
                 #print "regexp for extracting dates : "+regexp
-                start=re.sub(regexp,r'\1',f)
+                start=re.sub(regexp0,r'\1',f)
                 if start==f:
                     raise Climaf_Data_Error("Start period not found") #? LV
                 if hasEnd :
-                    end=re.sub(regexp,r'\2',f)
+                    end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
                 else :
                     fperiod=init_period(start)
@@ -447,8 +447,11 @@ def selectExampleFiles(urls,**kwargs) :
 def selectCmip5DrsFiles(urls, **kwargs) :
     # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
+    #
     # second path segment can be any string (allows for : output,output1, merge...), 
     # but if 'merge' exists, it is used alone
+    # This segment ca also be empty
+    #
     # If version is 'last', tries provide version from directory 'last' if available,
     # otherwise those of last dir
     project=kwargs['project']
@@ -469,7 +472,9 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
         pattern1=l+"/"+project+"/merge"
-        if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
+        if not os.path.exists(pattern1) : pat_test=l+"/"+project+"/"+model
+        if os.path.exists(pat_test) : pattern1=l+"/"+project+"/*"
+        else : pattern1=l+"/"+project
         patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
