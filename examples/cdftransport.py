@@ -22,15 +22,11 @@ dataloc(project='NEMO', organization='generic', url=[url_nemo_standard,url_nemo_
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("NEMO","uo",filenameVar="grid_U_table2.3")
 calias("NEMO","vo",filenameVar="grid_V_table2.3")
-calias("NEMO","so",filenameVar="grid_T_table2.2")
-calias("NEMO","thetao",filenameVar="grid_T_table2.2")
+calias("NEMO","so,thetao",filenameVar="grid_T_table2.2")
 
 # Declare a special variable, composed of variables grouped in a file
 products="vomevt,vomevs,vozout,vozous"
 calias("NEMO",products,filenameVar="VT")
-
-# How to define a single variable from a multi-variable 
-derive('NEMO','vozovt','ccdo',products,operator='selname,vozovt')
 
 # Define defaults facets for datasets 
 cdef("project","NEMO")
@@ -41,6 +37,7 @@ cdef("period","199808-199809")
 # Define datasets 
 duo=ds(variable="uo")
 dvo=ds(variable="vo")
+dtest=ds(variable="vozout")
 dx=ds(variable=products)
 
 # Tell how to bring required fixed files to cdftransport

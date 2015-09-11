@@ -883,7 +883,20 @@ def cfilePage(cobj, deep, recurse_list=None) :
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
+
+def calias(project,variable,**kwargs):
+              
+    if not "," in variable: # mono-variable
+        classes.calias(project=project,variable=variable,**kwargs) 
         
+    else : #multi-variable
+        classes.calias(project=project,variable=variable,**kwargs) 
+        list_variable=variable.split(",")
+        
+        for v in list_variable:
+            operators.derive(project,v,'ccdo',variable,operator='selname,%s'%v)
+            classes.calias(project=project,variable=v,**kwargs) 
+
 
 def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 

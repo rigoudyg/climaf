@@ -30,7 +30,7 @@ if not atCNRM:
 # How to get fixed files for all cdftools binaries
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 #can also use placeholders as in '/cnrm/aster/data3/aster/vignonl/${project}/'
-fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc','ccdfmxlheatc'],
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc1','ccdfheatc2','ccdfmxlheatc'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
@@ -70,6 +70,27 @@ cfile(my_cdfvar)
 # Compute vertical profile of spatial variance
 my_cdfvar_prof=ccdfvar_profile(duo,pos_grid='U')
 
+# Plot mean values, vertical profile, spatial variance and vertical profile of spatial variance
+duo_JASO=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807-199810", realm="O")
+
+my_cdfmean4=ccdfmean(duo_JASO,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+my_plot=lines(my_cdfmean4,labels="uo",title="Mean values")
+cshow(my_plot)
+
+my_cdfmean_prof2=ccdfmean_profile(duo_JASO,pos_grid='U')
+my_cdfmean_prof2_level0=ccdo(my_cdfmean_prof2,operator="-sellevel,5.02159")
+my_plot2=lines(my_cdfmean_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of mean values")
+cshow(my_plot2)
+
+my_cdfvar2=ccdfvar(duo_JASO,pos_grid='U')
+my_plot3=lines(my_cdfvar2,labels="uo",title="Spatial variance")
+cshow(my_plot3)
+
+my_cdfvar_prof2=ccdfvar_profile(duo_JASO,pos_grid='U')
+my_cdfvar_prof2_level0=ccdo(my_cdfvar_prof2,operator="-sellevel,5.02159")
+my_plot4=lines(my_cdfvar_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of spatial variance")
+cshow(my_plot4)
+
 #-----------
 # cdfheatc   
 #-----------
@@ -86,9 +107,8 @@ dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
 dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
 
 # Compute the heat content in the specified area
-my_cdfheatc=ccdfheatc(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+my_cdfheatc=ccdfheatc2(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfheatc)
-
 
 #----------------
 #  cdfmxlheatc
