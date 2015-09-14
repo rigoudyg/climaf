@@ -37,7 +37,6 @@ cdef("period","199808-199809")
 # Define datasets 
 duo=ds(variable="uo")
 dvo=ds(variable="vo")
-dtest=ds(variable="vozout")
 dx=ds(variable=products)
 
 # Tell how to bring required fixed files to cdftransport

@@ -69,7 +69,7 @@ begin
     if dime(dim) .gt. 1 then
 
       if found then
-        print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+ Var_DimNames(dim))
+        print("There is more than one non-singleton dim in one of files:"+coord+" "+Var_DimNames(dim))
         status_exit(1)
       end if 
       found=True
@@ -237,7 +237,7 @@ begin
       if dime(dim) .gt. 1 then 
        
         if found then
-          print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+ Var_DimNames(dim))
+          print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+" "+Var_DimNames(dim))
           status_exit(1)
         end if 
         found=True

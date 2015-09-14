@@ -30,7 +30,7 @@ if not atCNRM:
 # How to get fixed files for all cdftools binaries
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 #can also use placeholders as in '/cnrm/aster/data3/aster/vignonl/${project}/'
-fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc1','ccdfheatc2','ccdfmxlheatc'],
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatc2','ccdfmxlheatc2'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
@@ -48,7 +48,6 @@ cdef("project","EM") # project EM describes data organization for NEMO outputs a
 #
 # CliMAF usage (ccdfmean, ccdfmean_profile, ccdfvar, ccdfvar_profile) :
 #
-
 
 # Define dataset with sea water x velocity ("uo")
 duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
@@ -102,7 +101,7 @@ cshow(my_plot4)
 # CliMAF usage (ccdfheatc) :
 #
 
-# Define dataset with salinity and temperature 
+# Define datasets with salinity and temperature 
 dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
 dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
 
@@ -124,7 +123,7 @@ cfile(my_cdfheatc)
 dmldx=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")
 
 # Compute the heat content in the mixed layer
-my_cdfmxlheatc=ccdfmxlheatc(dtho,dmldx)
+my_cdfmxlheatc=ccdfmxlheatc2(dtho,dmldx)
 cfile(my_cdfmxlheatc)
 
 #-----------
@@ -160,7 +159,7 @@ cfile(my_cdfstd_moy.moy)
 # CliMAF usage (ccdfsections) :
 #
 
-# Define dataset with salinity,  temperature, mld, sea water x and y velocity (uo/vo)
+# Define datasets with salinity,  temperature, mld, sea water x and y velocity (uo/vo)
 dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")      
 dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") 
 dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O") 
@@ -169,7 +168,7 @@ dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
 # Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang 
 # along a section made of Nsec linear segments
-my_cdfsections=ccdfsections(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
+my_cdfsections=ccdfsections2(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
 cfile(my_cdfsections)
 cfile(my_cdfsections.Utang)
 cfile(my_cdfsections.so)
@@ -179,9 +178,8 @@ cfile(my_cdfsections.sig1)
 cfile(my_cdfsections.sig2)
 cfile(my_cdfsections.sig4)
 
-my_cdfsections2=ccdfsections(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=305.0,Nsec=2,lat1=49.0,lon1=307.0,lat2=50.5,lon2=337.5,n1=20,more_points='40.3 305.1 50')
+my_cdfsections2=ccdfsections2(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=305.0,Nsec=2,lat1=49.0,lon1=307.0,lat2=50.5,lon2=337.5,n1=20,more_points='40.3 305.1 50')
 cfile(my_cdfsections2)
-
 
 #----------------
 #  cdfvT 
@@ -193,7 +191,7 @@ cfile(my_cdfsections2)
 # CliMAF usage (ccdfvT) :
 #
 
-# Define dataset with temperature ("thetao" in .nc <=> "votemper" for cdftools),
+# Define datasets with temperature ("thetao" in .nc <=> "votemper" for cdftools),
 # salinity ("so" in .nc <=> "vosaline" for cdftools),
 # zonal velocity component ("uo" in .nc <=> "vozocrtx" for cdftools),
 # meridional velocity component ("vo" in .nc <=> "vomecrty" for cdftools)
