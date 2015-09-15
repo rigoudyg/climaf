@@ -1,5 +1,5 @@
-ccdfmxlheatc : computes the heat content in the mixed layer 
---------------------------------------------------------------
+ccdfmxlheatc2 : computes the heat content in the mixed layer (mono-variable input file)
+----------------------------------------------------------------------------------------
 
 Computes the heat content in the mixed layer (Joules/m2). This is the
 wrapping around the native cdfmxlheatc operator assuming its usage
@@ -39,9 +39,9 @@ directory (use function :py:func:`~climaf.operators.fixed_fields()` for that; se
   >>> fixed_fields('ccdfmxlheatc',
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
-  >>> d2=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O") # dataset with mld
-  >>> my_cdfmxlheatc=ccdfmxlheatc(d1,d2)
+  >>> dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
+  >>> dmldx=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O") # dataset with mld
+  >>> my_cdfmxlheatc=ccdfmxlheatc2(dtho,dmldx)
   >>> cfile(my_cdfmxlheatc) # to compute the heat content in the mixed layer and get a filename with the result 
 
 **Implementation**: The operator is implemented as a binary using

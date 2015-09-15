@@ -51,14 +51,14 @@ example below).
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
    ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable 
-  >>> my_cdfmean_prof=ccdfmean_profile(d1,pos_grid='U')
+  >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable 
+  >>> my_cdfmean_prof=ccdfmean_profile(duo,pos_grid='U')
   >>> cfile(my_cdfmean_prof)  # to compute the vertical profile of horizontal means and get a filename with the result 
 
-  >>> my_cdfmean_prof2=ccdfmean_profile(d1,pos_grid='U',opt='-full')
+  >>> my_cdfmean_prof2=ccdfmean_profile(duo,pos_grid='U',opt='-full')
   >>> cfile(my_cdfmean_prof2)
 
-  >>> my_cdfmean_prof3=ccdfmean_profile(d1,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+  >>> my_cdfmean_prof3=ccdfmean_profile(duo,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
   >>> cfile(my_cdfmean_prof3)
 
 **Implementation**: The operator is implemented as a binary using

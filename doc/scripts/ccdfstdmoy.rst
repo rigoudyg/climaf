@@ -54,8 +54,8 @@ See also:
 
 **Climaf call example**:: 
 
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
-  >>> my_cdfstd_moy=ccdfstdmoy(d1)
+  >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
+  >>> my_cdfstd_moy=ccdfstdmoy(duo)
   >>> cfile(my_cdfstd_moy) # compute the mean value and standard deviation of "uo" field (sea water velocity)
   >>> moy_var=my_cdfstd_moy.moy # moy_var receives operator output named "moy", namely the field mean value
 

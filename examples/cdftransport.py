@@ -43,7 +43,6 @@ dx=ds(variable=products)
 # (this can use wildcards ${model}, ${project}, ${simulation})
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 fixed_fields('ccdftransport',
-             ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 
