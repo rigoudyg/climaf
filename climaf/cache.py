@@ -312,9 +312,12 @@ def csync(update=False) :
             rebuild()  
 
     # Save to disk
-    cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
-    pickle.dump(crs2filename,cacheIndexFile)  
-    cacheIndexFile.close()
+    try: 
+        cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
+        pickle.dump(crs2filename,cacheIndexFile)  
+        cacheIndexFile.close()
+    except:
+        clogger.warning("No cache index file yet")
 
 def cload() :
     global crs2filename 
