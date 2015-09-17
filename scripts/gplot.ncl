@@ -16,8 +16,21 @@ begin
   type="png"
   LABELON=False
   RASTER=True 
-  
-  ; Reading the field and its unit, setting REDU, and scaling the field
+
+  ;------------------
+  ; number of fields
+  ;------------------
+
+  AUX_FIELD=False
+  if (isvar("infile2")) then  
+    AUX_FIELD=True
+  end if
+
+  ;-----------------
+  ; Main field: fld
+  ;-----------------
+
+  ; Reading the main field and its unit, setting REDU, and scaling the field
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
     if isfilevar(ffile,var) then 
@@ -40,16 +53,16 @@ begin
   end if
   
   logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarithmic scale
-
   if (isvar("linp")) then if ((linp .eq. 1) .or. (linp .eq. -1)) then logp=False end if end if
-  if (.not. isvar("contours")) then contours=0 end if
-  LINEON=False
-  if ( isvar("contours") .and. (contours .ne. 0 ) ) then LINEON=True 
-  end if
+
   LEVELS_CONTOURS=False ; by default, contours lines (if actived i.e. if LINEON is True) follow color filled contours
-   
+  LINEON=False
+  if .not. AUX_FIELD then
+    if (isvar("contours") .and. (contours .ne. 0)) then LINEON=True end if
+  end if
+
   if isvar("focus") then
-    if ( .not. (focus .eq. "" .or. focus .eq. "land" .or. focus .eq. "ocean")) then
+    if (.not. (focus .eq. "" .or. focus .eq. "land" .or. focus .eq. "ocean")) then
       print("Wrong focus option '"+focus+"' . Only 'ocean' and 'land' are allowed")
       status_exit(2)
     end if
@@ -58,20 +71,18 @@ begin
   end if
       
   ; Try to adapt to various cases, using heuristics !
-  ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
-  
+  ; Assume dimensions order is anyway t,z,y,x, but that some may be missing 
   Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
   dime=dimsizes(fld)
   rank=dimsizes(dime)
   if (rank.gt.4) then 
-    print("This script is not tuned for high rank data ( rank="+rank+")")
+    print("This script is not tuned for high rank data for main field ( rank="+rank+")")
     print(Var_DimNames)
     status_exit(1)
   end if
   
   ; Removes singleton (degenerate) dimensions from fld while preserving meta data
   new_fld=rm_single_dims(fld)
-
   delete(Var_DimNames)
   Var_DimNames = getVarDimNames(new_fld)
   delete(dime)
@@ -180,8 +191,90 @@ begin
     end if
   else
     power10=0
-  end if  
+  end if
+    
+  ;-----------------------
+  ; Auxiliary field: fld2
+  ;-----------------------
+
+  if (AUX_FIELD) then
+
+    ; Reading the auxiliary field 
+    if isfilepresent(infile2) then
+      ffile2=addfile(infile2,"r")
+      if isfilevar(ffile2,var2) then 
+        if (getfilevartypes(ffile2,var2) .eq. "short") then
+          fld2 = short2flt( ffile2->$var2$ )
+        else
+          fld2 = ffile2->$var2$
+        end if
+      else
+        print("File "+infile2+" does not include variable "+var2)
+        status_exit(1)
+      end if
+    else
+      print("File "+infile2+" cannot be accessed")
+      status_exit(2)
+    end if
   
+    ; Try to adapt to various cases, using heuristics !
+    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
+    Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
+    dime2=dimsizes(fld2)
+    rank2=dimsizes(dime2)
+    if (rank2.gt.4) then 
+      print("This script is not tuned for high rank data for auxiliary field ( rank="+rank2+")")
+      print(Var_DimNames2)
+      status_exit(1)
+    end if
+  
+    ; Removes singleton (degenerate) dimensions from fld2 while preserving meta data
+    new_fld2=rm_single_dims(fld2)
+    delete(Var_DimNames2) 
+    Var_DimNames2 = getVarDimNames(new_fld2) 
+    delete(dime2) 
+    dime2=dimsizes(new_fld2)
+    delete(rank2) 
+    rank2=dimsizes(dime2)
+    delete(fld2)
+    fld2=new_fld2
+    delete(new_fld2)
+  
+    if (rank2 .eq. 4) then
+      ; assume first dimension is time. Select first time slice before further processing
+      ;print("Selecting first time step for auxiliary field")
+      fldtmp2=fld2(0,:,:,:)
+      delete(fld2)
+      fld2=fldtmp2
+      delete(fldtmp2)
+      delete(Var_DimNames2)
+      Var_DimNames2 = getVarDimNames(fld2) 
+      delete(dime2)
+      dime2=dimsizes(fld2)
+      rank2=dimsizes(dime2)
+    end if
+  
+    if (rank2 .eq. 3) then
+      print("plotting an auxiliary field with 2 horizontal dimensions")
+      fldtmp2=fld2(0,:,:)
+      delete(fld2)
+      fld2=fldtmp2
+      delete(fldtmp2)
+      ;delete(dime2)
+      ;dime2=dimsizes(fld2)
+      ;rank2=dimsizes(dime2)
+    end if ; rk eq 3  
+     
+    ; fld2 is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+    
+    if (rank2 .eq. 1) then 
+      delete(Var_DimNames2)
+      Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
+      hdim2=fld2&$Var_DimNames2(0)$
+    end if
+
+  end if ; AUX_FIELD is True
+
   ;-----------------
   ; Open workstation
   ;-----------------
@@ -196,6 +289,7 @@ begin
   gsn_define_colormap(wks,cmap) 
   i = NhlNewColor(wks,0.8,0.8,0.8)
   
+  ; main field resources
   res=True
   res@gsnFrame= False
   res@gsnDraw= False
@@ -231,37 +325,64 @@ begin
     res@cnLineLabelsOn = False
     res@cnLineLabelBackgroundColor = "white"
     res@cnInfoLabelString =""
-    
-    if (LINEON) then 
-      if (contours .eq. 1) then 
-        res@cnLinesOn=True
-        res@gsnContourNegLineDashPattern = 1
-        res@gsnContourZeroLineThicknessF = 1.5  
-      else
-        if (isstring(contours)) then
-          LEVELS_CONTOURS=True
-          res2=True
-          res2@gsnFrame= False
-          res2@gsnDraw=False
-          res2@gsnMaximize = True
-          res2@gsnLeftString     = ""
-          res2@gsnRightString    = ""
-          res2@gsnCenterString   = ""
 
-          res2@cnFillOn=False
-          res2@cnLineLabelsOn = False
-          res2@cnInfoLabelString = ""
+    if .not. AUX_FIELD then
+      if (LINEON) then 
+        if (contours .eq. 1) then 
+          res@cnLinesOn=True
+          res@gsnContourNegLineDashPattern = 1
+          res@gsnContourZeroLineThicknessF = 1.5  
+        else
+          if (isstring(contours)) then
+            LEVELS_CONTOURS=True
+            res2=True
+            res2@gsnFrame= False
+            res2@gsnDraw=False
+            res2@gsnMaximize = True
+            res2@gsnLeftString     = ""
+            res2@gsnRightString    = ""
+            res2@gsnCenterString   = ""
 
-          res2@cnLinesOn=True
-          res2@gsnContourNegLineDashPattern = 1
-          res2@gsnContourZeroLineThicknessF = 1.5  
+            res2@cnFillOn=False
+            res2@cnLineLabelsOn = False
+            res2@cnInfoLabelString = ""
 
-          res2@cnLevelSelectionMode = "ExplicitLevels"
-          res2@cnLevels=tofloat(str_split(contours," "))
-          delete(contours)
-        end if 
-      end if
-    end if   
+            res2@cnLinesOn=True
+            res2@gsnContourNegLineDashPattern = 1
+            res2@gsnContourZeroLineThicknessF = 1.5  
+            
+            res2@cnLevelSelectionMode = "ExplicitLevels"
+            res2@cnLevels=tofloat(str_split(contours," "))
+            delete(contours)
+          end if 
+        end if
+      end if   
+    else
+      ; auxiliary field
+      res2=True
+      res2@gsnFrame= False
+      res2@gsnDraw=False
+      res2@gsnMaximize = True
+      
+      res2@gsnLeftString     = ""
+      res2@gsnRightString    = ""
+      res2@gsnCenterString   = ""
+      
+      res2@cnFillOn=False
+      res2@cnLineLabelsOn = False
+      res2@cnInfoLabelString = ""
+      
+      res2@cnLinesOn=True
+      res2@gsnContourNegLineDashPattern = 1
+      res2@gsnContourZeroLineThicknessF = 1.5  
+      
+      if ( isvar("contours") ) then 
+        res2@cnLevelSelectionMode = "ExplicitLevels"
+        res2@cnLevels=tofloat(str_split(contours," "))
+        delete(contours)     
+      end if 
+
+    end if
 
     if (LABELON) then 
       res@cnLineLabelsOn=True
@@ -329,14 +450,14 @@ begin
     res@lbLabelFontThicknessF= 3.0
     res@lbTitleFontThicknessF= 3.0
     res@lbLabelAutoStride = True
-    res@lbOrientation     = "vertical" 
-                                
+    res@lbOrientation     = "vertical"
+                                    
   end if  ; not useXY
 
   if (.not. isvar("proj")) then 
     res@tmYLLabelFontHeightF = 0.020
     res@tmXBLabelFontHeightF = 0.020
-  
+    
     if type.eq."png" then
       res@tmYLLabelFontThicknessF=2.0
       res@tmXBLabelFontThicknessF=2.0
@@ -359,7 +480,7 @@ begin
 
   if useXY then 
     xyres = True
-    xyres@vpXF = 0.08
+    xyres@vpXF = 0.5
     xyres@vpWidthF = 0.45
     xyres@vpHeightF = 0.45
     xyres@tmXBLabelFontHeightF = 0.008
@@ -369,7 +490,15 @@ begin
     xyres@txFontHeightF = 0.010
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColors = "black" ; (/"red", "black"/)
+    xyres@tiMainString       = title
    
+    ; auxiliary field
+    if AUX_FIELD then
+      xyres2 = True
+      xyres2@gsnDraw = False
+      xyres2@gsnFrame = False
+    end if
+    
     if type.eq."png" then
       xyres@tmXBLabelFontThicknessF = 3.0
       xyres@tmYLLabelFontThicknessF = 3.0
@@ -383,8 +512,14 @@ begin
         set_pres_hgt_axes(hdim,xyres,True)
       end if
       plot0=gsn_csm_xy(wks,fld,hdim,xyres)
+      if AUX_FIELD then
+        plot1=gsn_csm_xy(wks,fld2,hdim2,xyres2)
+      end if
     else
       plot0=gsn_csm_xy(wks,hdim,fld,xyres)
+      if AUX_FIELD then
+        plot1=gsn_csm_xy(wks,hdim2,fld2,xyres2)
+      end if
     end if
   else
     if (horizontal) then 
@@ -396,55 +531,76 @@ begin
         res@gsnAddCyclic        = False
       end if
       if (isvar("proj")) then 
+        
         print("using gsn_csm_contour_map")
-        if(.not. LEVELS_CONTOURS) then
-          plot0=gsn_csm_contour_map(wks,fld,res)
+        plot0=gsn_csm_contour_map(wks,fld,res)
+        if .not. AUX_FIELD then
+          if(LEVELS_CONTOURS) then
+            plot1=gsn_csm_contour(wks,fld,res2)
+          end if
         else
-          plot0=gsn_csm_contour_map(wks,fld,res)
-          plot1=gsn_csm_contour(wks,fld,res2)
+          plot1=gsn_csm_contour(wks,fld2,res2)
         end if
+
       else 
+
         print("using gsn_csm_contour_map_ce")
-        if(.not. LEVELS_CONTOURS) then
-          plot0=gsn_csm_contour_map_ce(wks,fld,res)
-        else  
-          plot0=gsn_csm_contour_map_ce(wks,fld,res)
-          plot1=gsn_csm_contour(wks,fld,res2)
+        plot0=gsn_csm_contour_map_ce(wks,fld,res)
+        if .not. AUX_FIELD then
+          if(LEVELS_CONTOURS) then
+            plot1=gsn_csm_contour(wks,fld,res2)
+          end if
+        else
+          plot1=gsn_csm_contour(wks,fld2,res2)
         end if
+
       end if 
     else
       if logp then 
+
         print("using gsn_csm_pres_hgt")
-        if(.not. LEVELS_CONTOURS) then
-          plot0=gsn_csm_pres_hgt(wks,fld,res)
+        plot0=gsn_csm_pres_hgt(wks,fld,res)
+        if .not. AUX_FIELD then
+          if(LEVELS_CONTOURS) then
+            plot1=gsn_csm_pres_hgt(wks,fld,res2)
+          end if
         else
-          plot0=gsn_csm_pres_hgt(wks,fld,res)
-          plot1=gsn_csm_pres_hgt(wks,fld,res2)
+          plot1=gsn_csm_pres_hgt(wks,fld2,res2)
         end if
+
       else
         if ((isvar("linp")) .and. (linp .eq. 1)) then          
+
           print("using gsn_csm_contour; linp=1")
           ; useless :
           ;res@sfYArray            = zdim
           res@trYReverse        = True ; reverse Y-axis          
-          if(.not. LEVELS_CONTOURS) then
-            plot0=gsn_csm_contour(wks,fld,res)
+          plot0=gsn_csm_contour(wks,fld,res)
+          if .not. AUX_FIELD then
+            if(LEVELS_CONTOURS) then
+              plot1=gsn_csm_contour(wks,fld,res2)
+            end if
           else
-            plot0=gsn_csm_contour(wks,fld,res)
-            plot1=gsn_csm_contour(wks,fld,res2)
+            plot1=gsn_csm_contour(wks,fld2,res2)
           end if
+
         else 
           if ((isvar("linp")) .and. (linp .eq. -1)) then  
+
             print("using gsn_csm_contour; linp=-1")
             res@trYReverse        = True ; reverse Y-axis
             res@gsnYAxisIrregular2Linear= True
-            if(.not. LEVELS_CONTOURS) then
-              plot0=gsn_csm_contour(wks,fld,res)
-            else
+            plot0=gsn_csm_contour(wks,fld,res)
+            if .not. AUX_FIELD then
+              if(LEVELS_CONTOURS) then
+                res2@gsnYAxisIrregular2Linear= True
+                plot1=gsn_csm_contour(wks,fld,res2)
+              end if
+            else              
               res2@gsnYAxisIrregular2Linear= True
-              plot0=gsn_csm_contour(wks,fld,res)
-              plot1=gsn_csm_contour(wks,fld,res2)
+              plot1=gsn_csm_contour(wks,fld2,res2)
             end if
+
           end if
         end if
 
@@ -453,13 +609,13 @@ begin
     
   end if
 
-  if(.not. LEVELS_CONTOURS) then
-    draw(plot0)
-  else 
+  if LEVELS_CONTOURS .or. AUX_FIELD then
     overlay(plot0,plot1)      
     draw(plot0)
+  else
+    draw(plot0)  
   end if
-    
+
   frame(wks)
 
   status_exit(0)

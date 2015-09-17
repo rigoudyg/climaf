@@ -72,7 +72,7 @@ def load_standard_operators():
 #            'convert ${out} -trim ${out}) ', format="png")
 
 
-    # new version of gplot : plot only main field
+    # plot : plot only main field
     cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
             'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
@@ -80,26 +80,17 @@ def load_standard_operators():
             ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
     #
-    # gplot_2fields : plot a main field + an auxiliary field
-    cscript('plot_2fields'  , '(ncl -Q '+ scriptpath +'gplot_2fields.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
+    # plot_2fields : plot a main field + an auxiliary field
+    cscript('plot_2fields'  , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
             'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
             'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
             ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
-    
-        
+            
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
             'convert ${out} -trim ${out}) ', format="png")
 
-
-
-    cscript('test_plot'     , '(ncl -Q '+ scriptpath +'test_LV.ncl infile=\'\"${in}\"\' '
-            ' infile2=\'\"${in_2}\"\' plotname=\'\"${out}\"\' '
-            ' var=\'\"${var}\"\'  var2=\'\"${var_2}\"\' && ' 
-            ' convert ${out} -trim ${out}) ', format="png")
-# mettre var signifie que le script est capable d aller extraire la variable sinon c climaf qui le fait
-#(et donc on ne met pas var=)
