@@ -28,19 +28,32 @@ Changes, newest first :
  - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
    cdfsections, cdfstd, cdfvT; you need to have a patched version of
    Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
-   : :download:`cdftransport.py <../examples/cdftransport.py>` and :download:`cdftools.py <../examples/cdftools.py>` 
+   : :download:`cdftransport.py <../examples/cdftransport.py>` and 
+   :download:`cdftools.py <../examples/cdftools.py>` 
    
-
  - CliMAF can provide fixed fields to operators, which path may
    depend on project and simulation of operator's first operand 
    (see  :py:func:`~climaf.operators.fixed_fields()`)
 
+ - Multi-variable datasets are managed. This is handy for cases where
+   variables are grouped in a file. See an example in :
+   :download:`cdftransport.py <../examples/cdftransport.py>` , where 
+   variable 'products' is assigned
+
+ - Package :py:mod:`climaf.html` has been re-designed : simpler
+   function names (fline, flines), addition of basic function
+   :py:func:`~climaf.html.line()` for creating a simple links line ;
+   improve doc
+
+ - New function :py:func:`~climaf.classes.fds` allows to define simply 
+   a dataset from a single data file
+
  - Fixes :
  
   - datasets of type 'short' are correctly read
-  - operator's secondary output variables are duly renamed, according
-    to the name given to operator's the secondary output when
-    decalring it using :py:func:`~climaf.operators.script()` 
+  - operator's secondary output object have their 'variable' attribute 
+    duly renamed, according to the name declared for it when using 
+    :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 
@@ -65,9 +78,9 @@ Changes, newest first :
 
  - Outputs and rendering
 
-  - Package climaf.html allows to **easily create an html index**, which includes
-    tables of links (or thumbnails) to image files; iterating on
-    e.g. seasons and variables is handled by CliMAF. See :
+  - Package :py:mod:`climaf.html` allows to **easily create an html index**, 
+    which includes tables of links (or thumbnails) to image files; iterating on
+    two axes (e.g. seasons and variables) is handled by CliMAF. See :
     
     - a screen_dump for such an index : |indx| 
     - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 

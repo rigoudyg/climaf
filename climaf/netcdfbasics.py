@@ -3,12 +3,21 @@ import re
 from climaf.clogging import clogger
 
 def varOfFile(filename) :
+    lvars=varsOfFile(filename)
+    if len(lvars) > 1 :
+        clogger.debug("Got multiple variables (%s) and "
+                      "no direction to choose  - File is %s" %\
+                          (`lvars`,filename))
+        return(None)
+    if(lvars)==1 : return lvars[0]
+
+def varsOfFile(filename) :
     """ 
-    returns the name of the unique non-dimension variable in
-    NetCDF file FILENAME, or None if it is not unique
+    returns the list of non-dimensions variable in
+    NetCDF file FILENAME
     """
     from Scientific.IO.NetCDF import NetCDFFile as ncf
-    varname=None
+    lvars=[]
     fileobj=ncf(filename)
     #import NetCDF4
     #fileobj=netCDF4.Dataset(filename)
@@ -18,15 +27,9 @@ def varOfFile(filename) :
             not re.findall("^lon",filevar) and
             not re.findall("^time_",filevar) and
             not re.findall("_bnds$",filevar) ):
-            if varname is None : 
-                varname=filevar
-            else :
-                clogger.debug("Got at least two variables (%s and %s) "
-                                  "and no direction to choose  - File is %s"%\
-                                  (varname,filevar,filename))
-                return(None)
+            lvars.append(filevar)
     fileobj.close()
-    return(varname)
+    return(lvars)
 
 
 def fileHasVar(filename,varname):
@@ -48,3 +51,5 @@ def fileHasVar(filename,varname):
     fileobj.close()
     return(rep)
 
+def timeLimits(filename) :
+    return "185001-185212"
