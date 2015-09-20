@@ -1,7 +1,7 @@
 .. _news:
 
 ------------
-Whats' new
+What is new
 ------------
 
 Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
@@ -32,7 +32,7 @@ Changes, newest first :
    :download:`cdftools.py <../examples/cdftools.py>` 
    
  - CliMAF can provide fixed fields to operators, which path may
-   depend on project and simulation of operator's first operand 
+   depend on project and simulation of operator first operand 
    (see  :py:func:`~climaf.operators.fixed_fields()`)
 
  - Multi-variable datasets are managed. This is handy for cases where
@@ -41,19 +41,20 @@ Changes, newest first :
    variable 'products' is assigned
 
  - Package :py:mod:`climaf.html` has been re-designed : simpler
-   function names (fline, flines), addition of basic function
+   function names (:py:func:`~climaf.html.fline()`, 
+   :py:func:`~climaf.html.flines()`, addition of basic function
    :py:func:`~climaf.html.line()` for creating a simple links line ;
    improve doc
 
- - New function :py:func:`~climaf.classes.fds` allows to define simply 
+ - New function :py:func:`~climaf.classes.fds()` allows to define simply 
    a dataset from a single data file
 
  - Fixes :
  
   - datasets of type 'short' are correctly read
-  - operator's secondary output object have their 'variable' attribute 
+  - operator s secondary output objects have their 'variable' attribute 
     duly renamed, according to the name declared for it when using 
-    :py:func:`~climaf.operators.script()` 
+    :py:func:`~climaf.operators.cscript()` 
 
 .. _news_0.8:
 
@@ -63,7 +64,7 @@ Changes, newest first :
 
   - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
     facet/attribute 'experiment' was renamed 'simulation'**. It is
-    used for hosting either CMIP5's facet/attribute 'rip', or for
+    used for hosting either CMIP5 facet/attribute 'rip', or for
     'EXPID' at CNRM, or for JobName at IPSL. All 'projects' and
     examples, and this documentation too, have been changed
     accordingly. Please upgrade to this version if you want a
@@ -104,10 +105,10 @@ Changes, newest first :
     with CliMAF regular time axis management, on the fly, by modifying 
     the basic data selection script: it can
     enforce a reference time axis by intepreting the data
-    filename. This works e.g. for IPSL's averaged annual-cycle
+    filename. This works e.g. for IPSLs averaged annual-cycle
     datafiles. If needed, you may change function timefix() near line 
     30 in :download:`mcdo.sh <../scripts/mcdo.sh>` 
-  - automatic fix of CNRM's Nemo old data time_axis issues, provided you
+  - automatic fix of CNRM Nemo old data time_axis issues, provided you
     set environment variable CLIMAF_FIX_NEMO_TIME to anything but
     'no'. This will add processing cost. This adresses the wrong time
     coordinate variable t_ave_01month and t_ave_00086400
