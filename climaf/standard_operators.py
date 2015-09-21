@@ -118,26 +118,26 @@ def load_cdftools_operators():
     #
     # cdfheatc 
     #
-    cscript('ccdfheatc1',
+    cscript('ccdfheatc',
             'echo ""; cdfheatc ${in} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}', _var="heatc", canSelectVar=True)
     #
-    cscript('ccdfheatc2',
+    cscript('ccdfheatcm',
             'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file', _var="heatc", canSelectVar=True)
     # 
     # cdfsections 
     #
-    cscript('ccdfsections1',
-            scriptpath+'cdfsections1.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',  _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True) 
+    cscript('ccdfsections',
+            scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',  _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True) 
     #
-    cscript('ccdfsections2',
-            scriptpath+'cdfsections2.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}', _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
+    cscript('ccdfsectionsm',
+            scriptpath+'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}', _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
     #
     # cdfmxlheatc
     #
-    cscript('ccdfmxlheatc1',
+    cscript('ccdfmxlheatc',
             'echo ""; cdfmxlheatc ${in} ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc', _var="somxlheatc", canSelectVar=True)
     #
-    cscript('ccdfmxlheatc2',
+    cscript('ccdfmxlheatcm',
             'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file', _var="somxlheatc", canSelectVar=True) 
     #
     # cdfstd

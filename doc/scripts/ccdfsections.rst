@@ -1,4 +1,4 @@
-ccdfsections1 : computes some variables (Uorth, Utang,...) along a section made of Nsec linear segments (multi-variable input file)
+ccdfsections : computes some variables (Uorth, Utang,...) along a section made of Nsec linear segments (multi-variable input file)
 -----------------------------------------------------------------------------------------------------------------------------------
 
 Computes temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang
@@ -75,7 +75,7 @@ resolution).
   >>> dT=ds(simulation="PRE6CPLCr2alb", variable="so,thetao,rhopoto", period="199807", realm="O") 
   >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # dataset with zonal velocity component
   >>> dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") # dataset with meridional velocity component
-  >>> my_cdfsections=ccdfsections1(duo,dvo,dT,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
+  >>> my_cdfsections=ccdfsections(duo,dvo,dT,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
   >>> cfile(my_cdfsections) # to compute all variables along a section made of Nsec linear segments
   >>> Utang_var=my_cdfsections.Utang # Utang_var receives operator output named "Utang", namely the field ocean speed tangential to the section oriented south-north
   >>> so_var=my_cdfsections.so # so_var receives operator output named "so"
@@ -85,7 +85,7 @@ resolution).
   >>> sig2_var=my_cdfsections.sig2 # sig2_var receives operator output named "sig2"
   >>> sig4_var=my_cdfsections.sig4 # sig4_var receives operator output named "sig4"
   
-  >>> my_cdfsections2=ccdfsections1(duo,dvo,dT,larf=48.0,lorf=305.0,Nsec=2,lat1=49.0,lon1=307.0,lat2=50.5,lon2=337.5,n1=20,more_points='40.3 305.1 50')
+  >>> my_cdfsections2=ccdfsections(duo,dvo,dT,larf=48.0,lorf=305.0,Nsec=2,lat1=49.0,lon1=307.0,lat2=50.5,lon2=337.5,n1=20,more_points='40.3 305.1 50')
   >>> cfile(my_cdfsections2)
 
 **Implementation**: The operator is implemented as a script which

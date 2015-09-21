@@ -1,5 +1,5 @@
-ccdfheatc1 : computes the heat content in the specified area (multi-variable input file)
------------------------------------------------------------------------------------------
+ccdfheatcm : computes the heat content in the specified area (mono-variable input file)
+----------------------------------------------------------------------------------------
 
 Computes the heat content in the specified area (Joules). A sub-domain
 can be specified in option. This is the wrapping around the native
@@ -16,7 +16,8 @@ CliMAF optional arguments are the ones surrounded with '**'.
 
 **Inputs** (in the order of CliMAF call): 
 
-  - a dataset with salinity and temperature [T-file]
+  - a dataset with salinity [T-file]
+  - a dataset with temperature [T-file]
 
 **Mandatory arguments**: None
 
@@ -38,16 +39,16 @@ example below).
 
 **Climaf call example**:: 
 
-  >>> # Use "NEMO" project, where netcdf files with values of so and thetao are defined
-  >>> cdef("project","NEMO")
   >>> # How to get required files for cdftools cdfheatc binary
-  >>> fixed_fields('ccdfheatc1',
+  >>> fixed_fields('ccdfheatcm',
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
    ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
-  >>> dT=ds(simulation="PRE6CPLCr2alb", variable="so,thetao", period="199807", realm="O")
-  >>> my_cdfheatc=ccdfheatc1(dT,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2,opt='-full')
+  >>> dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O") # dataset with salinity
+  >>> dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
+  >>> my_cdfheatc=ccdfheatcm(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2,opt='-full')
   >>> cfile(my_cdfheatc) # to compute the heat content in the specified area and get the result on standard output
 
 **Implementation**: The operator is implemented as a binary using
 cdftools cdfheatc operator.  
+
