@@ -17,15 +17,20 @@ begin
   LABELON=False
   RASTER=True 
 
-  ;------------------
-  ; number of fields
-  ;------------------
+  ;---------------------------------------------------------
+  ; Evaluate number of fields and if drawing vectors or not
+  ;---------------------------------------------------------
 
   AUX_FIELD=False
   if (isvar("infile2")) then  
     AUX_FIELD=True
   end if
 
+  VECT=False
+  if (isvar("infile3") .and. isvar("infile4")) then  
+    VECT=True
+  end if
+  
   ;-----------------
   ; Main field: fld
   ;-----------------
@@ -275,6 +280,130 @@ begin
 
   end if ; AUX_FIELD is True
 
+  ;-----------------------
+  ; Vectors : fld3 & fld4
+  ;-----------------------
+
+  if VECT then
+
+    ;------
+    ; fld3
+    ;------
+    ; Reading the vector field 
+    if isfilepresent(infile3) then
+      ffile3=addfile(infile3,"r")
+      if isfilevar(ffile3,var3) then 
+        if (getfilevartypes(ffile3,var3) .eq. "short") then
+          fld3 = short2flt( ffile3->$var3$ )
+        else
+          fld3 = ffile3->$var3$
+        end if
+      else
+        print("File "+infile3+" does not include variable "+var3)
+        status_exit(1)
+      end if
+    else
+      print("File "+infile3+" cannot be accessed")
+      status_exit(2)
+    end if
+
+    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
+    Var_DimNames3 = getVarDimNames(fld3)  ; getting dimensions from metadata
+    dime3=dimsizes(fld3)
+    rank3=dimsizes(dime3)
+
+    if (rank3.gt.4) then 
+      print("This script is not tuned for high rank data for vector ( rank="+rank3+")")
+      print(Var_DimNames3)
+      status_exit(1)
+    end if
+
+    ; Removes singleton (degenerate) dimensions from fld3 while preserving meta data
+    new_fld3=rm_single_dims(fld3)
+    delete(Var_DimNames3) 
+    Var_DimNames3 = getVarDimNames(new_fld3) 
+    delete(dime3) 
+    dime3=dimsizes(new_fld3)
+    delete(rank3) 
+    rank3=dimsizes(dime3)
+    delete(fld3)
+    fld3=new_fld3
+    delete(new_fld3)
+  
+    if (rank3 .eq. 4) then
+      ; assume first dimension is time. Select first time slice before further processing
+      ;print("Selecting first time step for vector u")
+      fldtmp3=fld3(0,:,:,:)
+      delete(fld3)
+      fld3=fldtmp3
+      delete(fldtmp3)
+      delete(Var_DimNames3)
+      Var_DimNames3 = getVarDimNames(fld3) 
+      delete(dime3)
+      dime3=dimsizes(fld3)
+      rank3=dimsizes(dime3)
+    end if
+
+    if (rank3 .eq. 3) then
+      fldtmp3=fld3(0,:,:)
+      delete(fld3)
+      fld3=fldtmp3
+      delete(fldtmp3)
+    end if ; rk eq 3  
+     
+    ;------
+    ; fld4
+    ;------
+    ; Reading the vector field 
+    if isfilepresent(infile4) then
+      ffile4=addfile(infile4,"r")
+      if isfilevar(ffile4,var4) then 
+        if (getfilevartypes(ffile4,var4) .eq. "short") then
+          fld4 = short2flt( ffile4->$var4$ )
+        else
+          fld4 = ffile4->$var4$
+        end if
+      else
+        print("File "+infile4+" does not include variable "+var4)
+        status_exit(1)
+      end if
+    else
+      print("File "+infile4+" cannot be accessed")
+      status_exit(2)
+    end if
+
+    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
+    new_fld4=rm_single_dims(fld4)
+    Var_DimNames4 = getVarDimNames(new_fld4) 
+    dime4=dimsizes(new_fld4)
+    rank4=dimsizes(dime4)
+    delete(fld4)
+    fld4=new_fld4
+    delete(new_fld4)
+
+    if (rank4 .eq. 4) then
+      ; assume first dimension is time. Select first time slice before further processing
+      ;print("Selecting first time step for vector v")
+      fldtmp4=fld4(0,:,:,:)
+      delete(fld4)
+      fld4=fldtmp4
+      delete(fldtmp4)
+      delete(Var_DimNames4)
+      Var_DimNames4 = getVarDimNames(fld4) 
+      delete(dime4)
+      dime4=dimsizes(fld4)
+      rank4=dimsizes(dime4)
+    end if
+
+    if (rank4 .eq. 3) then
+      fldtmp4=fld4(0,:,:)
+      delete(fld4)
+      fld4=fldtmp4
+      delete(fldtmp4)
+    end if ; rk eq 3  
+  
+  end if ; VECT
+
   ;-----------------
   ; Open workstation
   ;-----------------
@@ -434,7 +563,12 @@ begin
         res@mpMaxLonF                = max(londim)
         res@mpMinLatF                = min(latdim)
         res@mpMaxLatF                = max(latdim)
-        res@mpCenterLonF=(min(londim)+max(londim))/2
+        if (isvar("CenterLon")) then 
+          res@mpCenterLonF=tofloat(CenterLon)
+        else
+          res@mpCenterLonF=(min(londim)+max(londim))/2
+        end if
+
       end if
     end if ;end horizontal
 
@@ -451,7 +585,30 @@ begin
     res@lbTitleFontThicknessF= 3.0
     res@lbLabelAutoStride = True
     res@lbOrientation     = "vertical"
-                                    
+                                
+    if VECT then ;A VOIR
+
+      res@vcRefMagnitudeF = 5.0 			; vec magnitude
+      res@vcRefLengthF = 0.5;0.05;0.01   			; size of ref vector
+      res@vcMonoLineArrowColor  = False             ; vectors color by magnitude
+      res@vcMinDistanceF        = 0.015;0.017              ; thins arrows near pole
+      res@vcGlyphStyle          = "CurlyVector"    	; curly vectors on
+      ;res@vcGlyphStyle          = "LineArrow"
+      ;
+      res@vcLineArrowColor        = "white"           ; change vector color
+      res@vcLineArrowThicknessF   = 2;2.5               ; change vector thickness
+      res@vcVectorDrawOrder       = "PostDraw"        ; draw vectors last  "PreDraw" ?
+      ;
+      res@gsnScalarContour=True    ; contours desired
+      ;
+      ;;  res@vfXCStride	  = 1
+      ;;  res@vfYCStride	  = 1
+      ;
+      ;res@vfUDataArray = zu(:,:dx-1)   ; (0,:dy-ky,:dx-kx)
+      ;res@vfVDataArray = zv(:,:dx-1)   ; (1,:dy-ky,:dx-kx)
+            
+    end if ; VECT
+    
   end if  ; not useXY
 
   if (.not. isvar("proj")) then 
@@ -533,7 +690,12 @@ begin
       if (isvar("proj")) then 
         
         print("using gsn_csm_contour_map")
-        plot0=gsn_csm_contour_map(wks,fld,res)
+        if VECT then
+          plot0=gsn_csm_vector_scalar_map(wks,fld3,fld4,fld,res)
+        else
+          plot0=gsn_csm_contour_map(wks,fld,res)
+        end if
+
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
             plot1=gsn_csm_contour(wks,fld,res2)
@@ -545,7 +707,12 @@ begin
       else 
 
         print("using gsn_csm_contour_map_ce")
-        plot0=gsn_csm_contour_map_ce(wks,fld,res)
+        if VECT then
+          plot0=gsn_csm_vector_scalar_map_ce(wks,fld3,fld4,fld,res) ;ou juste fld3(0,0,:,:) OK
+        else
+          plot0=gsn_csm_contour_map_ce(wks,fld,res)
+        end if
+
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
             plot1=gsn_csm_contour(wks,fld,res2)
@@ -553,6 +720,12 @@ begin
         else
           plot1=gsn_csm_contour(wks,fld2,res2)
         end if
+        ;essayer aussi de faire les vecteurs ici et de faire un overlay de tt a la fin
+        ;if VECT then
+        ;  ;plot2=gsn_csm_vector(wks,fld3,fld4,res); en overlay: juste sur au dessus de l equateur, seul: tout mais ce n est pas sur une carte mais en indice lat/lon => NON
+        ;OU
+        ;  plot2=gsn_csm_vector_map(wks,fld3,fld4,res) ;en overlay rien , seul oui sur tte la carte
+        ;end if
 
       end if 
     else
@@ -610,12 +783,15 @@ begin
   end if
 
   if LEVELS_CONTOURS .or. AUX_FIELD then
-    overlay(plot0,plot1)      
-    draw(plot0)
-  else
-    draw(plot0)  
+    overlay(plot0,plot1)   
   end if
+  
+  ;if VECT then
+  ;  overlay(plot0,plot2)  
+  ;end if
 
+  draw(plot0)
+  
   frame(wks)
 
   status_exit(0)

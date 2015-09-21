@@ -73,21 +73,42 @@ def load_standard_operators():
 
 
     # plot : plot only main field
+    #cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
+    #        'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
+    #        'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+    #        'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
+    #        ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
+    #        'convert ${out} -trim ${out}) ', format="png")
+    
     cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
+            'infile3=\'\"${in_2}\"\' infile4=\'\"${in_3}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+            'var=\'\"${var}\"\' var3=\'\"${var_2}\"\' var4=\'\"${var_3}\"\' '
+            'title=\'\"${title}\"\' scale=${scale} offset=${offset} CenterLon=${CenterLon} '
             'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
             ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
+            #argument supplementaire pr la taille du vecteur (en absolu ?), rotation de grille ?
+     
     #
     # plot_2fields : plot a main field + an auxiliary field
+    #cscript('plot_2fields'  , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
+    #        'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
+    #        'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+    #        'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
+    #        ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
+    #        'convert ${out} -trim ${out}) ', format="png")
+
     cscript('plot_2fields'  , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
+            'infile3=\'\"${in_3}\"\' infile4=\'\"${in_4}\"\' '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
+            'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' var3=\'\"${var_3}\"\' var4=\'\"${var_4}\"\' '
+            ' title=\'\"${title}\"\' scale=${scale} offset=${offset} CenterLon=${CenterLon} '
             'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
             ' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")
-            
+            #argument supplementaire pr la taille du vecteur (en absolu ?), rotation de grille ?
+
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
