@@ -7,12 +7,11 @@
  """
 # Created : S.Senesi - 2014
 
-import re, string, copy, os.path
+import re, string, copy
 
 import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
-from netcdfbasics import fileHasVar, varsOfFile, timeLimits
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -231,7 +230,8 @@ def processDatasetArgs(**kwargs) :
                         "You cannot use character '%s' when setting '%s=%s' because "
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
-            #print "initalizing facet %s with value"%(facet,val)
+        #print "initalizing facet %s with value"%(facet,val)
+    #
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
         if ( attval['table']=='fx' or attval['period']=='fx' or 
@@ -414,7 +414,7 @@ class cdataset(cobject):
         """ Returns the list of (local) files which include the data for the dataset
         Use cached value unless called with arg force=True
         """
-        if (force and self.project != 'file') or self.files is None :
+        if force or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
@@ -507,7 +507,7 @@ def eds(**kwargs):
     """
     Create a dataset ensemble using the same calling sequence as
     :py:func:`~climaf.classes.cdataset`, except that one of the facets
-    is a list, for defining the ensemble members; this facet must be among
+    is a list, for defining the nsemble members; this facet must be among
     the facets authorized for ensemble in the (single) project involved
 
     Example::
@@ -541,61 +541,6 @@ def eds(**kwargs):
         members.append(cdataset(**attval2))
         labels.append(member)
     return cens(labels,*members)
-
-def fds(filename, simulation=None, variable=None, period=None, model=None) :
-    """
-    fds stands for FileDataSet; it allows to create a dataset simply
-    by providing a filename and optionally a simulation name , a
-    variable name, a period and a model name.
-
-    For dataset attributes which are not provided, these defaults apply :
-
-    - simulation : the filename basename
-    - variable : the set of variables in the data file
-    - period : the period actually covered by the data file
-    - model : 'no_model'
-    - project  : 'file' (with separator = '|')
-
-    The following restriction apply to such datasets :
-
-    - functions :py:func:`~climaf.classes.calias` and 
-      :py:func:`~climaf.classes.derive` cannot be used for project 
-      'file'
-    
-    Results are unforeseen if all variables do not have the same time axis
-    
-    """
-    filename=os.path.expanduser(filename)
-    if not os.path.exists(filename): 
-        raise Climaf_Classes_Error("File %s does no exist"%filename)
-    #
-    project='file'
-    if model is None : model='no_model'
-    if simulation is None : simulation=os.path.basename(filename)
-    #
-    if variable is None :
-        lvars=varsOfFile(filename)
-        if len(lvars)==0 : 
-            raise Climaf_Classes_Error("No variable in file %s"%filename)
-        variable=lvars.pop()
-        for v in lvars : variable+=","+v
-    else :
-        lvars=variable.split(',')
-        for v in lvars :
-            if not fileHasVar(filename,v) :
-                raise Climaf_Classes_Error("No variable %s in file %s"%(v,filename))
-    #
-    fperiod=init_period(timeLimits(filename))
-    if period is None : period=`fperiod`
-    else :
-        if not fperiod.includes(init_period(period)) :
-            raise Climaf_Classes_Error("Max period from file %s is %s"\
-                                           %(filename,`fperiod`))
-    #
-    d=ds(project=project, model=model, simulation=simulation, 
-         variable=variable, period=period, filename=filename)
-    d.files=filename
-    return d
 
 
 class ctree(cobject):
@@ -715,6 +660,9 @@ def ds(*args,**kwargs) :
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
+    # Note : muts be kept phased with self.crs defined in 
+    # cdataset.init(), both for
+    # function name and CRS syntax
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
@@ -733,11 +681,7 @@ def ds(*args,**kwargs) :
         e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
         raise Climaf_Classes_Error(e)
         return None
-    else : 
-        rep=results[0]
-        if rep.project=='file' : 
-            rep.files=rep.kvp["filename"]
-        return rep
+    else : return results[0]
 
 def cfreqs(project,dic) :
     """ 

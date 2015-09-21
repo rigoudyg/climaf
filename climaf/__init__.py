@@ -9,7 +9,7 @@ from __future__ import print_function
 __all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver", "netcdfbasics",
           "operators", "period", "standard_operators" , "projects" ,"cmacro","html"]
 
-version="0.9"
+version="0.8"
 
 
 import time

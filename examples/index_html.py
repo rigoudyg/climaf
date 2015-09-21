@@ -5,70 +5,48 @@ and stored in CliMAF's cache, including :
   - a small table giving access to figure files through html links
 """
 from climaf.api import *
-from climaf.html import header,trailer,section,\
-    open_table,close_table,fline,flines,link,vspace,line
+from climaf.html import * 
 
-# Some global variables 
+# Some global variables for the atlas
 exp='AMIPV6ALB2G'
 period="1980"
 
-index=""
-index += header("CliMAF ATLAS of "+exp+" for "+period) 
-index += section("Example of Section level 3 header ",level=3)
-index += section("Meridional profiles (level 4)", level=4, key="Slice")
-
-# Basics
-##########
-# Create a line of links to figures, providing labels and figures filenames
-index+=line({"lab1":"fig1.ps", "lab2":"fig2.ps"},title="the title   ")
-
-# A function which provides a figure filename based on two args .
+# First : a function which provides a figure filename based on a few args.
 def my_slice(var,season) :
-    from climaf.operators import ccdo,time_average, plot, select
-    dats=ds(project='example',simulation=exp, variable=var, \
-	frequency='monthly', period=period)
+    dats=ds(project='example',simulation=exp, variable=var, frequency='monthly', period=period)
     zonal_mean=ccdo(dats,operator="zonmean")
     # Force storing the zonal mean for optimization purpose
     if season != "ANN" :
-        months={ "DJF":"12,1,2" , "MAM" : "3,4,5" , "JJA":"6,7,8", \
-	    "SON":"9,10,11" }
+        months={ "DJF":"12,1,2" , "MAM" : "3,4,5" , "JJA":"6,7,8", "SON":"9,10,11" }
         dat_season=select(zonal_mean,operator="selmon,"+months[season])
     else:
         dat_season=zonal_mean
     toplot=time_average(dat_season)
     return(cfile(plot(toplot,title=var+" "+exp+" "+period+" "+season)))
 
-# Create a link to a figure returned by function 'my_slice'
-index += link("A simple link ", my_slice('tas','ANN'))
+index=""
+index += html_header("CliMAF ATLAS of "+exp+" for "+period) 
+index += html_section("Example of Section level 3 header ",level=3)
+index += html_section("Meridional profiles (level 4)", level=4, key="Slice")
 
-# Advanced : create lines or tables of links, through automated iteration of a function call
-#########################################################################################
+# Define a table of html links ; use html_table_line() with your
+# fucntion (here my_slice) and a dict which has columns titles
+# as keys and values=args to the function 
+#seasons_labels={'Year':'ANN', 'Winter':'DJF', 'Spring': 'MAM','Summer': 'JJA','Fall': 'SON'}
+seasons_labels= {'Year':'ANN', 'Winter':'DJF',                 'Summer': 'JJA'              }
+index += html_open_table(title='variable',titles=seasons_labels,spacing=5)
+index += html_table_line(my_slice,'tas', seasons_labels,"tas - surface temperature")
 
-index+=vspace(3)
-# Define a line (i.e. a series of columns) of html links ; use
-# climaf.html.fline() with args: 
-#  - the function (here 'my_slice') called for each column  
-#  - a common value for first arg to my_slice, 
-#  - and a list of values for second arg (one for each column)
-index += open_table()
-index += fline(my_slice,'tas',['ANN', 'DJF','JJA'], title="Surface temperature")
-index += close_table()
-
-index+=vspace(3)
-# For creating a table , with a line showing column titles, and iterating 
-# over lines changing values of first arg to the function, use function
-# 'flines', which loops on a list of second args, or a dict with
-# similar keys and which values are line titles
-
-seasons= {'Year':'ANN', 'Winter':'DJF'}
-index += open_table(title='variable/season', columns=seasons.keys(), spacing=5)
+# For iterating over lines, use html_table_lines, which loops on another,
+# with one entry per table line, giving the line title 
 lvars={
-    "rst"  : "short wave at top ",
-    "ta"   : " upper air temp"}
-index += flines(my_slice,lvars,seasons.values(),thumbnail=60) 
+    "rst"  :"rst - short wave at top ",
+    "ta"   : "ta - upper air temp"}
+index += html_table_lines(my_slice,lvars,seasons_labels,thumbnail=60) 
 
-index += close_table()
-index += trailer()
+# That's all folk. Just close the table, the html document, and write it to file
+index += html_close_table()
+index += html_trailer()
 out="index_example.html"
 with open(out,"w") as filout : filout.write(index)
 

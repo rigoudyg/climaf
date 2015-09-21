@@ -10,7 +10,6 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 import sys, os, os.path, re, time, glob
 import pickle
 
-from climaf import version
 from classes import compare_trees, cobject, ctree, cdataset, cprojects, guess_projects
 from cmacro  import crewrite
 from clogging import clogger
@@ -112,10 +111,7 @@ def searchFile(path):
             return candidate
 
 def register(filename,crs):
-    """ 
-    Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
-    metadata 'CLiMAF' with CliMAF version and ref URL
-
+    """ Adds in FILE a metadata named CRS_def and with value CRS. 
     Records this FILE in dict crs2filename
 
     Silently skip non-existing files
@@ -131,11 +127,10 @@ def register(filename,crs):
     if os.path.exists(filename) :
         #while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
         if re.findall(".nc$",filename) : 
-            command="ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s"%\
-                (crs,version,filename)
+            command="ncatted -h -a CRS_def,global,o,c,\"%s\" %s"%(crs,filename)
         if re.findall(".png$",filename) :
-            command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
-                (crs,version,filename,filename,filename,filename)
+            command="convert -set \"CRS_def\" \"%s\" %s %s.png && mv -f %s.png %s"%\
+                (crs,filename,filename,filename,filename)
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
@@ -317,12 +312,9 @@ def csync(update=False) :
             rebuild()  
 
     # Save to disk
-    try: 
-        cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
-        pickle.dump(crs2filename,cacheIndexFile)  
-        cacheIndexFile.close()
-    except:
-        clogger.warning("No cache index file yet")
+    cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
+    pickle.dump(crs2filename,cacheIndexFile)  
+    cacheIndexFile.close()
 
 def cload() :
     global crs2filename 
@@ -641,7 +633,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 else :
                     print "Filtered objects = cache content"
                 return (map(crewrite,new_dict.keys()))
-            #else : print "No matching file "    
+            else : print "No matching file "    
         else:
             print "Content of CliMAF cache"
             return (map(crewrite,crs2filename.keys()))

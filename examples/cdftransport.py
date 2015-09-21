@@ -10,7 +10,7 @@ if 'cdfmean' not in cscripts :
 #
 cproject('NEMO')
 
-# For 'standard' Nemo output files (actually, they are easier accessible using project "EM")
+# For 'standard' Nemo output files (actually, they are better accessible using project "EM")
 root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
@@ -21,7 +21,7 @@ url_nemo_monitoring=root2+suffix
 #
 dataloc(project='NEMO', organization='generic', url=[url_nemo_standard,url_nemo_monitoring])
 # 
-# Declare how variables are scattered/grouped among files
+# Declare how variables are scattered/groupes among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("NEMO","uo",filenameVar="grid_U_table2.3")
 calias("NEMO","vo",filenameVar="grid_V_table2.3")
