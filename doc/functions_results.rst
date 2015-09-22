@@ -32,19 +32,30 @@ html : create an html index, with tables of links to figures
 
 .. automodule:: climaf.html
 
-.. autofunction:: climaf.html.html_header
+.. autofunction:: climaf.html.header
 
-.. autofunction:: climaf.html.html_section
+.. autofunction:: climaf.html.trailer
 
-.. autofunction:: climaf.html.html_open_table
+.. autofunction:: climaf.html.vspace
 
-.. autofunction:: climaf.html.html_table_line
+.. autofunction:: climaf.html.section
 
-.. autofunction:: climaf.html.html_table_lines
+.. autofunction:: climaf.html.open_table
 
-.. autofunction:: climaf.html.html_close_table
+.. autofunction:: climaf.html.close_table
 
-.. autofunction:: climaf.html.html_trailer
+.. autofunction:: climaf.html.open_line
+
+.. autofunction:: climaf.html.close_line
+
+.. autofunction:: climaf.html.link
+
+.. autofunction:: climaf.html.cell
+
+.. autofunction:: climaf.html.line
+
+.. autofunction:: climaf.html.flines
+
 
 
 clist : tell what's in cache, and much more

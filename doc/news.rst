@@ -47,7 +47,8 @@ Changes, newest first :
    improve doc
 
  - New function :py:func:`~climaf.classes.fds()` allows to define simply 
-   a dataset from a single data file
+   a dataset from a single data file. See example in 
+   :download:`data_file.py <../examples/data_file.py>`
 
  - Fixes :
  

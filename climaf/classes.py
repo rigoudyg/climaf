@@ -12,7 +12,7 @@ import re, string, copy, os.path
 import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
-from netcdfbasics import fileHasVar, varsOfFile, timeLimits
+from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -570,8 +570,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
     if not os.path.exists(filename): 
         raise Climaf_Classes_Error("File %s does no exist"%filename)
     #
-    project='file'
-    if model is None : model='no_model'
+    if model is None : model=model_id(filename)
     if simulation is None : simulation=os.path.basename(filename)
     #
     if variable is None :
@@ -586,15 +585,20 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
             if not fileHasVar(filename,v) :
                 raise Climaf_Classes_Error("No variable %s in file %s"%(v,filename))
     #
-    fperiod=init_period(timeLimits(filename))
-    if period is None : period=`fperiod`
+    fperiod=timeLimits(filename)
+    if period is None :
+        if fperiod is None :
+            raise Climaf_Classes_Error("Must provide a period for file %s "\
+                                           %(filename))
+        else :
+            period=`fperiod`
     else :
-        if not fperiod.includes(init_period(period)) :
+        if fperiod and not fperiod.includes(init_period(period)) :
             raise Climaf_Classes_Error("Max period from file %s is %s"\
                                            %(filename,`fperiod`))
     #
-    d=ds(project=project, model=model, simulation=simulation, 
-         variable=variable, period=period, filename=filename)
+    d=ds(project='file', model=model, simulation=simulation, 
+         variable=variable, period=period, path=filename)
     d.files=filename
     return d
 
@@ -737,7 +741,7 @@ def ds(*args,**kwargs) :
     else : 
         rep=results[0]
         if rep.project=='file' : 
-            rep.files=rep.kvp["filename"]
+            rep.files=rep.kvp["path"]
         return rep
 
 def cfreqs(project,dic) :

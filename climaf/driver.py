@@ -196,8 +196,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 ## return ceval(extract,userflags,format)
                 clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                 extract=capply('select',ds)
-                if extract is None :
-                    raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
+                if extract is None : raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
                 rep=ceval(extract,userflags=userflags,format=format)
                 userflags.unset_selectors()
                 cdedent()
