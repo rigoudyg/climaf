@@ -774,16 +774,23 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     used when computing the filename for this variable in this project
     (for optimisation purpose);
 
-    And that a given constant must be interpreted as a missing value
+    Can tell that a given constant must be interpreted as a missing value
 
     ``variable`` may be a list. In that case, ``fileVariable`` and
     ``filenameVar``, if provided, should be parallel lists
+
+    `` variable`` can be a comma separated list of variables, in which
+    case this tells how variables are grouped in files (it make sense
+    to use filenameVar in that case, as this is a xway to provide the
+    label which is unique to this grouping of variable; scale, offset
+    and missing args must be the same for all variables in that case
 
     Example ::
     
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
+    >>> calias('NEMO','so,thetao',filenameVar='grid_T_table2.2')
     
     """
     if not fileVariable : fileVariable = variable

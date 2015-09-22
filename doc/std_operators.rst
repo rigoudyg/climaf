@@ -50,7 +50,9 @@ Documented operators as of today :
     - operators dealing with heat content:
 	  
       - :doc:`scripts/ccdfheatc`
+      - :doc:`scripts/ccdfheatcm`
       - :doc:`scripts/ccdfmxlheatc`
+      - :doc:`scripts/ccdfmxlheatcm`
 
     - operators dealing with transport:
 
@@ -63,7 +65,8 @@ Documented operators as of today :
       - :doc:`scripts/ccdfstdmoy`
    
     - :doc:`scripts/ccdfsections`
-    
+    - :doc:`scripts/ccdfsectionsm`
+
 
 .. |sk| image:: swiss_knife_50.png
 

@@ -29,7 +29,9 @@ Changes, newest first :
    cdfsections, cdfstd, cdfvT; you need to have a patched version of
    Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
    : :download:`cdftransport.py <../examples/cdftransport.py>` and 
-   :download:`cdftools.py <../examples/cdftools.py>` 
+   :download:`cdftools.py <../examples/cdftools.py>` . A number of
+   operators come in two versions : one accepting multi-variable
+   inputs, and one accepting only mono-variable inputs (with an 'm' suffix)
    
  - CliMAF can provide fixed fields to operators, which path may
    depend on project and simulation of operator first operand 

@@ -63,9 +63,17 @@ begin
   ;print(all_fld)
   Var_DimNames = getvardims(all_fld)  ; getting dimensions from metadata
   dime=dimsizes(all_fld)
+  found=False
   coord=""
   do dim=0,dimsizes(dime)-1
     if dime(dim) .gt. 1 then
+
+      if found then
+        print("There is more than one non-singleton dim in one of files:"+coord+" "+Var_DimNames(dim))
+        status_exit(1)
+      end if 
+      found=True
+
       coord=Var_DimNames(dim)
       ;
       ; useless (addfiles: if the aggregated time coordinate has different units in the individual aggregated
@@ -74,25 +82,26 @@ begin
       ;  all_fld&$coord$ = cd_convert(all_fld&$coord$, all_files[0]->$var$&$coord$@units)
       ;
       ; check if all X axis are "time" else NCL sets first file attributes to other files
-
-      ; disabled until all sites have an advanced Ncl
-      ; if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
-      ;   first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
-      ;   if (.not. all(all_files[:]&$coord$@standard_name .eq. first_file_axis_name)) then
-      ;     print("Files have not same axis for variable "+coord)
-      ;     status_exit(1)
-      ;   end if        
-      ; end if
-
+      ;;if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
+      ;;  first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
+      if (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"Time"))) .or. (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"time"))) then
+        first_file_axis_name=all_files[0]->$var$&$coord$@long_name
+        if (.not. all(all_files[:]&$coord$@long_name .eq. first_file_axis_name)) then
+          print("Files have not same axis for variable "+coord)
+          status_exit(1)
+        end if        
+      end if
       ; data vector for X axis
-      if ( T_axis .eq. "real" ) then
-        Xaxis=all_fld&$coord$             ; take union of all time periods
-      else
-        Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
-      end if      
+      if (.not. ismissing(str_match(coord,"time"))) then ;;add
+        if ( T_axis .eq. "real" ) then
+          Xaxis=all_fld&$coord$             ; take union of all time periods
+        else
+          Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
+        end if      
+      end if
     end if
   end do
-
+  
   ;---Resources for "left" variable
   res=True
   res@gsnDraw          = False   ; Will draw later, after overlaying
@@ -131,12 +140,13 @@ begin
       colornames(i)=tab(i) 
     end do
   end if 
-  if (isvar("labels")) then
-    tab_labels=str_split(labels,"$")
-  end if
   
   ;---Titles
   if .not. isvar("title") then title="title" end if
+
+  if .not. isvar("labels") then labels=title end if
+  tab_labels=str_split(labels,"$")
+
   res@tiMainString     = title                    ; add title
   
   ;---Resources for legend
@@ -221,13 +231,13 @@ begin
     rank=dimsizes(dime)
     found=False
     coord:=""
-    
+   
     do dim=0,rank-1
       ;print("analyzing "+Var_DimNames(dim))
       if dime(dim) .gt. 1 then 
        
         if found then
-          print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+ Var_DimNames(dim))
+          print("There is more than one non-singleton dim for file "+ffile+ " :"+coord+" "+Var_DimNames(dim))
           status_exit(1)
         end if 
         found=True

@@ -52,11 +52,11 @@ See also:
 
 **Climaf call example**:: 
 
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807-199810", realm="O") # some dataset, with whatever variable
-  >>> my_cdfstd=ccdfstd(d1)
+  >>> dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807-199810", realm="O") # some dataset, with whatever variable
+  >>> my_cdfstd=ccdfstd(dmld)
   >>> cfile(my_cdfstd) # to compute the standard deviation of variable "omlmax"
 
-  >>> my_cdfstd2=ccdfstd(d1,opt='-full')
+  >>> my_cdfstd2=ccdfstd(dmld,opt='-full')
   >>> cfile(my_cdfstd2)
 
 **Implementation**: The operator is implemented as a binary using

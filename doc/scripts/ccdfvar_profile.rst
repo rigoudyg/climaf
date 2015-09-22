@@ -48,14 +48,14 @@ example below).
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),
    ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
-  >>> d1=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
-  >>> my_cdfvar_prof=ccdfvar_profile(d1,pos_grid='U')
+  >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
+  >>> my_cdfvar_prof=ccdfvar_profile(duo,pos_grid='U')
   >>> cfile(my_cdfvar_prof) # to compute the vertical profile of spatial variance and get a filename with the result 
 
-  >>> my_cdfvar_prof2=ccdfvar_profile(d1,pos_grid='U',opt='-full')
+  >>> my_cdfvar_prof2=ccdfvar_profile(duo,pos_grid='U',opt='-full')
   >>> cfile(my_cdfvar_prof2)
 
-  >>> my_cdfvar_prof3=ccdfvar_profile(d1,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+  >>> my_cdfvar_prof3=ccdfvar_profile(duo,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
   >>> cfile(my_cdfvar_prof3)
 
 **Implementation**: The operator is implemented as a binary using
