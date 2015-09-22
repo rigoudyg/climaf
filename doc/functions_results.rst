@@ -36,8 +36,6 @@ html : create an html index, with tables of links to figures
 
 .. autofunction:: climaf.html.trailer
 
-.. autofunction:: climaf.html.vspace
-
 .. autofunction:: climaf.html.section
 
 .. autofunction:: climaf.html.open_table
@@ -48,13 +46,17 @@ html : create an html index, with tables of links to figures
 
 .. autofunction:: climaf.html.close_line
 
+.. autofunction:: climaf.html.line
+
 .. autofunction:: climaf.html.link
 
 .. autofunction:: climaf.html.cell
 
-.. autofunction:: climaf.html.line
+.. autofunction:: climaf.html.fline
 
 .. autofunction:: climaf.html.flines
+
+.. autofunction:: climaf.html.vspace
 
 
 

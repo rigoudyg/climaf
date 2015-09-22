@@ -143,7 +143,7 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
    <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_,
    and follow  :download:`this template <scripts_template.rst>` which
    will render :doc:`e.g. as shows here <scripts_template>` , or for a
-   real example  :doc:`like this <scripts/plotmap>` , but this is not
+   real example  :download:`like this <../scripts/gplot.ncl>` , but this is not
    a firm pre-requisite. Save this text as
    ``<climaf_install_dir>/doc/operators/my_op.rst``. The text may
    describe your diagnostic at length, and should provide all

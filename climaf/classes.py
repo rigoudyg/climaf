@@ -553,17 +553,19 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
 
     - simulation : the filename basename
     - variable : the set of variables in the data file
-    - period : the period actually covered by the data file
-    - model : 'no_model'
+    - period : the period actually covered by the data file (if it has time_bnds)
+    - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
     - project  : 'file' (with separator = '|')
 
     The following restriction apply to such datasets :
 
     - functions :py:func:`~climaf.classes.calias` and 
-      :py:func:`~climaf.classes.derive` cannot be used for project 
+      :py:func:`~climaf.operators.derive` cannot be used for project 
       'file'
     
     Results are unforeseen if all variables do not have the same time axis
+    
+    Examples : See :download:`data_file.py <../examples/data_file.py>`
     
     """
     filename=os.path.expanduser(filename)
