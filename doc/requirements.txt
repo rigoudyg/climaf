@@ -1,2 +1,2 @@
 sphinxcontrib-napoleon==0.2.11
-scipy.io.netcdf==0.13.0
+scipy.io.netcdf==0.16.0
