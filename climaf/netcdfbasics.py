@@ -1,5 +1,16 @@
 import re
 
+from climaf.clogging import clogger
+from climaf.period import cperiod
+
+class Climaf_Netcdf_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
+
 try :
     from scipy.io.netcdf import netcdf_file as ncf
 except ImportError:
@@ -8,9 +19,6 @@ except ImportError:
     except ImportError:
         raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules scipy.io.netcdf or NetCDF4")
 
-
-from climaf.clogging import clogger
-from climaf.period import cperiod
 
 def varOfFile(filename) :
     lvars=varsOfFile(filename)
@@ -77,11 +85,3 @@ def timeLimits(filename) :
             return None
             #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
         
-
-class Climaf_Netcdf_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-    def __str__(self):
-        return `self.valeur`
