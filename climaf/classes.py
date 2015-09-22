@@ -336,6 +336,7 @@ class cdataset(cobject):
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
+        if (self.frequency=='seasonal') : self.period.fx=True
         #
         self.kvp=attval
         self.alias=varIsAliased(self.project,self.variable)
