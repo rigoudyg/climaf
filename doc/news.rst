@@ -17,26 +17,10 @@ Changes, newest first :
 
 - 2015/09/23 - Version 0.10 :
 
- - Operator 'lines' is smarter re.time axis: (see
-   :doc:`scripts/lines`):
-
-   - Tick marks are smartly adapted to the time period duration. 
-   - When datasets does not cover the same time period, the user can
-     choose wether time axis will be aligned to the same origin or
-     just be the union of all time periods 
-
- - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
-   cdfsections, cdfstd, cdfvT; you need to have a patched version of
-   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
-   : :download:`cdftransport.py <../examples/cdftransport.py>` and 
-   :download:`cdftools.py <../examples/cdftools.py>` . A number of
-   operators come in two versions : one accepting multi-variable
+ - Interface to Drakkar CDFTools: a number of
+   operators now come in two versions : one accepting multi-variable
    inputs, and one accepting only mono-variable inputs (with an 'm' suffix)
    
- - CliMAF can provide fixed fields to operators, which path may
-   depend on project and simulation of operator first operand 
-   (see  :py:func:`~climaf.operators.fixed_fields()`)
-
  - Multi-variable datasets are managed. This is handy for cases where
    variables are grouped in a file. See an example in :
    :download:`cdftransport.py <../examples/cdftransport.py>` , where 
@@ -51,6 +35,29 @@ Changes, newest first :
  - New function :py:func:`~climaf.classes.fds()` allows to define simply 
    a dataset from a single data file. See example in 
    :download:`data_file.py <../examples/data_file.py>`
+
+
+.. _news_0.9:
+
+- 2015/09/08 - Version 0.10 :
+
+ - Operator 'lines' is smarter re.time axis: (see
+   :doc:`scripts/lines`):
+
+   - Tick marks are smartly adapted to the time period duration. 
+   - When datasets does not cover the same time period, the user can
+     choose wether time axis will be aligned to the same origin or
+     just be the union of all time periods 
+
+ - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
+   cdfsections, cdfstd, cdfvT; you need to have a patched version of
+   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
+   : :download:`cdftransport.py <../examples/cdftransport.py>` and 
+   :download:`cdftools.py <../examples/cdftools.py>` 
+   
+ - CliMAF can provide fixed fields to operators, which path may
+   depend on project and simulation of operator first operand 
+   (see  :py:func:`~climaf.operators.fixed_fields()`)
 
  - Fixes :
  
