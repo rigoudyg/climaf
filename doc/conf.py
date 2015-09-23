@@ -119,10 +119,13 @@ pygments_style = 'sphinx'
 html_theme = 'default'
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
-    import sphinx_rtd_theme
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    html_theme = 'default'
-    #html_theme = 'nature'
+    rtd_theme=False
+    if rtd_theme :
+        import sphinx_rtd_theme
+        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+        html_theme = 'default'
+    else:
+        html_theme = 'nature'
 else:
     html_theme = 'nature'
     # Add any paths that contain custom themes here, relative to this directory.
