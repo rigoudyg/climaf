@@ -37,6 +37,7 @@ fds : define a dataset from a data file
 
 .. autofunction:: climaf.classes.fds
 
+
 cproject : declare a new project and its non-standard attributes/facets
 --------------------------------------------------------------------------
 

@@ -65,8 +65,8 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 # built documents.
 #
 # The short X.Y version.
-#from climaf import version
-version = '0.10'
+from climaf import version
+#version = '0.10'
 # The full version, including alpha/beta/rc tags.
 release = version
 
