@@ -11,18 +11,6 @@ class Climaf_Netcdf_Error(Exception):
     def __str__(self):
         return `self.valeur`
 
-try :
-    from Scientific.IO.NetCDF import NetCDFFile as ncf
-except ImportError:
-    try :
-        from NetCDF4 import netcdf_file as ncf
-    except ImportError:
-        try :
-            from scipy.io.netcdf import Dataset as ncf
-        except ImportError:
-            clogger.critical("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
-            #raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
-
 
 def varOfFile(filename) :
     lvars=varsOfFile(filename)
@@ -37,6 +25,7 @@ def varsOfFile(filename) :
     """ 
     returns the list of non-dimensions variable in NetCDF file FILENAME
     """
+    from anynetcdf import ncf
     lvars=[]
     fileobj=ncf(filename, 'r') 
     for filevar in fileobj.variables :
@@ -54,6 +43,7 @@ def fileHasVar(filename,varname):
     """ 
     returns True if FILENAME has variable VARNAME
     """
+    from anynetcdf import ncf
     rep=False
     clogger.debug("opening "+filename)
     fileobj=ncf(filename)
@@ -68,6 +58,7 @@ def model_id(filename):
     """ 
 
     """
+    from anynetcdf import ncf
     rep='no_model'
     clogger.debug("opening "+filename)
     f=ncf(filename, 'r') 
@@ -82,6 +73,7 @@ def timeLimits(filename) :
     except :
         raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
     #
+    from anynetcdf import ncf
     f=ncf(filename) 
     if 'time_bnds' in f.variables :
         tim=f.variables['time_bnds']

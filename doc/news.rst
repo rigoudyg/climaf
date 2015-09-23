@@ -13,7 +13,7 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
-.. _news_0.9:
+.. _news_0.10:
 
 - 2015/09/23 - Version 0.10 :
 
