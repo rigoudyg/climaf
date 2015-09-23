@@ -36,7 +36,7 @@ def header(title,style_file=None) :
           style_file +\
           """ type="text/css"/>"""
     else:
-        with open(cpath[0]+"/style.css") as fic :
+        with open(cpath[0]+"/cami_style_css") as fic :
             style=\
               """<style type="text/css" media=screen>"""+\
               fic.read()+\
