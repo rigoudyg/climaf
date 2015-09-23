@@ -12,7 +12,8 @@ __all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver",
 version="0.9"
 
 
-import time
+import time,os
+
 def tim(string=None):
     """
     Utility function : print duration since last call
@@ -30,7 +31,6 @@ already_inited=False
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not already_inited  and not on_rtd : 
-    import os
     import sys
     #
     already_inited=True
