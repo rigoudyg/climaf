@@ -12,12 +12,15 @@ class Climaf_Netcdf_Error(Exception):
         return `self.valeur`
 
 try :
-    from scipy.io.netcdf import netcdf_file as ncf
+    from Scientific.IO.NetCDF import NetCDFFile as ncf
 except ImportError:
     try :
-        from NetCDF4 import Dataset as ncf
+        from NetCDF4 import netcdf_file as ncf
     except ImportError:
-        raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules scipy.io.netcdf or NetCDF4")
+        try :
+            from scipy.io.netcdf import Dataset as ncf
+        except ImportError:
+            raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
 
 
 def varOfFile(filename) :
@@ -27,22 +30,23 @@ def varOfFile(filename) :
                       "no direction to choose  - File is %s" %\
                           (`lvars`,filename))
         return(None)
-    if(lvars)==1 : return lvars[0]
+    if len(lvars)==1 : return lvars[0]
 
 def varsOfFile(filename) :
     """ 
     returns the list of non-dimensions variable in NetCDF file FILENAME
     """
     lvars=[]
-    with ncf(filename, 'r') as fileobj:
-        for filevar in fileobj.variables :
-            if ((filevar not in fileobj.dimensions) and
-                not re.findall("^lat",filevar) and
-                not re.findall("^lon",filevar) and
-                not re.findall("^time_",filevar) and
-                not re.findall("_bnds$",filevar) ):
-                lvars.append(filevar)
-        return(lvars)
+    fileobj=ncf(filename, 'r') 
+    for filevar in fileobj.variables :
+        if ((filevar not in fileobj.dimensions) and
+            not re.findall("^lat",filevar) and
+            not re.findall("^lon",filevar) and
+            not re.findall("^time_",filevar) and
+            not re.findall("_bnds$",filevar) ):
+            lvars.append(filevar)
+    fileobj.close()
+    return(lvars)
 
 
 def fileHasVar(filename,varname):
@@ -51,12 +55,13 @@ def fileHasVar(filename,varname):
     """
     rep=False
     clogger.debug("opening "+filename)
-    with ncf(filename, 'r') as fileobj:
-        for filevar in fileobj.variables :
-            if filevar == varname :
-                rep=True
-                break
-        return(rep)
+    fileobj=ncf(filename)
+    for filevar in fileobj.variables :
+        if filevar == varname :
+            rep=True
+            break
+    fileobj.close()
+    return(rep)
 
 def model_id(filename):
     """ 
@@ -64,8 +69,9 @@ def model_id(filename):
     """
     rep='no_model'
     clogger.debug("opening "+filename)
-    with ncf(filename, 'r') as f:
-        if 'model_id' in dir(f) : rep=f.model_id
+    f=ncf(filename, 'r') 
+    if 'model_id' in dir(f) : rep=f.model_id
+    f.close()
     return(rep)
     
 def timeLimits(filename) :
@@ -75,13 +81,15 @@ def timeLimits(filename) :
     except :
         raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
     #
-    with ncf(filename) as f:
-        if 'time_bnds' in f.variables :
-            tim=f.variables['time_bnds']
-            start=tim[0,0] ; end=tim[-1,1] 
-            ct=netcdftime.utime(tim.units, calendar=tim.calendar)
-            return cperiod(ct.num2date(start),ct.num2date(end))
-        else:
-            return None
-            #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
+    f=ncf(filename) 
+    if 'time_bnds' in f.variables :
+        tim=f.variables['time_bnds']
+        start=tim[0,0] ; end=tim[-1,1] 
+        ct=netcdftime.utime(tim.units, calendar=tim.calendar)
+        f.close()
+        return cperiod(ct.num2date(start),ct.num2date(end))
+    else:
+        f.close()
+        return None
+    #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
         

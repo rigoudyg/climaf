@@ -446,7 +446,7 @@ def selectExampleFiles(urls,**kwargs) :
                         
 
 def selectCmip5DrsFiles(urls, **kwargs) :
-    # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
+    # example for path : CMIP5/[output1/]CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
     #
     # second path segment can be any string (allows for : output,output1, merge...), 
@@ -472,15 +472,12 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
-        pattern1=l+"/"+project+"/merge"
-        if not os.path.exists(pattern1) :
-            pat_test=l+"/"+project+"/"+model
-            if os.path.exists(pat_test) : pattern1=l+"/"+project+"/*"
-            else : pattern1=l+"/"+project
-        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
+        pattern1=l+"/"+project+"/*/"+model # one * for modelling center
+        if len(glob.glob(pattern1))==0 : pattern1=l+"/"+project+"/*/*/"+model # another * for output1/output2/merge ....
+        patternv=pattern1+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
-        #print "looking at "+patternv+ " gives:" +`ldirs`
+        clogger.debug("Globbing with "+patternv+ " gives:" +`ldirs`)
         for repert in ldirs :
             lversions=os.listdir(repert)
             lversions.sort()

@@ -82,7 +82,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def test_selecting_files(self):
         print `ds`
         my_file=cfile(self.ds); print "myfile = "+my_file
-        expected=climaf.cache.currentCache+'/1b/8.nc'
+        expected=climaf.cache.currentCache+'/9e/2.nc'
         print "expected = "+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
 
