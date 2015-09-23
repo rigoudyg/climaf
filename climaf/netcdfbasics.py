@@ -20,7 +20,8 @@ except ImportError:
         try :
             from scipy.io.netcdf import Dataset as ncf
         except ImportError:
-            raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
+            clogger.critical("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
+            #raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
 
 
 def varOfFile(filename) :
