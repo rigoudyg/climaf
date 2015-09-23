@@ -1,4 +1,4 @@
 sphinxcontrib-napoleon==0.2.11
 sphinx_rtd_theme
-scipy.io.NetCDF
+scipy.io.netcdf
 
