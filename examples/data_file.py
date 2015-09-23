@@ -18,7 +18,7 @@ print 'model='      , explore.model
 print 'simu='       , explore.simulation
 print 'file='       , explore.baseFiles()
 
-# What is the internal representation of the dataset
+# What is the internal representation (or 'CRS') of the dataset
 print `explore`
 
 # Let us play with a multi-variable file (a file which is not CMIP5 compliant -> must provide period)
@@ -27,12 +27,10 @@ all=fds(multifile, period="1980")
 print 'variable(s)=', all.variable
 print 'model='      , all.model
 
-# Let us take one variable out of a series
-
 
 # If you know what you want from the data file
 my_rst=fds(multifile,variable='rst',period='198004')
 
-# You may which that CliMAF handles the model name, and a sensible simulation name 
+# You may whish that CliMAF handles the model name, and a sensible simulation name 
 my_rst=fds(multifile,simulation='my_simu',model='CNRM-CM', variable='rst',period='198004')
 cshow(plot(my_rst))

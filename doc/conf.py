@@ -364,9 +364,9 @@ intersphinx_mapping = {'python': ('https://docs.python.org/2', None)}
 
 autoclass_content="init"
 
-# import os
-# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-# if on_rtd:
-#     html_theme = 'default'
-# else:
-#     html_theme = 'nature'
+import os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    html_theme = 'default'
+else:
+    html_theme = 'nature'
