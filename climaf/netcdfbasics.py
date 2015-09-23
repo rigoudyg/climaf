@@ -1,6 +1,6 @@
 import re
 
-from climaf.clogging import clogger
+from climaf.clogging import clogger, dedent
 from climaf.period import cperiod
 
 class Climaf_Netcdf_Error(Exception):
