@@ -15,11 +15,6 @@
 import sys
 import os
 import os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    html_theme = 'default'
-else:
-    html_theme = 'nature'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -70,8 +65,8 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 # built documents.
 #
 # The short X.Y version.
-from climaf import version
-#version = '0.8'
+#from climaf import version
+version = '0.9'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -122,6 +117,13 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'default'
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    html_theme = 'default'
+    html_theme = 'nature'
+else:
+    html_theme = 'nature'
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
