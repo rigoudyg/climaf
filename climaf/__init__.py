@@ -28,9 +28,9 @@ def tim(string=None):
         if False : print("Duration %.1f for step %s"%(delta,string),file=sys.stderr)
 
 already_inited=False
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if not already_inited  and not on_rtd : 
+if not already_inited  and not onrtd : 
     import sys
     #
     already_inited=True
