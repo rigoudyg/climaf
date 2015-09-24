@@ -84,13 +84,17 @@ begin
       ; check if all X axis are "time" else NCL sets first file attributes to other files
       ;;if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
       ;;  first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
-      if (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"Time"))) .or. (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"time"))) then
-        first_file_axis_name=all_files[0]->$var$&$coord$@long_name
-        if (.not. all(all_files[:]&$coord$@long_name .eq. first_file_axis_name)) then
-          print("Files have not same axis for variable "+coord)
-          status_exit(1)
-        end if        
-      end if
+
+      ; if (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"Time"))) .or. (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"time"))) then
+      ; Next few lines are not supported by ncl 6.1 :
+      ;   first_file_axis_name=all_files[0]->$var$&$coord$@long_name
+      ;   if (.not. all(all_files[:]&$coord$@long_name .eq. first_file_axis_name)) then
+      ;     print("Files have not same axis for variable "+coord)
+      ;     status_exit(1)
+      ;   end if        
+      ; end if
+      ; End of "Next few lines are not supported by ncl 6.1 "
+
       ; data vector for X axis
       if (.not. ismissing(str_match(coord,"time"))) then ;;add
         if ( T_axis .eq. "real" ) then
