@@ -98,8 +98,8 @@ begin
   fld=new_fld
   delete(new_fld)
   
+  ; Assume first dimension is time. Select first time slice before further processing
   if (rank .eq. 4) then
-    ; assume first dimension is time. Select first time slice before further processing
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ; NOTE : this should be done only if at least two other dimensions have size > 1, otherwise we
 ; should plot some Hovmoeller diagram
@@ -116,6 +116,7 @@ begin
     rank=dimsizes(dime)
   end if
   
+  ; Assume second dimension is depth. Select first level before further processing
   useXY=False
   horizontal=False  
   if (rank .eq. 3) then
@@ -138,37 +139,40 @@ begin
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld) 
 
-    if ( isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) ) .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) .or. ( isatt(fld&$Var_DimNames(0)$,"standard_name") .and. (fld&$Var_DimNames(0)$@standard_name .eq. "latitude") .and. isatt(fld&$Var_DimNames(1)$,"standard_name") .and. (fld&$Var_DimNames(1)$@standard_name .eq. "longitude")  ) .or. ( isatt(fld&$Var_DimNames(0)$,"axis") .and. (fld&$Var_DimNames(0)$@axis .eq. "y") .and. isatt(fld&$Var_DimNames(1)$,"axis") .and. (fld&$Var_DimNames(0)$@axis .eq. "x") ) then
+    if ( isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) ) \ 
+      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) \ 
+           .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
+      .or. ( isatt(fld&$Var_DimNames(0)$,"standard_name") \
+           .and. (fld&$Var_DimNames(0)$@standard_name .eq. "latitude") \
+           .and. isatt(fld&$Var_DimNames(1)$,"standard_name") \
+           .and. (fld&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
+      .or. ( isatt(fld&$Var_DimNames(0)$,"axis") \
+           .and. (fld&$Var_DimNames(0)$@axis .eq. "y") \
+           .and. isatt(fld&$Var_DimNames(1)$,"axis") \
+           .and. (fld&$Var_DimNames(0)$@axis .eq. "x") ) then
       horizontal=True 
     end if
         
     ;We have a true cross-section or a horizontal map
     if logp  then useXY=False end if
     latname="lat"
+    lonname="lon"
     if .not. ismissing(str_match(Var_DimNames,"latitude"))
       latname="latitude"
+      lonname="longitude"
     end if
     if (ismissing(str_match(Var_DimNames,"lat"))) then
       if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
         useLatDim=True
-      if isfilevar(ffile,"nav_lat") then latname="nav_lat" end if
+        if isfilevar(ffile,"nav_lat") then 
+          latname="nav_lat" 
+          lonname="nav_lon"
+        end if
       end if
     end if
     latdim=ffile->$latname$
-                                
-    lonname="lon"
-    if .not. ismissing(str_match(Var_DimNames,"longitude"))
-      lonname="longitude"
-    end if
-    if (ismissing(str_match(Var_DimNames,"lon"))) then 
-      if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) then
-        useLonDim=True
-      if isfilevar(ffile,"nav_lat") then lonname="nav_lon" end if
-      end if
-    end if
-    londim=ffile->$lonname$
-
-  end if
+    londim=ffile->$lonname$                  
+  end if ; rk eq 2
 
   if (rank .eq. 1) then 
     delete(Var_DimNames)
@@ -245,8 +249,8 @@ begin
     fld2=new_fld2
     delete(new_fld2)
   
+    ; Assume first dimension is time. Select first time slice before further processing
     if (rank2 .eq. 4) then
-      ; assume first dimension is time. Select first time slice before further processing
       ;print("Selecting first time step for auxiliary field")
       fldtmp2=fld2(0,:,:,:)
       delete(fld2)
@@ -259,19 +263,45 @@ begin
       rank2=dimsizes(dime2)
     end if
   
+    ; Assume second dimension is depth. Select first level before further processing
     if (rank2 .eq. 3) then
       print("plotting an auxiliary field with 2 horizontal dimensions")
       fldtmp2=fld2(0,:,:)
       delete(fld2)
       fld2=fldtmp2
       delete(fldtmp2)
-      ;delete(dime2)
-      ;dime2=dimsizes(fld2)
-      ;rank2=dimsizes(dime2)
+      delete(dime2)         
+      dime2=dimsizes(fld2)  
+      rank2=dimsizes(dime2)  
     end if ; rk eq 3  
      
-    ; fld2 is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+    ; fld2 is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal  
+    useLatDim2=False
+    useLonDim2=False
     
+    if (rank2 .eq. 2) then  
+      delete(Var_DimNames2)
+      Var_DimNames2 = getVarDimNames(fld2) 
+      
+      latname2="lat"
+      lonname2="lon"
+      if .not. ismissing(str_match(Var_DimNames2,"latitude"))
+        latname2="latitude"
+        lonname2="longitude"
+      end if
+      if (ismissing(str_match(Var_DimNames2,"lat"))) then
+        if isatt(fld2,"coordinates") .and. (.not. ismissing(str_match(fld2@coordinates,"lat"))) then
+          useLatDim2=True
+          if isfilevar(ffile2,"nav_lat") then 
+            latname2="nav_lat" 
+            lonname2="nav_lon" 
+          end if
+        end if
+      end if
+      latdim2=ffile2->$latname2$
+      londim2=ffile2->$lonname2$  
+    end if; rk eq 2  
+
     if (rank2 .eq. 1) then 
       delete(Var_DimNames2)
       Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
@@ -286,10 +316,7 @@ begin
 
   if VECT then
 
-    ;------
-    ; fld3
-    ;------
-    ; Reading the vector field 
+    ; Reading vector fields 
     if isfilepresent(infile3) then
       ffile3=addfile(infile3,"r")
       if isfilevar(ffile3,var3) then 
@@ -307,54 +334,6 @@ begin
       status_exit(2)
     end if
 
-    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
-    Var_DimNames3 = getVarDimNames(fld3)  ; getting dimensions from metadata
-    dime3=dimsizes(fld3)
-    rank3=dimsizes(dime3)
-
-    if (rank3.gt.4) then 
-      print("This script is not tuned for high rank data for vector ( rank="+rank3+")")
-      print(Var_DimNames3)
-      status_exit(1)
-    end if
-
-    ; Removes singleton (degenerate) dimensions from fld3 while preserving meta data
-    new_fld3=rm_single_dims(fld3)
-    delete(Var_DimNames3) 
-    Var_DimNames3 = getVarDimNames(new_fld3) 
-    delete(dime3) 
-    dime3=dimsizes(new_fld3)
-    delete(rank3) 
-    rank3=dimsizes(dime3)
-    delete(fld3)
-    fld3=new_fld3
-    delete(new_fld3)
-  
-    if (rank3 .eq. 4) then
-      ; assume first dimension is time. Select first time slice before further processing
-      ;print("Selecting first time step for vector u")
-      fldtmp3=fld3(0,:,:,:)
-      delete(fld3)
-      fld3=fldtmp3
-      delete(fldtmp3)
-      delete(Var_DimNames3)
-      Var_DimNames3 = getVarDimNames(fld3) 
-      delete(dime3)
-      dime3=dimsizes(fld3)
-      rank3=dimsizes(dime3)
-    end if
-
-    if (rank3 .eq. 3) then
-      fldtmp3=fld3(0,:,:)
-      delete(fld3)
-      fld3=fldtmp3
-      delete(fldtmp3)
-    end if ; rk eq 3  
-     
-    ;------
-    ; fld4
-    ;------
-    ; Reading the vector field 
     if isfilepresent(infile4) then
       ffile4=addfile(infile4,"r")
       if isfilevar(ffile4,var4) then 
@@ -373,16 +352,58 @@ begin
     end if
 
     ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
+    Var_DimNames3 = getVarDimNames(fld3)  ; getting dimensions from metadata
+    dime3=dimsizes(fld3)
+    rank3=dimsizes(dime3)
+    
+    Var_DimNames4 = getVarDimNames(fld4) 
+    dime4=dimsizes(fld4)
+    rank4=dimsizes(dime4)
+    
+    if ((rank3.gt.4) .or. (rank4.gt.4)) then 
+      print("This script is not tuned for high rank data for vectors ( ranku="+rank3+", rankv="+rank4+" )")
+      print(Var_DimNames3)
+      print(Var_DimNames4)
+      status_exit(1)
+    end if  
+
+    ; Removes singleton (degenerate) dimensions from fld3 and fld4 while preserving meta data
+    new_fld3=rm_single_dims(fld3)
+    delete(Var_DimNames3) 
+    Var_DimNames3 = getVarDimNames(new_fld3) 
+    delete(dime3) 
+    dime3=dimsizes(new_fld3)
+    delete(rank3) 
+    rank3=dimsizes(dime3)
+    delete(fld3)
+    fld3=new_fld3
+    delete(new_fld3)
+
     new_fld4=rm_single_dims(fld4)
+    delete(Var_DimNames4) 
     Var_DimNames4 = getVarDimNames(new_fld4) 
+    delete(dime4) 
     dime4=dimsizes(new_fld4)
+    delete(rank4) 
     rank4=dimsizes(dime4)
     delete(fld4)
     fld4=new_fld4
     delete(new_fld4)
-
+    
+    ; Assume first dimension is time. Select first time slice before further processing
+    if (rank3 .eq. 4) then
+      ;print("Selecting first time step for vector u")
+      fldtmp3=fld3(0,:,:,:)
+      delete(fld3)
+      fld3=fldtmp3
+      delete(fldtmp3)
+      delete(Var_DimNames3)
+      Var_DimNames3 = getVarDimNames(fld3) 
+      delete(dime3)
+      dime3=dimsizes(fld3)
+      rank3=dimsizes(dime3)
+    end if
     if (rank4 .eq. 4) then
-      ; assume first dimension is time. Select first time slice before further processing
       ;print("Selecting first time step for vector v")
       fldtmp4=fld4(0,:,:,:)
       delete(fld4)
@@ -395,13 +416,69 @@ begin
       rank4=dimsizes(dime4)
     end if
 
+    ; Assume second dimension is depth. Select first level before further processing
+    if (rank3 .eq. 3) then
+      fldtmp3=fld3(0,:,:)
+      delete(fld3)
+      fld3=fldtmp3
+      delete(fldtmp3)
+    end if 
     if (rank4 .eq. 3) then
       fldtmp4=fld4(0,:,:)
       delete(fld4)
       fld4=fldtmp4
       delete(fldtmp4)
-    end if ; rk eq 3  
-  
+    end if   
+     
+    ; Rotation des champs de la grille du modele NEMO -> GEO si le fichier des champs d angles est present 
+    ; Ex. tests: fld3(:,:)=0.,fld4(:,:)=0.01
+    if ( isvar("rotation") .and. (rotation .eq. 1) ) then  
+      if isfilepresent("angles.nc") then
+        angle_file=addfile("angles.nc","r")
+        gcosu=angle_file->GCOSU
+        gsinu=angle_file->GSINU
+        gsinv=angle_file->GSINV
+        gcosv=angle_file->GCOSV
+        ; Remove singleton (degenerate) dimensions: (t,y,x) -> (y,x)
+        new_gcosu=rm_single_dims(gcosu)
+        new_gsinu=rm_single_dims(gsinu)
+        new_gcosv=rm_single_dims(gcosv)
+        new_gsinv=rm_single_dims(gsinv)
+        ; Rotation
+        x=fld3
+        y=fld4
+        fld3= x * new_gcosu - y * new_gsinu
+        fld4= x * new_gsinv + y * new_gcosv
+      end if
+    end if
+    
+    ; fld3 & fld4 is now 2D ;fld3 <=> u <=> X, fld4 <=> v <=> Y
+    useLatDimv=False
+    useLonDimv=False
+    
+    delete(Var_DimNames3)
+    Var_DimNames3 = getVarDimNames(fld3) 
+    delete(Var_DimNames4)
+    Var_DimNames4 = getVarDimNames(fld4) 
+    
+    latnamev="lat"
+    lonnamev="lon"
+    if .not. ismissing(str_match(Var_DimNames4,"latitude"))
+      latnamev="latitude"
+      lonnamev="longitude"
+    end if
+    if (ismissing(str_match(Var_DimNames4,"lat"))) then
+      if isatt(fld4,"coordinates") .and. (.not. ismissing(str_match(fld4@coordinates,"lat"))) then
+        useLatDimv=True
+        if isfilevar(ffile4,"nav_lat") then 
+          latnamev="nav_lat" 
+          lonnamev="nav_lon"
+        end if
+      end if
+    end if
+    latdimv=ffile4->$latnamev$
+    londimv=ffile3->$lonnamev$      
+      
   end if ; VECT
 
   ;-----------------
@@ -445,9 +522,9 @@ begin
       res@cnLevelSpacingF = vdelta
     end if
     if ( isvar("levels") ) then
-        res@cnLevelSelectionMode = "ExplicitLevels"
-        res@cnLevels=tofloat(str_split(levels," "))
-        delete(levels)
+      res@cnLevelSelectionMode = "ExplicitLevels"
+      res@cnLevels=tofloat(str_split(levels," "))
+      delete(levels)
     end if 
 
     res@cnLinesOn=False
@@ -483,6 +560,16 @@ begin
             res2@cnLevelSelectionMode = "ExplicitLevels"
             res2@cnLevels=tofloat(str_split(contours," "))
             delete(contours)
+
+            if (horizontal) then
+              res2@gsnAddCyclic = False
+              if useLatDim then
+                res2@sfXArray            = londim
+                res2@sfYArray            = latdim
+                res2@gsnAddCyclic        = False
+              end if
+            end if
+
           end if 
         end if
       end if   
@@ -510,6 +597,15 @@ begin
         res2@cnLevels=tofloat(str_split(contours," "))
         delete(contours)     
       end if 
+
+      if (horizontal) then
+        res2@gsnAddCyclic = False
+        if useLatDim2 then
+          res2@sfXArray            = londim2
+          res2@sfYArray            = latdim2
+          res2@gsnAddCyclic        = False
+        end if
+      end if
 
     end if
 
@@ -559,13 +655,13 @@ begin
           end if 
         end if
       else
-        res@mpMinLonF                = min(londim)
-        res@mpMaxLonF                = max(londim)
         res@mpMinLatF                = min(latdim)
         res@mpMaxLatF                = max(latdim)
-        if (isvar("CenterLon")) then 
-          res@mpCenterLonF=tofloat(CenterLon)
+        if (isvar("mpCenterLonF")) then 
+          res@mpCenterLonF=tofloat(mpCenterLonF)
         else
+          res@mpMinLonF                = min(londim)
+          res@mpMaxLonF                = max(londim)
           res@mpCenterLonF=(min(londim)+max(londim))/2
         end if
 
@@ -586,27 +682,44 @@ begin
     res@lbLabelAutoStride = True
     res@lbOrientation     = "vertical"
                                 
-    if VECT then ;A VOIR
-
-      res@vcRefMagnitudeF = 5.0 			; vec magnitude
-      res@vcRefLengthF = 0.5;0.05;0.01   			; size of ref vector
-      res@vcMonoLineArrowColor  = False             ; vectors color by magnitude
-      res@vcMinDistanceF        = 0.015;0.017              ; thins arrows near pole
-      res@vcGlyphStyle          = "CurlyVector"    	; curly vectors on
-      ;res@vcGlyphStyle          = "LineArrow"
-      ;
-      res@vcLineArrowColor        = "white"           ; change vector color
-      res@vcLineArrowThicknessF   = 2;2.5               ; change vector thickness
-      res@vcVectorDrawOrder       = "PostDraw"        ; draw vectors last  "PreDraw" ?
-      ;
-      res@gsnScalarContour=True    ; contours desired
-      ;
-      ;;  res@vfXCStride	  = 1
-      ;;  res@vfYCStride	  = 1
-      ;
-      ;res@vfUDataArray = zu(:,:dx-1)   ; (0,:dy-ky,:dx-kx)
-      ;res@vfVDataArray = zv(:,:dx-1)   ; (1,:dy-ky,:dx-kx)
-            
+    if VECT then 
+      if (isvar("vcRefMagnitudeF")) then                ; define vector ref magnitude
+        res@vcRefMagnitudeF=tofloat(vcRefMagnitudeF)
+      end if
+    
+      if (isvar("vcRefLengthF")) then         	        ; define size of ref vector
+        res@vcRefLengthF=tofloat(vcRefLengthF)
+      end if
+      
+      if (isvar("vcMinDistanceF")) then                 ; define density of vectors
+        res@vcMinDistanceF        = tofloat(vcMinDistanceF)
+      else
+        res@vcMinDistanceF        = 0.017               ; thins arrows near pole
+      end if
+      
+      if (isvar("vcGlyphStyle")) then                   ; style of vectors: "LineArrow" (default), "CurlyVector", ...
+        res@vcGlyphStyle          = vcGlyphStyle
+      end if
+      
+      ;res@vcRefAnnoOrthogonalPosF   = -1.0             ; move ref vector  
+      res@vcMonoLineArrowColor  =  True                 ; vectors color by magnitude
+      if (isvar("vcLineArrowColor")) then               ; change vector color
+        res@vcLineArrowColor      =  vcLineArrowColor
+      else
+        res@vcLineArrowColor      = "white"            
+      end if
+      
+      res@vcLineArrowThicknessF   = 2                   ; change vector thickness
+      res@gsnScalarContour=True                         ; contours desired
+      res@vcVectorDrawOrder       = "PostDraw"          ; draw vectors last  
+      
+      if (horizontal) then 
+        if useLatDimv then
+          res@vfXArray            = londimv
+          res@vfYArray            = latdimv
+          res@gsnAddCyclic        = False
+        end if
+      end if
     end if ; VECT
     
   end if  ; not useXY
@@ -687,6 +800,7 @@ begin
         res@sfYArray            = latdim
         res@gsnAddCyclic        = False
       end if
+     
       if (isvar("proj")) then 
         
         print("using gsn_csm_contour_map")
@@ -695,7 +809,7 @@ begin
         else
           plot0=gsn_csm_contour_map(wks,fld,res)
         end if
-
+        
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
             plot1=gsn_csm_contour(wks,fld,res2)
@@ -703,12 +817,15 @@ begin
         else
           plot1=gsn_csm_contour(wks,fld2,res2)
         end if
-
+        ;if VECT then
+        ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
+        ;end if
+        
       else 
 
         print("using gsn_csm_contour_map_ce")
         if VECT then
-          plot0=gsn_csm_vector_scalar_map_ce(wks,fld3,fld4,fld,res) ;ou juste fld3(0,0,:,:) OK
+          plot0=gsn_csm_vector_scalar_map_ce(wks,fld3,fld4,fld,res)
         else
           plot0=gsn_csm_contour_map_ce(wks,fld,res)
         end if
@@ -720,11 +837,8 @@ begin
         else
           plot1=gsn_csm_contour(wks,fld2,res2)
         end if
-        ;essayer aussi de faire les vecteurs ici et de faire un overlay de tt a la fin
         ;if VECT then
-        ;  ;plot2=gsn_csm_vector(wks,fld3,fld4,res); en overlay: juste sur au dessus de l equateur, seul: tout mais ce n est pas sur une carte mais en indice lat/lon => NON
-        ;OU
-        ;  plot2=gsn_csm_vector_map(wks,fld3,fld4,res) ;en overlay rien , seul oui sur tte la carte
+        ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
         ;end if
 
       end if 

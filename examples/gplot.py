@@ -38,6 +38,31 @@ cshow(plot_map3b)
 plot_map4b=plot(surface_ta, proj='NH', contours="230 231 232 233", title='A Map which contours lines don t follow color filled contours')
 cshow(plot_map4b)
 
+# with vectors
+duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
+dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") 
+tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="199807", realm="O")
+
+tpath='/data/climaf/${project}/${model}/'
+fixed_fields(['plot','plot_2fields'],
+             ('angles.nc',tpath+'angle_ORCA1.nc'))
+
+map_vect1=plot(tos, duo, dvo, title='SST without rotation of vectors on NEMO grid', vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
+cshow(map_vect1)
+
+map_vect2=plot(tos, duo, dvo, title='SST with rotation of vectors on NEMO grid', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
+cshow(map_vect2)
+
+map_vect3=plot(tos, duo, dvo, title='SST with contours lines and vectors', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, contours=1) #Vector style = "LineArrow" (default)
+cshow(map_vect3)
+ 
+map_vect4=plot(tos, duo, dvo, title='SST with curly vectors', rotation=1, vcRefLengthF=0.005, vcRefMagnitudeF=0.02, vcGlyphStyle="CurlyVector", vcLineArrowColor="yellow")
+cshow(map_vect4)
+
+map_vect5=plot(tos, duo, dvo, title='SST, proj=NH', rotation=1, vcRefLengthF=0.005, vcRefMagnitudeF=0.02, proj="NH")
+cshow(map_vect5)
+
+
 ## two fields ##
 
 # without projection
@@ -55,6 +80,25 @@ cshow(plot_map5b)
 
 plot_map6b=plot_2fields(surface_ta, map_field2, proj='NH', title='A Map which contours lines of auxiliary field are automatic levels')
 cshow(plot_map6b)
+
+# with vectors
+duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
+dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") 
+tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="199807", realm="O")
+sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'tos' sub box for auxiliary field
+
+tpath='/data/climaf/${project}/${model}/'
+fixed_fields(['plot','plot_2fields'],
+             ('angle_ORCA1.nc',tpath+'angle_ORCA1.nc'))
+
+map_vect6=plot_2fields(tos, sub_tos, duo, dvo, title='SST: 2 fields + vectors', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
+cshow(map_vect6)
+
+map_vect7=plot_2fields(tos, sub_tos, duo, dvo, title='SST: 2 fields + vectors', rotation=1, vcRefLengthF=0.005, vcRefMagnitudeF=0.02, vcGlyphStyle="CurlyVector", vcLineArrowColor="yellow")
+cshow(map_vect7)
+
+map_vect8=plot_2fields(tos, sub_tos, duo, dvo, title='SST: 2 fields + vectors, proj=NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, vcMinDistanceF=0.01, vcLineArrowColor="yellow", proj="NH")
+cshow(map_vect8)
 
 
 ##################
