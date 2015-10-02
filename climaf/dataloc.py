@@ -472,8 +472,10 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
-        pattern1=l+"/"+project+"/*/"+model # one * for modelling center
-        if len(glob.glob(pattern1))==0 : pattern1=l+"/"+project+"/*/*/"+model # another * for output1/output2/merge ....
+        totry=['merge/','output/','output?/','']
+        for p in totry :
+            pattern1=l+"/"+project+"/"+p+"*/"+model # one * for modelling center
+            if len(glob.glob(pattern1))>0 : break
         patternv=pattern1+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
