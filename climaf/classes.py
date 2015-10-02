@@ -336,7 +336,14 @@ class cdataset(cobject):
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
-        if (self.frequency=='seasonal') : self.period.fx=True
+        # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
+        if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
+            self.period.fx=True
+        freqs_dic=frequencies.get(self.project,None)
+        if freqs_dic :
+            for k,v in freqs_dic :
+                if v==self.frequency and k=='annual_cycle' :
+                    self.period.fx=True
         #
         self.kvp=attval
         self.alias=varIsAliased(self.project,self.variable)
