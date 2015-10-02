@@ -46,7 +46,12 @@ See examples in the section on data access at :ref:`examples` ; see function :py
 ..get on-line help 
 -------------------
 
-From the Python shell, all relevant CliMAF functions and variables are auto-documented using Python features. Hence, you can :
+If you are reading this text, you have access to the prettier form of
+documentation; consider going back to the front page for getting quick
+links and a top-level table of content. If this does not fit, or if
+you prefer digging the hard way try that : from the Python shell, all
+relevant CliMAF functions and variables are auto-documented using
+stndard Python documentation features. Hence, you can :
 
 - list these functions and variables by::
 
