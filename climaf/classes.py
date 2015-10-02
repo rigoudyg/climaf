@@ -759,7 +759,7 @@ def cfreqs(project,dic) :
     ``normalized`` frequency values to project-specific frequency values
 
     Normalized frequency values are : 
-      decadal, yearly, monthly, daily, 6h, 3h, fx
+      decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
