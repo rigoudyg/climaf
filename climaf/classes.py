@@ -341,8 +341,8 @@ class cdataset(cobject):
             self.period.fx=True
         freqs_dic=frequencies.get(self.project,None)
         if freqs_dic :
-            for k,v in freqs_dic :
-                if v==self.frequency and k=='annual_cycle' :
+            for k in freqs_dic :
+                if freqs_dic[k]==self.frequency and k=='annual_cycle' :
                     self.period.fx=True
         #
         self.kvp=attval
