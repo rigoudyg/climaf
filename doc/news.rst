@@ -1,7 +1,7 @@
 .. _news:
 
 ------------
-What is new
+What's new
 ------------
 
 Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
@@ -12,6 +12,12 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 .. _screen_dump: ../../html_index.png 
 
 Changes, newest first :
+
+.. _news_0.11:
+
+- 2015/10/07 - Version 0.xx :
+
+ - Operators : allow last operands to be missing; also allow to provide ``None`` for the other (non-last) ones which are missing; but first operand must always be present. This is used e.g. with operator ``plot`` for providing (or not) an auxilliary scalar field and also vector components fields. See e.g. :doc:`scripts/plot`
 
 .. _news_0.10:
 

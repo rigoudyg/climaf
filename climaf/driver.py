@@ -471,7 +471,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict_ff["model"]=modelOf(scriptCall.operands[0])
         subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
         subdict_ff["project"]=projectOf(scriptCall.operands[0])
-        l=script.fixedfields #return paths: (linkname, targetname)
+        l=script.fixedfields #return a list of paths pairs: [(linkname, targetname)]
         files_exist=dict()
         for ll,lt in l:
             #Replace input data placeholders with filenames for fixed fields

@@ -102,12 +102,18 @@ class cscript():
         
         -  reserved argument keywords are :
         
-         - **in, in_<digit>, ins, ins_<digit>, mmin** : they will be
-           replaced by CliMAF managed filenames for input data, as
+         - **in, in_<digit>, ins, ins_<digit>, mmin** : they are place 
+           holders for representing the datasets provided when calling
+           the operator from CliMAF; they will be
+           replaced by CliMAF managed filenames for these input data, as
            deduced from dataset description or upstream computation; these
-           filenames can actually be remote URLs (if the script can use
-           OpenDAP, see args), local 'raw' data files, or CliMAF cache
-           filenames
+           filenames will actually be either remote URLs (if the script can use
+           OpenDAP, see args), local 'raw' data filenames, or CliMAF cache
+           filenames. When invoking the operator, the first input stream must
+           be provided, while the last ones are optional (assuming the 
+           script/binary can cope with such a case). If you do not 
+           want to provide one input while providing some other one(s) after, 
+           use value None
         
           -  **in** stands for the URL of the first dataset invoked in the
              operator call
