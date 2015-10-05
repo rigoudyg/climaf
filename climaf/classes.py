@@ -828,7 +828,7 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, widths=None, heights=None, 
-                 fig_lines=None, orientation="portrait", fig_trim="off", page_trim="off"):
+                 fig_lines=None, orientation="portrait", fig_trim=False, page_trim=False):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
@@ -855,17 +855,17 @@ class cpage(cobject):
            (default) or 'landscape'
          fig_trim (str, optional): to turn on/off 'trim' for all figures.
            It removes all the surrounding extra space of figures in the page,
-           either 'off' (default) or 'on'
+           either False (default) or True
          page_trim (str, optional): to turn on/off 'trim' for the page. It
-           removes all the surrounding extra space of the page, either 'off'
-           (default) or 'on'
+           removes all the surrounding extra space of the page, either False
+           (default) or True
 
         Example:
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
           >>> fig=plot(tas_avg,title='title')
-          >>> my_page=cpage(widths=[0.2,0.8], heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]], orientation='landscape', fig_trim='on', page_trim='on')
+          >>> my_page=cpage(widths=[0.2,0.8], heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]], orientation='landscape', fig_trim=True, page_trim=True)
 
         
         """
@@ -935,7 +935,7 @@ class cpage(cobject):
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="], orientation='"+self.orientation+"', fig_trim='"+self.fig_trim+"', page_trim='" +self.page_trim+"')"
+        rep+="], orientation='"+self.orientation+"', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
         

@@ -36,9 +36,9 @@ cshow(page2)
 
 ###########################################################################
 # Define page3 as a figure array by trimming all the surrounding extra
-# space of figures (fig_trim="on") and also of the page (page_trim="on") 
+# space of figures (fig_trim=True) and also of the page (page_trim=True) 
 page3=cpage(fig_lines=[[None, fig1],[fig1, fig1],[fig1,fig1]],
-            fig_trim="on",page_trim="on")
+            fig_trim=True,page_trim=True)
 ###########################################################################
 
 cdrop(page3)
@@ -69,8 +69,8 @@ cshow(page4)
 ###########################################################################
 # Define page5 as a figure array by only specifying heights (in the case of
 # an ensemble : widths=[1.] by default) and by trimming all the surrounding
-# extra space of figures (fig_trim="on") and also of the page (page_trim="on") 
-page5=cpage(fig_lines=fig_ens, heights=[0.8,0.2],fig_trim="on", page_trim='on')
+# extra space of figures (fig_trim=True) and also of the page (page_trim=True) 
+page5=cpage(fig_lines=fig_ens, heights=[0.8,0.2],fig_trim=True, page_trim=True)
 ###########################################################################
 
 cdrop(page5)

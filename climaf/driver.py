@@ -881,13 +881,13 @@ def cfilePage(cobj, deep, recurse_list=None) :
             fig_width=figsize.split("x").pop(0)
             fig_height=figsize.split("x").pop(1)
                                        
-            if cobj.fig_trim == "on" and ( float(fig_width)/float(fig_height) < width/height ):
+            if cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
                 width_adj=float(fig_width)*(height/float(fig_height))
                 x+=width_adj+xmargin
             else:
                 x+=width+xmargin
 
-        if cobj.fig_trim == "on" and ( float(fig_width)/float(fig_height) > width/height ):
+        if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
             height_adj=float(fig_height)*(width/float(fig_width))
             y+=height_adj+ymargin
         else:
@@ -902,7 +902,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
 
     # page trim 
-    if cobj.page_trim == "on" :
+    if cobj.page_trim :
         args_page_trim=["convert", out_fig, "-trim", out_fig]
         comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         comm2.wait()
