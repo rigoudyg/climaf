@@ -55,10 +55,10 @@ def capply_script (script_name, *operands, **parameters):
         raise Climaf_Driver_Error("Script %s is not know. Consider declaring it "
                                   "with function 'cscript'", script_name)
     script=operators.scripts[script_name]
-    if len(operands) != script.inputs_number() : 
-        raise Climaf_Driver_Error("Operator %s is "
-                                  "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
-                script_name,script.inputs_number(),len(operands), script_name ))
+    # if len(operands) != script.inputs_number() : 
+    #     raise Climaf_Driver_Error("Operator %s is "
+    #                               "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
+    #             script_name,script.inputs_number(),len(operands), script_name ))
     #
     # Check that all parameters to the call are expected by the script 
     for para in parameters :
@@ -331,18 +331,23 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     template=Template(script.command)
 
     # Evaluate input data 
-    dict_invalues=dict()
+    invalues=[]
     sizes=[]
     for op in scriptCall.operands :
-        inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
-                      recurse_list=recurse_list)
-        if inValue is None or inValue is "" :
-            raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
+        if op :
+            inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
+                          recurse_list=recurse_list)
+            if inValue is None or inValue is "" :
+                raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
                                       %(scriptCall.script,`op`))
-        if isinstance(inValue,list) : size=len(inValue)
-        else : size=1
+            if isinstance(inValue,list) : size=len(inValue)
+            else : size=1
+        else:
+            inValue=''
+            size=0
         sizes.append(size)
-        dict_invalues[op]=inValue
+        invalues.append(inValue)
+    #print("len(invalues)=%d"%len(invalues))
     #
     # Replace input data placeholders with filenames
     subdict=dict()
@@ -350,7 +355,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if 0 in script.inputs :
         label,multiple,serie=script.inputs[0]
         op=scriptCall.operands[0]
-        infile=dict_invalues[op]
+        #print("processing 0, op=%s"%`op`)
+        infile=invalues[0]
         if not all(map(os.path.exists,infile.split(" "))) :
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
@@ -372,18 +378,22 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                         %(scriptCall.script,0,`op`))
             #subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
             subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
-        per=timePeriod(op)
-        if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
-            subdict["period"]=str(per)
-            subdict["period_iso"]=per.iso()
+        if op : 
+            per=timePeriod(op)
+            if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
+                subdict["period"]=str(per)
+                subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
             subdict["domain"]=domainOf(op)
     i=0
     for op in scriptCall.operands :
-        opscrs += op.crs+" - "
-        infile=dict_invalues[op]
-        if not all(map(os.path.exists,infile.split(" "))) :
-            raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
+        if op : opscrs += op.crs+" - "
+        #print("processing %s, i=%d"%(`op`,i))
+        infile=invalues[i]
+        if infile is not '' and \
+                not all(map(os.path.exists,infile.split(" "))) :
+            raise Climaf_Driver_Error("Internal error : some input file "
+                                      "does not exist among %s:"%(infile))
         i+=1
         if ( i> 1 or 1 in script.inputs) :
             label,multiple,serie=script.inputs[i]
@@ -393,16 +403,17 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
                 if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                       "," not in varOf(op):
+                        "," not in varOf(op):
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
                     subdict["var_%d"%i]=filevar
-		if units : subdict["units_%d"%i]=units 
-		if missing : subdict["missing_%d"%i]=missing
-            # Provide period selection if script allows for
-            per=timePeriod(op)
-            if not per.fx and per != "":
-                subdict["period_%d"%i]=str(per)
-                subdict["period_iso_%d"%i]=per.iso()
+                if units : subdict["units_%d"%i]=units 
+                if missing : subdict["missing_%d"%i]=missing
+                # Provide period selection if script allows for
+            if op :
+                per=timePeriod(op)
+                if not per.fx and per != "":
+                    subdict["period_%d"%i]=str(per)
+                    subdict["period_iso_%d"%i]=per.iso()
             subdict["domain_%d"%i]=domainOf(op)
     clogger.debug("subdict for operands is "+`subdict`)
     # substitution is deffered after scriptcall parameters evaluation, which may
@@ -572,6 +583,7 @@ def domainOf(cobject) :
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
         return domainOf(cobject.members[0])
+    elif cobject is None : return "none"
     else : clogger.error("Unkown class for argument "+`cobject`)
                   
 
@@ -592,6 +604,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
+    elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
                   

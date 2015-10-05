@@ -17,8 +17,9 @@ Installing (or using an installed version, at CNRM or IPSL)
   - ``~ssenesi/climaf`` on Ciclad
 
 
-- Installing CliMAF, if necessary, is quick, through only a few commands, using CliMAF GitHub
-  repository; this will also copy some data allowing for testing the installation and for running a few examples
+- Installing CliMAF, if necessary, is quick, through only a few commands, using `CliMAF GitHub
+  repository <https://github.com/senesis/climaf>`_ ; this will also
+  copy some data allowing for testing the installation and for running a few examples
 
   - first check the listed :ref:`requirements` ;
 

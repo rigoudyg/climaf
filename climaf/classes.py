@@ -337,7 +337,15 @@ class cdataset(cobject):
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
-        if (self.frequency=='seasonal') : self.period.fx=True
+        # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
+        if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
+            self.period.fx=True
+        freqs_dic=frequencies.get(self.project,None)
+        #print freqs_dic
+        if freqs_dic :
+            for k in freqs_dic :
+                if freqs_dic[k]==self.frequency and k=='annual_cycle' :
+                    self.period.fx=True
         #
         self.kvp=attval
         self.alias=varIsAliased(self.project,self.variable)
@@ -621,7 +629,7 @@ class ctree(cobject):
             if isinstance(p,cperiod) : parameters["period"]=`p`
         self.parameters=parameters
         for o in operands :
-            if not isinstance(o,cobject) :
+            if o and not isinstance(o,cobject) :
                 raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
@@ -637,9 +645,10 @@ class ctree(cobject):
         #
         ops=[ o for o in self.operands ]
         for op in ops :
-            opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
-            if crsrewrite : opcrs=crsrewrite(opcrs)
-            rep+= opcrs + ","
+            if op :
+                opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
+                if crsrewrite : opcrs=crsrewrite(opcrs)
+                rep+= opcrs + ","
         #
         clefs=self.parameters.keys()
         clefs.sort()
@@ -753,7 +762,7 @@ def cfreqs(project,dic) :
     ``normalized`` frequency values to project-specific frequency values
 
     Normalized frequency values are : 
-      decadal, yearly, monthly, daily, 6h, 3h, fx
+      decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
