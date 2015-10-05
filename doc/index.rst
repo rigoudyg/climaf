@@ -6,10 +6,18 @@
 CliMAF - a Climate Model Assessment Framework
 ========================================================
 
+Quick links : :ref:`news <news>` , :ref:`table of contents <contents>`,
+:ref:`functions <API>`, :ref:`standard operators
+<standard_operators>`, :ref:`howto <howto>`
+
 Welcome
 -------
 
-CliMAF is an `Open Source software <http://en.wikipedia.org/wiki/Open-source_software>`_ , distributed with a GPL-compatible licence. See :doc:`the licence notice <license>` 
+CliMAF is an `Open Source software
+<http://en.wikipedia.org/wiki/Open-source_software>`_, distributed
+with a GPL-compatible licence. See :doc:`the licence notice
+<license>`. 
+It is available at  `CliMAF GitHub repository <https://github.com/senesis/climaf>`_
 
 The aim of CliMAF is to allow for an actual, **easy, collaborative development of climate model outputs assessment suites by climate scientists with varied IT background**, and to ultimately share such suites for the benefit of the Climate Science. 
 
@@ -17,7 +25,7 @@ The aim of CliMAF is to allow for an actual, **easy, collaborative development o
 So, CliMAF can be described as :
 
 - an aid for handling access to common climate
-  simulations and re-analysis datafiles, and to to personnal data
+  simulations and re-analysis datafiles, and to personnal data
   files, in a uniform way
 - a wrapper which provides you with uniform, handy, combination and caching
   features around :
@@ -36,7 +44,7 @@ Description
 CliMAF is basically a Python-scriptable way to process NetCDF `CF compliant <http://cfconventions.org/>`_ climate model outputs which allows:
 
 - to almost *forget about accessing input data* : you refer to
-  'variables' in 'experiments', CliMAF knows a bunch of data
+  'variables' in 'simulations', CliMAF knows a bunch of data
   organization schemes, you just quote some root locations, usually in
   configuration files ; [ under development : data can also be on the
   `ESGF <http://esgf.llnl.gov/>`_ ] 

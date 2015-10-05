@@ -17,12 +17,13 @@ Installing (or using an installed version, at CNRM or IPSL)
   - ``~ssenesi/climaf`` on Ciclad
 
 
-- Installing CliMAF, if necessary, is quick, through only a few commands, using CliMAF GitHub
-  repository; this will also copy some data allowing for testing the installation and for running a few examples
+- Installing CliMAF, if necessary, is quick, through only a few commands, using `CliMAF GitHub
+  repository <https://github.com/senesis/climaf>`_ ; this will also
+  copy some data allowing for testing the installation and for running a few examples
 
   - first check the listed :ref:`requirements` ;
 
-  - execute :: 
+  - execute:: 
 
      cd some_installation_dir
      git clone https://github.com/senesis/climaf climaf
@@ -30,9 +31,15 @@ Installing (or using an installed version, at CNRM or IPSL)
      export PYTHONPATH=$PYTHONPATH:$(pwd)
      cd testing
      ./test_install.sh 
+
+
   
     and check the output of last command. Contact 'climaf at meteo dot
     fr' in case of problem at that stage
+
+   - for getting the development version, you may rather execute::
+
+      git clone -b dev https://github.com/senesis/climaf climaf
 
 
 .. _configuring:
@@ -50,6 +57,9 @@ Configuring CliMAF
    verbosity level on stderr (resp. on file climaf.log); defaults to
    'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
 
+ - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will automatic fix  CNRM’s Nemo old data time_axis issues. This adresses the wrong time coordinate variable t_ave_01month and t_ave_00086400. This will add processing cost
+
+
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
   functions; this will be executed at the end of climaf import; the code 
   must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not
@@ -62,6 +72,14 @@ Configuring CliMAF
 
     $ module load python/2.7.5 nco ncview ncl
 
+  - On some systems, if CDO fails at allocating memory, you may have
+    to put e.g. in your ~/.bash_profile::
+
+    $ ulimit -s unlimited 
+
+    in csh::
+
+    $ unlimit stacksize
 
 .. _running_inter:
 
@@ -162,7 +180,7 @@ In that case:
 
    >>> avg=climaf.operators.time_average(ds)
 
-- the same applies for macros, mutatis mutandis  ::
+- the same applies for macros, *mutatis mutandis*  ::
 
    >>> avg=climaf.macros.my_macro(ds)
 

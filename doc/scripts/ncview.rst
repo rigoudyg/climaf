@@ -1,4 +1,4 @@
-ncview : launch ncview on dataset 
+ncview : launch ncview on a dataset 
 ---------------------------------------
 
 Launch ncview in the background for displaying the dataset

@@ -2,9 +2,11 @@
 Management of CliMAF standard operators
 
 """
+import os
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript
+from climaf.clogging import clogger
 
 scriptpath=cpath[0]+"/../scripts/" 
 
@@ -54,7 +56,8 @@ def load_standard_operators():
     #
     cscript('mean_and_std',
             scriptpath+'mean_and_std.sh ${in} ${var} ${out} ${out_sdev}', 
-            # This tells CliMAF how to name output 'sdev' using input variable name
+            # This tells CliMAF how to compute varname for name output 'sdev' 
+	    # using input varname
             sdev_var="std(%s)" , 
             commuteWithTimeConcatenation=True)
     #
@@ -99,6 +102,7 @@ def load_standard_operators():
     #
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
+            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
+            'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")
 

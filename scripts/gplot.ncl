@@ -39,7 +39,11 @@ begin
   if isfilepresent(infile) then
     ffile=addfile(infile,"r")
     if isfilevar(ffile,var) then 
+<<<<<<< HEAD
       if (getfilevartypes(ffile,var) .eq. "short") then
+=======
+      if (getfilevartypes(ffile,var).eq."short") then
+>>>>>>> refs/remotes/upstream/optinp
         fld = short2flt( ffile->$var$ )
       else
         fld = ffile->$var$

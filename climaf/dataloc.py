@@ -12,6 +12,7 @@ import classes
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
+from operator import itemgetter
 
 locs=[]
 
@@ -131,6 +132,7 @@ def getlocs(project="*",model="*",simulation="*",frequency="*"):
 
 
 def isLocal(project, model, simulation, frequency) :
+    if project=='file' : return True
     ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency) 
     if (len(ofu) == 0 ) : return False
     rep=True
@@ -198,7 +200,7 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for %s, at these "
+            clogger.warning("no file found for %s, at these"
                             "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -252,61 +254,68 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
-    mustHaveVariable=False
-    if "filenameVar" in kwargs and kwargs['filenameVar'] :
-        kwargs['variable']=kwargs['filenameVar']
-        mustHaveVariable=True
+    # a dict and an ordered list of date globbing patterns
+    dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
+    lkeys=dt.keys() ; lkeys.sort(reverse=True)
+    # a dict and an ordered list for matching dates
+    dr=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})")
+    rkeys=dr.keys() ; rkeys.sort(reverse=True)
+    #
     for l in urls :
-        template=Template(l)
-        # There is no use to look for files which path is not specific
-        # to the required variable when we know it should
-        if l.find("${variable}") < 0 and mustHaveVariable :
-            continue
-        #
         # Instantiate keywords in pattern with attributes values
-        template=template.safe_substitute(**kwargs)
+        template=Template(l).safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
-        temp2=template
-        dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
-        for k in dt : temp2=temp2.replace(k,dt[k])
-        clogger.debug("Globbing on : "+temp2)
+        temp2=template ; 
+        for k in lkeys : temp2=temp2.replace(k,dt[k])
         lfiles=glob.glob(temp2)
+        clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
-        # Analyze all filenames
+        # If unsuccessful using varname, try with filenameVar
+        if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
+            kwargs['variable']=kwargs['filenameVar']
+            template=Template(l).safe_substitute(**kwargs)
+            temp2=template
+            for k in lkeys : temp2=temp2.replace(k,dt[k])
+            #
+            lfiles=glob.glob(temp2)
+            clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
+
+        # Construct regexp for extracting dates from filename
+        regexp=None
+        #print "template before searching dates : "+template
+        for key in rkeys :
+            #print "searchin "+key+" in "+=Template(l)
+            start=template.find(key)
+            if (start>=0 ) :
+                #print "found "+key
+                regexp=template.replace(key,dr[key],1)
+                hasEnd=False
+                start=regexp.find(key)
+                if (start >=0 ) :
+                    hasEnd=True
+                    regexp=regexp.replace(key,dr[key],1)
+                break
+        #print "regexp before searching dates : "+regexp
+        #
         for f in lfiles :
-            # print "looking at file"+f
-            # Construct regexp for extracting dates from filename
-            dt=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})",
-                    YYYYMMDD="([0-9]{10})")
-            regexp=None
-            # print "template before searching dates : "+template
-            lkeys=dt.keys() ; lkeys.sort(reverse=True)
-            for key in lkeys :
-                # print "searchin "+key+" in "+template
-                start=template.find(key)
-                if (start>=0 ) :
-                    # print "found "+key
-                    regexp=template.replace(key,dt[key],1)
-                    hasEnd=False
-                    start=regexp.find(key) 
-                    if (start >=0 ) :
-                        hasEnd=True
-                        regexp=regexp.replace(key,dt[key],1)
-                    break
+            #print "processing file "+f
             #
             # Analyze file time period
             fperiod=None
             if regexp :
-                regexp=regexp.replace("*",".*").replace("?",r".")
-                # print "regexp for extracting dates : "+regexp
-                start=re.sub(regexp,r'\1',f)
+                regexp0=regexp.replace("*",".*").replace("?",r".")
+                #print "regexp for extracting dates : "+regexp
+                start=re.sub(regexp0,r'\1',f)
+                if start==f:
+                    raise Climaf_Data_Error("Start period not found") #? LV
                 if hasEnd :
-                    end=re.sub(regexp,r'\2',f)
+                    end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
                 else :
                     fperiod=init_period(start)
+                #print "period for file %s is %s"%(f,fperiod)
                 #
                 # Filter file time period against required period
             else :
@@ -319,10 +328,21 @@ def selectGenericFiles(urls, **kwargs):
                     rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 # Filter against variable 
-                if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
-                    # Should check time period in the file if not regexp
-                    # print "appending "+f
+                if (l.find("${variable}")>=0):
+                    clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
+                    continue
+                if f not in rep and ( fileHasVar(f,variable) or ("," in variable)):
+                    # Should check time period in the file if not regexp
+                    clogger.debug('appending %s based on multi-var or var exists in file '%f)
+                    rep.append(f)
+            else:
+                if not fperiod :
+                    clogger.debug('not appending %s because period is None '%f)
+                else:
+                    if not period.intersects(fperiod) :
+                        clogger.debug('not appending %s because period doesn t intersect %s'%(f,period))
+
     return rep
 
 
@@ -366,7 +386,7 @@ def selectEmFiles(**kwargs) :
                         if fileHasVar(dir+"/"+fil,variable) :
                             rep.append(dir+"/"+fil)
                     #clogger.debug("Done with Looking at file "+fil)
-            else : clogger.error("Directory %s does not exist for EM simulation %s, realm %s "
+            else : clogger.error("Directory %s does not exist for simulation %s, realm %s "
                                  "and frequency %s"%(dir,simulation,realm,f))
         else :
             clogger.info("No archive location found for "+
@@ -426,10 +446,13 @@ def selectExampleFiles(urls,**kwargs) :
                         
 
 def selectCmip5DrsFiles(urls, **kwargs) :
-    # example for path : CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
+    # example for path : CMIP5/[output1/]CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
+    #
     # second path segment can be any string (allows for : output,output1, merge...), 
     # but if 'merge' exists, it is used alone
+    # This segment ca also be empty
+    #
     # If version is 'last', tries provide version from directory 'last' if available,
     # otherwise those of last dir
     project=kwargs['project']
@@ -449,12 +472,14 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
-        pattern1=l+"/"+project+"/merge"
-        if not os.path.exists(pattern1) : pattern1=l+"/"+project+"/*"
-        patternv=pattern1+"/*/"+model+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
+        totry=['merge/','output/','output?/','']
+        for p in totry :
+            pattern1=l+"/"+project+"/"+p+"*/"+model # one * for modelling center
+            if len(glob.glob(pattern1))>0 : break
+        patternv=pattern1+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
-        #print "looking at "+patternv+ " gives:" +`ldirs`
+        clogger.debug("Globbing with "+patternv+ " gives:" +`ldirs`)
         for repert in ldirs :
             lversions=os.listdir(repert)
             lversions.sort()

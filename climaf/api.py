@@ -15,6 +15,8 @@ Main functions are :
 
  - ``ds``      : define a dataset object (actually a front-end for ``cdataset``)
 
+ - ``fds``     : define a dataset object from a single file
+
  - ``eds``     : define an ensemble dataset object (actually a front-end for ``cens``)
 
  - ``derive``  : define a variable as computed from other variables
@@ -68,11 +70,11 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,calias,aliases,cpage,cfreqs,cens,eds
+from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
+from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport,calias
 from dataloc   import dataloc 
-from operators import cscript, scripts as cscripts, derive, operators
+from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
 from clogging  import clogger, clog, clog_file
 from site_settings import atCNRM, onCiclad

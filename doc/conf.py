@@ -14,6 +14,7 @@
 
 import sys
 import os
+import os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -36,12 +37,12 @@ extensions = [
     ,'sphinx.ext.viewcode'
     ]
 
-from climaf.site_settings import atCNRM,onCiclad
-if atCNRM or onCiclad :
-    #This one works at CNRM 
-    extensions.append('sphinxcontrib.napoleon')
-else:
-    extensions.append('sphinx.ext.napoleon') #this one works at RTD
+#from climaf.site_settings import atCNRM,onCiclad
+#if atCNRM or onCiclad :
+#This one works at CNRM , Ciclad and RTD
+extensions.append('sphinxcontrib.napoleon')
+#else:
+# extensions.append('sphinx.ext.napoleon') #this one works at RTD
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -65,7 +66,7 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 #
 # The short X.Y version.
 from climaf import version
-#version = '0.8'
+#version = '0.10'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -116,14 +117,27 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 html_theme = 'default'
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    rtd_theme=False
+    if rtd_theme :
+        import sphinx_rtd_theme
+        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+        html_theme = 'default'
+    else:
+        html_theme = 'nature'
+else:
+    html_theme = 'nature'
+    # Add any paths that contain custom themes here, relative to this directory.
+    #html_theme_path = []
+
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #html_theme_options = {}
 
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -144,7 +158,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -364,9 +378,4 @@ intersphinx_mapping = {'python': ('https://docs.python.org/2', None)}
 
 autoclass_content="init"
 
-# import os
-# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-# if on_rtd:
-#     html_theme = 'default'
-# else:
-#     html_theme = 'nature'
+

@@ -32,6 +32,12 @@ eds : define an ensemble of datasets
 
 .. autofunction:: climaf.classes.eds
 
+fds : define a dataset from a data file 
+---------------------------------------------------
+
+.. autofunction:: climaf.classes.fds
+
+
 cproject : declare a new project and its non-standard attributes/facets
 --------------------------------------------------------------------------
 
@@ -42,7 +48,7 @@ cprojects : dictionary of known projects
 
 .. autodata:: climaf.classes.cprojects
 
-dataloc : describe data locations for a series of experiments
+dataloc : describe data locations for a series of simulations
 --------------------------------------------------------------------------
 
 .. autoclass:: climaf.dataloc.dataloc

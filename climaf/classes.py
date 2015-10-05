@@ -7,11 +7,12 @@
  """
 # Created : S.Senesi - 2014
 
-import re, string, copy
+import re, string, copy, os.path
 
 import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
+from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -55,7 +56,7 @@ class cproject():
 
         For instance, cproject CMIP5, after its Data Reference Syntax, 
         has attributes : 
-        experiment, model, rip (here called simulation), variable, frequency, realm, table, version
+        model, simulation (used for rip), experiment, variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
@@ -86,7 +87,7 @@ class cproject():
         however of lower priority than the value set using :py:func:`cdef`
 
         A project can be declared as having non-standard variable
-        names, or variables that should undergo re-scaling; see
+        names in datafiles, or variables that should undergo re-scaling; see
         :py:func:`~climaf.classes.calias`
 
         A project can be declared as having non-standard frequency names (this is 
@@ -111,6 +112,8 @@ class cproject():
         self.separator="."
         if "separator" in kwargs : self.separator=kwargs['separator']
         if "sep"       in kwargs : self.separator=kwargs['sep']
+        if self.separator=="," :
+            raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
@@ -228,8 +231,7 @@ def processDatasetArgs(**kwargs) :
                         "You cannot use character '%s' when setting '%s=%s' because "
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
-        #print "initalizing facet %s with value"%(facet,val)
-    #
+            #print "initalizing facet %s with value"%(facet,val)
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
         if ( attval['table']=='fx' or attval['period']=='fx' or 
@@ -334,9 +336,23 @@ class cdataset(cobject):
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
+        # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
+        if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
+            self.period.fx=True
+        freqs_dic=frequencies.get(self.project,None)
+        #print freqs_dic
+        if freqs_dic :
+            for k in freqs_dic :
+                if freqs_dic[k]==self.frequency and k=='annual_cycle' :
+                    self.period.fx=True
         #
         self.kvp=attval
-        self.alias=varIsAliased(self.project,self.variable) 
+        self.alias=varIsAliased(self.project,self.variable)
+        #
+        if ("," in self.variable and self.alias) :
+            filevar,scale,offset,units,filenameVar,missing=self.alias
+            if (filevar != self.variable or scale != 1. or offset != 0 or missing ) :
+                raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
         # 
@@ -393,6 +409,8 @@ class cdataset(cobject):
         return(True) 
 
     def hasExactVariable(self):
+        # Assume that group variable do not need aliasing
+        if ("," in self.variable) : return True
         clogger.debug("always returns False, yet - TBD")
         return(False) 
     
@@ -405,7 +423,7 @@ class cdataset(cobject):
         """ Returns the list of (local) files which include the data for the dataset
         Use cached value unless called with arg force=True
         """
-        if force or self.files is None :
+        if (force and self.project != 'file') or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
@@ -498,7 +516,7 @@ def eds(**kwargs):
     """
     Create a dataset ensemble using the same calling sequence as
     :py:func:`~climaf.classes.cdataset`, except that one of the facets
-    is a list, for defining the nsemble members; this facet must be among
+    is a list, for defining the ensemble members; this facet must be among
     the facets authorized for ensemble in the (single) project involved
 
     Example::
@@ -533,6 +551,67 @@ def eds(**kwargs):
         labels.append(member)
     return cens(labels,*members)
 
+def fds(filename, simulation=None, variable=None, period=None, model=None) :
+    """
+    fds stands for FileDataSet; it allows to create a dataset simply
+    by providing a filename and optionally a simulation name , a
+    variable name, a period and a model name.
+
+    For dataset attributes which are not provided, these defaults apply :
+
+    - simulation : the filename basename
+    - variable : the set of variables in the data file
+    - period : the period actually covered by the data file (if it has time_bnds)
+    - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
+    - project  : 'file' (with separator = '|')
+
+    The following restriction apply to such datasets :
+
+    - functions :py:func:`~climaf.classes.calias` and 
+      :py:func:`~climaf.operators.derive` cannot be used for project 
+      'file'
+    
+    Results are unforeseen if all variables do not have the same time axis
+    
+    Examples : See :download:`data_file.py <../examples/data_file.py>`
+    
+    """
+    filename=os.path.expanduser(filename)
+    if not os.path.exists(filename): 
+        raise Climaf_Classes_Error("File %s does no exist"%filename)
+    #
+    if model is None : model=model_id(filename)
+    if simulation is None : simulation=os.path.basename(filename)
+    #
+    if variable is None :
+        lvars=varsOfFile(filename)
+        if len(lvars)==0 : 
+            raise Climaf_Classes_Error("No variable in file %s"%filename)
+        variable=lvars.pop()
+        for v in lvars : variable+=","+v
+    else :
+        lvars=variable.split(',')
+        for v in lvars :
+            if not fileHasVar(filename,v) :
+                raise Climaf_Classes_Error("No variable %s in file %s"%(v,filename))
+    #
+    fperiod=timeLimits(filename)
+    if period is None :
+        if fperiod is None :
+            raise Climaf_Classes_Error("Must provide a period for file %s "\
+                                           %(filename))
+        else :
+            period=`fperiod`
+    else :
+        if fperiod and not fperiod.includes(init_period(period)) :
+            raise Climaf_Classes_Error("Max period from file %s is %s"\
+                                           %(filename,`fperiod`))
+    #
+    d=ds(project='file', model=model, simulation=simulation, 
+         variable=variable, period=period, path=filename)
+    d.files=filename
+    return d
+
 
 class ctree(cobject):
     def __init__(self, climaf_operator, script, *operands, **parameters ) :
@@ -549,7 +628,7 @@ class ctree(cobject):
             if isinstance(p,cperiod) : parameters["period"]=`p`
         self.parameters=parameters
         for o in operands :
-            if not isinstance(o,cobject) :
+            if o and not isinstance(o,cobject) :
                 raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
@@ -565,9 +644,10 @@ class ctree(cobject):
         #
         ops=[ o for o in self.operands ]
         for op in ops :
-            opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
-            if crsrewrite : opcrs=crsrewrite(opcrs)
-            rep+= opcrs + ","
+            if op :
+                opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
+                if crsrewrite : opcrs=crsrewrite(opcrs)
+                rep+= opcrs + ","
         #
         clefs=self.parameters.keys()
         clefs.sort()
@@ -633,7 +713,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
                    [ compare_trees(op1,op2,func,filter_on_operator) 
                      for op1,op2 in zip(tree1.operands, tree2.operands) ]))
     elif isinstance(tree1,scriptChild) and isinstance(tree2,scriptChild):
-        if tree1.name==tree2.name :
+        if tree1.varname==tree2.varname :
             return compare_trees(tree1.father,tree2.father,
                                  func,filter_on_operator)
 
@@ -651,9 +731,6 @@ def ds(*args,**kwargs) :
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
-    # Note : muts be kept phased with self.crs defined in 
-    # cdataset.init(), both for
-    # function name and CRS syntax
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
@@ -672,7 +749,11 @@ def ds(*args,**kwargs) :
         e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
         raise Climaf_Classes_Error(e)
         return None
-    else : return results[0]
+    else : 
+        rep=results[0]
+        if rep.project=='file' : 
+            rep.files=rep.kvp["path"]
+        return rep
 
 def cfreqs(project,dic) :
     """ 
@@ -680,7 +761,7 @@ def cfreqs(project,dic) :
     ``normalized`` frequency values to project-specific frequency values
 
     Normalized frequency values are : 
-      decadal, yearly, monthly, daily, 6h, 3h, fx
+      decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
@@ -698,20 +779,27 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
 
-    Also allows to tell which variable name should be used when computing the
-    filename for this variable in this project (for optimisation
-    purpose);
+    Arg ``filenameVar`` allows to tell which fake variable name should be
+    used when computing the filename for this variable in this project
+    (for optimisation purpose);
 
-    And that a given constant must be interpreted as a missing value
+    Can tell that a given constant must be interpreted as a missing value
 
     ``variable`` may be a list. In that case, ``fileVariable`` and
     ``filenameVar``, if provided, should be parallel lists
+
+    `` variable`` can be a comma separated list of variables, in which
+    case this tells how variables are grouped in files (it make sense
+    to use filenameVar in that case, as this is a xway to provide the
+    label which is unique to this grouping of variable; scale, offset
+    and missing args must be the same for all variables in that case
 
     Example ::
     
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
+    >>> calias('NEMO','so,thetao',filenameVar='grid_T_table2.2')
     
     """
     if not fileVariable : fileVariable = variable
@@ -766,7 +854,7 @@ class cpage(cobject):
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
-          >>> fig=plotmap(tas_avg,crs='title')
+          >>> fig=plot(tas_avg,crs='title')
           >>> my_page=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
 
         
@@ -835,8 +923,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^"
-                    r",",r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

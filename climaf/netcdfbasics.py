@@ -1,44 +1,52 @@
 import re
 
-from climaf.clogging import clogger
+from climaf.clogging import clogger, dedent
+from climaf.period import cperiod
+
+class Climaf_Netcdf_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
+
 
 def varOfFile(filename) :
+    lvars=varsOfFile(filename)
+    if len(lvars) > 1 :
+        clogger.debug("Got multiple variables (%s) and "
+                      "no direction to choose  - File is %s" %\
+                          (`lvars`,filename))
+        return(None)
+    if len(lvars)==1 : return lvars[0]
+
+def varsOfFile(filename) :
     """ 
-    returns the name of the unique non-dimension variable in
-    NetCDF file FILENAME, or None if it is not unique
+    returns the list of non-dimensions variable in NetCDF file FILENAME
     """
-    from Scientific.IO.NetCDF import NetCDFFile as ncf
-    varname=None
-    fileobj=ncf(filename)
-    #import NetCDF4
-    #fileobj=netCDF4.Dataset(filename)
+    from anynetcdf import ncf
+    lvars=[]
+    fileobj=ncf(filename, 'r') 
     for filevar in fileobj.variables :
         if ((filevar not in fileobj.dimensions) and
+            not re.findall("^lat",filevar) and
+            not re.findall("^lon",filevar) and
             not re.findall("^time_",filevar) and
             not re.findall("_bnds$",filevar) ):
-            if varname is None : 
-                varname=filevar
-            else :
-                clogger.debug("Got at least two variables (%s and %s) "
-                                  "and no direction to choose  - File is %s"%\
-                                  (varname,filevar,filename))
-                return(None)
+            lvars.append(filevar)
     fileobj.close()
-    return(varname)
+    return(lvars)
 
 
 def fileHasVar(filename,varname):
     """ 
     returns True if FILENAME has variable VARNAME
     """
-    from Scientific.IO.NetCDF import NetCDFFile as ncf
+    from anynetcdf import ncf
     rep=False
     clogger.debug("opening "+filename)
-    try :
-        fileobj=ncf(filename)
-    except:
-        clogger.error("Issue opening file "+filename)
-        return False
+    fileobj=ncf(filename)
     for filevar in fileobj.variables :
         if filevar == varname :
             rep=True
@@ -46,3 +54,35 @@ def fileHasVar(filename,varname):
     fileobj.close()
     return(rep)
 
+def model_id(filename):
+    """ 
+
+    """
+    from anynetcdf import ncf
+    rep='no_model'
+    clogger.debug("opening "+filename)
+    f=ncf(filename, 'r') 
+    if 'model_id' in dir(f) : rep=f.model_id
+    f.close()
+    return(rep)
+    
+def timeLimits(filename) :
+    #
+    try :
+        import netcdftime
+    except :
+        raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
+    #
+    from anynetcdf import ncf
+    f=ncf(filename) 
+    if 'time_bnds' in f.variables :
+        tim=f.variables['time_bnds']
+        start=tim[0,0] ; end=tim[-1,1] 
+        ct=netcdftime.utime(tim.units, calendar=tim.calendar)
+        f.close()
+        return cperiod(ct.num2date(start),ct.num2date(end))
+    else:
+        f.close()
+        return None
+    #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
+        

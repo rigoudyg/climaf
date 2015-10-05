@@ -1,8 +1,10 @@
 .. _news:
 
 ------------
-Whats' new
+What is new
 ------------
+
+Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
 
 .. |indx| image:: html_index.png 
   :scale: 13%
@@ -11,45 +13,125 @@ Whats' new
 
 Changes, newest first :
 
+.. _news_0.10:
+
+- 2015/09/23 - Version 0.10 :
+
+ - Interface to Drakkar CDFTools: a number of
+   operators now come in two versions : one accepting multi-variable
+   inputs, and one accepting only mono-variable inputs (with an 'm' suffix)
+   
+ - Multi-variable datasets are managed. This is handy for cases where
+   variables are grouped in a file. See an example in :
+   :download:`cdftransport.py <../examples/cdftransport.py>` , where 
+   variable 'products' is assigned
+
+ - Package :py:mod:`climaf.html` has been re-designed : simpler
+   function names (:py:func:`~climaf.html.fline()`, 
+   :py:func:`~climaf.html.flines()`, addition of basic function
+   :py:func:`~climaf.html.line()` for creating a simple links line ;
+   improve doc
+
+ - New function :py:func:`~climaf.classes.fds()` allows to define simply 
+   a dataset from a single data file. See example in 
+   :download:`data_file.py <../examples/data_file.py>`
+
+
+.. _news_0.9:
+
+- 2015/09/08 - Version 0.9 :
+
+ - Operator 'lines' is smarter re.time axis: (see
+   :doc:`scripts/lines`):
+
+   - Tick marks are smartly adapted to the time period duration. 
+   - When datasets does not cover the same time period, the user can
+     choose wether time axis will be aligned to the same origin or
+     just be the union of all time periods 
+
+ - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
+   cdfsections, cdfstd, cdfvT; you need to have a patched version of
+   Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
+   : :download:`cdftransport.py <../examples/cdftransport.py>` and 
+   :download:`cdftools.py <../examples/cdftools.py>` 
+   
+ - CliMAF can provide fixed fields to operators, which path may
+   depend on project and simulation of operator first operand 
+   (see  :py:func:`~climaf.operators.fixed_fields()`)
+
+ - Fixes :
+ 
+  - datasets of type 'short' are correctly read
+  - operator s secondary output objects have their 'variable' attribute 
+    duly renamed, according to the name declared for it when using 
+    :py:func:`~climaf.operators.cscript()` 
+
 .. _news_0.8:
 
-- 2015/07/08 - Version 0.8 :
+- 2015/08/27 - Version 0.8 :
 
+ - Basics
 
- - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
-   facet/attribute 'experiment' was renamed 'simulation'**. It is used
-   it for hosting either CMIP5's facet/attribute 'rip', or for 'EXPID'
-   at CNRM, or for JobName at IPSL. All 'projects' and
-   examples have been changed accordingly. A facet 'experiment' was
-   added to project CMIP5 (for hosting the 'CMIP5 controlled' experiment name)
- - Package climaf.html allows to **easily create an html index**, which includes
-   tables of links (or thumbnails) to image files; iterating on
-   e.g. seasons and variables is handled by CliMAF. See :
+  - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
+    facet/attribute 'experiment' was renamed 'simulation'**. It is
+    used for hosting either CMIP5 facet/attribute 'rip', or for
+    'EXPID' at CNRM, or for JobName at IPSL. All 'projects' and
+    examples, and this documentation too, have been changed
+    accordingly. Please upgrade to this version if you want a
+    consistent documentation. A facet named 'experiment' was added to
+    project CMIP5 (for hosting the 'CMIP5-controlled-vocabulary'
+    experiment name, as e.g. 'historical').
+  - **default values for facets** are now handled on a per-project
+    basis. See :py:func:`~climaf.classes.cdef()` and
+    :py:class:`~climaf.classes.cdataset()`. 
+  - Binary ``climaf`` can be used as a **back end** in your scripts,
+    feeding it with a string argument. See :ref:`backend`
 
-   - a screen_dump for such an index : |indx| 
-   - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
-   - the package documentation : :py:mod:`climaf.html`
- - Binary ``climaf`` can be used as a **back end** in your scripts,
-   feeding it with a string argument. See :ref:`backend`
- - Function :py:func:`~climaf.driver.cfile` can create **hard links** :
-   the same datafile will (or inode) exists with two filenames (one in
-   CliMAF cache, one which is yours), while disk usage is counted only
-   for one datafile; you may remove any of the two file(name)s
-   as you want, without disturbing accessing the data with the other filename.
- - When creating a symlink between a CliMAF cache file and another
-   filename with function :py:func:`~climaf.driver.cfile` : **the
-   symlink source file is now 'your' filename**; hence, no risk that some
-   CliMAF command does erase it 'in your back'; and CliMAf will nicely
-   handle broken symlinks, when you erase 'your' files
- - **default values for facets** are now handled on a per-project
-   basis. See :py:func:`~climaf.classes.cdef()` and
-   :py:class:`~climaf.classes.cdataset()`. 
- - scripts argument 'labels' now uses '$' as a separator
- - fixes :
+ - Outputs and rendering
 
-  - check that no dataset attribute include the separator defined for
-    corresponding project
-  - fix issues at startup when reading cache index
+  - Package :py:mod:`climaf.html` allows to **easily create an html index**, 
+    which includes tables of links (or thumbnails) to image files; iterating on
+    two axes (e.g. seasons and variables) is handled by CliMAF. See :
+    
+    - a screen_dump for such an index : |indx| 
+    - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
+    - the package documentation : :py:mod:`climaf.html`
+  - Function :py:func:`~climaf.driver.cfile` can create **hard
+    links** : the same datafile (actually : the samer inode) will
+    exists with two filenames (one in CliMAF cache, one which is
+    yours), while disk usage is counted only for one datafile; you may
+    remove any of the two file(name)s as you want, without disturbing
+    accessing the data with the other filename.
+  - When creating a symlink between a CliMAF cache file and another
+    filename with function :py:func:`~climaf.driver.cfile` : **the
+    symlink source file is now 'your' filename**; hence, no risk that some
+    CliMAF command does erase it 'in your back'; and CliMAf will nicely
+    handle broken symlinks, when you erase 'your' files
+
+ - Inputs
+
+  - climatology files, which have a somewhat intricated time axis
+    (e.g. monthly averages over a 10 year period) can now be handled
+    with CliMAF regular time axis management, on the fly, by modifying 
+    the basic data selection script: it can
+    enforce a reference time axis by intepreting the data
+    filename. This works e.g. for IPSLs averaged annual-cycle
+    datafiles. If needed, you may change function timefix() near line 
+    30 in :download:`mcdo.sh <../scripts/mcdo.sh>` 
+  - automatic fix of CNRM Nemo old data time_axis issues, provided you
+    set environment variable CLIMAF_FIX_NEMO_TIME to anything but
+    'no'. This will add processing cost. This adresses the wrong time
+    coordinate variable t_ave_01month and t_ave_00086400
+  - speed-up datafiles scanning, incl. for transitory data organization
+    during simulation run with libIGCM
+
+ - fixes and minor changes:
+
+   - check that no dataset attribute include the separator defined for
+     corresponding project
+   - fix issues at startup when reading cache index
+   - rename an argument for operator 'plot' : domain -> focus
+   - scripts argument 'labels' now uses '$' as a separator
 
 .. _news_0.7:
 
@@ -112,7 +194,7 @@ Changes, newest first :
    replacement at :doc:`scripts/plot` )
  - **A number of 'projects' are built-in**, which describe data
    organization and data location for a number of analyses and
-   experiments datasets available at one of our data centers, 
+   simulations datasets available at one of our data centers, 
    as e.g. CMIP5, OBS4MIPS, OCMPI5, EM, ...) ; see :ref:`known_datasets` 
  - **Variable alias** and **variable scaling** are now managed, on a
    per-project basis. 
@@ -151,7 +233,7 @@ Changes, newest first :
     examples in :download:`data_generic.py
     <../examples/data_generic.py>`).
   - Access to fixed fields is now possible, and fixed fields may be
-    specific to a given experiment. . See examples in
+    specific to a given simulation. . See examples in
     :download:`data_generic.py <../examples/data_generic.py>`  
     and :download:`data_cmip5drs.py <../examples/data_cmip5drs.py>`        
     

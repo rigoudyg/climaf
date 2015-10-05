@@ -23,10 +23,20 @@ with the same name
 
 .. autoclass:: climaf.operators.cscript
 
+fixed_fields : when operators need auxilliray data fields (e.g. grid, mesh, mask)
+-----------------------------------------------------------------------------------
+
+And you may need to tell how an operator will receive some fixed fields
+'behind the curtain' (in addition to the datasets, which are provided
+as arguments)
+
+.. autofunction:: climaf.operators.fixed_fields
+
+
 cmacro : define a macro  
 -----------------------------------------
 
-.. autofunction:: climaf.cmacros.cmacro
+.. autofunction:: climaf.cmacro.macro
 
 cens : define an ensemble of objects
 ---------------------------------------------------

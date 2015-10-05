@@ -44,7 +44,8 @@ class scriptFlags():
 
 class cscript():
     def __init__(self,name, command, format="nc", canOpendap=False, 
-                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False, **kwargs):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
+                 canSelectVar=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
@@ -284,7 +285,7 @@ class cscript():
         for p in kwargs : 
             if re.match(pattern,p):
                 outvarnames[re.findall(pattern,p)[0]]=kwargs[p]
-        #clogger.debug("outvarnames = "+`outvarnames`)
+        clogger.debug("outvarnames for script %s = %s"%(name,`outvarnames`))
         #
         # Analyze outputs names , associated variable names 
         # (or format strings), and store it in attribute dict 'outputs' 
@@ -296,12 +297,13 @@ class cscript():
                 if (outname in outvarnames) : 
                     self.outputs[outname]=outvarnames[outname]
                 else :
-                    self.outputs[outname]=outname
+                    self.outputs[outname]="%s"#outname
             else:
-                self.outputs[None]="%s"
+                self.outputs[None]=outvarnames.get('',"%s")
+                self.outputs['']=outvarnames.get('',"%s")
         #clogger.debug("outputs = "+`self.outputs`)
         #
-        canSelectVar= (command.find("${var}") > 0 )
+        canSelectVar= canSelectVar or (command.find("${var}") > 0 )
         canAggregateTime=(command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
         canAlias= (command.find("${alias}") > 0 )
         canMissing= (command.find("${missing}") > 0 )
@@ -314,6 +316,7 @@ class cscript():
         #
         self.name=name
         self.command=command
+        self.fixedfields=None #LV
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\
@@ -356,6 +359,38 @@ class cscript():
             if e != old : ls.append(e)
             old=e
         return(len(ls))
+    
+        
+def fixed_fields(operator, *paths):
+    """
+    Declare than an operator (or a list of) needs fixed fields. CliMAF will
+    provide them to the operator through symbolic links at execution time
+
+    Parameters:
+      operator (string of list of strings) : name of the CliMAF operator.
+      paths (couples) : a number of couples composed of the filename as expected
+        by the operator
+        and a path for the data; the path  may uses placeholders : ${model}, ${project}
+        and ${simulation}, which will be replaced by the corresponding facet
+        values for the first operand.
+
+    Returns:
+      None
+
+    Example:
+       >>> fixed_fields('ccdftransport',
+        ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
+        ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
+
+    """
+    if not isinstance(operator,list):
+        namelist=[operator]
+    else:
+        namelist=operator
+        
+    for name_op in namelist:
+        scripts[name_op].fixedfields=paths
+
 
 class coperator():
     def __init__(self,op, command, canOpendap=False, canSelectVar=False, 
