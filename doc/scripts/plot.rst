@@ -124,8 +124,8 @@ Vectors:
 **Required file** If rotation is set to 1, file 'angles.nc' must be
 made available to the script: use function fixed_fields() for that
 (see example below). For an example of this file and the script which
-creates this file: see :download:`angle_ORCA1.nc
-<../../tools/angle_ORCA1.nc>` and :download:`angle.ncl
+creates this file: see :download:`angle_EM.nc
+<../../tools/angle_EM.nc>` and :download:`angle.ncl
 <../../tools/angle.ncl>`  
 
 **Outputs** :
@@ -143,7 +143,7 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # Extraction of 'tos' sub box for auxiliary field
      >>> sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> # How to get required file for rotate vectors from model grid on geographic grid
-     >>> fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angles.nc'))
+     >>> fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
     
      >>> # A Map of one field and vectors, with contours lines follow color filled contours and rotation of vectors on geographic grid
      >>> plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors', 

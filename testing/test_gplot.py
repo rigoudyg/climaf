@@ -43,9 +43,8 @@ duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", 
 dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") 
 tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="199807", realm="O")
 
-tpath='/data/climaf/${project}/${model}/'
 fixed_fields('plot',
-             ('angles.nc',tpath+'angles.nc'))
+             ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
 
 map_vect1=plot(tos, None, duo, dvo, title='SST without rotation of vectors on NEMO grid', vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 cshow(map_vect1)
@@ -87,9 +86,8 @@ dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", 
 tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="199807", realm="O")
 sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'tos' sub box for auxiliary field
 
-tpath='/data/climaf/${project}/${model}/'
 fixed_fields('plot',
-             ('angles.nc',tpath+'angles.nc'))
+             ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
 
 map_vect6=plot(tos, sub_tos, duo, dvo, title='SST: 2 fields + vectors', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 cshow(map_vect6)
