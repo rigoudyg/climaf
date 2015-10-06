@@ -13,10 +13,22 @@ number of graphic attributes
 **Inputs** (in the order of CliMAF call):
 
   - a dataset for main field which can be up to 4-dimensional
-          
-Warning: Order of data dimensions is supposed to be time, height, lat,
-lon. Only first time step is used. Only the first vertical dimension
-is used if the two other dimensions are not degenerated.  
+
+Additional fields (optional):
+
+  - a dataset for auxiliary field which can be up to 4-dimensional
+  - 2 datasets for the vector plot which can be up to 4-dimensional
+
+Warnings: 
+
+- Order of all data dimensions is supposed to be time, height, lat,
+  lon. Only first time step is used. Only the first vertical dimension
+  is used if the two other dimensions are not degenerated.   
+
+- Order of inputs is supposed to be main field, auxiliary field and
+  vectors datasets. For additional fields, if one or several optional
+  datasets are not used, set None instead of dataset; unless it is
+  about one or several last fields.   
 
 **Mandatory arguments**: None (but ``title`` is recommended)
 
@@ -37,17 +49,6 @@ General:
     "NH","SH60"...
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
-
-Additional fields:
-
-  - ``aux`` : a dataset for auxiliary field which can be up to
-    4-dimensional
-  - ``u, v`` : 2 datasets for the vector plot which can be up to
-    4-dimensional
-
-Warning: Order of data dimensions is supposed to be time, height, lat,
-lon. Only first time step is used. Only the first vertical dimension
-is used if the two other dimensions are not degenerated.  
 
 Main field:
 
@@ -130,72 +131,72 @@ creates this file: see :download:`angle_ORCA1.nc
 **Outputs** :
   - main output : a PNG figure
 
-**Climaf call example** For more examples, see :download:`gplot.py <../../examples/gplot.py>`    
+**Climaf call example** For more examples which are systematically
+tested, see :download:`gplot.py <../../examples/gplot.py>` and
+:download:`test_gplot.py <../../testing/test_gplot.py>`    
  
   - A map ::
 
      >>> duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
      >>> dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") 
      >>> tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="199807", realm="O")
-     >>> sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'tos' sub box for auxiliary field
+     >>> # Extraction of 'tos' sub box for auxiliary field
+     >>> sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> # How to get required file for rotate vectors from model grid on geographic grid
      >>> fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angle_ORCA1.nc'))
     
-     >>> plot_map=plot(tos, u=duo, v=dvo, title='A Map which contours lines follow color filled contours', contours=1, 
-     ... rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) # rotation of vectors on geographic grid
-     >>> cshow(plot_map)
+     >>> # A Map of one field and vectors, with contours lines follow color filled contours and rotation of vectors on geographic grid
+     >>> plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors', 
+     ... contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) 
+     >>> cshow(plot_map1)
 
-     >>> plot_map2=plot(tos, u=duo, v=dvo, title='A Map which contours lines don t follow color filled contours', contours='1 3 5 7 9 11 13', 
-     ... proj='NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) # rotation of vectors on geographic grid
-     >>> cshow(plot_map2)
+     >>> # A Map of one field and vectors, with contours lines don t follow color filled contours and rotation of vectors on geographic grid
+     >>> plot_map2=plot(tos, None, duo, dvo, title='1 field (user control contours) + vectors', contours='1 3 5 7 9 11 13', 
+     ... proj='NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 
-     >>> plot_map3=plot(tos, aux=sub_tos, u=duo, v=dvo, title='SST: 2 fields + vectors', contours='0 2 4 6 8 10 12 14 16',
-     ... rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) # contours lines of auxiliary field are explicit levels,
-     ... # rotation of vectors on geographic grid
-     >>> cshow(plot_map3)
+     >>> # A Map of two fields and vectors, with explicit contours levels for auxiliary field and rotation of vectors on geographic grid
+     >>> plot_map3=plot(tos, sub_tos, duo, dvo, title='2 fields (user control auxiliary field contours) + vectors', contours='0 2 4 6 8 10 12 14 16',
+     ... rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) 
 
-     >>> plot_map4=plot_2fields(tos, aux=sub_tos, u=duo, v=dvo, title='SST: 2 fields + vectors, proj=NH', rotation=1, vcRefLengthF=0.002,
-     ... vcRefMagnitudeF=0.02, vcMinDistanceF=0.01, vcLineArrowColor="yellow", proj="NH") # contours lines of auxiliary field are automatic levels,
-     ... # rotation of vectors on geographic grid
-     >>> cshow(plot_map4)
+     >>> # A Map of two fields and vectors, with automatic contours levels for auxiliary field and rotation of vectors on geographic grid
+     >>> plot_map4=plot(tos, sub_tos, duo, dvo, title='2 fields (automatic contours levels for auxiliary field) + vectors', 
+     ... proj="NH", rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, vcMinDistanceF=0.01, vcLineArrowColor="yellow") 
 
   - A cross-section ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
-     >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
+     >>> # Extraction of 'january_ta' sub box for auxiliary field
+     >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 
-     >>> plot_cross=plot(ta_zonal_mean,title='A cross-section without contours lines') # by default, vertical cross-sections 
-     ... # in pressure coordinates will have a logarithmic scale
-     >>> cshow(plot_cross)
+     >>> # A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale (default)
+     >>> plot_cross1=plot(ta_zonal_mean,title='1 field cross-section without contours lines')
+     >>> cshow(plot_cross1)
 
-     >>> plot_cross2=plot(ta_zonal_mean, contours=1, title='A cross-section which contours lines follow color filled contours')
-     >>> cshow(plot_cross2)
+     >>> # A cross-section of one field, which contours lines follow color filled contours
+     >>> plot_cross2=plot(ta_zonal_mean, contours=1, title='1 field (contours lines follow color filled contours)')
 
-     >>> plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
-     >>> cshow(plot_cross3)
+     >>> # A cross-section of one field, which contours lines don t follow color filled contours
+     >>> plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='1 field (user control contours)')
 
-     >>> plot_cross4=plot(ta_zonal_mean, aux=ta_zonal_mean2, contours="240 245 250", 
-     ... title='A cross-section which contours lines of auxiliary field are explicit levels') # 2 fields, logarithmic scale
-     >>> cshow(plot_cross4)
+     >>> # A cross-section of two fields, with explicit contours levels for auxiliary field
+     >>> plot_cross4=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='2 fields (user control auxiliary field contours)') 
 
-     >>> plot_cross5=plot(ta_zonal_mean, aux=ta_zonal_mean2, linp=-1, title='A cross-section which contours lines of auxiliary field are automatic levels')
-     ... # vertical axis will have a pressure-linear spacing
-     >>> cshow(plot_cross5)
-
+     >>> # A cross-section of two fields, with automatic contours levels for auxiliary field and a pressure-linear spacing for vertical axis 
+     >>> plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='2 fields (automatic contours levels for auxiliary field)')
+     
   - A profile ::
 
      >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")
      >>> ta_profile2=ccdo(ta_zonal_mean2,operator="mermean")
 
-     >>> plot_profile1=plot(ta_profile, title='A profile') # by default, vertical profiles 
-     ... #in pressure coordinates will have a logarithmic scale
+     >>> # One profile, with a logarithmic scale (default)
+     >>> plot_profile1=plot(ta_profile, title='A profile')
      >>> cshow(plot_profile1)
-
-     >>> plot_profile2=plot(ta_profile, aux=ta_profile2, title='Two profiles', linp=1) # 2 fields, 
-     ... # vertical axis will have a index-linear spacing
-     >>> cshow(plot_profile2)
+ 
+     >>> # Two profiles, with a index-linear spacing for vertical axis
+     >>> plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', linp=1)
 
 **Side effects** : None
 

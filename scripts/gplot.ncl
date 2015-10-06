@@ -22,13 +22,17 @@ begin
   ;---------------------------------------------------------
 
   AUX_FIELD=False
-  if (isvar("infile2")) then  
-    AUX_FIELD=True
+  if (isvar("aux_file")) then
+    if (aux_file .ne. "") then  
+      AUX_FIELD=True
+    end if
   end if
 
   VECT=False
-  if (isvar("infile3") .and. isvar("infile4")) then  
-    VECT=True
+  if (isvar("u_file") .and. isvar("v_file")) then  
+    if (u_file .ne. "" .and. v_file .ne. "") then
+      VECT=True
+    end if
   end if
   
   ;-----------------
@@ -36,24 +40,20 @@ begin
   ;-----------------
 
   ; Reading the main field and its unit, setting REDU, and scaling the field
-  if isfilepresent(infile) then
-    ffile=addfile(infile,"r")
-    if isfilevar(ffile,var) then 
-<<<<<<< HEAD
-      if (getfilevartypes(ffile,var) .eq. "short") then
-=======
-      if (getfilevartypes(ffile,var).eq."short") then
->>>>>>> refs/remotes/upstream/optinp
-        fld = short2flt( ffile->$var$ )
+  if isfilepresent(main_file) then
+    ffile=addfile(main_file,"r")
+    if isfilevar(ffile,main_var) then 
+      if (getfilevartypes(ffile,main_var) .eq. "short") then
+        fld = short2flt( ffile->$main_var$ )
       else
-        fld = ffile->$var$
+        fld = ffile->$main_var$
       end if
     else
-      print("File "+infile+" does not include variable "+var)
+      print("File "+main_file+" does not include variable "+main_var)
       status_exit(1)
     end if
   else
-    print("File "+infile+" cannot be accessed")
+    print("File "+main_file+" cannot be accessed")
     status_exit(2)
   end if
 
@@ -213,20 +213,20 @@ begin
   if (AUX_FIELD) then
 
     ; Reading the auxiliary field 
-    if isfilepresent(infile2) then
-      ffile2=addfile(infile2,"r")
-      if isfilevar(ffile2,var2) then 
-        if (getfilevartypes(ffile2,var2) .eq. "short") then
-          fld2 = short2flt( ffile2->$var2$ )
+    if isfilepresent(aux_file) then
+      ffile2=addfile(aux_file,"r")
+      if isfilevar(ffile2,aux_var) then 
+        if (getfilevartypes(ffile2,aux_var) .eq. "short") then
+          fld2 = short2flt( ffile2->$aux_var$ )
         else
-          fld2 = ffile2->$var2$
+          fld2 = ffile2->$aux_var$
         end if
       else
-        print("File "+infile2+" does not include variable "+var2)
+        print("File "+aux_file+" does not include variable "+aux_var)
         status_exit(1)
       end if
     else
-      print("File "+infile2+" cannot be accessed")
+      print("File "+aux_file+" cannot be accessed")
       status_exit(2)
     end if
   
@@ -321,37 +321,37 @@ begin
   if VECT then
 
     ; Reading vector fields 
-    if isfilepresent(infile3) then
-      ffile3=addfile(infile3,"r")
-      if isfilevar(ffile3,var3) then 
-        if (getfilevartypes(ffile3,var3) .eq. "short") then
-          fld3 = short2flt( ffile3->$var3$ )
+    if isfilepresent(u_file) then
+      ffile3=addfile(u_file,"r")
+      if isfilevar(ffile3,u_var) then 
+        if (getfilevartypes(ffile3,u_var) .eq. "short") then
+          fld3 = short2flt( ffile3->$u_var$ )
         else
-          fld3 = ffile3->$var3$
+          fld3 = ffile3->$u_var$
         end if
       else
-        print("File "+infile3+" does not include variable "+var3)
+        print("File "+u_file+" does not include variable "+u_var)
         status_exit(1)
       end if
     else
-      print("File "+infile3+" cannot be accessed")
+      print("File "+u_file+" cannot be accessed")
       status_exit(2)
     end if
 
-    if isfilepresent(infile4) then
-      ffile4=addfile(infile4,"r")
-      if isfilevar(ffile4,var4) then 
-        if (getfilevartypes(ffile4,var4) .eq. "short") then
-          fld4 = short2flt( ffile4->$var4$ )
+    if isfilepresent(v_file) then
+      ffile4=addfile(v_file,"r")
+      if isfilevar(ffile4,v_var) then 
+        if (getfilevartypes(ffile4,v_var) .eq. "short") then
+          fld4 = short2flt( ffile4->$v_var$ )
         else
-          fld4 = ffile4->$var4$
+          fld4 = ffile4->$v_var$
         end if
       else
-        print("File "+infile4+" does not include variable "+var4)
+        print("File "+v_file+" does not include variable "+v_var)
         status_exit(1)
       end if
     else
-      print("File "+infile4+" cannot be accessed")
+      print("File "+v_file+" cannot be accessed")
       status_exit(2)
     end if
 

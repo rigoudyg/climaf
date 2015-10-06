@@ -67,32 +67,12 @@ def load_standard_operators():
     cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
             'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
     #
-#    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
-#            'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-#            'var=\'\"${var}\"\' title=\'\"${title}\"\' scale=${scale} offset=${offset} '
-#            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
-#            ' proj=\'\"${proj}\"\' contours=${contours} focus=\'\"${focus}\"\' && '
-#            'convert ${out} -trim ${out}) ', format="png")
+    # plot: main field (main_file) + auxiliary field (aux_file, optional) + vectors (u_file & v_file, optionals)
     #
-    # plot : plot only main field + vectors    
-    #
-    cscript('plot'     , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' '
-            'infile3=\'\"${in_2}\"\' infile4=\'\"${in_3}\"\' rotation=${rotation} '
+    cscript('plot'  , '(ncl -Q '+ scriptpath +'gplot.ncl main_file=\'\"${in}\"\' aux_file=\'\"${in_2}\"\' '
+            'u_file=\'\"${in_3}\"\' v_file=\'\"${in_4}\"\' rotation=${rotation} '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' var3=\'\"${var_2}\"\' var4=\'\"${var_3}\"\' '
-            'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
-            'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
-            'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
-            'convert ${out} -trim ${out}) ', format="png")
-    #
-    # plot_2fields: main field + auxiliary field + vectors 
-    #
-    cscript('plot_2fields'  , '(ncl -Q '+ scriptpath +'gplot.ncl infile=\'\"${in}\"\' infile2=\'\"${in_2}\"\' '
-            'infile3=\'\"${in_3}\"\' infile4=\'\"${in_4}\"\' rotation=${rotation} '
-            'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
-            'var=\'\"${var}\"\' var2=\'\"${var_2}\"\' var3=\'\"${var_3}\"\' var4=\'\"${var_4}\"\' '
+            'main_var=\'\"${var}\"\' aux_var=\'\"${var_2}\"\' u_var=\'\"${var_3}\"\' v_var=\'\"${var_4}\"\' '
             'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
