@@ -143,7 +143,7 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # Extraction of 'tos' sub box for auxiliary field
      >>> sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> # How to get required file for rotate vectors from model grid on geographic grid
-     >>> fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angle_ORCA1.nc'))
+     >>> fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angles.nc'))
     
      >>> # A Map of one field and vectors, with contours lines follow color filled contours and rotation of vectors on geographic grid
      >>> plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors', 

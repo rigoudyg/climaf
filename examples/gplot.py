@@ -15,7 +15,7 @@ duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", 
 dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
 # How to get required file for rotate vectors from model grid on geographic grid
-fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angle_ORCA1.nc'))
+fixed_fields('plot', ('angles.nc','/data/climaf/${project}/${model}/angles.nc'))
 
 # A Map of one field and vectors, with contours lines follow color filled contours, rotation of vectors on geographic grid
 # and with default projection (a cylindrical equidistant)
