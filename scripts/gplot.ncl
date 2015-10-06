@@ -453,6 +453,9 @@ begin
         y=fld4
         fld3= x * new_gcosu - y * new_gsinu
         fld4= x * new_gsinv + y * new_gcosv
+      else
+        print("File angles.nc cannot be accessed")
+        status_exit(2)
       end if
     end if
     
