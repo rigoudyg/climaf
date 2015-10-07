@@ -8,9 +8,11 @@
 
 set -x
 
-in_u=$1 ; shift
-in_v=$1 ; shift
-in_T=$1 ; shift
+in_1=$1 ; shift
+in_2=$1 ; shift
+in_3=$1 ; shift
+in_4=$1 ; shift 
+in_5=$1 ; shift
 larf=$1 ; shift 
 lorf=$1 ; shift 
 Nsec=$1 ; shift 
@@ -29,7 +31,11 @@ out_sig1=$1 ; shift
 out_sig2=$1 ; shift
 out_sig4=$1 ; shift
 
-cdfsections ${in_u} ${in_v} ${in_T} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${more_points}
+tmp_file=$(mktemp /tmp/tmp_file.XXXXXX)
+
+cdo merge ${in_1} ${in_2} ${in_3} $tmp_file
+
+cdfsections ${in_4} ${in_5} $tmp_file ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} ${more_points}
 
 cdo selname,Uorth section.nc ${out}
 cdo selname,Utang section.nc ${out_Utang}
@@ -40,4 +46,4 @@ cdo selname,sig1 section.nc ${out_sig1}
 cdo selname,sig2 section.nc ${out_sig2}
 cdo selname,sig4 section.nc ${out_sig4}
 
-rm -f section.nc 
+rm -f section.nc $tmp_file

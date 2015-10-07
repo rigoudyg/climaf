@@ -17,8 +17,9 @@ Installing (or using an installed version, at CNRM or IPSL)
   - ``~ssenesi/climaf`` on Ciclad
 
 
-- Installing CliMAF, if necessary, is quick, through only a few commands, using CliMAF GitHub
-  repository; this will also copy some data allowing for testing the installation and for running a few examples
+- Installing CliMAF, if necessary, is quick, through only a few commands, using `CliMAF GitHub
+  repository <https://github.com/senesis/climaf>`_ ; this will also
+  copy some data allowing for testing the installation and for running a few examples
 
   - first check the listed :ref:`requirements` ;
 
@@ -95,7 +96,7 @@ files); then, you can either :
 
   - set your PATH e.g. in your ``~/.profile`` file::
 
-    $ export PATH=$PATH:<some_installation_dir>/climaf/bin
+    $ export PATH=$PATH:<some_installation_dir>/bin
 
   - and then launch CliMAF ::
 
@@ -105,14 +106,14 @@ files); then, you can either :
 
   - you may of course also directly type ::  
 
-    $ <some_installation_dir>/climaf/bin/climaf
+    $ <some_installation_dir>/bin/climaf
 
 
 - or import ``climaf.api.*`` in your python environment :
 
   - set your PYTHONPATH , e.g. in your ``~/.profile`` file::
 
-    $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
+    $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/
 
   - type ::
 
@@ -132,7 +133,7 @@ Please see also : :ref:`examples`
 Using CliMAF as a back end in your scripts 
 --------------------------------------------
 
-Binary ``climaf`` described above (and located in ``<some_installation_dir>/climaf/bin``) can
+Binary ``climaf`` described above (and located in ``<some_installation_dir>/bin``) can
 be used with a string argument which is a series of valid CliMAF
 commands. It will then run silently in the background (up to the point
 where an error occurs) and may be used e.g. to get the filename for a

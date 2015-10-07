@@ -7,11 +7,13 @@
  """
 # Created : S.Senesi - 2014
 
-import re, string, copy
+import re, string, copy, os.path
 
 import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
+from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
+from decimal import Decimal
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -230,8 +232,7 @@ def processDatasetArgs(**kwargs) :
                         "You cannot use character '%s' when setting '%s=%s' because "
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
-        #print "initalizing facet %s with value"%(facet,val)
-    #
+            #print "initalizing facet %s with value"%(facet,val)
     # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
         if ( attval['table']=='fx' or attval['period']=='fx' or 
@@ -336,6 +337,15 @@ class cdataset(cobject):
         #
         self.model    =attval.get('model',"*")
         self.frequency=attval.get('frequency',"*")
+        # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
+        if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
+            self.period.fx=True
+        freqs_dic=frequencies.get(self.project,None)
+        #print freqs_dic
+        if freqs_dic :
+            for k in freqs_dic :
+                if freqs_dic[k]==self.frequency and k=='annual_cycle' :
+                    self.period.fx=True
         #
         self.kvp=attval
         self.alias=varIsAliased(self.project,self.variable)
@@ -414,7 +424,7 @@ class cdataset(cobject):
         """ Returns the list of (local) files which include the data for the dataset
         Use cached value unless called with arg force=True
         """
-        if force or self.files is None :
+        if (force and self.project != 'file') or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
@@ -476,7 +486,7 @@ class cens(cobject):
         >>> ds1980=ds(period="1980")
         >>> ds1981=ds(period="1981")
         >>> #
-        >>> cens(['1980',1981'],ds1980,ds1981)
+        >>> cens(['1980','1981'],ds1980,ds1981)
         >>> ncview(cens)  # will launch ncview once per member
         
         """
@@ -542,6 +552,67 @@ def eds(**kwargs):
         labels.append(member)
     return cens(labels,*members)
 
+def fds(filename, simulation=None, variable=None, period=None, model=None) :
+    """
+    fds stands for FileDataSet; it allows to create a dataset simply
+    by providing a filename and optionally a simulation name , a
+    variable name, a period and a model name.
+
+    For dataset attributes which are not provided, these defaults apply :
+
+    - simulation : the filename basename
+    - variable : the set of variables in the data file
+    - period : the period actually covered by the data file (if it has time_bnds)
+    - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
+    - project  : 'file' (with separator = '|')
+
+    The following restriction apply to such datasets :
+
+    - functions :py:func:`~climaf.classes.calias` and 
+      :py:func:`~climaf.operators.derive` cannot be used for project 
+      'file'
+    
+    Results are unforeseen if all variables do not have the same time axis
+    
+    Examples : See :download:`data_file.py <../examples/data_file.py>`
+    
+    """
+    filename=os.path.expanduser(filename)
+    if not os.path.exists(filename): 
+        raise Climaf_Classes_Error("File %s does no exist"%filename)
+    #
+    if model is None : model=model_id(filename)
+    if simulation is None : simulation=os.path.basename(filename)
+    #
+    if variable is None :
+        lvars=varsOfFile(filename)
+        if len(lvars)==0 : 
+            raise Climaf_Classes_Error("No variable in file %s"%filename)
+        variable=lvars.pop()
+        for v in lvars : variable+=","+v
+    else :
+        lvars=variable.split(',')
+        for v in lvars :
+            if not fileHasVar(filename,v) :
+                raise Climaf_Classes_Error("No variable %s in file %s"%(v,filename))
+    #
+    fperiod=timeLimits(filename)
+    if period is None :
+        if fperiod is None :
+            raise Climaf_Classes_Error("Must provide a period for file %s "\
+                                           %(filename))
+        else :
+            period=`fperiod`
+    else :
+        if fperiod and not fperiod.includes(init_period(period)) :
+            raise Climaf_Classes_Error("Max period from file %s is %s"\
+                                           %(filename,`fperiod`))
+    #
+    d=ds(project='file', model=model, simulation=simulation, 
+         variable=variable, period=period, path=filename)
+    d.files=filename
+    return d
+
 
 class ctree(cobject):
     def __init__(self, climaf_operator, script, *operands, **parameters ) :
@@ -558,7 +629,7 @@ class ctree(cobject):
             if isinstance(p,cperiod) : parameters["period"]=`p`
         self.parameters=parameters
         for o in operands :
-            if not isinstance(o,cobject) :
+            if o and not isinstance(o,cobject) :
                 raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
@@ -574,9 +645,10 @@ class ctree(cobject):
         #
         ops=[ o for o in self.operands ]
         for op in ops :
-            opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
-            if crsrewrite : opcrs=crsrewrite(opcrs)
-            rep+= opcrs + ","
+            if op :
+                opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
+                if crsrewrite : opcrs=crsrewrite(opcrs)
+                rep+= opcrs + ","
         #
         clefs=self.parameters.keys()
         clefs.sort()
@@ -660,9 +732,6 @@ def ds(*args,**kwargs) :
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
-    # Note : muts be kept phased with self.crs defined in 
-    # cdataset.init(), both for
-    # function name and CRS syntax
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
@@ -681,7 +750,11 @@ def ds(*args,**kwargs) :
         e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
         raise Climaf_Classes_Error(e)
         return None
-    else : return results[0]
+    else : 
+        rep=results[0]
+        if rep.project=='file' : 
+            rep.files=rep.kvp["path"]
+        return rep
 
 def cfreqs(project,dic) :
     """ 
@@ -689,7 +762,7 @@ def cfreqs(project,dic) :
     ``normalized`` frequency values to project-specific frequency values
 
     Normalized frequency values are : 
-      decadal, yearly, monthly, daily, 6h, 3h, fx
+      decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
@@ -711,16 +784,23 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     used when computing the filename for this variable in this project
     (for optimisation purpose);
 
-    And that a given constant must be interpreted as a missing value
+    Can tell that a given constant must be interpreted as a missing value
 
     ``variable`` may be a list. In that case, ``fileVariable`` and
     ``filenameVar``, if provided, should be parallel lists
+
+    `` variable`` can be a comma separated list of variables, in which
+    case this tells how variables are grouped in files (it make sense
+    to use filenameVar in that case, as this is a xway to provide the
+    label which is unique to this grouping of variable; scale, offset
+    and missing args must be the same for all variables in that case
 
     Example ::
     
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
+    >>> calias('NEMO','so,thetao',filenameVar='grid_T_table2.2')
     
     """
     if not fileVariable : fileVariable = variable
@@ -756,46 +836,65 @@ def cmissing(project,missing,*kwargs) :
 
 
 class cpage(cobject):
-    def __init__(self, widths=None, heights=None, 
-                 fig_lines=None, orientation="portrait"):
+    def __init__(self, fig_lines=None, widths=None, heights=None, 
+                  orientation="portrait", fig_trim=False, page_trim=False):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
         Args:
-         widths (list): the list of figure widths, i.e. the width 
-           of each column
-         heights (list): the list of figure heights, i.e. the height 
-           of each line
-         fig_line (a list of lists of figure objects): each sublist 
-          of 'fig_lines' represents a line of figures
+         fig_line (a list of lists of figure objects or an ensemble of
+           figure objects): each sublist of 'fig_lines' represents a
+           line of figures
+         widths (list, optional): the list of figure widths, i.e. the
+           width of each column. By default, if fig_line is:
+             - a list of lists:  spacing is even
+             - an ensemble:  one column is used
+         heights (list, optional): the list of figure heights, i.e. the
+           height of each line. By default  spacing is even
          orientation (str, optional): page's orientation, either 'portrait' 
-          (default) or 'landscape'
+           (default) or 'landscape'
+         fig_trim (str, optional): to turn on/off triming for all figures.
+           It removes all the surrounding extra space of figures in the page,
+           either False (default) or True
+         page_trim (str, optional): to turn on/off triming for the page. It
+           removes all the surrounding extra space of the page, either False
+           (default) or True
 
         Example:
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
-          >>> fig=plot(tas_avg,crs='title')
-          >>> my_page=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
+          >>> fig=plot(tas_avg,title='title')
+          >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
+          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=True, page_trim=True)
 
         
         """
-        if not widths : widths=[1.]
-        self.widths=widths
-        if not heights : heights=[1.]
-        self.heights=heights
-        self.orientation=orientation
-        if not self.widths :
-            raise Climaf_Classes_Error("widths must be provided")
-        if not self.heights :
-            raise Climaf_Classes_Error("heights must be provided")
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
+       
+        self.orientation=orientation
+        self.fig_trim=fig_trim
+        self.page_trim=page_trim
+
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
                 "fig_lines must be an ensemble or a list "
                 "of lists (each representing a line of figures)")
         if isinstance(fig_lines,list) :
+            if not widths :
+                widths=[]
+                for line in fig_lines:
+                    if len(line)!=len(fig_lines[0]):
+                        raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
+                for column in fig_lines[0]: widths.append(round(1./len(fig_lines[0]),2))
+            self.widths=widths
+
+            if not heights :
+                heights=[]
+                for line in fig_lines: heights.append(round(1./len(fig_lines),2))
+            self.heights=heights
+
             if len(fig_lines)!=len(self.heights) :
                 raise Climaf_Classes_Error(
                     "fig_lines must have same size than heights")
@@ -810,27 +909,38 @@ class cpage(cobject):
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
             figs=list(fig_lines.members)
+
+            if not widths: widths=[1.]
+            self.widths=widths
+            if not heights :
+                heights=[]
+                for memb in figs: heights.append(round(1./len(figs),2))
+            self.heights=heights
+            
             self.fig_lines=[]
             for l in heights :
                 line=[]
                 for c in widths :
                     if len(figs) > 0 : line.append(figs.pop(0))
                     else : line.append(None)
+                              
                 self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
-        
+               
     def buildcrs(self,crsrewrite=None,period=None):
-        rep="cpage("+`self.widths`+","+`self.heights`+",["
+        rep="cpage(["
         for line in self.fig_lines :
             rep+="["
             for f in line :
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="], orientation='"+self.orientation+"')"
+        rep+="],"+`self.widths`+","+`self.heights`+",orientation='"+self.orientation+\
+              "', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
+        
         return rep
 
         
@@ -844,8 +954,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
-                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'Â£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'Â§',r'/',r'.',r'Ã¸',r'+',r'Â°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

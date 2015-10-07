@@ -42,7 +42,7 @@ multiplot=plot(ens, title='tas')
 cshow(multiplot)
 
 # Assemble all plots in a page and display it
-page=cpage([1],[0.5,0.5],multiplot)
+page=cpage(multiplot)
 cshow(page)
 
 # Add a member to an ensemble
@@ -59,4 +59,4 @@ average=ensavg(ens)
 
 # Compute anomalies wrt to ensemble mean
 anomalies=minus(ens,average)
-cshow(cpage([0.5,0.5],[0.5,0.5],plot(anomalies,title='tas')))
+cshow(cpage(plot(anomalies,title='tas')))

@@ -20,12 +20,10 @@ out=$1 ; shift
 out_htrp=$1 ; shift
 out_strp=$1 ; shift
 
-tmp_file=$(mktemp /tmp/tmp_file.XXXXXX)
-
 (echo climaf; echo ${imin},${imax},${jmin},${jmax}; echo EOF) | cdftransport ${opt1} ${in_x} ${in_u} ${in_v} ${opt2}
 
 cdo selname,vtrp climaf_transports.nc ${out}
 cdo selname,htrp climaf_transports.nc ${out_htrp}
 cdo selname,strp climaf_transports.nc ${out_strp}
 
-rm -f climaf_transports.nc $tmp_file section_trp.dat htrp.txt vtrp.txt strp.txt
+rm -f climaf_transports.nc section_trp.dat htrp.txt vtrp.txt strp.txt

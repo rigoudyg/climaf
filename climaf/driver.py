@@ -55,10 +55,10 @@ def capply_script (script_name, *operands, **parameters):
         raise Climaf_Driver_Error("Script %s is not know. Consider declaring it "
                                   "with function 'cscript'", script_name)
     script=operators.scripts[script_name]
-    if len(operands) != script.inputs_number() : 
-        raise Climaf_Driver_Error("Operator %s is "
-                                  "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
-                script_name,script.inputs_number(),len(operands), script_name ))
+    # if len(operands) != script.inputs_number() : 
+    #     raise Climaf_Driver_Error("Operator %s is "
+    #                               "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
+    #             script_name,script.inputs_number(),len(operands), script_name ))
     #
     # Check that all parameters to the call are expected by the script 
     for para in parameters :
@@ -196,8 +196,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 ## return ceval(extract,userflags,format)
                 clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                 extract=capply('select',ds)
-                if extract is None :
-                    raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
+                if extract is None : raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
                 rep=ceval(extract,userflags=userflags,format=format)
                 userflags.unset_selectors()
                 cdedent()
@@ -332,18 +331,23 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     template=Template(script.command)
 
     # Evaluate input data 
-    dict_invalues=dict()
+    invalues=[]
     sizes=[]
     for op in scriptCall.operands :
-        inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
-                      recurse_list=recurse_list)
-        if inValue is None or inValue is "" :
-            raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
+        if op :
+            inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
+                          recurse_list=recurse_list)
+            if inValue is None or inValue is "" :
+                raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
                                       %(scriptCall.script,`op`))
-        if isinstance(inValue,list) : size=len(inValue)
-        else : size=1
+            if isinstance(inValue,list) : size=len(inValue)
+            else : size=1
+        else:
+            inValue=''
+            size=0
         sizes.append(size)
-        dict_invalues[op]=inValue
+        invalues.append(inValue)
+    #print("len(invalues)=%d"%len(invalues))
     #
     # Replace input data placeholders with filenames
     subdict=dict()
@@ -351,7 +355,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if 0 in script.inputs :
         label,multiple,serie=script.inputs[0]
         op=scriptCall.operands[0]
-        infile=dict_invalues[op]
+        #print("processing 0, op=%s"%`op`)
+        infile=invalues[0]
         if not all(map(os.path.exists,infile.split(" "))) :
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
@@ -373,18 +378,22 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                         %(scriptCall.script,0,`op`))
             #subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
             subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
-        per=timePeriod(op)
-        if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
-            subdict["period"]=str(per)
-            subdict["period_iso"]=per.iso()
+        if op : 
+            per=timePeriod(op)
+            if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
+                subdict["period"]=str(per)
+                subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
             subdict["domain"]=domainOf(op)
     i=0
     for op in scriptCall.operands :
-        opscrs += op.crs+" - "
-        infile=dict_invalues[op]
-        if not all(map(os.path.exists,infile.split(" "))) :
-            raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
+        if op : opscrs += op.crs+" - "
+        #print("processing %s, i=%d"%(`op`,i))
+        infile=invalues[i]
+        if infile is not '' and \
+                not all(map(os.path.exists,infile.split(" "))) :
+            raise Climaf_Driver_Error("Internal error : some input file "
+                                      "does not exist among %s:"%(infile))
         i+=1
         if ( i> 1 or 1 in script.inputs) :
             label,multiple,serie=script.inputs[i]
@@ -394,16 +403,17 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
                 if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                       "," not in varOf(op):
+                        "," not in varOf(op):
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
                     subdict["var_%d"%i]=filevar
-		if units : subdict["units_%d"%i]=units 
-		if missing : subdict["missing_%d"%i]=missing
-            # Provide period selection if script allows for
-            per=timePeriod(op)
-            if not per.fx and per != "":
-                subdict["period_%d"%i]=str(per)
-                subdict["period_iso_%d"%i]=per.iso()
+                if units : subdict["units_%d"%i]=units 
+                if missing : subdict["missing_%d"%i]=missing
+                # Provide period selection if script allows for
+            if op :
+                per=timePeriod(op)
+                if not per.fx and per != "":
+                    subdict["period_%d"%i]=str(per)
+                    subdict["period_iso_%d"%i]=per.iso()
             subdict["domain_%d"%i]=domainOf(op)
     clogger.debug("subdict for operands is "+`subdict`)
     # substitution is deffered after scriptcall parameters evaluation, which may
@@ -573,6 +583,7 @@ def domainOf(cobject) :
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
         return domainOf(cobject.members[0])
+    elif cobject is None : return "none"
     else : clogger.error("Unkown class for argument "+`cobject`)
                   
 
@@ -593,6 +604,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
+    elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
                   
@@ -855,7 +867,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
     ymargin=20. # Vertical shift between figures
     #
     usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
-    usable_width =page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
+    usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
     y=y_top_margin
@@ -863,27 +875,68 @@ def cfilePage(cobj, deep, recurse_list=None) :
         # Line height in pixels
         height=usable_height*rheight 
         x=x_left_margin
+        
         for fig, rwidth in zip(line, cobj.widths) :
             # Figure width in pixels
-            width=usable_width*rwidth 
+            width=usable_width*rwidth
             scaling="%dx%d+%d+%d" %(width,height,x,y)
             if fig : 
                 figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
             else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
             args.extend([figfile , "-geometry", scaling, "-composite" ])
-            x+=width+xmargin
-        y+=height+ymargin
+
+            # Real size of figure in pixels: [fig_width x fig_height]
+            args_figsize=["identify", figfile]
+            comm_figsize=subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output_figsize=comm_figsize.stdout.read()
+            figsize=output_figsize.split(" ").pop(2)
+            fig_width=figsize.split("x").pop(0)
+            fig_height=figsize.split("x").pop(1)
+                                       
+            if cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
+                width_adj=float(fig_width)*(height/float(fig_height))
+                x+=width_adj+xmargin
+            else:
+                x+=width+xmargin
+
+        if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
+            height_adj=float(fig_height)*(width/float(fig_width))
+            y+=height_adj+ymargin
+        else:
+            y+=height+ymargin
+            
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
     args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
+
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait()!=0 :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
+
+    # page trim 
+    if cobj.page_trim :
+        args_page_trim=["convert", out_fig, "-trim", out_fig]
+        comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        comm2.wait()
+    
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
+
+def calias(project,variable,**kwargs):
+              
+    if not "," in variable: # mono-variable
+        classes.calias(project=project,variable=variable,**kwargs) 
         
+    else : #multi-variable
+        classes.calias(project=project,variable=variable,**kwargs) 
+        list_variable=variable.split(",")
+        
+        for v in list_variable:
+            operators.derive(project,v,'ccdo',variable,operator='selname,%s'%v)
+            classes.calias(project=project,variable=v,**kwargs) 
+
 
 def CFlongname(varname) :
     """ Returns long_name of variable VARNAME after CF convention 

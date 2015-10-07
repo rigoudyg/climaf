@@ -68,14 +68,15 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,calias,aliases,cpage,cfreqs,cens,eds
+from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport 
+from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport,calias
 from dataloc   import dataloc 
-from operators import cscript, scripts as cscripts, derive, operators, fixed_fields
+from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
 from clogging  import clogger, clog, clog_file
-from site_settings import atCNRM, onCiclad
+from site_settings import atCNRM, onCiclad, atTGCC
+from usual_functions import *
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 

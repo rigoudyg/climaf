@@ -36,7 +36,7 @@ as arguments)
 cmacro : define a macro  
 -----------------------------------------
 
-.. autofunction:: climaf.cmacros.cmacro
+.. autofunction:: climaf.cmacro.macro
 
 cens : define an ensemble of objects
 ---------------------------------------------------

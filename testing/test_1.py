@@ -82,7 +82,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def test_selecting_files(self):
         print `ds`
         my_file=cfile(self.ds); print "myfile = "+my_file
-        expected=climaf.cache.currentCache+'/1b/8.nc'
+        expected=climaf.cache.currentCache+'/9e/2.nc'
         print "expected = "+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
 
@@ -115,7 +115,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
 
     def test_selecting_files(self):
         my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/1b/8.nc'
+        expected=climaf.cache.currentCache+'/9e/2.nc'
         print "actual="+my_file
         print "expected="+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
@@ -132,16 +132,16 @@ class C_OCMIP5_CIclad(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_drs_ocmip5_ciclad"))
         dataloc(project="OCMIP5", organization="generic",
-                url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${experiment}/'
+                url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${simulation}/'
                      '${frequency}/${variable}/${variable}_*_${model}_'
-                     '${experiment}_YYYY-YYYY.nc'])
+                     '${simulation}_YYYY-YYYY.nc'])
         cdef("frequency","mon") ; cdef("project","OCMIP5")
-        cactl=ds(experiment="CTL", model="IPSL-CM4", variable="CACO3", period="1860-1861")
+        cactl=ds(simulation="CTL", model="IPSL-CM4", variable="CACO3", period="1860-1861")
         mfile=cfile(cactl)
         self.file=mfile
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
-        expected=climaf.cache.currentCache+'/f2/9.nc'
+        expected=climaf.cache.currentCache+'/53/c.nc'
         print self.file
         print expected
         self.assertEqual(self.file,expected,'Issue')

@@ -25,15 +25,11 @@ dataloc(project='NEMO', organization='generic', url=[url_nemo_standard,url_nemo_
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("NEMO","uo",filenameVar="grid_U_table2.3")
 calias("NEMO","vo",filenameVar="grid_V_table2.3")
-calias("NEMO","so",filenameVar="grid_T_table2.2")
-calias("NEMO","thetao",filenameVar="grid_T_table2.2")
+calias("NEMO","so,thetao",filenameVar="grid_T_table2.2")
 
 # Declare a special variable, composed of variables grouped in a file
 products="vomevt,vomevs,vozout,vozous"
 calias("NEMO",products,filenameVar="VT")
-
-# How to define a single variable from a multi-variable 
-derive('NEMO','vozovt','ccdo',products,operator='selname,vozovt')
 
 # Define defaults facets for datasets 
 cdef("project","NEMO")
@@ -50,7 +46,6 @@ dx=ds(variable=products)
 # (this can use wildcards ${model}, ${project}, ${simulation})
 tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 fixed_fields('ccdftransport',
-             ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 

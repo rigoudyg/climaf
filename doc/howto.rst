@@ -46,7 +46,12 @@ See examples in the section on data access at :ref:`examples` ; see function :py
 ..get on-line help 
 -------------------
 
-From the Python shell, all relevant CliMAF functions and variables are auto-documented using Python features. Hence, you can :
+If you are reading this text, you have access to the prettier form of
+documentation; consider going back to the front page for getting quick
+links and a top-level table of content. If this does not fit, or if
+you prefer digging the hard way try that : from the Python shell, all
+relevant CliMAF functions and variables are auto-documented using
+stndard Python documentation features. Hence, you can :
 
 - list these functions and variables by::
 
@@ -143,7 +148,7 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
    <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_,
    and follow  :download:`this template <scripts_template.rst>` which
    will render :doc:`e.g. as shows here <scripts_template>` , or for a
-   real example  :doc:`like this <scripts/plotmap>` , but this is not
+   real example  :download:`like this <../scripts/gplot.ncl>` , but this is not
    a firm pre-requisite. Save this text as
    ``<climaf_install_dir>/doc/operators/my_op.rst``. The text may
    describe your diagnostic at length, and should provide all

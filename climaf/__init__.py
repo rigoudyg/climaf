@@ -6,13 +6,14 @@ from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-__all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators" , "projects" ,"cmacro","html"]
+__all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
+          "operators", "period", "standard_operators", "projects", "cmacro", "html", "usual_functions" ]
 
-version="0.8"
+version="0.11"
 
 
-import time
+import time,os
+
 def tim(string=None):
     """
     Utility function : print duration since last call
@@ -27,9 +28,9 @@ def tim(string=None):
         if False : print("Duration %.1f for step %s"%(delta,string),file=sys.stderr)
 
 already_inited=False
+onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if not already_inited  : 
-    import os
+if not already_inited  and not onrtd : 
     import sys
     #
     already_inited=True
@@ -59,7 +60,7 @@ if not already_inited  :
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     exec "from climaf.projects  import *" in sys.modules['__main__'].__dict__
     tim("execs_projects")
-    exec "from climaf.classes   import ds, eds, cens" in sys.modules['__main__'].__dict__
+    exec "from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__
     tim("execs_classes")
     exec "from climaf.operators import cscript" in sys.modules['__main__'].__dict__
     tim("execs_cscript")

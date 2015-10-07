@@ -13,6 +13,30 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.10:
+
+- 2015/09/23 - Version 0.10 :
+
+ - Interface to Drakkar CDFTools: a number of
+   operators now come in two versions : one accepting multi-variable
+   inputs, and one accepting only mono-variable inputs (with an 'm' suffix)
+   
+ - Multi-variable datasets are managed. This is handy for cases where
+   variables are grouped in a file. See an example in :
+   :download:`cdftransport.py <../examples/cdftransport.py>` , where 
+   variable 'products' is assigned
+
+ - Package :py:mod:`climaf.html` has been re-designed : simpler
+   function names (:py:func:`~climaf.html.fline()`, 
+   :py:func:`~climaf.html.flines()`, addition of basic function
+   :py:func:`~climaf.html.line()` for creating a simple links line ;
+   improve doc
+
+ - New function :py:func:`~climaf.classes.fds()` allows to define simply 
+   a dataset from a single data file. See example in 
+   :download:`data_file.py <../examples/data_file.py>`
+
+
 .. _news_0.9:
 
 - 2015/09/08 - Version 0.9 :
