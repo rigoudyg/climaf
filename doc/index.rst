@@ -6,9 +6,8 @@
 CliMAF - a Climate Model Assessment Framework
 ========================================================
 
-Quick links : :ref:`news <news>` , :ref:`table of contents <contents>`,
-:ref:`functions <API>`, :ref:`standard operators
-<standard_operators>`, :ref:`howto <howto>`
+Quick links : :ref:`news <news>` , :ref:`functions <API>`,
+:ref:`standard_operators`, :ref:`howto`, :ref:`examples`,  :ref:`contents`
 
 Welcome
 -------
