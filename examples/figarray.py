@@ -14,13 +14,8 @@ cfile(fig1)
 
 ###########################################################################
 # Define page1 as a figure array
-page1=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33],
-                fig_lines=[[None, fig1],[fig1, fig1],[fig1,fig1]])
+page1=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]], widths=[0.2,0.8],heights=[0.33,0.33,0.33])
 ###########################################################################
-
-# Clear cache value for page1
-cdrop(page1)
-
 # ask for display of page1
 cshow(page1)
 
@@ -49,7 +44,7 @@ ens=cens(['1980','1981'],tas,tas81)
 fig_ens=plot(ens,title="title")
 
 # Trigger computation of fig_ens as a cached file
-cfile(fig_ens)
+#cfile(fig_ens)
 cshow(fig_ens) # will launch cshow once per member
 
 ###########################################################################

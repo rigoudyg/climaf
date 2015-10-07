@@ -929,14 +929,15 @@ class cpage(cobject):
         self.crs=self.buildcrs()
                
     def buildcrs(self,crsrewrite=None,period=None):
-        rep="cpage("+`self.widths`+","+`self.heights`+",["
+        rep="cpage(["
         for line in self.fig_lines :
             rep+="["
             for f in line :
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="], orientation='"+self.orientation+"', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
+        rep+="],"+`self.widths`+","+`self.heights`+",orientation='"+self.orientation+\
+              "', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
         
