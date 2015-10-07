@@ -2,17 +2,13 @@
 
 This module declares reference products on ipsl data organization and specifics, as managed by J. Servonnat at IPSL;
 
-**Also declares how to derive CMIP5 variables from the original ERAI variables set (aliasing)**
-
-Attributes are 'grid', and 'frequency'
-
-Various grids are available. Original grid writes as : grid='_'. Other grids write e.g. as : grid ='T42' or grid ='T127'
+Attributes are : ...
 
 Example of an 'ref_ipsl' project dataset declaration ::
 
  >>> cdef('project','ref_ipsl')
- >>> d=ds(variable='tas',period='198001',grid='_', frequency='monthly')
- >>> d2=ds(variable='tas',period='198001',grid='144142',frequency='daily')
+ >>> d=ds(variable='tas',period='198001'....)
+ >>> d2=ds(variable='tas',period='198001', frequency='daily', ....)
 
 """
 

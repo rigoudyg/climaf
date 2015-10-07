@@ -2,10 +2,6 @@
 This module declares locations for searching data for IGCM outputs produced by libIGCM for all frequencies, and where the data is
 at IPSL and on Ciclad
 
-Attributes for CMIP5 datasets are : model, rip, frequency, table, realm, version
-
-Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
-
 Example for an IGCM_OUT dataset declaration ::
 
  >>> tas1pc=ds(project='IGCM_OUT', model='IPSLCM6', experiment='piControl', variable='tas', frequency='monthly', period='1860-1861')

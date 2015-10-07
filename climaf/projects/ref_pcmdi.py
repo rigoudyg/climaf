@@ -1,6 +1,6 @@
 """
 
-This module declares reference products on ciclad data organization and specifics, as managed by J. Servonnat at IPSL;
+This module declares PCMDI reference products on ciclad data organization and specifics, as managed by J. Servonnat at IPSL;
 
 """
 
