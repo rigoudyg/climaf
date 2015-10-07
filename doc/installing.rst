@@ -113,7 +113,7 @@ files); then, you can either :
 
   - set your PYTHONPATH , e.g. in your ``~/.profile`` file::
 
-    $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/climaf
+    $ export PYTHONPATH=$PYTHONPATH:<some_installation_dir>/
 
   - type ::
 

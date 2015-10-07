@@ -6,10 +6,10 @@ from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-__all__=[ "site_settings", "cache" , "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators" , "projects" ,"cmacro","html"]
+__all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
+          "operators", "period", "standard_operators", "projects", "cmacro", "html", "usual_functions" ]
 
-version="0.10"
+version="0.11"
 
 
 import time,os
