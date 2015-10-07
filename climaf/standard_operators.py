@@ -86,3 +86,80 @@ def load_standard_operators():
             'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")
 
+    #
+
+
+    if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
+        load_cdftools_operators()
+    else :
+        clogger.warning("No Cdftool available")
+
+    
+
+def load_cdftools_operators():
+    #
+    # CDFTools operators 
+    #
+    # cdfmean
+    #
+    cscript('ccdfmean',
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_3D%s")    
+    #
+    cscript('ccdfmean_profile',
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s")
+    #    
+    cscript('ccdfvar',
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_3D%s")
+    #    
+    cscript('ccdfvar_profile',
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_%s")
+    
+    #
+    # cdftransport : case where VT file must be given 
+    #
+    #cscript('ccdftransport',
+    #        scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
+     #       canSelectVar=True)
+    
+    cscript('ccdftransport',
+            scriptpath+'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
+            _var='vtrp', htrp_var='htrp', strp_var='strp', canSelectVar=True)  
+    #
+    # cdfheatc 
+    #
+    cscript('ccdfheatc',
+            'echo ""; cdfheatc ${in} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}', _var="heatc", canSelectVar=True)
+    #
+    cscript('ccdfheatcm',
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file', _var="heatc", canSelectVar=True)
+    # 
+    # cdfsections 
+    #
+    cscript('ccdfsections',
+            scriptpath+'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',  _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True) 
+    #
+    cscript('ccdfsectionsm',
+            scriptpath+'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}', _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
+    #
+    # cdfmxlheatc
+    #
+    cscript('ccdfmxlheatc',
+            'echo ""; cdfmxlheatc ${in} ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc', _var="somxlheatc", canSelectVar=True)
+    #
+    cscript('ccdfmxlheatcm',
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file', _var="somxlheatc", canSelectVar=True) 
+    #
+    # cdfstd
+    #
+    cscript('ccdfstd',
+            'cdfstd ${opt} ${ins}; mv cdfstd.nc ${out}; rm -f cdfstd.nc', _var="%s_std", canSelectVar=True)
+    #
+    cscript('ccdfstdmoy',
+            'cdfstd -save ${opt} ${ins}; mv cdfstd.nc ${out}; mv cdfmoy.nc ${out_moy}; rm -f cdfstd.nc cdfmoy.nc', _var="%s_std", moy_var="%s", canSelectVar=True) 
+    
+    #
+    # cdfvT ; a bit tricky about naming the output
+    #
+    cscript('ccdfvT', 'cdfvT ${in_1} ${in_2} ${in_3} ${in_4} -o ${out}', _var="vomevt,vomevs,vozout,vozous", canSelectVar=True)
+    #
+

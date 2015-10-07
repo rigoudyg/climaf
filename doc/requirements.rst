@@ -18,5 +18,6 @@ Optional
 
 If wanting to build or modify CliMAF documentation :
 
-- Sphinx : executable 'sphinx-build' 
-- package : sphinxcontrib.napoleon 
+- Sphinx : 
+  - executable 'sphinx-build' 
+  - package sphinxcontrib.napoleon 

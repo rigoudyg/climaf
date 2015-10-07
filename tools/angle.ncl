@@ -1,3 +1,8 @@
+;; Example script for creating a file o rotation angles to be used in CliMAF with 
+;; operator 'plot'  (i.e. with script gplot.ncl)
+
+;; This one iwas created by Matthieu Chevallier, and has been tested with ORCA1 grid
+
 ;Step 1. Load the necessary NCL scripts
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"

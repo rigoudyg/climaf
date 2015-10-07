@@ -5,7 +5,7 @@ from climaf.api import *
 craz()
 
 ##########
-# A map
+# Maps
 ##########
 
 # Define datasets for main field, auxiliary field and vectors
@@ -14,10 +14,10 @@ sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of '
 duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
-# How to get required file for rotate vectors from model grid on geographic grid
+# How to get the required file for rotating vectors from model grid on geographic grid
 fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
 
-# A Map of one field and vectors, with contours lines follow color filled contours, rotation of vectors on geographic grid
+# A Map with one field and vectors, with contours lines like color fill, rotation of vectors on geographic grid
 # and with default projection (a cylindrical equidistant)
 plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors',
               contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
@@ -25,14 +25,14 @@ plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color 
 # Displaying a figure object will compute and cache it if not already done
 cshow(plot_map1)
 
-# A Map of one field and vectors, with contours lines don t follow color filled contours, rotation of vectors on geographic grid
+# A Map of one field and vectors, with user-controled contours lines, rotation of vectors on geographic grid
 # and with stereopolar projection
-plot_map2=plot(tos, None, duo, dvo, title='1 field (user control contours) + vectors', contours='1 3 5 7 9 11 13',
+plot_map2=plot(tos, None, duo, dvo, title='1 field (user-controled contours) + vectors', contours='1 3 5 7 9 11 13',
                proj='NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 cshow(plot_map2)
 
 # A Map of two fields and vectors, with explicit contours levels for auxiliary field and rotation of vectors on geographic grid
-plot_map3=plot(tos, sub_tos, duo, dvo, title='2 fields (user control auxiliary field contours) + vectors', contours='0 2 4 6 8 10 12 14 16',
+plot_map3=plot(tos, sub_tos, duo, dvo, title='2 fields (user-controled auxiliary field contours) + vectors', contours='0 2 4 6 8 10 12 14 16',
                rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 cshow(plot_map3)
 
@@ -54,7 +54,7 @@ cshow(plot_map6)
 
 
 ##################
-# A cross-section
+# Cross-sections
 ##################
 
 # Define datasets for main field and auxiliary field
@@ -72,15 +72,15 @@ plot_cross2=plot(ta_zonal_mean, contours=1, title='1 field (contours lines follo
 cshow(plot_cross2)
 
 # A cross-section of one field, which contours lines don t follow color filled contours
-plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='1 field (user control contours)')
+plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='1 field (user-controled contours)')
 cshow(plot_cross3)
 
 # Same cross-section but with linp=1 (vertical axis will have a index-linear spacing, and logarithmic in pressure)
-plot_cross4=plot(ta_zonal_mean, linp=1, contours="240 245 250", title='1 field (user control contours)')
+plot_cross4=plot(ta_zonal_mean, linp=1, contours="240 245 250", title='1 field (user-controled contours)')
 cshow(plot_cross4)
 
 # A cross-section of two fields, with explicit contours levels for auxiliary field
-plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='2 fields (user control auxiliary field contours)')
+plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='2 fields (user-controled auxiliary field contours)')
 cshow(plot_cross5)
 
 # A cross-section of two fields, with automatic contours levels for auxiliary field
