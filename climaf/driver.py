@@ -867,7 +867,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
     ymargin=20. # Vertical shift between figures
     #
     usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
-    usable_width =page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
+    usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
     y=y_top_margin
@@ -875,23 +875,51 @@ def cfilePage(cobj, deep, recurse_list=None) :
         # Line height in pixels
         height=usable_height*rheight 
         x=x_left_margin
+        
         for fig, rwidth in zip(line, cobj.widths) :
             # Figure width in pixels
-            width=usable_width*rwidth 
+            width=usable_width*rwidth
             scaling="%dx%d+%d+%d" %(width,height,x,y)
             if fig : 
                 figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
             else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
             args.extend([figfile , "-geometry", scaling, "-composite" ])
-            x+=width+xmargin
-        y+=height+ymargin
+
+            # Real size of figure in pixels: [fig_width x fig_height]
+            args_figsize=["identify", figfile]
+            comm_figsize=subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output_figsize=comm_figsize.stdout.read()
+            figsize=output_figsize.split(" ").pop(2)
+            fig_width=figsize.split("x").pop(0)
+            fig_height=figsize.split("x").pop(1)
+                                       
+            if cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
+                width_adj=float(fig_width)*(height/float(fig_height))
+                x+=width_adj+xmargin
+            else:
+                x+=width+xmargin
+
+        if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
+            height_adj=float(fig_height)*(width/float(fig_width))
+            y+=height_adj+ymargin
+        else:
+            y+=height+ymargin
+            
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
     args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
+
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait()!=0 :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
+
+    # page trim 
+    if cobj.page_trim :
+        args_page_trim=["convert", out_fig, "-trim", out_fig]
+        comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        comm2.wait()
+    
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig

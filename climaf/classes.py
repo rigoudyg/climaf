@@ -13,6 +13,7 @@ import dataloc
 from period import init_period, cperiod
 from clogging import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
+from decimal import Decimal
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -485,7 +486,7 @@ class cens(cobject):
         >>> ds1980=ds(period="1980")
         >>> ds1981=ds(period="1981")
         >>> #
-        >>> cens(['1980',1981'],ds1980,ds1981)
+        >>> cens(['1980','1981'],ds1980,ds1981)
         >>> ncview(cens)  # will launch ncview once per member
         
         """
@@ -836,45 +837,72 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, widths=None, heights=None, 
-                 fig_lines=None, orientation="portrait"):
+                 fig_lines=None, orientation="portrait", fig_trim=False, page_trim=False):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
         Args:
-         widths (list): the list of figure widths, i.e. the width 
-           of each column
-         heights (list): the list of figure heights, i.e. the height 
-           of each line
-         fig_line (a list of lists of figure objects): each sublist 
-          of 'fig_lines' represents a line of figures
+         fig_line (a list of lists of figure objects or an ensemble of
+           figure objects): each sublist of 'fig_lines' represents a
+           line of figures
+         widths (list, optional): the list of figure widths, i.e. the
+           width of each column. By default, if fig_line is:
+             - a list of lists: widths is a list which size is the
+               length of a sublist of 'fig_lines' (i.e. the number
+               of figures by column) and which each value is
+               1./(number of figures by column)
+            - an ensemble: widths=[1.]
+         heights (list, optional): the list of figure heights, i.e. the
+           height of each line. By default, if fig_line is:
+            - a list of lists: heights is a list which size is the
+               length of 'fig_lines' (i.e. the number of lines) and which
+               each value is 1./(number of lines)          
+            - an ensemble: heights is a list which size is the
+               length of 'fig_lines.members' (i.e. the number of members)
+               and which each value is 1./(number of members)    
          orientation (str, optional): page's orientation, either 'portrait' 
-          (default) or 'landscape'
+           (default) or 'landscape'
+         fig_trim (str, optional): to turn on/off 'trim' for all figures.
+           It removes all the surrounding extra space of figures in the page,
+           either False (default) or True
+         page_trim (str, optional): to turn on/off 'trim' for the page. It
+           removes all the surrounding extra space of the page, either False
+           (default) or True
 
         Example:
 
          Using no default value, to create a page with 2 columns and 3 lines::
         
-          >>> fig=plot(tas_avg,crs='title')
-          >>> my_page=cpage(widths=[0.2,0.8],heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]],orientation='landscape'))
+          >>> fig=plot(tas_avg,title='title')
+          >>> my_page=cpage(widths=[0.2,0.8], heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]], orientation='landscape', fig_trim=True, page_trim=True)
 
         
         """
-        if not widths : widths=[1.]
-        self.widths=widths
-        if not heights : heights=[1.]
-        self.heights=heights
-        self.orientation=orientation
-        if not self.widths :
-            raise Climaf_Classes_Error("widths must be provided")
-        if not self.heights :
-            raise Climaf_Classes_Error("heights must be provided")
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
+       
+        self.orientation=orientation
+        self.fig_trim=fig_trim
+        self.page_trim=page_trim
+
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
                 "fig_lines must be an ensemble or a list "
                 "of lists (each representing a line of figures)")
         if isinstance(fig_lines,list) :
+            if not widths :
+                widths=[]
+                for line in fig_lines:
+                    if len(line)!=len(fig_lines[0]):
+                        raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
+                for column in fig_lines[0]: widths.append(round(1./len(fig_lines[0]),2))
+            self.widths=widths
+
+            if not heights :
+                heights=[]
+                for line in fig_lines: heights.append(round(1./len(fig_lines),2))
+            self.heights=heights
+
             if len(fig_lines)!=len(self.heights) :
                 raise Climaf_Classes_Error(
                     "fig_lines must have same size than heights")
@@ -889,16 +917,25 @@ class cpage(cobject):
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
             figs=list(fig_lines.members)
+
+            if not widths: widths=[1.]
+            self.widths=widths
+            if not heights :
+                heights=[]
+                for memb in figs: heights.append(round(1./len(figs),2))
+            self.heights=heights
+            
             self.fig_lines=[]
             for l in heights :
                 line=[]
                 for c in widths :
                     if len(figs) > 0 : line.append(figs.pop(0))
                     else : line.append(None)
+                              
                 self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
-        
+               
     def buildcrs(self,crsrewrite=None,period=None):
         rep="cpage("+`self.widths`+","+`self.heights`+",["
         for line in self.fig_lines :
@@ -907,9 +944,10 @@ class cpage(cobject):
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="], orientation='"+self.orientation+"')"
+        rep+="], orientation='"+self.orientation+"', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
+        
         return rep
 
         
