@@ -340,9 +340,10 @@ class cdataset(cobject):
         if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
             self.period.fx=True
         freqs_dic=frequencies.get(self.project,None)
+        #print freqs_dic
         if freqs_dic :
-            for k,v in freqs_dic :
-                if v==self.frequency and k=='annual_cycle' :
+            for k in freqs_dic :
+                if freqs_dic[k]==self.frequency and k=='annual_cycle' :
                     self.period.fx=True
         #
         self.kvp=attval
@@ -627,7 +628,7 @@ class ctree(cobject):
             if isinstance(p,cperiod) : parameters["period"]=`p`
         self.parameters=parameters
         for o in operands :
-            if not isinstance(o,cobject) :
+            if o and not isinstance(o,cobject) :
                 raise Climaf_Classes_Error("operand "+`o`+" is not a CliMAF object")
         self.crs=self.buildcrs()
         self.outputs=dict()
@@ -643,9 +644,10 @@ class ctree(cobject):
         #
         ops=[ o for o in self.operands ]
         for op in ops :
-            opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
-            if crsrewrite : opcrs=crsrewrite(opcrs)
-            rep+= opcrs + ","
+            if op :
+                opcrs = op.buildcrs(crsrewrite=crsrewrite,period=period)
+                if crsrewrite : opcrs=crsrewrite(opcrs)
+                rep+= opcrs + ","
         #
         clefs=self.parameters.keys()
         clefs.sort()
