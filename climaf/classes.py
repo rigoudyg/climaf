@@ -560,7 +560,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
 
     For dataset attributes which are not provided, these defaults apply :
 
-    - simulation : the filename basename
+    - simulation : the filename basename (without suffix '.nc')
     - variable : the set of variables in the data file
     - period : the period actually covered by the data file (if it has time_bnds)
     - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
@@ -582,7 +582,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
         raise Climaf_Classes_Error("File %s does no exist"%filename)
     #
     if model is None : model=model_id(filename)
-    if simulation is None : simulation=os.path.basename(filename)
+    if simulation is None : simulation=os.path.basename(filename)[0:-3]
     #
     if variable is None :
         lvars=varsOfFile(filename)

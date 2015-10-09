@@ -763,7 +763,8 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
             if ln or hard :
                 if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln :
-                    if not os.path.samefile(result,target):
+                    if os.path.exists(target) and \
+                            not os.path.samefile(result,target):
                         shutil.move(result,target)
                         if os.path.exists(result) : os.remove(result)
                         os.symlink(target,result)
