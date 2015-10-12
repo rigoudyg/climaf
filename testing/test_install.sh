@@ -1,6 +1,6 @@
 #!/bin/bash
 # Created - S.Senesi - Feb 2015
-export PYTHONPATH=$PYTHONPATH:$(cd $(dirname $0)/..; pwd)
+export PYTHONPATH=$(cd $(dirname $0)/..; pwd):$PYTHONPATH
 echo -e "\nTesting system requirements\n"
 if ! python -m unittest -b -v -f test_req ; then 
     echo "You cannot run CliMAF without the binaries reported missing above"

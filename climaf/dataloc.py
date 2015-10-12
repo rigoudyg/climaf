@@ -132,7 +132,6 @@ def getlocs(project="*",model="*",simulation="*",frequency="*"):
 
 
 def isLocal(project, model, simulation, frequency) :
-    if project=='file' : return True
     ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency) 
     if (len(ofu) == 0 ) : return False
     rep=True

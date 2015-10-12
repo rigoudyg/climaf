@@ -517,7 +517,7 @@ def eds(**kwargs):
     """
     Create a dataset ensemble using the same calling sequence as
     :py:func:`~climaf.classes.cdataset`, except that one of the facets
-    is a list, for defining the ensemble members; this facet must be among
+    is a list, for defining the nsemble members; this facet must be among
     the facets authorized for ensemble in the (single) project involved
 
     Example::
@@ -836,8 +836,8 @@ def cmissing(project,missing,*kwargs) :
 
 
 class cpage(cobject):
-    def __init__(self, widths=None, heights=None, 
-                 fig_lines=None, orientation="portrait", fig_trim=False, page_trim=False):
+    def __init__(self, fig_lines=None, widths=None, heights=None, 
+                  orientation="portrait", fig_trim=False, page_trim=False):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
@@ -847,25 +847,16 @@ class cpage(cobject):
            line of figures
          widths (list, optional): the list of figure widths, i.e. the
            width of each column. By default, if fig_line is:
-             - a list of lists: widths is a list which size is the
-               length of a sublist of 'fig_lines' (i.e. the number
-               of figures by column) and which each value is
-               1./(number of figures by column)
-            - an ensemble: widths=[1.]
+             - a list of lists:  spacing is even
+             - an ensemble:  one column is used
          heights (list, optional): the list of figure heights, i.e. the
-           height of each line. By default, if fig_line is:
-            - a list of lists: heights is a list which size is the
-               length of 'fig_lines' (i.e. the number of lines) and which
-               each value is 1./(number of lines)          
-            - an ensemble: heights is a list which size is the
-               length of 'fig_lines.members' (i.e. the number of members)
-               and which each value is 1./(number of members)    
+           height of each line. By default  spacing is even
          orientation (str, optional): page's orientation, either 'portrait' 
            (default) or 'landscape'
-         fig_trim (str, optional): to turn on/off 'trim' for all figures.
+         fig_trim (str, optional): to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
            either False (default) or True
-         page_trim (str, optional): to turn on/off 'trim' for the page. It
+         page_trim (str, optional): to turn on/off triming for the page. It
            removes all the surrounding extra space of the page, either False
            (default) or True
 
@@ -874,7 +865,8 @@ class cpage(cobject):
          Using no default value, to create a page with 2 columns and 3 lines::
         
           >>> fig=plot(tas_avg,title='title')
-          >>> my_page=cpage(widths=[0.2,0.8], heights=[0.33,0.33,0.33], fig_lines=[[None, fig],[fig, fig],[fig,fig]], orientation='landscape', fig_trim=True, page_trim=True)
+          >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
+          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=True, page_trim=True)
 
         
         """
@@ -937,14 +929,15 @@ class cpage(cobject):
         self.crs=self.buildcrs()
                
     def buildcrs(self,crsrewrite=None,period=None):
-        rep="cpage("+`self.widths`+","+`self.heights`+",["
+        rep="cpage(["
         for line in self.fig_lines :
             rep+="["
             for f in line :
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="], orientation='"+self.orientation+"', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
+        rep+="],"+`self.widths`+","+`self.heights`+",orientation='"+self.orientation+\
+              "', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
         
@@ -961,8 +954,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
-                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'Â£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'Â§',r'/',r'.',r'Ã¸',r'+',r'Â°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

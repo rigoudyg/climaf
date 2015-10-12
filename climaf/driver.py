@@ -181,7 +181,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 (userflags.canMissing       or ds.missingIsOK())      and \
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
                 (format == 'file')) :
-                clogger.debug("Delivering basefiles is OK for the target use")
+                clogger.debug("Delivering file set or sets is OK for the target use")
                 cdedent()
                 rep=ds.baseFiles()
                 if not rep : raise Climaf_Driver_Error("No file found for %s"%`ds`)
@@ -207,7 +207,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             #   then assume it can also select on time and provide it with the address
             #   else : fetch the relevant selection of the data, and store it in cache
             clogger.debug("Dataset is remote " )
-            if (userflags.canOpendap and format == 'file' ) :
+            if (userflags.canOpenDap and format == 'file' ) :
                 clogger.debug("But user can OpenDAP " )
                 cdedent()
                 return(ds.adressOf())
@@ -314,7 +314,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         clogger.debug("Evaluating object from crs : %s"%cobject)
         raise Climaf_Driver_Error("Evaluation from CRS is not yet implemented ( %s )"%cobject)
     else :
-        raise Climaf_Driver_Error("argument such as " +`cobject`+" are not (yet) managed")
+        raise Climaf_Driver_Error("argument " +`cobject`+" is not (yet) managed")
 
 
 

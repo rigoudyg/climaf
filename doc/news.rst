@@ -1,7 +1,7 @@
 .. _news:
 
 ------------
-What is new
+Whats' new
 ------------
 
 Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
@@ -52,19 +52,19 @@ Changes, newest first :
  - Interface to Drakkar CDFTools: cdfmean, cdftransport, cdfheatc, cdfmxlheatc,
    cdfsections, cdfstd, cdfvT; you need to have a patched version of
    Cdftools3.0;  see :ref:`CDFTools operators <cdftools>` and examples
-   : :download:`cdftransport.py <../examples/cdftransport.py>` and 
-   :download:`cdftools.py <../examples/cdftools.py>` 
+   : :download:`cdftransport.py <../examples/cdftransport.py>` and :download:`cdftools.py <../examples/cdftools.py>` 
    
+
  - CliMAF can provide fixed fields to operators, which path may
-   depend on project and simulation of operator first operand 
+   depend on project and simulation of operator's first operand 
    (see  :py:func:`~climaf.operators.fixed_fields()`)
 
  - Fixes :
  
   - datasets of type 'short' are correctly read
-  - operator s secondary output objects have their 'variable' attribute 
-    duly renamed, according to the name declared for it when using 
-    :py:func:`~climaf.operators.cscript()` 
+  - operator's secondary output variables are duly renamed, according
+    to the name given to operator's the secondary output when
+    decalring it using :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 
@@ -74,7 +74,7 @@ Changes, newest first :
 
   - **A CHANGE BREAKING BACKWARD COMPATIBILITY : default
     facet/attribute 'experiment' was renamed 'simulation'**. It is
-    used for hosting either CMIP5 facet/attribute 'rip', or for
+    used for hosting either CMIP5's facet/attribute 'rip', or for
     'EXPID' at CNRM, or for JobName at IPSL. All 'projects' and
     examples, and this documentation too, have been changed
     accordingly. Please upgrade to this version if you want a
@@ -89,9 +89,9 @@ Changes, newest first :
 
  - Outputs and rendering
 
-  - Package :py:mod:`climaf.html` allows to **easily create an html index**, 
-    which includes tables of links (or thumbnails) to image files; iterating on
-    two axes (e.g. seasons and variables) is handled by CliMAF. See :
+  - Package climaf.html allows to **easily create an html index**, which includes
+    tables of links (or thumbnails) to image files; iterating on
+    e.g. seasons and variables is handled by CliMAF. See :
     
     - a screen_dump for such an index : |indx| 
     - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
@@ -115,10 +115,10 @@ Changes, newest first :
     with CliMAF regular time axis management, on the fly, by modifying 
     the basic data selection script: it can
     enforce a reference time axis by intepreting the data
-    filename. This works e.g. for IPSLs averaged annual-cycle
+    filename. This works e.g. for IPSL's averaged annual-cycle
     datafiles. If needed, you may change function timefix() near line 
     30 in :download:`mcdo.sh <../scripts/mcdo.sh>` 
-  - automatic fix of CNRM Nemo old data time_axis issues, provided you
+  - automatic fix of CNRM's Nemo old data time_axis issues, provided you
     set environment variable CLIMAF_FIX_NEMO_TIME to anything but
     'no'. This will add processing cost. This adresses the wrong time
     coordinate variable t_ave_01month and t_ave_00086400

@@ -16,7 +16,6 @@ Example for a CMIP5 dataset declaration ::
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs,cdef
-from climaf.site_settings import atCNRM, onCiclad
 
 p=cproject("CMIP5" ,"model","experiment", ("frequency","monthly"),
            ("table","*"),("realm","*"),("version","last"),
@@ -28,15 +27,16 @@ cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })
 
 urls_CMIP5=None
 
-if atCNRM :
+if os.path.exists('/cnrm'):
     # Declare a list of root directories for CNRM-CM CMIP5 data on CNRM's Lustre file system.
     urls_CMIP5=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", 
                 "/cnrm/aster/data2/ESG/data5", "/cnrm/aster/data4/ESG/data6", 
                 "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8",
                 "/cnrm/aster/data2/ESG/vdr"]
-if onCiclad :
-    # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
-    urls_CMIP5=["/prodigfs/esg"]
+else :
+    if os.path.exists('/prodigfs') :
+        # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
+        urls_CMIP5=["/prodigfs/esg"]
 
 if urls_CMIP5 :
     # Next command will lead to explore all directories in 'url' 

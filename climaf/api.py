@@ -15,8 +15,6 @@ Main functions are :
 
  - ``ds``      : define a dataset object (actually a front-end for ``cdataset``)
 
- - ``fds``     : define a dataset object from a single file
-
  - ``eds``     : define an ensemble dataset object (actually a front-end for ``cens``)
 
  - ``derive``  : define a variable as computed from other variables
@@ -77,7 +75,8 @@ from dataloc   import dataloc
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
 from clogging  import clogger, clog, clog_file
-from site_settings import atCNRM, onCiclad
+from site_settings import atCNRM, onCiclad, atTGCC
+from usual_functions import *
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 

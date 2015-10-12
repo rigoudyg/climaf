@@ -1,17 +1,17 @@
 # -*- coding: iso-8859-1 -*-
 """
-CliMAF module ``html`` defines functions for building some html index
+CliMAF module ``hmtl`` defines functions for building some html index
 giving acces to figure files, through links bearing a label or through
-thumbnails. It eases iterating over lines and columns in tables. **See
-an example in** :download:`index_html.py <../examples/index_html.py>`
-and :download:`its screen dump <../doc/html_index.png>`
+thumbnails, and organized in tables. It eases iterating over lines and
+columns in tables. **See an example in** :download:`index_html.py
+<../examples/index_html.py>` and :download:`its screen dump
+<../doc/html_index.png>`
 
 """
 
-import os
 from climaf import __path__ as cpath
 
-def header(title,style_file=None) :
+def html_header(title,style_file=None) :
     """ Returns text for an html document header, with provided
     title. If a style filename is not provided, a default style sheet
     will apply
@@ -43,185 +43,82 @@ def header(title,style_file=None) :
               """</style>"""
     return rep+style+trailer+'\n'
 
-def trailer():
-    """ Returns the text for closing an html document
-    """
-    return("</body>\n")
-
-def vspace(nb=1) : 
-    return nb*"<br>\n"
-
-def section(title,level=1,key="None"):
+def html_section(title,level=1,key="None"):
     """ Returns text for a section header in an html document
     with given title. Style depends on level value. Arg key is not yet used
     """
     return '<h'+`level`+'><a name="'+key+'"></a>'+title+'</h4>'+'\n'
 
-def open_table(title="",columns=[],spacing=5):
-    """ 
-    Returns header text for an html table. title will go as title for
-    first column. columns should be a list of column titles
+def html_open_table(title="",titles=None,spacing=5):
+    """ Returns header text for an html table. If titles is not None,
+    it should be a dict which keys will be used as column titles. In
+    that case, if title is provided, it is used as title for the first
+    column.
     """
     rep= '<TABLE CELLSPACING='+`spacing`+'>'+'\n'
-    rep+=' <TR>\n <TH ALIGN=LEFT> '+title+' </TH> \n'
-    for label in columns:
-        rep+='<TD ALIGN=RIGHT>'+label+'</TD>\n'
-    rep+='</TR> \n'
-    return rep
+    if titles is not None :
+        rep+=' <TR>\n <TH ALIGN=LEFT> '+title+' </TH> \n'
+        dic=titles.keys()
+        for label in dic :
+            rep+='<TD ALIGN=RIGHT>'+label+'</TD>\n'
+        rep+='</TR> \n'
+        return rep
 
-def close_table() :
+def html_close_table() :
     """ Returns text for closing an html table
     """
     return("</TABLE>\n")
 
-def open_line(title) :
-    return(' <TR>\n <TH ALIGN=LEFT> <li>'+title+'</li> </TH> \n')
-
-def close_line() :
-    return(' </TR>\n')
-
-def link(label,filename,thumbnail=None) :
-    """ 
-    Creates the provided label, with a link to the provided image
-    filename (if not None) and possibly showing a thumbnail for the
-    image (with the provided thumbnail size)
-    """
-    if filename :
-        rep='<A HREF="'+filename+'">'
-        if thumbnail is not None :
-            rep+= '<IMG HEIGHT=' + `thumbnail` + \
-                ' WIDTH=' + `thumbnail` + ' SRC="'+filename+'">'
-        else:
-            rep+=label
-        rep+='</a>'
-    else:
-        rep=label
-    return rep
-
-def cell(label,filename,thumbnail=None) :
-    """ 
-    Create a table cell with the provided label, which bears a link to
-    the provided filename and possibly shows a thumbnail for the link
-    with the provided thumbnail size
-    """
-    return '<TD ALIGN=RIGHT>'+ \
-        link(label,filename,thumbnail)+\
-        '</TD>\n'
-
-def line(dic,title="",thumbnail=None):
-    """
-    Create an html line with labels from dic keys and links to
-    filenames from dic values. Put a line title if provided. Replace
-    labels with thumbnail figures if arg thumbnail is set to a size
-    (in pixels);in that case, dic can also be a list of filenames
-    """
-    if thumbnail :
-        if isinstance(dic,dict) : 
-            figures=dic.values()
-        else : 
-            figures=dic.keys()
-        labels=figures # not actually used
-    else : 
-        figures=dic.values()
-        labels=dic.keys()
-    rep=title
-    for lab,fig in zip(labels,figures): 
-        rep+=cell(lab,fig,thumbnail)
-    rep+=vspace()
-    return rep
-
-def flines(func,fargs, sargs, common_args=[], \
-       other_fargs=[], other_sargs=[], thumbnail=None, **kwargs):
-    """ 
-    **See doc for** :py:func:`~climaf.html.table_line` **first** 
-
-    Creates a table by iterating calling table_line over 'fargs'
-    (which can be a list or a dict) with :
-
-    - 'farg' being the running element (or key) of 'fargs' 
-    - 'title' being the corresponding 'fargs' value (or 'farg' if not a dict)
-    - 'common_args' being forwarded
-    - 'other_args' being the merge of other_fargs[farg] and other_sargs
-    
-    It forwards remaining keyword arguments (kwargs)
-
-    Example : assuming that function avg returns the name for a figure
-    showing the average value of a variable over a mask, create a
-    table of links for average values of two variables over two masks,
-    with thumbnail of images:
-
-    >>> t=table_lines(avg,['tas','tos'],['land','sea'],thumbnail=40)
-
+def html_table_lines(func,dic,*args,**thumb) :
+    """ Returns text for multiple lines of a table, by iterating
+    calls to :py:func:`~climaf.html.html_table_lines` . dic is a
+    dictionary which keys are provided as first argument of the
+    calls, and values as last argument. Dictionary argument thumb is
+    forwarded too.
     """
     rep=""
-    for farg in fargs:
-        args=[farg,sargs]+common_args
-        if other_fargs : 
-            args=args+other_fargs.get(farg,None)
-        args=args+other_sargs
-        if isinstance(fargs,list) :
-            title=`farg`
-        else:
-            title=fargs.get(farg,`farg`)
-        rep+=fline(func,*args,title=title,thumbnail=thumbnail,**kwargs)
+    for var in dic:
+        a=args+(dic[var],)
+        rep+=html_table_line(func,var,*a,**thumb)
     return(rep)
 
-
-def fline(func,farg, sargs, title=None, \
-         common_args=[], other_args=[], thumbnail=None, **kwargs) :
+def html_table_line(func,*args,**thumb) :
     """
-    Create the html text for a line of table cells, by iterating
-    calling a function, once per column, with at least two
-    arguments. Cells have a label and possibly a link
+    Create the html text for a line of table cells , which
+    each includes an HREF link to an image file, and a label or thumbnail
+    bearing this link. Last arg is a title for first column. But
+    last argument, is a dictionary which keys are
+    the labels and which values are tuples of arguments (or single
+    values) to pass to the function for computing the filename. 
+    Other arguments (except last and but last) are also passed to
+    the function, in front of the dict values ones.
+    The dict argument can also be a list.
 
-    - 'func' is a python function which computes labels 
-      and/or figures; 
-    - 'farg' is any object, used a 1st arg for 'func'; 
-    - 'sargs' is a list or a dict, used for providing 
-      the 2nd arg to each call to 'func'. 
-    - 'title' is a line title (for first column); 
-      if missing, 'farg' is used
-    - see further below fo remaining arguments
+    Example : assume function 'foo' takes 3 arguments and just
+    concatenate them (assuming they are strings). A call to :
     
-    So, there will be one column/cell per item in 'sargs'; each cell
-    shows a label which can be an active link.  Both the label value
-    and the link value can be the result of calling 'func' arg with
-    the pair of arguments ('farg' and the running element of 'sargs');
-    the function can return a single value (either a label or a figure
-    filename) or both
+    >>> html_table_line(foo,'/root',{ 'labelA': ('/dirA','A.nc'), 'labelB':('/dirB','B.png') }, 'title' )
 
-    Use cases :
+    will produce :
+      <TH ALIGN=LEFT> <li>title</li> </TH> 
+      <TD ALIGN=RIGHT><A HREF='/root/dirA/A.nc'>labelA</a> </TD>
+      <TD ALIGN=RIGHT><A HREF='/root/dirB/B.png'>labelB</a> </TD>
+      
+    If func is None, a function like 'foo' above is used If last
+    argument is a list, it is turned into a dictionary with value=key
+    Values are not necessary tuples Dict argument thumb may include
+    key 'thumbnail', in which case thumbnails will be generated (with
+    the size being dict value)
 
-     - a line showing just of numeric value; we assume that 
-       function average(var,mask) returns such a numeric 
-       value, which is a gloabl average of a variable over a mask:
+    Examples:
 
-       >>> rep=fline(average, 'tas', \
-       ...   [ 'global', 'sea', 'land', 'tropics'], 'tas averages')
+    >>> html_table_line(None,'/root',[ '/labA', '/labB'])
 
-     - a line showing the same average values, but each value is a
-       link to e.g. a figure of the time series of global average
-       values : same call, but just let function 'average' compute the
-       average and the figure, and return a couple : average, figure
-       filename
-
-     - a line showing pre-defined labels, which here are shortcuts for
-       mask names, and which carry links to same figures as above : let
-       function 'average' only return the figure filename, and call :
- 
-       >>> rep=fline(average, 'tas', 
-       ...  {'global':'GLB','sea':'SEA','land':"LND"}, 'tas averages')
-
-    Advanced arguments :
-
-      - common_args : a list of additionnal arguments to pass to
-        'func', whatever the value of its second argument
-      - other_args : a dictionnary of lists of additionnal arguments
-        to pass to 'func'; only the entry which key equals running
-        value of second argument is passed to 'func' (after common_args)
-      - thumbnail : if 'func' returns a filename, generate a thumbnail
-        image of that size (in pixels)
-
+    will produce :
+    
+      - <TD ALIGN=RIGHT><A HREF='/root/labA'>labA</a> </TD>
+      - <TD ALIGN=RIGHT><A HREF='/root/labB'>labB</a> </TD>
+    
     """
     def foo(*args):
         if len(args)==1 :
@@ -229,38 +126,39 @@ def fline(func,farg, sargs, title=None, \
         else:
             return reduce(lambda x,y : x+y, args)
     if not func : func=foo
-    #
-    if not title : title=`farg`
-    imposed_labels=True
-    if not isinstance(sargs,dict) :
-        imposed_labels=False
-        if not isinstance(sargs,list) :
-            print "Issue with second args :"+\
-                "not a dict nor a list (got `sargs`) "
+    largs=list(args)
+    title=largs.pop()
+    rep=' <TR>\n <TH ALIGN=LEFT> <li>'+title+'</li> </TH> \n'
+    dic=largs.pop()
+    if not isinstance(dic,dict) :
+        if not isinstance(dic,list) :
+            print "Issue with dictionary : got `dic` "
             return
         else :
-            sargs=dict(zip(sargs,sargs))
-    rep=open_line(title)
-    for key in sargs : 
-        allargs=[farg,sargs[key]]
-        allargs=allargs+common_args
-        if other_args :
-            allargs=allargs+other_args.get(key,None)
-        #print 'allargs=',allargs
-        funcrep=func(*allargs,**kwargs)
-        if isinstance(funcrep,tuple): 
-            #print "tuple case",lab,rfig
-            lab,rfig=funcrep
-        else :
-            if imposed_labels or os.path.exists(funcrep) :
-                lab=sargs[key] ; rfig=funcrep
-                #print "fig case",lab,rfig
-            else:
-                lab=funcrep ; rfig=None
-                #print "lab case",lab,rfig
-        rep+=cell(lab,rfig,thumbnail)
-    rep+=close_line()
+            dic=dict(zip(dic,dic))
+    for k in dic :
+        if not isinstance(dic[k],list) and not isinstance(dic[k],tuple) :
+            dic[k]=[dic[k]]
+    for label in dic :
+        #print "largs="+`largs`
+        allargs=largs[:]
+        #print "dic[label]="+`dic[label]`
+        allargs.extend(dic[label])
+        #print "allargs="+`allargs`
+        #print `func`
+        #print "f="+func(*allargs)
+        fig=func(*allargs)
+        rep+='<TD ALIGN=RIGHT><A HREF="'+fig+'">'
+        if 'thumbnail' not in thumb : rep+=label
+        else: rep+= '<IMG HEIGHT=' + `thumb['thumbnail']` + ' WIDTH=' + `thumb['thumbnail']` + ' SRC="'+fig+'">'
+        rep+='</a> </TD>\n'
+    rep+='</TR> \n'
     return(rep)
+
+def html_trailer():
+    """ Returns the text for closing an html document
+    """
+    return("</body>\n")
 
 #cinstantiate("index.html","inst.html")
 
