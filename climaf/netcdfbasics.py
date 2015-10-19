@@ -32,6 +32,8 @@ def varsOfFile(filename) :
         if ((filevar not in fileobj.dimensions) and
             not re.findall("^lat",filevar) and
             not re.findall("^lon",filevar) and
+            not re.findall("nav_lat",filevar) and
+            not re.findall("nav_lon",filevar) and
             not re.findall("^time_",filevar) and
             not re.findall("_bnds$",filevar) ):
             lvars.append(filevar)

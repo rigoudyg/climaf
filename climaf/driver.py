@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
+import tempfile
 
 # Climaf modules
 import climaf
@@ -906,7 +907,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
         else:
             y+=height+ymargin
             
-    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="pdf")
     args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
 
@@ -943,6 +944,46 @@ def CFlongname(varname) :
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
+
+def cfileens(obj,filename) :
+    """
+    Create the file for a CliMAF ensemble. Launch computation if needed.
+
+    Args:
+    
+        object (CliMAF object) : an ensemble ('cens' objet)
+        
+        filename: name of output file including all variables of
+         ensemble's members, with variable names suffixed by member
+         label (i.e. 'var(obj.members[n])'_'obj.labels[n]') 
+                
+    """
+    if isinstance(obj,classes.cens) :
+    
+        print("Members are: %s" %obj.members)
+        print("Labels are: %s" %obj.labels)
+
+        if os.path.isfile(filename):
+            #clogger.warning("File '%s' already exists and will be appended" %filename) 
+            raise Climaf_Driver_Error("File '%s' already exists (stop to don\'t append it)" %filename)
+                
+        for memb,lab in zip(obj.members,obj.labels):
+            ffile=cfile(memb)
+            
+            f = tempfile.NamedTemporaryFile(suffix=".nc")
+            command="ncrename -O -v %s,%s_%s %s %s"%(varOf(memb), varOf(memb), lab, ffile, f.name)
+            if ( os.system(command) != 0 ) :
+                raise Climaf_Driver_Error("ncrename failed : %s" %command)         
+            
+            command2="ncks -A %s %s"%(f.name,filename)
+            if ( os.system(command2) != 0 ) :
+                raise Climaf_Driver_Error("Issue when merging %s and %s (using command: %s)"%(f.name,filename,command2))
+            f.close()
+      
+    else:
+        clogger.warning("objet is not a 'cens' objet")
+
+        
 class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
