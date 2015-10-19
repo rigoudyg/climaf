@@ -17,6 +17,11 @@ Changes, newest first :
 
 - 2015/10/19 - Version 0.11 :
 
+ - For :py:func:`~climaf.classes.cpage` (which creates an **array of
+   figures**), default keywords changed : fig_trim=False ->
+   fig_trim=True, page_trim=False -> page_trim=True. See example
+   :download:`figarray <../examples/figarray.py>`.   
+
  - New function :py:func:`~climaf.driver.efile()` allows to apply
    :py:func:`~climaf.driver.cfile()` to an ensemble dataset. It
    provide a single file with variable names suffixed by member label.       

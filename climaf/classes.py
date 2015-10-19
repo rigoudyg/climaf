@@ -837,7 +837,7 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
-                  orientation="portrait", fig_trim=False, page_trim=False):
+                  orientation="portrait", fig_trim=True, page_trim=True):
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
@@ -855,10 +855,10 @@ class cpage(cobject):
            (default) or 'landscape'
          fig_trim (str, optional): to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
-           either False (default) or True
+           either True (default) or False
          page_trim (str, optional): to turn on/off triming for the page. It
-           removes all the surrounding extra space of the page, either False
-           (default) or True
+           removes all the surrounding extra space of the page, either True
+           (default) or False 
 
         Example:
 
@@ -866,7 +866,7 @@ class cpage(cobject):
         
           >>> fig=plot(tas_avg,title='title')
           >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
-          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=True, page_trim=True)
+          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=False, page_trim=False)
 
         
         """

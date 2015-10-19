@@ -605,6 +605,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
+    elif isinstance(cobject,classes.cpage) : return None
     elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
@@ -908,19 +909,16 @@ def cfilePage(cobj, deep, recurse_list=None) :
             y+=height+ymargin
             
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
-    args.append(out_fig)
+    if cobj.page_trim :
+        args.extend(["-trim", out_fig])
+    else:
+        args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
 
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait()!=0 :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
-
-    # page trim 
-    if cobj.page_trim :
-        args_page_trim=["convert", out_fig, "-trim", out_fig]
-        comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        comm2.wait()
-    
+        
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
