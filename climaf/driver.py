@@ -885,7 +885,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
                 figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
             else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
-            args.extend([figfile , "-geometry", scaling, "-composite" ])
+            args.extend([figfile, "-geometry", scaling, "-composite" ])
 
             # Real size of figure in pixels: [fig_width x fig_height]
             args_figsize=["identify", figfile]
@@ -907,7 +907,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
         else:
             y+=height+ymargin
             
-    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="pdf")
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
     args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
 
@@ -945,27 +945,29 @@ def CFlongname(varname) :
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
 
-def cfileens(obj,filename) :
+def efile(obj, filename, forced=False) :
     """
-    Create the file for a CliMAF ensemble. Launch computation if needed.
+    Create the file for an ensemble of CliMAF objects. Launch computation if needed.
 
     Args:
     
-        object (CliMAF object) : an ensemble ('cens' objet)
+        obj (CliMAF object) : an ensemble of CliMAF objects ('cens' objet)
         
-        filename: name of output file including all variables of
+        filename (str) : name of output file including all variables of
          ensemble's members, with variable names suffixed by member
-         label (i.e. 'var(obj.members[n])'_'obj.labels[n]') 
+         label (i.e. 'var(obj.members[n])'_'obj.labels[n]')
+
+        forced (logical, optional) : if True, CliMAF will append the
+         result to filename if it already exists
                 
     """
     if isinstance(obj,classes.cens) :
-    
-        print("Members are: %s" %obj.members)
-        print("Labels are: %s" %obj.labels)
 
         if os.path.isfile(filename):
-            #clogger.warning("File '%s' already exists and will be appended" %filename) 
-            raise Climaf_Driver_Error("File '%s' already exists (stop to don\'t append it)" %filename)
+            if forced:
+                clogger.warning("File '%s' already exists and will be appended" %filename) 
+            else:
+                raise Climaf_Driver_Error("File '%s' already exists (stop to don\'t append it)" %filename)
                 
         for memb,lab in zip(obj.members,obj.labels):
             ffile=cfile(memb)

@@ -13,6 +13,24 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.11:
+
+- 2015/10/19 - Version 0.11 :
+
+ - New function :py:func:`~climaf.driver.efile()` allows to apply
+   :py:func:`~climaf.driver.cfile()` to an ensemble dataset. It
+   provide a single file with variable names suffixed by member label.       
+ 
+ - The **general purpose plot operator** (for plotting 1D and 2D
+   datasets: maps, cross-sections and profiles), named ``plot``, was
+   significantly enriched. It allows now for plotting an additional
+   scalar field displayed as contours and for plotting an optional
+   vector field, for setting the reference longitude, the contours
+   levels for main or auxiliary field, the reference length used for
+   the vector field plot, the rotation of vectors from model grid to
+   geographic grid, ... See :doc:`scripts/plot`   
+
+
 .. _news_0.10:
 
 - 2015/09/23 - Version 0.10 :
