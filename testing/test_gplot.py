@@ -99,6 +99,33 @@ map_vect8=plot(tos, sub_tos, duo, dvo, title='SST: 2 fields + vectors, proj=NH',
 cshow(map_vect8)
 
 
+## with selection of time step and/or level step for all fields which have this dimension ##
+
+# case where (t,z,y,x) are not degenerated
+duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # uo(time_counter, depthu, y, x) 
+dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
+thetao=ds(project="EM",simulation="PRE6CPLCr2alb", variable="thetao", period="1998", realm="O") # thetao(time_counter, deptht, y, x) 
+sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'thetao' sub box for auxiliary field
+
+map_select1=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10, time=0) # time selection has no impact for vectors because time dimension is degenerated, so only level selection is done for vectors
+cshow(map_select1)
+
+map_select2=plot(thetao, sub_thetao, duo, dvo, title='Selecting level and time closed to 10 and 1400000 respectively',  rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
+cshow(map_select2)
+
+# case where (t,y,x) are not degenerated
+duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="1998", realm="O") # uo(time_counter, depthu, y, x) 
+dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="1998", realm="O")
+tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="1998", realm="O") # tos(time_counter, y, x) 
+sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'tos' sub box for auxiliary field
+
+map_select3=plot(tos, sub_tos, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10, time=1) # level selection has no impact on main field and auxiliary field because they have not depth dimension, whereas level (and time) selection is done for vectors 
+cshow(map_select3)
+
+map_select4=plot(tos, sub_tos, duo, dvo, title='Selecting level and time closed to 10 and 1400000 respectively', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
+cshow(map_select4)
+
+
 ##################
 # A cross-section
 ##################
@@ -174,13 +201,27 @@ plot_cross6c=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='A cross-section
 cshow(plot_cross6c)
 
 
+## with selection of time step and/or level step for all fields which have this dimension : case where (t,z,y) are not degenerated ##
+# we will have a cross-section or a profile depending on time and level selection
+january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="1980") # ta(time, plev, lat, lon) 
+ta_zonal_mean=ccdo(january_ta,operator="zonmean") # => (t,z,y)
+cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
+ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # => (t,z,y)
+
+select_cross1=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting index 10 for time', linp=1, time=10) # time selection is done for main and auxiliary field => dim:=(z,y) => we have a cross-section
+cshow(select_cross1)
+
+select_cross2=plot(ta_zonal_mean, ta_zonal_mean2, title='Time and level selection => profile', linp=1, time=0, level=4) # time and level selection is done => dim:=(y) => we have a vertical profile 
+cshow(select_cross2) 
+
+
 #############
 # A profile
 #############    
-#january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
-#ta_zonal_mean=ccdo(january_ta, operator="zonmean")
-#cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
-#ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
+january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+ta_zonal_mean=ccdo(january_ta, operator="zonmean")
+cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
+ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 
 ## one field ##
 ta_profile=ccdo(ta_zonal_mean, operator="mermean")

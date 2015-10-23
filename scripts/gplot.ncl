@@ -11,8 +11,7 @@ begin
   if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
-  ;print("plotting cross section "+plotname+ " from "+infile)
-  
+
   type="png"
   LABELON=False
   RASTER=True 
@@ -101,15 +100,38 @@ begin
   delete(fld)
   fld=new_fld
   delete(new_fld)
-  
+
   ; Assume first dimension is time. Select first time slice before further processing
   if (rank .eq. 4) then
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ; NOTE : this should be done only if at least two other dimensions have size > 1, otherwise we
 ; should plot some Hovmoeller diagram
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ;print("Selecting first time step")
-    fldtmp=fld(0,:,:,:)
+    ; case where (t,z,y,x) are not degenerated
+    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
+      .or. ( (isvar("time")) .and. iscoord(fld,Var_DimNames(0)) .and. isatt(fld&$Var_DimNames(0)$,"standard_name") \
+      .and. (fld&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+      
+      if isint(time) then
+        print("Selecting index "+time+" for main field time step, i.e. time = "+fld&$Var_DimNames(0)$(time))
+        fldtmp=fld(time,:,:,:)
+      else
+        if isfloat(time) then 
+          ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
+          ;utc_time=cd_calendar(fld&$Var_DimNames(0)$,1)
+          ;index=closest_val(time,utc_time)
+          ;print("Selecting time closed to "+time+" for main field, i.e. time = "+utc_time(index))
+          index=closest_val(time,fld&$Var_DimNames(0)$)
+          print("Selecting time closed to "+time+" for main field, i.e. time = "+fld&$Var_DimNames(0)$(index))
+          fldtmp=fld(index,:,:,:)       
+        end if
+      end if
+    else
+      ; case where no time argument or 'bad' files
+      print("Selecting first time step for main field")
+      fldtmp=fld(0,:,:,:)
+    end if
+
     delete(fld)
     fld=fldtmp
     delete(fldtmp)
@@ -119,17 +141,76 @@ begin
     dime=dimsizes(fld)
     rank=dimsizes(dime)
   end if
-  
+ 
   ; Assume second dimension is depth. Select first level before further processing
   useXY=False
-  horizontal=False  
-  if (rank .eq. 3) then
-    print("plotting a field with 2 horizontal dimensions")
-    fldtmp=fld(0,:,:)
+  horizontal=False 
+  print(Var_DimNames)
+  if (rank .eq. 3) then 
+    ;print("plotting a field with 2 horizontal dimensions")
+    ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
+    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
+      .or. ( (isvar("time")) .and. iscoord(fld,Var_DimNames(0)) .and. isatt(fld&$Var_DimNames(0)$,"standard_name") \
+      .and. (fld&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+      
+      if isint(time) then
+        print("Selecting index "+time+" for main field time step, i.e. time = "+fld&$Var_DimNames(0)$(time))
+        fldtmp=fld(time,:,:)
+      else
+        if isfloat(time) then 
+          index=closest_val(time,fld&$Var_DimNames(0)$)
+          print("Selecting time closed to "+time+" for main field, i.e. time = "+fld&$Var_DimNames(0)$(index))
+          fldtmp=fld(index,:,:)
+        end if
+      end if
+      ; case where (t,z,y) or (t,z,x) are not degenerated
+      if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(1),"depth"))) ) \
+        .or. ( (isvar("level")) .and. iscoord(fld,Var_DimNames(1)) .and. isatt(fld&$Var_DimNames(1)$,"axis") \
+        .and. (fld&$Var_DimNames(1)$@axis .eq. "Z") ) then
+
+        delete(fld)
+        fld=fldtmp
+        delete(fldtmp)
+
+        if isint(level) then
+          print("Selecting index "+level+" for main field level, i.e. level = "+fld&$Var_DimNames(1)$(level))
+          fldtmp=fld(level,:)
+        else
+          if isfloat(level) then 
+            index=closest_val(level,fld&$Var_DimNames(1)$)
+            print("Selecting level closed to "+level+" for main field, i.e. level = "+fld&$Var_DimNames(1)$(index))
+            fldtmp=fld(index,:)
+          end if
+        end if
+      end if  
+
+    else
+      ; case where (z,y,x) are not degenerated
+      if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(0),"depth"))) ) \
+        .or. ( (isvar("level")) .and. iscoord(fld,Var_DimNames(0)) .and. isatt(fld&$Var_DimNames(0)$,"axis") \
+        .and. (fld&$Var_DimNames(0)$@axis .eq. "Z") ) then
+        
+        if isint(level) then
+          print("Selecting index "+level+" for main field level, i.e. level = "+fld&$Var_DimNames(0)$(level))
+          fldtmp=fld(level,:,:)
+        else
+          if isfloat(level) then 
+            index=closest_val(level,fld&$Var_DimNames(0)$)
+            print("Selecting level closed to "+level+" for main field, i.e. level = "+fld&$Var_DimNames(0)$(index))
+            fldtmp=fld(index,:,:)
+          end if
+        end if
+          
+      else
+        ; case where no time/level arguments or 'bad' files
+        print("Selecting first time or level step for main field")
+        fldtmp=fld(0,:,:)
+      
+      end if ; level
+    end if ; time
     delete(fld)
     fld=fldtmp
     delete(fldtmp)
-    horizontal=True
     delete(dime)
     dime=dimsizes(fld)
     rank=dimsizes(dime)
@@ -143,9 +224,12 @@ begin
     delete(Var_DimNames)
     Var_DimNames = getVarDimNames(fld) 
 
-    if ( isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) ) \ 
+    if ( isatt(fld,"coordinates") .and. ( (.not. ismissing(str_match(fld@coordinates,"lon"))) .or. (.not. ismissing(str_match(fld@coordinates,"LON"))) ) \ 
+           .and. ( (.not. ismissing(str_match(fld@coordinates,"lat"))) .or. (.not. ismissing(str_match(fld@coordinates,"LAT"))) ) ) \ 
       .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) \ 
            .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
+      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"LAT"))) \ 
+           .and. (.not. ismissing(str_match(Var_DimNames(1),"LON"))) ) \
       .or. ( isatt(fld&$Var_DimNames(0)$,"standard_name") \
            .and. (fld&$Var_DimNames(0)$@standard_name .eq. "latitude") \
            .and. isatt(fld&$Var_DimNames(1)$,"standard_name") \
@@ -161,12 +245,16 @@ begin
     if logp  then useXY=False end if
     latname="lat"
     lonname="lon"
-    if .not. ismissing(str_match(Var_DimNames,"latitude"))
+    if .not. ismissing(str_match(Var_DimNames,"latitude")) then
       latname="latitude"
       lonname="longitude"
     end if
+    if .not. ismissing(str_match(Var_DimNames,"LAT")) then
+      latname="LAT"
+      lonname="LON"
+    end if
     if (ismissing(str_match(Var_DimNames,"lat"))) then
-      if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
+      if isatt(fld,"coordinates") .and. ( (.not. ismissing(str_match(fld@coordinates,"lat"))) .or. (.not. ismissing(str_match(fld@coordinates,"LAT"))) ) then 
         useLatDim=True
         if isfilevar(ffile,"nav_lat") then 
           latname="nav_lat" 
@@ -255,8 +343,27 @@ begin
   
     ; Assume first dimension is time. Select first time slice before further processing
     if (rank2 .eq. 4) then
-      ;print("Selecting first time step for auxiliary field")
-      fldtmp2=fld2(0,:,:,:)
+      ; case where (t,z,y,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames2(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld2,Var_DimNames2(0)) .and. isatt(fld2&$Var_DimNames2(0)$,"standard_name") \
+        .and. (fld2&$Var_DimNames2(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for auxiliary field time step, i.e. time = "+fld2&$Var_DimNames2(0)$(time))
+          fldtmp2=fld2(time,:,:,:)
+        else
+          if isfloat(time) then 
+            index2=closest_val(time,fld2&$Var_DimNames2(0)$)
+            print("Selecting time closed to "+time+" for auxiliary field, i.e. time = "+fld2&$Var_DimNames2(0)$(index2))
+            fldtmp2=fld2(index2,:,:,:)
+          end if
+        end if
+      else
+        ; case where no time argument or 'bad' files
+        print("Selecting first time step for auxiliary field")
+        fldtmp2=fld2(0,:,:,:)
+      end if
+
       delete(fld2)
       fld2=fldtmp2
       delete(fldtmp2)
@@ -269,8 +376,66 @@ begin
   
     ; Assume second dimension is depth. Select first level before further processing
     if (rank2 .eq. 3) then
-      print("plotting an auxiliary field with 2 horizontal dimensions")
-      fldtmp2=fld2(0,:,:)
+      ;print("plotting an auxiliary field with 2 horizontal dimensions")
+      ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames2(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld2,Var_DimNames2(0)) .and. isatt(fld2&$Var_DimNames2(0)$,"standard_name") \
+        .and. (fld2&$Var_DimNames2(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for auxiliary field time step, i.e. time = "+fld2&$Var_DimNames2(0)$(time))
+          fldtmp2=fld2(time,:,:)
+        else
+          if isfloat(time) then 
+            index2=closest_val(time,fld2&$Var_DimNames2(0)$)
+            print("Selecting time closed to "+time+" for auxiliary field, i.e. time = "+fld2&$Var_DimNames2(0)$(index2))
+            fldtmp2=fld2(index2,:,:)
+          end if
+        end if
+        ; case where (t,z,y) or (t,z,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames2(1),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld2,Var_DimNames2(1)) .and. isatt(fld2&$Var_DimNames2(1)$,"axis") \
+          .and. (fld2&$Var_DimNames2(1)$@axis .eq. "Z") ) then
+          
+          delete(fld2)
+          fld2=fldtmp2
+          delete(fldtmp2)
+          
+          if isint(level) then
+            print("Selecting index "+level+" for auxiliary field level, i.e. level = "+fld2&$Var_DimNames2(1)$(level))
+            fldtmp2=fld2(level,:)
+          else
+            if isfloat(level) then 
+              index2=closest_val(level,fld2&$Var_DimNames2(1)$)
+              print("Selecting level closed to "+level+" for auxiliary field, i.e. level = "+fld2&$Var_DimNames2(1)$(index2))
+              fldtmp2=fld2(index2,:)
+            end if
+          end if
+        end if  
+        
+      else
+        ; case where (z,y,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames2(0),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld2,Var_DimNames2(0)) .and. isatt(fld2&$Var_DimNames2(0)$,"axis") \
+          .and. (fld2&$Var_DimNames2(0)$@axis .eq. "Z") ) then
+          
+          if isint(level) then
+            print("Selecting index "+level+" for auxiliary field level, i.e. level = "+fld2&$Var_DimNames2(0)$(level))
+            fldtmp2=fld2(level,:,:)
+          else
+            if isfloat(level) then 
+              index2=closest_val(level,fld2&$Var_DimNames2(0)$)
+              print("Selecting level closed to "+level+" for auxiliary field, i.e. level = "+fld2&$Var_DimNames2(0)$(index2))
+              fldtmp2=fld2(index2,:,:)
+            end if
+          end if
+          
+        else
+          ; case where no time/level arguments or 'bad' files
+          print("Selecting first time or level step for auxiliary field")
+          fldtmp2=fld2(0,:,:)
+        end if ; level
+      end if ; time
       delete(fld2)
       fld2=fldtmp2
       delete(fldtmp2)
@@ -289,12 +454,16 @@ begin
       
       latname2="lat"
       lonname2="lon"
-      if .not. ismissing(str_match(Var_DimNames2,"latitude"))
+      if .not. ismissing(str_match(Var_DimNames2,"latitude")) then
         latname2="latitude"
         lonname2="longitude"
       end if
+      if .not. ismissing(str_match(Var_DimNames2,"LAT")) then
+        latname2="LAT"
+        lonname2="LON"
+      end if
       if (ismissing(str_match(Var_DimNames2,"lat"))) then
-        if isatt(fld2,"coordinates") .and. (.not. ismissing(str_match(fld2@coordinates,"lat"))) then
+        if isatt(fld2,"coordinates") .and. ( (.not. ismissing(str_match(fld2@coordinates,"lat"))) .or. (.not. ismissing(str_match(fld2@coordinates,"LAT"))) ) then
           useLatDim2=True
           if isfilevar(ffile2,"nav_lat") then 
             latname2="nav_lat" 
@@ -396,8 +565,27 @@ begin
     
     ; Assume first dimension is time. Select first time slice before further processing
     if (rank3 .eq. 4) then
-      ;print("Selecting first time step for vector u")
-      fldtmp3=fld3(0,:,:,:)
+      ; case where (t,z,y,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames3(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld3,Var_DimNames3(0)) .and. isatt(fld3&$Var_DimNames3(0)$,"standard_name") \
+        .and. (fld3&$Var_DimNames3(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for vector u time step, i.e. time = "+fld3&$Var_DimNames3(0)$(time))
+          fldtmp3=fld3(time,:,:,:)
+        else
+          if isfloat(time) then 
+            index3=closest_val(time,fld3&$Var_DimNames3(0)$)
+            print("Selecting time closed to "+time+" for vector u, i.e. time = "+fld3&$Var_DimNames3(0)$(index3))
+            fldtmp3=fld3(index3,:,:,:)
+          end if
+        end if
+      else
+        ; case where no time argument or 'bad' files
+        print("Selecting first time step for vector u")
+        fldtmp3=fld3(0,:,:,:)
+      end if
+
       delete(fld3)
       fld3=fldtmp3
       delete(fldtmp3)
@@ -408,8 +596,27 @@ begin
       rank3=dimsizes(dime3)
     end if
     if (rank4 .eq. 4) then
-      ;print("Selecting first time step for vector v")
-      fldtmp4=fld4(0,:,:,:)
+      ; case where (t,z,y,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames4(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld4,Var_DimNames4(0)) .and. isatt(fld4&$Var_DimNames4(0)$,"standard_name") \
+        .and. (fld4&$Var_DimNames4(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for vector v time step, i.e. time = "+fld4&$Var_DimNames4(0)$(time))
+          fldtmp4=fld4(time,:,:,:)
+        else
+          if isfloat(time) then 
+            index4=closest_val(time,fld4&$Var_DimNames4(0)$)
+            print("Selecting time closed to "+time+" for vector v, i.e. time = "+fld4&$Var_DimNames4(0)$(index4))
+            fldtmp4=fld4(index4,:,:,:)
+          end if
+        end if
+      else
+        ; case where no time argument or 'bad' files
+        print("Selecting first time step for vector v")
+        fldtmp4=fld4(0,:,:,:)
+      end if
+
       delete(fld4)
       fld4=fldtmp4
       delete(fldtmp4)
@@ -422,13 +629,129 @@ begin
 
     ; Assume second dimension is depth. Select first level before further processing
     if (rank3 .eq. 3) then
-      fldtmp3=fld3(0,:,:)
+      ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames3(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld3,Var_DimNames3(0)) .and. isatt(fld3&$Var_DimNames3(0)$,"standard_name") \
+        .and. (fld3&$Var_DimNames3(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for vector u time step, i.e. time = "+fld3&$Var_DimNames3(0)$(time))
+          fldtmp3=fld3(time,:,:)
+        else
+          if isfloat(time) then 
+            index3=closest_val(time,fld3&$Var_DimNames3(0)$)
+            print("Selecting time closed to "+time+" for vector u, i.e. time = "+fld3&$Var_DimNames3(0)$(index3))
+            fldtmp3=fld3(index3,:,:)
+          end if
+        end if
+        ; case where (t,z,y) or (t,z,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames3(1),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld3,Var_DimNames3(1)) .and. isatt(fld3&$Var_DimNames3(1)$,"axis") \
+          .and. (fld3&$Var_DimNames3(1)$@axis .eq. "Z") ) then
+          
+          delete(fld3)
+          fld3=fldtmp3
+          delete(fldtmp3)
+          
+          if isint(level) then
+            print("Selecting index "+level+" for vector u level, i.e. level = "+fld3&$Var_DimNames3(1)$(level))
+            fldtmp3=fld3(level,:)
+          else
+            if isfloat(level) then 
+              index3=closest_val(level,fld3&$Var_DimNames3(1)$)
+              print("Selecting level closed to "+level+" for vector u, i.e. level = "+fld3&$Var_DimNames3(1)$(index3))
+              fldtmp3=fld3(index3,:)
+            end if
+          end if
+        end if  
+        
+      else
+        ; case where (z,y,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames3(0),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld3,Var_DimNames3(0)) .and. isatt(fld3&$Var_DimNames3(0)$,"axis") \
+          .and. (fld3&$Var_DimNames3(0)$@axis .eq. "Z") ) then
+          
+          if isint(level) then
+            print("Selecting index "+level+" for vector u level, i.e. level = "+fld3&$Var_DimNames3(0)$(level))
+            fldtmp3=fld3(level,:,:)
+          else
+            if isfloat(level) then 
+              index3=closest_val(level,fld3&$Var_DimNames3(0)$)
+              print("Selecting level closed to "+level+" for vector u, i.e. level = "+fld3&$Var_DimNames3(0)$(index3))
+              fldtmp3=fld3(index3,:,:)
+            end if
+          end if
+          
+        else
+          ;case where no time/level arguments or 'bad' files
+          print("Selecting first time or level step for vector u")
+          fldtmp3=fld3(0,:,:)
+        end if ; level
+      end if ; time
       delete(fld3)
       fld3=fldtmp3
       delete(fldtmp3)
     end if 
-    if (rank4 .eq. 3) then
-      fldtmp4=fld4(0,:,:)
+    if (rank4 .eq. 3) then 
+      ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
+      if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames4(0),"time"))) ) \
+        .or. ( (isvar("time")) .and. iscoord(fld4,Var_DimNames4(0)) .and. isatt(fld4&$Var_DimNames4(0)$,"standard_name") \
+        .and. (fld4&$Var_DimNames4(0)$@standard_name .eq. "time") ) then
+        
+        if isint(time) then
+          print("Selecting index "+time+" for vector v time step, i.e. time = "+fld4&$Var_DimNames4(0)$(time))
+          fldtmp4=fld4(time,:,:)
+        else
+          if isfloat(time) then 
+            index4=closest_val(time,fld4&$Var_DimNames4(0)$)
+            print("Selecting time closed to "+time+" for vector v, i.e. time = "+fld4&$Var_DimNames4(0)$(index4))
+            fldtmp4=fld4(index4,:,:)
+          end if
+        end if
+        ; case where (t,z,y) or (t,z,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames4(1),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld4,Var_DimNames4(1)) .and. isatt(fld4&$Var_DimNames4(1)$,"axis") \
+          .and. (fld4&$Var_DimNames4(1)$@axis .eq. "Z") ) then
+          
+          delete(fld4)
+          fld4=fldtmp4
+          delete(fldtmp4)
+          
+          if isint(level) then
+            print("Selecting index "+level+" for vector v level, i.e. level = "+fld4&$Var_DimNames4(1)$(level))
+            fldtmp4=fld4(level,:)
+          else
+            if isfloat(level) then 
+              index4=closest_val(level,fld4&$Var_DimNames4(1)$)
+              print("Selecting level closed to "+level+" for vector v, i.e. level = "+fld4&$Var_DimNames4(1)$(index4))
+              fldtmp4=fld4(index4,:)
+            end if
+          end if
+        end if  
+        
+      else
+        ; case where (z,y,x) are not degenerated
+        if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames4(0),"depth"))) ) \
+          .or. ( (isvar("level")) .and. iscoord(fld4,Var_DimNames4(0)) .and. isatt(fld4&$Var_DimNames4(0)$,"axis") \
+          .and. (fld4&$Var_DimNames4(0)$@axis .eq. "Z") ) then
+          
+          if isint(level) then
+            print("Selecting index "+level+" for vector v level, i.e. level = "+fld4&$Var_DimNames4(0)$(level))
+            fldtmp4=fld4(level,:,:)
+          else
+            if isfloat(level) then 
+              index4=closest_val(level,fld4&$Var_DimNames4(0)$)
+              print("Selecting level closed to "+level+" for vector v, i.e. level = "+fld4&$Var_DimNames4(0)$(index4))
+              fldtmp4=fld4(index4,:,:)
+            end if
+          end if
+          
+        else
+          ; case where no time/level arguments or 'bad' files
+          print("Selecting first time or level step for vector v")
+          fldtmp4=fld4(0,:,:)
+        end if ; level
+      end if ; time
       delete(fld4)
       fld4=fldtmp4
       delete(fldtmp4)
@@ -470,12 +793,16 @@ begin
     
     latnamev="lat"
     lonnamev="lon"
-    if .not. ismissing(str_match(Var_DimNames4,"latitude"))
+    if .not. ismissing(str_match(Var_DimNames4,"latitude")) then
       latnamev="latitude"
       lonnamev="longitude"
     end if
+    if .not. ismissing(str_match(Var_DimNames4,"LAT")) then
+      latnamev="LAT"
+      lonnamev="LON"
+    end if
     if (ismissing(str_match(Var_DimNames4,"lat"))) then
-      if isatt(fld4,"coordinates") .and. (.not. ismissing(str_match(fld4@coordinates,"lat"))) then
+      if isatt(fld4,"coordinates") .and. ( (.not. ismissing(str_match(fld4@coordinates,"lat"))) .or. (.not. ismissing(str_match(fld4@coordinates,"LAT"))) ) then 
         useLatDimv=True
         if isfilevar(ffile4,"nav_lat") then 
           latnamev="nav_lat" 
@@ -528,10 +855,15 @@ begin
       res@cnMaxLevelValF = vmax
       res@cnLevelSpacingF = vdelta
     end if
-    if ( isvar("levels") ) then
+    ;if ( isvar("levels") ) then
+    ;  res@cnLevelSelectionMode = "ExplicitLevels"
+    ;  res@cnLevels=tofloat(str_split(levels," "))
+    ;  delete(levels)
+    ;end if 
+    if ( isvar("colors") ) then
       res@cnLevelSelectionMode = "ExplicitLevels"
-      res@cnLevels=tofloat(str_split(levels," "))
-      delete(levels)
+      res@cnLevels=tofloat(str_split(colors," "))
+      delete(colors)
     end if 
 
     res@cnLinesOn=False

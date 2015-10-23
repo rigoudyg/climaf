@@ -47,6 +47,15 @@ General:
     "NH","SH60"...
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
+  - ``time``, ``level`` : for selecting time or level. This arguments
+    apply on all fields which have time and/or level dimension. Set it
+    to: 
+
+    - an integer if you want to select an index, 
+    - or a float if you want to select closest coordinate value,
+    - default: select the first time step if we have dimensions
+      (t,z,y,x) not degenerated; select first time or level step if
+      field dimensions is 3.     
 
 Main field:
 
@@ -57,7 +66,7 @@ Main field:
      default (climaf) is 'BlueDarkRed18'
    - ``vmin``, ``vmax`` , ``vdelta`` : min and max values and levels
      when applying the colormap, or 
-   - ``levels`` : list of levels used when applying colormap
+   - ``colors`` : list of levels used when applying colormap
      e.g. lin="260 270 280 290"
   - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
@@ -159,6 +168,13 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> plot_map4=plot(tos, sub_tos, duo, dvo, title='2 fields (automatic contours levels for auxiliary field) + vectors', 
      ... proj="NH", rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, vcMinDistanceF=0.01, vcLineArrowColor="yellow") 
 
+     >>> # A Map of two fields and vectors, with index selection of time step and/or level step for all fields which have this dimension :
+     >>> # time selection has no impact for vectors because time dimension is degenerated, so only level selection is done for vectors
+     >>> thetao=ds(project="EM",simulation="PRE6CPLCr2alb", variable="thetao", period="1998", realm="O") # thetao(time_counter, deptht, y, x) 
+     >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
+     >>> plot_map5=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, 
+     ... vcRefMagnitudeF=0.02, level=10, time=0) 
+
   - A cross-section ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
@@ -182,7 +198,15 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
 
      >>> # A cross-section of two fields, with automatic contours levels for auxiliary field and a pressure-linear spacing for vertical axis 
      >>> plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='2 fields (automatic contours levels for auxiliary field)')
-     
+    
+     >>> # A cross-section with value selection of time step for all fields which have this dimension
+     >>> # time selection is done for main and auxiliary field 
+     >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="1980") # ta(time, plev, lat, lon) 
+     >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean") 
+     >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
+     >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
+     >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', linp=1, time=3000.) 
+
   - A profile ::
 
      >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")

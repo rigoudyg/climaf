@@ -76,7 +76,7 @@ def load_standard_operators():
             'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
+            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
             'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
             'convert ${out} -trim ${out}) ', format="png")    
     #
@@ -86,7 +86,7 @@ def load_standard_operators():
             'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")
     #
-
+    
 
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
