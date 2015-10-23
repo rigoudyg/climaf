@@ -853,10 +853,10 @@ class cpage(cobject):
            height of each line. By default  spacing is even
          orientation (str, optional): page's orientation, either 'portrait' 
            (default) or 'landscape'
-         fig_trim (str, optional): to turn on/off triming for all figures.
+         fig_trim (logical, optional): to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
            either True (default) or False
-         page_trim (str, optional): to turn on/off triming for the page. It
+         page_trim (logical, optional): to turn on/off triming for the page. It
            removes all the surrounding extra space of the page, either True
            (default) or False 
 

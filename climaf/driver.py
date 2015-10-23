@@ -955,17 +955,18 @@ def efile(obj, filename, forced=False) :
          ensemble's members, with variable names suffixed by member
          label (i.e. 'var(obj.members[n])'_'obj.labels[n]')
 
-        forced (logical, optional) : if True, CliMAF will append the
-         result to filename if it already exists
+        forced (logical, optional) : if True, CliMAF will override the file
+         'filename' if it already exists 
                 
     """
     if isinstance(obj,classes.cens) :
 
         if os.path.isfile(filename):
             if forced:
-                clogger.warning("File '%s' already exists and will be appended" %filename) 
+                os.system("rm -rf %s" %filename)
+                clogger.warning("File '%s' already exists and was overriding" %filename)
             else:
-                raise Climaf_Driver_Error("File '%s' already exists (stop to don\'t append it)" %filename)
+                raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
                 
         for memb,lab in zip(obj.members,obj.labels):
             ffile=cfile(memb)
