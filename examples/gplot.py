@@ -124,10 +124,10 @@ cshow(select_cross2)
 # A profile
 #############
 # Define datasets for main field and auxiliary field (already done)
-#january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
-#ta_zonal_mean=ccdo(january_ta, operator="zonmean") 
-#cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
-#ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
+january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+ta_zonal_mean=ccdo(january_ta, operator="zonmean") 
+cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
+ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
 ta_profile=ccdo(ta_zonal_mean,operator="mermean")   # main field
 ta_profile2=ccdo(ta_zonal_mean2,operator="mermean") # auxiliary field
 

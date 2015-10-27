@@ -15,6 +15,14 @@ Changes, newest first :
 
 .. _news_0.11:
 
+- 2015/10/27 - Version 0.11 :
+  
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - it has new arguments : ``level`` and ``time`` for selecting time
+     or level;   
+   - and optional argument ``levels`` was renamed ``colors``.  
+   
 - 2015/10/19 - Version 0.11 :
 
  - For :py:func:`~climaf.classes.cpage` (which creates an **array of
@@ -67,8 +75,8 @@ Changes, newest first :
  - Operator 'lines' is smarter re.time axis: (see
    :doc:`scripts/lines`):
 
-   - Tick marks are smartly adapted to the time period duration. 
-   - When datasets does not cover the same time period, the user can
+   - Tick marks are smartly adapted to the time period duration.  
+   - When datasets does not cover the same time period, the user can 
      choose wether time axis will be aligned to the same origin or
      just be the union of all time periods 
 
@@ -87,7 +95,7 @@ Changes, newest first :
   - datasets of type 'short' are correctly read
   - operator's secondary output variables are duly renamed, according
     to the name given to operator's the secondary output when
-    decalring it using :py:func:`~climaf.operators.script()` 
+    declaring it using :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 
