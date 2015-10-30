@@ -1,0 +1,7 @@
+
+
+stdout and stderr of script call :
+	 (ncl -Q climaf/../scripts/gplot.ncl infile='"/home/vignonl/tmp/climaf_cache/6b/0.nc"' plotname='"/home/vignonl/tmp/climaf_cache/64/f.png"'  vmin=270 vmax=300 vdelta=5 var='"tas"' title='"A Map"'       contours=1  && convert /home/vignonl/tmp/climaf_cache/64/f.png -trim /home/vignonl/tmp/climaf_cache/64/f.png) 
+
+(0)	plotting a field with 2 horizontal dimensions
+(0)	using gsn_csm_contour_map_ce
