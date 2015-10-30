@@ -108,7 +108,7 @@ cshow(plot_cross6)
 
 # Two plots where (t,z,y) are not degenerated, with selection of time step and/or level step for all fields which have this dimension :
 # we will have a cross-section or a profile depending on time and level selection
-january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="1980") # ta(time, plev, lat, lon) 
+january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", period="1980") # ta(time, plev, lat, lon) 
 ta_zonal_mean=ccdo(january_ta,operator="zonmean") # => (t,z,y)
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # => (t,z,y)

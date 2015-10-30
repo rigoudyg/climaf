@@ -6,8 +6,64 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 ;--------------------------------------------------------------------------------------------
-undef("field_reduce")
+undef("data_select")
+; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field'
+function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string)
 
+local VarDimNames, dim, rk, index
+begin
+  
+  VarDimNames = getVarDimNames(field)  ; getting dimensions from metadata
+  dim=dimsizes(field)
+  rk=dimsizes(dim)
+
+  if isint(arg) then
+    print("Selecting index "+arg+" for "+arg_name+" step, i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
+    
+    if rk .eq. 4 then
+      new_fld=field(arg,:,:,:)     
+    else 
+      if rk .eq. 3 then
+        new_fld=field(arg,:,:)
+      else 
+        if rk .eq. 2 then
+          new_fld=field(arg,:)
+        end if ;rk eq 2
+      end if ; rk eq 3
+    end if ; rk eq 4
+    
+  else
+    if isfloat(arg) then 
+      ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
+      ;utc_time=cd_calendar(field&$Var_DimNames(0)$,1)
+      ;index=closest_val(time,utc_time)
+      ;print("Selecting time closed to "+time+", i.e. time = "+utc_time(index))
+      index=closest_val(arg,field&$dim_field_name$)
+      print("Selecting "+arg_name+" closed to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
+      
+      if rk .eq. 4 then
+        new_fld=field(index,:,:,:)     
+      else 
+        if rk .eq. 3 then
+          new_fld=field(index,:,:)
+        else 
+          if rk .eq. 2 then
+            new_fld=field(index,:)
+          end if ;rk eq 2
+        end if ; rk eq 3
+      end if ; rk eq 4
+      
+    end if ;arg is float
+  end if ;arg is integer
+  
+  return(new_fld)
+
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("field_reduce")
+; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
 function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical)
 
 local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
@@ -43,16 +99,10 @@ begin
   end if
   
   ; Removes singleton (degenerate) dimensions from field while preserving meta data
-  new_field=rm_single_dims(field)
-  delete(Var_DimNames)
-  Var_DimNames = getVarDimNames(new_field)
-  delete(dime)
-  dime=dimsizes(new_field)
-  delete(rank)
-  rank=dimsizes(dime)
-  delete(field)
-  field=new_field
-  delete(new_field)
+  field:=rm_single_dims(field)
+  Var_DimNames:=getVarDimNames(field)
+  dime:=dimsizes(field)
+  rank:=dimsizes(dime)
   
   ; Assume first dimension is time. Select first time slice before further processing
   if (rank .eq. 4) then
@@ -64,35 +114,18 @@ begin
     if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+    
+      field:=data_select("time", time, field, Var_DimNames(0))
       
-      if isint(time) then
-        print("Selecting index "+time+" for time step, i.e. time = "+field&$Var_DimNames(0)$(time))
-        fldtmp=field(time,:,:,:)
-      else
-        if isfloat(time) then 
-          ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
-          ;utc_time=cd_calendar(field&$Var_DimNames(0)$,1)
-          ;index=closest_val(time,utc_time)
-          ;print("Selecting time closed to "+time+", i.e. time = "+utc_time(index))
-          index=closest_val(time,field&$Var_DimNames(0)$)
-          print("Selecting time closed to "+time+", i.e. time = "+field&$Var_DimNames(0)$(index))
-          fldtmp=field(index,:,:,:)       
-        end if
-      end if
     else
       ; case where no time argument or 'bad' files
       print("Selecting first time step")
-      fldtmp=field(0,:,:,:)
+      field:=field(0,:,:,:)
     end if
 
-    delete(field)
-    field=fldtmp
-    delete(fldtmp)
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(field) 
-    delete(dime)
-    dime=dimsizes(field)
-    rank=dimsizes(dime)
+    Var_DimNames:=getVarDimNames(field) 
+    dime:=dimsizes(field)
+    rank:=dimsizes(dime)
   end if
  
   ; Assume second dimension is depth. Select first level before further processing
@@ -102,36 +135,15 @@ begin
     if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
-      
-      if isint(time) then
-        print("Selecting index "+time+" for time step, i.e. time = "+field&$Var_DimNames(0)$(time))
-        fldtmp=field(time,:,:)
-      else
-        if isfloat(time) then 
-          index=closest_val(time,field&$Var_DimNames(0)$)
-          print("Selecting time closed to "+time+", i.e. time = "+field&$Var_DimNames(0)$(index))
-          fldtmp=field(index,:,:)
-        end if
-      end if
+        
+      field:=data_select("time", time, field, Var_DimNames(0))
+
       ; case where (t,z,y) or (t,z,x) are not degenerated
       if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(1),"depth"))) ) \
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
         .and. (field&$Var_DimNames(1)$@axis .eq. "Z") ) then
 
-        delete(field)
-        field=fldtmp
-        delete(fldtmp)
-
-        if isint(level) then
-          print("Selecting index "+level+" for level, i.e. level = "+field&$Var_DimNames(1)$(level))
-          fldtmp=field(level,:)
-        else
-          if isfloat(level) then 
-            index=closest_val(level,field&$Var_DimNames(1)$)
-            print("Selecting level closed to "+level+", i.e. level = "+field&$Var_DimNames(1)$(index))
-            fldtmp=field(index,:)
-          end if
-        end if
+        field:=data_select("level", level, field, Var_DimNames(1))
       end if  
 
     else
@@ -139,37 +151,23 @@ begin
       if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(0),"depth"))) ) \
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
         .and. (field&$Var_DimNames(0)$@axis .eq. "Z") ) then
-        
-        if isint(level) then
-          print("Selecting index "+level+" for level, i.e. level = "+field&$Var_DimNames(0)$(level))
-          fldtmp=field(level,:,:)
-        else
-          if isfloat(level) then 
-            index=closest_val(level,field&$Var_DimNames(0)$)
-            print("Selecting level closed to "+level+", i.e. level = "+field&$Var_DimNames(0)$(index))
-            fldtmp=field(index,:,:)
-          end if
-        end if
-          
+
+        field:=data_select("level", level, field, Var_DimNames(0))
       else
         ; case where no time/level arguments or 'bad' files
         print("Selecting first time or level step")
-        fldtmp=field(0,:,:)
+        field:=field(0,:,:)
       
       end if ; level
     end if ; time
-    delete(field)
-    field=fldtmp
-    delete(fldtmp)
-    delete(dime)
-    dime=dimsizes(field)
-    rank=dimsizes(dime)
+
+    dime:=dimsizes(field)
+    rank:=dimsizes(dime)
   end if ; rk eq 3  
 
   ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
   if (rank .eq. 2) then
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(field) 
+    Var_DimNames:=getVarDimNames(field) 
 
     if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lon"))) .or. (.not. ismissing(str_match(field@coordinates,"LON"))) ) \ 
            .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
@@ -177,17 +175,17 @@ begin
            .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
       .or. ( (.not. ismissing(str_match(Var_DimNames(0),"LAT"))) \ 
            .and. (.not. ismissing(str_match(Var_DimNames(1),"LON"))) ) \
-      .or. ( isatt(field&$Var_DimNames(0)$,"standard_name") \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
            .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") \
-           .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
            .and. (field&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
-      .or. ( isatt(field&$Var_DimNames(0)$,"axis") \
-           .and. (field&$Var_DimNames(0)$@axis .eq. "y") \
-           .and. isatt(field&$Var_DimNames(1)$,"axis") \
-           .and. (field&$Var_DimNames(0)$@axis .eq. "x") ) then
+      .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+           .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
+           .and. ( (field&$Var_DimNames(1)$@axis .eq. "x") .or. (field&$Var_DimNames(1)$@axis .eq. "X") ) ) then
       horizontal=True 
     end if
-        
+
     ;We have a true cross-section or a horizontal map
     if logp  then useXY=False end if
     latname="lat"
@@ -200,8 +198,12 @@ begin
       latname="LAT"
       lonname="LON"
     end if
-    if (ismissing(str_match(Var_DimNames,"lat"))) then
-      if isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) then 
+    if ( (ismissing(str_match(Var_DimNames,"lat"))) .and. ismissing(str_match(Var_DimNames,"LAT")) ) then
+      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
+        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+             .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
+        .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+             .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
         useLatDim=True
         if isfilevar(ffile,"nav_lat") then 
           latname="nav_lat" 
@@ -214,12 +216,15 @@ begin
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(field)  ; getting dimensions from metadata
+    Var_DimNames:=getVarDimNames(field)  ; getting dimensions from metadata
     hor_dim=field&$Var_DimNames(0)$
     vprofile=False
     useXY=True
-    if ( ismissing(str_match(Var_DimNames(0),"lat")) .and. ismissing(str_match(Var_DimNames(0),"lon")) ) then
+    if ( .not. ismissing(str_match(Var_DimNames(0),"depth")) .or. (Var_DimNames(0) .eq. "sigma") \
+      .or. (Var_DimNames(0) .eq. "z") .or. (Var_DimNames(0) .eq. "Z") \
+      .or. (Var_DimNames(0) .eq. "plev") .or. (Var_DimNames(0) .eq. "lev") .or. (Var_DimNames(0) .eq. "level") \
+      .or. (Var_DimNames(0) .eq. "p") .or. (Var_DimNames(0) .eq. "pressure") \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") .and. ( (field&$Var_DimNames(0)$@axis .eq. "z") .or. (field&$Var_DimNames(0)$@axis .eq. "Z") ) ) ) then
       print("We have a vertical profile")
       vprofile=True
     end if
@@ -416,15 +421,15 @@ begin
         gsinv=angle_file->GSINV
         gcosv=angle_file->GCOSV
         ; Remove singleton (degenerate) dimensions: (t,y,x) -> (y,x)
-        new_gcosu=rm_single_dims(gcosu)
-        new_gsinu=rm_single_dims(gsinu)
-        new_gcosv=rm_single_dims(gcosv)
-        new_gsinv=rm_single_dims(gsinv)
+        gcosu:=rm_single_dims(gcosu)
+        gsinu:=rm_single_dims(gsinu)
+        gcosv:=rm_single_dims(gcosv)
+        gsinv:=rm_single_dims(gsinv)
         ; Rotation
         x=fld3
         y=fld4
-        fld3= x * new_gcosu - y * new_gsinu
-        fld4= x * new_gsinv + y * new_gcosv
+        fld3 := x * gcosu - y * gsinu
+        fld4 := x * gsinv + y * gcosv
       else
         print("File angles.nc cannot be accessed")
         status_exit(2)

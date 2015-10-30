@@ -754,7 +754,7 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
        
 
     """
-    clogger.debug("cfile called on "+str(object))  
+    clogger.debug("cfile called on "+str(object))
     result=climaf.driver.ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
