@@ -17,7 +17,7 @@ from operator import itemgetter
 locs=[]
 
 class dataloc():
-    def __init__(self,organization=None, url=None, project="*",model="*", simulation="*", 
+    def __init__(self,organization='generic', url=None, project="*",model="*", simulation="*", 
                  realm="*", table="*", frequency="*"):
         """
         Create an entry in the data locations dictionary for an ensemble of datasets.
@@ -41,7 +41,7 @@ class dataloc():
            - CMIP5_DRS : any datafile organized after the CMIP5 data reference syntax, such as on IPSL's Ciclad and CNRM's Lustre
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
            - generic : a data organization described by the user, using patterns such as described for 
-             :py:func:`~climaf.dataloc.selectGenericFiles`
+             :py:func:`~climaf.dataloc.selectGenericFiles`. This is the default
 
            Please ask the CliMAF dev team for implementing further organizations. 
            It is quite quick for data which are on the filesystem. Organizations 
@@ -319,7 +319,8 @@ def selectGenericFiles(urls, **kwargs):
                 #
                 # Filter file time period against required period
             else :
-                if ( 'frequency' in kwargs and kwargs['frequency']=="fx") :
+                if ( 'frequency' in kwargs and (kwargs['frequency']=="fx" or \
+                    kwargs['frequency']=="seasonal" or kwargs['frequency']=="annual_cycle" ))  :
                     if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)

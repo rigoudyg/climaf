@@ -372,7 +372,7 @@ def fixed_fields(operator, *paths):
       paths (couples) : a number of couples composed of the filename as expected
         by the operator
         and a path for the data; the path  may uses placeholders : ${model}, ${project}
-        and ${simulation}, which will be replaced by the corresponding facet
+        ${simulation} and ${realm}, which will be replaced by the corresponding facet
         values for the first operand.
 
     Returns:
