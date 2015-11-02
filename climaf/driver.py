@@ -8,7 +8,7 @@ from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
+import sys, os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
 
 # Climaf modules
@@ -27,8 +27,8 @@ def capply(climaf_operator, *operands, **parameters):
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
     res=None
-    if operands is None or operands[0] is None :
-        raise Climaf_Driver_Error("Operands is None")
+    if operands is None or operands[0] is None and not allow_errors_on_ds_call : 
+        raise Climaf_Driver_Error("Operands is None for operator %s"%climaf_operator)
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
         #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
@@ -753,7 +753,7 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
 
     """
     clogger.debug("cfile called on "+str(object))  
-    result=climaf.driver.ceval(object,format='file',deep=deep)
+    result=ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
         target=os.path.abspath(os.path.expanduser(target))
@@ -763,7 +763,9 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
             if ln or hard :
                 if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln :
-                    if not os.path.samefile(result,target):
+                    targetdir=os.path.dirname(target)
+                    if not(os.path.exists(targetdir)) : os.makedirs(targetdir)
+                    if not os.path.exists(target) or not os.path.samefile(result,target):
                         shutil.move(result,target)
                         if os.path.exists(result) : os.remove(result)
                         os.symlink(target,result)
@@ -820,7 +822,7 @@ def cexport(*args,**kwargs) :
             kwargs['format']="file" 
         if (kwargs['format']=="MA") :
             kwargs['format']="MaskedArray" 
-    return climaf.driver.ceval(*args,**kwargs)
+    return ceval(*args,**kwargs)
 
 def cimport(cobject,crs) :
     clogger.debug("cimport called with argument",cobject)  
@@ -924,18 +926,18 @@ def cfilePage(cobj, deep, recurse_list=None) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
 
-def calias(project,variable,**kwargs):
+def calias(project,variable,fileVariable=None,**kwargs):
               
     if not "," in variable: # mono-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         
     else : #multi-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         list_variable=variable.split(",")
         
         for v in list_variable:
             operators.derive(project,v,'ccdo',variable,operator='selname,%s'%v)
-            classes.calias(project=project,variable=v,**kwargs) 
+            classes.calias(project=project,variable=v,fileVariable=None,**kwargs) 
 
 
 def CFlongname(varname) :

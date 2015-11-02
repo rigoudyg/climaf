@@ -9,7 +9,7 @@ from __future__ import print_function
 __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
           "operators", "period", "standard_operators", "projects", "cmacro", "html", "usual_functions" ]
 
-version="0.11"
+version="dev"
 
 
 import time,os
@@ -53,7 +53,7 @@ if not already_inited  and not onrtd :
         default_cache="/data/"+os.getenv("USER")+"/climaf_cache"
     else: default_cache="~/tmp/climaf_cache"
     cachedir=os.getenv("CLIMAF_CACHE",default_cache)
-    cache.setNewUniqueCache(cachedir)
+    cache.setNewUniqueCache(cachedir,raz=False)
     print ("Cache directory set to : "+cachedir+" (use $CLIMAF_CACHE if set) ",file=sys.stderr)
     tim("set cache")
     #

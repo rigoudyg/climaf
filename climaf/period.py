@@ -5,7 +5,7 @@
 # S.Senesi 08/2014 : created
 
 import re, datetime
-from climaf.clogging import clogger
+from climaf.clogging import clogger, dedent
 
 class cperiod():
     """

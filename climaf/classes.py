@@ -10,10 +10,10 @@
 import re, string, copy, os.path
 
 import dataloc
-from period import init_period, cperiod
-from clogging import clogger, dedent
+from period    import init_period, cperiod
+from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
-from decimal import Decimal
+from decimal   import Decimal
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -126,6 +126,7 @@ class cproject():
         self.attributes_for_ensemble=['simulation']
         if 'ensemble' in kwargs :
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
+
     def __repr__(self):
         return self.crs
     def crs2ds(self,crs) :
@@ -718,6 +719,12 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             return compare_trees(tree1.father,tree2.father,
                                  func,filter_on_operator)
 
+allow_errors_on_ds_call=False
+
+def allow_error_on_ds(allow=True) :
+    global allow_errors_on_ds_call
+    allow_errors_on_ds_call=allow
+    #print ('allow_errors_on_ds_call='+`allow_errors_on_ds_call`)
 
 def ds(*args,**kwargs) :
     """
@@ -743,17 +750,16 @@ def ds(*args,**kwargs) :
         except Climaf_Classes_Error: dataset=None
         if (dataset) : results.append(dataset)
     if len(results) > 1 :
-        e="CRS expressions %s is ambiguous among projects %s"%(crs,`cprojects.keys()`)
-        clogger.error(e)
-        raise Climaf_Classes_Error(e)
+        e="CRS expression %s is ambiguous among projects %s"%(crs,`cprojects.keys()`)
+        if allow_errors_on_ds_call : clogger.info(e)
+        else : raise Climaf_Classes_Error(e)
     elif len(results) == 0 :
-        e="CRS expressions %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
-        raise Climaf_Classes_Error(e)
-        return None
+        e="CRS expression %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
+        if allow_errors_on_ds_call : clogger.info(e)
+        else : raise Climaf_Classes_Error(e)
     else : 
         rep=results[0]
-        if rep.project=='file' : 
-            rep.files=rep.kvp["path"]
+        if rep.project=='file' : rep.files=rep.kvp["path"]
         return rep
 
 def cfreqs(project,dic) :
