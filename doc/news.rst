@@ -13,16 +13,19 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
-.. _news_0.11:
+.. _news_0.12:
 
-- 2015/10/27 - Version 0.11 :
+- 2015/10/27 - Version Pre-0.12 :
   
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
    - new arguments : ``level`` and ``time`` for selecting time
      or level;   
    - optional argument ``levels`` was renamed ``colors``.  
+   - code re-design 
    
+.. _news_0.11:
+
 - 2015/10/19 - Version 0.11 :
 
  - For :py:func:`~climaf.classes.cpage` (which creates an **array of
