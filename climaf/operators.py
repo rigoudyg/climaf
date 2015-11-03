@@ -317,7 +317,7 @@ class cscript():
         #
         self.name=name
         self.command=command
-        self.fixedfields=None #LV
+        self.fixedfields=None 
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\

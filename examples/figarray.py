@@ -13,8 +13,11 @@ fig1=plot(tas,title="title")
 cfile(fig1)
 
 ###########################################################################
-# Define page1 as a figure array
-page1=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]], widths=[0.2,0.8],heights=[0.33,0.33,0.33])
+# Define page1 as a figure array by trimming all the surrounding extra
+# space of figures (fig_trim=True by default) and also of the page
+# (page_trim=True by default)
+page1=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]],
+            widths=[0.2,0.8],heights=[0.33,0.33,0.33])
 ###########################################################################
 # ask for display of page1
 cshow(page1)
@@ -28,10 +31,10 @@ page2=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]])
 cshow(page2)
 
 ###########################################################################
-# Define page3 as a figure array by trimming all the surrounding extra
-# space of figures (fig_trim=True) and also of the page (page_trim=True) 
+# Define page3 as a figure array by not trimming all the surrounding extra
+# space of the page (page_trim=False) but of figures (fig_trim=True by default) 
 page3=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]],
-            fig_trim=True,page_trim=True)
+            page_trim=False)
 ###########################################################################
 cshow(page3)
 
@@ -56,9 +59,9 @@ page4=cpage(fig_ens)
 cshow(page4)
 
 ###########################################################################
-# Define page5 as a figure array by only specifying heights (in the case of
-# an ensemble : widths=[1.] by default) and by trimming all the surrounding
-# extra space of figures (fig_trim=True) and also of the page (page_trim=True) 
-page5=cpage(fig_ens, heights=[0.8,0.2],fig_trim=True, page_trim=True)
+# Define page5 as a figure array by only specifying heights (in the case of an
+# ensemble : widths=[1.] by default) and by not trimming all the surrounding extra
+# space of the page (page_trim=False) but of figures (fig_trim=True by default) 
+page5=cpage(fig_ens, heights=[0.8,0.2], page_trim=False)
 ###########################################################################
 cshow(page5)

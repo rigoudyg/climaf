@@ -13,6 +13,37 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.11:
+
+- 2015/10/27 - Version 0.11 :
+  
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - it has new arguments : ``level`` and ``time`` for selecting time
+     or level;   
+   - and optional argument ``levels`` was renamed ``colors``.  
+   
+- 2015/10/19 - Version 0.11 :
+
+ - For :py:func:`~climaf.classes.cpage` (which creates an **array of
+   figures**), default keywords changed : fig_trim=False ->
+   fig_trim=True, page_trim=False -> page_trim=True. See example
+   :download:`figarray <../examples/figarray.py>`.   
+
+ - New function :py:func:`~climaf.driver.efile()` allows to apply
+   :py:func:`~climaf.driver.cfile()` to an ensemble dataset. It
+   provide a single file with variable names suffixed by member label.       
+ 
+ - The **general purpose plot operator** (for plotting 1D and 2D
+   datasets: maps, cross-sections and profiles), named ``plot``, was
+   significantly enriched. It allows now for plotting an additional
+   scalar field displayed as contours and for plotting an optional
+   vector field, for setting the reference longitude, the contours
+   levels for main or auxiliary field, the reference length used for
+   the vector field plot, the rotation of vectors from model grid to
+   geographic grid, ... See :doc:`scripts/plot`   
+
+
 .. _news_0.10:
 
 - 2015/09/23 - Version 0.10 :
@@ -44,8 +75,8 @@ Changes, newest first :
  - Operator 'lines' is smarter re.time axis: (see
    :doc:`scripts/lines`):
 
-   - Tick marks are smartly adapted to the time period duration. 
-   - When datasets does not cover the same time period, the user can
+   - Tick marks are smartly adapted to the time period duration.  
+   - When datasets does not cover the same time period, the user can 
      choose wether time axis will be aligned to the same origin or
      just be the union of all time periods 
 
@@ -64,7 +95,7 @@ Changes, newest first :
   - datasets of type 'short' are correctly read
   - operator's secondary output variables are duly renamed, according
     to the name given to operator's the secondary output when
-    decalring it using :py:func:`~climaf.operators.script()` 
+    declaring it using :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 

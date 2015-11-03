@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
+import tempfile
 
 # Climaf modules
 import climaf
@@ -609,6 +610,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
+    elif isinstance(cobject,classes.cpage) : return None
     elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
@@ -757,7 +759,7 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
        
 
     """
-    clogger.debug("cfile called on "+str(object))  
+    clogger.debug("cfile called on "+str(object))
     result=climaf.driver.ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
@@ -890,7 +892,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
                 figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
             else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
-            args.extend([figfile , "-geometry", scaling, "-composite" ])
+            args.extend([figfile, "-geometry", scaling, "-composite" ])
 
             # Real size of figure in pixels: [fig_width x fig_height]
             args_figsize=["identify", figfile]
@@ -913,19 +915,16 @@ def cfilePage(cobj, deep, recurse_list=None) :
             y+=height+ymargin
             
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
-    args.append(out_fig)
+    if cobj.page_trim :
+        args.extend(["-trim", out_fig])
+    else:
+        args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
 
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait()!=0 :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
-
-    # page trim 
-    if cobj.page_trim :
-        args_page_trim=["convert", out_fig, "-trim", out_fig]
-        comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        comm2.wait()
-    
+        
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
@@ -949,6 +948,49 @@ def CFlongname(varname) :
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
+
+def efile(obj, filename, forced=False) :
+    """
+    Create the file for an ensemble of CliMAF objects. Launch computation if needed.
+
+    Args:
+    
+        obj (CliMAF object) : an ensemble of CliMAF objects ('cens' objet)
+        
+        filename (str) : name of output file including all variables of
+         ensemble's members, with variable names suffixed by member
+         label (i.e. 'var(obj.members[n])'_'obj.labels[n]')
+
+        forced (logical, optional) : if True, CliMAF will override the file
+         'filename' if it already exists 
+                
+    """
+    if isinstance(obj,classes.cens) :
+
+        if os.path.isfile(filename):
+            if forced:
+                os.system("rm -rf %s" %filename)
+                clogger.warning("File '%s' already exists and was overriding" %filename)
+            else:
+                raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
+                
+        for memb,lab in zip(obj.members,obj.labels):
+            ffile=cfile(memb)
+            
+            f = tempfile.NamedTemporaryFile(suffix=".nc")
+            command="ncrename -O -v %s,%s_%s %s %s"%(varOf(memb), varOf(memb), lab, ffile, f.name)
+            if ( os.system(command) != 0 ) :
+                raise Climaf_Driver_Error("ncrename failed : %s" %command)         
+            
+            command2="ncks -A %s %s"%(f.name,filename)
+            if ( os.system(command2) != 0 ) :
+                raise Climaf_Driver_Error("Issue when merging %s and %s (using command: %s)"%(f.name,filename,command2))
+            f.close()
+      
+    else:
+        clogger.warning("objet is not a 'cens' objet")
+
+        
 class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

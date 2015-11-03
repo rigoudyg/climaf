@@ -5,14 +5,249 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
+;--------------------------------------------------------------------------------------------
+undef("data_select")
+; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field'
+function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string)
+
+local VarDimNames, dim, rk, index
+begin
+  
+  VarDimNames = getVarDimNames(field)  ; getting dimensions from metadata
+  dim=dimsizes(field)
+  rk=dimsizes(dim)
+
+  if isint(arg) then
+    print("Selecting index "+arg+" for "+arg_name+" step, i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
+    
+    if rk .eq. 4 then
+      new_fld=field(arg,:,:,:)     
+    else 
+      if rk .eq. 3 then
+        new_fld=field(arg,:,:)
+      else 
+        if rk .eq. 2 then
+          new_fld=field(arg,:)
+        end if ;rk eq 2
+      end if ; rk eq 3
+    end if ; rk eq 4
+    
+  else
+    if isfloat(arg) then 
+      ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
+      ;utc_time=cd_calendar(field&$Var_DimNames(0)$,1)
+      ;index=closest_val(time,utc_time)
+      ;print("Selecting time closed to "+time+", i.e. time = "+utc_time(index))
+      index=closest_val(arg,field&$dim_field_name$)
+      print("Selecting "+arg_name+" closed to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
+      
+      if rk .eq. 4 then
+        new_fld=field(index,:,:,:)     
+      else 
+        if rk .eq. 3 then
+          new_fld=field(index,:,:)
+        else 
+          if rk .eq. 2 then
+            new_fld=field(index,:)
+          end if ;rk eq 2
+        end if ; rk eq 3
+      end if ; rk eq 4
+      
+    end if ;arg is float
+  end if ;arg is integer
+  
+  return(new_fld)
+
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("field_reduce")
+; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
+function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical)
+
+local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
+begin
+  
+  ; Reading the field 
+  if isfilepresent(filename) then
+    ffile=addfile(filename,"r")
+    if isfilevar(ffile,varname) then 
+      if (getfilevartypes(ffile,varname) .eq. "short") then
+        field = short2flt( ffile->$varname$ )
+      else
+        field = ffile->$varname$
+      end if
+    else
+      print("File "+filename+" does not include variable "+varname)
+      status_exit(1)
+    end if
+  else
+    print("File "+filename+" cannot be accessed")
+    status_exit(2)
+  end if
+
+  ; Try to adapt to various cases, using heuristics !
+  ; Assume dimensions order is anyway t,z,y,x, but that some may be missing 
+  Var_DimNames = getVarDimNames(field)  ; getting dimensions from metadata
+  dime=dimsizes(field)
+  rank=dimsizes(dime)
+  if (rank.gt.4) then 
+    print("This script is not tuned for high rank data for field ( rank="+rank+")")
+    print(Var_DimNames)
+    status_exit(1)
+  end if
+  
+  ; Removes singleton (degenerate) dimensions from field while preserving meta data
+  field:=rm_single_dims(field)
+  Var_DimNames:=getVarDimNames(field)
+  dime:=dimsizes(field)
+  rank:=dimsizes(dime)
+  
+  ; Assume first dimension is time. Select first time slice before further processing
+  if (rank .eq. 4) then
+;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+; NOTE : this should be done only if at least two other dimensions have size > 1, otherwise we
+; should plot some Hovmoeller diagram
+;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ; case where (t,z,y,x) are not degenerated
+    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
+      .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+      .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+    
+      field:=data_select("time", time, field, Var_DimNames(0))
+      
+    else
+      ; case where no time argument or 'bad' files
+      print("Selecting first time step")
+      field:=field(0,:,:,:)
+    end if
+
+    Var_DimNames:=getVarDimNames(field) 
+    dime:=dimsizes(field)
+    rank:=dimsizes(dime)
+  end if
+ 
+  ; Assume second dimension is depth. Select first level before further processing
+  if (rank .eq. 3) then 
+    ;print("plotting a field with 2 horizontal dimensions")
+    ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
+    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
+      .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+      .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+        
+      field:=data_select("time", time, field, Var_DimNames(0))
+
+      ; case where (t,z,y) or (t,z,x) are not degenerated
+      if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(1),"depth"))) ) \
+        .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
+        .and. (field&$Var_DimNames(1)$@axis .eq. "Z") ) then
+
+        field:=data_select("level", level, field, Var_DimNames(1))
+      end if  
+
+    else
+      ; case where (z,y,x) are not degenerated
+      if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(0),"depth"))) ) \
+        .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+        .and. (field&$Var_DimNames(0)$@axis .eq. "Z") ) then
+
+        field:=data_select("level", level, field, Var_DimNames(0))
+      else
+        ; case where no time/level arguments or 'bad' files
+        print("Selecting first time or level step")
+        field:=field(0,:,:)
+      
+      end if ; level
+    end if ; time
+
+    dime:=dimsizes(field)
+    rank:=dimsizes(dime)
+  end if ; rk eq 3  
+
+  ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+  if (rank .eq. 2) then
+    Var_DimNames:=getVarDimNames(field) 
+
+    if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lon"))) .or. (.not. ismissing(str_match(field@coordinates,"LON"))) ) \ 
+           .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
+      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) \ 
+           .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
+      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"LAT"))) \ 
+           .and. (.not. ismissing(str_match(Var_DimNames(1),"LON"))) ) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+           .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
+           .and. (field&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
+      .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+           .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
+           .and. ( (field&$Var_DimNames(1)$@axis .eq. "x") .or. (field&$Var_DimNames(1)$@axis .eq. "X") ) ) then
+      horizontal=True 
+    end if
+
+    ;We have a true cross-section or a horizontal map
+    if logp  then useXY=False end if
+    latname="lat"
+    lonname="lon"
+    if .not. ismissing(str_match(Var_DimNames,"latitude")) then
+      latname="latitude"
+      lonname="longitude"
+    end if
+    if .not. ismissing(str_match(Var_DimNames,"LAT")) then
+      latname="LAT"
+      lonname="LON"
+    end if
+    if ( (ismissing(str_match(Var_DimNames,"lat"))) .and. ismissing(str_match(Var_DimNames,"LAT")) ) then
+      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
+        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+             .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
+        .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+             .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
+        useLatDim=True
+        if isfilevar(ffile,"nav_lat") then 
+          latname="nav_lat" 
+          lonname="nav_lon"
+        end if
+      end if
+    end if
+    lat_dim=ffile->$latname$
+    lon_dim=ffile->$lonname$                  
+  end if ; rk eq 2
+
+  if (rank .eq. 1) then 
+    Var_DimNames:=getVarDimNames(field)  ; getting dimensions from metadata
+    hor_dim=field&$Var_DimNames(0)$
+    vprofile=False
+    useXY=True
+    if ( .not. ismissing(str_match(Var_DimNames(0),"depth")) .or. (Var_DimNames(0) .eq. "sigma") \
+      .or. (Var_DimNames(0) .eq. "z") .or. (Var_DimNames(0) .eq. "Z") \
+      .or. (Var_DimNames(0) .eq. "plev") .or. (Var_DimNames(0) .eq. "lev") .or. (Var_DimNames(0) .eq. "level") \
+      .or. (Var_DimNames(0) .eq. "p") .or. (Var_DimNames(0) .eq. "pressure") \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") .and. ( (field&$Var_DimNames(0)$@axis .eq. "z") .or. (field&$Var_DimNames(0)$@axis .eq. "Z") ) ) ) then
+      print("We have a vertical profile")
+      vprofile=True
+    end if
+  end if
+
+  ; Return depending on rank=1 or rank=2
+  if (rank .eq. 1) then 
+    return([/field, hor_dim/])
+  else ;rk eq 2
+    return([/field, lat_dim, lon_dim/])
+  end if
+  
+end
+
+;--------------------------------------------------------------------------------------------
+
 
 begin
 
   if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
-  ;print("plotting cross section "+plotname+ " from "+infile)
-  
+
   type="png"
   LABELON=False
   RASTER=True 
@@ -38,29 +273,8 @@ begin
   ;-----------------
   ; Main field: fld
   ;-----------------
-
-  ; Reading the main field and its unit, setting REDU, and scaling the field
-  if isfilepresent(main_file) then
-    ffile=addfile(main_file,"r")
-    if isfilevar(ffile,main_var) then 
-      if (getfilevartypes(ffile,main_var) .eq. "short") then
-        fld = short2flt( ffile->$main_var$ )
-      else
-        fld = ffile->$main_var$
-      end if
-    else
-      print("File "+main_file+" does not include variable "+main_var)
-      status_exit(1)
-    end if
-  else
-    print("File "+main_file+" cannot be accessed")
-    status_exit(2)
-  end if
-
-  if (.not. isvar("units")) then 
-    if (isatt(fld,"units")) then units=fld@units else units="None" end if
-  end if
   
+  ; Setting variables depending on optional arguments
   logp=True ; by default, vertical cross-sections (and profiles) in pressure coordinates will have a logarithmic scale
   if (isvar("linp")) then if ((linp .eq. 1) .or. (linp .eq. -1)) then logp=False end if end if
 
@@ -77,119 +291,33 @@ begin
     end if
   else
     focus=""
-  end if
-      
-  ; Try to adapt to various cases, using heuristics !
-  ; Assume dimensions order is anyway t,z,y,x, but that some may be missing 
-  Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
-  dime=dimsizes(fld)
-  rank=dimsizes(dime)
-  if (rank.gt.4) then 
-    print("This script is not tuned for high rank data for main field ( rank="+rank+")")
-    print(Var_DimNames)
-    status_exit(1)
-  end if
-  
-  ; Removes singleton (degenerate) dimensions from fld while preserving meta data
-  new_fld=rm_single_dims(fld)
-  delete(Var_DimNames)
-  Var_DimNames = getVarDimNames(new_fld)
-  delete(dime)
-  dime=dimsizes(new_fld)
-  delete(rank)
-  rank=dimsizes(dime)
-  delete(fld)
-  fld=new_fld
-  delete(new_fld)
-  
-  ; Assume first dimension is time. Select first time slice before further processing
-  if (rank .eq. 4) then
-;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-; NOTE : this should be done only if at least two other dimensions have size > 1, otherwise we
-; should plot some Hovmoeller diagram
-;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ;print("Selecting first time step")
-    fldtmp=fld(0,:,:,:)
-    delete(fld)
-    fld=fldtmp
-    delete(fldtmp)
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(fld) 
-    delete(dime)
-    dime=dimsizes(fld)
-    rank=dimsizes(dime)
-  end if
-  
-  ; Assume second dimension is depth. Select first level before further processing
+  end if   
+
+  print("---------------")
+  print("  MAIN FIELD  ")
+  print("---------------")
+
   useXY=False
-  horizontal=False  
-  if (rank .eq. 3) then
-    print("plotting a field with 2 horizontal dimensions")
-    fldtmp=fld(0,:,:)
-    delete(fld)
-    fld=fldtmp
-    delete(fldtmp)
-    horizontal=True
-    delete(dime)
-    dime=dimsizes(fld)
-    rank=dimsizes(dime)
-  end if ; rk eq 3  
-     
-  ; fld is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+  horizontal=False
   useLatDim=False
-  useLonDim=False
-
-  if (rank .eq. 2) then
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(fld) 
-
-    if ( isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lon"))) .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) ) \ 
-      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) \ 
-           .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
-      .or. ( isatt(fld&$Var_DimNames(0)$,"standard_name") \
-           .and. (fld&$Var_DimNames(0)$@standard_name .eq. "latitude") \
-           .and. isatt(fld&$Var_DimNames(1)$,"standard_name") \
-           .and. (fld&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
-      .or. ( isatt(fld&$Var_DimNames(0)$,"axis") \
-           .and. (fld&$Var_DimNames(0)$@axis .eq. "y") \
-           .and. isatt(fld&$Var_DimNames(1)$,"axis") \
-           .and. (fld&$Var_DimNames(0)$@axis .eq. "x") ) then
-      horizontal=True 
-    end if
-        
-    ;We have a true cross-section or a horizontal map
-    if logp  then useXY=False end if
-    latname="lat"
-    lonname="lon"
-    if .not. ismissing(str_match(Var_DimNames,"latitude"))
-      latname="latitude"
-      lonname="longitude"
-    end if
-    if (ismissing(str_match(Var_DimNames,"lat"))) then
-      if isatt(fld,"coordinates") .and. (.not. ismissing(str_match(fld@coordinates,"lat"))) then
-        useLatDim=True
-        if isfilevar(ffile,"nav_lat") then 
-          latname="nav_lat" 
-          lonname="nav_lon"
-        end if
-      end if
-    end if
-    latdim=ffile->$latname$
-    londim=ffile->$lonname$                  
-  end if ; rk eq 2
-
-  if (rank .eq. 1) then 
-    delete(Var_DimNames)
-    Var_DimNames = getVarDimNames(fld)  ; getting dimensions from metadata
-    hdim=fld&$Var_DimNames(0)$
-    vprofile=False
-    useXY=True
-    if ( ismissing(str_match(Var_DimNames(0),"lat")) .and. ismissing(str_match(Var_DimNames(0),"lon")) ) then
-      print("We have a vertical profile")
-      vprofile=True
-    end if
+  vprofile=False
+  
+  ; Reading main field and reduction if necessary
+  array=field_reduce(main_file, main_var, logp, useXY, horizontal, useLatDim, vprofile)
+  
+  fld=array[0]
+  if ListCount(array) .eq. 2 then
+    hdim=array[1]
+  else ; ListCount eq 3
+    latdim=array[1]
+    londim=array[2]
   end if
   
+  ; Reading main field unit, scaling the field and setting REDU
+  if (.not. isvar("units")) then 
+    if (isatt(fld,"units")) then units=fld@units else units="None" end if
+  end if
+
   units=units 
   fld=fld*tofloat(scale)+tofloat(offset)
   
@@ -205,234 +333,83 @@ begin
   else
     power10=0
   end if
-    
+  
+  
   ;-----------------------
   ; Auxiliary field: fld2
   ;-----------------------
 
   if (AUX_FIELD) then
-
-    ; Reading the auxiliary field 
-    if isfilepresent(aux_file) then
-      ffile2=addfile(aux_file,"r")
-      if isfilevar(ffile2,aux_var) then 
-        if (getfilevartypes(ffile2,aux_var) .eq. "short") then
-          fld2 = short2flt( ffile2->$aux_var$ )
-        else
-          fld2 = ffile2->$aux_var$
-        end if
-      else
-        print("File "+aux_file+" does not include variable "+aux_var)
-        status_exit(1)
-      end if
-    else
-      print("File "+aux_file+" cannot be accessed")
-      status_exit(2)
-    end if
-  
-    ; Try to adapt to various cases, using heuristics !
-    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
-    Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
-    dime2=dimsizes(fld2)
-    rank2=dimsizes(dime2)
-    if (rank2.gt.4) then 
-      print("This script is not tuned for high rank data for auxiliary field ( rank="+rank2+")")
-      print(Var_DimNames2)
-      status_exit(1)
-    end if
-  
-    ; Removes singleton (degenerate) dimensions from fld2 while preserving meta data
-    new_fld2=rm_single_dims(fld2)
-    delete(Var_DimNames2) 
-    Var_DimNames2 = getVarDimNames(new_fld2) 
-    delete(dime2) 
-    dime2=dimsizes(new_fld2)
-    delete(rank2) 
-    rank2=dimsizes(dime2)
-    delete(fld2)
-    fld2=new_fld2
-    delete(new_fld2)
-  
-    ; Assume first dimension is time. Select first time slice before further processing
-    if (rank2 .eq. 4) then
-      ;print("Selecting first time step for auxiliary field")
-      fldtmp2=fld2(0,:,:,:)
-      delete(fld2)
-      fld2=fldtmp2
-      delete(fldtmp2)
-      delete(Var_DimNames2)
-      Var_DimNames2 = getVarDimNames(fld2) 
-      delete(dime2)
-      dime2=dimsizes(fld2)
-      rank2=dimsizes(dime2)
-    end if
-  
-    ; Assume second dimension is depth. Select first level before further processing
-    if (rank2 .eq. 3) then
-      print("plotting an auxiliary field with 2 horizontal dimensions")
-      fldtmp2=fld2(0,:,:)
-      delete(fld2)
-      fld2=fldtmp2
-      delete(fldtmp2)
-      delete(dime2)         
-      dime2=dimsizes(fld2)  
-      rank2=dimsizes(dime2)  
-    end if ; rk eq 3  
-     
-    ; fld2 is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal  
-    useLatDim2=False
-    useLonDim2=False
     
-    if (rank2 .eq. 2) then  
-      delete(Var_DimNames2)
-      Var_DimNames2 = getVarDimNames(fld2) 
-      
-      latname2="lat"
-      lonname2="lon"
-      if .not. ismissing(str_match(Var_DimNames2,"latitude"))
-        latname2="latitude"
-        lonname2="longitude"
-      end if
-      if (ismissing(str_match(Var_DimNames2,"lat"))) then
-        if isatt(fld2,"coordinates") .and. (.not. ismissing(str_match(fld2@coordinates,"lat"))) then
-          useLatDim2=True
-          if isfilevar(ffile2,"nav_lat") then 
-            latname2="nav_lat" 
-            lonname2="nav_lon" 
-          end if
-        end if
-      end if
-      latdim2=ffile2->$latname2$
-      londim2=ffile2->$lonname2$  
-    end if; rk eq 2  
+    print("---------------------")
+    print("   AUXILIARY FIELD   ")
+    print("---------------------")
 
-    if (rank2 .eq. 1) then 
-      delete(Var_DimNames2)
-      Var_DimNames2 = getVarDimNames(fld2)  ; getting dimensions from metadata
-      hdim2=fld2&$Var_DimNames2(0)$
+    useLatDim2=False
+    
+    logp_dummy=False
+    useXY_dummy=False
+    horizontal_dummy=False
+    vprofile_dummy=False
+  
+    ; Reading auxiliary field and reduction if necessary
+    array2=field_reduce(aux_file, aux_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy)
+  
+    fld2=array2[0]
+    if ListCount(array2) .eq. 2 then
+      hdim2=array2[1]
+    else ; ListCount eq 3
+      latdim2=array2[1]
+      londim2=array2[2]
     end if
-
+  
   end if ; AUX_FIELD is True
 
   ;-----------------------
   ; Vectors : fld3 & fld4
   ;-----------------------
-
+ 
   if VECT then
 
-    ; Reading vector fields 
-    if isfilepresent(u_file) then
-      ffile3=addfile(u_file,"r")
-      if isfilevar(ffile3,u_var) then 
-        if (getfilevartypes(ffile3,u_var) .eq. "short") then
-          fld3 = short2flt( ffile3->$u_var$ )
-        else
-          fld3 = ffile3->$u_var$
-        end if
-      else
-        print("File "+u_file+" does not include variable "+u_var)
-        status_exit(1)
-      end if
-    else
-      print("File "+u_file+" cannot be accessed")
-      status_exit(2)
-    end if
+    print("---------------------")
+    print("    VECTOR FIELDS    ")
+    print("---------------------")
+    ; fld3 <=> u <=> X, fld4 <=> v <=> Y
 
-    if isfilepresent(v_file) then
-      ffile4=addfile(v_file,"r")
-      if isfilevar(ffile4,v_var) then 
-        if (getfilevartypes(ffile4,v_var) .eq. "short") then
-          fld4 = short2flt( ffile4->$v_var$ )
-        else
-          fld4 = ffile4->$v_var$
-        end if
-      else
-        print("File "+v_file+" does not include variable "+v_var)
-        status_exit(1)
-      end if
-    else
-      print("File "+v_file+" cannot be accessed")
-      status_exit(2)
-    end if
+    print("-----> Vector u ")
 
-    ; Assume dimensions order is anyway t,z,y,x, but that some may be missing
-    Var_DimNames3 = getVarDimNames(fld3)  ; getting dimensions from metadata
-    dime3=dimsizes(fld3)
-    rank3=dimsizes(dime3)
-    
-    Var_DimNames4 = getVarDimNames(fld4) 
-    dime4=dimsizes(fld4)
-    rank4=dimsizes(dime4)
-    
-    if ((rank3.gt.4) .or. (rank4.gt.4)) then 
-      print("This script is not tuned for high rank data for vectors ( ranku="+rank3+", rankv="+rank4+" )")
-      print(Var_DimNames3)
-      print(Var_DimNames4)
+    ; Reading vector u and reduction if necessary
+    logp_dummy=False
+    useXY_dummy=False
+    horizontal_dummy=False
+    vprofile_dummy=False
+
+    useLatDimv=False
+    array3=field_reduce(u_file, u_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy)
+  
+    fld3=array3[0]
+    if ListCount(array3) .eq. 2 then
+      print("Rank data for vector u is 1 !!! Vectors fields must have a rank >= 2 !")
       status_exit(1)
-    end if  
+    else ; ListCount eq 3
+      ;latdimv=array3[1]
+      londimv=array3[2]
+    end if
 
-    ; Removes singleton (degenerate) dimensions from fld3 and fld4 while preserving meta data
-    new_fld3=rm_single_dims(fld3)
-    delete(Var_DimNames3) 
-    Var_DimNames3 = getVarDimNames(new_fld3) 
-    delete(dime3) 
-    dime3=dimsizes(new_fld3)
-    delete(rank3) 
-    rank3=dimsizes(dime3)
-    delete(fld3)
-    fld3=new_fld3
-    delete(new_fld3)
-
-    new_fld4=rm_single_dims(fld4)
-    delete(Var_DimNames4) 
-    Var_DimNames4 = getVarDimNames(new_fld4) 
-    delete(dime4) 
-    dime4=dimsizes(new_fld4)
-    delete(rank4) 
-    rank4=dimsizes(dime4)
-    delete(fld4)
-    fld4=new_fld4
-    delete(new_fld4)
+    print("-----> Vector v ")
     
-    ; Assume first dimension is time. Select first time slice before further processing
-    if (rank3 .eq. 4) then
-      ;print("Selecting first time step for vector u")
-      fldtmp3=fld3(0,:,:,:)
-      delete(fld3)
-      fld3=fldtmp3
-      delete(fldtmp3)
-      delete(Var_DimNames3)
-      Var_DimNames3 = getVarDimNames(fld3) 
-      delete(dime3)
-      dime3=dimsizes(fld3)
-      rank3=dimsizes(dime3)
+    ; Reading vector v and reduction if necessary
+    useLatDimv=False
+    array4=field_reduce(v_file, v_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy)
+  
+    fld4=array4[0]
+    if ListCount(array4) .eq. 2 then
+      print("Rank data for vector v is 1 !!! Vectors fields must have a rank >= 2 !")
+      status_exit(1)
+    else ; ListCount eq 3
+      latdimv=array4[1]
+      ;londimv=array4[2]
     end if
-    if (rank4 .eq. 4) then
-      ;print("Selecting first time step for vector v")
-      fldtmp4=fld4(0,:,:,:)
-      delete(fld4)
-      fld4=fldtmp4
-      delete(fldtmp4)
-      delete(Var_DimNames4)
-      Var_DimNames4 = getVarDimNames(fld4) 
-      delete(dime4)
-      dime4=dimsizes(fld4)
-      rank4=dimsizes(dime4)
-    end if
-
-    ; Assume second dimension is depth. Select first level before further processing
-    if (rank3 .eq. 3) then
-      fldtmp3=fld3(0,:,:)
-      delete(fld3)
-      fld3=fldtmp3
-      delete(fldtmp3)
-    end if 
-    if (rank4 .eq. 3) then
-      fldtmp4=fld4(0,:,:)
-      delete(fld4)
-      fld4=fldtmp4
-      delete(fldtmp4)
-    end if   
      
     ; Rotation des champs de la grille du modele NEMO -> GEO si le fichier des champs d angles est present 
     ; Ex. tests: fld3(:,:)=0.,fld4(:,:)=0.01
@@ -444,47 +421,20 @@ begin
         gsinv=angle_file->GSINV
         gcosv=angle_file->GCOSV
         ; Remove singleton (degenerate) dimensions: (t,y,x) -> (y,x)
-        new_gcosu=rm_single_dims(gcosu)
-        new_gsinu=rm_single_dims(gsinu)
-        new_gcosv=rm_single_dims(gcosv)
-        new_gsinv=rm_single_dims(gsinv)
+        gcosu:=rm_single_dims(gcosu)
+        gsinu:=rm_single_dims(gsinu)
+        gcosv:=rm_single_dims(gcosv)
+        gsinv:=rm_single_dims(gsinv)
         ; Rotation
         x=fld3
         y=fld4
-        fld3= x * new_gcosu - y * new_gsinu
-        fld4= x * new_gsinv + y * new_gcosv
+        fld3 := x * gcosu - y * gsinu
+        fld4 := x * gsinv + y * gcosv
       else
         print("File angles.nc cannot be accessed")
         status_exit(2)
       end if
-    end if
-    
-    ; fld3 & fld4 is now 2D ;fld3 <=> u <=> X, fld4 <=> v <=> Y
-    useLatDimv=False
-    useLonDimv=False
-    
-    delete(Var_DimNames3)
-    Var_DimNames3 = getVarDimNames(fld3) 
-    delete(Var_DimNames4)
-    Var_DimNames4 = getVarDimNames(fld4) 
-    
-    latnamev="lat"
-    lonnamev="lon"
-    if .not. ismissing(str_match(Var_DimNames4,"latitude"))
-      latnamev="latitude"
-      lonnamev="longitude"
-    end if
-    if (ismissing(str_match(Var_DimNames4,"lat"))) then
-      if isatt(fld4,"coordinates") .and. (.not. ismissing(str_match(fld4@coordinates,"lat"))) then
-        useLatDimv=True
-        if isfilevar(ffile4,"nav_lat") then 
-          latnamev="nav_lat" 
-          lonnamev="nav_lon"
-        end if
-      end if
-    end if
-    latdimv=ffile4->$latnamev$
-    londimv=ffile3->$lonnamev$      
+    end if 
       
   end if ; VECT
 
@@ -528,10 +478,10 @@ begin
       res@cnMaxLevelValF = vmax
       res@cnLevelSpacingF = vdelta
     end if
-    if ( isvar("levels") ) then
+    if ( isvar("colors") ) then
       res@cnLevelSelectionMode = "ExplicitLevels"
-      res@cnLevels=tofloat(str_split(levels," "))
-      delete(levels)
+      res@cnLevels=tofloat(str_split(colors," "))
+      delete(colors)
     end if 
 
     res@cnLinesOn=False
