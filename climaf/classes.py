@@ -847,6 +847,7 @@ class cpage(cobject):
            line of figures
          widths (list, optional): the list of figure widths, i.e. the
            width of each column. By default, if fig_line is:
+
              - a list of lists:  spacing is even
              - an ensemble:  one column is used
          heights (list, optional): the list of figure heights, i.e. the
