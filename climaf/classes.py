@@ -955,8 +955,8 @@ def guess_projects(crs) :
         Guess which is the project name for a dataset's crs, with minimum 
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'Â£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
-                    r";",r":",r"!",r'Â§',r'/',r'.',r'Ã¸',r'+',r'Â°']
+        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator

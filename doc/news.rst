@@ -19,9 +19,9 @@ Changes, newest first :
   
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
-   - it has new arguments : ``level`` and ``time`` for selecting time
+   - new arguments : ``level`` and ``time`` for selecting time
      or level;   
-   - and optional argument ``levels`` was renamed ``colors``.  
+   - optional argument ``levels`` was renamed ``colors``.  
    
 - 2015/10/19 - Version 0.11 :
 
@@ -31,12 +31,12 @@ Changes, newest first :
    :download:`figarray <../examples/figarray.py>`.   
 
  - New function :py:func:`~climaf.driver.efile()` allows to apply
-   :py:func:`~climaf.driver.cfile()` to an ensemble dataset. It
-   provide a single file with variable names suffixed by member label.       
+   :py:func:`~climaf.driver.cfile()` to an ensemble object. It
+   writes a single file with variable names suffixed by member label.       
  
  - The **general purpose plot operator** (for plotting 1D and 2D
    datasets: maps, cross-sections and profiles), named ``plot``, was
-   significantly enriched. It allows now for plotting an additional
+   significantly enriched. It now allows for plotting an additional
    scalar field displayed as contours and for plotting an optional
    vector field, for setting the reference longitude, the contours
    levels for main or auxiliary field, the reference length used for

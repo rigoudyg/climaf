@@ -34,7 +34,7 @@ Main functions are :
 
  - ``cfile``   : get the file value of a CliMAF object (compute it)
  
- - ``efile``   : create the file for an ensemble of CliMAF objects
+ - ``efile``   : create a single file for an ensemble of CliMAF objects
 
  - ``cshow``   : display a result of type 'figure'
 

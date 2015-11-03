@@ -951,15 +951,18 @@ def CFlongname(varname) :
 
 def efile(obj, filename, forced=False) :
     """
-    Create the file for an ensemble of CliMAF objects. Launch computation if needed.
+    Create a single file for an ensemble of CliMAF objects (launch computation if needed).
+    
+    This is a convenience function. Such files are not handled in CliMAF cache
 
     Args:
     
         obj (CliMAF object) : an ensemble of CliMAF objects ('cens' objet)
         
-        filename (str) : name of output file including all variables of
-         ensemble's members, with variable names suffixed by member
-         label (i.e. 'var(obj.members[n])'_'obj.labels[n]')
+        filename (str) : output filename. It will include a field for each 
+         ensemble's member, with a variable name suffixed by the member
+         label (e.g. : tas_CNRM-CM, tas_IPSL-CM... ) (more formally : 
+         'var(obj.members[n])'_'obj.labels[n]')
 
         forced (logical, optional) : if True, CliMAF will override the file
          'filename' if it already exists 

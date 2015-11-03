@@ -53,9 +53,9 @@ General:
 
     - an integer if you want to select an index, 
     - or a float if you want to select closest coordinate value,
-    - default: select the first time step if we have dimensions
-      (t,z,y,x) not degenerated; select first time or level step if
-      field dimensions is 3.     
+    - default: select the first time step if we have non-degenerated 
+      dimensions (t,z,y,x) ; select first time or level step if
+      field rank is 3.     
 
 Main field:
 
@@ -67,7 +67,7 @@ Main field:
    - ``vmin``, ``vmax`` , ``vdelta`` : min and max values and levels
      when applying the colormap, or 
    - ``colors`` : list of levels used when applying colormap
-     e.g. lin="260 270 280 290"
+     e.g. colors="260 270 280 290"
   - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
   - ``units`` : name of the main field units; used in the caption;
