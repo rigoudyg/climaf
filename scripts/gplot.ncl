@@ -12,8 +12,8 @@ begin
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
   ;print("plotting cross section "+plotname+ " from "+infile)
-  
-  type="png"
+    
+  ;type="png"
   LABELON=False
   RASTER=True 
 
@@ -491,12 +491,12 @@ begin
   ;-----------------
   ; Open workstation
   ;-----------------
-
-  if type.eq."png" then
-    type@wkWidth= 900
-    type@wkHeight=900 
-  end if
-
+ 
+  ;if type.eq."png" then
+  ;  type@wkWidth= 900 
+  ;  type@wkHeight=900 
+  ;end if
+  
   wks = gsn_open_wks(type,plotname)
   
   gsn_define_colormap(wks,cmap) 
@@ -507,6 +507,7 @@ begin
   res@gsnFrame= False
   res@gsnDraw= False
   res@gsnMaximize = True
+  res@gsnPaperOrientation="portrait"
   ; preferable pour plot en domaine limite :
   res@gsnLeftString     = ""
   ;res@gsnRightString    = ""
@@ -914,7 +915,12 @@ begin
   draw(plot0)
   
   frame(wks)
-
+  
+  if type .eq. "png" then
+    print("convert "+plotname+" -trim "+plotname)
+    system("convert "+plotname+" -trim "+plotname)
+  end if
+  
   status_exit(0)
   
 end

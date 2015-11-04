@@ -837,7 +837,7 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
-                  orientation="portrait", fig_trim=True, page_trim=True):
+                  orientation="portrait", fig_trim=True, page_trim=True, format="png"): #LV
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
@@ -876,7 +876,8 @@ class cpage(cobject):
         self.orientation=orientation
         self.fig_trim=fig_trim
         self.page_trim=page_trim
-
+        #LV
+        self.format=format
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
                 "fig_lines must be an ensemble or a list "

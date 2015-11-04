@@ -18,6 +18,11 @@ scripts=dict()
 operators=dict()
 derived_variables=dict()
 
+#LV
+known_formats=['nc','graph','txt']  
+graphic_formats=['png','pdf']
+none_formats=[None,'txt']
+
 class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
@@ -277,7 +282,10 @@ class cscript():
         #
         # Check if command includes an argument allowing for 
         # providing an output filename
-        if command.find("${out") < 0 : format=None
+        #if command.find("${out") < 0 : format=None #LV
+        if command.find("${out") < 0 :
+            if format is not "txt" :
+                format=None        
         #
         # Search in call arguments for keywords matching "<output_name>_var" 
         # which may provide format string for 'computing' outputs variable 
@@ -317,12 +325,15 @@ class cscript():
         #
         self.name=name
         self.command=command
-        self.fixedfields=None #LV
+        self.fixedfields=None 
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\
             commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
-        self.outputFormat=format
+        if format in known_formats or format in graphic_formats or format in none_formats:  #LV
+            self.outputFormat=format
+        else:
+            raise Climaf_Operator_Error('Allowed formats yet are : "nc", "png" and "pdf"')
         scripts[name]=self
 
         # Init doc string for the operator

@@ -1,54 +1,46 @@
 
 
 stdout and stderr of script call :
-	 climaf/../scripts/mcdo.sh "" "/home/vignonl/tmp/climaf_cache/17/1.nc" "precip" "1980-01-01T00:00:00,1980-01-31T23:59:00" "" "pr,precip,0.000012,0.000000" "" "" /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
+	 ncdump -h /home/vignonl/tmp/climaf_cache/6b/0.nc 
 
-+ operator=
-+ shift
-+ outs=/home/vignonl/tmp/climaf_cache/17/1.nc
-+ shift
-+ var=precip
-+ shift
-+ period=1980-01-01T00:00:00,1980-01-31T23:59:00
-+ shift
-+ region=
-+ shift
-+ alias=pr,precip,0.000012,0.000000
-+ shift
-+ units=
-+ shift
-+ vm=
-+ shift
-++ mktemp -d --tmpdir climaf_mcdo_XXXXXX
-+ tmp=/tmp/climaf_mcdo_2OkrXo
-+ '[' precip ']'
-+ selvar=-selname,precip
-+ '[' 1980-01-01T00:00:00,1980-01-31T23:59:00 ']'
-+ seldate=-seldate,1980-01-01T00:00:00,1980-01-31T23:59:00
-+ '[' '' ']'
-+ '[' pr,precip,0.000012,0.000000 ']'
-+ IFS=', '
-+ read var filevar scale offset
-+ selalias='-expr,pr=precip*0.000012+0.000000;'
-+ '[' '' ']'
-+ i=0
-+ for out in '$outs'
-+ i=1
-+ eval 'files=$1'
-++ files=/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
-+ vfiles=
-+ for file in '$files'
-++ basename /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc
-+ tmp2=/tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
-+ rm -f /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
-+ '[' ']'
-+ '[' pr,precip,0.000012,0.000000 ']'
-+ cdo 'expr,pr=precip*0.000012+0.000000;' -selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc /tmp/climaf_mcdo_2OkrXo/pr_gpcp.1d.nc
-cdo expr: Started child process "selname,precip -seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe1.1)".
-cdo(2) selname: Started child process "seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc (pipe2.1)".
-climaf/../scripts/mcdo.sh : ligne 54 : 28729 Erreur de segmentation  cdo ${selalias#-} ${selvar} $selregion $seldate $file $tmp2
-+ '[' '' ']'
-+ echo 'Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc '
-Issue while selecting data from /cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcp/pr_gpcp.1d.nc 
-+ rm -fr /tmp/climaf_mcdo_2OkrXo
-+ exit 1
+netcdf \0 {
+dimensions:
+	lon = 256 ;
+	lat = 128 ;
+	time = UNLIMITED ; // (1 currently)
+variables:
+	float lon(lon) ;
+		lon:standard_name = "longitude" ;
+		lon:long_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+	float lat(lat) ;
+		lat:standard_name = "latitude" ;
+		lat:long_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+	double time(time) ;
+		time:standard_name = "time" ;
+		time:units = "days since 1975-01-01 00:00:00" ;
+		time:calendar = "standard" ;
+	float tas(time, lat, lon) ;
+		tas:long_name = "2m_Temperature" ;
+		tas:units = "K" ;
+		tas:grid_type = "gaussian" ;
+		tas:_FillValue = 1.e+20f ;
+		tas:missing_value = 1.e+20f ;
+		tas:comment = "instantaneous values" ;
+
+// global attributes:
+		:CDI = "Climate Data Interface version 1.6.9 (http://mpimet.mpg.de/cdi)" ;
+		:Conventions = "CF-1.0" ;
+		:history = "Wed Nov 04 16:36:13 2015: cdo -f nc seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 -selname,tas /mnt/nfs/d3/aster/data3/aster/vignonl/code/climaf/examples/data/AMIPV6ALB2G/L/AMIPV6ALB2GSFX1980.nc climaf_mcdo_XwNKTG/AMIPV6ALB2GSFX1980.nc\n",
+			"Mon Feb 16 16:03:44 2015: cdo selvar,tas,tasmin,tasmax,hfls,hfss AMIPV6ALB2GSFX1980.nc AMIPV6ALB2GSFX1980e.nc\n",
+			"Thu Apr 10 07:47:44 2014: ncrcat -n 12,2,1 AMIPV6ALB2GSFX198001.nc AMIPV6ALB2GSFX1980.nc\n",
+			"created at time: Thu Apr 10 07:47:07 2014" ;
+		:institution = "CNRM (Centre National de Recherches Meteorologiques, Meteo-France, Toulouse, France)" ;
+		:title = "[EXPE]" ;
+		:nco_openmp_thread_number = 1 ;
+		:CDO = "Climate Data Operators version 1.6.9 (http://mpimet.mpg.de/cdo)" ;
+		:CRS_def = "select(ds(\'example.AMIPV6ALB2G.tas.198001.global.monthly\'))" ;
+}
