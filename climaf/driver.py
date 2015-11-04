@@ -8,7 +8,7 @@ from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
+import sys, os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
 import tempfile
 
@@ -28,8 +28,8 @@ def capply(climaf_operator, *operands, **parameters):
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
     res=None
-    if operands is None or operands[0] is None :
-        raise Climaf_Driver_Error("Operands is None")
+    if operands is None or operands[0] is None and not allow_errors_on_ds_call : 
+        raise Climaf_Driver_Error("Operands is None for operator %s"%climaf_operator)
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
         #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
@@ -759,8 +759,8 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
        
 
     """
-    clogger.debug("cfile called on "+str(object))
-    result=climaf.driver.ceval(object,format='file',deep=deep)
+    clogger.debug("cfile called on "+str(object))  
+    result=ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
         target=os.path.abspath(os.path.expanduser(target))
@@ -929,18 +929,18 @@ def cfilePage(cobj, deep, recurse_list=None) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
 
-def calias(project,variable,**kwargs):
+def calias(project,variable,fileVariable=None,**kwargs):
               
     if not "," in variable: # mono-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         
     else : #multi-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         list_variable=variable.split(",")
         
         for v in list_variable:
             operators.derive(project,v,'ccdo',variable,operator='selname,%s'%v)
-            classes.calias(project=project,variable=v,**kwargs) 
+            classes.calias(project=project,variable=v,fileVariable=None,**kwargs) 
 
 
 def CFlongname(varname) :

@@ -254,6 +254,7 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
+    altvar=kwargs.get('filenameVar',variable)
     # a dict and an ordered list of date globbing patterns
     dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
     lkeys=dt.keys() ; lkeys.sort(reverse=True)
@@ -319,21 +320,22 @@ def selectGenericFiles(urls, **kwargs):
                 #
                 # Filter file time period against required period
             else :
-                if ( 'frequency' in kwargs and (kwargs['frequency']=="fx" or \
-                    kwargs['frequency']=="seasonal" or kwargs['frequency']=="annual_cycle" ))  :
-                    if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
+                    kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
+                    if (l.find("${variable}")>=0) or fileHasVar(f,variable) or fileHasVar(f,altvar) : 
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                 else :
                     clogger.warning("Cannot yet filter files re. time using only file content. TBD")
                     rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
+                clogger.debug('Period is OK - Considering variable filtering on %s and %s for %s'%(variable,altvar,f)) 
                 # Filter against variable 
                 if (l.find("${variable}")>=0):
                     clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
                     continue
-                if f not in rep and ( fileHasVar(f,variable) or ("," in variable)):
+                if f not in rep and ( fileHasVar(f,variable) or fileHasVar(f,altvar) or ("," in variable)):
                     # Should check time period in the file if not regexp
                     clogger.debug('appending %s based on multi-var or var exists in file '%f)
                     rep.append(f)

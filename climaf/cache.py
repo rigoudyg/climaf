@@ -10,8 +10,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 import sys, os, os.path, re, time, glob
 import pickle
 
-from climaf import version
-from classes import compare_trees, cobject, ctree, cdataset, cprojects, guess_projects
+from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro  import crewrite
 from clogging import clogger
 import operators
@@ -22,7 +21,11 @@ cachedirs=None
 #: The index associating filenames to CRS expressions
 crs2filename=dict()  
 
-def setNewUniqueCache(path) :
+#: A dict containing cache index entries (as listed on index file), which 
+# were up to now not interpretable, given the set of defined tporjects
+crs_not_yet_evaluable=dict()
+
+def setNewUniqueCache(path,raz=True) :
     """ Define PATH as the sole cache to use from now. And clear it 
 
     """
@@ -33,7 +36,7 @@ def setNewUniqueCache(path) :
     cachedirs=[ path ] # The list of cache directories
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
-    craz(hideError=True)
+    if (raz) : craz(hideError=True)
 
 def generateUniqueFileName(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
@@ -120,8 +123,8 @@ def register(filename,crs):
 
     Silently skip non-existing files
     """
-    # First read index from file if it is yet empty
-    if len(crs2filename.keys()) == 0 : cload()
+    # First read index from file if it is yet empty - No : done at startup
+    # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
     waited=0
     while waited < 20 and not os.path.exists(filename) :
@@ -191,8 +194,8 @@ def hasMatchingObject(cobject,ds_func) :
     Can be applied for finding same object with included or including
     time-period
     """
-    # First read index from file if it is yet empty
-    if len(crs2filename.keys()) == 0 : cload()
+    # First read index from file if it is yet empty - No : done at startup
+    # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
         import operators
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
@@ -326,6 +329,7 @@ def csync(update=False) :
 
 def cload() :
     global crs2filename 
+    global crs_not_yet_evaluable
 
     if len(crs2filename) != 0 :
         Climaf_Driver_Error(
@@ -338,31 +342,51 @@ def cload() :
         pass
         #clogger.debug("no index file yet")
     #
-    inconsistents=[]
-    for crs in crs2filename.copy() :
+    must_check_index_entries=False
+    if (must_check_index_entries) :
         # We may have some crs inherited from past sessions and for which
-        # some operator may have become non-standard
-        try :
-            eval(crs, sys.modules['__main__'].__dict__)
-        except:
-            #clogger.debug("Inconsistent cache object is skipped : %s"%crs)
-            crs2filename.pop(crs)
-            inconsistents.append(crs)
-    # Analyze projects of inconsistent cache objects
-    projects=set()
-    for crs in inconsistents : 
-        ps=guess_projects(crs)
-        for p in ps :
-            if p not in cprojects : projects.add(p)
-    if projects :
-        clogger.error( 
-            "The cache has %d objects for non-declared projects %s.\n"
-            "For using it, consider including relevant project(s) "
-            "declaration(s) in ~/.climaf and restarting CliMAF.\n"
-            "You can also declare these projects right now and call 'csync(True)'\n"
-            "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
-                (len(inconsistents),`list(projects)`))
+        # some operator may have become non-standard, or some projects are yet 
+        # undeclared
+        crs_not_yet_evaluable=dict()
+        allow_error_on_ds()
+        for crs in crs2filename.copy() :
+            try :
+                #print "evaluating crs="+crs
+                eval(crs, sys.modules['__main__'].__dict__)
+            except:
+                print ("Inconsistent cache object is skipped : %s"%crs)
+                #clogger.debug("Inconsistent cache object is skipped : %s"%crs)
+                p=guess_projects(crs)
+                if p not in crs_not_yet_evaluable : crs_not_yet_evaluable[p]=dict()
+                crs_not_yet_evaluable[p][crs]=crs2filename[crs]
+                crs2filename.pop(crs)
+                # Analyze projects of inconsistent cache objects
+                projects= crs_not_yet_evaluable.keys()
+                if projects :
+                    clogger.info( 
+                        "The cache has %d objects for non-declared projects %s.\n"
+                        "For using it, consider including relevant project(s) "
+                        "declaration(s) in ~/.climaf and restarting CliMAF.\n"
+                        "You can also declare these projects right now and call 'csync(True)'\n"
+                        "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
+                        (len(crs_not_yet_evaluable),`list(projects)`))
+        allow_error_on_ds(False)
         
+
+def cload_for_project(project):
+    """
+    Append to the cache index dict those left index entries for 'project' which evaluate successfully
+    """
+    d=crs_not_yet_evaluable[project]
+    for crs in d.copy() :
+        try :
+            #print "evaluating crs="+crs
+            eval(crs, sys.modules['__main__'].__dict__)
+            crs2filename[crs]=d[crs]
+            d.pop(crs)
+        except:
+            clogger.error("CRS expression %s is not valid for project %s"%(crs,project))
+         
 def craz(hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index
