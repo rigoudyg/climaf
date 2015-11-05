@@ -10,6 +10,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 import sys, os, os.path, re, time, glob
 import pickle
 
+from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro  import crewrite
 from clogging import clogger
@@ -201,14 +202,17 @@ def hasMatchingObject(cobject,ds_func) :
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
     for crs in crs2filename.copy() :
-        co=eval(crs, sys.modules['__main__'].__dict__)
-        altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
-        if altperiod :
-            if os.path.exists(crs2filename[crs]) :
-                return co,altperiod
-            else :
-                clogger.debug("Removing %s from cache index, because file is missing",crs)
-                crs2filename.pop(crs)
+        try: 
+            co=eval(crs, sys.modules['__main__'].__dict__)
+            altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
+            if altperiod :
+                if os.path.exists(crs2filename[crs]) :
+                    return co,altperiod
+                else :
+                    clogger.debug("Removing %s from cache index, because file is missing",crs)
+                    crs2filename.pop(crs)
+        except :
+            pass # usually case of a CRS which project is not currently defined
     return None,None
 
 def hasIncludingObject(cobject) :

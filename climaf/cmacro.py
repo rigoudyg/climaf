@@ -81,7 +81,12 @@ def macro(name,cobj,lobjects=[]):
         s=cobj
         # Next line used for interpreting macros's CRS
         exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
-        cobj=eval(cobj, sys.modules['__main__'].__dict__)
+        try :
+            cobj=eval(cobj, sys.modules['__main__'].__dict__)
+        except :
+            # usually case of a CRS which project is not currently defined
+            clogger.error("Cannot interpret %s with the projects currently define"%s)
+            return None
         #print "string %s was interpreted as %s"%(s,cobj)
     domatch=False
     for o in lobjects :
