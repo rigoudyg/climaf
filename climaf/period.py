@@ -93,16 +93,15 @@ class cperiod():
     def start_with(self,begin) :
         """ If period BEGIN actually begins period SELF, returns the 
         complement of BEGIN in SELF; otherwise returns None """
-        if (self.fx) :
-            raise Climaf_Period_Error("Meaningless for period 'fx'")
+        if (self.fx) :return(False)
         if self.start==begin.start and self.end >= begin.end : 
             return cperiod(begin.end,self.end)
     #
     def includes(self,included) :
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
-        if (self.fx) :
-            raise Climaf_Period_Error("Meaningless for period 'fx'")
+        if (self.fx) :return(False)
+        #raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end :
             return cperiod(self.start,included.start), 
         cperiod(included.end,self.end)

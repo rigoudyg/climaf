@@ -156,8 +156,11 @@ begin
       else
         ; case where no time/level arguments or 'bad' files
         print("Selecting first time or level step")
-        field:=field(0,:,:)
-      
+        ;printVarSummary(field)
+        other=field(0,:,:)
+        delete(field)
+        field=other
+        ;field=field(0,:,:)
       end if ; level
     end if ; time
 

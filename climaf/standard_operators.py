@@ -25,9 +25,12 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
+            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('plus', 'cdo add ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('space_average',
