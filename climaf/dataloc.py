@@ -310,7 +310,7 @@ def selectGenericFiles(urls, **kwargs):
                 #print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp0,r'\1',f)
                 if start==f:
-                    raise Climaf_Data_Error("Start period not found") #? LV
+                    raise Climaf_Data_Error("Start period not found") #? 
                 if hasEnd :
                     end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))

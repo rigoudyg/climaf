@@ -247,8 +247,7 @@ begin
   if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
-
-  type="png"
+  if (.not. isvar("type")) then type="png" end if
   LABELON=False
   RASTER=True 
 
@@ -442,10 +441,10 @@ begin
   ; Open workstation
   ;-----------------
 
-  if type.eq."png" then
-    type@wkWidth= 900
-    type@wkHeight=900 
-  end if
+  ;if type.eq."png" then
+  ;  type@wkWidth= 900
+  ;  type@wkHeight=900 
+  ;end if
 
   wks = gsn_open_wks(type,plotname)
   
@@ -457,6 +456,7 @@ begin
   res@gsnFrame= False
   res@gsnDraw= False
   res@gsnMaximize = True
+  res@gsnPaperOrientation="portrait"
   ; preferable pour plot en domaine limite :
   res@gsnLeftString     = ""
   ;res@gsnRightString    = ""
@@ -865,6 +865,11 @@ begin
   
   frame(wks)
 
+  if type .eq. "png" then
+    print("convert "+plotname+" -trim "+plotname)
+    system("convert "+plotname+" -trim "+plotname)
+  end if
+  
   status_exit(0)
   
 end

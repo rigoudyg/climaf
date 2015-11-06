@@ -140,6 +140,9 @@ def register(filename,crs):
         if re.findall(".png$",filename) :
             command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
                 (crs,version,filename,filename,filename,filename)
+        if re.findall(".pdf$",filename) :
+            command="pdftk %s dump_data output rapport.txt && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> rapport.txt && pdftk %s update_info rapport.txt output %s.pdf && mv -f %s.pdf %s && rm -f rapport.txt"%\
+                (filename,crs,filename,filename,filename,filename)                             
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
@@ -159,6 +162,8 @@ def getCRS(filename) :
             'sed -r -e "s/.*:CRS_def *= *\\\"(.*)\\\" *;$/\\1/" '
     elif re.findall(".png$",filename) :
         form='identify -verbose %s | grep -E " *CRS_def: " | sed -r -e "s/.*CRS_def: *//"'
+    elif re.findall(".pdf$",filename) :
+        form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"' 
     else :
         clogger.critical("unknown filetype for %s"%filename)
         return None
@@ -432,7 +437,7 @@ def list_cache():
     find_return=""
     for dir_cache in cachedirs :
         rep=os.path.expanduser(dir_cache)
-        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' \) -print" %rep).read()
+        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) -print" %rep).read()
     files_in_cache=find_return.split('\n')
     files_in_cache.pop(-1)
     return(files_in_cache)
@@ -524,7 +529,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find=False
     if size or age or access != 0 :
         var_find=True
-        command="find %s -type f \( -name '*.png' -o -name '*.nc' \) %s -print" %(rep, opt_find)
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) %s -print" %(rep, opt_find) 
         clogger.debug("Find command is :"+command)
 
         #construction of the new dictionary after research on size/age/access
