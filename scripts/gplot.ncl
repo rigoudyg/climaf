@@ -11,8 +11,7 @@ begin
   if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
-  ;print("plotting cross section "+plotname+ " from "+infile)
-    
+  if (.not. isvar("type")) then type="png" end if
   ;type="png"
   LABELON=False
   RASTER=True 

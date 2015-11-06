@@ -18,7 +18,6 @@ scripts=dict()
 operators=dict()
 derived_variables=dict()
 
-#LV
 known_formats=['nc','graph','txt']  
 graphic_formats=['png','pdf']
 none_formats=[None,'txt']
@@ -57,7 +56,11 @@ class cscript():
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc' or 'png' or 'None'; defaults to 'nc'
+          format (str): script outputs format -- either 'nc' or 'png' or 'pdf' or 'None'
+            or 'graph' ('graph' allows to the user to choose two different graphic output
+            formats: 'png' or 'pdf') or 'txt' (the text output are not managed by CliMAF,
+            but only displayed - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF);
+            defaults to 'nc'  
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
           commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
             of time periods ? set it to true, if the operator can be applied on time
@@ -282,7 +285,6 @@ class cscript():
         #
         # Check if command includes an argument allowing for 
         # providing an output filename
-        #if command.find("${out") < 0 : format=None #LV
         if command.find("${out") < 0 :
             if format is not "txt" :
                 format=None        
@@ -330,7 +332,7 @@ class cscript():
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\
             commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
-        if format in known_formats or format in graphic_formats or format in none_formats:  #LV
+        if format in known_formats or format in graphic_formats or format in none_formats:  
             self.outputFormat=format
         else:
             raise Climaf_Operator_Error('Allowed formats yet are : "nc", "png" and "pdf"')

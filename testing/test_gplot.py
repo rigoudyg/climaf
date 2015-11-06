@@ -13,8 +13,9 @@ craz()
 # with default projection (a cylindrical equidistant)
 surface_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
 
-plot_map1=plot(surface_ta, title='A Map without contours lines')
+plot_map1=plot(surface_ta, title='A Map without contours lines', format="pdf") # with 'pdf' output format (default is 'png')
 cshow(plot_map1)
+cshow(cpdfcrop(plot_map1)) # 'cpdfcrop' <=> 'pdfcrop' by preserving metadata
 
 plot_map2=plot(surface_ta, contours=0, title='A Map without contours lines')
 cshow(plot_map2)

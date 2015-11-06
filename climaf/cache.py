@@ -128,15 +128,12 @@ def register(filename,crs):
         #while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
         if re.findall(".nc$",filename) : 
             command="ncatted -h -a CRS_def,global,o,c,\"%s\" %s"%(crs,filename)
-        if re.findall(".png$",filename) :#LV
+        if re.findall(".png$",filename) :
             command="convert -set \"CRS_def\" \"%s\" %s %s.png && mv -f %s.png %s"%\
                 (crs,filename,filename,filename,filename)
-        if re.findall(".pdf$",filename) : #LV
+        if re.findall(".pdf$",filename) :
             command="pdftk %s dump_data output rapport.txt && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> rapport.txt && pdftk %s update_info rapport.txt output %s.pdf && mv -f %s.pdf %s && rm -f rapport.txt"%\
-                (filename,crs,filename,filename,filename,filename)
-        #if re.findall(".txt$",filename) : #LV
-        #    command="sed -i '1i%s' %s"%(crs,filename)
-                             
+                (filename,crs,filename,filename,filename,filename)                             
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
@@ -156,12 +153,10 @@ def getCRS(filename) :
     if re.findall(".nc$",filename) : 
         form='ncdump -h %s | grep -E "CRS_def *=" | '+\
             'sed -r -e "s/.*:CRS_def *= *\\\"(.*)\\\" *;$/\\1/" '
-    elif re.findall(".png$",filename) :#LV
+    elif re.findall(".png$",filename) :
         form='identify -verbose %s | grep -E " *CRS_def: " | sed -r -e "s/.*CRS_def: *//"'
-    elif re.findall(".pdf$",filename) : #LV
+    elif re.findall(".pdf$",filename) :
         form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"' 
-    #elif re.findall(".txt$",filename) : #LV
-    #    form='sed -n "1p" %s' 
     else :
         clogger.critical("unknown filetype for %s"%filename)
         return None
@@ -408,7 +403,7 @@ def list_cache():
     find_return=""
     for dir_cache in cachedirs :
         rep=os.path.expanduser(dir_cache)
-        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) -print" %rep).read() #LV
+        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) -print" %rep).read()
     files_in_cache=find_return.split('\n')
     files_in_cache.pop(-1)
     return(files_in_cache)
@@ -500,7 +495,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find=False
     if size or age or access != 0 :
         var_find=True
-        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) %s -print" %(rep, opt_find) #LV
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) %s -print" %(rep, opt_find) 
         clogger.debug("Find command is :"+command)
 
         #construction of the new dictionary after research on size/age/access

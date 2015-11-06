@@ -36,7 +36,7 @@ def capply(climaf_operator, *operands, **parameters):
         res=capply_script(climaf_operator, *operands, **parameters)
         # Evaluate object right now if there is no output to manage
         op=operators.scripts[climaf_operator]
-        if op.outputFormat is None : ceval(res,userflags=copy.copy(op.flags))
+        if op.outputFormat in operators.none_formats : ceval(res,userflags=copy.copy(op.flags))
     elif climaf_operator in cmacro.cmacros :
         if (len(parameters) > 0) :
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
@@ -135,7 +135,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     arg derived_list is the list of variables that have been considered as 'derived'
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
-    if format != 'MaskedArray' and format != 'file' and format != 'txt' : #LV
+    if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
         raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf" and "txt"') 
     #
     if userflags is None : userflags=operators.scriptFlags()
@@ -421,27 +421,31 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    #LV
     if script.outputFormat not in operators.none_formats and \
            ( script.outputFormat in operators.known_formats or script.outputFormat in operators.graphic_formats ):
         if script.outputFormat=="graph" :
+            found_format=False
             for p in scriptCall.parameters :
                 if p=="format" and scriptCall.parameters[p] in operators.graphic_formats :
+                    found_format=True
                     output_fmt=scriptCall.parameters[p]
                 elif p=="format" and scriptCall.parameters[p] not in operators.graphic_formats :
+                    found_format=True
                     raise Climaf_Driver_Error('Allowed graphic formats yet are : "png" and "pdf"')
+            if not found_format : #default graphic format 
+                output_fmt="png"
         else:
             output_fmt=script.outputFormat
         # Compute a filename for each ouptut
         # Un-named main output
         main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
-                                                          format=output_fmt) #LV
+                                                          format=output_fmt) 
         subdict["out"]=main_output_filename
         subdict["out_"+scriptCall.variable]=main_output_filename
         # Named outputs
         for output in scriptCall.outputs:
             subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
-                                                         format=output_fmt) #LV
+                                                         format=output_fmt) 
                         
     # Account for script call parameters
     for p in scriptCall.parameters : 
@@ -512,7 +516,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     for line in command.stdout:
         command_std+=line
         logfile.write(line)
-        if script.outputFormat=="txt" : #LV
+        if script.outputFormat=="txt" : 
             sys.stdout.write(line)
     logfile.close()
     
@@ -652,7 +656,6 @@ def cread(datafile,varname=None):
     if not datafile : return(None)
     if re.findall(".png$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
-    #LV
     elif re.findall(".pdf$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
     elif re.findall(".nc$",datafile) :
@@ -678,7 +681,6 @@ def cread(datafile,varname=None):
 def cview(datafile):
     if re.findall(".png$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
-    #LV
     if re.findall(".pdf$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
     else :
@@ -840,7 +842,7 @@ def cexport(*args,**kwargs) :
     clogger.debug("cexport called with arguments"+str(args))  
     if "format" in kwargs :
         if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc" \
-            or kwargs['format']=="png" or kwargs['format']=="pdf") : #LV
+            or kwargs['format']=="png" or kwargs['format']=="pdf") : 
             kwargs['format']="file" 
         if (kwargs['format']=="MA") :
             kwargs['format']="MaskedArray" 
@@ -930,9 +932,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
         else:
             y+=height+ymargin
             
-    #LV   
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
-    #out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
 
     if cobj.page_trim :
         args.extend(["-trim", out_fig])

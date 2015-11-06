@@ -34,7 +34,7 @@ variables:
 // global attributes:
 		:CDI = "Climate Data Interface version 1.6.9 (http://mpimet.mpg.de/cdi)" ;
 		:Conventions = "CF-1.0" ;
-		:history = "Wed Nov 04 16:36:13 2015: cdo -f nc seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 -selname,tas /mnt/nfs/d3/aster/data3/aster/vignonl/code/climaf/examples/data/AMIPV6ALB2G/L/AMIPV6ALB2GSFX1980.nc climaf_mcdo_XwNKTG/AMIPV6ALB2GSFX1980.nc\n",
+		:history = "Fri Nov 06 11:18:29 2015: cdo -f nc seldate,1980-01-01T00:00:00,1980-01-31T23:59:00 -selname,tas /mnt/nfs/d3/aster/data3/aster/vignonl/code/climaf/examples/data/AMIPV6ALB2G/L/AMIPV6ALB2GSFX1980.nc climaf_mcdo_P4hDgz/AMIPV6ALB2GSFX1980.nc\n",
 			"Mon Feb 16 16:03:44 2015: cdo selvar,tas,tasmin,tasmax,hfls,hfss AMIPV6ALB2GSFX1980.nc AMIPV6ALB2GSFX1980e.nc\n",
 			"Thu Apr 10 07:47:44 2014: ncrcat -n 12,2,1 AMIPV6ALB2GSFX198001.nc AMIPV6ALB2GSFX1980.nc\n",
 			"created at time: Thu Apr 10 07:47:07 2014" ;

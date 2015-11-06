@@ -38,6 +38,12 @@ General:
 
   - ``title`` : string for graphic title; optional : CliMAF will provide the CRS of
     the dataset
+  - ``format`` : graphic output format, either 'png' or 'pdf';
+    default: 'png'. For 'png' format, all the surrounding white extra
+    space are cropped, while not for 'pdf' format. In case of 'pdf'
+    format, if you want to trim white extra space, use 'cpdfcrop'
+    operator which is 'pdfcrop' tool and which preserves in more
+    metadata.  
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
@@ -142,12 +148,14 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # How to get required file for rotate vectors from model grid on geographic grid
      >>> fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
     
-     >>> # A Map of one field and vectors, contours lines follows color fill, and rotation of vectors on geographic grid
+     >>> # A Map of one field and vectors, contours lines follows color fill, rotation of vectors on geographic grid and with 'pdf' output format 
      >>> plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors', 
-     ... contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) 
+     ... contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, format="pdf") 
      >>> cshow(plot_map1)
+     >>> # 'cpdfcrop' operator applied on 'plot_map1' object ('cpdfcrop' <=> 'pdfcrop' by preserving metadata)
+     >>> cshow(cpdfcrop(plot_map1))
 
-     >>> # A Map of one field and vectors, user-controlled contours lines contours; rotation as above
+     >>> # A Map of one field and vectors, user-controlled contours lines, rotation as above, and  with 'png' output format (default)
      >>> plot_map2=plot(tos, None, duo, dvo, title='1 field (user control contours) + vectors', contours='1 3 5 7 9 11 13', 
      ... proj='NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 
