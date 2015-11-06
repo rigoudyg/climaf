@@ -25,7 +25,6 @@ the input file, but no data values for any variables.
   >>> cdef("period","198001")
   >>> tas=ds(project="example", simulation="AMIPV6ALB2G", variable="tas") # some dataset, with whatever variable
   >>> header=ncdump(tas)
-  >>> cfile(header)
 
 **Side effects** : none
 
