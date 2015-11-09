@@ -24,6 +24,11 @@ Changes, newest first :
    - optional argument ``levels`` was renamed ``colors``.  
    - code re-design 
    
+- 2015/11/09 - Version Pre-0.12 :
+   
+ - If running on Ciclad, to use the new version of standard operator
+   ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
+
 .. _news_0.11:
 
 - 2015/11/06 - Version 0.11 :
