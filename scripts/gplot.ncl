@@ -99,10 +99,16 @@ begin
   end if
   
   ; Removes singleton (degenerate) dimensions from field while preserving meta data
-  field:=rm_single_dims(field)
-  Var_DimNames:=getVarDimNames(field)
-  dime:=dimsizes(field)
-  rank:=dimsizes(dime)
+  new_field=rm_single_dims(field)
+  delete(Var_DimNames)
+  Var_DimNames=getVarDimNames(new_field)
+  delete(dime)
+  dime=dimsizes(new_field)
+  delete(rank)
+  rank=dimsizes(dime)
+  delete(field)
+  field=new_field
+  delete(new_field)
   
   ; Assume first dimension is time. Select first time slice before further processing
   if (rank .eq. 4) then
@@ -115,17 +121,22 @@ begin
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
     
-      field:=data_select("time", time, field, Var_DimNames(0))
+      fldtmp=data_select("time", time, field, Var_DimNames(0))
       
     else
       ; case where no time argument or 'bad' files
       print("Selecting first time step")
-      field:=field(0,:,:,:)
+      fldtmp=field(0,:,:,:)
     end if
 
-    Var_DimNames:=getVarDimNames(field) 
-    dime:=dimsizes(field)
-    rank:=dimsizes(dime)
+    delete(field)
+    field=fldtmp
+    delete(fldtmp)
+    delete(Var_DimNames)
+    Var_DimNames = getVarDimNames(field) 
+    delete(dime)
+    dime=dimsizes(field)
+    rank=dimsizes(dime)
   end if
  
   ; Assume second dimension is depth. Select first level before further processing
@@ -136,14 +147,18 @@ begin
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
         
-      field:=data_select("time", time, field, Var_DimNames(0))
+      fldtmp=data_select("time", time, field, Var_DimNames(0))
 
       ; case where (t,z,y) or (t,z,x) are not degenerated
       if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(1),"depth"))) ) \
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
         .and. (field&$Var_DimNames(1)$@axis .eq. "Z") ) then
 
-        field:=data_select("level", level, field, Var_DimNames(1))
+        delete(field)
+        field=fldtmp
+        delete(fldtmp)
+
+        fldtmp=data_select("level", level, field, Var_DimNames(1))
       end if  
 
     else
@@ -152,22 +167,27 @@ begin
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
         .and. (field&$Var_DimNames(0)$@axis .eq. "Z") ) then
 
-        field:=data_select("level", level, field, Var_DimNames(0))
+        fldtmp=data_select("level", level, field, Var_DimNames(0))
       else
         ; case where no time/level arguments or 'bad' files
         print("Selecting first time or level step")
-        field:=field(0,:,:)
+        fldtmp=field(0,:,:)
       
       end if ; level
     end if ; time
 
-    dime:=dimsizes(field)
-    rank:=dimsizes(dime)
-  end if ; rk eq 3  
+    delete(field)
+    field=fldtmp
+    delete(fldtmp)
+    delete(dime)
+    dime=dimsizes(field)
+    rank=dimsizes(dime)
+ end if ; rk eq 3  
 
   ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
   if (rank .eq. 2) then
-    Var_DimNames:=getVarDimNames(field) 
+    delete(Var_DimNames)
+    Var_DimNames=getVarDimNames(field) 
 
     if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lon"))) .or. (.not. ismissing(str_match(field@coordinates,"LON"))) ) \ 
            .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
@@ -216,7 +236,8 @@ begin
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
-    Var_DimNames:=getVarDimNames(field)  ; getting dimensions from metadata
+    delete(Var_DimNames)
+    Var_DimNames=getVarDimNames(field)  ; getting dimensions from metadata
     hor_dim=field&$Var_DimNames(0)$
     vprofile=False
     useXY=True
@@ -420,15 +441,15 @@ begin
         gsinv=angle_file->GSINV
         gcosv=angle_file->GCOSV
         ; Remove singleton (degenerate) dimensions: (t,y,x) -> (y,x)
-        gcosu:=rm_single_dims(gcosu)
-        gsinu:=rm_single_dims(gsinu)
-        gcosv:=rm_single_dims(gcosv)
-        gsinv:=rm_single_dims(gsinv)
+        new_gcosu=rm_single_dims(gcosu)
+        new_gsinu=rm_single_dims(gsinu)
+        new_gcosv=rm_single_dims(gcosv)
+        new_gsinv=rm_single_dims(gsinv)
         ; Rotation
         x=fld3
         y=fld4
-        fld3 := x * gcosu - y * gsinu
-        fld4 := x * gsinv + y * gcosv
+        fld3 = x * new_gcosu - y * new_gsinu
+        fld4 = x * new_gsinv + y * new_gcosv
       else
         print("File angles.nc cannot be accessed")
         status_exit(2)
