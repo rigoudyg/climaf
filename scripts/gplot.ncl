@@ -699,7 +699,7 @@ begin
   res@vpHeightF = 0.8
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  if (.not. isvar("title")) then title=var end if
+  if (.not. isvar("title")) then title=main_var end if 
 
   res@tiMainString       = title
   res@vpXF      =0.1
@@ -866,7 +866,6 @@ begin
   frame(wks)
 
   if type .eq. "png" then
-    print("convert "+plotname+" -trim "+plotname)
     system("convert "+plotname+" -trim "+plotname)
   end if
   
