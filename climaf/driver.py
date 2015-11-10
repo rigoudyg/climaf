@@ -427,7 +427,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
                                                           format=script.outputFormat)
         subdict["out"]=main_output_filename
-        subdict["out_"+scriptCall.variable]=main_output_filename
+        subdict["out_"+varOf(scriptCall)]=main_output_filename
         # Named outputs
         for output in scriptCall.outputs:
             subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
@@ -770,11 +770,11 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
             if ln or hard :
                 if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln :
-                    if os.path.exists(target) and \
+                    if not os.path.exists(target) or \
                             not os.path.samefile(result,target):
                         shutil.move(result,target)
-                        if os.path.exists(result) : os.remove(result)
-                        os.symlink(target,result)
+                    if os.path.exists(result) : os.remove(result)
+                    os.symlink(target,result)
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
