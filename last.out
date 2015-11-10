@@ -1,0 +1,13 @@
+
+
+stdout and stderr of script call :
+	 (ncl -Q climaf/../scripts/gplot.ncl main_file='"/home/vignonl/tmp/climaf_cache/03/1.nc"' aux_file='"/home/vignonl/tmp/climaf_cache/17/b.nc"'    plotname='"/home/vignonl/tmp/climaf_cache/82/3.png"'     main_var='"ta"' aux_var='"ta"'   title='"Two profiles"'          linp=1        )
+
+(0)	---------------
+(0)	  MAIN FIELD  
+(0)	---------------
+(0)	We have a vertical profile
+(0)	---------------------
+(0)	   AUXILIARY FIELD   
+(0)	---------------------
+(0)	We have a vertical profile
