@@ -892,13 +892,17 @@ def cfilePage(cobj, deep, recurse_list=None) :
     #
     # margins
     x_left_margin=10. # Left shift at start and end of line
-    y_top_margin=10. # Initial vertical shift for first line
+    y_top_margin=10.#10. # Initial vertical shift for first line
     x_right_margin=10. # Right shift at start and end of line
     y_bot_margin=10. # Vertical shift for last line
     xmargin=20. # Horizontal shift between figures
     ymargin=20. # Vertical shift between figures
     #
-    usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
+    #LV
+    if cobj.title is "":
+        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
+    else:
+        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.splice_y
     usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
@@ -939,11 +943,18 @@ def cfilePage(cobj, deep, recurse_list=None) :
             y+=height+ymargin
             
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
-
+    #LV
     if cobj.page_trim :
-        args.extend(["-trim", out_fig])
-    else:
-        args.append(out_fig)
+        args.append("-trim")
+    if cobj.title != "":
+        splice="0x%d" %(cobj.splice_y)
+        annotate="+%d+%d" %(cobj.annotate_x, cobj.annotate_y)
+        args.extend(["-gravity", cobj.gravity, "-background", cobj.background, \
+                     "-splice", splice, "-font", cobj.font, "-pointsize", "%d"%cobj.pointsize, \
+                     "-annotate", annotate, cobj.title])
+
+    args.append(out_fig)
+    #LV
     clogger.debug("Compositing figures : %s"%`args`)
 
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

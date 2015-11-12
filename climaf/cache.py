@@ -455,7 +455,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     files on disk) using :py:func:`csync()`
     
     Args:
-     size (string, optional): n[ckMG]
+     size (string, optional): n[ckMG]     
       Search files using more than n units of disk space, rounding up.
       The following suffixes can be used:
 
@@ -464,8 +464,10 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         - "M"    for Megabytes (units of     1,048,576 bytes)
         - "G"    for Gigabytes (units of 1,073,741,824 bytes)
 
-     age (string, optional): Number of 24h periods. Search files which status was last changed n*24 hours ago.
-      Any fractional part is ignored, so to match age='+1', a file has to have been changed at least two days ago.
+     age (string, optional): Number of 24h periods. Search files which
+      status was last changed n*24 hours ago.
+      Any fractional part is ignored, so to match age='+1', a file has
+      to have been changed at least two days ago.
       Numeric arguments can be specified as:
       
         - `+n`   for greater than n

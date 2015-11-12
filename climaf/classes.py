@@ -843,29 +843,58 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
-                  orientation="portrait", fig_trim=True, page_trim=True, format="png"): 
+                 orientation="portrait", fig_trim=True, page_trim=True, format="png",
+                 title="", annotate_x=0, annotate_y=26, splice_y=50, pointsize=24,
+                 font="Times-New-Roman", gravity="North", background="white"): #LV
         """
         Builds a CliMAF cpage object, which represents an array of figures
 
         Args:
-         fig_line (a list of lists of figure objects or an ensemble of
+          fig_line (a list of lists of figure objects or an ensemble of
            figure objects): each sublist of 'fig_lines' represents a
            line of figures
-         widths (list, optional): the list of figure widths, i.e. the
+          widths (list, optional): the list of figure widths, i.e. the
            width of each column. By default, if fig_line is:
 
              - a list of lists:  spacing is even
              - an ensemble:  one column is used
-         heights (list, optional): the list of figure heights, i.e. the
+          heights (list, optional): the list of figure heights, i.e. the
            height of each line. By default  spacing is even
-         orientation (str, optional): page's orientation, either 'portrait' 
+          orientation (str, optional): page's orientation, either 'portrait' 
            (default) or 'landscape'
-         fig_trim (logical, optional): to turn on/off triming for all figures.
+          fig_trim (logical, optional): to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
            either True (default) or False
-         page_trim (logical, optional): to turn on/off triming for the page. It
+          page_trim (logical, optional): to turn on/off triming for the page. It
            removes all the surrounding extra space of the page, either True
            (default) or False 
+          format (str, optional): graphic output format, either 'png' (default)
+           or 'pdf'
+          title (str, optional): append a label below or above (depending optional
+           argument 'gravity') figures in the page
+          If title is activated:
+            annotate_x, annotate_y (int, optional): annotate the page with text.
+              annotate_x is the offset towards the right from the upper left corner
+              of the page, while annotate_y is the offset upward or the bottom
+              according to the optional argument 'gravity' (i.e. 'South' or 'North'
+              respectively); CLiMAF default: annotate_x=0, annotate_y=26. 
+              For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#annotate
+              where annotate_x and annotate_y correspond respectively to tx and ty
+              in '-annotate {+-}tx{+-}ty text'
+            splice_y (int, optional): width of the assigned box for title; CLiMAF
+              default: 50. For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#splice
+            pointsize (int, optional): pointsize of the title; CLiMAF default: 24
+            font (str, optional): set the font to use when creating title; CLiMAF
+              default: 'Times-New-Roman'. To print a complete list of fonts, use :
+              'convert -list font'
+            gravity (str, optional): the choosen direction specifies where to position
+              title; CLiMAF default: 'North'. For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#gravity
+            background (str, optional): background color of the assigned box for
+              title; default: 'white'. To print a complete list of color names, use:
+              'convert -list color'
 
         Example:
 
@@ -873,9 +902,9 @@ class cpage(cobject):
         
           >>> fig=plot(tas_avg,title='title')
           >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
-          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=False, page_trim=False)
-
-        
+          ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=False, page_trim=False,
+          ... format='pdf', title='Page title', annotate_x=10, annotate_y=20, splice_y=45,
+          ... pointsize=20, font='Utopia', gravity='South', background='grey90' )
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
@@ -884,6 +913,18 @@ class cpage(cobject):
         self.fig_trim=fig_trim
         self.page_trim=page_trim
         self.format=format
+        #LV
+        self.title=title
+        self.annotate_x=annotate_x
+        self.annotate_y=annotate_y
+        self.splice_y=splice_y
+        self.pointsize=pointsize
+        self.font=font
+        self.gravity=gravity
+        self.background=background
+        if ( self.splice_y < (self.annotate_y + self.pointsize) ) :
+            raise Climaf_Classes_Error("Title exceeds the assigned box: splice_y<annotate_y+pointsize")
+        #LV
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
                 "fig_lines must be an ensemble or a list "
@@ -943,14 +984,23 @@ class cpage(cobject):
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
             rep+=" ],"; 
-        rep+="],"+`self.widths`+","+`self.heights`+",orientation='"+self.orientation+\
-              "', fig_trim='%s', page_trim='%s')" %(self.fig_trim,self.page_trim)
+
+        if self.title is "" :
+            rep+=( "],"+`self.widths`+","+`self.heights`+", orientation='"+self.orientation+\
+                   "', fig_trim='%s', page_trim='%s', format='"+self.format+"')" )%(self.fig_trim,self.page_trim)
+        else:
+            rep+=( "],"+`self.widths`+","+`self.heights`+", orientation='"+self.orientation+\
+                   "', fig_trim='%s', page_trim='%s', format='"+self.format+"', title='"+self.title+\
+                   "', annotate_x=%d, annotate_y=%d, splice_y=%d, pointsize=%d, font='"+self.font+\
+                   "', gravity='"+self.gravity+"', background='"+self.background+"')" )\
+                   %(self.fig_trim,self.page_trim,self.annotate_x,self.annotate_y,self.splice_y,self.pointsize)
+                   #LV
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
         
         return rep
 
-        
+
 def guess_projects(crs) :
     """
     Return the list of projects involved in the datasets involved in a 

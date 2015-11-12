@@ -29,6 +29,12 @@ Changes, newest first :
  - If running on Ciclad, to use the new version of standard operator
    ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
 
+- 2015/11/12 :
+
+ - New arguments for :py:func:`~climaf.classes.cpage` for creating a
+   ``title``. See example :download:`figarray
+   <../examples/figarray.py>`.   
+
 .. _news_0.11:
 
 - 2015/11/06 - Version 0.11 :
