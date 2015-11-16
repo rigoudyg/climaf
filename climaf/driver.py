@@ -898,7 +898,6 @@ def cfilePage(cobj, deep, recurse_list=None) :
     xmargin=20. # Horizontal shift between figures
     ymargin=20. # Vertical shift between figures
     #
-    #LV
     if cobj.title is "":
         usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
     else:
@@ -943,7 +942,6 @@ def cfilePage(cobj, deep, recurse_list=None) :
             y+=height+ymargin
             
     out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
-    #LV
     if cobj.page_trim :
         args.append("-trim")
     if cobj.title != "":
@@ -954,7 +952,6 @@ def cfilePage(cobj, deep, recurse_list=None) :
                      "-annotate", annotate, cobj.title])
 
     args.append(out_fig)
-    #LV
     clogger.debug("Compositing figures : %s"%`args`)
 
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
