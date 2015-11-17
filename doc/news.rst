@@ -24,7 +24,33 @@ Changes, newest first :
    - optional argument ``levels`` was renamed ``colors``.  
    - code re-design 
    
+- 2015/11/09 - Version Pre-0.12 :
+   
+ - If running on Ciclad, to use the new version of standard operator
+   ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
+
+- 2015/11/12 :
+
+ - New arguments for :py:func:`~climaf.classes.cpage` for creating a
+   ``title``. See example :download:`figarray
+   <../examples/figarray.py>`.   
+
 .. _news_0.11:
+
+- 2015/11/06 - Version 0.11 :
+
+ - Two new output formats allowed for operators : 'graph' and 'text';
+   see :py:func:`~climaf.operators.cscript` 
+  - 'graph' allows to the user to choose two different graphic output
+  formats: 'png' or 'pdf' (new graphic ouput format); 
+  - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF. The text
+    output are not managed by CliMAF (but only displayed).
+
+- Two new standard operators :
+  - ``ncdump`` for **show only the header information of a netCDF
+    file**; see :doc:`scripts/ncdump` 
+  - ``cpdfcrop`` for **crop pdf figures to their minimal size by
+    preserving metadata**; see :doc:`scripts/cpdfcrop` 
 
 - 2015/10/19 - Version 0.11 :
 

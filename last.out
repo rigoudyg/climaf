@@ -1,0 +1,9 @@
+
+
+stdout and stderr of script call :
+	 (ncl -Q climaf/../scripts/gplot.ncl main_file='"/home/vignonl/tmp/climaf_cache/df/d.nc"'     plotname='"/home/vignonl/tmp/climaf_cache/77/2.png"'     main_var='"tas"'    title='"title 1981"'                  )
+
+(0)	---------------
+(0)	  MAIN FIELD  
+(0)	---------------
+(0)	using gsn_csm_contour_map_ce
