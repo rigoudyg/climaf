@@ -44,6 +44,15 @@ General:
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
     metadata.  
+  - ``resolution`` : string for image resolution, containing width and
+    height of resultant image or paper separated by character 'x', as
+    e.g. : "900x900" (in pixels for PNG output), "8.5x14" (in inches
+    for PDF output)
+
+    - if format is "png", resolution specifies the width and height of
+      resultant image in pixels; default (ncl): 1024x1024
+    - if format is "pdf", resolution specifies the width and height of
+      the paper, in inches; default (ncl): 8.5x11 (<=> 612x792 in pixels)
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or

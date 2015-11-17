@@ -76,8 +76,9 @@ def load_standard_operators():
             'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} type=\'\"${format}\"\' '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' )', format="graph")            
+            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
+            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
+            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' )', format="graph")            
     # 
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '

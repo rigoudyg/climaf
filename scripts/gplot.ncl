@@ -462,13 +462,22 @@ begin
   ; Open workstation
   ;-----------------
 
-  ;if type.eq."png" then
-  ;  type@wkWidth= 900
-  ;  type@wkHeight=900 
-  ;end if
+  if isvar("resolution") then
+    nb_pixels_or_inches = str_split(resolution, "x")
+    width = stringtofloat(nb_pixels_or_inches(0))
+    height = stringtofloat(nb_pixels_or_inches(1))
+    if type .eq. "png" then ;image resolution in pixels
+      type@wkWidth = width
+      type@wkHeight = height
+    else 
+      if type .eq. "pdf" then ;image resolution in inches
+        type@wkPaperWidthF  = width 
+        type@wkPaperHeightF = height
+      end if
+    end if
+  end if
 
   wks = gsn_open_wks(type,plotname)
-  
   gsn_define_colormap(wks,cmap) 
   i = NhlNewColor(wks,0.8,0.8,0.8)
   
