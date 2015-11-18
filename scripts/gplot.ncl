@@ -463,19 +463,41 @@ begin
   ;-----------------
 
   if isvar("resolution") then
-    nb_pixels_or_inches = str_split(resolution, "x")
-    width = stringtofloat(nb_pixels_or_inches(0))
-    height = stringtofloat(nb_pixels_or_inches(1))
-    if type .eq. "png" then ;image resolution in pixels
-      type@wkWidth = width
-      type@wkHeight = height
-    else 
-      if type .eq. "pdf" then ;image resolution in inches
-        type@wkPaperWidthF  = width 
-        type@wkPaperHeightF = height
+    if ( .not. ismissing(str_match(resolution,"x")) .or. .not. ismissing(str_match(resolution,"*")) ) then
+
+      if .not. ismissing(str_match(resolution,"x")) then
+        nb_pixels_or_inches = str_split(resolution, "x")
+      else
+        if .not. ismissing(str_match(resolution,"*")) then
+          nb_pixels_or_inches = str_split(resolution, "*")
+        end if
       end if
-    end if
-  end if
+      width = stringtofloat(nb_pixels_or_inches(0))
+      height = stringtofloat(nb_pixels_or_inches(1))
+    
+      if type .eq. "png" then ;image resolution in pixels
+        type@wkWidth = width
+        type@wkHeight = height
+      else 
+        if type .eq. "pdf" then ;image resolution in inches
+          type@wkPaperWidthF  = width 
+          type@wkPaperHeightF = height
+        end if
+      end if
+
+    else ; resolution is not given by 'widthxheight' or 'width*height'
+      
+      if type .eq. "png" then 
+        print("For PNG output, resolution must be given by 'widthxheight' or 'width*height'")
+        status_exit(1)
+      else
+        if type .eq. "pdf" then
+          type@wkPaperSize = resolution
+        end if
+      end if
+
+    end if ; str_match
+  end if ;resolution
 
   wks = gsn_open_wks(type,plotname)
   gsn_define_colormap(wks,cmap) 
