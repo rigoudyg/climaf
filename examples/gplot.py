@@ -18,10 +18,10 @@ dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="199807", 
 fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
 
 # A Map with one field and vectors, with contours lines like color fill, rotation of vectors on geographic grid,
-# default projection (a cylindrical equidistant) and with 'pdf' output format
+# default projection (a cylindrical equidistant), with 'pdf' output format and paper resolution of 17x22 inches (<=> 1224x1584 pixels)
 plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors',
-              contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, format="pdf")
-
+              contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, format="pdf", resolution='17*22') 
+ 
 # Displaying a figure object will compute and cache it if not already done
 cshow(plot_map1)
 # 'cpdfcrop' operator applied on 'plot_map1' object ('cpdfcrop' <=> 'pdfcrop' by preserving metadata)

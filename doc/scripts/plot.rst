@@ -44,15 +44,17 @@ General:
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
     metadata.  
-  - ``resolution`` : string for image resolution, containing width and
-    height of resultant image or paper separated by character 'x', as
-    e.g. : "900x900" (in pixels for PNG output), "8.5x14" (in inches
-    for PDF output)
+  - ``resolution`` : string for image resolution, either containing
+    width and height of resultant image or paper separated by
+    character 'x' or '*', or containing a standard paper size by name
+    only for PDF output, as e.g. : "900x900" (in pixels for PNG
+    output), "8.5*14" (in inches for PDF output), "A4" for PDF output 
 
     - if format is "png", resolution specifies the width and height of
       resultant image in pixels; default (ncl): 1024x1024
-    - if format is "pdf", resolution specifies the width and height of
-      the paper, in inches; default (ncl): 8.5x11 (<=> 612x792 in pixels)
+    - if format is "pdf", resolution specifies either the width and
+      height of the paper, in inches, or a standard paper size by
+      name; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
@@ -166,9 +168,10 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # How to get required file for rotate vectors from model grid on geographic grid
      >>> fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
     
-     >>> # A Map of one field and vectors, contours lines follows color fill, rotation of vectors on geographic grid and with 'pdf' output format 
+     >>> # A Map of one field and vectors, contours lines follows color fill, rotation of vectors on geographic grid, with 'pdf' output format 
+     >>> # and paper resolution of 17x22 inches (<=> 1224x1584 pixels)
      >>> plot_map1=plot(tos, None, duo, dvo, title='1 field (contours lines follow color filled contours) + vectors', 
-     ... contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, format="pdf") 
+     ... contours=1, rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, format="pdf", resolution='17*22') 
      >>> cshow(plot_map1)
      >>> # 'cpdfcrop' operator applied on 'plot_map1' object ('cpdfcrop' <=> 'pdfcrop' by preserving metadata)
      >>> cshow(cpdfcrop(plot_map1))
