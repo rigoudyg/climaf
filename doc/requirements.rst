@@ -1,7 +1,11 @@
 .. _requirements:
 
-Requirements
-------------
+Requirements and ackowledgements
+---------------------------------
+
+This is a natural place for acknowledging the unvaluable contribution
+by the tools/packages listed below, with a special thanks to CDO
+2015: Climate Data Operators. Available at: http://www.mpimet.mpg.de/cdo
 
 - Python version 2.x, with one NetCDF package (either
   Scientific.IO.NetCDF, or NETCDF4 or scipy.io.netcdf)
@@ -19,5 +23,6 @@ Optional
 If wanting to build or modify CliMAF documentation :
 
 - Sphinx : 
+
   - executable 'sphinx-build' 
   - package sphinxcontrib.napoleon 

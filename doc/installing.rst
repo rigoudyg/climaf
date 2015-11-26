@@ -37,7 +37,7 @@ Installing (or using an installed version, at CNRM or IPSL)
     and check the output of last command. Contact 'climaf at meteo dot
     fr' in case of problem at that stage
 
-   - for getting the development version, you may rather execute::
+  - for getting the development version, you may rather execute::
 
       git clone -b dev https://github.com/senesis/climaf climaf
 
