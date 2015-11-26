@@ -961,10 +961,10 @@ def cfilePage(cobj, deep, recurse_list=None) :
     if cobj.page_trim :
         args.append("-trim")
     if cobj.title != "":
-        splice="0x%d" %(cobj.splice_y)
-        annotate="+%d+%d" %(cobj.annotate_x, cobj.annotate_y)
+        splice="0x%d" %(cobj.ybox)
+        annotate="+%d+%d" %(cobj.x, cobj.y)
         args.extend(["-gravity", cobj.gravity, "-background", cobj.background, \
-                     "-splice", splice, "-font", cobj.font, "-pointsize", "%d"%cobj.pointsize, \
+                     "-splice", splice, "-font", cobj.font, "-pointsize", "%d"%cobj.pt, \
                      "-annotate", annotate, cobj.title])
 
     args.append(out_fig)

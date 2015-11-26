@@ -844,7 +844,7 @@ def cmissing(project,missing,*kwargs) :
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
                  orientation="portrait", fig_trim=True, page_trim=True, format="png",
-                 title="", annotate_x=0, annotate_y=26, splice_y=50, pointsize=24,
+                 title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white"): 
         """
         Builds a CliMAF cpage object, which represents an array of figures
@@ -875,20 +875,20 @@ class cpage(cobject):
 
            If title is activated:
         
-            - annotate_x, annotate_y (int, optional) : annotate the page with text.
-            annotate_x is the offset towards the right from the upper left corner
-            of the page, while annotate_y is the offset upward or the bottom
+            - x, y (int, optional) : annotate the page with text.
+            x is the offset towards the right from the upper left corner
+            of the page, while y is the offset upward or the bottom
             according to the optional argument 'gravity' (i.e. 'South' or 'North'
-            respectively); CLiMAF default: annotate_x=0, annotate_y=26. For more details, see:
+            respectively); CLiMAF default: x=0, y=26. For more details, see:
             http://www.imagemagick.org/script/command-line-options.php?#annotate ;
-            where annotate_x and annotate_y correspond respectively to tx and ty
+            where x and y correspond respectively to tx and ty
             in '-annotate {+-}tx{+-}ty text'
 
-            - splice_y (int, optional) : width of the assigned box for title;
+            - ybox (int, optional) : width of the assigned box for title;
             CLiMAF default: 50. For more details, see:
             http://www.imagemagick.org/script/command-line-options.php?#splice
 
-            - pointsize (int, optional) : pointsize of the title; CLiMAF default: 24
+            - pt (int, optional) : pt of the title; CLiMAF default: 24
 
             - font (str, optional): set the font to use when creating title; CLiMAF
             default: 'Times-New-Roman'. To print a complete list of fonts, use :
@@ -909,8 +909,8 @@ class cpage(cobject):
           >>> fig=plot(tas_avg,title='title')
           >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
           ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=False, page_trim=False,
-          ... format='pdf', title='Page title', annotate_x=10, annotate_y=20, splice_y=45,
-          ... pointsize=20, font='Utopia', gravity='South', background='grey90' )
+          ... format='pdf', title='Page title', x=10, y=20, ybox=45,
+          ... pt=20, font='Utopia', gravity='South', background='grey90' )
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
@@ -920,15 +920,15 @@ class cpage(cobject):
         self.page_trim=page_trim
         self.format=format
         self.title=title
-        self.annotate_x=annotate_x
-        self.annotate_y=annotate_y
-        self.splice_y=splice_y
-        self.pointsize=pointsize
+        self.x=x
+        self.y=y
+        self.ybox=ybox
+        self.pt=pt
         self.font=font
         self.gravity=gravity
         self.background=background
-        if ( self.splice_y < (self.annotate_y + self.pointsize) ) :
-            raise Climaf_Classes_Error("Title exceeds the assigned box: splice_y<annotate_y+pointsize")
+        if ( self.ybox < (self.y + self.pt) ) :
+            raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
                 "fig_lines must be a CliMAF ensemble or a list "
@@ -995,9 +995,9 @@ class cpage(cobject):
         else:
             rep+=( "],"+`self.widths`+","+`self.heights`+", orientation='"+self.orientation+\
                    "', fig_trim='%s', page_trim='%s', format='"+self.format+"', title='"+self.title+\
-                   "', annotate_x=%d, annotate_y=%d, splice_y=%d, pointsize=%d, font='"+self.font+\
+                   "', x=%d, y=%d, ybox=%d, pt=%d, font='"+self.font+\
                    "', gravity='"+self.gravity+"', background='"+self.background+"')" )\
-                   %(self.fig_trim,self.page_trim,self.annotate_x,self.annotate_y,self.splice_y,self.pointsize)
+                   %(self.fig_trim,self.page_trim,self.x,self.y,self.ybox,self.pt)
             
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")

@@ -40,7 +40,7 @@ General:
     the dataset
   - ``format`` : graphic output format, either 'png' or 'pdf';
     default: 'png'. For 'png' format, all the surrounding white extra
-    space are cropped, while not for 'pdf' format. In case of 'pdf'
+    space are cropped (but not for 'pdf' format). In case of 'pdf'
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
     metadata.  
