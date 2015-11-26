@@ -1,0 +1,16 @@
+
+
+stdout and stderr of script call :
+	 (ncl -Q climaf/../scripts/gplot.ncl main_file='"/home/vignonl/tmp/climaf_cache/0d/7.nc"' aux_file='""' u_file='"/home/vignonl/tmp/climaf_cache/f4/4.nc"' v_file='"/home/vignonl/tmp/climaf_cache/ad/0.nc"' rotation=1 plotname='"/home/vignonl/tmp/climaf_cache/e2/5.pdf"'     main_var='"tos"' aux_var='""' u_var='"uo"' v_var='"vo"' title='"1 field (user-controled contours) + vectors"'    vcRefMagnitudeF=0.02 vcRefLengthF=0.002         proj='"NH"' contours='"1 3 5 7 9 11 13"'  type='"pdf"' resolution='"8.5x14"' )
+
+(0)	---------------
+(0)	  MAIN FIELD  
+(0)	---------------
+(0)	---------------------
+(0)	    VECTOR FIELDS    
+(0)	---------------------
+(0)	-----> Vector u 
+(0)	Selecting first time or level step
+(0)	-----> Vector v 
+(0)	Selecting first time or level step
+(0)	using gsn_csm_contour_map

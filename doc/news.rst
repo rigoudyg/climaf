@@ -29,7 +29,10 @@ Changes, newest first :
  - If running on Ciclad, to use the new version of standard operator
    ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
 
-- 2015/11/12 :
+- 2015/11/17 - Version Pre-0.12 :
+
+ - Standard operator ``plot`` : new optional argument ``resolution``
+   for changing default image resolution (see :doc:`scripts/plot`)
 
  - New arguments for :py:func:`~climaf.classes.cpage` for creating a
    ``title``. See example :download:`figarray
