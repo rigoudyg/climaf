@@ -81,7 +81,11 @@ class dataloc():
             if re.findall("^esgf://.*",url) : self.organization="ESGF"
             self.urls=[url]
         self.urls = map(os.path.expanduser,self.urls)
-        self.urls = map(os.path.abspath,self.urls)
+        alt=[]
+        for u in self.urls :
+            if u[0] != '$' : alt.append(os.path.abspath(u))
+            else : alt.append(u)
+        self.urls=alt
         # Register new dataloc only if not already registered
         if not (any([ l == self for l in locs])) : locs.append(self)
     def __eq__(self, other):
@@ -200,7 +204,7 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for %s, at these"
+            clogger.warning("no file found for %s, at these "
                             "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -322,7 +326,8 @@ def selectGenericFiles(urls, **kwargs):
             else :
                 if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
                     kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
-                    if (l.find("${variable}")>=0) or fileHasVar(f,variable) or fileHasVar(f,altvar) : 
+                    if (l.find("${variable}")>=0) or variable=='*' or \
+                       fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) : 
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                 else :
@@ -335,10 +340,13 @@ def selectGenericFiles(urls, **kwargs):
                     clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
                     continue
-                if f not in rep and ( fileHasVar(f,variable) or fileHasVar(f,altvar) or ("," in variable)):
+                if (f not in rep) and \
+                   (variable=='*' or "," in variable or fileHasVar(f,variable) or \
+                    (altvar != variable and fileHasVar(f,altvar))) :
                     # Should check time period in the file if not regexp
                     clogger.debug('appending %s based on multi-var or var exists in file '%f)
                     rep.append(f)
+                    continue
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)

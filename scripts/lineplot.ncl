@@ -66,12 +66,13 @@ begin
   found=False
   coord=""
   do dim=0,dimsizes(dime)-1
-    if dime(dim) .gt. 1 then
+    if (dime(dim) .gt. 1) .and. ismissing(str_match(Var_DimNames(dim),"bnds")) then
 
       if found then
         print("There is more than one non-singleton dim in one of files:"+coord+" "+Var_DimNames(dim))
         status_exit(1)
       end if 
+      ; print("First non-singleton dim is :"+Var_DimNames(dim)+" size is "+dime(dim))
       found=True
 
       coord=Var_DimNames(dim)
@@ -101,7 +102,9 @@ begin
           Xaxis=all_fld&$coord$             ; take union of all time periods
         else
           Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
-        end if      
+        end if  
+      else
+        Xaxis=all_fld&$coord$
       end if
     end if
   end do
@@ -138,6 +141,7 @@ begin
   end if
  
   do i=0,n-1 colornames(i)=stdcolors(i) end do
+
   if isvar("colors") then 
     tab=str_split(colors," ")
     do i=0,dimsizes(tab)-1 
@@ -165,45 +169,47 @@ begin
   logp=True
   if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
   
-  ;--------------------------------------------------
-  ; The time_axis_label function adds additional
-  ; resources to "res" to produce nicely-formatted
-  ; time labels on X axis. This function only works
-  ; if you have a time "units" recognized by the
-  ; cd_calendar function.
-  ;---------------------------------------------------
-  restick = True
+  if (.not. ismissing(str_match(coord,"time"))) then ;;add
+    ;--------------------------------------------------
+    ; The time_axis_label function adds additional
+    ; resources to "res" to produce nicely-formatted
+    ; time labels on X axis. This function only works
+    ; if you have a time "units" recognized by the
+    ; cd_calendar function.
+    ; ---------------------------------------------------
+    restick = True
     
-  if (isvar("fmt")) then
-    restick@ttmFormat=fmt  
-  else
-    ymdhms = cd_calendar(Xaxis,0) ;return array of dimension dimsizes(Xaxis) x 6 and of type float
-    ;ymdhms(:,0) <=> years, ymdhms(:,1) <=> months, etc
-    ymdhms_dim = dimsizes(ymdhms)
-    nt = ymdhms_dim(0)
-
-    if ymdhms(nt-1,0) .ne. ymdhms(0,0) then ;year changes
-
-      if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 1) then ;2 years 
-        ;(by default, 'time_axis_labels' sets "%c%y")
-        restick@ttmNumTicks=8      ; approximate number of tick labels
-        restick@ttmMajorStride=3   ; number of timesteps desired between major tickmarks 
-        restick@ttmMinorStride=1   ; number of timesteps desired between minor tickmarks
-        restick@ttmFormat="%N/%y"         
-      else if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 9) then ;10 years 
-        ;(by default, 'time_axis_labels' sets "%Y")
-        restick@ttmNumTicks=12
-        restick@ttmMajorStride=12
-        restick@ttmMinorStride=3
-        restick@ttmFormat="%N/%y" 
+    if (isvar("fmt")) then
+      restick@ttmFormat=fmt  
+    else
+      ymdhms = cd_calendar(Xaxis,0) ;return array of dimension dimsizes(Xaxis) x 6 and of type float
+                                ;ymdhms(:,0) <=> years, ymdhms(:,1) <=> months, etc
+      ymdhms_dim = dimsizes(ymdhms)
+      nt = ymdhms_dim(0)
+      
+      if ymdhms(nt-1,0) .ne. ymdhms(0,0) then ;year changes
+        
+        if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 1) then ;2 years 
+                                ;(by default, 'time_axis_labels' sets "%c%y")
+          restick@ttmNumTicks=8      ; approximate number of tick labels
+          restick@ttmMajorStride=3   ; number of timesteps desired between major tickmarks 
+          restick@ttmMinorStride=1   ; number of timesteps desired between minor tickmarks
+          restick@ttmFormat="%N/%y"         
+        else 
+          if (abs(ymdhms(nt-1,0)-ymdhms(0,0)) .eq. 9) then ;10 years 
+                                ;(by default, 'time_axis_labels' sets "%Y")
+            restick@ttmNumTicks=12
+            restick@ttmMajorStride=12
+            restick@ttmMinorStride=3
+            restick@ttmFormat="%N/%y" 
+          end if
+        end if
       end if
-      end if
-
-    end if
+  time_axis_labels(Xaxis,res,restick)
+  end if
 
   end if
 
-  time_axis_labels(Xaxis,res,restick)
 
   ;---Open workstation
   wks = gsn_open_wks ("png",plotname) 

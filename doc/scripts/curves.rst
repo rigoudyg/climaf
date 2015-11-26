@@ -1,4 +1,4 @@
-lines : plot multiple profiles (along p, lat, lon..) 
+curves : plot multiple profiles (along p, lat, lon..) 
 -------------------------------------------------------------
 
 Plot a series of xy curves (along lat, lon or pressure/z_index ) for
@@ -12,8 +12,8 @@ an ensemble dataset using NCL
 
   - an ensemble dataset which can be up to 4-dimensional, but with
     only one non-degenerated dimension. All members are (yet) assumed
-    to have the same vector size. Works best when dimension is
-    time. For other case ssee standard operator ``curves``
+    to have the same vector size. OK when dimension is
+    not time
 
 **Mandatory arguments**: 
 
@@ -26,28 +26,8 @@ an ensemble dataset using NCL
     character '$'
   - ``colors`` : a string with one NCL color name per member,
     separated by whitespace
-  - ``thickness`` : thickness of the curves line; default to 2.
-  - ``T_axis`` : a string ("real" or "tweaked") which determines time
-    axis when datasets does not cover the same time period; default to
-    "real". 
-
-   - T_axis="real"    : time axis will be the union of all time
-     periods   
-   - T_axis="tweaked" : time axis will be aligned to the same origin
-     (take the first file as ref.) 
-      
   - ``linp`` : set it to 1 for getting a vertical axis with
     index-linear spacing  
-  - ``fmt``: a string specifying the format of the tick labels. This
-    string is parsed as follows: the '%' acts as the escape
-    character. The single character after every '%' is formatted
-    according to the rule described here:
-
-    https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
-
-    In case fmt is absent, a minimal algorithm exists which tries to
-    determine the format string depending on the length and values of
-    the date-time. 
 
 **Outputs** :
 

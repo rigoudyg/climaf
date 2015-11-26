@@ -653,9 +653,12 @@ def cread(datafile,varname=None):
         # Note taken from the CDOpy developper : .data is not backwards 
         # compatible to old scipy versions, [:] is
         data=fileobj.variables[varname][:]
-        fillv=fileobj.variables[varname]._FillValue
         import numpy.ma
-        rep= numpy.ma.array(data,mask = data==fillv)
+        if '_FillValue' in dir(fileobj.variables[varname]) :
+            fillv=fileobj.variables[varname]._FillValue
+            rep= numpy.ma.array(data,mask = data==fillv)
+        else : 
+            rep= numpy.ma.array(data)
         fileobj.close()
         return(rep)
     else :
@@ -770,11 +773,16 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
             if ln or hard :
                 if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln :
-                    if not os.path.exists(target) or \
-                            not os.path.samefile(result,target):
+                    if os.path.exists(target) :
+                        if not os.path.samefile(result,target): 
+                            os.remove(target)
+                            shutil.move(result,target)
+                            os.symlink(target,result)
+                    else: 
+                        if not os.path.exists(os.path.dirname(target)):
+                            os.makedirs(os.path.dirname(target))
                         shutil.move(result,target)
-                    if os.path.exists(result) : os.remove(result)
-                    os.symlink(target,result)
+                        os.symlink(target,result)
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
@@ -817,6 +825,19 @@ def  cMA(obj,deep=None) :
     """
     clogger.debug("cMA called with arguments"+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray',deep=deep)
+
+def cvalue(obj,index=0) :
+    """
+    Return the value of the array for an object, after MV flattening, at a given index
+    Example :
+    >>> data=ds(project='mine',variable='tas', ...)
+    >>> data1=time_average(data)
+    >>> data2=space_average(data1)
+    >>> v=cvalue(data2)
+
+    Does use the file representation of the object
+    """
+    return cMA(obj).data.flat[index]
 
 def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
@@ -867,12 +888,12 @@ def cfilePage(cobj, deep, recurse_list=None) :
     args=["convert", "-size", page_size, "xc:white"]
     #
     # margins
-    x_left_margin=10. # Left shift at start and end of line
-    y_top_margin=10. # Initial vertical shift for first line
-    x_right_margin=10. # Right shift at start and end of line
-    y_bot_margin=10. # Vertical shift for last line
-    xmargin=20. # Horizontal shift between figures
-    ymargin=20. # Vertical shift between figures
+    x_left_margin=30. # Left shift at start and end of line
+    y_top_margin=30. # Initial vertical shift for first line
+    x_right_margin=30. # Right shift at start and end of line
+    y_bot_margin=30. # Vertical shift for last line
+    xmargin=30. # Horizontal shift between figures
+    ymargin=30. # Vertical shift between figures
     #
     usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
     usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
@@ -902,13 +923,13 @@ def cfilePage(cobj, deep, recurse_list=None) :
             fig_width=figsize.split("x").pop(0)
             fig_height=figsize.split("x").pop(1)
                                        
-            if cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
+            if False and cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
                 width_adj=float(fig_width)*(height/float(fig_height))
                 x+=width_adj+xmargin
             else:
                 x+=width+xmargin
 
-        if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
+        if False and cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
             height_adj=float(fig_height)*(width/float(fig_width))
             y+=height_adj+ymargin
         else:
