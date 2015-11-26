@@ -89,6 +89,11 @@ def load_standard_operators():
             'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
             'convert ${out} -trim ${out}) ', format="png")
     #
+    cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
+            'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
+            'labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
+            'convert ${out} -trim ${out}) ', format="png")
+    #
     
 
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :

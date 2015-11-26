@@ -98,7 +98,7 @@ def link(label,filename,thumbnail=None) :
         rep=label
     return rep
 
-def cell(label,filename,thumbnail=None) :
+def cell(label,filename=None,thumbnail=None) :
     """ 
     Create a table cell with the provided label, which bears a link to
     the provided filename and possibly shows a thumbnail for the link

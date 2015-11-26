@@ -10,7 +10,7 @@ CliMAF macros module :
 
 import sys, os
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage
+from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds
 from clogging import clogger, dedent
 
 #: Dictionary of macros
@@ -132,11 +132,13 @@ def crewrite(crs,alsoAtTop=True):
     # Next line used for interpreting macros's CRS
     exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
+    allow_error_on_ds()
     try :
         co=eval(crs, sys.modules['__main__'].__dict__)
     except:
         clogger.debug("Issue when rewriting %s"%crs)
         return(crs)
+    allow_error_on_ds(False)
     if isinstance(co,ctree) or isinstance(co,scriptChild) or isinstance(co,cpage) :
         if alsoAtTop :
             for m in cmacros :

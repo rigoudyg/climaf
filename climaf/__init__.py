@@ -58,11 +58,11 @@ if not already_inited  and not onrtd :
     tim("set cache")
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
-    exec "from climaf.projects  import *" in sys.modules['__main__'].__dict__
+    exec("from climaf.projects  import *") in sys.modules['__main__'].__dict__
     tim("execs_projects")
-    exec "from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__
+    exec("from climaf.classes   import ds, eds, cens, fds") in sys.modules['__main__'].__dict__
     tim("execs_classes")
-    exec "from climaf.operators import cscript" in sys.modules['__main__'].__dict__
+    exec("from climaf.operators import cscript") in sys.modules['__main__'].__dict__
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")

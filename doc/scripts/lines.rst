@@ -12,11 +12,12 @@ an ensemble dataset using NCL
 
   - an ensemble dataset which can be up to 4-dimensional, but with
     only one non-degenerated dimension. All members are (yet) assumed
-    to have the same vector size
+    to have the same vector size. Works best when dimension is
+    time. For other case ssee standard operator ``curves``
 
 **Mandatory arguments**: 
 
-  - ``var`` : name of the variable to plot (must be the same for all members)
+  - None
 
 **Optional arguments**:
 

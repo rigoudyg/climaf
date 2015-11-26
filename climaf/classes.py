@@ -755,7 +755,7 @@ def ds(*args,**kwargs) :
         else : raise Climaf_Classes_Error(e)
     elif len(results) == 0 :
         e="CRS expression %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
-        if allow_errors_on_ds_call : clogger.info(e)
+        if allow_errors_on_ds_call : clogger.debug(e)
         else : raise Climaf_Classes_Error(e)
     else : 
         rep=results[0]
@@ -886,7 +886,7 @@ class cpage(cobject):
 
         if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
             raise Climaf_Classes_Error(
-                "fig_lines must be an ensemble or a list "
+                "fig_lines must be a CliMAF ensemble or a list "
                 "of lists (each representing a line of figures)")
         if isinstance(fig_lines,list) :
             if not widths :
