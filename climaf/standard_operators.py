@@ -79,10 +79,9 @@ def load_standard_operators():
             'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
-            'convert ${out} -trim ${out}) ', format="png")    
-    #
+            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} type=\'\"${format}\"\' '
+            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' )', format="graph")            
+    # 
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
@@ -94,8 +93,12 @@ def load_standard_operators():
             'labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
             'convert ${out} -trim ${out}) ', format="png")
     #
-    
-
+    # cpdfcrop : pdfcrop by preserving metadata
+    #
+    cscript('cpdfcrop'     , 'pdfcrop ${in} ${out} ', format="pdf")
+    #    
+    cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
+    #
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :
