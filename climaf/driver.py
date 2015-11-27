@@ -425,7 +425,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         if script.outputFormat=="graph" :
             if 'format' in scriptCall.parameters :
                 if scriptCall.parameters['format'] in operators.graphic_formats :
-                    output_fmt=scriptCall.parameters[p]
+                    output_fmt=scriptCall.parameters['format']
                 else: 
                     raise Climaf_Driver_Error('Allowed graphic formats yet are : "png" and "pdf"')
             else : #default graphic format 
@@ -917,7 +917,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
     if cobj.title is "":
         usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
     else:
-        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.splice_y
+        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.ybox
     usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
