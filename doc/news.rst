@@ -15,46 +15,41 @@ Changes, newest first :
 
 .. _news_0.12:
 
-- 2015/10/27 - Version Pre-0.12 :
+- 2015/11/27 - Version 0.12 :
   
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
-   - new arguments : ``level`` and ``time`` for selecting time
-     or level;   
-   - optional argument ``levels`` was renamed ``colors``.  
+   - new arguments : 
+
+    - ``level`` and ``time`` for selecting time  or level;   
+    - ``resolution``   for controling image resolution 
+    - ``format`` : graphical format : either png (default) or pdf
+
+   - optional argument ``levels`` was renamed ``colors``
    - code re-design 
-   
-- 2015/11/09 - Version Pre-0.12 :
-   
- - If running on Ciclad, to use the new version of standard operator
-   ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
+   - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
 
-- 2015/11/17 - Version Pre-0.12 :
+ - New arguments for :py:func:`~climaf.classes.cpage` :
 
- - Standard operator ``plot`` : new optional argument ``resolution``
-   for changing default image resolution (see :doc:`scripts/plot`)
+   - ``title``. See example :download:`figarray <../examples/figarray.py>`
+   - ``format`` : graphical output format : either png (default) or pdf
 
- - New arguments for :py:func:`~climaf.classes.cpage` for creating a
-   ``title``. See example :download:`figarray
-   <../examples/figarray.py>`.   
-
-.. _news_0.11:
-
-- 2015/11/06 - Version 0.11 :
 
  - Two new output formats allowed for operators : 'graph' and 'text';
    see :py:func:`~climaf.operators.cscript` 
+
   - 'graph' allows the user to choose between two graphic output
     formats: 'png' and 'pdf' (new graphic ouput format), if the
     corresponding operator supports it (this is the case for plot()); 
   - 'txt' allows to use any operator that just ouputs text (e.g. 
     'ncdump -h'). The text output is not managed by CliMAF (but only displayed).
 
-- Two new standard operators :
-  - ``ncdump`` : **show only the header information of a netCDF
-    file**; see :doc:`scripts/ncdump` 
-  - ``cpdfcrop`` : **crop pdf figures to their minimal size,
-    preserving metadata**; see :doc:`scripts/cpdfcrop` 
+ - Two new standard operators :
+
+    - ``ncdump`` : **show only the header information of a netCDF
+      file**; see :doc:`scripts/ncdump` 
+    - ``cpdfcrop`` : **crop pdf figures to their minimal size,
+      preserving metadata**; see :doc:`scripts/cpdfcrop` 
 
 - 2015/10/19 - Version 0.11 :
 

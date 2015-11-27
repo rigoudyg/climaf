@@ -22,7 +22,7 @@ cMA : get the Masked Array value of a CliMAF object
 .. autofunction:: climaf.driver.cMA
 
 cvalue : get the scalar value of a CliMAF scalar object 
-------------------------------------------------------
+--------------------------------------------------------
 
 .. autofunction:: climaf.driver.cMA
 

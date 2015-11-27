@@ -853,8 +853,8 @@ class cpage(cobject):
         
           fig_line (a list of lists of figure objects or an ensemble of figure objects) :
            each sublist of 'fig_lines' represents a line of figures   
-          widths (list, optional) : the list of figure widths, i.e. the
-           width of each column. By default, if fig_line is:
+          widths (list, optional) : the list of figure widths, i.e. the width of each 
+           column. By default, if fig_line is:
 
              - a list of lists:  spacing is even
              - an ensemble:  one column is used
@@ -873,34 +873,29 @@ class cpage(cobject):
           title (str, optional) : append a label below or above (depending optional
            argument 'gravity') figures in the page.
 
-           If title is activated:
+        If title is activated:
         
             - x, y (int, optional) : annotate the page with text.
-            x is the offset towards the right from the upper left corner
-            of the page, while y is the offset upward or the bottom
-            according to the optional argument 'gravity' (i.e. 'South' or 'North'
-            respectively); CLiMAF default: x=0, y=26. For more details, see:
-            http://www.imagemagick.org/script/command-line-options.php?#annotate ;
-            where x and y correspond respectively to tx and ty
-            in '-annotate {+-}tx{+-}ty text'
-
+              x is the offset towards the right from the upper left corner
+              of the page, while y is the offset upward or the bottom
+              according to the optional argument 'gravity' (i.e. 'South' or 'North'
+              respectively); CLiMAF default: x=0, y=26. For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#annotate ;
+              where x and y correspond respectively to tx and ty
+              in ``-annotate {+-}tx{+-}ty text``
             - ybox (int, optional) : width of the assigned box for title;
-            CLiMAF default: 50. For more details, see:
-            http://www.imagemagick.org/script/command-line-options.php?#splice
-
+              CLiMAF default: 50. For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#splice
             - pt (int, optional) : pt of the title; CLiMAF default: 24
-
             - font (str, optional): set the font to use when creating title; CLiMAF
-            default: 'Times-New-Roman'. To print a complete list of fonts, use :
-            'convert -list font'
-
+              default: 'Times-New-Roman'. To print a complete list of fonts, use :
+              'convert -list font'
             - gravity (str, optional) : the choosen direction specifies where to position
-            title; CLiMAF default: 'North'. For more details, see:
-            http://www.imagemagick.org/script/command-line-options.php?#gravity
-
+              title; CLiMAF default: 'North'. For more details, see:
+              http://www.imagemagick.org/script/command-line-options.php?#gravity
             - background (str, optional) : background color of the assigned box for
-            title; default: 'white'. To print a complete list of color names, use:
-            'convert -list color'
+              title; default: 'white'. To print a complete list of color names, use:
+              'convert -list color'
 
         Example:
 
