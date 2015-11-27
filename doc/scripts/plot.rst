@@ -32,7 +32,7 @@ Warnings:
 
 **Mandatory arguments**: None (but ``title`` is recommended)
 
-**Optional arguments**:
+**Optional arguments** (see also :ref:`More plot optional arguments <plot_more_args>` )       
 
 General:
 
@@ -85,6 +85,7 @@ Main field:
      when applying the colormap, or 
    - ``colors`` : list of levels used when applying colormap
      e.g. colors="260 270 280 290"
+
   - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
   - ``units`` : name of the main field units; used in the caption;
@@ -240,6 +241,8 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # Two profiles, with a index-linear spacing for vertical axis
      >>> plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', linp=1)
 
+.. _plot_more_args:
+
 **More optional arguments**:
 
 For map:
@@ -319,36 +322,36 @@ For map:
 
 For cross-sections:
 
-  - ``vcb`` : same that for map
-  - ``lbLabelFontHeightF`` : same that for map
-  - ``tmYLLabelFontHeightF`` : same that for map
-  - ``tmXBLabelFontHeightF`` : same that for map
+  - ``vcb`` : same as  for map
+  - ``lbLabelFontHeightF`` : same as  for map
+  - ``tmYLLabelFontHeightF`` : same as  for map
+  - ``tmXBLabelFontHeightF`` : same as  for map
   - ``tmYRLabelFontHeightF`` : sets the font height of the Y-Axis
     right labels in NDC coordinates; default (ncl): <dynamic>; see
     e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/tm.shtml#tmYRLabelFontHeightF
-  - ``tiXAxisFontHeightF`` : same that for map
-  - ``tiYAxisFontHeightF`` : same description that for map but
+  - ``tiXAxisFontHeightF`` : same as  for map
+  - ``tiYAxisFontHeightF`` : same description as for map but
     different default; default (climaf): 0.024
-  - ``tiMainFont`` : same that for map
-  - ``tiMainFontHeightF`` : same that for map
-  - ``tiMainPosition`` : same that for map
-  - ``gsnLeftString`` : same that for map
-  - ``gsnRightString`` : same that for map
-  - ``gsnCenterString`` : same that for map
-  - ``gsnStringFont`` : same that for map
-  - ``gsnStringFontHeightF`` : same that for map
+  - ``tiMainFont`` : same as  for map
+  - ``tiMainFontHeightF`` : same as  for map
+  - ``tiMainPosition`` : same as  for map
+  - ``gsnLeftString`` : same as  for map
+  - ``gsnRightString`` : same as  for map
+  - ``gsnCenterString`` : same as  for map
+  - ``gsnStringFont`` : same as  for map
+  - ``gsnStringFontHeightF`` : same as  for map
 
 For profiles:
 
   - ``invXY`` : set it to True to invert X axis and Y axis; default
     (climaf): False 
-  - ``tmYLLabelFontHeightF`` : same description that for map but
+  - ``tmYLLabelFontHeightF`` : same description as for map but
     different default; default (climaf): 0.008
-  - ``tmXBLabelFontHeightF`` : same description that for map but
+  - ``tmXBLabelFontHeightF`` : same description as for map but
     different default; default (climaf): 0.008
-  - ``tiXAxisFontHeightF`` : same that for map
-  - ``tiYAxisFontHeightF`` : same that for map
-  - ``tiMainFontHeightF`` : same that for map
+  - ``tiXAxisFontHeightF`` : same as  for map
+  - ``tiYAxisFontHeightF`` : same as  for map
+  - ``tiMainFontHeightF`` : same as  for map
 
 **More climaf call example** 
  
