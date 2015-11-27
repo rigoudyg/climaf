@@ -1,6 +1,10 @@
 curves : plot multiple profiles (along p, lat, lon..) 
 -------------------------------------------------------------
 
+**WARNING : this operator will not be supported in future
+versions. It will be replaced by an improved version of operator lines,
+when thisis one will be able to handle more cases than time series**
+
 Plot a series of xy curves (along lat, lon or pressure/z_index ) for
 an ensemble dataset using NCL
 

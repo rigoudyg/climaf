@@ -51,6 +51,9 @@ Changes, newest first :
     - ``cpdfcrop`` : **crop pdf figures to their minimal size,
       preserving metadata**; see :doc:`scripts/cpdfcrop` 
 
+ - An operator for temporary use : ``curves`` (see :doc:`scripts/curves`) :  
+
+
 - 2015/10/19 - Version 0.11 :
 
  - For :py:func:`~climaf.classes.cpage` (which creates an **array of
