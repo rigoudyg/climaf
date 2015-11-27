@@ -15,6 +15,26 @@ Changes, newest first :
 
 .. _news_0.12:
 
+- 2015/11/27 - Version Pre-0.12 :
+
+ - Standard operator ``plot`` : 17 new optional arguments to adjust
+   title, sub-title, color bar, label font, label font height,
+   ... (see "More optional arguments" at the end of
+   :doc:`scripts/plot`)       
+
+
+- 2015/11/17 - Version Pre-0.12 :
+
+ - Standard operator ``plot`` : new optional argument ``resolution``
+   for changing default image resolution (see :doc:`scripts/plot`)
+
+
+- 2015/11/09 - Version Pre-0.12 :
+   
+ - If running on Ciclad, to use the new version of standard operator
+   ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
+
+
 - 2015/10/27 - Version Pre-0.12 :
   
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
@@ -24,16 +44,6 @@ Changes, newest first :
    - optional argument ``levels`` was renamed ``colors``.  
    - code re-design 
    
-- 2015/11/09 - Version Pre-0.12 :
-   
- - If running on Ciclad, to use the new version of standard operator
-   ``plot``, you must load NCL Version 6.3.0; see :ref:`configuring` 
-
-- 2015/11/17 - Version Pre-0.12 :
-
- - Standard operator ``plot`` : new optional argument ``resolution``
-   for changing default image resolution (see :doc:`scripts/plot`)
-
 
 .. _news_0.11:
 

@@ -36,10 +36,10 @@ Warnings:
 
 General:
 
-  - ``title`` : string for graphic title; optional : CliMAF will provide the CRS of
-    the dataset
+  - ``title`` : string for graphic title; optional : CliMAF will
+    provide the CRS of the dataset
   - ``format`` : graphic output format, either 'png' or 'pdf';
-    default: 'png'. For 'png' format, all the surrounding white extra
+    default: 'png'. For 'png' format, all the surrounding white extra 
     space are cropped, while not for 'pdf' format. In case of 'pdf'
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
@@ -119,10 +119,11 @@ Vectors:
   - ``rotation`` : set it to 1 if you want to rotate vectors from model
     grid to geographic grid (see note below about an angles file)
   
-  - ``vcRefLengthF`` : length used, in units of Ncl's NDC , to render vectors
-    with a magnitude equal to the reference magnitude, as specified by
-    vcRefMagnitudeF; default (ncl): <dynamic>; see e.g. 
-    http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcRefLengthF
+  - ``vcRefLengthF`` : length used, in units of Ncl's NDC (Normalized
+    Device Coordinates), to render vectors with a magnitude equal to
+    the reference magnitude, as specified by vcRefMagnitudeF; default
+    (ncl): <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcRefLengthF 
 
   - ``vcRefMagnitudeF`` : magnitude used as the reference magnitude
     used for the vector field plot; default (ncl): 0.0 (i.e. the maximum
@@ -130,10 +131,11 @@ Vectors:
     magnitude); see e.g. 
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcRefMagnitudeF
 
-  - ``vcMinDistanceF`` : minimum distance in NDC space that is to
-    separate the data locations of neighboring vectors; see e.g. 
-    http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcMinDistanceF ;
-    default (climaf): 0.017  
+  - ``vcMinDistanceF`` : minimum distance in NDC (Normalized Device
+    Coordinates) space that is to separate the data locations of
+    neighboring vectors; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcMinDistanceF
+    ; default (climaf): 0.017   
 
   - ``vcGlyphStyle`` : style of glyph used to represent the vector
     magnitude and direction; default (ncl): "LineArrow"; see e.g.
@@ -226,7 +228,6 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
      >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', linp=1, time=3000.) 
-
   - A profile ::
 
      >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")
@@ -239,11 +240,154 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> # Two profiles, with a index-linear spacing for vertical axis
      >>> plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', linp=1)
 
+**More optional arguments**:
+
+For map:
+
+  - ``vcb`` : for vertical color bar. Set it to True (resp. False) to
+    arrange labelbar boxes vertically (resp. horizontally); default
+    (climaf): True 
+  - ``lbLabelFontHeightF`` : the height in Normalized Device
+    Coordinates (NDC) of the text used to draw the labels of color
+    bar; default (ncl): 0.02; see
+    e.g. https://www.ncl.ucar.edu/Document/Graphics/Resources/lb.shtml#lbLabelFontHeightF
+  - ``tmYLLabelFontHeightF`` : sets the height of the Y-Axis left
+    labels in NDC coordinates (only for cylindrical equidistant
+    projections in case of map, see ``gsnPolarLabelFontHeightF`` for
+    polar stereographic projections); default (ncl): <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/tm.shtml#tmYLLabelFontHeightF       
+  - ``tmXBLabelFontHeightF`` : sets the font height in NDC coordinates
+    for the bottom X Axis labels (only for cylindrical equidistant
+    projections in case of map, see ``gsnPolarLabelFontHeightF`` for
+    polar stereographic projections); default (ncl): <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/tm.shtml#tmXBLabelFontHeightF  
+  - ``gsnPolarLabelFontHeightF`` : the font height of the polar
+    lat/lon labels for polar stereographic projections; default (ncl):
+    <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml 
+  - ``tiXAxisFontHeightF`` : sets the font height in NDC coordinates
+    of the X-Axis title; default (ncl): 0.025; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/ti.shtml#tiXAxisFontHeightF 
+  - ``tiYAxisFontHeightF`` : sets the font height in NDC coordinates
+    to use for the Y-Axis title; default (ncl): 0.025; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/ti.shtml#tiYAxisFontHeightF  
+  - ``tiMainFont`` : string for setting the font index for the Main
+    title; default (ncl): "pwritx"; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/ti.shtml#tiMainFont 
+  - ``tiMainFontHeightF`` : sets the font height in NDC coordinates of
+    the Main title; default (ncl): 0.025; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/ti.shtml#tiMainFontHeightF
+  - ``tiMainPosition`` : base horizontal location of the justification
+    point of the Main title; default (ncl): Center; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/ti.shtml#tiMainPosition 
+  - ``gsnLeftString`` : adds a string just above the plot's upper
+    boundary and left-justifies it; set it to: 
+
+    - a string to add this given string (for example gsnLeftString=""
+      if you want turn off this sub-title), or
+    - default (ncl): add data@long_name; see
+      e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnLeftString  
+  - ``gsnRightString`` : adds a string just above the plot's upper
+    boundary and right-justifies it; set it to: 
+
+    - a string to add this given string (for example gsnRightString=""
+      if you want turn off this sub-title), or
+    - default (ncl): add data@units; see
+      e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnRightString 
+  - ``gsnCenterString`` : adds a string just above the plot's upper
+    boundary and centers it;
+
+    - if you select time and/or level (by optional arguments ``time``
+      and/or ``level``), set it to:  
+
+      - a string to add this given string (for example
+	gsnCenterString="" if you want turn off this sub-title), or 
+      - defaut (climaf): add select values for time and/or level 
+      
+    - if you don't select time and/or level, set it to:
+    
+      - a string to add this given string, or 
+      - defaut (ncl): none; see
+	e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnCenterString   
+  - ``gsnStringFont`` : font of three strings: gsnLeftString,
+    gsnCenterString and gsnRightString; default (ncl): <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnStringFont
+  - ``gsnStringFontHeightF`` : font height of three strings:
+    gsnLeftString, gsnCenterString and gsnRightString; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnStringFontHeightF
+    ; default (climaf): 0.012
+
+For cross-sections:
+
+  - ``vcb`` : same that for map
+  - ``lbLabelFontHeightF`` : same that for map
+  - ``tmYLLabelFontHeightF`` : same that for map
+  - ``tmXBLabelFontHeightF`` : same that for map
+  - ``tmYRLabelFontHeightF`` : sets the font height of the Y-Axis
+    right labels in NDC coordinates; default (ncl): <dynamic>; see
+    e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/tm.shtml#tmYRLabelFontHeightF
+  - ``tiXAxisFontHeightF`` : same that for map
+  - ``tiYAxisFontHeightF`` : same description that for map but
+    different default; default (climaf): 0.024
+  - ``tiMainFont`` : same that for map
+  - ``tiMainFontHeightF`` : same that for map
+  - ``tiMainPosition`` : same that for map
+  - ``gsnLeftString`` : same that for map
+  - ``gsnRightString`` : same that for map
+  - ``gsnCenterString`` : same that for map
+  - ``gsnStringFont`` : same that for map
+  - ``gsnStringFontHeightF`` : same that for map
+
+For profiles:
+
+  - ``invXY`` : set it to True to invert X axis and Y axis; default
+    (climaf): False 
+  - ``tmYLLabelFontHeightF`` : same description that for map but
+    different default; default (climaf): 0.008
+  - ``tmXBLabelFontHeightF`` : same description that for map but
+    different default; default (climaf): 0.008
+  - ``tiXAxisFontHeightF`` : same that for map
+  - ``tiYAxisFontHeightF`` : same that for map
+  - ``tiMainFontHeightF`` : same that for map
+
+**More climaf call example** 
+ 
+  - Maps ::
+
+     >>> duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="1998", realm="O") 
+     >>> dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="1998", realm="O")
+     >>> thetao=ds(project="EM",simulation="PRE6CPLCr2alb", variable="thetao", period="1998", realm="O") 
+     >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0)
+     >>> fixed_fields('plot', ('angles.nc',cpath+"/../tools/angle_${project}.nc"))
+
+     >>> map=plot(thetao, sub_thetao, duo, dvo, title='A map with some adjustments', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=0,
+     >>> ... lbLabelFontHeightF=0.012, tmYLLabelFontHeightF=0.015, tmXBLabelFontHeightF=0.015, 
+     >>> ... tiMainFont="helvetica-bold", tiMainFontHeightF=0.022, tiMainPosition="Left", gsnLeftString="")
+     >>> cshow(map)
+
+     >>> # A map with stereopolar projection (=> 'gsnPolarLabelFontHeightF' replace 'tmYLLabelFontHeightF' and 'tmXBLabelFontHeightF')
+     >>> map_proj=plot(thetao, sub_thetao, duo, dvo, title='A map with some adjustments', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=0, proj="NH",
+     >>> ... lbLabelFontHeightF=0.012, gsnPolarLabelFontHeightF=0.015, 
+     >>> ... tiMainFont="helvetica", tiMainFontHeightF=0.03, tiMainPosition="Left", gsnLeftString="")
+
+  - A cross-section ::
+
+     >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+     >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
+     >>> cross=plot(ta_zonal_mean,title='A cross-section with some adjustments',
+     >>> ... tiMainFont="helvetica",tiMainFontHeightF=0.030,tiMainPosition="Center", gsnStringFontHeightF=0.015)
+
+  - A profile ::
+      
+     >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+     >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
+     >>> ta_profile=ccdo(ta_zonal_mean, operator="mermean")
+     >>> profile=plot(ta_profile, title='A profile with some adjustments', linp=1,
+     >>> ... invXY=True, tmXBLabelFontHeightF=0.01, tmYLLabelFontHeightF=0.01) 
+
 **Side effects** : None
 
 **Implementation** : Basic use of ncl: gsn_csm_pres_hgt, gsn_csm_xy,
 gsn_csm_contour_map, gsn_csm_contour_map_ce, gsn_csm_contour,
 gsn_csm_vector_scalar_map, gsn_csm_vector_scalar_map_ce
-
-
 

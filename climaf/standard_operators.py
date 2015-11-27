@@ -78,7 +78,15 @@ def load_standard_operators():
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
             'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
             'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
-            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' )', format="graph")            
+            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
+            'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} '
+            'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
+            'tmYRLabelFontHeightF=${tmYRLabelFontHeightF} tiXAxisFontHeightF=${tiXAxisFontHeightF} '
+            'tiYAxisFontHeightF=${tiYAxisFontHeightF} gsnPolarLabelFontHeightF=${gsnPolarLabelFontHeightF} '
+            'tiMainFont=\'\"${tiMainFont}\"\' tiMainFontHeightF=${tiMainFontHeightF} '
+            'tiMainPosition=\'\"${tiMainPosition}\"\' gsnLeftString=\'\"${gsnLeftString}\"\' '
+            'gsnRightString=\'\"${gsnRightString}\"\' gsnCenterString=\'\"${gsnCenterString}\"\' '
+            'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} )', format="graph")            
     # 
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '

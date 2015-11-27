@@ -111,7 +111,7 @@ sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extractio
 map_select1=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10, time=0) # time selection has no impact for vectors because time dimension is degenerated, so only level selection is done for vectors
 cshow(map_select1)
 
-map_select2=plot(thetao, sub_thetao, duo, dvo, title='Selecting level and time closed to 10 and 1400000 respectively',  rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
+map_select2=plot(thetao, sub_thetao, duo, dvo, title='Selecting level and time close to 10 and 1400000 respectively',  rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
 cshow(map_select2)
 
 # case where (t,y,x) are not degenerated
@@ -123,7 +123,7 @@ sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of '
 map_select3=plot(tos, sub_tos, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10, time=1) # level selection has no impact on main field and auxiliary field because they have not depth dimension, whereas level (and time) selection is done for vectors 
 cshow(map_select3)
 
-map_select4=plot(tos, sub_tos, duo, dvo, title='Selecting level and time closed to 10 and 1400000 respectively', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
+map_select4=plot(tos, sub_tos, duo, dvo, title='Selecting level and time close to 10 and 1400000 respectively', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.) # same selection but with value instead of index 
 cshow(map_select4)
 
 
