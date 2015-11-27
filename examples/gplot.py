@@ -69,7 +69,7 @@ dvo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="vo", period="1998", re
 tos=ds(project="EM",simulation="PRE6CPLCr2alb", variable="tos", period="1998", realm="O") # tos(time_counter, y, x) 
 sub_tos=llbox(tos, latmin=30, latmax=80, lonmin=-60, lonmax=0) # extraction of 'tos' sub box for auxiliary field
 
-map_select2=plot(tos, sub_tos, duo, dvo, title='Selecting level and time closed to 10 and 1400000 respectively', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.)  # level selection has no impact on main field and auxiliary field because they have not depth dimension, whereas level (and time) selection is done for vectors 
+map_select2=plot(tos, sub_tos, duo, dvo, title='Selecting level and time close to 10 and 1400000 respectively', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02, level=10., time=1400000.)  # level selection has no impact on main field and auxiliary field because they have not depth dimension, whereas level (and time) selection is done for vectors 
 cshow(map_select2)
 
 
