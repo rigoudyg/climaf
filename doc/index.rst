@@ -3,14 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
+Quick links : :ref:`News <news>` | :ref:`Functions <API>` |
+:ref:`standard_operators` | :ref:`howto` | :ref:`examples` |  :ref:`contents`
+
+.. |logo| image:: Logo-CliMAF-compact.png
+  :scale: 60%
+
+|logo| 
+
 CliMAF - a Climate Model Assessment Framework
 ========================================================
 
-Quick links : :ref:`news <news>` , :ref:`functions <API>`,
-:ref:`standard_operators`, :ref:`howto`, :ref:`examples`,  :ref:`contents`
-
-Welcome
--------
 
 CliMAF is an `Open Source software
 <http://en.wikipedia.org/wiki/Open-source_software>`_, distributed

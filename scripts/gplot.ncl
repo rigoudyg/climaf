@@ -7,8 +7,9 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 ;--------------------------------------------------------------------------------------------
 undef("data_select")
-; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field'
-function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string)
+; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field' 
+; and create a list, called 'select_list', of extracted values 
+function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string, select_list:string)
 
 local VarDimNames, dim, rk, index
 begin
@@ -19,15 +20,27 @@ begin
 
   if isint(arg) then
     print("Selecting index "+arg+" for "+arg_name+" step, i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
-    
+    if arg_name .eq. "time" then
+      ;value=cd_calendar(field&$dim_field_name$(arg),2) ; value returned will be in the format YYYYMMDD
+      utc_date=cd_calendar(field&$dim_field_name$(arg),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
+      year  = tointeger(utc_date(:,0))    ; Convert to integer for
+      month = tointeger(utc_date(:,1))    ; use sprinti 
+      day   = tointeger(utc_date(:,2))
+      value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) 
+    else
+      value=field&$dim_field_name$(arg)
+    end if
     if rk .eq. 4 then
       new_fld=field(arg,:,:,:)     
+      select_list=select_list+" "+arg_name+"="+value
     else 
       if rk .eq. 3 then
         new_fld=field(arg,:,:)
+        select_list=select_list+" "+arg_name+"="+value
       else 
         if rk .eq. 2 then
           new_fld=field(arg,:)
+          select_list=select_list+" "+arg_name+"="+value
         end if ;rk eq 2
       end if ; rk eq 3
     end if ; rk eq 4
@@ -35,20 +48,32 @@ begin
   else
     if isfloat(arg) then 
       ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
-      ;utc_time=cd_calendar(field&$Var_DimNames(0)$,1)
+      ;utc_time=cd_calendar(field&$VarDimNames(0),1)
       ;index=closest_val(time,utc_time)
-      ;print("Selecting time closed to "+time+", i.e. time = "+utc_time(index))
+      ;print("Selecting time close to "+time+", i.e. time = "+utc_time(index))
       index=closest_val(arg,field&$dim_field_name$)
-      print("Selecting "+arg_name+" closed to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
-      
+      print("Selecting "+arg_name+" close to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
+      if arg_name .eq. "time" then
+        ;value=cd_calendar(field&$dim_field_name$(index),2) ;value returned will be in the format YYYYMMDD
+        utc_date=cd_calendar(field&$dim_field_name$(index),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
+        year  = tointeger(utc_date(:,0))    ; Convert to integer for
+        month = tointeger(utc_date(:,1))    ; use sprinti 
+        day   = tointeger(utc_date(:,2))
+        value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) 
+      else
+        value=field&$dim_field_name$(index)
+      end if
       if rk .eq. 4 then
         new_fld=field(index,:,:,:)     
+        select_list=select_list+" "+arg_name+"="+value
       else 
         if rk .eq. 3 then
           new_fld=field(index,:,:)
+          select_list=select_list+" "+arg_name+"="+value
         else 
           if rk .eq. 2 then
             new_fld=field(index,:)
+            select_list=select_list+" "+arg_name+"="+value
           end if ;rk eq 2
         end if ; rk eq 3
       end if ; rk eq 4
@@ -57,14 +82,14 @@ begin
   end if ;arg is integer
   
   return(new_fld)
-
+  
 end
 
 ;--------------------------------------------------------------------------------------------
 
 undef("field_reduce")
 ; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
-function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical)
+function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string)
 
 local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
 begin
@@ -121,8 +146,8 @@ begin
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
     
-      fldtmp=data_select("time", time, field, Var_DimNames(0))
-      
+      fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list)
+  
     else
       ; case where no time argument or 'bad' files
       print("Selecting first time step")
@@ -147,8 +172,8 @@ begin
       .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
         
-      fldtmp=data_select("time", time, field, Var_DimNames(0))
-
+      fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list)
+        
       ; case where (t,z,y) or (t,z,x) are not degenerated
       if ( (isvar("level")) .and. (.not. ismissing(str_match(Var_DimNames(1),"depth"))) ) \
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
@@ -158,7 +183,7 @@ begin
         field=fldtmp
         delete(fldtmp)
 
-        fldtmp=data_select("level", level, field, Var_DimNames(1))
+        fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
       end if  
 
     else
@@ -167,8 +192,8 @@ begin
         .or. ( (isvar("level")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
         .and. (field&$Var_DimNames(0)$@axis .eq. "Z") ) then
 
-        fldtmp=data_select("level", level, field, Var_DimNames(0))
-      else
+        fldtmp=data_select("level", level, field, Var_DimNames(0), extract_list)
+       else
         ; case where no time/level arguments or 'bad' files
         print("Selecting first time or level step")
         fldtmp=field(0,:,:)
@@ -232,7 +257,7 @@ begin
       end if
     end if
     lat_dim=ffile->$latname$
-    lon_dim=ffile->$lonname$                  
+    lon_dim=ffile->$lonname$
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
@@ -323,16 +348,17 @@ begin
   vprofile=False
   
   ; Reading main field and reduction if necessary
-  array=field_reduce(main_file, main_var, logp, useXY, horizontal, useLatDim, vprofile)
+  main_field_select=""
+  array=field_reduce(main_file, main_var, logp, useXY, horizontal, useLatDim, vprofile, main_field_select)
   
   fld=array[0]
-  if ListCount(array) .eq. 2 then
+  if ListCount(array) .eq. 2 then ; rk eq 1
     hdim=array[1]
-  else ; ListCount eq 3
+  else ; ListCount eq 3 <=> rk eq 2
     latdim=array[1]
     londim=array[2]
   end if
-  
+ 
   ; Reading main field unit, scaling the field and setting REDU
   if (.not. isvar("units")) then 
     if (isatt(fld,"units")) then units=fld@units else units="None" end if
@@ -373,7 +399,8 @@ begin
     vprofile_dummy=False
   
     ; Reading auxiliary field and reduction if necessary
-    array2=field_reduce(aux_file, aux_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy)
+    aux_field_select=""
+    array2=field_reduce(aux_file, aux_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select)
   
     fld2=array2[0]
     if ListCount(array2) .eq. 2 then
@@ -405,7 +432,8 @@ begin
     vprofile_dummy=False
 
     useLatDimv=False
-    array3=field_reduce(u_file, u_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy)
+    uselect=""
+    array3=field_reduce(u_file, u_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect)
   
     fld3=array3[0]
     if ListCount(array3) .eq. 2 then
@@ -420,7 +448,8 @@ begin
     
     ; Reading vector v and reduction if necessary
     useLatDimv=False
-    array4=field_reduce(v_file, v_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy)
+    vselect=""
+    array4=field_reduce(v_file, v_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect)
   
     fld4=array4[0]
     if ListCount(array4) .eq. 2 then
@@ -462,13 +491,44 @@ begin
   ; Open workstation
   ;-----------------
 
-  ;if type.eq."png" then
-  ;  type@wkWidth= 900
-  ;  type@wkHeight=900 
-  ;end if
+  if isvar("resolution") then
+    if ( .not. ismissing(str_match(resolution,"x")) .or. .not. ismissing(str_match(resolution,"*")) ) then
+
+      if .not. ismissing(str_match(resolution,"x")) then
+        nb_pixels_or_inches = str_split(resolution, "x")
+      else
+        if .not. ismissing(str_match(resolution,"*")) then
+          nb_pixels_or_inches = str_split(resolution, "*")
+        end if
+      end if
+      width = stringtofloat(nb_pixels_or_inches(0))
+      height = stringtofloat(nb_pixels_or_inches(1))
+    
+      if type .eq. "png" then ;image resolution in pixels
+        type@wkWidth = width
+        type@wkHeight = height
+      else 
+        if type .eq. "pdf" then ;image resolution in inches
+          type@wkPaperWidthF  = width 
+          type@wkPaperHeightF = height
+        end if
+      end if
+
+    else ; resolution is not given by 'widthxheight' or 'width*height'
+      
+      if type .eq. "png" then 
+        print("For PNG output, resolution must be given by 'widthxheight' or 'width*height'")
+        status_exit(1)
+      else
+        if type .eq. "pdf" then
+          type@wkPaperSize = resolution
+        end if
+      end if
+
+    end if ; str_match
+  end if ;resolution
 
   wks = gsn_open_wks(type,plotname)
-  
   gsn_define_colormap(wks,cmap) 
   i = NhlNewColor(wks,0.8,0.8,0.8)
   
@@ -477,21 +537,123 @@ begin
   res@gsnFrame= False
   res@gsnDraw= False
   res@gsnMaximize = True
-  res@gsnPaperOrientation="portrait"
-  ; preferable pour plot en domaine limite :
-  res@gsnLeftString     = ""
-  ;res@gsnRightString    = ""
-  ;res@gsnCenterString   = ""
+  res@gsnPaperOrientation="portrait" 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; ContourPlot resources
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ; ContourPlot resources
   if (.not. useXY  ) then 
     res@gsnSpreadColors     = True
     res@gsnSpreadColorEnd   = -2
-    res@gsnLeftString     = ""
-    res@gsnRightString    = ""
-    res@gsnCenterString   = ""
 
+    ; Main title
+    if (.not. isvar("title")) then title=main_var end if 
+    res@tiMainString  = title
+
+    if isvar("tiMainFont") then
+      res@tiMainFont = tiMainFont ;22 <=> "helvetica-bold"
+    end if
+    if isvar("tiMainFontHeightF") then
+      res@tiMainFontHeightF  = tiMainFontHeightF ;.030       
+    end if
+    if isvar("tiMainPosition") then
+      res@tiMainPosition = tiMainPosition
+      res@tiMainJust = "Center"+tiMainPosition
+    end if
+
+    ; 3 sub-titles (label, font, height)
+    if isvar("gsnLeftString") then
+      res@gsnLeftString = gsnLeftString
+    end if
+    
+    if .not. isvar("gsnRightString") then
+      if power10.ge.4 then
+        res@gsnRightString = units+" x10~S~"+sprinti("%0.1i", power10)+""
+      else
+        res@gsnRightString = units ; ncl default
+      end if
+    else
+      res@gsnRightString = gsnRightString
+    end if
+
+    if .not. isvar("gsnCenterString") then
+      if ( isvar("time") .or. isvar("level") ) then
+        main_field_select=str_left_strip(main_field_select) ; strips leading spaces from the input strings
+        main_field_select=str_sub_str(main_field_select," ",", ") 
+        main_field_select=str_sub_str(main_field_select,"time","t")
+        main_field_select=str_sub_str(main_field_select,"level","l")
+        res@gsnCenterString = main_field_select     
+      end if
+    else 
+      res@gsnCenterString = gsnCenterString
+    end if
+    
+    if isvar("gsnStringFont") then
+      res@gsnStringFont = gsnStringFont ; "helvetica-bold"
+    end if
+    if isvar("gsnStringFontHeightF") then
+      res@gsnStringFontHeightF = gsnStringFontHeightF
+    else 
+      res@gsnStringFontHeightF = 0.012
+    end if
+
+    ; Label Bar
+    res@lbLabelBarOn = True
+    res@lbTitleOn    = False
+    ;res@lbTitleFontHeightF=0.012
+    
+    if isvar("lbLabelFontHeightF") then
+      res@lbLabelFontHeightF=lbLabelFontHeightF ;0.012
+    end if
+    res@lbLabelFontThicknessF= 3.0
+    res@lbTitleFontThicknessF= 3.0
+    res@lbLabelAutoStride = True
+    if ( .not. isvar("vcb") .or. (isvar("vcb") .and. vcb) ) then
+      res@lbOrientation     = "vertical"
+    else
+      if ( isvar("vcb") .and. (.not. vcb) ) then
+        res@lbOrientation     = "horizontal"
+      end if
+    end if
+
+    ; Axis Label 
+    if (.not. isvar("proj")) then 
+      if isvar("tmYLLabelFontHeightF") then
+        res@tmYLLabelFontHeightF = tmYLLabelFontHeightF ;0.015
+      end if
+      if isvar("tmXBLabelFontHeightF") then
+        res@tmXBLabelFontHeightF = tmXBLabelFontHeightF ;0.015
+      end if
+      
+      if type.eq."png" then
+        res@tmYLLabelFontThicknessF=2.0
+        res@tmXBLabelFontThicknessF=2.0
+      end if
+     
+    else ; proj
+      if isvar("gsnPolarLabelFontHeightF") then
+        res@gsnPolarLabelFontHeightF=gsnPolarLabelFontHeightF
+      end if
+    end if
+
+    if (.not. horizontal) then ; cross-section
+      if isvar("tmYRLabelFontHeightF") then
+        res@tmYRLabelFontHeightF=tmYRLabelFontHeightF
+      end if
+    end if
+    
+    if isvar("tiYAxisFontHeightF") then
+      res@tiYAxisFontHeightF=tiYAxisFontHeightF
+    else
+      if (.not. horizontal) then ; cross-section
+        res@tiYAxisFontHeightF=0.024
+      end if
+    end if
+    
+    if isvar("tiXAxisFontHeightF") then
+      res@tiXAxisFontHeightF=tiXAxisFontHeightF
+    end if
+      
+    ; Levels
     res@cnFillOn=True 
     if (controlMinMax) then 
       res@cnLevelSelectionMode = "ManualLevels" 
@@ -564,8 +726,9 @@ begin
       
       res2@cnFillOn=False
       res2@cnLineLabelsOn = False
+      res2@cnLineLabelBackgroundColor = -1
       res2@cnInfoLabelString = ""
-      
+    
       res2@cnLinesOn=True
       res2@gsnContourNegLineDashPattern = 1
       res2@gsnContourZeroLineThicknessF = 1.5  
@@ -585,7 +748,7 @@ begin
         end if
       end if
 
-    end if
+    end if ; NOT AUX_FIELD
 
     if (LABELON) then 
       res@cnLineLabelsOn=True
@@ -635,8 +798,21 @@ begin
       else
         res@mpMinLatF                = min(latdim)
         res@mpMaxLatF                = max(latdim)
-        if (isvar("mpCenterLonF")) then 
-          res@mpCenterLonF=tofloat(mpCenterLonF)
+        if (isvar("mpCenterLonF")) then
+          do while ((mpCenterLonF .gt. 180) .and. (mpCenterLonF .le. 360))
+            mpCenterLonF=mpCenterLonF-360
+          end do
+          if mpCenterLonF .gt. (max(londim)-180) then
+            print("out of data range: mpCenterLonF + 180 > max(londim)")
+          end if
+          if mpCenterLonF .lt. (max(londim)-180) then
+            ; pivots about a user-specified longitude (rectilinear grids only)
+            fld_flip=lonPivot(fld,mpCenterLonF+180) 
+            delete(fld)
+            fld=fld_flip
+            delete(fld_flip)
+          end if
+          res@mpCenterLonF=mpCenterLonF
         else
           res@mpMinLonF                = min(londim)
           res@mpMaxLonF                = max(londim)
@@ -645,32 +821,18 @@ begin
 
       end if
     end if ;end horizontal
-
-    res@lbLabelBarOn = True
-    if power10.ge.4 then
-      res@lbTitleString=units+" x10~S~"+sprinti("%0.1i", power10)+""
-    else
-      res@lbTitleString=units
-    end if
-  
-    res@lbTitleFontHeightF=0.012
-    res@lbLabelFontHeightF=0.012
-    res@lbLabelFontThicknessF= 3.0
-    res@lbTitleFontThicknessF= 3.0
-    res@lbLabelAutoStride = True
-    res@lbOrientation     = "vertical"
-                                
+    
     if VECT then 
       if (isvar("vcRefMagnitudeF")) then                ; define vector ref magnitude
-        res@vcRefMagnitudeF=tofloat(vcRefMagnitudeF)
+        res@vcRefMagnitudeF=vcRefMagnitudeF
       end if
     
       if (isvar("vcRefLengthF")) then         	        ; define size of ref vector
-        res@vcRefLengthF=tofloat(vcRefLengthF)
+        res@vcRefLengthF=vcRefLengthF
       end if
       
       if (isvar("vcMinDistanceF")) then                 ; define density of vectors
-        res@vcMinDistanceF        = tofloat(vcMinDistanceF)
+        res@vcMinDistanceF        = vcMinDistanceF
       else
         res@vcMinDistanceF        = 0.017               ; thins arrows near pole
       end if
@@ -679,7 +841,10 @@ begin
         res@vcGlyphStyle          = vcGlyphStyle
       end if
       
-      ;res@vcRefAnnoOrthogonalPosF   = -1.0             ; move ref vector  
+      res@vcRefAnnoOrthogonalPosF = -1.                 ; move ref vector  
+      res@vcRefAnnoParallelPosF = 1.                    ; move ref vector  
+      res@vcRefAnnoFontHeightF = 0.01
+
       res@vcMonoLineArrowColor  =  True                 ; vectors color by magnitude
       if (isvar("vcLineArrowColor")) then               ; change vector color
         res@vcLineArrowColor      =  vcLineArrowColor
@@ -692,6 +857,7 @@ begin
       res@vcVectorDrawOrder       = "PostDraw"          ; draw vectors last  
       
       if (horizontal) then 
+        res@gsnAddCyclic = False
         if useLatDimv then
           res@vfXArray            = londimv
           res@vfYArray            = latdimv
@@ -701,44 +867,47 @@ begin
     end if ; VECT
     
   end if  ; not useXY
-
-  if (.not. isvar("proj")) then 
-    res@tmYLLabelFontHeightF = 0.020
-    res@tmXBLabelFontHeightF = 0.020
-    
-    if type.eq."png" then
-      res@tmYLLabelFontThicknessF=2.0
-      res@tmXBLabelFontThicknessF=2.0
-    end if
-  end if
-  
-  res@tiMainFont=22 
-  res@tiMainFontHeightF  = .030       
   
   ; Viewport resources
   res@vpWidthF  =0.8
   res@vpHeightF = 0.8
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  if (.not. isvar("title")) then title=main_var end if 
-
-  res@tiMainString       = title
   res@vpXF      =0.1
   res@vpYF      =0.96
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+  ; Profile
   if useXY then 
     xyres = True
+    xyres@gsnDraw = False
+    xyres@gsnFrame = False
     xyres@vpXF = 0.5
     xyres@vpWidthF = 0.45
     xyres@vpHeightF = 0.45
-    xyres@tmXBLabelFontHeightF = 0.008
-    xyres@tmYLLabelFontHeightF = 0.008
-    xyres@gsnDraw = False
-    xyres@gsnFrame = False
     xyres@txFontHeightF = 0.010
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColors = "black" ; (/"red", "black"/)
     xyres@tiMainString       = title
+    if isvar("tiMainFontHeightF") then
+      xyres@tiMainFontHeightF=tiMainFontHeightF
+    end if
+    if isvar("tmXBLabelFontHeightF") then
+      xyres@tmXBLabelFontHeightF=tmXBLabelFontHeightF 
+    else
+      xyres@tmXBLabelFontHeightF=0.008
+    end if
+    if isvar("tmYLLabelFontHeightF") then
+      xyres@tmYLLabelFontHeightF=tmYLLabelFontHeightF 
+    else
+      xyres@tmYLLabelFontHeightF=0.008
+    end if
+    if isvar("tiXAxisFontHeightF") then
+      xyres@tiXAxisFontHeightF=tiXAxisFontHeightF
+    end if
+    if isvar("tiYAxisFontHeightF") then
+      xyres@tiYAxisFontHeightF=tiYAxisFontHeightF
+    end if
    
     ; auxiliary field
     if AUX_FIELD then
@@ -752,6 +921,7 @@ begin
       xyres@tmYLLabelFontThicknessF = 3.0
       xyres@txFontThicknessF = 3.0
     end if
+
     if vprofile then
       xyres@trYReverse = True ; reverse Y-axis
       if logp then 
@@ -759,15 +929,42 @@ begin
         ;delete(xyres@tmYLMode)
         set_pres_hgt_axes(hdim,xyres,True)
       end if
-      plot0=gsn_csm_xy(wks,fld,hdim,xyres)
+
+      xaxis=fld
+      yaxis=hdim
+      if (isvar("invXY") .and. invXY) then
+        xaxis=hdim
+        yaxis=fld
+      end if      
+      plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
       if AUX_FIELD then
-        plot1=gsn_csm_xy(wks,fld2,hdim2,xyres2)
+        xaxis2=fld2
+        yaxis2=hdim2
+        if (isvar("invXY") .and. invXY) then
+          xaxis2=hdim2
+          yaxis2=fld2
+        end if
+        plot1=gsn_csm_xy(wks,xaxis2,yaxis2,xyres2)
       end if
+
     else
-      plot0=gsn_csm_xy(wks,hdim,fld,xyres)
-      if AUX_FIELD then
-        plot1=gsn_csm_xy(wks,hdim2,fld2,xyres2)
+      xaxis=hdim
+      yaxis=fld
+      if (isvar("invXY") .and. invXY) then
+        xaxis=fld
+        yaxis=hdim
       end if
+      plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
+      if AUX_FIELD then
+        xaxis2=hdim2
+        yaxis2=fld2
+        if (isvar("invXY") .and. invXY) then
+          xaxis2=fld2
+          yaxis2=hdim2
+        end if
+        plot1=gsn_csm_xy(wks,xaxis2,yaxis2,xyres2)
+      end if
+      
     end if
   else
     if (horizontal) then 
