@@ -11,7 +11,7 @@ export PYTHONPATH=$dir:$PYTHONPATH
 cd $dir/examples
 
 # List of scripts that can be tested anywhere (based on data installed with the package, or a test is done)
-scripts="clean_cache.py index_html.py data_generic.py plotmap.py basic_oce.py latlonbox.py \
+scripts="index_html.py data_generic.py plotmap.py basic_oce.py latlonbox.py \
          ann_cycle.py derived.py export.py increm.py regrid.py  macro.py \
          plot_timeseries.py plot_xsection.py figarray.py data_file.py"
 
@@ -26,8 +26,10 @@ elif [[ $(uname -n) == ciclad* ]]; then
     scripts=$scripts" data_cmip5drs.py ensemble.py"
 fi
 
+scripts="seaice.py"
+
 # Cleaning script
-scripts=$scripts" clean_cache.py"
+scripts="clean_cache.py  "$scripts" clean_cache.py"
 
 echo "tested example scripts : "$scripts 
 export CLIMAF_LOG_LEVEL=critical

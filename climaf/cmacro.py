@@ -10,7 +10,7 @@ CliMAF macros module :
 
 import sys, os
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage
+from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds
 from clogging import clogger, dedent
 
 #: Dictionary of macros
@@ -81,7 +81,12 @@ def macro(name,cobj,lobjects=[]):
         s=cobj
         # Next line used for interpreting macros's CRS
         exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
-        cobj=eval(cobj, sys.modules['__main__'].__dict__)
+        try :
+            cobj=eval(cobj, sys.modules['__main__'].__dict__)
+        except :
+            # usually case of a CRS which project is not currently defined
+            clogger.error("Cannot interpret %s with the projects currently define"%s)
+            return None
         #print "string %s was interpreted as %s"%(s,cobj)
     domatch=False
     for o in lobjects :
@@ -127,11 +132,13 @@ def crewrite(crs,alsoAtTop=True):
     # Next line used for interpreting macros's CRS
     exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
+    allow_error_on_ds()
     try :
         co=eval(crs, sys.modules['__main__'].__dict__)
     except:
         clogger.debug("Issue when rewriting %s"%crs)
         return(crs)
+    allow_error_on_ds(False)
     if isinstance(co,ctree) or isinstance(co,scriptChild) or isinstance(co,cpage) :
         if alsoAtTop :
             for m in cmacros :

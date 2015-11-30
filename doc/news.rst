@@ -13,6 +13,70 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.12:
+
+- 2015/11/27 - Version 0.12 :
+  
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - new arguments : 
+
+    - ``level`` and ``time`` for selecting time  or level;   
+    - ``resolution``   for controling image resolution 
+    - ``format`` : graphical format : either png (default) or pdf
+    - **17 new optional arguments to adjust title, sub-title, color bar, label font, label font height**
+      , ... (see :ref:`More plot optional arguments <plot_more_args>` )       
+
+   - optional argument ``levels`` was renamed ``colors``
+   - code re-design 
+   - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
+
+ - New arguments for :py:func:`~climaf.classes.cpage` :
+
+   - ``title``. See example :download:`figarray <../examples/figarray.py>`
+   - ``format`` : graphical output format : either png (default) or pdf
+
+
+ - Two new output formats allowed for operators : 'graph' and 'text';
+   see :py:func:`~climaf.operators.cscript` 
+
+  - 'graph' allows the user to choose between two graphic output
+    formats: 'png' and 'pdf' (new graphic ouput format), if the
+    corresponding operator supports it (this is the case for plot()); 
+  - 'txt' allows to use any operator that just ouputs text (e.g. 
+    'ncdump -h'). The text output is not managed by CliMAF (but only displayed).
+
+ - Two new standard operators :
+
+    - ``ncdump`` : **show only the header information of a netCDF
+      file**; see :doc:`scripts/ncdump` 
+    - ``cpdfcrop`` : **crop pdf figures to their minimal size,
+      preserving metadata**; see :doc:`scripts/cpdfcrop` 
+
+ - An operator for temporary use : ``curves`` (see :doc:`scripts/curves`) :  
+
+
+- 2015/10/19 - Version 0.11 :
+
+ - For :py:func:`~climaf.classes.cpage` (which creates an **array of
+   figures**), default keywords changed : fig_trim=False ->
+   fig_trim=True, page_trim=False -> page_trim=True. See example
+   :download:`figarray <../examples/figarray.py>`.   
+
+ - New function :py:func:`~climaf.driver.efile()` allows to apply
+   :py:func:`~climaf.driver.cfile()` to an ensemble object. It
+   writes a single file with variable names suffixed by member label.       
+ 
+ - The **general purpose plot operator** (for plotting 1D and 2D
+   datasets: maps, cross-sections and profiles), named ``plot``, was
+   significantly enriched. It now allows for plotting an additional
+   scalar field displayed as contours and for plotting an optional
+   vector field, for setting the reference longitude, the contours
+   levels for main or auxiliary field, the reference length used for
+   the vector field plot, the rotation of vectors from model grid to
+   geographic grid, ... See :doc:`scripts/plot`   
+
+
 .. _news_0.10:
 
 - 2015/09/23 - Version 0.10 :
@@ -44,8 +108,8 @@ Changes, newest first :
  - Operator 'lines' is smarter re.time axis: (see
    :doc:`scripts/lines`):
 
-   - Tick marks are smartly adapted to the time period duration. 
-   - When datasets does not cover the same time period, the user can
+   - Tick marks are smartly adapted to the time period duration.  
+   - When datasets does not cover the same time period, the user can 
      choose wether time axis will be aligned to the same origin or
      just be the union of all time periods 
 
@@ -64,7 +128,7 @@ Changes, newest first :
   - datasets of type 'short' are correctly read
   - operator's secondary output variables are duly renamed, according
     to the name given to operator's the secondary output when
-    decalring it using :py:func:`~climaf.operators.script()` 
+    declaring it using :py:func:`~climaf.operators.script()` 
 
 .. _news_0.8:
 

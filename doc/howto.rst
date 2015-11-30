@@ -161,7 +161,9 @@ If you are willing to share as an `Open Source sofwtare <http://en.wikipedia.org
 .. _how_to_improve_doc:
 
 ..contribute to improve CliMAF documentation
--------------------------------------------- CliMAF documentation is
+-------------------------------------------- 
+
+CliMAF documentation is
 built using `Sphinx <http://sphinx-doc.org/>`_ and can easily be
 modified and improved, provided you are not afraid by looking at text
 files formated using the `REStructured Text syntax

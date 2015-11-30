@@ -28,11 +28,15 @@ Main functions are :
 
  - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
 
+ - ``cvalue``  : get the value of a CliMAF object which actually is a scalar
+
  - ``cens``    : define an ensemble of objects 
 
 - for managing/viewing results :
 
  - ``cfile``   : get the file value of a CliMAF object (compute it)
+ 
+ - ``efile``   : create a single file for an ensemble of CliMAF objects
 
  - ``cshow``   : display a result of type 'figure'
 
@@ -70,7 +74,7 @@ from projects import *
 #
 from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cimport, cexport,calias
+from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
