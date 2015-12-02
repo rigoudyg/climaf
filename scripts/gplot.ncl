@@ -1,6 +1,8 @@
 ; General-purpose plot using NCL, for use in CliMAF. 
 ; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
 
+; Second version : L.Vignon - november 2015
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
@@ -1024,9 +1026,11 @@ begin
         plot0=gsn_csm_pres_hgt(wks,fld,res)
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
+            res2@tmYRMode = "Automatic" ; turn off special labels on right axis
             plot1=gsn_csm_pres_hgt(wks,fld,res2)
           end if
         else
+          res2@tmYRMode = "Automatic" ; turn off special labels on right axis
           plot1=gsn_csm_pres_hgt(wks,fld2,res2)
         end if
 

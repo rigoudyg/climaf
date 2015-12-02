@@ -21,7 +21,7 @@ saFile=cfile(sa)
 # Requiring a copy the result as some other place
 saFile=cfile(sa,"~/tmp/space_average.nc")
 # Requiring a symbolic link to CliMAF cache result 
-saFile=cfile(sa,"~/tmp/space_average_link.nc")
+saFile=cfile(sa,"~/tmp/space_average_link.nc",ln=True)
 
 # Looking at the result
 print saFile
