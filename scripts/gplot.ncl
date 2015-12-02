@@ -1024,9 +1024,11 @@ begin
         plot0=gsn_csm_pres_hgt(wks,fld,res)
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
+            res2@tmYRMode = "Automatic" ; turn off special labels on right axis
             plot1=gsn_csm_pres_hgt(wks,fld,res2)
           end if
         else
+          res2@tmYRMode = "Automatic" ; turn off special labels on right axis
           plot1=gsn_csm_pres_hgt(wks,fld2,res2)
         end if
 
