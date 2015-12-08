@@ -804,7 +804,8 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
-                    source=os.readlink(result)
+                    if os.path.islink(result) : source=os.readlink(result)
+                    else : source=result
                     if (source == target):
                         # This is a case where the file had already been symlinked to the same target name
                         shutil.move(source,result)
