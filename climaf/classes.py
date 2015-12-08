@@ -843,8 +843,8 @@ def cmissing(project,missing,*kwargs) :
 
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
-                 orientation="portrait", fig_trim=True, page_trim=True, format="png",
-                 title="", x=0, y=26, ybox=50, pt=24,
+                 fig_trim=True, page_trim=True, format="png",
+                 page_width=1600., page_height=2400.,title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white"): 
         """
         Builds a CliMAF cpage object, which represents an array of figures
@@ -860,8 +860,6 @@ class cpage(cobject):
              - an ensemble:  one column is used
           heights (list, optional) : the list of figure heights, i.e. the
            height of each line. By default  spacing is even
-          orientation (str, optional) : page's orientation, either 'portrait' 
-           (default) or 'landscape'
           fig_trim (logical, optional) : to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
            either True (default) or False
@@ -870,6 +868,10 @@ class cpage(cobject):
            (default) or False 
           format (str, optional) : graphic output format, either 'png' (default)
            or 'pdf'
+          page_width (float, optional) : width resolution of resultant image;
+           CLiMAF default: 1600. 
+          page_height (float, optional) : height resolution of resultant image;
+           CLiMAF default: 2400. 
           title (str, optional) : append a label below or above (depending optional
            argument 'gravity') figures in the page.
 
@@ -905,15 +907,17 @@ class cpage(cobject):
           >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
           ... heights=[0.33,0.33,0.33], orientation='landscape', fig_trim=False, page_trim=False,
           ... format='pdf', title='Page title', x=10, y=20, ybox=45,
-          ... pt=20, font='Utopia', gravity='South', background='grey90' )
+          ... pt=20, font='Utopia', gravity='South', background='grey90',
+          ... page_width=800., page_height=1200.)
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
        
-        self.orientation=orientation
         self.fig_trim=fig_trim
         self.page_trim=page_trim
         self.format=format
+        self.page_width=page_width
+        self.page_height=page_height
         self.title=title
         self.x=x
         self.y=y
@@ -985,14 +989,17 @@ class cpage(cobject):
             rep+=" ],"; 
 
         if self.title is "" :
-            rep+=( "],"+`self.widths`+","+`self.heights`+", orientation='"+self.orientation+\
-                   "', fig_trim='%s', page_trim='%s', format='"+self.format+"')" )%(self.fig_trim,self.page_trim)
+            rep+=( "],"+`self.widths`+","+`self.heights`+", fig_trim='%s', page_trim='%s', format='"+self.format+\
+                   "', page_width=%d, page_height=%d)" )\
+                   %(self.fig_trim,self.page_trim,self.page_width,self.page_height)
+            
         else:
-            rep+=( "],"+`self.widths`+","+`self.heights`+", orientation='"+self.orientation+\
-                   "', fig_trim='%s', page_trim='%s', format='"+self.format+"', title='"+self.title+\
+            rep+=( "],"+`self.widths`+","+`self.heights`+\
+                   ", fig_trim='%s', page_trim='%s', format='"+self.format+\
+                   "', page_width=%d, page_height=%d, title='"+self.title+\
                    "', x=%d, y=%d, ybox=%d, pt=%d, font='"+self.font+\
                    "', gravity='"+self.gravity+"', background='"+self.background+"')" )\
-                   %(self.fig_trim,self.page_trim,self.x,self.y,self.ybox,self.pt)
+                   %(self.fig_trim,self.page_trim,self.page_width,self.page_height,self.x,self.y,self.ybox,self.pt)
             
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
