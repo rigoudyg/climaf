@@ -13,14 +13,18 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+.. _news_0.13:
+
 - 2015/12/08 :
 
  - Changes for :py:func:`~climaf.classes.cpage`  :
 
-   - argument ``orientation`` was removed and replaced by new
-     arguments ``page_width`` and ``page_height`` for controling more
+   - argument ``orientation`` is now deprecated and replaced by new
+     arguments ``page_width`` and ``page_height`` for more control on
      image resolution    
-   - best adjustment of figures in height (if ``fig_trim`` is True).
+   - better adjustment of figures in height (if ``fig_trim`` is True).
+ 
+ - Fix function cfile() for case hard=True
 
 
 .. _news_0.12:
