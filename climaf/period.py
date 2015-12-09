@@ -130,10 +130,15 @@ def init_period(dates) :
     Returns:
       the corresponding CliMAF 'period' object
 
+    When using only YYYY, can omit some Ys (for zeros). 
+    Cannot handle year 0000
+
     Examples :
     
     -  a one-year long period : '1980', or '1980-1980'
     -  a decade : '1980-1989'
+    -  first millenium : 1-1000  # Must have leading zeroes if you want to quote a month
+    -  first century : 1-100
     -  one month : '198005'
     -  two months : '198003-198004'
     -  one day : '17890714'
@@ -150,9 +155,11 @@ def init_period(dates) :
         raise Climaf_Period_Error("arg is not a string : "+`dates`)
     if (dates == 'fx' ) : return cperiod('fx')
     
-    start=re.sub(r'^([0-9]{4,12}).*',r'\1',dates)
+    start=re.sub(r'^([0-9]{1,12}).*',r'\1',dates)
+    # Pad with leading 0 to reach a length of 4 characters
+    start=(4-len(start))*"0"+start
     # TBD : check that start actually matches a date
-    syear  =int(start[0:4])
+    syear  =int(start[0:4])  
     smonth =int(start[4:6])  if len(start) > 5  else 1
     sday   =int(start[6:8])  if len(start) > 7  else 1
     shour  =int(start[8:10]) if len(start) > 9  else 0
@@ -160,14 +167,15 @@ def init_period(dates) :
     try :
         s=datetime.datetime(year=syear,month=smonth,day=sday,hour=shour,minute=sminute)
     except :
-        raise Climaf_Period_Error("period start string %s is not a date"%start)
+        raise Climaf_Period_Error("period start string %s is not a date (%s %s %s %s %s)"%(start,syear,smonth,sday,shour,sminute))
     #
-    end=re.sub(r'.*[-_]([0-9]{4,12})$',r'\1',dates)
+    end=re.sub(r'.*[-_]([0-9]{1,12})$',r'\1',dates)
+    end=(4-len(end))*"0"+end
     #clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
     done=False
     if (end==dates) :
         # No string found for end of period
-        if (len(start)==4 ) : eyear=syear+1 ; emonth=1 ; eday=1 ; ehour=0 
+        if (len(start)<=4 ) : eyear=syear+1 ; emonth=1 ; eday=1 ; ehour=0 
         elif (len(start)==6 ) :
             eyear=syear ; emonth=smonth+1 ;
             if (emonth > 12) :
@@ -191,7 +199,7 @@ def init_period(dates) :
     else:
         #clogger.debug("len(end)=%d"%len(end))
         if len(start) != len(end) :
-            raise Climaf_Period_Error("Must have same numer of digits for start and end dates (%s and %s)%(start,end)")
+            raise Climaf_Period_Error("Must have same numer of digits for start and end dates (%s and %s)"%(start,end))
         if (len(end)<12)  :
             eminute = 0
         else :

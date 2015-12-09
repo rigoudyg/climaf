@@ -19,6 +19,8 @@ Documented operators as of today :
     - :doc:`scripts/time_average`
     - :doc:`scripts/space_average`
     - :doc:`scripts/minus`
+    - :doc:`scripts/ncdump`
+    - :doc:`scripts/cpdfcrop`
 
  - graphics
     - :doc:`scripts/plot`
