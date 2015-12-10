@@ -54,7 +54,11 @@ General:
       resultant image in pixels; default (ncl): 1024x1024
     - if format is "pdf", resolution specifies either the width and
       height of the paper, in inches, or a standard paper size by
-      name; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
+      name; default (ncl): 8.5x11 or "letter" (ncl imposes a
+      resolution of 72 dots per inch (dpi), wich is equivalent to
+      612x792 pixels)  
+  - ``trim`` : to turn on/off triming for PNG figures; default
+    (climaf): True. 
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or

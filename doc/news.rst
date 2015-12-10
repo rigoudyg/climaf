@@ -13,6 +13,11 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2015/12/10 : 
+
+  - New argument for standard operator ``plot`` : ``trim`` to turn
+    on/off triming for PNG figures (see :doc:`scripts/plot`) 
+
 - 2015/12/08 :
 
  - Changes for :py:func:`~climaf.classes.cpage`  :
