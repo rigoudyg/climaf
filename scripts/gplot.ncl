@@ -258,8 +258,37 @@ begin
         end if
       end if
     end if
-    lat_dim=ffile->$latname$
-    lon_dim=ffile->$lonname$
+
+    if ( isfilevar(ffile,"nav_lat") .and. isfilepresent("coordinates.nc") ) \ 
+      .or. ( isfilevar(ffile,"nav_lat") .and. isfilepresent("mesh_mask.nc") ) then
+      
+      if isfilepresent("coordinates.nc") then
+        coord_file=addfile("coordinates.nc","r")
+        lat_dim=coord_file->gphit
+        lon_dim=coord_file->glamt
+        lat_dim_tmp=rm_single_dims(lat_dim)
+        lon_dim_tmp=rm_single_dims(lon_dim)
+        delete(lat_dim)
+        delete(lon_dim)
+        lat_dim=lat_dim_tmp
+        lon_dim=lon_dim_tmp
+        delete(lat_dim_tmp)
+        delete(lon_dim_tmp)
+      else
+        if isfilepresent("mesh_mask.nc") then
+          coord_file=addfile("mesh_mask.nc","r")
+          lat_dim=coord_file->nav_lat
+          lon_dim=coord_file->nav_lon
+        end if
+      end if
+    else
+      if isfilevar(ffile,"nav_lat") then
+        print("File coordinates.nc or mesh_mask.nc cannot be accessed")
+      end if
+      lat_dim=ffile->$latname$
+      lon_dim=ffile->$lonname$
+    end if
+
   end if ; rk eq 2
 
   if (rank .eq. 1) then 

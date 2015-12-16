@@ -151,12 +151,23 @@ Vectors:
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
 
-**Required file** If rotation is set to 1, file 'angles.nc' must be
-made available to the script: use function fixed_fields() for that
-(see example below). For an example of this file and the script which
-creates this file: see :download:`angle_EM.nc
-<../../tools/angle_EM.nc>` and :download:`angle.ncl
-<../../tools/angle.ncl>`  
+**Required files** 
+  - If rotation is set to 1, file 'angles.nc' must be made available
+    to the script: use function fixed_fields() for that (see example
+    below). For an example of this file and the script which creates
+    this file: see :download:`angle_EM.nc <../../tools/angle_EM.nc>`
+    and :download:`angle.ncl <../../tools/angle.ncl>`  
+
+  - It is preferable that files 'coordinates.nc' or 'mesh_mask.nc' are
+    present in the current directory if field has wrong coordinates
+    'nav_lat' and 'nav_lon': use function fixed_fields() for
+    that. For an example of these files: see
+    :download:`eORCA_R025_coordinates_v1.0.nc
+    <../../tools/eORCA_R025_coordinates_v1.0.nc>` 
+    :download:`ORCA025_old_coordinates.nc
+    <../../tools/ORCA025_old_coordinates.nc>` (old
+    grid NEMO) and :download:`mesh_mask_eORCA_R025.nc
+    <../../tools/mesh_mask_eORCA_R025.nc>`  
 
 **Outputs** :
   - main output : a PNG figure

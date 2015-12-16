@@ -13,6 +13,13 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+
+- 2015/12/14 :
+ 
+  - Add possibility of making available coordinates files if field has
+    wrong coordinates 'nav_lat' and 'nav_lon' (see
+    :doc:`scripts/plot`)  
+
 - 2015/12/10 : 
 
   - New argument for standard operator ``plot`` : ``trim`` to turn
