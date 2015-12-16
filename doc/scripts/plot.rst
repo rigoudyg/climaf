@@ -143,12 +143,25 @@ Vectors:
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
 
-**Required file** If rotation is set to 1, file 'angles.nc' must be
-made available to the script: use function fixed_fields() for that
-(see example below). For an example of this file and the script which
-creates this file: see :download:`angle_EM.nc
-<../../tools/angle_EM.nc>` and :download:`angle.ncl
-<../../tools/angle.ncl>`  
+**Required files** 
+  - If rotation is set to 1, file 'angles.nc' must be made available
+    to the script: use function fixed_fields() for that (see example
+    below). For an example of this file and the script which creates
+    this file: see :download:`angle_EM.nc <../../tools/angle_EM.nc>`
+    and :download:`angle.ncl <../../tools/angle.ncl>`  
+
+.. _navlat_issue:
+
+**Optional files**
+  - If the field to plot is from Nemo and has uncomplete nav_lat or
+    nav_lon coordinates, you should provide correct values by bringing
+    to the script a file locally named either 'coordinates.nc' or
+    'mesh_mask.nc', and which content ressembles the well-known
+    corresponding Nemo constant files. You do that using function
+    :py:func:`~climaf.operators.fixed_fields()`. Such files are not
+    included with CliMAF and must be sought by your local Nemo
+    dealer. At CNRM you may have a look at
+    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
 
 **Outputs** :
   - main output : a PNG figure

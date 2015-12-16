@@ -258,8 +258,37 @@ begin
         end if
       end if
     end if
-    lat_dim=ffile->$latname$
-    lon_dim=ffile->$lonname$
+
+    if ( isfilevar(ffile,"nav_lat") .and. isfilepresent("coordinates.nc") ) \ 
+      .or. ( isfilevar(ffile,"nav_lat") .and. isfilepresent("mesh_mask.nc") ) then
+      
+      if isfilepresent("coordinates.nc") then
+        coord_file=addfile("coordinates.nc","r")
+        lat_dim=coord_file->gphit
+        lon_dim=coord_file->glamt
+        lat_dim_tmp=rm_single_dims(lat_dim)
+        lon_dim_tmp=rm_single_dims(lon_dim)
+        delete(lat_dim)
+        delete(lon_dim)
+        lat_dim=lat_dim_tmp
+        lon_dim=lon_dim_tmp
+        delete(lat_dim_tmp)
+        delete(lon_dim_tmp)
+      else
+        if isfilepresent("mesh_mask.nc") then
+          coord_file=addfile("mesh_mask.nc","r")
+          lat_dim=coord_file->nav_lat
+          lon_dim=coord_file->nav_lon
+        end if
+      end if
+    else
+      if isfilevar(ffile,"nav_lat") then
+        print("File coordinates.nc or mesh_mask.nc cannot be accessed")
+      end if
+      lat_dim=ffile->$latname$
+      lon_dim=ffile->$lonname$
+    end if
+
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
@@ -296,6 +325,7 @@ begin
   if (.not. isvar("scale")) then scale=1.0 end if
   if (.not. isvar("offset")) then offset=0.0 end if
   if (.not. isvar("type")) then type="png" end if
+  if (.not. isvar("trim")) then trim=True end if
   LABELON=False
   RASTER=True 
 
@@ -529,7 +559,9 @@ begin
 
     end if ; str_match
   end if ;resolution
-
+  ;if type .eq. "pdf" then
+  ;  type@wkPDFResolution = 3600
+  ;end if
   wks = gsn_open_wks(type,plotname)
   gsn_define_colormap(wks,cmap) 
   i = NhlNewColor(wks,0.8,0.8,0.8)
@@ -884,6 +916,8 @@ begin
     xyres = True
     xyres@gsnDraw = False
     xyres@gsnFrame = False
+    xyres@gsnMaximize = True
+    xyres@gsnPaperOrientation = "portrait"
     xyres@vpXF = 0.5
     xyres@vpWidthF = 0.45
     xyres@vpHeightF = 0.45
@@ -1087,10 +1121,10 @@ begin
   
   frame(wks)
 
-  if type .eq. "png" then
-    system("convert "+plotname+" -trim "+plotname)
+  if ( type .eq. "png" .and. trim ) then
+      system("convert "+plotname+" -trim "+plotname)
   end if
-  
+
   status_exit(0)
   
 end

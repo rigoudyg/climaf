@@ -13,18 +13,22 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
-.. _news_0.13:
 
 - 2015/12/08 :
 
- - Changes for :py:func:`~climaf.classes.cpage`  :
+  - Allow operator :doc:`plot <scripts/plot>` to use a local coordinates
+    file, for dealing with Nemo data files having un-complete
+    'nav_lat' and 'nav_lon'. See :ref:`navlat issues with plot
+    <navlat_issue>`.  Such files are available e.g. at CNRM in
+    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+  - Changes for :py:func:`~climaf.classes.cpage`  :
 
    - argument ``orientation`` is now deprecated and replaced by new
      arguments ``page_width`` and ``page_height`` for more control on
      image resolution    
    - better adjustment of figures in height (if ``fig_trim`` is True).
- 
- - Fix function cfile() for case hard=True
+
+  - Fix function cfile() for case hard=True
 
 
 .. _news_0.12:
@@ -40,10 +44,10 @@ Changes, newest first :
     - ``format`` : graphical format : either png (default) or pdf
     - **17 new optional arguments to adjust title, sub-title, color bar, label font, label font height**
       , ... (see :ref:`More plot optional arguments <plot_more_args>` )       
-
-   - optional argument ``levels`` was renamed ``colors``
-   - code re-design 
-   - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
+    - ``trim`` to turn on triming for PNG figures 
+    - optional argument ``levels`` was renamed ``colors``
+    - code re-design 
+    - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
 
  - New arguments for :py:func:`~climaf.classes.cpage` :
 
