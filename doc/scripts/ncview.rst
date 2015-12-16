@@ -22,7 +22,7 @@ Launch ncview in the background for displaying the dataset
 **Climaf call example** ::
  
   >>> tas= .... #some dataset like e.g. of monthly mean of a low level temperature
-  >>> cobj(ncview(tas))
+  >>> ncview(tas)
 
 **Side effects** : ncview is launched, displaying the file correspondign to the dataset
 

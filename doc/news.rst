@@ -13,18 +13,70 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+
+- 2015/12/14 :
+ 
+  - Add possibility of making available coordinates files if field has
+    wrong coordinates 'nav_lat' and 'nav_lon' (see
+    :doc:`scripts/plot`)  
+
+- 2015/12/10 : 
+
+  - New argument for standard operator ``plot`` : ``trim`` to turn
+    on/off triming for PNG figures (see :doc:`scripts/plot`) 
+
+- 2015/12/08 :
+
+ - Changes for :py:func:`~climaf.classes.cpage`  :
+
+   - argument ``orientation`` was removed and replaced by new
+     arguments ``page_width`` and ``page_height`` for controling more
+     image resolution    
+   - best adjustment of figures in height (if ``fig_trim`` is True).
+
+
 .. _news_0.12:
 
-- 2015/10/27 - Version Pre-0.12 :
+- 2015/11/27 - Version 0.12 :
   
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
-   - new arguments : ``level`` and ``time`` for selecting time
-     or level;   
-   - optional argument ``levels`` was renamed ``colors``.  
+   - new arguments : 
+
+    - ``level`` and ``time`` for selecting time  or level;   
+    - ``resolution``   for controling image resolution 
+    - ``format`` : graphical format : either png (default) or pdf
+    - **17 new optional arguments to adjust title, sub-title, color bar, label font, label font height**
+      , ... (see :ref:`More plot optional arguments <plot_more_args>` )       
+
+   - optional argument ``levels`` was renamed ``colors``
    - code re-design 
-   
-.. _news_0.11:
+   - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
+
+ - New arguments for :py:func:`~climaf.classes.cpage` :
+
+   - ``title``. See example :download:`figarray <../examples/figarray.py>`
+   - ``format`` : graphical output format : either png (default) or pdf
+
+
+ - Two new output formats allowed for operators : 'graph' and 'text';
+   see :py:func:`~climaf.operators.cscript` 
+
+  - 'graph' allows the user to choose between two graphic output
+    formats: 'png' and 'pdf' (new graphic ouput format), if the
+    corresponding operator supports it (this is the case for plot()); 
+  - 'txt' allows to use any operator that just ouputs text (e.g. 
+    'ncdump -h'). The text output is not managed by CliMAF (but only displayed).
+
+ - Two new standard operators :
+
+    - ``ncdump`` : **show only the header information of a netCDF
+      file**; see :doc:`scripts/ncdump` 
+    - ``cpdfcrop`` : **crop pdf figures to their minimal size,
+      preserving metadata**; see :doc:`scripts/cpdfcrop` 
+
+ - An operator for temporary use : ``curves`` (see :doc:`scripts/curves`) :  
+
 
 - 2015/10/19 - Version 0.11 :
 
