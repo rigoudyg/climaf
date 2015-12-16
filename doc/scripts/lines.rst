@@ -27,14 +27,13 @@ an ensemble dataset using NCL
   - ``colors`` : a string with one NCL color name per member,
     separated by whitespace
   - ``thickness`` : thickness of the curves line; default to 2.
-  - ``T_axis`` : a string ("real" or "tweaked") which determines time
+  - ``X_axis`` : a string ("real" or "aligned") which determines X
     axis when datasets does not cover the same time period; default to
-    "real". 
+    "real".  
 
-   - T_axis="real"    : time axis will be the union of all time
-     periods   
-   - T_axis="tweaked" : time axis will be aligned to the same origin
-     (take the first file as ref.) 
+   - T_axis="real"    : X axis will be the union of all periods    
+   - T_axis="aligned" : X axis will be aligned to the same origin
+     (take the first file as ref.)  
       
   - ``linp`` : set it to 1 for getting a vertical axis with
     index-linear spacing  

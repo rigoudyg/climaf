@@ -13,16 +13,16 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl lineplot.ncl infile=.. plotname=.. var=.. T_axis="real" title=.. labels=.. colors=.. thickness=.. linp=1 fmt=..
+; ncl lineplot.ncl infile=.. plotname=.. var=.. X_axis="real" title=.. labels=.. colors=.. thickness=.. linp=1 fmt=..
 ;
 ; infile, plotname and var are mandatory
 ;
 ; infile : a string holding the series of filenames, separated by whitespaces
 ;
-; T_axis : a string ("real" or "tweaked") which determines time axis when datasets
-; does not cover the same time period; 
-;    - T_axis="real"    : time axis will be the union of all time periods
-;    - T_axis="tweaked" : time axis will be aligned to the same origin (take the 
+; X_axis : a string ("real" or "aligned") which determines X axis when datasets
+; does not cover the same range; 
+;    - X_axis="real"    : X axis will be the union of all X axis
+;    - X_axis="aligned" : X axis will be aligned to the same origin (take the 
 ;                         first file as ref.) 
 ;
 ; colors : a string holding a series of color NCL names, separated by whitespaces
@@ -57,7 +57,7 @@ begin
   all_files=addfiles(files,"r")
 
   ;---Extraction of min and max x-range 
-  if (.not. isvar("T_axis")) then T_axis="real" end if
+  if (.not. isvar("X_axis")) then X_axis="real" end if
 
   all_fld=all_files[:]->$var$
   ;print(all_fld)
@@ -98,7 +98,7 @@ begin
 
       ; data vector for X axis
       if (.not. ismissing(str_match(coord,"time"))) then ;;add
-        if ( T_axis .eq. "real" ) then
+        if ( X_axis .eq. "real" ) then
           Xaxis=all_fld&$coord$             ; take union of all time periods
         else
           Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
@@ -117,10 +117,10 @@ begin
   res@vpWidthF    = 0.7          ; Make plots wider
   res@vpHeightF   = 0.5
 
-  res@trXMinF=min(Xaxis)
-  res@trXMaxF=max(Xaxis)
-  res@trYMinF=min(all_fld) 
-  res@trYMaxF=max(all_fld) 
+  ;res@trXMinF=min(Xaxis)
+  ;res@trXMaxF=max(Xaxis)
+  ;res@trYMinF=min(all_fld) 
+  ;res@trYMaxF=max(all_fld) 
 
   ;---Thickness
   if isvar("thickness") then 
@@ -178,9 +178,9 @@ begin
     ; cd_calendar function.
     ; ---------------------------------------------------
     restick = True
-    
+
     if (isvar("fmt")) then
-      restick@ttmFormat=fmt  
+      restick@ttmFormat=fmt
     else
       ymdhms = cd_calendar(Xaxis,0) ;return array of dimension dimsizes(Xaxis) x 6 and of type float
                                 ;ymdhms(:,0) <=> years, ymdhms(:,1) <=> months, etc
@@ -205,11 +205,10 @@ begin
           end if
         end if
       end if
-  time_axis_labels(Xaxis,res,restick)
+      ;time_axis_labels(Xaxis,res,restick) bug
+    end if
+    time_axis_labels(Xaxis,res,restick)
   end if
-
-  end if
-
 
   ;---Open workstation
   wks = gsn_open_wks ("png",plotname) 
@@ -255,10 +254,10 @@ begin
         coord=Var_DimNames(dim)
         ;print(coord)
         ; Store coordinate in 'ax'
-        if ( T_axis .eq. "real" ) then
+        if ( X_axis .eq. "real" ) then
           ax:=fld&$coord$
         else
-          ; Take first file as reference for X axis if T_axis .eq. "tweaked"
+          ; Take first file as reference for X axis if X_axis .eq. "aligned"
           if (i .eq. 0 ) then 
             ax=fld&$coord$
           end if
@@ -280,6 +279,11 @@ begin
               res@xyYStyle = "Log" 
               set_pres_hgt_axes(ax,res,True)
             end if
+            print(fld)
+            print(ndtooned(fld))
+            print(ax)
+            print(ax@long_name)
+            print(fld@long_name)
             plot = gsn_csm_xy(wks,ndtooned(fld),ax,res)
           else
             plot = gsn_csm_xy(wks,ax,ndtooned(fld),res)
