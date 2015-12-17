@@ -38,12 +38,76 @@
 ; In case fmt is absent, a minimal algorithm exists which tries to determine the 
 ; format string depending on the length and values of the date-time.
 ;
-; Second version : L.Vignon - july 2015
+; Third version : L.Vignon - december 2015
 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl" 
+
+;--------------------------------------------------------------------------------------------
+undef("str_convert")
+; Convert an input string into logical, integer, float or the same string
+function str_convert(str:string)
+
+local val, valf
+begin
+  
+  if .not. ismissing(str_match(str,"True")) then
+    ;val=True
+    return(True)
+  else
+    if .not. ismissing(str_match(str,"False")) then
+      ;val=False
+      return(False)
+    else
+      ;if .not. ismissing(str_match(str,".")) then ;add "[0-9]"
+      ;  print("point")
+
+      if ismissing(str_match(str,".")) then
+        val=stringtoint(str)
+        if ismissing(val) then 
+          return(str)
+        else
+          return(val)
+        end if
+      else
+        valf=stringtofloat(str)
+        if ismissing(valf) then 
+          return(str)
+        else
+          return(valf)
+        end if
+      end if
+
+      ;val=stringtoint(str)
+      ;if ismissing(val) then 
+      ;  valf=stringtofloat(str)
+      ;;else
+      ;  if ismissing(valf) then
+      ;    return(str)
+      ;  else
+      ;    return(valf)
+      ;  end if
+      ;else
+      ;  return(val)
+      ;end if
+
+
+      ;else
+      ;  if .not. ismissing(str_match_regex(str,"[0-9]")) .and. ismissing(str_match(str,".")) then
+      ;    print("entier") 
+      ;    val=stringtoint(str)
+      ;  end if
+      ;end if
+    end if
+  end if
+
+  ;return(val)
+  
+end 
+
+;--------------------------------------------------------------------------------------------
 
 begin
   files=str_split(infile," ")
@@ -56,11 +120,10 @@ begin
   ;---Read all data
   all_files=addfiles(files,"r")
 
-  ;---Extraction of min and max x-range 
   if (.not. isvar("X_axis")) then X_axis="real" end if
-
+  
+  ;---Extraction of Xaxis values (useful if Xaxis is time) 
   all_fld=all_files[:]->$var$
-  ;print(all_fld)
   Var_DimNames = getvardims(all_fld)  ; getting dimensions from metadata
   dime=dimsizes(all_fld)
   found=False
@@ -86,25 +149,25 @@ begin
       ;;if (.not. all(all_files[:]&$coord$@standard_name .eq. "time")) then
       ;;  first_file_axis_name=all_files[0]->$var$&$coord$@standard_name
 
-      ; if (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"Time"))) .or. (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"time"))) then
       ; Next few lines are not supported by ncl 6.1 :
-      ;   first_file_axis_name=all_files[0]->$var$&$coord$@long_name
-      ;   if (.not. all(all_files[:]&$coord$@long_name .eq. first_file_axis_name)) then
-      ;     print("Files have not same axis for variable "+coord)
-      ;     status_exit(1)
-      ;   end if        
-      ; end if
+      ;if (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"Time"))) .or. (.not. ismissing(str_match(all_files[:]&$coord$@long_name,"time"))) then
+      ;  first_file_axis_name=all_files[0]->$var$&$coord$@long_name
+      ;  if (.not. all(all_files[:]&$coord$@long_name .eq. first_file_axis_name)) then
+      ;    print("Files have not same axis for variable "+coord)
+      ;    status_exit(1)
+      ;  end if        
+      ;end if
       ; End of "Next few lines are not supported by ncl 6.1 "
 
       ; data vector for X axis
-      if (.not. ismissing(str_match(coord,"time"))) then ;;add
+      if (.not. ismissing(str_match(coord,"time"))) .or. (.not. ismissing(str_match(coord,"Time"))) then ;;add
         if ( X_axis .eq. "real" ) then
           Xaxis=all_fld&$coord$             ; take union of all time periods
         else
           Xaxis=all_files[0]->$var$&$coord$ ; take first file origin as reference for time axis
         end if  
-      else
-        Xaxis=all_fld&$coord$
+      ;else
+      ;  Xaxis=all_fld&$coord$
       end if
     end if
   end do
@@ -113,14 +176,28 @@ begin
   res=True
   res@gsnDraw          = False   ; Will draw later, after overlaying
   res@gsnFrame         = False   ; all plots
- 
-  res@vpWidthF    = 0.7          ; Make plots wider
-  res@vpHeightF   = 0.5
-
-  ;res@trXMinF=min(Xaxis)
-  ;res@trXMaxF=max(Xaxis)
-  ;res@trYMinF=min(all_fld) 
-  ;res@trYMaxF=max(all_fld) 
+  ;res@vpWidthF    = 0.7          ; Make plots wider
+  ;res@vpHeightF   = 0.5
+  ;add LV
+  res@gsnMaximize = True
+  type="png"
+  res@vpXF = 0.5
+  res@vpWidthF = 0.45
+  res@vpHeightF = 0.45
+  res@txFontHeightF = 0.010
+  ;res@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
+  res@tmXBLabelFontHeightF=0.008
+  res@tmYLLabelFontHeightF=0.008
+  res@tmXBLabelFontThicknessF = 3.0
+  res@tmYLLabelFontThicknessF = 3.0
+  res@txFontThicknessF = 3.0
+  
+  if (.not. ismissing(str_match(coord,"time"))) .or. (.not. ismissing(str_match(coord,"Time"))) then
+    res@trXMinF=min(Xaxis)
+    res@trXMaxF=max(Xaxis)
+    ;res@trYMinF=min(all_fld) 
+    ;res@trYMaxF=max(all_fld)
+  end if
 
   ;---Thickness
   if isvar("thickness") then 
@@ -161,15 +238,50 @@ begin
   res@pmLegendDisplayMode    = "Always"              ; turn on legend
   res@pmLegendWidthF         = 0.12                  ; Change width and
   res@pmLegendHeightF        = 0.15                  ; height of legend.
-  res@lgLabelFontHeightF     = .011                  ; change font height
+  res@lgLabelFontHeightF     = 0.009;.011                  ; change font height
   res@lgPerimOn              = False                 ; no box around
   ;res@lgItemOrder           = (/1,0/)               ; reverse legend
+  ; add lv
+  ;res@pmLegendSide           = "Top"      
+ 
+
+  ;test
+  if isvar("options") then
+    reslist=str_split(options,"|")
+    do i=0,dimsizes(reslist)-1 
+
+      resval=str_split(options,"=")
+    end do
+
+  end if
+  ;resval=str_split(options,"=")
+  ;print(resval)
+  ;key=resval(0)
+  ;value=resval(1)
+  ;print(key)
+  ;res@$key$=True;value
+
+  key="True"
+  f=test(key)
+  print(f)
+  print(islogical(f))
+  
+  key1="0.12"
+  f1=test(key1)
+  print(f1)
+  printVarSummary(f1)
+
+  key2="33"
+  f2=test(key2)
+  print(f2)
+  printVarSummary(f2)
+
 
   ;---linp
   logp=True
   if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
   
-  if (.not. ismissing(str_match(coord,"time"))) then ;;add
+  if (.not. ismissing(str_match(coord,"time"))) .or. (.not. ismissing(str_match(coord,"Time"))) then ;;add
     ;--------------------------------------------------
     ; The time_axis_label function adds additional
     ; resources to "res" to produce nicely-formatted
@@ -269,7 +381,7 @@ begin
         
         if (i .eq. 0) then 
           res@pmLegendParallelPosF   = 0.15 ;xvalue(0) 
-          res@pmLegendOrthogonalPosF = -0.1 ;yvalue(0)      ; move up slightly 
+          res@pmLegendOrthogonalPosF = -0.15;-0.1 ;yvalue(0)      ; move up slightly 
 
           if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
             if (ax@positive .eq. "down") then 
@@ -279,19 +391,24 @@ begin
               res@xyYStyle = "Log" 
               set_pres_hgt_axes(ax,res,True)
             end if
-            print(fld)
-            print(ndtooned(fld))
-            print(ax)
-            print(ax@long_name)
-            print(fld@long_name)
+            if isatt(fld, "long_name") then
+              res@tiXAxisString = fld@long_name
+            end if
             plot = gsn_csm_xy(wks,ndtooned(fld),ax,res)
           else
+            if isatt(ax, "long_name") \
+              .and. (ismissing(str_match(coord,"time"))) .and. (ismissing(str_match(coord,"Time"))) then
+              res@tiXAxisString = ax@long_name
+            end if
+            if isatt(fld, "long_name") then
+              res@tiYAxisString = fld@long_name
+            end if
             plot = gsn_csm_xy(wks,ax,ndtooned(fld),res)
           end if
 
         else
           res@pmLegendParallelPosF   = 0.15+0.35*(tointeger(i/4.)) ;xvalue(tointeger(i/4.)) 
-          res@pmLegendOrthogonalPosF = -0.1+0.1*(mod(i,4.))        ;yvalue(mod(i,4.)) 
+          res@pmLegendOrthogonalPosF = -0.15+0.05*(mod(i,4.)) ;-0.1+0.1*(mod(i,4.))        ;yvalue(mod(i,4.)) 
           
           if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
             if (ax@positive .eq. "down") then 
@@ -322,7 +439,8 @@ begin
 
   draw(plot) ; This will draw all n plots
   frame(wks)
-
+  ;add lv
+  ;system("convert "+plotname+" -trim "+plotname)
 end
 
 
