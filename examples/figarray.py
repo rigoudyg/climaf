@@ -7,7 +7,7 @@ cdef("period","198001")
 tas=ds(project="example", simulation="AMIPV6ALB2G", variable="tas")
 
 # Define a figure
-fig1=plot(tas,title="title")
+fig1=plot(tas,title="title",resolution="1600*2400")
 
 # Trigger computation of fig1 as a cached file
 cfile(fig1)
@@ -15,9 +15,10 @@ cfile(fig1)
 ###########################################################################
 # Define page1 as a figure array by trimming all the surrounding extra
 # space of figures (fig_trim=True by default) and also of the page
-# (page_trim=True by default)
+# (page_trim=True by default), and control image resolution
 page1=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]],
-            widths=[0.2,0.8],heights=[0.33,0.33,0.33])
+            widths=[0.2,0.8],heights=[0.33,0.33,0.33],
+            page_width=800, page_height=1200)
 ###########################################################################
 # ask for display of page1
 cshow(page1)
@@ -29,7 +30,7 @@ page2=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]],
             widths=[0.2,0.8],heights=[0.33,0.33,0.33],title="Page title",
             background="grey90",x=-300,y=26,pt=20,
             font='Utopia',ybox=60)
-cshow(page2)
+cshow(page2
  
 ###########################################################################
 # Same as page1 with a title but without tuning parameters for the title

@@ -26,8 +26,6 @@ elif [[ $(uname -n) == ciclad* ]]; then
     scripts=$scripts" data_cmip5drs.py ensemble.py"
 fi
 
-scripts="seaice.py"
-
 # Cleaning script
 scripts="clean_cache.py  "$scripts" clean_cache.py"
 
