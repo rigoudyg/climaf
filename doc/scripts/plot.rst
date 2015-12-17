@@ -44,17 +44,13 @@ General:
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
     metadata.  
-  - ``resolution`` : string for image resolution, either containing
-    width and height of resultant image or paper separated by
-    character 'x' or '*', or containing a standard paper size by name
-    only for PDF output, as e.g. : "900x900" (in pixels for PNG
-    output), "8.5*14" (in inches for PDF output), "A4" for PDF output 
+  - ``resolution`` : string for output image resolution
 
     - if format is "png", resolution specifies the width and height of
-      resultant image in pixels; default (ncl): 1024x1024
+      resultant image in pixels as e.g. 800x1200; default (ncl): 1024x1024
     - if format is "pdf", resolution specifies either the width and
-      height of the paper, in inches, or a standard paper size by
-      name; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
+      height of the paper, as above but in inches unit, or a standard paper size by
+      name, as e.g. 'A4'; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
@@ -147,12 +143,25 @@ Vectors:
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
 
-**Required file** If rotation is set to 1, file 'angles.nc' must be
-made available to the script: use function fixed_fields() for that
-(see example below). For an example of this file and the script which
-creates this file: see :download:`angle_EM.nc
-<../../tools/angle_EM.nc>` and :download:`angle.ncl
-<../../tools/angle.ncl>`  
+**Required files** 
+  - If rotation is set to 1, file 'angles.nc' must be made available
+    to the script: use function fixed_fields() for that (see example
+    below). For an example of this file and the script which creates
+    this file: see :download:`angle_EM.nc <../../tools/angle_EM.nc>`
+    and :download:`angle.ncl <../../tools/angle.ncl>`  
+
+.. _navlat_issue:
+
+**Optional files**
+  - If the field to plot is from Nemo and has uncomplete nav_lat or
+    nav_lon coordinates, you should provide correct values by bringing
+    to the script a file locally named either 'coordinates.nc' or
+    'mesh_mask.nc', and which content ressembles the well-known
+    corresponding Nemo constant files. You do that using function
+    :py:func:`~climaf.operators.fixed_fields()`. Such files are not
+    included with CliMAF and must be sought by your local Nemo
+    dealer. At CNRM you may have a look at
+    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
 
 **Outputs** :
   - main output : a PNG figure

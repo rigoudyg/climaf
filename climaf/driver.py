@@ -804,7 +804,8 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
-                    source=os.readlink(result)
+                    if os.path.islink(result) : source=os.readlink(result)
+                    else : source=result
                     if (source == target):
                         # This is a case where the file had already been symlinked to the same target name
                         shutil.move(source,result)
@@ -899,11 +900,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
     clogger.debug("Computing figure array for cpage %s"%(cobj.crs))
     #
     # page size and creation
-    if cobj.orientation == "portrait":
-        page_width=800. ; page_height=1200.
-    elif cobj.orientation == "landscape":
-        page_width=1200. ; page_height=800.
-    page_size="%dx%d"%(page_width, page_height)
+    page_size="%dx%d"%(cobj.page_width, cobj.page_height)
     args=["convert", "-size", page_size, "xc:white"]
     #
     # margins
@@ -915,10 +912,10 @@ def cfilePage(cobj, deep, recurse_list=None) :
     ymargin=30. # Vertical shift between figures
     #
     if cobj.title is "":
-        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
+        usable_height=cobj.page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
     else:
-        usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.ybox
-    usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
+        usable_height=cobj.page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.ybox
+    usable_width=cobj.page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
     y=y_top_margin
@@ -926,6 +923,7 @@ def cfilePage(cobj, deep, recurse_list=None) :
         # Line height in pixels
         height=usable_height*rheight 
         x=x_left_margin
+        max_old=0.
         for fig, rwidth in zip(line, cobj.widths) :
             # Figure width in pixels
             width=usable_width*rwidth
@@ -944,15 +942,29 @@ def cfilePage(cobj, deep, recurse_list=None) :
             figsize=output_figsize.split(" ").pop(2)
             fig_width=figsize.split("x").pop(0)
             fig_height=figsize.split("x").pop(1)
-                                       
+            # Scaling and max height
+            if float(fig_width) != 1. and float(fig_height) != 1. : 
+                if ( (float(fig_width)/float(fig_height))*float(height) ) < width:
+                    new_fig_width=( float(fig_width)/float(fig_height) )*float(height)
+                    new_fig_height=height
+                else:
+                    new_fig_height=( float(fig_height)/float(fig_width) )*float(width)
+                    new_fig_width=width
+            else:  # for figure = 'None' 
+                new_fig_height=fig_height
+                new_fig_width=fig_width
+           
+            max_fig_height=max( float(new_fig_height),max_old)
+            max_old=float(new_fig_height)
+                       
             if False and cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
                 width_adj=float(fig_width)*(height/float(fig_height))
                 x+=width_adj+xmargin
             else:
                 x+=width+xmargin
 
-        if False and cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
-            height_adj=float(fig_height)*(width/float(fig_width))
+        if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
+            height_adj=max_fig_height
             y+=height_adj+ymargin
         else:
             y+=height+ymargin
