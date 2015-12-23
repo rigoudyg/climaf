@@ -93,9 +93,10 @@ def load_standard_operators():
     # 
     cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
-            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\'  && '
-            'convert ${out} -trim ${out}) ', format="png")
+            'linp=${linp} labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
+            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' lgcols=${lgcols} '
+            'scale=${scale} offset=${offset} type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
+            'trim=${trim} invXY=${invXY} ) ', format="graph")
     #
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
