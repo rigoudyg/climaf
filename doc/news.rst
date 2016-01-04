@@ -14,6 +14,15 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 Changes, newest first :
 
 
+- 2016/01/04 :
+
+ - Standard operator 'curves' was remplaced by a general plot of xy
+   curves. It now able to handle multiple profiles (time series, along
+   lat, lon or pressure/z_index): see :doc:`scripts/curves`  
+
+ - Standard operators 'lines' and 'timeplot' were removed, and
+   replaced by 'curves': see :doc:`scripts/curves`  
+
 - 2015/12/08 :
 
   - Allow operator :doc:`plot <scripts/plot>` to use a local coordinates

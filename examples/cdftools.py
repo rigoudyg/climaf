@@ -75,21 +75,21 @@ my_cdfvar_prof=ccdfvar_profile(duo,pos_grid='U')
 duo_JASO=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807-199810", realm="O")
 
 my_cdfmean4=ccdfmean(duo_JASO,pos_grid='U',imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
-my_plot=lines(my_cdfmean4,labels="uo",title="Mean values")
+my_plot=curves(my_cdfmean4,labels="uo",title="Mean values")
 cshow(my_plot)
 
 my_cdfmean_prof2=ccdfmean_profile(duo_JASO,pos_grid='U')
 my_cdfmean_prof2_level0=ccdo(my_cdfmean_prof2,operator="-sellevel,5.02159")
-my_plot2=lines(my_cdfmean_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of mean values")
+my_plot2=curves(my_cdfmean_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of mean values")
 cshow(my_plot2)
 
 my_cdfvar2=ccdfvar(duo_JASO,pos_grid='U')
-my_plot3=lines(my_cdfvar2,labels="uo",title="Spatial variance")
+my_plot3=curves(my_cdfvar2,labels="uo",title="Spatial variance")
 cshow(my_plot3)
 
 my_cdfvar_prof2=ccdfvar_profile(duo_JASO,pos_grid='U')
 my_cdfvar_prof2_level0=ccdo(my_cdfvar_prof2,operator="-sellevel,5.02159")
-my_plot4=lines(my_cdfvar_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of spatial variance")
+my_plot4=curves(my_cdfvar_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159) of spatial variance")
 cshow(my_plot4)
 
 #-----------
