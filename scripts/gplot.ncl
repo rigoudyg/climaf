@@ -322,8 +322,8 @@ end
 begin
 
   if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
-  if (.not. isvar("scale")) then scale=1.0 end if
-  if (.not. isvar("offset")) then offset=0.0 end if
+  if (.not. isvar("myscale")) then myscale=1.0 end if
+  if (.not. isvar("myoffset")) then myoffset=0.0 end if
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
   LABELON=False
@@ -395,9 +395,9 @@ begin
   if (.not. isvar("units")) then 
     if (isatt(fld,"units")) then units=fld@units else units="None" end if
   end if
-
+  
   units=units 
-  fld=fld*tofloat(scale)+tofloat(offset)
+  fld=fld*tofloat(myscale)+tofloat(myoffset)
   
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
