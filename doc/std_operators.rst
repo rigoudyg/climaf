@@ -21,6 +21,7 @@ Documented operators as of today :
     - :doc:`scripts/minus`
     - :doc:`scripts/ncdump`
     - :doc:`scripts/cpdfcrop`
+    - :doc:`scripts/cepscrop`
 
  - graphics
     - :doc:`scripts/plot`

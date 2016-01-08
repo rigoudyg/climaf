@@ -142,7 +142,10 @@ def register(filename,crs):
                 (crs,version,filename,filename,filename,filename)
         if re.findall(".pdf$",filename) :
             command="pdftk %s dump_data output rapport.txt && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> rapport.txt && pdftk %s update_info rapport.txt output %s.pdf && mv -f %s.pdf %s && rm -f rapport.txt"%\
-                (filename,crs,filename,filename,filename,filename)                             
+                (filename,crs,filename,filename,filename,filename)
+        if re.findall(".eps$",filename) :
+            command='exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s'%\
+                (version,crs,filename)
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
@@ -163,7 +166,9 @@ def getCRS(filename) :
     elif re.findall(".png$",filename) :
         form='identify -verbose %s | grep -E " *CRS_def: " | sed -r -e "s/.*CRS_def: *//"'
     elif re.findall(".pdf$",filename) :
-        form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"' 
+        form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"'
+    elif re.findall(".eps$",filename) :
+        form='exiv2 -p x %s | grep "CRS_def" | awk \'{for (i=4;i<=NF;i++) {printf $i " "} }\' '
     else :
         clogger.critical("unknown filetype for %s"%filename)
         return None
@@ -297,7 +302,13 @@ def cdrop(obj, rm=True) :
         fil=crs2filename.pop(crs)
         if rm :
             try :
+                path_file=os.path.dirname(fil)
                 os.remove(fil)
+                try:
+                    os.rmdir(path_file)
+                except OSError as ex:
+                    clogger.warning(ex)
+                
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache"%crs)
@@ -437,7 +448,7 @@ def list_cache():
     find_return=""
     for dir_cache in cachedirs :
         rep=os.path.expanduser(dir_cache)
-        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) -print" %rep).read()
+        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" %rep).read()
     files_in_cache=find_return.split('\n')
     files_in_cache.pop(-1)
     return(files_in_cache)
@@ -531,7 +542,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find=False
     if size or age or access != 0 :
         var_find=True
-        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' \) %s -print" %(rep, opt_find) 
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" %(rep, opt_find) 
         clogger.debug("Find command is :"+command)
 
         #construction of the new dictionary after research on size/age/access
