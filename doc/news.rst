@@ -18,8 +18,8 @@ Changes, newest first :
  - A new output format allowed for operators : 'eps'; see
    :py:func:`~climaf.operators.cscript`. For that, you have to
    download 'exiv2', which is a image metadata manipulation tool
-   and which is used to preserve metadata for 'eps' figure (in
-   writing and reading XMP metadata in 'eps' file) 
+   and which is used to preserve metadata for 'eps' figure (by writing
+   and reading XMP metadata in 'eps' file)  
 
  - A new standard operator to crop eps figures to their minimal size :
    ``cepscrop``; see :doc:`scripts/cepscrop`   
