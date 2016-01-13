@@ -51,6 +51,8 @@ General:
     - if format is "pdf", resolution specifies either the width and
       height of the paper, as above but in inches unit, or a standard paper size by
       name, as e.g. 'A4'; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
+  - ``trim`` : to turn on/off triming for PNG figures; default
+    (climaf): True. 
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or

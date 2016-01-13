@@ -14,6 +14,11 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 Changes, newest first :
 
 
+- 2015/12/10 : 
+
+  - New argument for standard operator ``plot`` : ``trim`` to turn
+    on/off triming for PNG figures (see :doc:`scripts/plot`) 
+
 - 2015/12/08 :
 
   - Allow operator :doc:`plot <scripts/plot>` to use a local coordinates

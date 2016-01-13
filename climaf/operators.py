@@ -377,16 +377,16 @@ class cscript():
         
 def fixed_fields(operator, *paths):
     """
-    Declare than an operator (or a list of) needs fixed fields. CliMAF will
-    provide them to the operator through symbolic links at execution time
+    Declare that an operator (or a list of) needs fixed fields. CliMAF will
+    provide them to the operator at execution time through symbolic links 
 
     Parameters:
-      operator (string of list of strings) : name of the CliMAF operator.
+      operator (string, or list of strings) : name of the CliMAF operator.
       paths (couples) : a number of couples composed of the filename as expected
         by the operator
         and a path for the data; the path  may uses placeholders : ${model}, ${project}
         ${simulation} and ${realm}, which will be replaced by the corresponding facet
-        values for the first operand.
+        values for the first operand of the target operator.
 
     Returns:
       None
@@ -396,7 +396,7 @@ def fixed_fields(operator, *paths):
         ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
         ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
 
-       >>> fixed_fields('gplot',
+       >>> fixed_fields('plot',
         ... ('coordinates.nc','/cnrm/aster/data3/aster/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
 
     """

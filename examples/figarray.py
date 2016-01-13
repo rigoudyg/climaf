@@ -30,7 +30,7 @@ page2=cpage([[None, fig1],[fig1, fig1],[fig1,fig1]],
             widths=[0.2,0.8],heights=[0.33,0.33,0.33],title="Page title",
             background="grey90",x=-300,y=26,pt=20,
             font='Utopia',ybox=60)
-cshow(page2
+cshow(page2)
  
 ###########################################################################
 # Same as page1 with a title but without tuning parameters for the title
