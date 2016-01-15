@@ -848,39 +848,39 @@ class cpage(cobject):
                  page_width=1000., page_height=1500.,title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white"): 
         """
-        Builds a CliMAF cpage object, which represents an array of figures
+        Builds a CliMAF cpage object, which represents an array of figures. 
 
         Args:
         
-          fig_line (a list of lists of figure objects or an ensemble of figure objects) :
+          fig_lines (a list of lists of figure objects or an ensemble of figure objects):
            each sublist of 'fig_lines' represents a line of figures   
-          widths (list, optional) : the list of figure widths, i.e. the width of each 
-           column. By default, if fig_line is:
+          widths (list, optional): the list of figure widths, i.e. the width of each 
+           column. By default, if fig_lines is:
 
-             - a list of lists:  spacing is even
-             - an ensemble:  one column is used
-          heights (list, optional) : the list of figure heights, i.e. the
-           height of each line. By default  spacing is even
-          fig_trim (logical, optional) : to turn on/off triming for all figures.
+             - a list of lists: spacing is even
+             - an ensemble: one column is used
+          heights (list, optional): the list of figure heights, i.e. the
+           height of each line. By default spacing is even
+          fig_trim (logical, optional): to turn on/off triming for all figures.
            It removes all the surrounding extra space of figures in the page,
            either True (default) or False
-          page_trim (logical, optional) : to turn on/off triming for the page. It
+          page_trim (logical, optional): to turn on/off triming for the page. It
            removes all the surrounding extra space of the page, either True
            (default) or False 
-          format (str, optional) : graphic output format, either 'png' (default)
-           or 'pdf'
-          page_width (float, optional) : width resolution of resultant image;
+          format (str, optional): graphic output format, either 'png' (default)
+           or 'pdf' (not recommended)
+          page_width (float, optional): width resolution of resultant image;
            CLiMAF default: 1000. 
-          page_height (float, optional) : height resolution of resultant image;
+          page_height (float, optional): height resolution of resultant image;
            CLiMAF default: 1500. 
           orientation (str,optional): if set, it supersedes page_width and 
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
-          title (str, optional) : append a label below or above (depending optional
+          title (str, optional): append a label below or above (depending optional
            argument 'gravity') figures in the page.
 
         If title is activated:
         
-            - x, y (int, optional) : annotate the page with text.
+            - x, y (int, optional): annotate the page with text.
               x is the offset towards the right from the upper left corner
               of the page, while y is the offset upward or the bottom
               according to the optional argument 'gravity' (i.e. 'South' or 'North'
@@ -888,30 +888,32 @@ class cpage(cobject):
               http://www.imagemagick.org/script/command-line-options.php?#annotate ;
               where x and y correspond respectively to tx and ty
               in ``-annotate {+-}tx{+-}ty text``
-            - ybox (int, optional) : width of the assigned box for title;
+            - ybox (int, optional): width of the assigned box for title;
               CLiMAF default: 50. For more details, see:
               http://www.imagemagick.org/script/command-line-options.php?#splice
-            - pt (int, optional) : pt of the title; CLiMAF default: 24
+            - pt (int, optional): font size of the title; CLiMAF default: 24
             - font (str, optional): set the font to use when creating title; CLiMAF
-              default: 'Times-New-Roman'. To print a complete list of fonts, use :
+              default: 'Times-New-Roman'. To print a complete list of fonts, use:
               'convert -list font'
-            - gravity (str, optional) : the choosen direction specifies where to position
+            - gravity (str, optional): the choosen direction specifies where to position
               title; CLiMAF default: 'North'. For more details, see:
               http://www.imagemagick.org/script/command-line-options.php?#gravity
-            - background (str, optional) : background color of the assigned box for
+            - background (str, optional): background color of the assigned box for
               title; default: 'white'. To print a complete list of color names, use:
               'convert -list color'
 
         Example:
 
          Using no default value, to create a page with 2 columns and 3 lines::
-        
+
+          >>> tas_ds=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
+          >>> tas_avg=time_average(tas_ds)
           >>> fig=plot(tas_avg,title='title')
           >>> my_page=cpage([[None, fig],[fig, fig],[fig,fig]], widths=[0.2,0.8],
           ... heights=[0.33,0.33,0.33], fig_trim=False, page_trim=False,
           ... format='pdf', title='Page title', x=10, y=20, ybox=45,
           ... pt=20, font='Utopia', gravity='South', background='grey90',
-          ... page_width=800., page_height=1200.)
+          ... page_width=1600., page_height=2400.)
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
@@ -1017,6 +1019,174 @@ class cpage(cobject):
         
         return rep
 
+
+class cpage_pdf(cobject):
+    def __init__(self, fig_lines=None, widths=None, heights=None,
+                 orientation=None, page_width=1000., page_height=1500.,
+                 scale=1., openright=False,
+                 title="", x=0, y=2, titlebox=False, pt="\Huge",
+                 font="\\familydefault", background="white"):
+        """
+        Builds a CliMAF cpage_pdf object, which represents an array of figures
+        Figures are automatically centered in the page using 'pdfjam' tool; see
+        http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam   
+
+        Args:
+        
+          fig_lines (a list of lists of figure objects or an ensemble of figure objects):
+           each sublist of 'fig_lines' represents a line of figures   
+          widths (list, optional): the list of figure widths, i.e. the width of each 
+           column. By default, if fig_lines is:
+
+             - a list of lists: spacing is even
+             - an ensemble: one column is used
+          heights (list, optional): the list of figure heights, i.e. the
+           height of each line. By default spacing is even        
+          page_width (float, optional): width resolution of resultant image;
+           CLiMAF default: 1000. 
+          page_height (float, optional): height resolution of resultant image;
+           CLiMAF default: 1500. 
+          orientation (str,optional): if set, it supersedes page_width and 
+           page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
+          scale (float, optional): to scale all input pages; default:1.
+          openright (logical, optional): this option puts an empty figure before the
+           first figure; default: False. For more details, see: 
+           http://ftp.oleane.net/pub/CTAN/macros/latex/contrib/pdfpages/pdfpages.pdf
+          title (str, optional): append a label in the page.
+
+        If title is activated:
+        
+            - x (int, optional): horizontal space from title centered position (using
+              '\hspace' LaTeX command). The length of the space must be expressed in cm.
+              A positive value shift title to the right whereas a negative value shift
+              title to the left. CLiMAF default: 0 (means that title is centered).
+            - y (int, optional): vertical space corresponding to top and bottom margin
+              (using 'geometry' package), so only a positive value has an effect. The
+              length of the space must be expressed in cm. CLiMAF default: 2 (means that
+              title is positioned in 2cm from the top of the page; for information, left
+              and right margins are equal to 2cm).
+            - titlebox (logical, optional): set it to True to frame the text in a box,
+              color frame is 'black' (using 'graphicx' package); CLiMAF default: False.
+            - pt (int, optional): font size of the title; CLiMAF default: '\Huge'
+              (corresponding to 24 pt).
+            - font (str, optional): set the font to use when creating title. Use font
+              abbreviation among available LaTex fonts; default: '\\familydefault'.
+            - background (str, optional): background color of the assigned box for
+              title if 'titlebox' is 'True' among available LaTex colors (using
+              '\fcolorbox' LaTeX command); default: 'white'.
+
+        Example:
+
+         Using no default value, to create a PDF page with 2 columns and 3 lines::
+         
+          >>> tas_ds=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
+          >>> tas_avg=time_average(tas_ds)
+          >>> fig=plot(tas_avg,title='title',format='pdf')
+          >>> crop_fig=cpdfcrop(fig)
+          >>> my_pdfpage=cpage_pdf([[crop_fig,crop_fig],[crop_fig, crop_fig],[crop_fig,crop_fig]],
+          ... widths=[0.2,0.8], heights=[0.33,0.33,0.33], page_width=800., page_height=1200., 
+          ... scale=0.95, openright=True, title='Page title', x=-5, y=10, titlebox=True, 
+          ... pt='\huge', font='ptm', background='yellow') # Font name is 'Times'
+        """
+        if fig_lines is None :
+            raise Climaf_Classes_Error("fig_lines must be provided")
+        if orientation is not None :
+            if orientation=='portrait' :
+                page_width=1000.; page_height=1500.
+            else : 
+                if orientation=='landscape' :
+                    page_width=1500.; page_height=1000.
+                else :
+                    raise Climaf_Classes_Error(
+                    "if set, orientation must be 'portrait' or 'landscape'")
+        self.page_width=page_width
+        self.page_height=page_height
+        self.scale=scale
+        self.openright=openright
+        self.title=title
+        self.x=x
+        self.y=y
+        self.titlebox=titlebox
+        self.pt=pt
+        self.font=font
+        self.background=background
+        if not isinstance(fig_lines,list) and not isinstance(fig_lines,cens) :
+            raise Climaf_Classes_Error(
+                "fig_lines must be a CliMAF ensemble or a list "
+                "of lists (each representing a line of figures)")
+        if isinstance(fig_lines,list) :
+            if not widths :
+                widths=[]
+                for line in fig_lines:
+                    if len(line)!=len(fig_lines[0]):
+                        raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
+                for column in fig_lines[0]: widths.append(round(1./len(fig_lines[0]),2))
+            self.widths=widths
+
+            if not heights :
+                heights=[]
+                for line in fig_lines: heights.append(round(1./len(fig_lines),2))
+            self.heights=heights
+
+            if len(fig_lines)!=len(self.heights) :
+                raise Climaf_Classes_Error(
+                    "fig_lines must have same size than heights")
+            for line in fig_lines:
+                if not isinstance(line,list) :
+                    raise Climaf_Classes_Error(
+                        "each element in fig_lines must be a list of figures")
+                if len(line)!=len(self.widths) :
+                    raise Climaf_Classes_Error(
+                        "each line in fig_lines must have same dimension as "
+                        "widths; pb for sublist "+`line`)
+            self.fig_lines=fig_lines
+        else: # case of an ensemble (cens) 
+            figs=list(fig_lines.members)
+
+            if not widths: widths=[1.]
+            self.widths=widths
+            if not heights :
+                heights=[]
+                for memb in figs: heights.append(round(1./len(figs),2))
+            self.heights=heights
+            
+            self.fig_lines=[]
+            for l in heights :
+                line=[]
+                for c in widths :
+                    if len(figs) > 0 : line.append(figs.pop(0))
+                    else : line.append(None)
+                              
+                self.fig_lines.append(line)
+        #
+        self.crs=self.buildcrs()
+               
+    def buildcrs(self,crsrewrite=None,period=None):
+        rep="cpage_pdf(["
+        for line in self.fig_lines :
+            rep+="["
+            for f in line :
+                if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
+                else : rep+=`None`+","
+            rep+=" ],"; 
+
+        if self.title is "" :
+            rep+=( "],"+`self.widths`+","+`self.heights`+\
+                   "', page_width=%d, page_height=%d, scale=%.2f, openright='%s')" )\
+                   %(self.page_width,self.page_height,self.scale,self.openright)
+            
+        else:
+            rep+=( "],"+`self.widths`+","+`self.heights`+\
+                   "', page_width=%d, page_height=%d, scale=%.2f, openright='%s', title='"\
+                   +self.title+"', x=%d, y=%d, titlebox='%s', pt='"+self.pt+"', font='"\
+                   +self.font+"', background='"+self.background+"')" )\
+                   %(self.page_width,self.page_height,self.scale,self.openright,self.x,self.y,self.titlebox)
+
+        rep=rep.replace(",]","]")
+        rep=rep.replace(", ]","]")
+        
+        return rep
+            
 
 def guess_projects(crs) :
     """
