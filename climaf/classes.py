@@ -848,7 +848,8 @@ class cpage(cobject):
                  page_width=1000., page_height=1500.,title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white"): 
         """
-        Builds a CliMAF cpage object, which represents an array of figures. 
+        Builds a CliMAF cpage object, which represents an array of figures (output:
+        'png' or 'pdf' figure)
 
         Args:
         
@@ -856,7 +857,7 @@ class cpage(cobject):
            each sublist of 'fig_lines' represents a line of figures   
           widths (list, optional): the list of figure widths, i.e. the width of each 
            column. By default, if fig_lines is:
-
+           
              - a list of lists: spacing is even
              - an ensemble: one column is used
           heights (list, optional): the list of figure heights, i.e. the
@@ -1027,12 +1028,11 @@ class cpage_pdf(cobject):
                  title="", x=0, y=2, titlebox=False, pt="\Huge",
                  font="\\familydefault", background="white"):
         """
-        Builds a CliMAF cpage_pdf object, which represents an array of figures
-        Figures are automatically centered in the page using 'pdfjam' tool; see
+        Builds a CliMAF cpage_pdf object, which represents an array of figures (output:
+        'pdf' figure). Figures are automatically centered in the page using 'pdfjam' tool; see
         http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam   
 
         Args:
-        
           fig_lines (a list of lists of figure objects or an ensemble of figure objects):
            each sublist of 'fig_lines' represents a line of figures   
           widths (list, optional): the list of figure widths, i.e. the width of each 
@@ -1057,7 +1057,7 @@ class cpage_pdf(cobject):
         If title is activated:
         
             - x (int, optional): horizontal space from title centered position (using
-              '\hspace' LaTeX command). The length of the space must be expressed in cm.
+              'hspace' LaTeX command). The length of the space must be expressed in cm.
               A positive value shift title to the right whereas a negative value shift
               title to the left. CLiMAF default: 0 (means that title is centered).
             - y (int, optional): vertical space corresponding to top and bottom margin
@@ -1067,13 +1067,13 @@ class cpage_pdf(cobject):
               and right margins are equal to 2cm).
             - titlebox (logical, optional): set it to True to frame the text in a box,
               color frame is 'black' (using 'graphicx' package); CLiMAF default: False.
-            - pt (int, optional): font size of the title; CLiMAF default: '\Huge'
+            - pt (int, optional): font size of the title; CLiMAF default: '\\\\Huge'
               (corresponding to 24 pt).
             - font (str, optional): set the font to use when creating title. Use font
-              abbreviation among available LaTex fonts; default: '\\familydefault'.
+              abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
             - background (str, optional): background color of the assigned box for
               title if 'titlebox' is 'True' among available LaTex colors (using
-              '\fcolorbox' LaTeX command); default: 'white'.
+              'fcolorbox' LaTeX command); default: 'white'.
 
         Example:
 

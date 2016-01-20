@@ -1,4 +1,4 @@
-# How to build a an array of figures using cpage()
+# PART 1: How to build a an array of figures using cpage()
 from climaf.api import *
 
 # Define a dataset with one single time step
@@ -82,3 +82,24 @@ cshow(page6)
 page7=cpage(fig_ens, heights=[0.8,0.2], page_trim=False)
 ###########################################################################
 cshow(page7)
+
+# PART 2: How to build a PDF page of figures array using cpage_pdf()
+
+# input figures in PNG
+fig1=plot(tas,title="title",resolution="1600*2400")
+
+pdfpage1=cpage_pdf([[fig1, fig1],[fig1, fig1],[fig1,fig1]], widths=[0.2,0.8], heights=[0.33,0.33,0.33],
+                   page_width=1000., page_height=1500., scale=0.95, 
+                   title='Page title', x=-5, y=5, font='ptm', pt='\Huge', titlebox=True, background="red") # Font name is 'Times'
+cshow(pdfpage1)
+
+# input figures in PDF
+fig2=plot(tas,title="title",resolution="13*19", format="pdf")
+fig2_crop=cpdfcrop(fig2)
+
+pdfpage2=cpage_pdf([[fig2_crop, fig2_crop],[fig2_crop, fig2_crop],[fig2_crop,fig2_crop]],
+                   widths=[0.2,0.8],heights=[0.33,0.33,0.33], page_width=1000., page_height=1500., scale=0.95,
+                   title='Page title', x=-5, y=10, font='ptm', pt='\huge', titlebox=True, background='yellow') 
+
+cshow(pdfpage2)
+cfile(pdfpage2)

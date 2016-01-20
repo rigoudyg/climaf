@@ -80,13 +80,13 @@ ref.)
     For more details, see: https://www.ncl.ucar.edu/
 
   - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
-    default: 'png'. For 'png' format, all the surrounding white extra
+    default: 'png'. For 'png' format, all the surrounding extra white
     space are cropped with optional argument ``trim`` (but not for
     'pdf' or 'eps' format). In case of 'pdf' or 'eps' format, if you
-    want to trim white extra space, use 'cpdfcrop' (which is 'pdfcrop'
+    want to trim extra white space, use 'cpdfcrop' (which is 'pdfcrop'
     tool) or 'cepscrop' operator respectively.  
   - ``trim`` : set it to True if you want to crop all the surrounding
-    white extra space for 'png' format; default: True.
+    extra white space for 'png' format; default: True. 
   - ``resolution`` : string for output image resolution
 
     - if format is "png", resolution specifies the width and height of

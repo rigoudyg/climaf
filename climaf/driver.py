@@ -851,11 +851,13 @@ def cMA(obj,deep=None) :
 def cvalue(obj,index=0) :
     """
     Return the value of the array for an object, after MV flattening, at a given index
-    Example :
-    >>> data=ds(project='mine',variable='tas', ...)
-    >>> data1=time_average(data)
-    >>> data2=space_average(data1)
-    >>> v=cvalue(data2)
+
+    Example:
+    
+     >>> data=ds(project='mine',variable='tas', ...)
+     >>> data1=time_average(data)
+     >>> data2=space_average(data1)
+     >>> v=cvalue(data2)
 
     Does use the file representation of the object
     """

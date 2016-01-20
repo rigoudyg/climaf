@@ -1,10 +1,10 @@
 cpdfcrop : crop pdf figures to their minimal size 
 ---------------------------------------------------
 
-Remove empty margins, i.e. white extra space, of an input PDF
+Remove empty margins, i.e. extra white space, of an input PDF
 figure. The resulting output figure occupies the minimal paper size
 needed for the content and is therefore suitable for inclusion as a
-graphic.  
+graphic.   
 
 **References** : http://manpages.ubuntu.com/manpages/precise/man1/pdfcrop.1.html
 
@@ -17,7 +17,7 @@ graphic.
 **Optional arguments**:
   - none
 
-**Output** :
+**Output** : the PDF cropped figure 
 
 **Climaf call example**::
  

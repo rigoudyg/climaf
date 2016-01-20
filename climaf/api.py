@@ -40,9 +40,9 @@ Main functions are :
 
  - ``cshow``    : display a result of type 'figure' 
 
- - ``cpage``    : create an array of figures
+ - ``cpage``    : create an array of figures (output: 'png' or 'pdf' figure)
 
- - ``cpage_pdf``: create an array of figures
+ - ``cpage_pdf``: create an array of figures (output: 'pdf' figure)
 
  - ``cdump``    : tell what's in cache
 

@@ -1,12 +1,12 @@
 cepscrop : crop eps figures to their minimal size 
 ---------------------------------------------------
 
-Remove empty margins, i.e. white extra space, of an input EPS
+Remove empty margins, i.e. extra white space, of an input EPS
 figure. The resulting output figure occupies the minimal paper size
 needed for the content and is therefore suitable for inclusion as a
 graphic. We first convert 'eps' figure in 'pdf' figure, then we crop
-white extra space and to finish we convert this cropped 'pdf' figure
-in 'eps' file.     
+extra white space and to finish we convert this cropped 'pdf' figure
+in 'eps' file.       
 
 **References** :
 
@@ -23,7 +23,7 @@ in 'eps' file.
 **Optional arguments**:
   - none
 
-**Output** :
+**Output** : the EPS cropped figure
 
 **Climaf call example**::
  

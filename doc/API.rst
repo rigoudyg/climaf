@@ -14,13 +14,29 @@ after executing::
 even if they belong to another module
 
 
-.. toctree::
-
+.. toctree:: 
    functions_data
+  
+.. toctree:: 
    functions_processing
-   functions_results
+
+- :doc:`functions_results`
+
+  - for managing numerical results
+
+    .. toctree:: functions_results1
+
+  - for viewing results, see also :ref:`standard_operators` (graphics
+    part) 
+
+    .. toctree:: functions_results2
+  - for listing and managing data in cache:   
+
+    .. toctree:: functions_results3
+
+.. toctree:: 
    functions_utilities
+
+.. toctree:: 
    functions_internals
-
-
 
