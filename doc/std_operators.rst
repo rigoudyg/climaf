@@ -19,8 +19,6 @@ Documented operators as of today :
     - :doc:`scripts/space_average`
     - :doc:`scripts/minus`
     - :doc:`scripts/ncdump`
-    - :doc:`scripts/cpdfcrop`
-    - :doc:`scripts/cepscrop`
 
  - graphics:
 
@@ -62,10 +60,10 @@ Documented operators as of today :
 		 
 		 - 1/ there is no argument 'fig_trim' allowing you to
 		   trim extra white space of figures, so you must use
-		   'cpdfcrop' beforehand (on all figures) 
+		   'cpdfcrop' beforehand (on all figures)
 		 - 2/ there is no argument 'page_trim' allowing you to
 		   trim extra white space of page, so you must use
-		   'cpdfcrop' on result 
+		   'cpdfcrop' on result
     
 		 **So, to create an array of figures:**
 	       
@@ -77,19 +75,20 @@ Documented operators as of today :
 		 'page_height' of 'cpage') 
 
 	       - If you want an **PDF** output figure: you can use
-		 either 'cpage_pdf' or 'cpage':  
+		 either 'cpage_pdf' or 'cpage': 
 
 		 - **'cpage_pdf'** is highly recommended 
 		 - if you want to have more control on figures
 		   adjustment in the page, use **'cpage'** and
 		   increase resolution of each figure and also output
-		   page  
-
-	       .. 
+		   page   
+	       ..
 
     - :doc:`scripts/plot`
     - :doc:`scripts/curves`
     - :doc:`scripts/ncview`
+    - :doc:`scripts/cpdfcrop`
+    - :doc:`scripts/cepscrop`
 
  - swiss knife |sk| :
     - :doc:`scripts/ccdo`
