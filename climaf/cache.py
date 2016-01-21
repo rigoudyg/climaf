@@ -168,7 +168,7 @@ def getCRS(filename) :
     elif re.findall(".pdf$",filename) :
         form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"'
     elif re.findall(".eps$",filename) :
-        form='exiv2 -p x %s | grep "CRS_def" | awk \'{for (i=4;i<=NF;i++) {printf $i " "} }\' '
+        form='exiv2 -p x %s | grep "CRS_def" | awk \'{for (i=4;i<=NF;i++) {print $i " "} }\' '
     else :
         clogger.critical("unknown filetype for %s"%filename)
         return None
