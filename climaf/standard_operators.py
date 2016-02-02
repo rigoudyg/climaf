@@ -86,14 +86,16 @@ def load_standard_operators():
             'tiMainFont=\'\"${tiMainFont}\"\' tiMainFontHeightF=${tiMainFontHeightF} '
             'tiMainPosition=\'\"${tiMainPosition}\"\' gsnLeftString=\'\"${gsnLeftString}\"\' '
             'gsnRightString=\'\"${gsnRightString}\"\' gsnCenterString=\'\"${gsnCenterString}\"\' '
-            'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} )', format="graph")            
+            'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} '
+            'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
+            'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' )', format="graph")            
     # 
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'linp=${linp} labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
             'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' lgcols=${lgcols} '
             'myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
-            'trim=${trim} invXY=${invXY} ) ', format="graph")
+            'trim=${trim} invXY=${invXY} )', format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #

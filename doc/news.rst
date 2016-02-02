@@ -13,6 +13,17 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/02/01 :
+
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - new arguments : 
+     
+     - ``shade_below`` and ``shade_above`` to shade contour regions
+       for auxiliary field; 
+     - ``options``, ``aux_options`` and ``shading_options`` for setting NCL graphic resources defined by user
+   - colors smoothed to contours
+
 - 2016/01/20 :
 
  - A new function :py:func:`~climaf.classes.cpage_pdf` to create a
