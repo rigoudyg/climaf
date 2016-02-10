@@ -133,16 +133,17 @@ Main field and/or auxiliary field:
 
 Auxiliary field:
 
-  - ``shade_below``, ``shade_above`` : shades contour regions given
-    low and/or high values using patterns (default: 17; see
+  - ``shade_below``, ``shade_above`` : shade contour regions for 
+    values lower than (resp. higher than) the threshold, using a 
+    pattern (default pattern number is 17; see
     https://www.ncl.ucar.edu/Document/Graphics/Images/fillpatterns.png
     for all patterns). 
-    Warning: NCL shading depends on list of levels used for drawing
+    Warning: NCL shading depends on the list of levels used for drawing
     contours. For example, if contours="0 1 2 4 6" and if you set
     shade_below=1, you will get a shaded region [0,1]; while if
     contours="0 2 4 6", no region will be shaded because there is no
-    full contours intervals which entirely match the constraints less
-    than 1.
+    full contours intervals which entirely match the constraints 'less
+    than 1'
 
 Vectors:
 
