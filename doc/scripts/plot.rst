@@ -44,7 +44,7 @@ General:
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
     metadata.  
-  - ``resolution`` : string for output image resolution
+  - ``resolution`` : string for output image resolution : 
 
     - if format is "png", resolution specifies the width and height of
       resultant image in pixels as e.g. 800x1200; default (ncl): 1024x1024
@@ -163,7 +163,13 @@ Vectors:
     :py:func:`~climaf.operators.fixed_fields()`. Such files are not
     included with CliMAF and must be sought by your local Nemo
     dealer. At CNRM you may have a look at
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/. They may become
+    available in CliMAF distro at  :download:`eORCA_R025_coordinates_v1.0.nc
+    <../../tools/eORCA_R025_coordinates_v1.0.nc>` 
+    :download:`ORCA025_old_coordinates.nc
+    <../../tools/ORCA025_old_coordinates.nc>` (old
+    NEMO grid) and :download:`mesh_mask_eORCA_R025.nc
+    <../../tools/mesh_mask_eORCA_R025.nc>` 
 
 **Outputs** :
   - main output : a PNG figure

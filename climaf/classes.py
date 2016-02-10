@@ -844,8 +844,7 @@ def cmissing(project,missing,*kwargs) :
 class cpage(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None, 
                  fig_trim=True, page_trim=True, format="png",
-                 orientation=None,
-                 page_width=1000., page_height=1500.,title="", x=0, y=26, ybox=50, pt=24,
+                 page_width=1600., page_height=2400.,title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white"): 
         """
         Builds a CliMAF cpage object, which represents an array of figures
@@ -870,11 +869,9 @@ class cpage(cobject):
           format (str, optional) : graphic output format, either 'png' (default)
            or 'pdf'
           page_width (float, optional) : width resolution of resultant image;
-           CLiMAF default: 1000. 
+           CLiMAF default: 1600. 
           page_height (float, optional) : height resolution of resultant image;
-           CLiMAF default: 1500. 
-          orientation (str,optional): if set, it supersedes page_width and 
-           page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
+           CLiMAF default: 2400. 
           title (str, optional) : append a label below or above (depending optional
            argument 'gravity') figures in the page.
 
@@ -915,18 +912,10 @@ class cpage(cobject):
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")
+       
         self.fig_trim=fig_trim
         self.page_trim=page_trim
         self.format=format
-        if orientation is not None :
-            if orientation=='portrait' :
-                page_width=1000.; page_height=1500.
-            else : 
-                if orientation=='landscape' :
-                    page_width=1500.; page_height=1000.
-                else :
-                    raise Climaf_Classes_Error(
-                    "if set, orientation must be 'portrait' or 'landscape'")
         self.page_width=page_width
         self.page_height=page_height
         self.title=title
