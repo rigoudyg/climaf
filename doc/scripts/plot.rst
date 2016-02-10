@@ -54,9 +54,7 @@ General:
     - if format is "pdf" or "eps", resolution specifies either the
       width and height of the paper, as above but in inches unit, or a
       standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11
-      or "letter" (<=> ncl imposes a resolution of 72 dots per inch
-      (dpi), wich is equivalent to 612x792 in pixels) 
->>>>>>> refs/remotes/LVGH/eps_outputFormat
+      or "letter" (<=> 612x792 pixels) 
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
