@@ -508,7 +508,7 @@ class cens(cobject):
 
     def buildcrs(self,crsrewrite=None,period=None) :
         rep="cens("+`self.labels`+","
-        for m in self.members : rep+=m.buildcrs(crsrewrite=crsrewrite)+","
+        for m in self.members : rep+=m.buildcrs(crsrewrite=crsrewrite,period=period)+","
         rep=rep+")"
         rep=rep.replace(",)",")")
         return rep

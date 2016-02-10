@@ -487,7 +487,7 @@ def derive(project, derivedVar, Operator, *invars, **params) :
     elif Operator in operators :
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else : 
-        clogger.error("second argument must be a script or operator, already declared")
+        clogger.error("second argument (%s) must be a script or operator, already declared"%`Operator`)
 
 def is_derived_variable(variable,project):
     """ True if the variable is a derived variable, either in provided project
