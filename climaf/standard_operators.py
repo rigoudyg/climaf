@@ -67,16 +67,13 @@ def load_standard_operators():
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
-    cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
-    #
     # plot: main field (main_file) + auxiliary field (aux_file, optional) + vectors (u_file & v_file, optionals)
     #
     cscript('plot'  , '(ncl -Q '+ scriptpath +'gplot.ncl main_file=\'\"${in}\"\' aux_file=\'\"${in_2}\"\' '
             'u_file=\'\"${in_3}\"\' v_file=\'\"${in_4}\"\' rotation=${rotation} '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
             'main_var=\'\"${var}\"\' aux_var=\'\"${var_2}\"\' u_var=\'\"${var_3}\"\' v_var=\'\"${var_4}\"\' '
-            'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
+            'title=\'\"${title}\"\' myscale=${scale} myoffset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
             'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
@@ -91,16 +88,12 @@ def load_standard_operators():
             'gsnRightString=\'\"${gsnRightString}\"\' gsnCenterString=\'\"${gsnCenterString}\"\' '
             'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} )', format="graph")            
     # 
-    cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
-            'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
-            'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
-            'convert ${out} -trim ${out}) ', format="png")
-    #
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness} && '
-            'convert ${out} -trim ${out}) ', format="png")
+            'linp=${linp} labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
+            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' lgcols=${lgcols} '
+            'myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
+            'trim=${trim} invXY=${invXY} ) ', format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #

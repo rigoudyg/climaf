@@ -24,9 +24,7 @@ Documented operators as of today :
 
  - graphics
     - :doc:`scripts/plot`
-    - :doc:`scripts/lines`
     - :doc:`scripts/curves`
-    - :doc:`scripts/timeplot`
     - :doc:`scripts/ncview`
 
  - swiss knife |sk| :

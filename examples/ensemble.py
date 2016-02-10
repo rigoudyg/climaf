@@ -20,8 +20,8 @@ tas_ga=space_average(e2)
 
 # Ensemble-capable scripts are those which declares their main input using keyord ${mmin}
 # They receive the labels if they were declared with keyword ${labels}
-# 'lines' is such a script, devoted to plot xy curves
-p=lines(tas_ga,title="Surface Temperature global average")
+# 'curves' is such a script, devoted to plot xy curves
+p=curves(tas_ga,title="Surface Temperature global average")
 cshow(p)
 
 

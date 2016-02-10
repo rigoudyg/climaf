@@ -172,7 +172,7 @@ Vectors:
     <../../tools/mesh_mask_eORCA_R025.nc>` 
 
 **Outputs** :
-  - main output : a PNG figure
+  - main output : a PNG or PDF figure
 
 **Climaf call example** For more examples which are systematically
 tested, see :download:`gplot.py <../../examples/gplot.py>` and

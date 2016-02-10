@@ -14,10 +14,14 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 Changes, newest first :
 
 
-- 2015/12/10 : 
+- 2016/01/04 :
 
-  - New argument for standard operator ``plot`` : ``trim`` to turn
-    on/off triming for PNG figures (see :doc:`scripts/plot`) 
+ - Standard operator 'curves' now handle multiple cases : time series,
+   along lat, lon or profile in pressure/z_index. It also allows to
+   set NCL graphic ressources: see :doc:`scripts/curves`.
+
+ - Standard operators 'lines' and 'timeplot' were removed, and
+   replaced by 'curves': see :doc:`scripts/curves`  
 
 - 2015/12/08 :
 
@@ -49,10 +53,10 @@ Changes, newest first :
     - ``format`` : graphical format : either png (default) or pdf
     - **17 new optional arguments to adjust title, sub-title, color bar, label font, label font height**
       , ... (see :ref:`More plot optional arguments <plot_more_args>` )       
-
-   - optional argument ``levels`` was renamed ``colors``
-   - code re-design 
-   - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
+    - ``trim`` to turn on triming for PNG figures 
+    - optional argument ``levels`` was renamed ``colors``
+    - code re-design 
+    - if running on Ciclad, you must load NCL Version 6.3.0; see :ref:`configuring` 
 
  - New arguments for :py:func:`~climaf.classes.cpage` :
 
