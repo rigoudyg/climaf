@@ -19,7 +19,7 @@ operators=dict()
 derived_variables=dict()
 
 known_formats=['nc','graph','txt']  
-graphic_formats=['png','pdf']
+graphic_formats=['png','pdf','eps']
 none_formats=[None,'txt']
 
 class scriptFlags():
@@ -56,9 +56,9 @@ class cscript():
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc' or 'png' or 'pdf' or 'None'
-            or 'graph' ('graph' allows to the user to choose two different graphic output
-            formats: 'png' or 'pdf') or 'txt' (the text output are not managed by CliMAF,
+          format (str): script outputs format -- either 'nc', 'png', 'pdf', 'eps', 'None'
+            or 'graph' ('graph' allows to the user to choose three different graphic output
+            formats: 'png', 'pdf' or 'eps') or 'txt' (the text output are not managed by CliMAF,
             but only displayed - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF);
             defaults to 'nc'  
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
@@ -335,7 +335,7 @@ class cscript():
         if format in known_formats or format in graphic_formats or format in none_formats:  
             self.outputFormat=format
         else:
-            raise Climaf_Operator_Error('Allowed formats yet are : "nc", "png" and "pdf"')
+            raise Climaf_Operator_Error('Allowed formats yet are : "nc", "png", "pdf" and "eps"')
         scripts[name]=self
 
         # Init doc string for the operator

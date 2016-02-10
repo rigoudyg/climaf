@@ -14,9 +14,8 @@ for an ensemble dataset using NCL
     only one non-degenerated dimension. Members can have different
     vector size.  
 
-Remark : If x axis is time and time units are different, the script
-convert all time period into the same unit (take the first file as
-ref.)  
+Remark : If x axis is time and time units are different among members,
+the script convert all time periods to first's one
 
 **Mandatory arguments**: None (but ``title`` is recommended)
 
@@ -32,8 +31,8 @@ ref.)
     x*scale + offset); default = 1. and 0. (no scaling) 
   - ``linp`` : set it to 1 for getting a vertical axis with
     index-linear spacing  
-  - ``X_axis`` : a string ("real" or "aligned") which determines X
-    axis when datasets does not cover the same range; default to
+  - ``X_axis`` : a string ("real" or "aligned") which drives X
+    axis when member profiles do not cover the same range; default to
     "real".   
 
     - X_axis="real"    : X axis will be the union of all X axis 
@@ -49,15 +48,13 @@ ref.)
     https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
 
     In case fmt is absent, a minimal algorithm exists which tries to
-    determine the format string depending on the length and values of
-    the date-time. 
-  - ``lgcols`` : number of columns for legend. lgcols must be
-    different from 0; default: 3.
-  - ``options`` : a string for setting NCL graphic resources defined
-    by user, each separated by "|", as e.g. :
-    ' options="tiMainString=lv|xyLineThicknessF=5." '. This list is
-    priority in front of graphic resources in the script, the list of
-    CliMAF default graphic resources is here : 
+    determine the format string depending on the time range length.
+  - ``lgcols`` : number of columns for legend; default: 3.
+  - ``options`` : a string for setting NCL graphic resources directly
+    , separated by "|", as e.g. :
+    ' options="tiMainString=lv|xyLineThicknessF=5." '. These
+    ressources have higher priority than CliMAF default ones, which
+    are :
 
     - txFontHeightF = 0.010
     - tmXBLabelFontHeightF=0.008
@@ -81,10 +78,10 @@ ref.)
 
   - ``format`` : graphic output format, either 'png' or 'pdf';
     default: 'png'. For 'png' format, all the surrounding white extra
-    space are cropped with optional argument ``trim`` (but not for
+    space can be cropped with optional argument ``trim`` (but not for
     'pdf' format). In case of 'pdf' format, if you want to trim white
-    extra space, use 'cpdfcrop' operator which is 'pdfcrop' tool and
-    which preserves in more metadata.  
+    extra space, use 'cpdfcrop' operator which uses 'pdfcrop' tool and
+    which preserves metadata.  
   - ``trim`` : set it to True if you want to crop all the surrounding
     white extra space for 'png' format; default: True.
   - ``resolution`` : string for output image resolution
@@ -134,7 +131,7 @@ ref.)
   >>> d1=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="186001", domain=[0,40,30,80])
   >>> ta_zonal_mean=ccdo(d0,operator="zonmean")
   >>> ta_zonal_mean1=ccdo(d1,operator="zonmean")
-  >>> ens=cens(['lat1','lat2'],ta_zonal_mean,ta_zonal_mean1)
+  >>> ens=cens(['box1','box2'],ta_zonal_mean,ta_zonal_mean1)
   >>> figens=curves(ens,title="zonal mean")
   >>> cshow(figens)
   >>> # Same as above and X and Y are inverted

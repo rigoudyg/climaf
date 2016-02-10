@@ -136,7 +136,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
-        raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf" and "txt"') 
+        raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf", "eps" and "txt"') 
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -427,7 +427,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if scriptCall.parameters['format'] in operators.graphic_formats :
                     output_fmt=scriptCall.parameters['format']
                 else: 
-                    raise Climaf_Driver_Error('Allowed graphic formats yet are : "png" and "pdf"')
+                    raise Climaf_Driver_Error('Allowed graphic formats yet are : "png", "pdf" and "eps"')
             else : #default graphic format 
                 output_fmt="png"
         else:
@@ -654,9 +654,7 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
 def cread(datafile,varname=None):
     import re
     if not datafile : return(None)
-    if re.findall(".png$",datafile) :
-        subprocess.Popen(["display",datafile,"&"])
-    elif re.findall(".pdf$",datafile) :
+    if re.findall(".png$",datafile) or re.findall(".pdf$",datafile) or re.findall(".eps$",datafile):
         subprocess.Popen(["display",datafile,"&"])
     elif re.findall(".nc$",datafile) :
         clogger.debug("reading NetCDF file %s"%datafile)
@@ -682,9 +680,7 @@ def cread(datafile,varname=None):
         return None
 
 def cview(datafile):
-    if re.findall(".png$",datafile) :
-        subprocess.Popen(["display",datafile,"&"])
-    if re.findall(".pdf$",datafile) :
+    if re.findall(".png$",datafile) or re.findall(".pdf$",datafile) or re.findall(".eps$",datafile) :
         subprocess.Popen(["display",datafile,"&"])
     else :
         clogger.error("cannot yet handle %s"%datafile)
@@ -865,7 +861,7 @@ def cexport(*args,**kwargs) :
     clogger.debug("cexport called with arguments"+str(args))  
     if "format" in kwargs :
         if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc" \
-            or kwargs['format']=="png" or kwargs['format']=="pdf") : 
+            or kwargs['format']=="png" or kwargs['format']=="pdf" or kwargs['format']=="eps") : 
             kwargs['format']="file" 
         if (kwargs['format']=="MA") :
             kwargs['format']="MaskedArray" 

@@ -1,10 +1,10 @@
-cpdfcrop : crop pdf figures to their minimal size by preserving metadata
--------------------------------------------------------------------------
+cpdfcrop : crop pdf figures to their minimal size 
+---------------------------------------------------
 
-Remove empty margins, i.e. white extra space, of an input PDF figure
-and also update metadata. The resulting output figure occupies the
-minimal paper size needed for the content and is therefore suitable
-for inclusion as a graphic. 
+Remove empty margins, i.e. white extra space, of an input PDF
+figure. The resulting output figure occupies the minimal paper size
+needed for the content and is therefore suitable for inclusion as a
+graphic.  
 
 **References** : http://manpages.ubuntu.com/manpages/precise/man1/pdfcrop.1.html
 
@@ -32,5 +32,5 @@ for inclusion as a graphic.
 **Side effects** : none
 
 **Implementation** : standard 'pdfcrop' utility to remove empty
-margins and standard 'pdftk' utility to preserve metadata
+margins  
 

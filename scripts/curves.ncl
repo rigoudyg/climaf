@@ -13,7 +13,7 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. scale=.. offset=.. linp=1  X_axis=.. invXY=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
+; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. myscale=.. myoffset=.. linp=1  X_axis=.. invXY=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
 ;
 ; infile, plotname and var are mandatory
 ;
@@ -25,7 +25,7 @@
 ;
 ; colors : a string holding a series of color NCL names, separated by whitespaces
 ; 
-; scale, offset : for scaling the input field (x -> x*scale + offset); default = 1. 
+; myscale, myoffset : for scaling the input field (x -> x*scale + offset); default = 1. 
 ; and 0. (no scaling) 
 ;
 ; If argument linp=1 and data is a vertical profile, do not plot it in log(p) 

@@ -38,8 +38,9 @@ General:
 
   - ``title`` : string for graphic title; optional : CliMAF will
     provide the CRS of the dataset
-  - ``format`` : graphic output format, either 'png' or 'pdf';
+  - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
     default: 'png'. For 'png' format, all the surrounding white extra
+<<<<<<< HEAD
     space are cropped (but not for 'pdf' format). In case of 'pdf'
     format, if you want to trim white extra space, use 'cpdfcrop'
     operator which is 'pdfcrop' tool and which preserves in more
@@ -53,6 +54,24 @@ General:
       name, as e.g. 'A4'; default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)
   - ``trim`` : to turn on/off triming for PNG figures; default
     (climaf): True. 
+=======
+    space are cropped with optional argument ``trim`` (but not for
+    'pdf' or 'eps' format). In case of 'pdf' or 'eps' format, if you
+    want to trim white extra space, use 'cpdfcrop' (which is 'pdfcrop'
+    tool) or 'cepscrop' operator respectively. 
+  - ``trim`` : set it to True if you want to crop all the surrounding
+    white extra space for 'png' format; default: True.
+  - ``resolution`` : string for output image resolution
+
+    - if format is "png", resolution specifies the width and height of
+      resultant image in pixels as e.g. 800x1200; default (ncl):
+      1024x1024 
+    - if format is "pdf" or "eps", resolution specifies either the
+      width and height of the paper, as above but in inches unit, or a
+      standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11
+      or "letter" (<=> ncl imposes a resolution of 72 dots per inch
+      (dpi), wich is equivalent to 612x792 in pixels) 
+>>>>>>> refs/remotes/LVGH/eps_outputFormat
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or

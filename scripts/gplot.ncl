@@ -540,7 +540,7 @@ begin
         type@wkWidth = width
         type@wkHeight = height
       else 
-        if type .eq. "pdf" then ;image resolution in inches
+        if (type .eq. "pdf") .or. (type .eq. "eps") then ;image resolution in inches
           type@wkPaperWidthF  = width 
           type@wkPaperHeightF = height
         end if
@@ -552,7 +552,7 @@ begin
         print("For PNG output, resolution must be given by 'widthxheight' or 'width*height'")
         status_exit(1)
       else
-        if type .eq. "pdf" then
+        if (type .eq. "pdf") .or. (type .eq. "eps") then
           type@wkPaperSize = resolution
         end if
       end if
