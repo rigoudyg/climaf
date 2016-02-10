@@ -7,55 +7,57 @@ Main functions are :
 
 - for data definition and access :
 
- - ``cproject``: declare a project and its non-standard attributes/facets
+ - ``cproject`` : declare a project and its non-standard attributes/facets
 
- - ``dataloc`` : set data locations for a series of simulations
+ - ``dataloc``  : set data locations for a series of simulations
 
- - ``cdef``    : define some default values for datasets attributes
+ - ``cdef``     : define some default values for datasets attributes
 
- - ``ds``      : define a dataset object (actually a front-end for ``cdataset``)
+ - ``ds``       : define a dataset object (actually a front-end for ``cdataset``)
 
- - ``eds``     : define an ensemble dataset object (actually a front-end for ``cens``)
+ - ``eds``      : define an ensemble dataset object (actually a front-end for ``cens``)
 
- - ``derive``  : define a variable as computed from other variables
+ - ``derive``   : define a variable as computed from other variables
 
- - `` calias`` : describe how a variable is derived form another, single, one, and which
+ - `` calias``  : describe how a variable is derived form another, single, one, and which
    variable name should be used in deriving data filename for this variable
 
 - for processing the data 
 
- - ``cscript`` : define a new CliMAF operator (this also defines a new Python function)
+ - ``cscript``  : define a new CliMAF operator (this also defines a new Python function)
 
- - ``cMA``     : get the Masked Array value of a CliMAF object (compute it)
+ - ``cMA``      : get the Masked Array value of a CliMAF object (compute it)
 
- - ``cvalue``  : get the value of a CliMAF object which actually is a scalar
+ - ``cvalue``   : get the value of a CliMAF object which actually is a scalar
 
- - ``cens``    : define an ensemble of objects 
+ - ``cens``     : define an ensemble of objects 
 
 - for managing/viewing results :
 
- - ``cfile``   : get the file value of a CliMAF object (compute it)
+ - ``cfile``    : get the file value of a CliMAF object (compute it)
  
- - ``efile``   : create a single file for an ensemble of CliMAF objects
+ - ``efile``    : create a single file for an ensemble of CliMAF objects
 
- - ``cshow``   : display a result of type 'figure'
+ - ``cshow``    : display a result of type 'figure' 
 
- - ``cpage``   : create an array of figures
+ - ``cpage``    : create an array of figures (output: 'png' or 'pdf' figure)
 
- - ``cdump``   : tell what's in cache
+ - ``cpage_pdf``: create an array of figures (output: 'pdf' figure)
 
- - ``cdrop``   : delete the cached file for an object
+ - ``cdump``    : tell what's in cache
 
- - ``craz``    : reset cache
+ - ``cdrop``    : delete the cached file for an object
 
- - ``csync``   : save cache index to disk
+ - ``craz``     : reset cache
+
+ - ``csync``    : save cache index to disk
 
 
 - utility functions :
 
- - ``clog``    : tune verbosity
+ - ``clog``     : tune verbosity
 
- - ``clog_file``    : tune verbosity for log file
+ - ``clog_file``: tune verbosity for log file
 
 """
 # Created : S.Senesi - 2014
@@ -72,7 +74,7 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds
+from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf
 from cmacro    import macro,cmacros
 from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
 from dataloc   import dataloc 

@@ -13,6 +13,13 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/01/20 :
+
+ - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a
+   **PDF page of figures array** using 'pdfjam'. See example
+   :download:`figarray <../examples/figarray.py>`. 
+
+
 - 2016/01/08 :
 
  - A new output format allowed for operators : 'eps'; see

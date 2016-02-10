@@ -220,7 +220,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return rep
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
-             isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cens) : 
+             isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) or \
+             isinstance(cobject,classes.cens) : 
         recurse_list.append(cobject.buildcrs())
         clogger.debug("Evaluating compound object : " + `cobject`)
         #################################################################
@@ -235,7 +236,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             cdedent()
             if format=='file' : return filename
             else: return cread(filename,varOf(cobject))
-        if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cens) :
+        if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cpage_pdf) and \
+               not isinstance(cobject,classes.cens) :
             #
             clogger.debug("Searching cache for including object for : " + `cobject`)
             ########################################################################
@@ -300,6 +302,11 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 raise Climaf_Driver_Error("generating script aborted for "+cobject.father.crs)
         elif isinstance(cobject,classes.cpage) :
             file=cfilePage(cobject, deep, recurse_list=recurse_list)
+            cdedent()
+            if ( format == 'file' ) : return (file)
+            else : return cread(file)
+        elif isinstance(cobject,classes.cpage_pdf) :
+            file=cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if ( format == 'file' ) : return (file)
             else : return cread(file)
@@ -381,7 +388,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
         if op : 
             per=timePeriod(op)
-            if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
+            if per and not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
                 subdict["period"]=str(per)
                 subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
@@ -575,7 +582,7 @@ def timePeriod(cobject) :
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(cobject.members[0])
-    else : clogger.error("unkown class for argument "+`cobject`)
+    else : return None #clogger.error("unkown class for argument "+`cobject`)
                   
 def domainOf(cobject) :
     """ Returns a domain for a CliMAF object : if object is a dataset, returns
@@ -624,7 +631,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
-    elif isinstance(cobject,classes.cpage) : return None
+    elif isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) : return None
     elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
@@ -822,7 +829,7 @@ def cshow(obj) :
     clogger.debug("cshow called on "+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray')
 
-def  cMA(obj,deep=None) :
+def cMA(obj,deep=None) :
     """
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.
 
@@ -844,11 +851,13 @@ def  cMA(obj,deep=None) :
 def cvalue(obj,index=0) :
     """
     Return the value of the array for an object, after MV flattening, at a given index
-    Example :
-    >>> data=ds(project='mine',variable='tas', ...)
-    >>> data1=time_average(data)
-    >>> data2=space_average(data1)
-    >>> v=cvalue(data2)
+
+    Example:
+    
+     >>> data=ds(project='mine',variable='tas', ...)
+     >>> data1=time_average(data)
+     >>> data2=space_average(data1)
+     >>> v=cvalue(data2)
 
     Does use the file representation of the object
     """
@@ -985,6 +994,73 @@ def cfilePage(cobj, deep, recurse_list=None) :
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
+
+
+def cfilePage_pdf(cobj, deep, recurse_list=None) :
+    """
+    Builds a PDF page with CliMAF figures using pdfjam, computing associated crs
+
+    Args:
+     cobj (cpage_pdf object)
+     
+    Returns : the filename in CliMAF cache, which contains the result (and None if failure)
+
+    """
+    if not isinstance(cobj,classes.cpage_pdf):
+        raise Climaf_Driver_Error("cobj is not a cpage_pdf object")
+    clogger.debug("Computing figure array for cpage %s"%(cobj.crs))
+    #
+    # margins
+    xmargin=30. # Horizontal shift between figures
+    ymargin=30. # Vertical shift between figures
+    #
+    # page size and creation
+    page_size="{%dpx,%dpx}"%(cobj.page_width, cobj.page_height)
+    fig_nb="%dx%d"%(len(cobj.fig_lines[0]),len(cobj.fig_lines))
+    fig_delta="%d %d"%(xmargin, ymargin)
+    preamb="\pagestyle{empty} \usepackage{hyperref} \usepackage{graphicx} \usepackage{geometry} \geometry{vmargin=%dcm,hmargin=2cm}"%cobj.y
+    
+    args=["pdfjam","--keepinfo", "--preamble",  preamb, "--papersize", page_size, "--delta", fig_delta, "--nup", fig_nb] #"%s"%preamb
+    #
+    # page composition
+    for line in cobj.fig_lines :
+        for fig in line :
+            if fig : 
+                figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
+                clogger.debug("Compositing figure %s",fig.crs)
+            else : raise Climaf_Driver_Error("Each figure must exist ('None' figure is not accepted)")
+            args.extend([figfile])            
+    #
+    # more optional options
+    if cobj.openright is True:
+        args.extend(["--openright", "True"])
+        
+    if cobj.scale != 1.:
+        args.extend(["--scale", "%.2f"%cobj.scale])
+
+    if cobj.title != "":
+        if cobj.titlebox :
+            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
+        else:
+            latex_command="\\begin{center} \\hspace{%dcm} %s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
+                           %(cobj.x, cobj.pt, cobj.font, cobj.title)
+        args.extend(["--pagecommand", latex_command])
+
+    #
+    # launch process and registering output in cache 
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format='pdf')
+
+    args.extend(["--outfile", out_fig])
+
+    clogger.debug("Compositing figures : %s"%`args`)
+    comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if comm.wait()!=0 :
+        raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
+    
+    if cache.register(out_fig,cobj.crs) :
+        clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
+    return out_fig
+    
 
 def calias(project,variable,fileVariable=None,**kwargs):
               
