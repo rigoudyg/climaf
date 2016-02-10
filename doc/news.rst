@@ -6,17 +6,13 @@ Whats' new
 
 Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
 
-.. |indx| image:: html_index.png 
-  :scale: 13%
-
-.. _screen_dump: ../../html_index.png 
-
 Changes, newest first :
 
-- 2016/02/01 :
+- 2016/02/10 :
 
- - cshow, displaying pdf or eps figures, will use a multi-page capable
-   viewer (xdg-open) if it is available. Otherwise, it uses 'display'
+ - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps
+   figures, does use a multi-page capable viewer (xdg-open) if it is
+   available. Otherwise, it uses 'display'
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
    - new arguments : 
@@ -25,31 +21,23 @@ Changes, newest first :
        for auxiliary field; 
      - ``options``, ``aux_options`` and ``shading_options`` for
        setting        NCL graphic resources directly
-   - colors smoothed to contours
-
-- 2016/01/20 :
+   - color filling is smoothed to contours
 
  - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a
    **PDF page of figures array** using 'pdfjam'. See example
    :download:`figarray <../examples/figarray.py>`. 
 
+ - A new output format allowed for operators : **eps**; see
+   :py:func:`~climaf.operators.cscript`. This needs an install of
+   'exiv2' - see :doc:`requirements`
 
-- 2016/01/08 :
-
- - A new output format allowed for operators : 'eps'; see
-   :py:func:`~climaf.operators.cscript`. For that, you have to
-   download 'exiv2', which is a image metadata manipulation tool
-   and which is used to preserve metadata for 'eps' figure (by writing
-   and reading XMP metadata in 'eps' file)  
-
- - A new standard operator to crop eps figures to their minimal size :
+ - A new standard operator, to crop eps figures to their minimal size :
    ``cepscrop``; see :doc:`scripts/cepscrop`   
 
-- 2016/01/04 :
-
- - Standard operator 'curves' now handle multiple cases : time series,
-   along lat, lon or profile in pressure/z_index. It also allows to
-   set NCL graphic ressources: see :doc:`scripts/curves`.
+ - Standard operator 'curves' now handle multiple profile cases : time
+   series, profile along lat or lon, and profile in
+   pressure/z_index. It also allows to set NCL graphic ressources
+   directly : see :doc:`scripts/curves`.
 
  - Standard operators 'lines' and 'timeplot' were removed, and
    replaced by 'curves': see :doc:`scripts/curves`  
@@ -61,11 +49,11 @@ Changes, newest first :
     'nav_lat' and 'nav_lon'. See :ref:`navlat issues with plot
     <navlat_issue>`.  Such files are available e.g. at CNRM in
     /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
-  - Changes for :py:func:`~climaf.classes.cpage`  :
+  - Change for :py:func:`~climaf.classes.cpage`  :
 
-   - argument ``orientation`` is now deprecated and replaced by new
-     arguments ``page_width`` and ``page_height`` for more control on
-     image resolution    
+   - argument ``orientation`` is now deprecated and preferably
+     replaced by new arguments ``page_width`` and ``page_height`` for
+     better control on image resolution
    - better adjustment of figures in height (if ``fig_trim`` is True).
 
   - Fix function cfile() for case hard=True
@@ -164,7 +152,7 @@ Changes, newest first :
 - 2015/09/08 - Version 0.9 :
 
  - Operator 'lines' is smarter re.time axis: (see
-   :doc:`scripts/lines`):
+   :doc:`scripts/curves`):
 
    - Tick marks are smartly adapted to the time period duration.  
    - When datasets does not cover the same time period, the user can 
@@ -208,6 +196,12 @@ Changes, newest first :
     :py:class:`~climaf.classes.cdataset()`. 
   - Binary ``climaf`` can be used as a **back end** in your scripts,
     feeding it with a string argument. See :ref:`backend`
+
+.. |indx| image:: html_index.png 
+  :scale: 13%
+
+.. _screen_dump: ../../html_index.png 
+
 
  - Outputs and rendering
 
@@ -265,7 +259,7 @@ Changes, newest first :
    ensemble-capable will be automagically looped over members. See  
    examples in :download:`ensemble.py <../examples/ensemble.py>`.
  - New standard operator ``lines`` for **plotting profiles or other xy 
-   curves for ensembles**; see :doc:`scripts/lines`
+   curves for ensembles**; see :doc:`scripts/curves`
  - Standard operator ``plot`` has new arguments : ``contours`` for
    adding contour lines, ``domain`` for greying out land or ocean; see :doc:`scripts/plot`
  - **Extended access to observation data** as managed by VDR at CNRM :

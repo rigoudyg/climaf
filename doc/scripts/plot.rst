@@ -86,6 +86,7 @@ General:
       'aux_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2"'     
     - ``shading_options`` for auxiliary field shading, e.g. :
       'shading_options="gsnShadeHigh=3|gsnShadeLow =5"'   
+
     For more details, see: https://www.ncl.ucar.edu/
 
 Main field:

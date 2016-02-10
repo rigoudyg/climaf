@@ -74,6 +74,7 @@ the script convert all time periods to first's one
     - lgBoxMinorExtentF      = 0.2    
     - tiXAxisString, tiYAxisString= data @long_name if data has
       "long_name" attribute (take the first file as ref.)
+
     For more details, see: https://www.ncl.ucar.edu/
 
   - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
