@@ -11,7 +11,6 @@ __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", 
 
 version="0.12"
 
-
 import time,os
 
 def tim(string=None):
@@ -26,6 +25,10 @@ def tim(string=None):
         tim.last=time.time()
         #if ("dotiming" in vars() and dotiming) :
         if False : print("Duration %.1f for step %s"%(delta,string),file=sys.stderr)
+
+xdg_bin=False
+if (os.system("type xdg-open >/dev/null 2>&1")== 0) :
+    xdg_bin=True
 
 already_inited=False
 onrtd = os.environ.get('READTHEDOCS', None) == 'True'

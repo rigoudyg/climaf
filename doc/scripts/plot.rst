@@ -76,6 +76,20 @@ General:
       dimensions (t,z,y,x) ; select first time or level step if
       field rank is 3.     
 
+  - ``options``, ``aux_options``, ``shading_options`` : strings for
+    setting NCL graphic resources directly, for the various 
+    fields (resources are separated by "|"). These lists have higher
+    priority than the CliMAF default ones. Each field has its own
+    options argument, e.g. :  
+
+    - ``options`` for main field and vectors, e.g. :
+      'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
+    - ``aux_options`` for auxiliary field, e.g. :
+      'aux_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2"'     
+    - ``shading_options`` for auxiliary field shading, e.g. :
+      'shading_options="gsnShadeHigh=3|gsnShadeLow =5"'   
+    For more details, see: https://www.ncl.ucar.edu/
+
 Main field:
 
   - colormap and its interpretation :
@@ -116,6 +130,19 @@ Main field and/or auxiliary field:
       - default (ncl): draw contours of auxiliary field in "AutomaticLevels"
 	ncl mode; see e.g.
 	http://www.ncl.ucar.edu/Document/Graphics/Resources/cn.shtml#cnLevelSelectionMode
+
+Auxiliary field:
+
+  - ``shade_below``, ``shade_above`` : shades contour regions given
+    low and/or high values using patterns (default: 17; see
+    https://www.ncl.ucar.edu/Document/Graphics/Images/fillpatterns.png
+    for all patterns). 
+    Warning: NCL shading depends on list of levels used for drawing
+    contours. For example, if contours="0 1 2 4 6" and if you set
+    shade_below=1, you will get a shaded region [0,1]; while if
+    contours="0 2 4 6", no region will be shaded because there is no
+    full contours intervals which entirely match the constraints less
+    than 1.
 
 Vectors:
 
@@ -198,9 +225,13 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> plot_map2=plot(tos, None, duo, dvo, title='1 field (user control contours) + vectors', contours='1 3 5 7 9 11 13', 
      ... proj='NH', rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02)
 
-     >>> # A Map of two fields and vectors, with explicit contours levels for auxiliary field and rotation of vectors 
-     >>> plot_map3=plot(tos, sub_tos, duo, dvo, title='2 fields (user control auxiliary field contours) + vectors', contours='0 2 4 6 8 10 12 14 16',
-     ... rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02) 
+     >>> # A Map of two fields and vectors, with explicit contours levels and shading for auxiliary field, rotation of vectors 
+     >>> # and graphic resources defined by user for auxiliary field
+     >>> plot_map3=plot(tos, sub_tos, duo, dvo, title='2 fields (user control auxiliary field contours) + vectors', 
+     ... rotation=1, vcRefLengthF=0.002, vcRefMagnitudeF=0.02,
+     ... contours='0 2 4 6 8 10 12 14 16', shade_above=6, shade_below=4,
+     ... auxfld_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2",
+     ... shading_options="gsnShadeHigh=3|gsnShadeLow =5")
 
      >>> # A Map of two fields and vectors, with automatic contours levels for auxiliary field and rotation of vectors 
      >>> plot_map4=plot(tos, sub_tos, duo, dvo, title='2 fields (automatic contours levels for auxiliary field) + vectors', 

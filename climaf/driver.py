@@ -21,6 +21,7 @@ import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
+from climaf import xdg_bin
 
 def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
@@ -661,8 +662,11 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
 def cread(datafile,varname=None):
     import re
     if not datafile : return(None)
-    if re.findall(".png$",datafile) or re.findall(".pdf$",datafile) or re.findall(".eps$",datafile):
+    if re.findall(".png$",datafile) or \
+           ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and (not xdg_bin) ):
         subprocess.Popen(["display",datafile,"&"])
+    elif ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and xdg_bin ) :
+        subprocess.Popen(["xdg-open",datafile])
     elif re.findall(".nc$",datafile) :
         clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
@@ -687,8 +691,11 @@ def cread(datafile,varname=None):
         return None
 
 def cview(datafile):
-    if re.findall(".png$",datafile) or re.findall(".pdf$",datafile) or re.findall(".eps$",datafile) :
+    if re.findall(".png$",datafile) or \
+           ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and (not xdg_bin) ) :
         subprocess.Popen(["display",datafile,"&"])
+    elif ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and xdg_bin) :
+        subprocess.Popen(["xdg-open",datafile])
     else :
         clogger.error("cannot yet handle %s"%datafile)
         return None

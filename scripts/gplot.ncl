@@ -8,6 +8,106 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 
 ;--------------------------------------------------------------------------------------------
+undef("str_convert")
+; Convert an input string into logical, integer, float or the same string
+function str_convert(str:string)
+
+local val, valf
+begin
+  
+  if .not. ismissing(str_match(str,"True")) then
+    return(True)
+  else
+    if .not. ismissing(str_match(str,"False")) then
+      return(False)
+    else
+
+      if ismissing(str_match(str,".")) then ; integer or string
+        val=stringtoint(str)
+        if ismissing(val) then 
+          return(str)
+        else
+          return(val)
+        end if
+      else                                  ; float (or string)
+        valf=stringtofloat(str)
+        if ismissing(valf) then 
+          return(str)
+        else
+          return(valf)
+        end if
+      end if
+
+    end if ; if False
+  end if ; if True
+
+end 
+
+;--------------------------------------------------------------------------------------------
+
+undef("res_list")
+; Extract graphic resources from 'opt' associated to resource 'fct_res'
+procedure res_list(opt:string, fct_res:logical)
+
+local reslist, resval, key, value, value_convert
+begin
+  
+  reslist=str_split(opt,"|")
+  do i=0,dimsizes(reslist)-1 
+    resval=str_split(reslist(i),"=")
+    key=resval(0)
+    value=resval(1)
+    value_convert=str_convert(value)
+    fct_res@$key$=value_convert
+    delete(value_convert)
+  end do
+  
+  return
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("shading")
+; Shade contour regions given low and/or high values using patterns
+function shading(routname, field:numeric, resname:logical)
+
+begin
+
+  if ( isvar("shade_below") .or. isvar("shade_above") ) then 
+
+    if ( isvar("shade_below") .and. (.not. isvar("shade_above")) ) then 
+      resname@gsnShadeLow = 17   
+      if isvar("shading_options") then res_list(shading_options, resname) end if
+      routname = gsn_contour_shade(routname, shade_below, min(field), resname) 
+    else 
+      if ( isvar("shade_above") .and. (.not. isvar("shade_below")) ) then 
+        resname@gsnShadeHigh = 17
+        if isvar("shading_options") then res_list(shading_options, resname) end if
+        routname = gsn_contour_shade(routname, max(field), shade_above, resname) 
+      else 
+        
+        if ( shade_above .lt. shade_below ) then
+          resname@gsnShadeMid = 17
+          if isvar("shading_options") then res_list(shading_options, resname) end if
+          routname = gsn_contour_shade(routname, shade_above, shade_below, resname) 
+        else
+          resname@gsnShadeLow = 17   
+          resname@gsnShadeHigh = 17
+          if isvar("shading_options") then res_list(shading_options, resname) end if
+          routname = gsn_contour_shade(routname, shade_below, shade_above, resname) 
+        end if
+
+      end if
+    end if 
+   
+    return(routname)
+
+  end if
+  
+end
+
+;--------------------------------------------------------------------------------------------
+
 undef("data_select")
 ; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field' 
 ; and create a list, called 'select_list', of extracted values 
@@ -758,12 +858,12 @@ begin
       res2@gsnRightString    = ""
       res2@gsnCenterString   = ""
       
-      res2@cnFillOn=False
+      res2@cnFillOn=False 
       res2@cnLineLabelsOn = False
       res2@cnLineLabelBackgroundColor = -1
       res2@cnInfoLabelString = ""
     
-      res2@cnLinesOn=True
+      res2@cnLinesOn=True 
       res2@gsnContourNegLineDashPattern = 1
       res2@gsnContourZeroLineThicknessF = 1.5  
       
@@ -781,7 +881,20 @@ begin
           res2@gsnAddCyclic        = False
         end if
       end if
+     
+      if ( isvar("shade_below") .or. isvar("shade_above") ) then 
+        ; without low or high values, for shading all the field
+        ;res2@cnMonoFillPattern = True
+        ;res2@cnMonoFillColor   = True   ; Use same fill color
+        ;res2@cnFillPattern = 3
 
+        res2@lbLabelBarOn = False
+        res2@cnFillOn=True
+        ;res2@cnFillColor    = "black"   ; foreground by default
+        opt = True
+        opt@gsnShadeFillType = "pattern" ; "color" or "pattern"
+      end if
+      
     end if ; NOT AUX_FIELD
 
     if (LABELON) then 
@@ -792,7 +905,9 @@ begin
         res@cnLinesOn=False
         res@cnLineLabelsOn=False
       end if
-      res@cnRasterModeOn=True
+      ;res@cnRasterModeOn=True
+      res@cnFillMode = "RasterFill" 
+      res@cnRasterSmoothingOn=True 
     end if
 
     if (horizontal) then ; only for map
@@ -950,6 +1065,7 @@ begin
       xyres2 = True
       xyres2@gsnDraw = False
       xyres2@gsnFrame = False
+      xyres2@xyLineThicknesses = 3.0
     end if
     
     if type.eq."png" then
@@ -972,6 +1088,7 @@ begin
         xaxis=hdim
         yaxis=fld
       end if      
+      if isvar("options") then res_list(options, xyres) end if
       plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
       if AUX_FIELD then
         xaxis2=fld2
@@ -980,6 +1097,7 @@ begin
           xaxis2=hdim2
           yaxis2=fld2
         end if
+        if isvar("aux_options") then res_list(aux_options, xyres2) end if 
         plot1=gsn_csm_xy(wks,xaxis2,yaxis2,xyres2)
       end if
 
@@ -990,6 +1108,7 @@ begin
         xaxis=fld
         yaxis=hdim
       end if
+      if isvar("options") then res_list(options, xyres) end if 
       plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
       if AUX_FIELD then
         xaxis2=hdim2
@@ -998,6 +1117,7 @@ begin
           xaxis2=fld2
           yaxis2=hdim2
         end if
+        if isvar("aux_options") then res_list(aux_options, xyres2) end if 
         plot1=gsn_csm_xy(wks,xaxis2,yaxis2,xyres2)
       end if
       
@@ -1015,6 +1135,7 @@ begin
       if (isvar("proj")) then 
         
         print("using gsn_csm_contour_map")
+        if isvar("options") then res_list(options, res) end if 
         if VECT then
           plot0=gsn_csm_vector_scalar_map(wks,fld3,fld4,fld,res)
         else
@@ -1022,19 +1143,22 @@ begin
         end if
         
         if .not. AUX_FIELD then
-          if(LEVELS_CONTOURS) then
+          if (LEVELS_CONTOURS) then
+            if isvar("options") then res_list(options, res2) end if 
             plot1=gsn_csm_contour(wks,fld,res2)
           end if
         else
+          if isvar("aux_options") then res_list(aux_options, res2) end if 
           plot1=gsn_csm_contour(wks,fld2,res2)
+          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
         end if
         ;if VECT then
         ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
         ;end if
         
       else 
-
         print("using gsn_csm_contour_map_ce")
+        if isvar("options") then res_list(options, res) end if 
         if VECT then
           plot0=gsn_csm_vector_scalar_map_ce(wks,fld3,fld4,fld,res)
         else
@@ -1042,11 +1166,14 @@ begin
         end if
 
         if .not. AUX_FIELD then
-          if(LEVELS_CONTOURS) then
+          if (LEVELS_CONTOURS) then
+            if isvar("options") then res_list(options, res2) end if 
             plot1=gsn_csm_contour(wks,fld,res2)
           end if
         else
+          if isvar("aux_options") then res_list(aux_options, res2) end if 
           plot1=gsn_csm_contour(wks,fld2,res2)
+          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
         end if
         ;if VECT then
         ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
@@ -1057,15 +1184,19 @@ begin
       if logp then 
 
         print("using gsn_csm_pres_hgt")
+        if isvar("options") then res_list(options, res) end if 
         plot0=gsn_csm_pres_hgt(wks,fld,res)
         if .not. AUX_FIELD then
           if(LEVELS_CONTOURS) then
             res2@tmYRMode = "Automatic" ; turn off special labels on right axis
+            if isvar("options") then res_list(options, res2) end if 
             plot1=gsn_csm_pres_hgt(wks,fld,res2)
           end if
         else
-          res2@tmYRMode = "Automatic" ; turn off special labels on right axis
+          res2@tmYRMode = "Automatic"   ; turn off special labels on right axis
+          if isvar("aux_options") then res_list(aux_options, res2) end if 
           plot1=gsn_csm_pres_hgt(wks,fld2,res2)
+          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
         end if
 
       else
@@ -1075,13 +1206,17 @@ begin
           ; useless :
           ;res@sfYArray            = zdim
           res@trYReverse        = True ; reverse Y-axis          
+          if isvar("options") then res_list(options, res) end if 
           plot0=gsn_csm_contour(wks,fld,res)
           if .not. AUX_FIELD then
             if(LEVELS_CONTOURS) then
+              if isvar("options") then res_list(options, res2) end if 
               plot1=gsn_csm_contour(wks,fld,res2)
             end if
           else
+            if isvar("aux_options") then res_list(aux_options, res2) end if 
             plot1=gsn_csm_contour(wks,fld2,res2)
+            if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
           end if
 
         else 
@@ -1090,15 +1225,19 @@ begin
             print("using gsn_csm_contour; linp=-1")
             res@trYReverse        = True ; reverse Y-axis
             res@gsnYAxisIrregular2Linear= True
+            if isvar("options") then res_list(options, res) end if 
             plot0=gsn_csm_contour(wks,fld,res)
             if .not. AUX_FIELD then
               if(LEVELS_CONTOURS) then
                 res2@gsnYAxisIrregular2Linear= True
+                if isvar("options") then res_list(options, res2) end if 
                 plot1=gsn_csm_contour(wks,fld,res2)
               end if
             else              
               res2@gsnYAxisIrregular2Linear= True
+              if isvar("aux_options") then res_list(aux_options, res2) end if 
               plot1=gsn_csm_contour(wks,fld2,res2)
+              if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
             end if
 
           end if

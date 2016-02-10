@@ -13,6 +13,20 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/02/01 :
+
+ - cshow, displaying pdf or eps figures, will use a multi-page capable
+   viewer (xdg-open) if it is available. Otherwise, it uses 'display'
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - new arguments : 
+     
+     - ``shade_below`` and ``shade_above`` to shade contour regions
+       for auxiliary field; 
+     - ``options``, ``aux_options`` and ``shading_options`` for
+       setting        NCL graphic resources directly
+   - colors smoothed to contours
+
 - 2016/01/20 :
 
  - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a
