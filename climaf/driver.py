@@ -137,7 +137,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
-        raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf", "eps" and "txt"') 
+        raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s"%', '.join([repr(x) for x in operators.graphic_formats]))
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -435,7 +435,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if scriptCall.parameters['format'] in operators.graphic_formats :
                     output_fmt=scriptCall.parameters['format']
                 else: 
-                    raise Climaf_Driver_Error('Allowed graphic formats yet are : "png", "pdf" and "eps"')
+                    raise Climaf_Driver_Error('Allowed graphic formats yet are : %s'%', '.join([repr(x) for x in operators.graphic_formats]))
             else : #default graphic format 
                 output_fmt="png"
         else:
