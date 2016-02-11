@@ -51,7 +51,7 @@
 ; as e.g. : ' options="tiMainString=lv|xyLineThicknessF=5." '.This list is priority in 
 ; front of graphic resources in this script.
 ;
-; format : graphic output format, either 'png' or 'pdf'; default: 'png'.
+; format : graphic output format, either 'png', 'pdf' or 'eps'; default: 'png'.
 ;
 ; trim : set it to True if you want to crop all the surrounding white extra space for 'png' 
 ; format; default: True.
@@ -59,10 +59,10 @@
 ; resolution : string for output image resolution
 ;  - if format is "png", resolution specifies the width and height of resultant image in pixels 
 ;    as e.g. 800x1200; default (ncl): 1024x1024
-;  - if format is "pdf", resolution specifies either the width and height of the paper, as above 
-;    but in inches unit, or a standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11 or
-;    "letter" (<=> ncl imposes a resolution of 72 dots per inch (dpi), wich is equivalent to 
-;    612x792 in pixels)  
+;  - if format is "pdf" or "eps", resolution specifies either the width and height of the paper, 
+;    as above but in inches unit, or a standard paper size by name, as e.g. 'A4'; default (ncl): 
+;    8.5x11 or "letter" (<=> ncl imposes a resolution of 72 dots per inch (dpi), wich is equivalent 
+;    to 612x792 in pixels)  
 ;
 ;
 ; Third version : L.Vignon - january 2016
@@ -378,7 +378,7 @@ begin
         type@wkWidth = width
         type@wkHeight = height
       else 
-        if type .eq. "pdf" then ;image resolution in inches
+        if (type .eq. "pdf") .or. (type .eq. "eps") then ;image resolution in inches
           type@wkPaperWidthF  = width 
           type@wkPaperHeightF = height
         end if
@@ -390,7 +390,7 @@ begin
         print("For PNG output, resolution must be given by 'widthxheight' or 'width*height'")
         status_exit(1)
       else
-        if type .eq. "pdf" then
+        if (type .eq. "pdf") .or. (type .eq. "eps") then
           type@wkPaperSize = resolution
         end if
       end if
