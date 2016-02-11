@@ -1054,17 +1054,17 @@ class cpage_pdf(cobject):
            http://ftp.oleane.net/pub/CTAN/macros/latex/contrib/pdfpages/pdfpages.pdf
           title (str, optional): append a label in the page.
 
-        If title is activated, its is by default horizontally centered:
+        If title is activated, it is by default horizontally centered:
         
             - x (int, optional): title horizontal shift (in cm). 
             - y (int, optional): vertical shift from the top of the page (in cm); 
               only positive (down) values have an effect, default=2 cm 
             - titlebox (logical, optional): set it to True to frame the text in a box,
               frame color is 'black'
-            - pt (int, optional): title font size; CLiMAF default: '\\\\Huge'
+            - pt (int, optional): title font size; CLiMAF default: '\Huge'
               (corresponding to 24 pt).
             - font (str, optional): font
-              abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
+              abbreviation among available LaTex fonts; default: '\\familydefault'.
             - background (str, optional): frame fill background color; among LaTex 
               'fcolorbox' colors; default: 'white'.
 

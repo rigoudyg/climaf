@@ -60,9 +60,8 @@
 ;  - if format is "png", resolution specifies the width and height of resultant image in pixels 
 ;    as e.g. 800x1200; default (ncl): 1024x1024
 ;  - if format is "pdf" or "eps", resolution specifies either the width and height of the paper, 
-;    as above but in inches unit, or a standard paper size by name, as e.g. 'A4'; default (ncl): 
-;    8.5x11 or "letter" (<=> ncl imposes a resolution of 72 dots per inch (dpi), wich is equivalent 
-;    to 612x792 in pixels)  
+;    as above but in inches unit, or a standard paper size by name, as e.g. 'A4'. Ncl uses a 
+;    resolution of 72 dots per inch (dpi); default (ncl): 8.5x11 or "letter" (<=> 612x792 in pixels)  
 ;
 ;
 ; Third version : L.Vignon - january 2016

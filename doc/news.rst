@@ -20,7 +20,7 @@ Changes, newest first :
      - ``shade_below`` and ``shade_above`` to shade contour regions
        for auxiliary field; 
      - ``options``, ``aux_options`` and ``shading_options`` for
-       setting        NCL graphic resources directly
+       setting NCL graphic resources directly
    - color filling is smoothed to contours
 
  - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a

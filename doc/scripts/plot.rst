@@ -53,8 +53,9 @@ General:
       1024x1024 
     - if format is "pdf" or "eps", resolution specifies either the
       width and height of the paper, as above but in inches unit, or a
-      standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11
-      or "letter" (<=> 612x792 pixels) 
+      standard paper size by name, as e.g. 'A4'. Ncl uses a resolution
+      of 72 dots per inch (dpi); default (ncl): 8.5x11 or "letter"
+      (<=> 612x792 pixels)  
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
