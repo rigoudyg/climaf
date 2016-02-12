@@ -1061,10 +1061,10 @@ class cpage_pdf(cobject):
               only positive (down) values have an effect, default=2 cm 
             - titlebox (logical, optional): set it to True to frame the text in a box,
               frame color is 'black'
-            - pt (int, optional): title font size; CLiMAF default: '\Huge'
+            - pt (int, optional): title font size; CLiMAF default: '\\\Huge'
               (corresponding to 24 pt).
             - font (str, optional): font
-              abbreviation among available LaTex fonts; default: '\\familydefault'.
+              abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
             - background (str, optional): frame fill background color; among LaTex 
               'fcolorbox' colors; default: 'white'.
 
