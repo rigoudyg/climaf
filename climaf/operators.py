@@ -18,6 +18,10 @@ scripts=dict()
 operators=dict()
 derived_variables=dict()
 
+known_formats=['nc','graph','txt']  
+graphic_formats=['png','pdf','eps']
+none_formats=[None,'txt']
+
 class scriptFlags():
     def __init__(self,canOpendap=False, canSelectVar=False, 
                  canSelectTime=False, canSelectDomain=False, 
@@ -52,7 +56,11 @@ class cscript():
         Args:
           name (str): name for the CliMAF operator.
           command (str): script calling sequence, according to the syntax described below.
-          format (str): script outputs format -- either 'nc' or 'png' or 'None'; defaults to 'nc'
+          format (str): script outputs format -- either 'nc', 'png', 'pdf', 'eps', 'None'
+            or 'graph' ('graph' allows to the user to choose three different graphic output
+            formats: 'png', 'pdf' or 'eps') or 'txt' (the text output are not managed by CliMAF,
+            but only displayed - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF);
+            defaults to 'nc'  
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
           commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
             of time periods ? set it to true, if the operator can be applied on time
@@ -73,7 +81,7 @@ class cscript():
         
         >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
         >>> # define some dataset
-        >>> tas_ds = ds(project='example', simulation='AMIPV6', variable='tas', period='1980-1981')
+        >>> tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
         >>> # Apply operator 'mycdo' to dataset 'tas_ds', choosing a given 'operator' argument
         >>> tas_avg = mycdo(tas_ds,operator='timavg')
         
@@ -277,7 +285,9 @@ class cscript():
         #
         # Check if command includes an argument allowing for 
         # providing an output filename
-        if command.find("${out") < 0 : format=None
+        if command.find("${out") < 0 :
+            if format is not "txt" :
+                format=None        
         #
         # Search in call arguments for keywords matching "<output_name>_var" 
         # which may provide format string for 'computing' outputs variable 
@@ -317,12 +327,15 @@ class cscript():
         #
         self.name=name
         self.command=command
-        self.fixedfields=None #LV
+        self.fixedfields=None 
         self.flags=scriptFlags(canOpendap, canSelectVar, canSelectTime, \
             canSelectDomain, canAggregateTime, canAlias, canMissing,\
             commuteWithEnsemble,\
             commuteWithTimeConcatenation, commuteWithSpaceConcatenation )
-        self.outputFormat=format
+        if format in known_formats or format in graphic_formats or format in none_formats:  
+            self.outputFormat=format
+        else:
+            raise Climaf_Operator_Error('Allowed formats yet are : "nc", "png", "pdf" and "eps"')
         scripts[name]=self
 
         # Init doc string for the operator
@@ -364,16 +377,16 @@ class cscript():
         
 def fixed_fields(operator, *paths):
     """
-    Declare than an operator (or a list of) needs fixed fields. CliMAF will
-    provide them to the operator through symbolic links at execution time
+    Declare that an operator (or a list of) needs fixed fields. CliMAF will
+    provide them to the operator at execution time through symbolic links 
 
     Parameters:
-      operator (string of list of strings) : name of the CliMAF operator.
+      operator (string, or list of strings) : name of the CliMAF operator.
       paths (couples) : a number of couples composed of the filename as expected
         by the operator
         and a path for the data; the path  may uses placeholders : ${model}, ${project}
-        and ${simulation}, which will be replaced by the corresponding facet
-        values for the first operand.
+        ${simulation} and ${realm}, which will be replaced by the corresponding facet
+        values for the first operand of the target operator.
 
     Returns:
       None
@@ -382,6 +395,9 @@ def fixed_fields(operator, *paths):
        >>> fixed_fields('ccdftransport',
         ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
         ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
+
+       >>> fixed_fields('plot',
+        ... ('coordinates.nc','/cnrm/aster/data3/aster/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
 
     """
     if not isinstance(operator,list):
@@ -471,7 +487,7 @@ def derive(project, derivedVar, Operator, *invars, **params) :
     elif Operator in operators :
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else : 
-        clogger.error("second argument must be a script or operator, already declared")
+        clogger.error("second argument (%s) must be a script or operator, already declared"%`Operator`)
 
 def is_derived_variable(variable,project):
     """ True if the variable is a derived variable, either in provided project

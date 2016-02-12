@@ -74,10 +74,10 @@ cshow(fig)
 
 # CRUTS3
 ###############################
-tcru=ds(project='cruts3', variable='tas',period='1980-2000',grid='')
+tcru=ds(project='cruts3', variable='tas',period='1980-2000',grid='T127')
 tcru_ga=space_average(tcru)
 tcru_yga=ccdo(tcru_ga,operator='yearmean')
-f=timeplot(tcru_yga,title="Tempe CRUTS3")
+f=curves(tcru_yga,title="Tempe CRUTS3")
 
 # CERES
 ###########################
@@ -86,5 +86,5 @@ rlut=ds(project='ceres', variable='rlut',period='2001-2013')
 rlut_cycle=ccdo(rlut,operator='ymonavg')
 # Average annual cycle on a latlon box
 cycle=space_average(llbox(rlut_cycle,latmin=-20,latmax=30,lonmin=-30,lonmax=50))
-cshow(timeplot(cycle,title='rlut on box'))
+cshow(curves(cycle,title='rlut on box'))
                     

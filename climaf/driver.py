@@ -8,8 +8,9 @@ from __future__ import print_function
 
 # Created : S.Senesi - 2014
 
-import sys,os, os.path, re, posixpath, subprocess, time, shutil, copy
+import sys, os, os.path, re, posixpath, subprocess, time, shutil, copy
 from string import Template
+import tempfile
 
 # Climaf modules
 import climaf
@@ -20,6 +21,7 @@ import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period
+from climaf import xdg_bin
 
 def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
@@ -27,15 +29,15 @@ def capply(climaf_operator, *operands, **parameters):
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
     res=None
-    if operands is None or operands[0] is None :
-        raise Climaf_Driver_Error("Operands is None")
+    if operands is None or operands[0] is None and not allow_errors_on_ds_call : 
+        raise Climaf_Driver_Error("Operands is None for operator %s"%climaf_operator)
     opds=map(str,operands)
     if climaf_operator in operators.scripts :
         #clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res=capply_script(climaf_operator, *operands, **parameters)
         # Evaluate object right now if there is no output to manage
         op=operators.scripts[climaf_operator]
-        if op.outputFormat is None : ceval(res,userflags=copy.copy(op.flags))
+        if op.outputFormat in operators.none_formats : ceval(res,userflags=copy.copy(op.flags))
     elif climaf_operator in cmacro.cmacros :
         if (len(parameters) > 0) :
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
@@ -134,8 +136,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     arg derived_list is the list of variables that have been considered as 'derived'
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
-    if format != 'MaskedArray' and format != 'file' and format != 'png' :
-	raise Climaf_Driver_Error('Allowed formats yet are : "object", "file" and "png"')
+    if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
+        raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf", "eps" and "txt"') 
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -219,7 +221,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return rep
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
-             isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cens) : 
+             isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) or \
+             isinstance(cobject,classes.cens) : 
         recurse_list.append(cobject.buildcrs())
         clogger.debug("Evaluating compound object : " + `cobject`)
         #################################################################
@@ -234,7 +237,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             cdedent()
             if format=='file' : return filename
             else: return cread(filename,varOf(cobject))
-        if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cens) :
+        if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cpage_pdf) and \
+               not isinstance(cobject,classes.cens) :
             #
             clogger.debug("Searching cache for including object for : " + `cobject`)
             ########################################################################
@@ -299,6 +303,11 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 raise Climaf_Driver_Error("generating script aborted for "+cobject.father.crs)
         elif isinstance(cobject,classes.cpage) :
             file=cfilePage(cobject, deep, recurse_list=recurse_list)
+            cdedent()
+            if ( format == 'file' ) : return (file)
+            else : return cread(file)
+        elif isinstance(cobject,classes.cpage_pdf) :
+            file=cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if ( format == 'file' ) : return (file)
             else : return cread(file)
@@ -380,7 +389,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
         if op : 
             per=timePeriod(op)
-            if not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
+            if per and not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
                 subdict["period"]=str(per)
                 subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
@@ -420,17 +429,28 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    if script.outputFormat is not None :
+    if script.outputFormat not in operators.none_formats :
+        if script.outputFormat=="graph" :
+            if 'format' in scriptCall.parameters :
+                if scriptCall.parameters['format'] in operators.graphic_formats :
+                    output_fmt=scriptCall.parameters['format']
+                else: 
+                    raise Climaf_Driver_Error('Allowed graphic formats yet are : "png", "pdf" and "eps"')
+            else : #default graphic format 
+                output_fmt="png"
+        else:
+            output_fmt=script.outputFormat
         # Compute a filename for each ouptut
         # Un-named main output
         main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
-                                                          format=script.outputFormat)
+                                                          format=output_fmt) 
         subdict["out"]=main_output_filename
-        subdict["out_"+scriptCall.variable]=main_output_filename
+        subdict["out_"+varOf(scriptCall)]=main_output_filename
         # Named outputs
         for output in scriptCall.outputs:
             subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
-                                                         format=script.outputFormat)
+                                                         format=output_fmt) 
+                        
     # Account for script call parameters
     for p in scriptCall.parameters : 
         #clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
@@ -471,6 +491,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict_ff["model"]=modelOf(scriptCall.operands[0])
         subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
         subdict_ff["project"]=projectOf(scriptCall.operands[0])
+        subdict_ff["realm"]=realmOf(scriptCall.operands[0])
         l=script.fixedfields #return paths: (linkname, targetname)
         files_exist=dict()
         for ll,lt in l:
@@ -500,6 +521,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     for line in command.stdout:
         command_std+=line
         logfile.write(line)
+        if script.outputFormat=="txt" : 
+            sys.stdout.write(line)
     logfile.close()
     
     # Clean fixed fields symbolic links
@@ -510,7 +533,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 os.system("rm -f "+ll)  
 
     if ( repcom == 0 ):
-        if script.outputFormat is not None :
+        if script.outputFormat not in operators.none_formats :
+            
             # Tagging output files with their CliMAF Reference Syntax definition
             # Un-named main output
             ok = cache.register(main_output_filename,scriptCall.crs)
@@ -559,7 +583,7 @@ def timePeriod(cobject) :
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(cobject.members[0])
-    else : clogger.error("unkown class for argument "+`cobject`)
+    else : return None #clogger.error("unkown class for argument "+`cobject`)
                   
 def domainOf(cobject) :
     """ Returns a domain for a CliMAF object : if object is a dataset, returns
@@ -591,12 +615,16 @@ def varOf(cobject) : return attributeOf(cobject,"variable")
 def modelOf(cobject) : return attributeOf(cobject,"model")
 def simulationOf(cobject) : return attributeOf(cobject,"simulation")
 def projectOf(cobject) : return attributeOf(cobject,"project")
+def realmOf(cobject) : return attributeOf(cobject,"realm")
 
 def attributeOf(cobject,attrib) :
     """ Returns the attribute for a CliMAF object : if object is a dataset, returns
     its attribute property, otherwise returns attribute of first operand
     """
-    if isinstance(cobject,classes.cdataset) : return getattr(cobject,attrib) 
+    if isinstance(cobject,classes.cdataset) : 
+        val=getattr(cobject,attrib,None) 
+        if val is not None : return val
+        else : return(cobject.kvp.get(attrib))
     elif isinstance(cobject,classes.cens) : return attributeOf(cobject.members[0],attrib)
     elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
     elif isinstance(cobject,classes.ctree) :
@@ -604,6 +632,7 @@ def attributeOf(cobject,attrib) :
         return attributeOf(cobject.operands[0],attrib)
     elif isinstance(cobject,cmacro.cdummy) :
         return "dummy"
+    elif isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) : return None
     elif cobject is None : return ''
     else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
 
@@ -633,8 +662,11 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
 def cread(datafile,varname=None):
     import re
     if not datafile : return(None)
-    if re.findall(".png$",datafile) :
+    if re.findall(".png$",datafile) or \
+           ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and (not xdg_bin) ):
         subprocess.Popen(["display",datafile,"&"])
+    elif ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and xdg_bin ) :
+        subprocess.Popen(["xdg-open",datafile])
     elif re.findall(".nc$",datafile) :
         clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
@@ -646,9 +678,12 @@ def cread(datafile,varname=None):
         # Note taken from the CDOpy developper : .data is not backwards 
         # compatible to old scipy versions, [:] is
         data=fileobj.variables[varname][:]
-        fillv=fileobj.variables[varname]._FillValue
         import numpy.ma
-        rep= numpy.ma.array(data,mask = data==fillv)
+        if '_FillValue' in dir(fileobj.variables[varname]) :
+            fillv=fileobj.variables[varname]._FillValue
+            rep= numpy.ma.array(data,mask = data==fillv)
+        else : 
+            rep= numpy.ma.array(data)
         fileobj.close()
         return(rep)
     else :
@@ -656,8 +691,11 @@ def cread(datafile,varname=None):
         return None
 
 def cview(datafile):
-    if re.findall(".png$",datafile) :
+    if re.findall(".png$",datafile) or \
+           ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and (not xdg_bin) ) :
         subprocess.Popen(["display",datafile,"&"])
+    elif ( (re.findall(".pdf$",datafile) or re.findall(".eps$",datafile)) and xdg_bin) :
+        subprocess.Popen(["xdg-open",datafile])
     else :
         clogger.error("cannot yet handle %s"%datafile)
         return None
@@ -753,7 +791,7 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
 
     """
     clogger.debug("cfile called on "+str(object))  
-    result=climaf.driver.ceval(object,format='file',deep=deep)
+    result=ceval(object,format='file',deep=deep)
     if target is None : return result
     else :
         target=os.path.abspath(os.path.expanduser(target))
@@ -763,14 +801,21 @@ def cfile(object,target=None,ln=None,hard=None,deep=None) :
             if ln or hard :
                 if ln and hard : Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln :
-                    if not os.path.samefile(result,target):
+                    if os.path.exists(target) :
+                        if not os.path.samefile(result,target): 
+                            os.remove(target)
+                            shutil.move(result,target)
+                            os.symlink(target,result)
+                    else: 
+                        if not os.path.exists(os.path.dirname(target)):
+                            os.makedirs(os.path.dirname(target))
                         shutil.move(result,target)
-                        if os.path.exists(result) : os.remove(result)
                         os.symlink(target,result)
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
-                    source=os.readlink(result)
+                    if os.path.islink(result) : source=os.readlink(result)
+                    else : source=result
                     if (source == target):
                         # This is a case where the file had already been symlinked to the same target name
                         shutil.move(source,result)
@@ -791,7 +836,7 @@ def cshow(obj) :
     clogger.debug("cshow called on "+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray')
 
-def  cMA(obj,deep=None) :
+def cMA(obj,deep=None) :
     """
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.
 
@@ -810,13 +855,29 @@ def  cMA(obj,deep=None) :
     clogger.debug("cMA called with arguments"+str(obj)) 
     return climaf.driver.ceval(obj,format='MaskedArray',deep=deep)
 
+def cvalue(obj,index=0) :
+    """
+    Return the value of the array for an object, after MV flattening, at a given index
+
+    Example:
+    
+     >>> data=ds(project='mine',variable='tas', ...)
+     >>> data1=time_average(data)
+     >>> data2=space_average(data1)
+     >>> v=cvalue(data2)
+
+    Does use the file representation of the object
+    """
+    return cMA(obj).data.flat[index]
+
 def cexport(*args,**kwargs) :
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
 
     """
     clogger.debug("cexport called with arguments"+str(args))  
     if "format" in kwargs :
-        if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc") :
+        if (kwargs['format']=="NetCDF" or kwargs['format']=="netcdf" or kwargs['format']=="nc" \
+            or kwargs['format']=="png" or kwargs['format']=="pdf" or kwargs['format']=="eps") : 
             kwargs['format']="file" 
         if (kwargs['format']=="MA") :
             kwargs['format']="MaskedArray" 
@@ -851,23 +912,22 @@ def cfilePage(cobj, deep, recurse_list=None) :
     clogger.debug("Computing figure array for cpage %s"%(cobj.crs))
     #
     # page size and creation
-    if cobj.orientation == "portrait":
-        page_width=800. ; page_height=1200.
-    elif cobj.orientation == "landscape":
-        page_width=1200. ; page_height=800.
-    page_size="%dx%d"%(page_width, page_height)
+    page_size="%dx%d"%(cobj.page_width, cobj.page_height)
     args=["convert", "-size", page_size, "xc:white"]
     #
     # margins
-    x_left_margin=10. # Left shift at start and end of line
-    y_top_margin=10. # Initial vertical shift for first line
-    x_right_margin=10. # Right shift at start and end of line
-    y_bot_margin=10. # Vertical shift for last line
-    xmargin=20. # Horizontal shift between figures
-    ymargin=20. # Vertical shift between figures
+    x_left_margin=30. # Left shift at start and end of line
+    y_top_margin=30. # Initial vertical shift for first line
+    x_right_margin=30. # Right shift at start and end of line
+    y_bot_margin=30. # Vertical shift for last line
+    xmargin=30. # Horizontal shift between figures
+    ymargin=30. # Vertical shift between figures
     #
-    usable_height=page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
-    usable_width=page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
+    if cobj.title is "":
+        usable_height=cobj.page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin
+    else:
+        usable_height=cobj.page_height-ymargin*(len(cobj.heights)-1.)-y_top_margin -y_bot_margin-cobj.ybox
+    usable_width=cobj.page_width -xmargin*(len(cobj.widths)-1.) -x_left_margin-x_right_margin
     #
     # page composition
     y=y_top_margin
@@ -875,17 +935,18 @@ def cfilePage(cobj, deep, recurse_list=None) :
         # Line height in pixels
         height=usable_height*rheight 
         x=x_left_margin
-        
+        max_old=0.
         for fig, rwidth in zip(line, cobj.widths) :
             # Figure width in pixels
             width=usable_width*rwidth
             scaling="%dx%d+%d+%d" %(width,height,x,y)
             if fig : 
-                figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
+                figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)                
             else : figfile='xc:None'
             clogger.debug("Compositing figure %s",fig.crs if fig else 'None')
-            args.extend([figfile , "-geometry", scaling, "-composite" ])
-
+            
+            args.extend([figfile, "-geometry", scaling, "-composite" ])
+            
             # Real size of figure in pixels: [fig_width x fig_height]
             args_figsize=["identify", figfile]
             comm_figsize=subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -893,49 +954,133 @@ def cfilePage(cobj, deep, recurse_list=None) :
             figsize=output_figsize.split(" ").pop(2)
             fig_width=figsize.split("x").pop(0)
             fig_height=figsize.split("x").pop(1)
-                                       
-            if cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
+            # Scaling and max height
+            if float(fig_width) != 1. and float(fig_height) != 1. : 
+                if ( (float(fig_width)/float(fig_height))*float(height) ) < width:
+                    new_fig_width=( float(fig_width)/float(fig_height) )*float(height)
+                    new_fig_height=height
+                else:
+                    new_fig_height=( float(fig_height)/float(fig_width) )*float(width)
+                    new_fig_width=width
+            else:  # for figure = 'None' 
+                new_fig_height=fig_height
+                new_fig_width=fig_width
+           
+            max_fig_height=max( float(new_fig_height),max_old)
+            max_old=float(new_fig_height)
+                       
+            if False and cobj.fig_trim and ( float(fig_width)/float(fig_height) < width/height ):
                 width_adj=float(fig_width)*(height/float(fig_height))
                 x+=width_adj+xmargin
             else:
                 x+=width+xmargin
 
         if cobj.fig_trim and ( float(fig_width)/float(fig_height) > width/height ):
-            height_adj=float(fig_height)*(width/float(fig_width))
+            height_adj=max_fig_height
             y+=height_adj+ymargin
         else:
             y+=height+ymargin
             
-    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format="png")
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
+    if cobj.page_trim :
+        args.append("-trim")
+    if cobj.title != "":
+        splice="0x%d" %(cobj.ybox)
+        annotate="+%d+%d" %(cobj.x, cobj.y)
+        args.extend(["-gravity", cobj.gravity, "-background", cobj.background, \
+                     "-splice", splice, "-font", cobj.font, "-pointsize", "%d"%cobj.pt, \
+                     "-annotate", annotate, cobj.title])
+
     args.append(out_fig)
     clogger.debug("Compositing figures : %s"%`args`)
 
     comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait()!=0 :
         raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
-
-    # page trim 
-    if cobj.page_trim :
-        args_page_trim=["convert", out_fig, "-trim", out_fig]
-        comm2=subprocess.Popen(args_page_trim, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        comm2.wait()
-    
+        
     if cache.register(out_fig,cobj.crs) :
         clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
         return out_fig
 
-def calias(project,variable,**kwargs):
+
+def cfilePage_pdf(cobj, deep, recurse_list=None) :
+    """
+    Builds a PDF page with CliMAF figures using pdfjam, computing associated crs
+
+    Args:
+     cobj (cpage_pdf object)
+     
+    Returns : the filename in CliMAF cache, which contains the result (and None if failure)
+
+    """
+    if not isinstance(cobj,classes.cpage_pdf):
+        raise Climaf_Driver_Error("cobj is not a cpage_pdf object")
+    clogger.debug("Computing figure array for cpage %s"%(cobj.crs))
+    #
+    # margins
+    xmargin=30. # Horizontal shift between figures
+    ymargin=30. # Vertical shift between figures
+    #
+    # page size and creation
+    page_size="{%dpx,%dpx}"%(cobj.page_width, cobj.page_height)
+    fig_nb="%dx%d"%(len(cobj.fig_lines[0]),len(cobj.fig_lines))
+    fig_delta="%d %d"%(xmargin, ymargin)
+    preamb="\pagestyle{empty} \usepackage{hyperref} \usepackage{graphicx} \usepackage{geometry} \geometry{vmargin=%dcm,hmargin=2cm}"%cobj.y
+    
+    args=["pdfjam","--keepinfo", "--preamble",  preamb, "--papersize", page_size, "--delta", fig_delta, "--nup", fig_nb] #"%s"%preamb
+    #
+    # page composition
+    for line in cobj.fig_lines :
+        for fig in line :
+            if fig : 
+                figfile=ceval(fig,format="file", deep=deep, recurse_list=recurse_list)
+                clogger.debug("Compositing figure %s",fig.crs)
+            else : raise Climaf_Driver_Error("Each figure must exist ('None' figure is not accepted)")
+            args.extend([figfile])            
+    #
+    # more optional options
+    if cobj.openright is True:
+        args.extend(["--openright", "True"])
+        
+    if cobj.scale != 1.:
+        args.extend(["--scale", "%.2f"%cobj.scale])
+
+    if cobj.title != "":
+        if cobj.titlebox :
+            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
+        else:
+            latex_command="\\begin{center} \\hspace{%dcm} %s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
+                           %(cobj.x, cobj.pt, cobj.font, cobj.title)
+        args.extend(["--pagecommand", latex_command])
+
+    #
+    # launch process and registering output in cache 
+    out_fig=cache.generateUniqueFileName(cobj.buildcrs(), format='pdf')
+
+    args.extend(["--outfile", out_fig])
+
+    clogger.debug("Compositing figures : %s"%`args`)
+    comm=subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if comm.wait()!=0 :
+        raise Climaf_Driver_Error("Compositing failed : %s" %comm.stderr.read())
+    
+    if cache.register(out_fig,cobj.crs) :
+        clogger.debug("Registering file %s for cpage %s"%(out_fig,cobj.crs))
+    return out_fig
+    
+
+def calias(project,variable,fileVariable=None,**kwargs):
               
     if not "," in variable: # mono-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         
     else : #multi-variable
-        classes.calias(project=project,variable=variable,**kwargs) 
+        classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         list_variable=variable.split(",")
         
         for v in list_variable:
             operators.derive(project,v,'ccdo',variable,operator='selname,%s'%v)
-            classes.calias(project=project,variable=v,**kwargs) 
+            classes.calias(project=project,variable=v,fileVariable=None,**kwargs) 
 
 
 def CFlongname(varname) :
@@ -943,6 +1088,52 @@ def CFlongname(varname) :
     """
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
+
+def efile(obj, filename, forced=False) :
+    """
+    Create a single file for an ensemble of CliMAF objects (launch computation if needed).
+    
+    This is a convenience function. Such files are not handled in CliMAF cache
+
+    Args:
+    
+        obj (CliMAF object) : an ensemble of CliMAF objects ('cens' objet)
+        
+        filename (str) : output filename. It will include a field for each 
+         ensemble's member, with a variable name suffixed by the member
+         label (e.g. : tas_CNRM-CM, tas_IPSL-CM... ) (more formally : 
+         'var(obj.members[n])'_'obj.labels[n]')
+
+        forced (logical, optional) : if True, CliMAF will override the file
+         'filename' if it already exists 
+                
+    """
+    if isinstance(obj,classes.cens) :
+
+        if os.path.isfile(filename):
+            if forced:
+                os.system("rm -rf %s" %filename)
+                clogger.warning("File '%s' already exists and was overriding" %filename)
+            else:
+                raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
+                
+        for memb,lab in zip(obj.members,obj.labels):
+            ffile=cfile(memb)
+            
+            f = tempfile.NamedTemporaryFile(suffix=".nc")
+            command="ncrename -O -v %s,%s_%s %s %s"%(varOf(memb), varOf(memb), lab, ffile, f.name)
+            if ( os.system(command) != 0 ) :
+                raise Climaf_Driver_Error("ncrename failed : %s" %command)         
+            
+            command2="ncks -A %s %s"%(f.name,filename)
+            if ( os.system(command2) != 0 ) :
+                raise Climaf_Driver_Error("Issue when merging %s and %s (using command: %s)"%(f.name,filename,command2))
+            f.close()
+      
+    else:
+        clogger.warning("objet is not a 'cens' objet")
+
+        
 class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

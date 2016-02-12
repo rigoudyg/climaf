@@ -33,4 +33,4 @@ my_rst=fds(multifile,variable='rst',period='198004')
 
 # You may whish that CliMAF handles the model name, and a sensible simulation name 
 my_rst=fds(multifile,simulation='my_simu',model='CNRM-CM', variable='rst',period='198004')
-cshow(plot(my_rst))
+cshow(plot(my_rst, title='Multivar file example'))

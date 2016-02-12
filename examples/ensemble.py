@@ -20,8 +20,8 @@ tas_ga=space_average(e2)
 
 # Ensemble-capable scripts are those which declares their main input using keyord ${mmin}
 # They receive the labels if they were declared with keyword ${labels}
-# 'lines' is such a script, devoted to plot xy curves
-p=lines(tas_ga,title="Surface Temperature global average")
+# 'curves' is such a script, devoted to plot xy curves
+p=curves(tas_ga,title="Surface Temperature global average")
 cshow(p)
 
 
@@ -60,3 +60,16 @@ average=ensavg(ens)
 # Compute anomalies wrt to ensemble mean
 anomalies=minus(ens,average)
 cshow(cpage(plot(anomalies,title='tas')))
+
+# Note : if you want to extend an ensemble with the result of some
+# operation on this ensemble you have to take care of the dynmaic
+# nature of CliMAF objjetcs, that could lead to an infinite recursion
+# You would rather use copy.deepcopy to create the extendable ensemble 
+
+e2=cens(['1980','1981'],j0,j1)
+cscript('ecdo','ccdo ${operator} ${mmin} ${out}')
+emin=ecdo(e2,operator='ensmin')
+import copy
+e3=copy.deepcopy(e2)
+e3.members.append(emin)
+e3.labels.append('emin')

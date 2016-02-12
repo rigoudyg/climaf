@@ -1,0 +1,150 @@
+curves : plot multiple profiles (along p, lat, lon, time, ...) 
+---------------------------------------------------------------
+
+Plot a series of xy curves (along time, lat, lon or pressure/z_index)
+for an ensemble dataset using NCL 
+
+**References** : http://www.ncl.ucar.edu
+
+**Provider / contact** : climaf at meteo dot fr
+
+**Inputs** (in the order of CliMAF call):
+
+  - an ensemble dataset which can be up to 4-dimensional, but with
+    only one non-degenerated dimension. Members can have different
+    vector size.  
+
+Remark : If x axis is time and time units are different among members,
+the script convert all time periods to first's one
+
+**Mandatory arguments**: None (but ``title`` is recommended)
+
+**Optional arguments**:
+
+  - ``title`` : string for graphic title; optional : CliMAF will
+    provide the CRS of the dataset 
+  - ``labels`` : a string with one label per member, separated by
+    character '$'
+  - ``colors`` : a string with one NCL color name per member,
+    separated by whitespaces
+  - ``scale``, ``offset`` : for scaling the input field (x ->
+    x*scale + offset); default = 1. and 0. (no scaling) 
+  - ``linp`` : set it to 1 for getting a vertical axis with
+    index-linear spacing  
+  - ``X_axis`` : a string ("real" or "aligned") which drives X
+    axis when member profiles do not cover the same range; default to
+    "real".   
+
+    - X_axis="real"    : X axis will be the union of all X axis 
+    - X_axis="aligned" : X axis will be aligned to the same origin
+      (take the first file as ref.)  
+  - ``invXY`` : set it to True to invert X axis and Y axis; default:
+    False  
+  - ``fmt``: a string specifying the format of the tick labels for
+    time x axis. This string is parsed as follows: the '%' acts as the
+    escape character. The single character after every '%' is
+    formatted according to the rule described here: 
+
+    https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
+
+    In case fmt is absent, a minimal algorithm exists which tries to
+    determine the format string depending on the time range length.
+  - ``lgcols`` : number of columns for legend; default: 3.
+  - ``options`` : a string for setting NCL graphic resources directly
+    , separated by "|", as e.g. :
+    ' options="tiMainString=lv|xyLineThicknessF=5." '. These
+    ressources have higher priority than CliMAF default ones, which
+    are :
+
+    - txFontHeightF = 0.010
+    - tmXBLabelFontHeightF=0.008
+    - tmYLLabelFontHeightF=0.008
+    - tiXAxisFontHeightF=0.014
+    - tiYAxisFontHeightF=0.014
+    - tmXBLabelFontThicknessF = 3.0
+    - tmYLLabelFontThicknessF = 3.0
+    - txFontThicknessF = 3.0
+    - xyLineThicknessF     = 3.0    
+    - xyMonoDashPattern      = True
+    - pmLegendDisplayMode    = "Always"            
+    - pmLegendWidthF         = 0.12               
+    - pmLegendHeightF        = 0.15               
+    - lgLabelFontHeightF     = 0.009            
+    - lgPerimOn              = False            
+    - lgBoxMinorExtentF      = 0.2    
+    - tiXAxisString, tiYAxisString= data @long_name if data has
+      "long_name" attribute (take the first file as ref.)
+
+    For more details, see: https://www.ncl.ucar.edu/
+
+  - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
+    default: 'png'. For 'png' format, all the surrounding extra white
+    space are cropped with optional argument ``trim`` (but not for
+    'pdf' or 'eps' format). In case of 'pdf' or 'eps' format, if you
+    want to trim extra white space, use 'cpdfcrop' (which is 'pdfcrop'
+    tool) or 'cepscrop' operator respectively.  
+  - ``trim`` : set it to True if you want to crop all the surrounding
+    extra white space for 'png' format; default: True. 
+  - ``resolution`` : string for output image resolution
+
+    - if format is "png", resolution specifies the width and height of
+      resultant image in pixels as e.g. 800x1200; default (ncl):
+      1024x1024
+    - if format is "pdf" or "eps", resolution specifies either the
+      width and height of the paper, as above but in inches unit, or a
+      standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11
+      or "letter" (<=> ncl imposes a resolution of 72 dots per inch
+      (dpi), wich is equivalent to 612x792 in pixels)  
+  
+**Outputs** :
+
+  - main output : a PNG or PDF figure
+
+**Climaf call example**::
+ 
+  >>> # Two time series
+  >>> j0=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1980")
+  >>> j1=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1981")
+  >>> ens=cens(['1980','1981'],j0,j1)
+  >>> tas_ga=space_average(ens)
+  >>> # Time axis is "aligned"
+  >>> p=curves(tas_ga,title="Surface Temperature global average",X_axis="aligned",fmt="%c",options="tiMainString=my_title|xyLineThicknessF=5.",
+  ... lgcols=2,format="pdf",resolution="11*17")  
+  >>> cshow(p)
+  >>> # Time axis is "real" and X and Y are inverted
+  >>> p=curves(tas_ga,title="Surface Temperature global average",fmt="%c",options="tiMainString=my_title|xyLineThicknessF=5.",
+  ... lgcols=2,trim=False,invXY=True)
+  >>> cshow(p)
+
+  >>> # Some datasets of "CNRM-CM5" model
+  >>> d0=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860")
+  >>> d1=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1861")
+  >>> d2=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1862")
+  >>> d3=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1863")
+  >>> d4=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1864")
+  >>> ens2=cens(['1960','1961','1962','1963','1964'],d0,d1,d2,d3,d4)
+  >>> moy=space_average(ens2)
+  >>> p=curves(moy,title="Surface Temperature global average") # Time axis is "real"
+  >>> cshow(p)
+
+  >>> # Zonal mean on different domains (different vector size)
+  >>> d0=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="186001", domain=[-90,0,30,80])
+  >>> d1=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="186001", domain=[0,40,30,80])
+  >>> ta_zonal_mean=ccdo(d0,operator="zonmean")
+  >>> ta_zonal_mean1=ccdo(d1,operator="zonmean")
+  >>> ens=cens(['box1','box2'],ta_zonal_mean,ta_zonal_mean1)
+  >>> figens=curves(ens,title="zonal mean")
+  >>> cshow(figens)
+  >>> # Same as above and X and Y are inverted
+  >>> figens=curves(ens,title="zonal mean", invXY=True)
+  >>> cshow(figens)
+
+  >>> # Profil pressure/z_index
+  >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+  >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
+  >>> ta_profile=ccdo(ta_zonal_mean, operator="mermean")
+  >>> a=curves(ta_profile, title='A profile',linp=1) 
+  >>> cshow(a)
+  >>> # Same as above and X and Y are inverted
+  >>> a=curves(ta_profile, title='A profile',linp=1,invXY=True) 
+  >>> cshow(a)

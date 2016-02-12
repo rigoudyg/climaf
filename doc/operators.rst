@@ -157,7 +157,7 @@ Example for interfacing a diagnostic script with CliMAF
     and apply ``my_cdo`` on it, providing it with value ``tim_avg`` for
     argument ``operator``::
 
-     >>> tas_ds = ds(simulation="AMIPV6”, variable="tas", period=”1980-1981”)
+     >>> tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
      >>> tas_avg = mycdo(tas_ds,operator='timavg')
 
 -   The script/binary is actually called e.g. when requesting a file with

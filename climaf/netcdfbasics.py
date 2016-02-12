@@ -28,10 +28,16 @@ def varsOfFile(filename) :
     from anynetcdf import ncf
     lvars=[]
     fileobj=ncf(filename, 'r') 
-    for filevar in fileobj.variables :
+    vars=fileobj.variables
+    if isinstance(vars,dict ) : vars=vars.keys()
+    for filevar in vars :
         if ((filevar not in fileobj.dimensions) and
             not re.findall("^lat",filevar) and
             not re.findall("^lon",filevar) and
+            not re.findall("^LAT",filevar) and
+            not re.findall("^LON",filevar) and
+            not re.findall("nav_lat",filevar) and
+            not re.findall("nav_lon",filevar) and
             not re.findall("^time_",filevar) and
             not re.findall("_bnds$",filevar) ):
             lvars.append(filevar)
@@ -45,9 +51,11 @@ def fileHasVar(filename,varname):
     """
     from anynetcdf import ncf
     rep=False
-    clogger.debug("opening "+filename)
+    clogger.debug("opening "+filename+" for checkin if has variable"+varname)
     fileobj=ncf(filename)
-    for filevar in fileobj.variables :
+    vars=fileobj.variables
+    if isinstance(vars,dict ) : vars=vars.keys()
+    for filevar in vars :
         if filevar == varname :
             rep=True
             break

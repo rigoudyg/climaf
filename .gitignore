@@ -13,6 +13,8 @@ climaf.log
 /climaf/last.out
 /examples/last.out
 examples/romain/
-/climaf_prez/*
+/climaf_prez/
 /wps/
-*/last.out
+/lmdz/
+/doc/_static/
+/testing/last.out

@@ -25,9 +25,12 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath+'mcdo.sh ${operator} "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
+            scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('plus', 'cdo add ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('space_average',
@@ -64,31 +67,46 @@ def load_standard_operators():
     # Declare plot scripts
     cscript('ncview'    ,'ncview ${in} 1>/dev/null 2>&1&' )
     #
-    cscript('timeplot', 'ncl '+scriptpath+'timeplot.ncl infile=\'\"${in}\"\' outfile=\'\"${out}\"\' '
-            'var=\'\"${var}\"\' title=\'\"${title}\"\'',format="png")
-    #
     # plot: main field (main_file) + auxiliary field (aux_file, optional) + vectors (u_file & v_file, optionals)
     #
     cscript('plot'  , '(ncl -Q '+ scriptpath +'gplot.ncl main_file=\'\"${in}\"\' aux_file=\'\"${in_2}\"\' '
             'u_file=\'\"${in_3}\"\' v_file=\'\"${in_4}\"\' rotation=${rotation} '
             'plotname=\'\"${out}\"\' cmap=\'\"${color}\"\' vmin=${min} vmax=${max} vdelta=${delta} '
             'main_var=\'\"${var}\"\' aux_var=\'\"${var_2}\"\' u_var=\'\"${var_3}\"\' v_var=\'\"${var_4}\"\' '
-            'title=\'\"${title}\"\' scale=${scale} offset=${offset} mpCenterLonF=${mpCenterLonF} '
+            'title=\'\"${title}\"\' myscale=${scale} myoffset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} levels=\'\"${levels}\"\' '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' && '
-            'convert ${out} -trim ${out}) ', format="png")    
-    #
-    cscript('lines'     , '(ncl -Q '+ scriptpath +'lineplot.ncl infile=\'\"${mmin}\"\' '
+            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
+            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
+            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
+            'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} '
+            'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
+            'tmYRLabelFontHeightF=${tmYRLabelFontHeightF} tiXAxisFontHeightF=${tiXAxisFontHeightF} '
+            'tiYAxisFontHeightF=${tiYAxisFontHeightF} gsnPolarLabelFontHeightF=${gsnPolarLabelFontHeightF} '
+            'tiMainFont=\'\"${tiMainFont}\"\' tiMainFontHeightF=${tiMainFontHeightF} '
+            'tiMainPosition=\'\"${tiMainPosition}\"\' gsnLeftString=\'\"${gsnLeftString}\"\' '
+            'gsnRightString=\'\"${gsnRightString}\"\' gsnCenterString=\'\"${gsnCenterString}\"\' '
+            'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} '
+            'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
+            'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' )', format="graph")            
+    # 
+    cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\'  colors=\'\"${colors}\"\'  thickness=${thickness}'
-            'T_axis=\'\"${T_axis}\"\' fmt=\'\"${fmt}\"\'  && '
-            'convert ${out} -trim ${out}) ', format="png")
-
+            'linp=${linp} labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
+            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' lgcols=${lgcols} '
+            'myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
+            'trim=${trim} invXY=${invXY} )', format="graph")
     #
-
-
+    # cpdfcrop : pdfcrop by preserving metadata
+    #
+    cscript('cpdfcrop'     , 'pdfcrop ${in} ${out} ', format="pdf")
+    #
+    # cepscrop : crop 'eps' file using epstopdf, pdfcrop and pdftops
+    #
+    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf; pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
+    #    
+    cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
+    #
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :

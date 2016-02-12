@@ -10,7 +10,8 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 import sys, os, os.path, re, time, glob
 import pickle
 
-from classes import compare_trees, cobject, ctree, cdataset, cprojects, guess_projects
+from climaf import version
+from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro  import crewrite
 from clogging import clogger
 import operators
@@ -21,7 +22,11 @@ cachedirs=None
 #: The index associating filenames to CRS expressions
 crs2filename=dict()  
 
-def setNewUniqueCache(path) :
+#: A dict containing cache index entries (as listed on index file), which 
+# were up to now not interpretable, given the set of defined tporjects
+crs_not_yet_evaluable=dict()
+
+def setNewUniqueCache(path,raz=True) :
     """ Define PATH as the sole cache to use from now. And clear it 
 
     """
@@ -32,7 +37,7 @@ def setNewUniqueCache(path) :
     cachedirs=[ path ] # The list of cache directories
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
-    craz(hideError=True)
+    if (raz) : craz(hideError=True)
 
 def generateUniqueFileName(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
@@ -111,13 +116,16 @@ def searchFile(path):
             return candidate
 
 def register(filename,crs):
-    """ Adds in FILE a metadata named CRS_def and with value CRS. 
+    """ 
+    Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
+    metadata 'CLiMAF' with CliMAF version and ref URL
+
     Records this FILE in dict crs2filename
 
     Silently skip non-existing files
     """
-    # First read index from file if it is yet empty
-    if len(crs2filename.keys()) == 0 : cload()
+    # First read index from file if it is yet empty - No : done at startup
+    # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
     waited=0
     while waited < 20 and not os.path.exists(filename) :
@@ -127,10 +135,17 @@ def register(filename,crs):
     if os.path.exists(filename) :
         #while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
         if re.findall(".nc$",filename) : 
-            command="ncatted -h -a CRS_def,global,o,c,\"%s\" %s"%(crs,filename)
+            command="ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s"%\
+                (crs,version,filename)
         if re.findall(".png$",filename) :
-            command="convert -set \"CRS_def\" \"%s\" %s %s.png && mv -f %s.png %s"%\
-                (crs,filename,filename,filename,filename)
+            command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
+                (crs,version,filename,filename,filename,filename)
+        if re.findall(".pdf$",filename) :
+            command="pdftk %s dump_data output rapport.txt && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> rapport.txt && pdftk %s update_info rapport.txt output %s.pdf && mv -f %s.pdf %s && rm -f rapport.txt"%\
+                (filename,crs,filename,filename,filename,filename)
+        if re.findall(".eps$",filename) :
+            command='exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s'%\
+                (version,crs,filename)
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :
             crs2filename[crs]=filename
@@ -150,6 +165,10 @@ def getCRS(filename) :
             'sed -r -e "s/.*:CRS_def *= *\\\"(.*)\\\" *;$/\\1/" '
     elif re.findall(".png$",filename) :
         form='identify -verbose %s | grep -E " *CRS_def: " | sed -r -e "s/.*CRS_def: *//"'
+    elif re.findall(".pdf$",filename) :
+        form='pdfinfo %s | grep "Keywords" | awk -F ":" \'{print $2}\' | sed "s/^ *//g"'
+    elif re.findall(".eps$",filename) :
+        form='exiv2 -p x %s | grep "CRS_def" | awk \'{for (i=4;i<=NF;i++) {print $i " "} }\' '
     else :
         clogger.critical("unknown filetype for %s"%filename)
         return None
@@ -186,21 +205,24 @@ def hasMatchingObject(cobject,ds_func) :
     Can be applied for finding same object with included or including
     time-period
     """
-    # First read index from file if it is yet empty
-    if len(crs2filename.keys()) == 0 : cload()
+    # First read index from file if it is yet empty - No : done at startup
+    # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
         import operators
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
     for crs in crs2filename.copy() :
-        co=eval(crs, sys.modules['__main__'].__dict__)
-        altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
-        if altperiod :
-            if os.path.exists(crs2filename[crs]) :
-                return co,altperiod
-            else :
-                clogger.debug("Removing %s from cache index, because file is missing",crs)
-                crs2filename.pop(crs)
+        try: 
+            co=eval(crs, sys.modules['__main__'].__dict__)
+            altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
+            if altperiod :
+                if os.path.exists(crs2filename[crs]) :
+                    return co,altperiod
+                else :
+                    clogger.debug("Removing %s from cache index, because file is missing",crs)
+                    crs2filename.pop(crs)
+        except :
+            pass # usually case of a CRS which project is not currently defined
     return None,None
 
 def hasIncludingObject(cobject) :
@@ -280,7 +302,13 @@ def cdrop(obj, rm=True) :
         fil=crs2filename.pop(crs)
         if rm :
             try :
+                path_file=os.path.dirname(fil)
                 os.remove(fil)
+                try:
+                    os.rmdir(path_file)
+                except OSError as ex:
+                    clogger.warning(ex)
+                
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache"%crs)
@@ -312,12 +340,16 @@ def csync(update=False) :
             rebuild()  
 
     # Save to disk
-    cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
-    pickle.dump(crs2filename,cacheIndexFile)  
-    cacheIndexFile.close()
+    try: 
+        cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
+        pickle.dump(crs2filename,cacheIndexFile)  
+        cacheIndexFile.close()
+    except:
+        clogger.warning("No cache index file yet")
 
 def cload() :
     global crs2filename 
+    global crs_not_yet_evaluable
 
     if len(crs2filename) != 0 :
         Climaf_Driver_Error(
@@ -330,31 +362,51 @@ def cload() :
         pass
         #clogger.debug("no index file yet")
     #
-    inconsistents=[]
-    for crs in crs2filename.copy() :
+    must_check_index_entries=False
+    if (must_check_index_entries) :
         # We may have some crs inherited from past sessions and for which
-        # some operator may have become non-standard
-        try :
-            eval(crs, sys.modules['__main__'].__dict__)
-        except:
-            #clogger.debug("Inconsistent cache object is skipped : %s"%crs)
-            crs2filename.pop(crs)
-            inconsistents.append(crs)
-    # Analyze projects of inconsistent cache objects
-    projects=set()
-    for crs in inconsistents : 
-        ps=guess_projects(crs)
-        for p in ps :
-            if p not in cprojects : projects.add(p)
-    if projects :
-        clogger.error( 
-            "The cache has %d objects for non-declared projects %s.\n"
-            "For using it, consider including relevant project(s) "
-            "declaration(s) in ~/.climaf and restarting CliMAF.\n"
-            "You can also declare these projects right now and call 'csync(True)'\n"
-            "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
-                (len(inconsistents),`list(projects)`))
+        # some operator may have become non-standard, or some projects are yet 
+        # undeclared
+        crs_not_yet_evaluable=dict()
+        allow_error_on_ds()
+        for crs in crs2filename.copy() :
+            try :
+                #print "evaluating crs="+crs
+                eval(crs, sys.modules['__main__'].__dict__)
+            except:
+                print ("Inconsistent cache object is skipped : %s"%crs)
+                #clogger.debug("Inconsistent cache object is skipped : %s"%crs)
+                p=guess_projects(crs)
+                if p not in crs_not_yet_evaluable : crs_not_yet_evaluable[p]=dict()
+                crs_not_yet_evaluable[p][crs]=crs2filename[crs]
+                crs2filename.pop(crs)
+                # Analyze projects of inconsistent cache objects
+                projects= crs_not_yet_evaluable.keys()
+                if projects :
+                    clogger.info( 
+                        "The cache has %d objects for non-declared projects %s.\n"
+                        "For using it, consider including relevant project(s) "
+                        "declaration(s) in ~/.climaf and restarting CliMAF.\n"
+                        "You can also declare these projects right now and call 'csync(True)'\n"
+                        "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
+                        (len(crs_not_yet_evaluable),`list(projects)`))
+        allow_error_on_ds(False)
         
+
+def cload_for_project(project):
+    """
+    Append to the cache index dict those left index entries for 'project' which evaluate successfully
+    """
+    d=crs_not_yet_evaluable[project]
+    for crs in d.copy() :
+        try :
+            #print "evaluating crs="+crs
+            eval(crs, sys.modules['__main__'].__dict__)
+            crs2filename[crs]=d[crs]
+            d.pop(crs)
+        except:
+            clogger.error("CRS expression %s is not valid for project %s"%(crs,project))
+         
 def craz(hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index
@@ -396,7 +448,7 @@ def list_cache():
     find_return=""
     for dir_cache in cachedirs :
         rep=os.path.expanduser(dir_cache)
-        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' \) -print" %rep).read()
+        find_return+=os.popen("find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" %rep).read()
     files_in_cache=find_return.split('\n')
     files_in_cache.pop(-1)
     return(files_in_cache)
@@ -414,7 +466,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     files on disk) using :py:func:`csync()`
     
     Args:
-     size (string, optional): n[ckMG]
+     size (string, optional): n[ckMG]     
       Search files using more than n units of disk space, rounding up.
       The following suffixes can be used:
 
@@ -423,8 +475,10 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         - "M"    for Megabytes (units of     1,048,576 bytes)
         - "G"    for Gigabytes (units of 1,073,741,824 bytes)
 
-     age (string, optional): Number of 24h periods. Search files which status was last changed n*24 hours ago.
-      Any fractional part is ignored, so to match age='+1', a file has to have been changed at least two days ago.
+     age (string, optional): Number of 24h periods. Search files which
+      status was last changed n*24 hours ago.
+      Any fractional part is ignored, so to match age='+1', a file has
+      to have been changed at least two days ago.
       Numeric arguments can be specified as:
       
         - `+n`   for greater than n
@@ -488,7 +542,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find=False
     if size or age or access != 0 :
         var_find=True
-        command="find %s -type f \( -name '*.png' -o -name '*.nc' \) %s -print" %(rep, opt_find)
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" %(rep, opt_find) 
         clogger.debug("Find command is :"+command)
 
         #construction of the new dictionary after research on size/age/access
@@ -633,7 +687,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 else :
                     print "Filtered objects = cache content"
                 return (map(crewrite,new_dict.keys()))
-            else : print "No matching file "    
+            #else : print "No matching file "    
         else:
             print "Content of CliMAF cache"
             return (map(crewrite,crs2filename.keys()))

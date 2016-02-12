@@ -17,7 +17,7 @@ from operator import itemgetter
 locs=[]
 
 class dataloc():
-    def __init__(self,organization=None, url=None, project="*",model="*", simulation="*", 
+    def __init__(self,organization='generic', url=None, project="*",model="*", simulation="*", 
                  realm="*", table="*", frequency="*"):
         """
         Create an entry in the data locations dictionary for an ensemble of datasets.
@@ -41,7 +41,7 @@ class dataloc():
            - CMIP5_DRS : any datafile organized after the CMIP5 data reference syntax, such as on IPSL's Ciclad and CNRM's Lustre
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
            - generic : a data organization described by the user, using patterns such as described for 
-             :py:func:`~climaf.dataloc.selectGenericFiles`
+             :py:func:`~climaf.dataloc.selectGenericFiles`. This is the default
 
            Please ask the CliMAF dev team for implementing further organizations. 
            It is quite quick for data which are on the filesystem. Organizations 
@@ -81,7 +81,11 @@ class dataloc():
             if re.findall("^esgf://.*",url) : self.organization="ESGF"
             self.urls=[url]
         self.urls = map(os.path.expanduser,self.urls)
-        self.urls = map(os.path.abspath,self.urls)
+        alt=[]
+        for u in self.urls :
+            if u[0] != '$' : alt.append(os.path.abspath(u))
+            else : alt.append(u)
+        self.urls=alt
         # Register new dataloc only if not already registered
         if not (any([ l == self for l in locs])) : locs.append(self)
     def __eq__(self, other):
@@ -132,6 +136,7 @@ def getlocs(project="*",model="*",simulation="*",frequency="*"):
 
 
 def isLocal(project, model, simulation, frequency) :
+    if project == 'file' : return True
     ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency) 
     if (len(ofu) == 0 ) : return False
     rep=True
@@ -199,7 +204,7 @@ def selectLocalFiles(**kwargs):
         return None
     else :
         if (len(rep) == 0 ) :
-            clogger.warning("no file found for %s, at these"
+            clogger.warning("no file found for %s, at these "
                             "data locations %s "%(`kwargs` , `urls`))
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -253,6 +258,7 @@ def selectGenericFiles(urls, **kwargs):
     period=kwargs['period']
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
+    altvar=kwargs.get('filenameVar',variable)
     # a dict and an ordered list of date globbing patterns
     dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
     lkeys=dt.keys() ; lkeys.sort(reverse=True)
@@ -308,7 +314,7 @@ def selectGenericFiles(urls, **kwargs):
                 #print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp0,r'\1',f)
                 if start==f:
-                    raise Climaf_Data_Error("Start period not found") #? LV
+                    raise Climaf_Data_Error("Start period not found") #? 
                 if hasEnd :
                     end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
@@ -318,23 +324,29 @@ def selectGenericFiles(urls, **kwargs):
                 #
                 # Filter file time period against required period
             else :
-                if ( 'frequency' in kwargs and kwargs['frequency']=="fx") :
-                    if (l.find("${variable}")>=0) or fileHasVar(f,variable) : 
+                if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
+                    kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
+                    if (l.find("${variable}")>=0) or variable=='*' or \
+                       fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) : 
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                 else :
                     clogger.warning("Cannot yet filter files re. time using only file content. TBD")
                     rep.append(f)
             if (fperiod and period.intersects(fperiod)) or not regexp :
+                clogger.debug('Period is OK - Considering variable filtering on %s and %s for %s'%(variable,altvar,f)) 
                 # Filter against variable 
                 if (l.find("${variable}")>=0):
                     clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
                     continue
-                if f not in rep and ( fileHasVar(f,variable) or ("," in variable)):
+                if (f not in rep) and \
+                   (variable=='*' or "," in variable or fileHasVar(f,variable) or \
+                    (altvar != variable and fileHasVar(f,altvar))) :
                     # Should check time period in the file if not regexp
                     clogger.debug('appending %s based on multi-var or var exists in file '%f)
                     rep.append(f)
+                    continue
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)
@@ -471,7 +483,7 @@ def selectCmip5DrsFiles(urls, **kwargs) :
     if frequency in frequency2drs : freqd=frequency2drs[frequency]
     # TBD : analyze ambiguity of variable among realms+tables
     for l in urls :
-        totry=['merge/','output/','output?/','']
+        totry=['merge/','output/','output?/','main/','']
         for p in totry :
             pattern1=l+"/"+project+"/"+p+"*/"+model # one * for modelling center
             if len(glob.glob(pattern1))>0 : break
