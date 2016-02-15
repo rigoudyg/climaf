@@ -807,6 +807,11 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     >>> calias('NEMO','so,thetao',filenameVar='grid_T_table2.2')
+
+    NB: A wrapper with same name of this function is defined in
+    :py:func:`climaf.driver.calias` and it is the one which is
+    exported by module climaf.api. It allows to use a list of
+    variable.  
     
     """
     if not fileVariable : fileVariable = variable
@@ -1025,7 +1030,7 @@ class cpage_pdf(cobject):
     def __init__(self, fig_lines=None, widths=None, heights=None,
                  orientation=None, page_width=1000., page_height=1500.,
                  scale=1., openright=False,
-                 title="", x=0, y=2, titlebox=False, pt="\Huge",
+                 title="", x=0, y=2, titlebox=False, pt="Huge",
                  font="\\familydefault", background="white"):
         """
         Builds a CliMAF cpage_pdf object, which represents an array of figures (output:
@@ -1061,7 +1066,7 @@ class cpage_pdf(cobject):
               only positive (down) values have an effect, default=2 cm 
             - titlebox (logical, optional): set it to True to frame the text in a box,
               frame color is 'black'
-            - pt (int, optional): title font size; CLiMAF default: '\\\Huge'
+            - pt (int, optional): title font size; CLiMAF default: 'Huge'
               (corresponding to 24 pt).
             - font (str, optional): font
               abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
@@ -1081,7 +1086,7 @@ class cpage_pdf(cobject):
           >>> my_pdfpage=cpage_pdf([[crop_fig,crop_fig],[crop_fig, crop_fig],[crop_fig,crop_fig]],
           ... widths=[0.2,0.8], heights=[0.33,0.33,0.33], page_width=800., page_height=1200., 
           ... scale=0.95, openright=True, title='Page title', x=-5, y=10, titlebox=True, 
-          ... pt='\huge', font='ptm', background='yellow') # Font name is 'Times'
+          ... pt='huge', font='ptm', background='yellow') # Font name is 'Times'
         """
         if fig_lines is None :
             raise Climaf_Classes_Error("fig_lines must be provided")

@@ -1047,9 +1047,9 @@ def cfilePage_pdf(cobj, deep, recurse_list=None) :
 
     if cobj.title != "":
         if cobj.titlebox :
-            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
+            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
         else:
-            latex_command="\\begin{center} \\hspace{%dcm} %s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
+            latex_command="\\begin{center} \\hspace{%dcm} \%s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
                            %(cobj.x, cobj.pt, cobj.font, cobj.title)
         args.extend(["--pagecommand", latex_command])
 
@@ -1070,7 +1070,14 @@ def cfilePage_pdf(cobj, deep, recurse_list=None) :
     
 
 def calias(project,variable,fileVariable=None,**kwargs):
-              
+    """
+    See :py:func:`climaf.classes.calias`
+    
+    Declare that in ``project``, ``variable`` is to be computed by
+    reading ``filevariable``;
+    It allows to use a list of variable, given as a string where
+    the name of variables are separated by commas
+    """
     if not "," in variable: # mono-variable
         classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         

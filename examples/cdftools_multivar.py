@@ -10,7 +10,10 @@
 #export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
 from climaf.api import *
 
-if not atCNRM: exit
+if not atCNRM: exit(0)
+if 'ccdfmean' not in cscripts :
+    print("CDFtools not available")
+    exit(0)
 
 # Declare "NEMO" project for Nemo raw outputs 
 #

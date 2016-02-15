@@ -67,6 +67,7 @@ calias : define a variable as computed, in a project,  from another, single, var
 ----------------------------------------------------------------------------------------
 
 .. autofunction:: climaf.classes.calias
+.. autofunction:: climaf.driver.calias
 
 
 cfreqs : declare non-standard frequency names, for a project
