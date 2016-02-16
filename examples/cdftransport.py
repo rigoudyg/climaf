@@ -16,7 +16,8 @@ suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 
 # For VT files from Monitoring
-root2="/cnrm/aster/data3/aster/chevalli/Monitoring/PRE6/SORTIE/PRE6/${simulation}/MONITOR/VT/"
+#root2="/cnrm/aster/data3/aster/chevalli/Monitoring/Results/NO_SAVE/PRE6/SORTIE/PRE6/${simulation}/MONITOR/VT/"
+root2="/cnrm/aster/data1/UTILS/climaf/test_data/Monitoring/Results/${simulation}/MONITOR/VT/"
 url_nemo_monitoring=root2+suffix
 #
 dataloc(project='NEMO', organization='generic', url=[url_nemo_standard,url_nemo_monitoring])
@@ -44,7 +45,8 @@ dx=ds(variable=products)
 
 # Tell how to bring required fixed files to cdftransport
 # (this can use wildcards ${model}, ${project}, ${simulation})
-tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
+#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/aster/data1/UTILS/climaf/test_data/Monitoring/MONITORING_v3.1/config/'
 fixed_fields('ccdftransport',
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
