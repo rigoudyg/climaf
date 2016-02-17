@@ -352,7 +352,8 @@ For map:
 
       - a string to add this given string (for example
 	gsnCenterString="" if you want turn off this sub-title), or 
-      - defaut (climaf): add select values for time and/or level 
+      - defaut (climaf): add select values for time and/or level for
+	main field
       
     - if you don't select time and/or level, set it to:
     
