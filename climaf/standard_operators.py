@@ -110,7 +110,7 @@ def load_standard_operators():
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :
-        clogger.warning("No Cdftool available")
+        clogger.warning("Binary cdftools not found. Some operators won't work")
 
     
 

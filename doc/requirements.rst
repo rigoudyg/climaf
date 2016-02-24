@@ -7,7 +7,7 @@ This is a natural place for acknowledging the unvaluable contribution
 by the tools/packages listed below, with a special thanks to CDO
 2015: Climate Data Operators. Available at: http://www.mpimet.mpg.de/cdo
 
-- Python version 2.x, with one NetCDF package (either
+- Python version 2.7, with one NetCDF package (either
   Scientific.IO.NetCDF, or NETCDF4 or scipy.io.netcdf)
 - `ImageMagick <http://www.imagemagick.org/>`_ (modules : convert,  identify) ; this is usually included in Linux distributions
 - `nco <http://nco.sourceforge.net/>`_ (ncatted, ncdump, ncwa, ncrcat) 
