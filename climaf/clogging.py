@@ -1,12 +1,24 @@
 import logging
 
+class MyFormatter(logging.Formatter):
+    def format(self, record):
+        record.levelname = record.levelname.lower()
+        return logging.Formatter.format(self, record)
+
 def log_l():
     global formatter
     logger = logging.getLogger('')
     # create formatter
-    formatter = logging.Formatter('[%(funcName)-10.10s : %(filename)-10s, L. %(lineno)-4d] : %(levelname)-8s : %(message)s')
+    formatter = MyFormatter('%(levelname)-8s : %(message)s')#logging.Formatter
     return logger
-    
+
+def log_e():
+    global formatter
+    logger = logging.getLogger('')
+    # create formatter
+    formatter = MyFormatter('[%(funcName)-10.10s : %(filename)-10s, L. %(lineno)-4d] : %(levelname)-8s : %(message)s')#logging.Formatter
+    return logger
+
 clogger=log_l()
 
 def clog(level=None) :
@@ -67,7 +79,7 @@ def indent():
     """
     global formatter
     form="\t"+getattr(formatter,'_fmt')
-    formatter = logging.Formatter(form)
+    formatter = MyFormatter(form)#logging.Formatter(form)
     clog()
     clog_file()
 
@@ -77,7 +89,7 @@ def dedent(n=1):
     """
     global formatter
     form=getattr(formatter,'_fmt').replace("\t","",n)
-    formatter = logging.Formatter(form)
+    formatter = MyFormatter(form)#logging.Formatter(form)
     clog()
     clog_file()
 

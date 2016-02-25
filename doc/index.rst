@@ -97,6 +97,7 @@ See the full, extended table at :ref:`contents`
    known_data
    API
    howto
+   experts_corner
    contributing
    news
    future_steps

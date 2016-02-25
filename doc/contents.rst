@@ -14,6 +14,7 @@ Contents
    std_operators
    API
    howto
+   experts_corner
    contributing
    news
    future_steps

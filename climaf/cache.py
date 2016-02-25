@@ -330,13 +330,13 @@ def csync(update=False) :
     # check if cache index is up to date; if not the 
     # function 'rebuild' is called
     if update :
-        clogger.warning("Listing crs from files present in cache")
+        clogger.info("Listing crs from files present in cache")
         crs_in_cache=list_cache()
         crs_in_cache.sort()
         crs_in_index=crs2filename.values()
         crs_in_index.sort()
         if crs_in_index != crs_in_cache:
-            clogger.warning("Rebuilding cache index")
+            clogger.info("Rebuilding cache index")
             rebuild()  
 
     # Save to disk
@@ -345,7 +345,7 @@ def csync(update=False) :
         pickle.dump(crs2filename,cacheIndexFile)  
         cacheIndexFile.close()
     except:
-        clogger.warning("No cache index file yet")
+        clogger.info("No cache index file yet")
 
 def cload() :
     global crs2filename 

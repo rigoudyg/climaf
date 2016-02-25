@@ -1,6 +1,12 @@
 #!/bin/bash
 # Created - S.Senesi - Feb 2015
 export PYTHONPATH=$(cd $(dirname $0)/..; pwd):$PYTHONPATH
+
+if ! [[ $(python -V 2>&1) == *2.7* ]]; then
+    echo "Python 2.7 is required"
+    exit 1
+fi
+
 echo -e "\nTesting system requirements\n"
 if ! python -m unittest -b -v -f test_req ; then 
     echo "You cannot run CliMAF without the binaries reported missing above"

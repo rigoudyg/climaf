@@ -15,7 +15,7 @@ index=""
 index += header("CliMAF ATLAS of "+exp+" for "+period) 
 index += section("Example of Section level 3 header ",level=3)
 index += section("Meridional profiles (level 4)", level=4, key="Slice")
-index+=vspace(2)
+index += vspace(2)
 
 # Basics
 ##########
@@ -72,21 +72,22 @@ index += close_table()
 index+=vspace(2)
 
 # An example for creating a line (i.e. a series of columns) using 'dirname' argument which 
-# creates a directory with the provided filename as a hard link to the target file in 'dirname'
+# creates a directory containing an autonomous copy of the atlas 
 # There are two methods to do it.
 index += open_table(title='variable/season', columns=['DJF', 'MAM', 'JJA'], spacing=5)
 
 # First, by calling 'cell' function which creates several cells with the same structure
 # (for example, a title for each one)
+atlas_dir=os.path.expanduser('~/tmp/atlas')
 index += open_line('Surface temperature') + \
-         cell('DJF', my_slice('tas','DJF'), thumbnail=60, dirname=os.path.expanduser('~/tmp/atlas')) + \
-         cell('MAM', my_slice('tas','MAM'), thumbnail="60*60", dirname=os.path.expanduser('~/tmp/atlas'), hover=True) + \
-         cell('JJA', my_slice('tas','JJA'), thumbnail="60x60", dirname=os.path.expanduser('~/tmp/atlas'), hover="200x200") + \
+         cell('DJF', my_slice('tas','DJF'), thumbnail=60, dirname=atlas_dir) + \
+         cell('MAM', my_slice('tas','MAM'), thumbnail="60*60", dirname=atlas_dir, hover=True) + \
+         cell('JJA', my_slice('tas','JJA'), thumbnail="60x60", dirname=atlas_dir, hover="200x200") + \
          close_line()
 # OR:
 # you can be more brief using 'fline' function (when you can supply it as argument the call
 # to a function which iteratively applies to a list)
-index += fline(my_slice,'tas',['DJF', 'MAM','JJA'], title="Surface temperature", thumbnail=60, hover=200, dirname=os.path.expanduser('~/tmp/atlas'))
+index += fline(my_slice,'tas',['DJF', 'MAM','JJA'], title="Surface temperature", thumbnail=60, hover=200, dirname=atlas_dir)
 
 index += close_table()
 
