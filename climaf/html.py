@@ -8,13 +8,13 @@ and :download:`its screen dump <../doc/html_index.png>`
 
 """
 
-import os
+import os, re, glob 
 from climaf import __path__ as cpath
 
 def header(title,style_file=None) :
     """ Returns text for an html document header, with provided
-    title. If a style filename is not provided, a default style sheet
-    will apply
+    title. If a style filename is not provided, a default style
+    sheet will apply
     """
     rep= """
     <?xml version="1.0" encoding="iso-8859-1"?> 
@@ -80,40 +80,146 @@ def open_line(title) :
 def close_line() :
     return(' </TR>\n')
 
-def link(label,filename,thumbnail=None) :
+def link(label,filename,thumbnail=None,hover=True) :
     """ 
     Creates the provided label, with a link to the provided image
     filename (if not None) and possibly showing a thumbnail for the
-    image (with the provided thumbnail size)
+    image (with the provided thumbnail size) and possibly displaying
+    this image when mouse is over it (with the provided hover size).
+
+    - 'thumbnail' can be an integer or a string with width or height
+      (in these cases, width=height), or a string with width and height
+      separated by character 'x' or '*'. The size is in pixels; default : 
+      None (no thumbnail)
+    - 'hover' can be a logical, or a string with width or height (in this
+      case, width=height), or a string with width and height separated by
+      character 'x' or '*'. The size is in pixels; default is True, which 
+      tanslates according to value of thumbnail :
+
+      - if thumbnail is not None, hover width and height are respectively
+        set as 3 times that of thumbnail width and height
+      - if thumbnail is None, size is '200*200' 
     """
     if filename :
-        rep='<A HREF="'+filename+'">'
         if thumbnail is not None :
-            rep+= '<IMG HEIGHT=' + `thumbnail` + \
-                ' WIDTH=' + `thumbnail` + ' SRC="'+filename+'">'
+
+            regex=re.compile('([0-9]+)[x*]([0-9]+)')
+            if isinstance(thumbnail, basestring) and regex.search(thumbnail):
+                thumbnail_width=regex.search(thumbnail).group(1)
+                thumbnail_height=regex.search(thumbnail).group(2)
+            else:
+                thumbnail_width=thumbnail
+                thumbnail_height=thumbnail
+
+            if hover :
+                if isinstance(hover, basestring):
+                    if regex.search(hover):
+                        hover_width=regex.search(hover).group(1)
+                        hover_height=regex.search(hover).group(2)
+                    else:
+                        try:
+                            int(hover)
+                        except:
+                            raise Climaf_Html_Error("If hover is a not empty string, it must " \
+                                                    "contain width and/or height, separated by 'x' or '*'")
+                            
+                        hover_width=hover
+                        hover_height=hover
+                else:
+                    hover_width=3*int(thumbnail_width)
+                    hover_height=3*int(thumbnail_height)
+
+                rep='<A class="info" HREF="'+filename+'"><IMG HEIGHT=' + `thumbnail_height` + \
+                     ' WIDTH=' + `thumbnail_width` + ' SRC="'+filename+'"><span><IMG HEIGHT='+ \
+                     `hover_height` + ' WIDTH='+ `hover_width` +' SRC="' +\
+                     filename+'"/></span></a>'
+
+            else:              
+                rep='<A HREF="'+filename+'"><IMG HEIGHT=' + `thumbnail_height` + \
+                      ' WIDTH=' + `thumbnail_width` + ' SRC="'+filename+'"></a>'
+            
         else:
-            rep+=label
-        rep+='</a>'
+
+            if hover :
+                if isinstance(hover, basestring):
+                    if regex.search(hover):
+                        hover_width=regex.search(hover).group(1)
+                        hover_height=regex.search(hover).group(2)
+                    else:
+                        try:
+                            int(hover)
+                        except:
+                            raise Climaf_Html_Error("If hover is a not empty string, it must " \
+                                                    "contain width and/or height, separaed by 'x' or '*'")
+                            
+                        hover_width=hover
+                        hover_height=hover
+                else:
+                    hover_width=200
+                    hover_height=200
+
+                rep='<A class="info" HREF="'+filename+'">' + label +'<span><IMG HEIGHT='+ \
+                     `hover_height` + ' WIDTH='+ `hover_width` +' SRC="' +\
+                     filename+'"/></span></a>'
+            else:            
+                rep='<A HREF="'+filename+'">' + label + '</a>'
+      
     else:
         rep=label
+        
     return rep
 
-def cell(label,filename=None,thumbnail=None) :
+def cell(label,filename=None,thumbnail=None,hover=True,dirname=None) :
     """ 
     Create a table cell with the provided label, which bears a link to
     the provided filename and possibly shows a thumbnail for the link
-    with the provided thumbnail size
+    with the provided thumbnail size (in pixels) and possibly display
+    it when you mouse over it (with the provided hover size in pixels).
+    If 'dirname' is not None, creates  a hard link in directory dirname 
+    to file filename. This allow to generate a portable atlas in this 
+    directory. Hard links are named after pattern 
+    climaf_atlas<digit>.<extension>
+    'dirname' can be a relative or absolute path, as long as
+    filename and dirname paths are coherent
     """
-    return '<TD ALIGN=RIGHT>'+ \
-        link(label,filename,thumbnail)+\
-        '</TD>\n'
+    if dirname:
+        os.system('mkdir -p '+dirname)
+        if filename:
+            tmpfilename,filextension=os.path.splitext(os.path.basename(filename))
+            
+            regex=re.compile('([a-z]+)\_([a-z]+)([0-9]+)')
+            nb=0
+            if glob.glob(dirname+"/climaf_atlas*"):
+                for i in glob.glob(dirname+"/climaf_atlas*"):
+                    res=regex.search(i)
+                    nb=max(int(res.group(3)),nb)
+                nb=nb+1
+            else:
+                nb=1
+     
+            os.link(filename,dirname+"/climaf_atlas"+str(nb)+filextension)
+          
+            return '<TD ALIGN=RIGHT>'+ \
+                   link(label,dirname+"/climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
+                   '</TD>\n'
 
-def line(dic,title="",thumbnail=None):
+    else:
+        
+        return '<TD ALIGN=RIGHT>'+ \
+               link(label,filename,thumbnail,hover)+\
+               '</TD>\n'
+
+def line(dic,title="",thumbnail=None,hover=True,dirname=None):
     """
     Create an html line with labels from dic keys and links to
     filenames from dic values. Put a line title if provided. Replace
     labels with thumbnail figures if arg thumbnail is set to a size
-    (in pixels);in that case, dic can also be a list of filenames
+    (in pixels) and display figures when you mouse over it if arg
+    hover is set to True or to a size (in pixels);in that case, dic
+    can also be a list of filenames. If 'dirname' is not None, creates
+    hardlinks to the filenames, in directory dirname, and named 
+    as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps'). 
+    This allows to generate a portable atlas in dirname
     """
     if thumbnail :
         if isinstance(dic,dict) : 
@@ -126,12 +232,12 @@ def line(dic,title="",thumbnail=None):
         labels=dic.keys()
     rep=title
     for lab,fig in zip(labels,figures): 
-        rep+=cell(lab,fig,thumbnail)
+        rep+=cell(lab,fig,thumbnail,hover,dirname)
     rep+=vspace()
     return rep
 
 def flines(func,fargs, sargs, common_args=[], \
-       other_fargs=[], other_sargs=[], thumbnail=None, **kwargs):
+       other_fargs=[], other_sargs=[], thumbnail=None, hover=True, dirname=None, **kwargs):
     """ 
     **See doc for** :py:func:`~climaf.html.fline` **first** 
 
@@ -148,9 +254,10 @@ def flines(func,fargs, sargs, common_args=[], \
     Example : assuming that function avg returns the filename for a figure
     showing the average value of a variable over a mask, create a
     table of links for average values of two variables over two masks,
-    with thumbnail of images:
-
-    >>> t=table_lines(avg,['tas','tos'],['land','sea'],thumbnail=40)
+    with thumbnail of images and displaying images when you mouse over it with
+    'hover' argument:
+    
+    >>> t=table_lines(avg,['tas','tos'],['land','sea'],thumbnail=40,hover='60x80')
 
     """
     rep=""
@@ -163,12 +270,12 @@ def flines(func,fargs, sargs, common_args=[], \
             title=`farg`
         else:
             title=fargs.get(farg,`farg`)
-        rep+=fline(func,*args,title=title,thumbnail=thumbnail,**kwargs)
+        rep+=fline(func,*args,title=title,thumbnail=thumbnail,hover=hover,dirname=dirname,**kwargs)
     return(rep)
 
 
 def fline(func,farg, sargs, title=None, \
-         common_args=[], other_args=[], thumbnail=None, **kwargs) :
+         common_args=[], other_args=[], thumbnail=None, hover=True, dirname=None, **kwargs) :
     """
     Create the html text for a line of table cells, by iterating
     calling a function, once per column, with at least two
@@ -210,7 +317,7 @@ def fline(func,farg, sargs, title=None, \
        function 'average' only return the figure filename, and call :
  
        >>> rep=fline(average, 'tas', 
-       ...  {'global':'GLB','sea':'SEA','land':"LND"}, 'tas averages')
+       ...  {'global':'GLB','sea':'SEA','land':'LND'}, 'tas averages')
 
     Advanced arguments :
 
@@ -221,7 +328,16 @@ def fline(func,farg, sargs, title=None, \
         value of second argument is passed to 'func' (after common_args)
       - thumbnail : if 'func' returns a filename, generate a thumbnail
         image of that size (in pixels)
-
+      - hover : if 'func' returns a filename, display image of that size
+        (in pixels) when you mouse over it. If hover is True:
+        
+        - hover width and height are respectively set in 3 times that of
+          thumbnail width and height if thumbnail is not None
+        - hover is set to '200*200' if thumbnail is None        
+      - dirname : if 'func' returns a filename, create a directory (if
+        doesn't exist) wich contains filename as a hard link to the
+        target dirname/'climaf_atlas'([0-9]+).ext ('ext' is 'png', 'pdf'
+        or 'eps')
     """
     def foo(*args):
         if len(args)==1 :
@@ -258,7 +374,7 @@ def fline(func,farg, sargs, title=None, \
             else:
                 lab=funcrep ; rfig=None
                 #print "lab case",lab,rfig
-        rep+=cell(lab,rfig,thumbnail)
+        rep+=cell(lab,rfig,thumbnail,hover,dirname)
     rep+=close_line()
     return(rep)
 
@@ -314,3 +430,12 @@ def cinstantiate(objin,filout=None,should_exec=True) :
 
 # TODO : a function which copy all images referenced by the index, and modifies
 # the index accordingly (for 'saving' the image package)
+
+class Climaf_Html_Error(Exception):
+    from clogging  import clogger, dedent
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`

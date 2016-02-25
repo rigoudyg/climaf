@@ -8,6 +8,31 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/02/22 :
+
+ - Changes for several functions of package :py:mod:`climaf.html`
+   (which easily creates an html index which includes tables of
+   links -or thumbnails- to image files). See
+   :py:func:`~climaf.html.link()`, :py:func:`~climaf.html.cell()`,
+   :py:func:`~climaf.html.line()`, :py:func:`~climaf.html.fline()`,
+   :py:func:`~climaf.html.flines()`:  
+
+   - new arguments:
+
+     - ``dirname`` to create a directory (if doesn't exist) wich
+       contains the provided filename  as a hard link
+     - ``hover`` for display image when you mouse over it with the
+       provided hover size in pixels, wich can be a logical, or a
+       string with width and/or height separated by character 'x' or
+       '*'; default=True (corresponding to a size 3 times that of
+       thumbnail size if thumbnail is not None; and corresponding to
+       '200*200' if thumbnail is None)
+   - change for ``thumbnail`` argument: as previously, it can be an
+     integer or a string with width or height (so width=height). Now,
+     it can also be a string with width and height separated by
+     character 'x' or '*'. The size is in pixels; default=None.  
+
+
 - 2016/02/10 :
 
  - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps
