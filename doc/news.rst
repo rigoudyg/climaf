@@ -8,8 +8,7 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
-- 2016/02/22 :
-
+ 
  - Changes for several functions of package :py:mod:`climaf.html`
    (which easily creates an html index which includes tables of
    links -or thumbnails- to image files). See
@@ -26,6 +25,16 @@ Changes, newest first :
        the thumbnail image 
    - change for ``thumbnail`` argument: it can also provide the
      geometry of thumbnails as 'witdh*height'
+
+ - Technical changes:
+
+   - Python 2.7 is required and tested in :download:`test_install
+     <../testing/test_install.sh>`  
+   - Bug fixes in :download:`anynetcdf <../climaf/anynetcdf.py>` to
+     import a module from 'scipy.io.netcdf' library (for reading and
+     writing NetCDF files). 
+   - Change format for log messages. For restoring former, verbose 
+     format see :doc:`experts_corner`.  
 
 
 - 2016/02/10 :
