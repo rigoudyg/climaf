@@ -38,8 +38,8 @@ example below).
 
 **Climaf call example**:: 
 
-  >>> # Use "NEMO" project, where netcdf files with values of so and thetao are defined
-  >>> cdef("project","NEMO")
+  >>> # Use "data_CNRM" project, where netcdf files with values of so and thetao are defined
+  >>> cdef("project","data_CNRM")
   >>> # How to get required files for cdftools cdfheatc binary
   >>> fixed_fields('ccdfheatc',
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),

@@ -806,7 +806,7 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
-    >>> calias('NEMO','so,thetao',filenameVar='grid_T_table2.2')
+    >>> calias('data_CNRM','so,thetao',filenameVar='grid_T_table2.2')
 
     NB: A wrapper with same name of this function is defined in
     :py:func:`climaf.driver.calias` and it is the one which is
@@ -1066,8 +1066,9 @@ class cpage_pdf(cobject):
               only positive (down) values have an effect, default=2 cm 
             - titlebox (logical, optional): set it to True to frame the text in a box,
               frame color is 'black'
-            - pt (int, optional): title font size; CLiMAF default: 'Huge'
-              (corresponding to 24 pt).
+            - pt (str, optional): title font size; CLiMAF default: 'Huge'
+              (corresponding to 24 pt). You can set or not a backslash before this
+              argument. 
             - font (str, optional): font
               abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
             - background (str, optional): frame fill background color; among LaTex 

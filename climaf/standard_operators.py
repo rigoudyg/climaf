@@ -9,6 +9,7 @@ from climaf.operators import cscript
 from climaf.clogging import clogger
 
 scriptpath=cpath[0]+"/../scripts/" 
+binpath=cpath[0]+"/../bin/" 
 
 def load_standard_operators():
     """ 
@@ -99,11 +100,11 @@ def load_standard_operators():
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #
-    cscript('cpdfcrop'     , 'pdfcrop ${in} ${out} ', format="pdf")
+    cscript('cpdfcrop'     , binpath + 'pdfcrop ${in} ${out} ', format="pdf")
     #
     # cepscrop : crop 'eps' file using epstopdf, pdfcrop and pdftops
     #
-    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf; pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
+    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
     #    
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #

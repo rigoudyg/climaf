@@ -8,6 +8,49 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/02/17 :
+
+ - Technical changes:
+
+   - For function :py:func:`~climaf.classes.cpage_pdf` (which creates
+     a PDF page of figures array using 'pdfjam'): you can set or not a
+     backslash before optional argument 'pt' (for title font size) as
+     LaTeX commands. See example :download:`figarray
+     <../examples/figarray.py>`. 
+   - Bug fixes in cdftools examples (:download:`cdftools
+     <../examples/cdftools.py>`, :download:`cdftools_multivar
+     <../examples/cdftools_multivar.py>`, :download:`cdftransport
+     <../examples/cdftransport.py>`) for searching 'ccdfmean' operator
+     in standard operators  
+   - Data access was modified for several examples;
+
+     - For :download:`cdftools <../examples/cdftools.py>`,
+       :download:`cdftools_multivar
+       <../examples/cdftools_multivar.py>` and :download:`cdftransport
+       <../examples/cdftransport.py>`: a new project 'data_CNRM' was
+       declared instead of 'NEMO' old project; this new project
+       accesses to data available at CNRM in a new directory
+       "/cnrm/aster/data1/UTILS/climaf/test_data", which contains both
+       Nemo raw outputs, Monitoring outputs (with VT-files) and fixed
+       fields. 
+
+     - For :download:`gplot <../examples/gplot.py>`: it work now with
+       'example' project (instead of 'EM' project) and also with the
+       new project 'data_CNRM' at CNRM for rotating vectors from model
+       grid on geographic grid.  
+
+   - Two examples :download:`gplot <../examples/gplot.py>` and
+     :download:`cdftools_multivar <../examples/cdftools_multivar.py>`
+     were added to the script which tests all examples
+     :download:`test_examples <../testing/test_examples.sh>` 
+
+   - 'cpdfcrop' and 'cepscrop' operators uses the Perl script
+     'pdfcrop' available in CliMAF distribution:
+     ``<your_climaf_installation_dir>/bin/pdfcrop``. This is the last
+     version described in
+     ``<your_climaf_installation_dir>/bin/README``.
+
+
 - 2016/02/10 :
 
  - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps

@@ -1046,11 +1046,16 @@ def cfilePage_pdf(cobj, deep, recurse_list=None) :
         args.extend(["--scale", "%.2f"%cobj.scale])
 
     if cobj.title != "":
+        if "\\" in cobj.pt:
+            pt=cobj.pt.split("\\")[-1]
+        else:
+            pt=cobj.pt
+        
         if cobj.titlebox :
-            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
+            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, pt, cobj.font, cobj.title)
         else:
             latex_command="\\begin{center} \\hspace{%dcm} \%s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
-                           %(cobj.x, cobj.pt, cobj.font, cobj.title)
+                           %(cobj.x, pt, cobj.font, cobj.title)
         args.extend(["--pagecommand", latex_command])
 
     #

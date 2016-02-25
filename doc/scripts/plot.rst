@@ -181,8 +181,8 @@ Vectors:
   - If rotation is set to 1, file 'angles.nc' must be made available
     to the script: use function fixed_fields() for that (see example
     below). For an example of this file and the script which creates
-    this file: see :download:`angle_EM.nc <../../tools/angle_EM.nc>`
-    and :download:`angle.ncl <../../tools/angle.ncl>`  
+    this file: see :download:`angle_EM.nc <../../angle_EM.nc>` and
+    :download:`angle.ncl <../../tools/angle.ncl>`     
 
 .. _navlat_issue:
 

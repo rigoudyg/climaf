@@ -77,8 +77,10 @@ if atCNRM:
     # Declare "data_CNRM" project with some 'standard' Nemo output files
     # (actually, they are easier accessible using project "EM")
     cproject('data_CNRM')
-    data_pattern="/cnrm/aster/data1/UTILS/climaf/test_data/data_EM/${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
-    dataloc(project='data_CNRM',organization='generic',url=data_pattern)
+    root="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+    suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
+    data_url=root+suffix
+    dataloc(project='data_CNRM',organization='generic',url=data_url)
     # Declare how variables are scattered/grouped among files
     calias("data_CNRM","tos,thetao",filenameVar="grid_T_table2.2")
     calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
