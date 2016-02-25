@@ -17,26 +17,24 @@ string:
 '[%(funcName)-10.10s : %(filename)-10s, L. %(lineno)-4d] :
 %(levelname)-8s : %(message)s'  
 
-For it, you have to do what follows :
+For that, type :
 
 >>> climaf.clogging.clogger=climaf.clogging.log_e()
->>> # And resets the verbosity level for CliMAF log messages on stderr
->>> # and/or for log file
->>> clog(level="info")  # level among "debug", "info", "warning", "critical"
+
+And reset the verbosity level for CliMAF log messages on stderr
+and/or for log file; e.g.
+
+>>> clog(level="info")  
 >>> clog_file(level="info")
->>> # An example to have a look to the format for log messages
->>> csync()
+>>> csync() # For an example of log message
 [csync      : cache.py  , L. 348 ] : info     : No cache index file yet
 
-If you want to return in the standard format, you have to proceed in
+If you want to return back to the standard format, you have to proceed in
 the same way but with the function 'climaf.clogging.log_l()', i.e. : 
 
 >>> climaf.clogging.clogger=climaf.clogging.log_l()
->>> # And resets the verbosity level for CliMAF log messages on stderr
->>> # and/or for log file
->>> clog(level="info")  # level among "debug", "info", "warning", "critical"
+>>> clog(level="info")  
 >>> clog_file(level="info")
->>> # An example to have a look to the format for log messages
->>> csync()
+>>> csync() # For an example
 info     : No cache index file yet
 
