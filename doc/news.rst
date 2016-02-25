@@ -19,18 +19,13 @@ Changes, newest first :
 
    - new arguments:
 
-     - ``dirname`` to create a directory (if doesn't exist) wich
-       contains the provided filename  as a hard link
-     - ``hover`` for display image when you mouse over it with the
-       provided hover size in pixels, wich can be a logical, or a
-       string with width and/or height separated by character 'x' or
-       '*'; default=True (corresponding to a size 3 times that of
-       thumbnail size if thumbnail is not None; and corresponding to
-       '200*200' if thumbnail is None)
-   - change for ``thumbnail`` argument: as previously, it can be an
-     integer or a string with width or height (so width=height). Now,
-     it can also be a string with width and height separated by
-     character 'x' or '*'. The size is in pixels; default=None.  
+     - ``dirname`` to create a directory wich contains hard links 
+       to the figure files;allows to create an autonomous, portable 
+       atlas
+     - ``hover`` for displaying a larger image when you mouse over 
+       the thumbnail image 
+   - change for ``thumbnail`` argument: it can also provide the
+     geometry of thumbnails as 'witdh*height'
 
 
 - 2016/02/10 :
