@@ -8,6 +8,20 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/02/24:
+ 
+ - A new default format for log messages on stderr and log files was
+   developped, so there are two available formats, more or less
+   verbose; see :doc:`experts_corner`.  
+
+ - Technical changes:
+
+   - Python 2.7 required in :download:`test_install
+     <../testing/test_install.sh>`  
+   - Bug fixes in :download:`anynetcdf <../climaf/anynetcdf.py>` to
+     import a module from 'scipy.io.netcdf' library (for reading and
+     writing NetCDF files). 
+
 - 2016/02/10 :
 
  - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps
