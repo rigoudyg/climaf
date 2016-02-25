@@ -53,8 +53,9 @@ General:
       1024x1024 
     - if format is "pdf" or "eps", resolution specifies either the
       width and height of the paper, as above but in inches unit, or a
-      standard paper size by name, as e.g. 'A4'; default (ncl): 8.5x11
-      or "letter" (<=> 612x792 pixels) 
+      standard paper size by name, as e.g. 'A4'. Ncl uses a resolution
+      of 72 dots per inch (dpi); default (ncl): 8.5x11 or "letter"
+      (<=> 612x792 pixels)  
   - ``linp`` : 
 
     - 1 for getting a vertical axis with index-linear spacing, or
@@ -180,8 +181,8 @@ Vectors:
   - If rotation is set to 1, file 'angles.nc' must be made available
     to the script: use function fixed_fields() for that (see example
     below). For an example of this file and the script which creates
-    this file: see :download:`angle_EM.nc <../../tools/angle_EM.nc>`
-    and :download:`angle.ncl <../../tools/angle.ncl>`  
+    this file: see :download:`angle_EM.nc <../../angle_EM.nc>` and
+    :download:`angle.ncl <../../tools/angle.ncl>`     
 
 .. _navlat_issue:
 
@@ -351,7 +352,8 @@ For map:
 
       - a string to add this given string (for example
 	gsnCenterString="" if you want turn off this sub-title), or 
-      - defaut (climaf): add select values for time and/or level 
+      - defaut (climaf): add select values for time and/or level for
+	main field
       
     - if you don't select time and/or level, set it to:
     

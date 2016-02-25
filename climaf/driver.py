@@ -137,7 +137,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
-        raise Climaf_Driver_Error('Allowed formats yet are : "object", "nc", "png", "pdf", "eps" and "txt"') 
+        raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s"%', '.join([repr(x) for x in operators.graphic_formats]))
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -435,7 +435,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if scriptCall.parameters['format'] in operators.graphic_formats :
                     output_fmt=scriptCall.parameters['format']
                 else: 
-                    raise Climaf_Driver_Error('Allowed graphic formats yet are : "png", "pdf" and "eps"')
+                    raise Climaf_Driver_Error('Allowed graphic formats yet are : %s'%', '.join([repr(x) for x in operators.graphic_formats]))
             else : #default graphic format 
                 output_fmt="png"
         else:
@@ -1046,11 +1046,16 @@ def cfilePage_pdf(cobj, deep, recurse_list=None) :
         args.extend(["--scale", "%.2f"%cobj.scale])
 
     if cobj.title != "":
-        if cobj.titlebox :
-            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, cobj.pt, cobj.font, cobj.title)
+        if "\\" in cobj.pt:
+            pt=cobj.pt.split("\\")[-1]
         else:
-            latex_command="\\begin{center} \\hspace{%dcm} %s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
-                           %(cobj.x, cobj.pt, cobj.font, cobj.title)
+            pt=cobj.pt
+        
+        if cobj.titlebox :
+            latex_command="\\begin{center} \\hspace{%dcm} \\setlength{\\fboxrule}{0.5pt} \\setlength{\\fboxsep}{2mm} \\fcolorbox{black}{%s}{\%s{\\fontfamily{%s}\\selectfont %s}} \\end{center}"%(cobj.x, cobj.background, pt, cobj.font, cobj.title)
+        else:
+            latex_command="\\begin{center} \\hspace{%dcm} \%s{\\fontfamily{%s}\\selectfont %s} \\end{center}"\
+                           %(cobj.x, pt, cobj.font, cobj.title)
         args.extend(["--pagecommand", latex_command])
 
     #
@@ -1070,7 +1075,14 @@ def cfilePage_pdf(cobj, deep, recurse_list=None) :
     
 
 def calias(project,variable,fileVariable=None,**kwargs):
-              
+    """
+    See :py:func:`climaf.classes.calias`
+    
+    Declare that in ``project``, ``variable`` is to be computed by
+    reading ``filevariable``;
+    It allows to use a list of variable, given as a string where
+    the name of variables are separated by commas
+    """
     if not "," in variable: # mono-variable
         classes.calias(project=project,variable=variable,fileVariable=fileVariable,**kwargs) 
         

@@ -90,5 +90,10 @@ if not already_inited  and not onrtd :
     atexit.register(cmacro.write,macroFilename)
     atexit.register(cache.csync)
     tim("atexit")
+    # Check if exiv2 is installed
+    #
+    if (os.system("type exiv2 >/dev/null 2>&1") != 0) :
+        operators.graphic_formats.remove('eps')
+        print("exiv2 is not installed so you can not use 'eps' output format")
 
 

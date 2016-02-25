@@ -9,6 +9,35 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 Changes, newest first :
 
  
+ - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
+
+   - new arguments : 
+     
+     - ``shade_below`` and ``shade_above`` to shade contour regions
+       for auxiliary field; 
+     - ``options``, ``aux_options`` and ``shading_options`` for
+       setting NCL graphic resources directly
+   - color filling is smoothed to contours
+
+ - Standard operator 'curves' now handle multiple profile cases : time
+   series, profile along lat or lon, and profile in
+   pressure/z_index. It also allows to set NCL graphic ressources
+   directly : see :doc:`scripts/curves`.
+
+ - Standard operators 'lines' and 'timeplot' were removed, and
+   replaced by 'curves': see :doc:`scripts/curves`  
+
+ - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a
+   **PDF page of figures array** using 'pdfjam'. See example
+   :download:`figarray <../examples/figarray.py>`. 
+
+ - A new output format allowed for graphic operators : **eps**; see
+   :py:func:`~climaf.operators.cscript`. This needs an install of
+   'exiv2' - see :doc:`requirements`
+
+ - A new standard operator, to crop eps figures to their minimal size :
+   ``cepscrop``; see :doc:`scripts/cepscrop`   
+
  - Changes for several functions of package :py:mod:`climaf.html`
    (which easily creates an html index which includes tables of
    links -or thumbnails- to image files). See
@@ -28,6 +57,34 @@ Changes, newest first :
 
  - Technical changes:
 
+   - For function :py:func:`~climaf.classes.cpage_pdf` (which creates
+     a PDF page of figures array using 'pdfjam'): you can set or not a
+     backslash before optional argument 'pt' (for title font size) as
+     LaTeX commands. See example :download:`figarray
+     <../examples/figarray.py>`. 
+   - Data access was modified for several examples:
+
+     - For :download:`cdftools <../examples/cdftools.py>`,
+       :download:`cdftools_multivar
+       <../examples/cdftools_multivar.py>` and :download:`cdftransport
+       <../examples/cdftransport.py>`: a new project 'data_CNRM' was
+       declared instead of 'NEMO' old project; this new project
+       uses data available at CNRM in a dedicated directory
+       "/cnrm/aster/data1/UTILS/climaf/test_data", which contains both
+       Nemo raw outputs, monitoring outputs (with VT-files) and fixed
+       fields. 
+
+     - Example :download:`gplot <../examples/gplot.py>`: now works with
+       project 'example' (instead of 'EM' project) and also with the
+       new project 'data_CNRM' at CNRM for rotating vectors from model
+       grid on geographic grid.  
+
+   - Two examples :download:`gplot <../examples/gplot.py>` and
+     :download:`cdftools_multivar <../examples/cdftools_multivar.py>`
+     were added to the script which tests all examples
+     :download:`test_examples <../testing/test_examples.sh>` 
+   - 'cpdfcrop' and 'cepscrop' tools are embarked in CliMAF distribution:
+     ``<your_climaf_installation_dir>/bin/pdfcrop``
    - Python 2.7 is required and tested in :download:`test_install
      <../testing/test_install.sh>`  
    - Bug fixes in :download:`anynetcdf <../climaf/anynetcdf.py>` to
@@ -36,40 +93,9 @@ Changes, newest first :
    - Change format for log messages. For restoring former, verbose 
      format see :doc:`experts_corner`.  
 
-
-- 2016/02/10 :
-
- - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps
-   figures, does use a multi-page capable viewer (xdg-open) if it is
-   available. Otherwise, it uses 'display'
- - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
-
-   - new arguments : 
-     
-     - ``shade_below`` and ``shade_above`` to shade contour regions
-       for auxiliary field; 
-     - ``options``, ``aux_options`` and ``shading_options`` for
-       setting        NCL graphic resources directly
-   - color filling is smoothed to contours
-
- - New function :py:func:`~climaf.classes.cpage_pdf` allows to create a
-   **PDF page of figures array** using 'pdfjam'. See example
-   :download:`figarray <../examples/figarray.py>`. 
-
- - A new output format allowed for operators : **eps**; see
-   :py:func:`~climaf.operators.cscript`. This needs an install of
-   'exiv2' - see :doc:`requirements`
-
- - A new standard operator, to crop eps figures to their minimal size :
-   ``cepscrop``; see :doc:`scripts/cepscrop`   
-
- - Standard operator 'curves' now handle multiple profile cases : time
-   series, profile along lat or lon, and profile in
-   pressure/z_index. It also allows to set NCL graphic ressources
-   directly : see :doc:`scripts/curves`.
-
- - Standard operators 'lines' and 'timeplot' were removed, and
-   replaced by 'curves': see :doc:`scripts/curves`  
+   - :py:func:`~climaf.classes.cshow`, when it displays pdf or eps
+     figures, does use a multi-page capable viewer (xdg-open) if it is
+     available. Otherwise, it uses 'display'
 
 - 2015/12/08 :
 

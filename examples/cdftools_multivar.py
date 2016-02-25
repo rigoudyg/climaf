@@ -10,38 +10,43 @@
 #export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
 from climaf.api import *
 
-if not atCNRM: exit
+if not atCNRM: exit(0)
+if 'ccdfmean' not in cscripts :
+    print("CDFtools not available")
+    exit(0)
 
-# Declare "NEMO" project for Nemo raw outputs 
+# Declare "data_CNRM" project for Nemo raw outputs 
 #
-cproject('NEMO')
+cproject('data_CNRM')
 
 # For 'standard' Nemo output files (actually, they are better accessible using project "EM")
-root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+#root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+root1="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 #
-dataloc(project='NEMO', organization='generic', url=[url_nemo_standard])
+dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard])
 # 
 # Declare how variables are scattered/groupes among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
-calias("NEMO","uo",filenameVar="grid_U_table2.3")
-calias("NEMO","vo",filenameVar="grid_V_table2.3")
+calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
+calias("data_CNRM","vo",filenameVar="grid_V_table2.3")
 
 # Declare variables grouped in a file
-calias("NEMO","so,thetao",filenameVar="grid_T_table2.2")
-calias("NEMO","thetao,omlmax",filenameVar="grid_T_table2.2")
-calias("NEMO","so,thetao,omlmax",filenameVar="grid_T_table2.2")
+calias("data_CNRM","so,thetao",filenameVar="grid_T_table2.2")
+calias("data_CNRM","thetao,omlmax",filenameVar="grid_T_table2.2")
+calias("data_CNRM","so,thetao,omlmax",filenameVar="grid_T_table2.2")
 
 # Define defaults facets for datasets 
-cdef("project","NEMO")
+cdef("project","data_CNRM")
 cdef("frequency","monthly")
 cdef("simulation","PRE6CPLCr2alb")
 cdef("period","199807")
 
 # How to get fixed files for all cdftools binaries
-tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-#can also use placeholders as in '/cnrm/aster/data3/aster/vignonl/${project}/'
+# (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
+#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
 fixed_fields(['ccdfheatc','ccdfmxlheatc'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),

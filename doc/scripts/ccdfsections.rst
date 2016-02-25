@@ -70,8 +70,8 @@ resolution).
 
 **Climaf call example**:: 
 
-  >>> # Use "NEMO" project, where netcdf files with values of so, thetao and rhopoto are defined
-  >>> cdef("project","NEMO")
+  >>> # Use "data_CNRM" project, where netcdf files with values of so, thetao and rhopoto are defined
+  >>> cdef("project","data_CNRM")
   >>> dT=ds(simulation="PRE6CPLCr2alb", variable="so,thetao,rhopoto", period="199807", realm="O") 
   >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # dataset with zonal velocity component
   >>> dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O") # dataset with meridional velocity component

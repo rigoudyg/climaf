@@ -67,7 +67,7 @@ cshow(cpage(plot(anomalies,title='tas')))
 # You would rather use copy.deepcopy to create the extendable ensemble 
 
 e2=cens(['1980','1981'],j0,j1)
-cscript('ecdo','ccdo ${operator} ${mmin} ${out}')
+cscript('ecdo','cdo ${operator} ${mmin} ${out}')
 emin=ecdo(e2,operator='ensmin')
 import copy
 e3=copy.deepcopy(e2)

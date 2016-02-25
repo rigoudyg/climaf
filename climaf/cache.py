@@ -54,7 +54,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
     Exits if uniqueness is unachievable (quite unexpectable !) """
     #
     import hashlib
-    directoryNameLength=2
+    directoryNameLength=5
     #
     if format==None : return ""
     prefix=""
@@ -62,7 +62,7 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
         prefix2=operator(expression)
         if prefix2 is not None : prefix=prefix2+"/"
     full=hashlib.sha224(expression).hexdigest()
-    number=4
+    number=36
     guess=full[0 : number - 1 ]
     existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
     if existing : 

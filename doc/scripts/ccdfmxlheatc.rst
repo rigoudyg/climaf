@@ -34,8 +34,8 @@ directory (use function :py:func:`~climaf.operators.fixed_fields()` for that; se
 
 **Climaf call example**:: 
 
-  >>> # Use "NEMO" project, where netcdf files with values of thetao and omlmax are defined
-  >>> cdef("project","NEMO")
+  >>> # Use "data_CNRM" project, where netcdf files with values of thetao and omlmax are defined
+  >>> cdef("project","data_CNRM")
   >>> # How to get required files for cdftools cdfmxlheatc binary
   >>> fixed_fields('ccdfmxlheatc',
    ... ('mask.nc',    '/data/climaf/${project}/${model}/ORCA1_mesh_mask.nc'),

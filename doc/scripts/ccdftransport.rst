@@ -65,9 +65,9 @@ below).
 
 **Climaf call example**:: 
 
-  >>> # Use "NEMO" project, where VT files (netcdf file with mean
+  >>> # Use "data_CNRM" project, where VT files (netcdf file with mean
   >>> # values of vt, vs, ut, us for heat and salt transport) are defined
-  >>> cdef("project","NEMO")
+  >>> cdef("project","data_CNRM")
   >>> # How to get required files for cdftools cdftransport binary
   >>> fixed_fields('ccdftransport',
    ... ('mesh_hgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
