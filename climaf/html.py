@@ -215,7 +215,7 @@ def line(dic,title="",thumbnail=None,hover=True,dirname=None):
     filenames from dic values. Put a line title if provided. Replace
     labels with thumbnail figures if arg thumbnail is set to a size
     (in pixels) and display figures when you mouse over it if arg
-    hover is set to True or to a size (in pixels);in that case, dic
+    hover is set to True or to a size (in pixels); in that case, dic
     can also be a list of filenames. If 'dirname' is not None, creates
     hardlinks to the filenames, in directory dirname, and named 
     as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps'). 
@@ -331,10 +331,10 @@ def fline(func,farg, sargs, title=None, \
       - hover : if 'func' returns a filename, display image of that size
         (in pixels) when you mouse over it. If hover is True:
         
-        - hover width and height are respectively set in 3 times that of
+        - hover width and height are respectively set as 3 times that of
           thumbnail width and height if thumbnail is not None
         - hover is set to '200*200' if thumbnail is None        
-      - dirname : if 'func' returns a filename, create a directory (if
+      - dirname : if 'func' returns a filename, creates a directory (if
         doesn't exist) wich contains filename as a hard link to the
         target dirname/'climaf_atlas'([0-9]+).ext ('ext' is 'png', 'pdf'
         or 'eps')

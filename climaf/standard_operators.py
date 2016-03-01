@@ -89,7 +89,7 @@ def load_standard_operators():
             'gsnRightString=\'\"${gsnRightString}\"\' gsnCenterString=\'\"${gsnCenterString}\"\' '
             'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} '
             'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
-            'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' )', format="graph")            
+            'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' )', format="graph")
     # 
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
@@ -104,7 +104,8 @@ def load_standard_operators():
     #
     # cepscrop : crop 'eps' file using epstopdf, pdfcrop and pdftops
     #
-    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
+    if (os.system("type exiv2 >/dev/null 2>&1") == 0) :
+        cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
     #    
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #

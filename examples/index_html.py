@@ -6,6 +6,7 @@ and stored in CliMAF's cache, including :
 """
 from climaf.api import *
 from climaf.html import *
+from climaf import cachedir
 
 # Some global variables 
 exp='AMIPV6ALB2G'
@@ -78,7 +79,8 @@ index += open_table(title='variable/season', columns=['DJF', 'MAM', 'JJA'], spac
 
 # First, by calling 'cell' function which creates several cells with the same structure
 # (for example, a title for each one)
-atlas_dir=os.path.expanduser('~/tmp/atlas')
+#atlas_dir=os.path.expanduser('~/tmp/atlas')
+atlas_dir=os.path.expanduser(cachedir+'/../atlas')
 index += open_line('Surface temperature') + \
          cell('DJF', my_slice('tas','DJF'), thumbnail=60, dirname=atlas_dir) + \
          cell('MAM', my_slice('tas','MAM'), thumbnail="60*60", dirname=atlas_dir, hover=True) + \

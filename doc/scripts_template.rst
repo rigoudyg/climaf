@@ -1,3 +1,5 @@
+:orphan:
+
 *Notes* :
 
  - *This is a template for describing a CliMAF operator. Depending on your reading context, one of these links may work for downloading it*: :download:`scripts_template.rst <scripts_template.rst>` *or* http://climaf.readthedocs.org/en/latest/_downloads/scripts_template.rst 

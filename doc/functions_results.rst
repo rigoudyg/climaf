@@ -1,3 +1,5 @@
+:orphan:
+
 -----------------------------------------
 Functions for managing/viewing results
 -----------------------------------------
@@ -6,11 +8,13 @@ Functions for managing/viewing results
 
 There are a few functions for managing CliMAF results
 
+.. _numerical_results:
+
 cfile : get the file value of a CliMAF object 
 ----------------------------------------------
 
 .. autofunction:: climaf.driver.cfile 
-
+   
 efile : create the file for an ensemble of CliMAF objects
 ---------------------------------------------------------- 
 
@@ -25,6 +29,9 @@ cvalue : get the scalar value of a CliMAF scalar object
 --------------------------------------------------------
 
 .. autofunction:: climaf.driver.cvalue
+
+
+.. _viewing_results:
 
 cshow : dump an object or display a 'figure'
 --------------------------------------------

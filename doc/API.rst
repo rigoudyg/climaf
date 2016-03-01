@@ -23,13 +23,14 @@ even if they belong to another module
 - :doc:`functions_results`
 
   - for managing numerical results
-
+    
     .. toctree:: functions_results1
-
+    
   - for viewing results, see also :ref:`standard_operators` (graphics
-    part) 
+    part)  
 
     .. toctree:: functions_results2
+
   - for listing and managing data in cache:   
 
     .. toctree:: functions_results3
