@@ -108,6 +108,19 @@ def load_standard_operators():
     #    
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #
+    # timesection : to plot hovmoller diagrams
+    #
+    cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
+            ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
+            ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
+            ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
+# ?    
+# title=\'\"${title}\"\' 
+# linp=${linp} 
+# colors=\'\"${colors}\"\' niveau de contours
+# invXY=${invXY}    
+    #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :
