@@ -82,7 +82,6 @@ Documented operators as of today :
 		   adjustment in the page, use **'cpage'** and
 		   increase resolution of each figure and also of 
 		   output page  
-               .. 
 
     - :doc:`scripts/plot`
     - :doc:`scripts/curves`

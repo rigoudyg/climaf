@@ -42,7 +42,7 @@ if not already_inited  and not onrtd :
     import atexit
     tim("atexit")
     #
-    import clogging, site_settings , cache, standard_operators, cmacro
+    import clogging, site_settings, cache, standard_operators, cmacro, operators
     tim("imports")
     print("Climaf version = "+version,file=sys.stderr)
     #
@@ -92,7 +92,7 @@ if not already_inited  and not onrtd :
     tim("atexit")
     # Check if exiv2 is installed
     #
-    if (os.system("type exiv2 >/dev/null 2>&1") != 0) :
+    if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in operators.graphic_formats:
         operators.graphic_formats.remove('eps')
         print("exiv2 is not installed so you can not use 'eps' output format")
 

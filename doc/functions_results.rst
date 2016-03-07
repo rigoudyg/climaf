@@ -1,3 +1,5 @@
+:orphan:
+
 -----------------------------------------
 Functions for managing/viewing results
 -----------------------------------------
@@ -10,7 +12,7 @@ cfile : get the file value of a CliMAF object
 ----------------------------------------------
 
 .. autofunction:: climaf.driver.cfile 
-
+   
 efile : create the file for an ensemble of CliMAF objects
 ---------------------------------------------------------- 
 

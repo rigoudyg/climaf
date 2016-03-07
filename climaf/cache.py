@@ -13,7 +13,7 @@ import pickle
 from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro  import crewrite
-from clogging import clogger
+from clogging import clogger, dedent
 import operators
 from operator import itemgetter  
 
@@ -350,9 +350,9 @@ def csync(update=False) :
 def cload() :
     global crs2filename 
     global crs_not_yet_evaluable
-
+ 
     if len(crs2filename) != 0 :
-        Climaf_Driver_Error(
+        Climaf_Cache_Error(
             "attempt to reset file index - would lead to inconsistency !")
     try :
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "r")
@@ -780,3 +780,10 @@ def rebuild():
     return(crs2filename)
     
 
+class Climaf_Cache_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`

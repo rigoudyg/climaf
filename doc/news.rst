@@ -50,7 +50,7 @@ Changes, newest first :
    - new arguments:
 
      - ``dirname`` to create a directory wich contains hard links 
-       to the figure files;allows to create an autonomous, portable 
+       to the figure files; allows to create an autonomous, portable 
        atlas
      - ``hover`` for displaying a larger image when you mouse over 
        the thumbnail image 
