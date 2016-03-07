@@ -9,6 +9,8 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 Changes, newest first :
 
  
+- 2016/02/25 :
+
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  
 
    - new arguments : 
