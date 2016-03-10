@@ -113,7 +113,7 @@ undef("data_select")
 ; and create a list, called 'select_list', of extracted values 
 function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string, select_list:string)
 
-local VarDimNames, dim, rk, index
+local VarDimNames, dim, rk, index, value
 begin
   
   VarDimNames = getVarDimNames(field)  ; getting dimensions from metadata
@@ -121,7 +121,7 @@ begin
   rk=dimsizes(dim)
 
   if isint(arg) then
-    print("Selecting index "+arg+" for "+arg_name+" step, i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
+    print("Selecting index "+arg+" for "+arg_name+", i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
     if arg_name .eq. "time" then
       ;value=cd_calendar(field&$dim_field_name$(arg),2) ; value returned will be in the format YYYYMMDD
       utc_date=cd_calendar(field&$dim_field_name$(arg),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
@@ -132,17 +132,15 @@ begin
     else
       value=field&$dim_field_name$(arg)
     end if
+    select_list=select_list+" "+arg_name+"="+value
     if rk .eq. 4 then
       new_fld=field(arg,:,:,:)     
-      select_list=select_list+" "+arg_name+"="+value
     else 
       if rk .eq. 3 then
         new_fld=field(arg,:,:)
-        select_list=select_list+" "+arg_name+"="+value
       else 
         if rk .eq. 2 then
           new_fld=field(arg,:)
-          select_list=select_list+" "+arg_name+"="+value
         end if ;rk eq 2
       end if ; rk eq 3
     end if ; rk eq 4
@@ -156,8 +154,8 @@ begin
       index=closest_val(arg,field&$dim_field_name$)
       print("Selecting "+arg_name+" close to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
       if arg_name .eq. "time" then
-        ;value=cd_calendar(field&$dim_field_name$(index),2) ;value returned will be in the format YYYYMMDD
-        utc_date=cd_calendar(field&$dim_field_name$(index),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
+        ;value=cd_calendar(field&$dim_field_name$(index),2) ; value returned will be in the format YYYYMMDD
+        utc_date=cd_calendar(field&$dim_field_name$(index),0) ; array returned will be of type float and dimensionned dimsizes(time)x6
         year  = tointeger(utc_date(:,0))    ; Convert to integer for
         month = tointeger(utc_date(:,1))    ; use sprinti 
         day   = tointeger(utc_date(:,2))
@@ -165,17 +163,15 @@ begin
       else
         value=field&$dim_field_name$(index)
       end if
+      select_list=select_list+" "+arg_name+"="+value
       if rk .eq. 4 then
         new_fld=field(index,:,:,:)     
-        select_list=select_list+" "+arg_name+"="+value
       else 
         if rk .eq. 3 then
           new_fld=field(index,:,:)
-          select_list=select_list+" "+arg_name+"="+value
         else 
           if rk .eq. 2 then
             new_fld=field(index,:)
-            select_list=select_list+" "+arg_name+"="+value
           end if ;rk eq 2
         end if ; rk eq 3
       end if ; rk eq 4

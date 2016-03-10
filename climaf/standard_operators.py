@@ -107,12 +107,22 @@ def load_standard_operators():
     if (os.system("type exiv2 >/dev/null 2>&1") == 0) :
         cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
     #    
+    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
+    #
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #
     cscript('slice',"ncks -O -F -v ${var} -d ${dim},${num},${num} ${in} tmp.nc ; ncwa -O -a ${dim} tmp.nc ${out} ; rm tmp.nc")
     #
     cscript("mask","cdo setctomiss,${miss} ${in} ${out}")
     #
+    # timesection : to plot hovmoller diagrams
+    #
+    cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
+            ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
+            ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
+            ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
+    #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()
     else :
