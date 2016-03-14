@@ -40,7 +40,7 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
         fil=cfile(std)
-        expected=climaf.cache.currentCache+'/d1/a.nc'
+        expected=climaf.cache.currentCache+'/d1a35/827e7/ea4ac/eeb5e/f2b68/4092d/43408.nc'
         print "actual=",fil
         print "expected=",expected
         self.assertEqual(fil,expected,"Issue evaluating script application as a file")
@@ -48,7 +48,7 @@ class A_basic(unittest.TestCase):
     def test_4_plotting(self):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        plot1d=climaf.driver.capply("timeplot",std,title="tas standard deviation") 
+        plot1d=climaf.driver.capply("plot",std,title="tas standard deviation") 
         # Have the plot displayed (this will also actually launch the script,
         cshow(plot1d)
 	os.system("sleep 3s")
@@ -101,21 +101,21 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
         # Declare a list of root directories for CMIP5 data on CNRM's Lustre file system.
-        urls_CMIP5=["/prodigfs/esg"]
+        urls_CMIP5=["/prodigfs/project"]
         dataloc(organization="CMIP5_DRS", url=urls_CMIP5)
         cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 
     def test_identifying_files(self):
         files=self.ds.baseFiles()
-        expected="/prodigfs/esg/CMIP5/merge/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
+        expected="/prodigfs/project/CMIP5/main/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
         print "actual="+files
         print "expected="+expected
         self.assertEqual(files,expected, 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
         my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/9e/2.nc'
+        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63.nc'
         print "actual="+my_file
         print "expected="+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
@@ -141,7 +141,7 @@ class C_OCMIP5_CIclad(unittest.TestCase):
         self.file=mfile
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
-        expected=climaf.cache.currentCache+'/53/c.nc'
+        expected=climaf.cache.currentCache+'/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015.nc'
         print self.file
         print expected
         self.assertEqual(self.file,expected,'Issue')

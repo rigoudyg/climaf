@@ -36,7 +36,7 @@ if atCNRM :
                 "/cnrm/aster/data2/ESG/vdr"]
 if onCiclad :
     # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
-    urls_CMIP5=["/prodigfs/esg","/prodigfs/project/"]
+    urls_CMIP5=["/prodigfs/project/"]
 
 if urls_CMIP5 :
     # Next command will lead to explore all directories in 'url' 
