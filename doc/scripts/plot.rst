@@ -97,11 +97,11 @@ Main field:
    - ``cmap`` : name of the Ncl colormap to use; see e.g. 
      https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness ;
      default (climaf) is 'BlueDarkRed18'
-   - ``vmin``, ``vmax`` , ``vdelta`` : min and max values and levels
-     when applying the colormap, or 
+   - ``min``, ``max`` , ``delta`` : min and max values and levels when applying the colormap, or 
    - ``colors`` : list of levels used when applying colormap
      e.g. colors="260 270 280 290"
 
+  - ``reverse`` : reverse colormap.
   - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
   - ``units`` : name of the main field units; used in the caption;

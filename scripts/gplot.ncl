@@ -187,7 +187,7 @@ end
 
 undef("field_reduce")
 ; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
-function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string)
+function field_reduce(filename:string, varname:string, logp:logical, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical)
 
 local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
 begin
@@ -360,29 +360,40 @@ begin
       
       if isfilepresent("coordinates.nc") then
         coord_file=addfile("coordinates.nc","r")
-        lat_dim=coord_file->gphit
-        lon_dim=coord_file->glamt
-        lat_dim_tmp=rm_single_dims(lat_dim)
-        lon_dim_tmp=rm_single_dims(lon_dim)
-        delete(lat_dim)
-        delete(lon_dim)
-        lat_dim=lat_dim_tmp
-        lon_dim=lon_dim_tmp
-        delete(lat_dim_tmp)
-        delete(lon_dim_tmp)
+
+	if isfilevar(ffile,"gphit") then 
+           lat_dim=coord_file->gphit
+	   lat_dim_tmp=rm_single_dims(lat_dim)
+	   delete(lat_dim)
+	   lat_dim=lat_dim_tmp
+	   delete(lat_dim_tmp)
+	end if
+	if isfilevar(ffile,"glamt") then 	
+	   lon_dim=coord_file->glamt
+           lon_dim_tmp=rm_single_dims(lon_dim)
+           delete(lon_dim)
+           lon_dim=lon_dim_tmp
+           delete(lon_dim_tmp)
+	end if
+
       else
+
         if isfilepresent("mesh_mask.nc") then
           coord_file=addfile("mesh_mask.nc","r")
-          lat_dim=coord_file->nav_lat
-          lon_dim=coord_file->nav_lon
+	  if isfilevar(ffile,"nav_lat") then lat_dim=coord_file->nav_lat end if
+	  if isfilevar(ffile,"nav_lon") then lon_dim=coord_file->nav_lon end if
         end if
+
+
       end if
     else
       if isfilevar(ffile,"nav_lat") then
         print("File coordinates.nc or mesh_mask.nc cannot be accessed")
       end if
-      lat_dim=ffile->$latname$
-      lon_dim=ffile->$lonname$
+      
+      if .not. ismissing(str_match(Var_DimNames,latname)) then lat_dim=ffile->$latname$ end if
+      if .not. ismissing(str_match(Var_DimNames,lonname)) then lon_dim=ffile->$lonname$ end if	
+
     end if
 
   end if ; rk eq 2
@@ -403,11 +414,21 @@ begin
     end if
   end if
 
-  ; Return depending on rank=1 or rank=2
+  lat_exist=True
+  lon_exist=True
+  ; Return depending on rank=1 or rank=2 (and depend on existence of lat and lon variables)
   if (rank .eq. 1) then 
     return([/field, hor_dim/])
   else ;rk eq 2
-    return([/field, lat_dim, lon_dim/])
+    if isvar("lon_dim") .and. isvar("lat_dim") then  return([/field, lat_dim, lon_dim/]) end if
+    if isvar("lon_dim") .and. .not. isvar("lat_dim") then  
+       lat_exist=False
+       return([/field, lon_dim/]) 
+    end if
+    if .not. isvar("lon_dim") .and. isvar("lat_dim") then  
+       lon_exist=False
+       return([/field, lat_dim/]) 
+    end if	 
   end if
   
 end
@@ -474,17 +495,23 @@ begin
   horizontal=False
   useLatDim=False
   vprofile=False
-  
+  lat_exist=True  
+  lon_exist=True
+
   ; Reading main field and reduction if necessary
   main_field_select=""
-  array=field_reduce(main_file, main_var, logp, useXY, horizontal, useLatDim, vprofile, main_field_select)
+  array=field_reduce(main_file, main_var, logp, useXY, horizontal, useLatDim, vprofile, main_field_select, lat_exist, lon_exist)
   
   fld=array[0]
-  if ListCount(array) .eq. 2 then ; rk eq 1
+  if (ListCount(array) .eq. 2) .and. useXY then ; rk eq 1
     hdim=array[1]
   else ; ListCount eq 3 <=> rk eq 2
-    latdim=array[1]
-    londim=array[2]
+    if lat_exist .and. lon_exist then 
+       latdim=array[1]
+       londim=array[2]
+    end if
+    if (lat_exist .and. .not. lon_exist) then latdim=array[1] end if
+    if (lon_exist .and. .not. lat_exist) then londim=array[1] end if
   end if
  
   ; Reading main field unit, scaling the field and setting REDU
@@ -525,17 +552,23 @@ begin
     useXY_dummy=False
     horizontal_dummy=False
     vprofile_dummy=False
-  
+    lat_exist_dummy=True  
+    lon_exist_dummy=True
+
     ; Reading auxiliary field and reduction if necessary
     aux_field_select=""
-    array2=field_reduce(aux_file, aux_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select)
+    array2=field_reduce(aux_file, aux_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy)
   
     fld2=array2[0]
-    if ListCount(array2) .eq. 2 then
+    if (ListCount(array2) .eq. 2) .and. useXY_dummy then
       hdim2=array2[1]
     else ; ListCount eq 3
-      latdim2=array2[1]
-      londim2=array2[2]
+      if lat_exist_dummy .and. lon_exist_dummy then	
+      	 latdim2=array2[1]	    
+	 londim2=array2[2]
+      end if
+      if (lat_exist_dummy .and. .not. lon_exist_dummy) then latdim2=array2[1] end if
+      if (lon_exist_dummy .and. .not. lat_exist_dummy) then londim2=array2[1] end if
     end if
   
   end if ; AUX_FIELD is True
@@ -558,18 +591,21 @@ begin
     useXY_dummy=False
     horizontal_dummy=False
     vprofile_dummy=False
+    lat_exist_dummy=True
+    lon_exist_dummy=True
 
     useLatDimv=False
     uselect=""
-    array3=field_reduce(u_file, u_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect)
+    array3=field_reduce(u_file, u_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy)
   
     fld3=array3[0]
-    if ListCount(array3) .eq. 2 then
+    if (ListCount(array3) .eq. 2) .and. useXY_dummy then
       print("Rank data for vector u is 1 !!! Vectors fields must have a rank >= 2 !")
       status_exit(1)
     else ; ListCount eq 3
       ;latdimv=array3[1]
-      londimv=array3[2]
+      if (lat_exist_dummy .and. lon_exist_dummy) then londimv=array3[2] end if
+      if (lon_exist_dummy .and. .not. lat_exist_dummy) then londimv=array3[1] end if
     end if
 
     print("-----> Vector v ")
@@ -577,15 +613,15 @@ begin
     ; Reading vector v and reduction if necessary
     useLatDimv=False
     vselect=""
-    array4=field_reduce(v_file, v_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect)
+    array4=field_reduce(v_file, v_var, logp_dummy, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy)
   
     fld4=array4[0]
-    if ListCount(array4) .eq. 2 then
+    if (ListCount(array4) .eq. 2) .and. useXY_dummy then
       print("Rank data for vector v is 1 !!! Vectors fields must have a rank >= 2 !")
       status_exit(1)
     else ; ListCount eq 3
-      latdimv=array4[1]
       ;londimv=array4[2]
+      if lat_exist_dummy then latdimv=array4[1] end if
     end if
      
     ; Rotation des champs de la grille du modele NEMO -> GEO si le fichier des champs d angles est present 
@@ -661,7 +697,9 @@ begin
   wks = gsn_open_wks(type,plotname)
   gsn_define_colormap(wks,cmap) 
   i = NhlNewColor(wks,0.8,0.8,0.8)
-  
+  ; reverse colormap
+  if (isvar("reverse") .and. reverse) then gsn_reverse_colormap(wks) end if
+
   ; main field resources
   res=True
   res@gsnFrame= False
@@ -834,8 +872,8 @@ begin
             if (horizontal) then
               res2@gsnAddCyclic = False
               if useLatDim then
-                res2@sfXArray            = londim
-                res2@sfYArray            = latdim
+                if isvar("londim") then res2@sfXArray = londim end if
+                if isvar("latdim") then res2@sfYArray = latdim end if
                 res2@gsnAddCyclic        = False
               end if
             end if
@@ -872,8 +910,8 @@ begin
       if (horizontal) then
         res2@gsnAddCyclic = False
         if useLatDim2 then
-          res2@sfXArray            = londim2
-          res2@sfYArray            = latdim2
+          if isvar("londim2") then res2@sfXArray = londim2 end if
+          if isvar("latdim2") then res2@sfYArray = latdim2 end if
           res2@gsnAddCyclic        = False
         end if
       end if
@@ -1169,7 +1207,7 @@ begin
         else
           if isvar("aux_options") then res_list(aux_options, res2) end if 
           plot1=gsn_csm_contour(wks,fld2,res2)
-          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+	  if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
         end if
         ;if VECT then
         ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
@@ -1247,7 +1285,7 @@ begin
   if LEVELS_CONTOURS .or. AUX_FIELD then
     overlay(plot0,plot1)   
   end if
-  
+
   ;if VECT then
   ;  overlay(plot0,plot2)  
   ;end if
