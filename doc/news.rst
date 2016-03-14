@@ -8,6 +8,10 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- to_date:
+
+  - Adapt to Ciclad new location for CMIP5 data, and improve install
+    doc for Ciclad
  
 - 2016/02/25 :
 

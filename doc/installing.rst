@@ -74,6 +74,7 @@ Configuring CliMAF
 
   - If running on Ciclad, you must setup your environment by::
 
+    $ module load python
     $ module load ncl/6.3.0
 
   - On some systems, if CDO fails at allocating memory, you may have
