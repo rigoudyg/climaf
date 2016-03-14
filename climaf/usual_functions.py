@@ -12,7 +12,7 @@ def iplot(map):
 
 # -> Identifie les niveaux verticaux du fichier compris entre zmin et zmax
 def getLevs(dat,zmin,zmax,convertPressureUnit=None):
-    from Scientific.IO.NetCDF import NetCDFFile as ncf
+    from anynetcdf import ncf
     filename=dat.baseFiles()
     fileobj=ncf(filename)
     min_lev = zmin
