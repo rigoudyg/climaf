@@ -7,7 +7,7 @@ except ImportError:
         from NetCDF4 import netcdf_file as ncf
     except ImportError:
         try :
-            from NetCDF4 import Dataset as ncf
+            from netCDF4 import Dataset as ncf
         except ImportError:
             try :
                 from scipy.io.netcdf import netcdf_file as ncf
