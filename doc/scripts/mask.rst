@@ -1,4 +1,4 @@
-mask : Set constant to missing value
+mask : set constant to missing value
 --------------------------------------
 
 Set the given constant to missing value.
