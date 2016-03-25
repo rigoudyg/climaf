@@ -19,6 +19,9 @@ Documented operators as of today :
     - :doc:`scripts/space_average`
     - :doc:`scripts/minus`
     - :doc:`scripts/ncdump`
+    - :doc:`scripts/slice`
+    - :doc:`scripts/mask`
+    - :doc:`scripts/ncpdq`
 
  - graphics:
 

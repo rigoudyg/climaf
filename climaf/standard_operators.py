@@ -77,10 +77,10 @@ def load_standard_operators():
             'title=\'\"${title}\"\' myscale=${scale} myoffset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' linp=${linp} colors=\'\"${colors}\"\' level=${level} time=${time} '
+            'units=\'\"${units}\"\' y=\'\"${y}\"\' colors=\'\"${colors}\"\' level=${level} time=${time} '
             'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
             'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
-            'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} '
+            'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} reverse=${reverse} '
             'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
             'tmYRLabelFontHeightF=${tmYRLabelFontHeightF} tiXAxisFontHeightF=${tiXAxisFontHeightF} '
             'tiYAxisFontHeightF=${tiYAxisFontHeightF} gsnPolarLabelFontHeightF=${gsnPolarLabelFontHeightF} '
@@ -93,10 +93,10 @@ def load_standard_operators():
     # 
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
-            'linp=${linp} labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
-            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' lgcols=${lgcols} '
-            'myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' '
-            'trim=${trim} invXY=${invXY} )', format="graph")
+            'y=\'\"${y}\"\' labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' units=\'\"${units}\"\' '
+            'X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' options=\'\"${options}\"\' aux_options=\'\"${aux_options}\"\' '
+            'lgcols=${lgcols} myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' '
+            'resolution=\'\"${resolution}\"\' trim=${trim} invXY=${invXY} vmin=${min} vmax=${max} )', format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #
@@ -108,6 +108,12 @@ def load_standard_operators():
         cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
     #    
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
+    #
+    cscript('slice',"ncks -O -F -v ${var} -d ${dim},${num},${num} ${in} tmp.nc ; ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
+    #
+    cscript("mask","cdo setctomiss,${miss} ${in} ${out}")
+    #
+    cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
     #
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()

@@ -19,7 +19,7 @@ zplot=plot(ta_zonal_mean,title="Zonal mean")
 cshow(zplot)
 
 # Plot with vertical levels equally spaced (with their index)
-zplotl=plot(ta_zonal_mean,title='title',linp=1)
+zplotl=plot(ta_zonal_mean,title='title', y="index")
 cshow(zplotl)
 
 # Compute meridional mean and plot it 
@@ -29,11 +29,11 @@ cshow(mplot)
 
 # Profile of global mean 
 ta_profile=ccdo(ta_merid_mean,operator="zonmean")
-gplot=plot(ta_profile, title="TA profile, log(p)")
+gplot=plot(ta_profile, title="TA profile, log", y="log")
 cshow(gplot)
 
 # Same plot except levels equally spaced
-gplotl=plot(ta_profile, title="TA profile, lin(p)",linp=1)
+gplotl=plot(ta_profile, title="TA profile, index-linear",y="index")
 cshow(gplotl)
 
 # Plot horizontal profile : Meridional profile of zonal tas mean

@@ -671,7 +671,7 @@ def cread(datafile,varname=None):
         clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
         if varname is None: raise Climaf_Driver_Error("")
-        from Scientific.IO.NetCDF import NetCDFFile as ncf
+        from anynetcdf import ncf
         fileobj=ncf(datafile)
         #import netCDF4
         #fileobj=netCDF4.Dataset(datafile)

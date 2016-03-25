@@ -133,72 +133,72 @@ cshow(map_select4)
 
 ## one field ##
 
-# with logp (by default, vertical cross-sections in pressure coordinates will have a logarithmic scale)
+# with y="log" (vertical cross-sections in pressure coordinates will have a logarithmic scale)
 january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
 ta_zonal_mean=ccdo(january_ta, operator="zonmean")
 
-plot_cross1=plot(ta_zonal_mean,title='A cross-section without contours lines')
+plot_cross1=plot(ta_zonal_mean, y="log", title='A cross-section without contours lines')
 cshow(plot_cross1)
 
-plot_cross2=plot(ta_zonal_mean, contours=0, title='A cross-section without contours lines')
+plot_cross2=plot(ta_zonal_mean, y="log", contours=0, title='A cross-section without contours lines')
 cshow(plot_cross2)
 
-plot_cross3=plot(ta_zonal_mean, contours=1, title='A cross-section which contours lines follow color filled contours')
+plot_cross3=plot(ta_zonal_mean, y="log", contours=1, title='A cross-section which contours lines follow color filled contours')
 cshow(plot_cross3)
 
-plot_cross4=plot(ta_zonal_mean, contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
+plot_cross4=plot(ta_zonal_mean, y="log", contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
 cshow(plot_cross4)
 
-# linp=1 (vertical axis will have a index-linear spacing, and logarithmic in pressure)
-plot_cross1b=plot(ta_zonal_mean, linp=1, title='A cross-section without contours lines')
+# y="index" (vertical axis will have a index-linear spacing, and logarithmic in pressure)
+plot_cross1b=plot(ta_zonal_mean, y="index", title='A cross-section without contours lines')
 cshow(plot_cross1b)
 
-plot_cross2b=plot(ta_zonal_mean, linp=1, contours=0, title='A cross-section without contours lines')
+plot_cross2b=plot(ta_zonal_mean, y="index", contours=0, title='A cross-section without contours lines')
 cshow(plot_cross2b)
 
-plot_cross3b=plot(ta_zonal_mean, linp=1, contours=1, title='A cross-section which contours lines follow color filled contours')
+plot_cross3b=plot(ta_zonal_mean, y="index", contours=1, title='A cross-section which contours lines follow color filled contours')
 cshow(plot_cross3b)
 
-plot_cross4b=plot(ta_zonal_mean, linp=1, contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
+plot_cross4b=plot(ta_zonal_mean, y="index", contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
 cshow(plot_cross4b)
 
-# linp=-1 (vertical axis will have a pressure-linear spacing, and logarithmic in index)
-plot_cross1c=plot(ta_zonal_mean, linp=-1, title='A cross-section without contours lines')
+# y="lin" (by default, vertical axis will have a pressure-linear spacing, and logarithmic in index)
+plot_cross1c=plot(ta_zonal_mean, y="lin", title='A cross-section without contours lines')
 cshow(plot_cross1c)
 
-plot_cross2c=plot(ta_zonal_mean, linp=-1, contours=0, title='A cross-section without contours lines')
+plot_cross2c=plot(ta_zonal_mean, contours=0, title='A cross-section without contours lines')
 cshow(plot_cross2c)
 
-plot_cross3c=plot(ta_zonal_mean, linp=-1, contours=1, title='A cross-section which contours lines follow color filled contours')
+plot_cross3c=plot(ta_zonal_mean, contours=1, title='A cross-section which contours lines follow color filled contours')
 cshow(plot_cross3c)
 
-plot_cross4c=plot(ta_zonal_mean, linp=-1, contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
+plot_cross4c=plot(ta_zonal_mean, contours="240 245 250", title='A cross-section which contours lines don t follow color filled contours')
 cshow(plot_cross4c)
 
 ## two fields ##
 
-# with logp (by default, vertical cross-sections in pressure coordinates will have a logarithmic scale)
+# with y="log" (vertical cross-sections in pressure coordinates will have a logarithmic scale)
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 
-plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
+plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, y="log", contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
 cshow(plot_cross5)
 
-plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='A cross-section which contours lines of auxiliary field are automatic levels')
+plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, y="log", title='A cross-section which contours lines of auxiliary field are automatic levels')
 cshow(plot_cross6)
 
-# linp=1 (vertical axis will have a index-linear spacing, and logarithmic in pressure)
-plot_cross5b=plot(ta_zonal_mean, ta_zonal_mean2, linp=1, contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
+# y="index" (vertical axis will have a index-linear spacing, and logarithmic in pressure)
+plot_cross5b=plot(ta_zonal_mean, ta_zonal_mean2, y="index", contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
 cshow(plot_cross5b)
 
-plot_cross6b=plot(ta_zonal_mean, ta_zonal_mean2, linp=1, title='A cross-section which contours lines of auxiliary field are automatic levels')
+plot_cross6b=plot(ta_zonal_mean, ta_zonal_mean2, y="index", title='A cross-section which contours lines of auxiliary field are automatic levels')
 cshow(plot_cross6b)
 
-# linp=-1 (vertical axis will have a pressure-linear spacing, and logarithmic in index)
-plot_cross5c=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
+# y="lin" (by default, vertical axis will have a pressure-linear spacing, and logarithmic in index)
+plot_cross5c=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='A cross-section which contours lines of auxiliary field are explicit levels')
 cshow(plot_cross5c)
 
-plot_cross6c=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='A cross-section which contours lines of auxiliary field are automatic levels')
+plot_cross6c=plot(ta_zonal_mean, ta_zonal_mean2, title='A cross-section which contours lines of auxiliary field are automatic levels')
 cshow(plot_cross6c)
 
 
@@ -209,10 +209,10 @@ ta_zonal_mean=ccdo(january_ta,operator="zonmean") # => (t,z,y)
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # => (t,z,y)
 
-select_cross1=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting index 10 for time', linp=1, time=10) # time selection is done for main and auxiliary field => dim:=(z,y) => we have a cross-section
+select_cross1=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting index 10 for time', y="index", time=10) # time selection is done for main and auxiliary field => dim:=(z,y) => we have a cross-section
 cshow(select_cross1)
 
-select_cross2=plot(ta_zonal_mean, ta_zonal_mean2, title='Time and level selection => profile', linp=1, time=0, level=4) # time and level selection is done => dim:=(y) => we have a vertical profile 
+select_cross2=plot(ta_zonal_mean, ta_zonal_mean2, title='Time and level selection => profile', time=0, level=4) # time and level selection is done => dim:=(y) => we have a vertical profile 
 cshow(select_cross2) 
 
 
@@ -227,22 +227,22 @@ ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 ## one field ##
 ta_profile=ccdo(ta_zonal_mean, operator="mermean")
 
-# with logp (by default, profiles will have a logarithmic scale)
-plot_profile1=plot(ta_profile, title='A profile') 
+# with y="log" (profiles will have a logarithmic scale)
+plot_profile1=plot(ta_profile, title='A profile', y="log") 
 cshow(plot_profile1)
 
-# without logp (linp=1 <=> logp=False)
-plot_profile1b=plot(ta_profile, linp=1, title='A profile')
+# with y="index" (vertical axis will have a index-linear spacing, and logarithmic in pressure) 
+plot_profile1b=plot(ta_profile, y="index", title='A profile')
 cshow(plot_profile1b)
 
 ## two fields ##
 ta_profile2=ccdo(ta_zonal_mean2,operator="mermean")
 
-# with logp (by default, profiles will have a logarithmic scale)
-plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles')
+# with y="log" (profiles will have a logarithmic scale)
+plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', y="log")
 cshow(plot_profile2)
 
-# without logp (linp=1 <=> logp=False)
-plot_profile2b=plot(ta_profile, ta_profile2, linp=1, title='Two profiles')
+# with y="index" (vertical axis will have a index-linear spacing, and logarithmic in pressure) 
+plot_profile2b=plot(ta_profile, ta_profile2, y="index", title='Two profiles')
 cshow(plot_profile2b)
 

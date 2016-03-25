@@ -29,8 +29,13 @@ the script convert all time periods to first's one
     separated by whitespaces
   - ``scale``, ``offset`` : for scaling the input field (x ->
     x*scale + offset); default = 1. and 0. (no scaling) 
-  - ``linp`` : set it to 1 for getting a vertical axis with
-    index-linear spacing  
+  - ``units`` : name of the main field units; used in the caption;
+    default is to use the corresponding CF metadata
+  - ``y`` : y axis style
+    
+    - default: vertical axis with data-linear spacing (y="lin"), or
+    - "index" for getting a vertical axis with index-linear spacing, or
+    - "log" for getting a vertical axis will have a logarithmic scale
   - ``X_axis`` : a string ("real" or "aligned") which drives X
     axis when member profiles do not cover the same range; default to
     "real".   
@@ -40,6 +45,7 @@ the script convert all time periods to first's one
       (take the first file as ref.)  
   - ``invXY`` : set it to True to invert X axis and Y axis; default:
     False  
+  - ``min``, ``max`` : min and max values for main field axis
   - ``fmt``: a string specifying the format of the tick labels for
     time x axis. This string is parsed as follows: the '%' acts as the
     escape character. The single character after every '%' is
@@ -50,11 +56,14 @@ the script convert all time periods to first's one
     In case fmt is absent, a minimal algorithm exists which tries to
     determine the format string depending on the time range length.
   - ``lgcols`` : number of columns for legend; default: 3.
-  - ``options`` : a string for setting NCL graphic resources directly
-    , separated by "|", as e.g. :
-    ' options="tiMainString=lv|xyLineThicknessF=5." '. These
-    ressources have higher priority than CliMAF default ones, which
-    are :
+  - ``options``, ``aux_options`` : strings for setting NCL graphic
+    resources directly for main field and auxiliary field
+    respectively. These resources are separated by "|", as e.g. : 
+    ' options="tiMainString=lv|xyLineThicknessF=5.",
+    aux_options="xyLineColor=red" '. It is recommended to use argument
+    ``aux_options`` only if you plot exactly two fields. 
+    These resources have higher priority than CliMAF default ones,
+    which are :  
 
     - txFontHeightF = 0.010
     - tmXBLabelFontHeightF=0.008
@@ -72,8 +81,8 @@ the script convert all time periods to first's one
     - lgLabelFontHeightF     = 0.009            
     - lgPerimOn              = False            
     - lgBoxMinorExtentF      = 0.2    
-    - tiXAxisString, tiYAxisString= data @long_name if data has
-      "long_name" attribute (take the first file as ref.)
+    - tiXAxisString, tiYAxisString= data @long_name (units) if data
+      has "long_name" attribute (take the first file as ref.) 
 
     For more details, see: https://www.ncl.ucar.edu/
 
@@ -143,8 +152,8 @@ the script convert all time periods to first's one
   >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
   >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
   >>> ta_profile=ccdo(ta_zonal_mean, operator="mermean")
-  >>> a=curves(ta_profile, title='A profile',linp=1) 
+  >>> a=curves(ta_profile, title='A profile',y="index") 
   >>> cshow(a)
   >>> # Same as above and X and Y are inverted
-  >>> a=curves(ta_profile, title='A profile',linp=1,invXY=True) 
+  >>> a=curves(ta_profile, title='A profile',y="index",invXY=True) 
   >>> cshow(a)

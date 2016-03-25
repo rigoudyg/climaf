@@ -13,7 +13,7 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. myscale=.. myoffset=.. linp=1  X_axis=.. invXY=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
+; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. myscale=.. myoffset=.. y="log"  X_axis=.. invXY=..vmin=.. vmax=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
 ;
 ; infile, plotname and var are mandatory
 ;
@@ -28,7 +28,13 @@
 ; myscale, myoffset : for scaling the input field (x -> x*scale + offset); default = 1. 
 ; and 0. (no scaling) 
 ;
-; If argument linp=1 and data is a vertical profile, do not plot it in log(p) 
+; units : name of the main field units; used in the caption; default is to use the 
+; corresponding CF metadata
+;
+; y : y axis style
+;    - default: vertical axis with data-linear spacing (y="lin"), or
+;    - "index" for getting a vertical axis with index-linear spacing, or
+;    - "log" for getting a vertical axis will have a logarithmic scale
 ;
 ; X_axis : a string ("real" or "aligned") which determines X axis when datasets
 ; does not cover the same range;  default to "real".
@@ -37,6 +43,8 @@
 ;                                (take the first file as ref.)  
 ;
 ; invXY : set it to True to invert X axis and Y axis; default: False 
+;
+; vmin, vmax : min and max values for main field axis
 ;
 ; fmt : a string specifying the format of the tick labels for time x axis. This 
 ; string is parsed as follows: the '%' acts as the escape character. The single 
@@ -47,9 +55,11 @@
 ; 
 ; lgcols : number of columns for legend. lgcols must be different from 0; default: 3.
 ;
-; options : a string for all graphic resources defined by user, each separated by "|", 
-; as e.g. : ' options="tiMainString=lv|xyLineThicknessF=5." '.This list is priority in 
-; front of graphic resources in this script.
+; options, aux_options : strings for all graphic resources defined by user for main field 
+; and auxiliary field respectively. These resources are separated by "|", 
+; as e.g. : ' options="tiMainString=lv|xyLineThicknessF=5.", aux_options="xyLineColor=red" '.
+; This list is priority in front of graphic resources in this script.
+; It is recommended to use argument aux_options only if you plot exactly two fields.
 ;
 ; format : graphic output format, either 'png', 'pdf' or 'eps'; default: 'png'.
 ;
@@ -179,7 +189,7 @@ begin
         ; print("First non-singleton dim is :"+Var_DimNames(dim)+" size is "+dime(dim))
         found=True
         coord=Var_DimNames(dim)
-        
+      
         if (i .eq. 0) then
           if isatt(fld&$coord$,"units") then
             unit_first_file=fld&$coord$@units
@@ -232,8 +242,8 @@ begin
  
   ;---Resources for "left" variable
   res=True
-  res@gsnDraw          = False   ; Will draw later, after overlaying
-  res@gsnFrame         = False   ; all plots
+  res@gsnDraw          = False    ; Will draw later, after overlaying
+  res@gsnFrame         = False    ; all plots
   res@gsnMaximize = True
   ;res@vpWidthF    = 0.7          ; Make plots wider
   ;res@vpHeightF   = 0.5
@@ -252,15 +262,25 @@ begin
   end if
 
   ; Min and max x axis
-  if ( .not. ( isatt(Xaxis,"axis") .and. (Xaxis@axis .eq. "Z") ) .and. (.not. invXY) ) \
-    .or. ( isatt(Xaxis,"axis") .and. (Xaxis@axis .eq. "Z") .and. invXY ) then
+  if ( .not. ( (isatt(Xaxis,"axis") .and. ((Xaxis@axis .eq. "Z") .or. (Xaxis@axis .eq. "z"))) \
+    .or. .not. ismissing(str_match(coord,"dept")) .or. (coord .eq. "sigma") .or. (coord .eq. "z") \
+    .or. (coord .eq. "Z") .or. (coord .eq. "plev") .or. (coord .eq. "lev") .or. (coord .eq. "level") \
+    .or. (coord .eq. "p") .or. (coord .eq. "pressure") ) .and. (.not. invXY) ) \
+    .or. ( ( (isatt(Xaxis,"axis") .and. ((Xaxis@axis .eq. "Z") .or. (Xaxis@axis .eq. "z"))) \
+    .or. .not. ismissing(str_match(coord,"dept")) .or. (coord .eq. "sigma") \
+    .or. (coord .eq. "z") .or. (coord .eq. "Z") .or. (coord .eq. "plev") \
+    .or. (coord .eq. "lev") .or. (coord .eq. "level") .or. (coord .eq. "p") .or. (coord .eq. "pressure") ) .and. invXY ) then
     res@trXMinF=min(Xaxis)
     res@trXMaxF=max(Xaxis)
+    if isvar("vmin") then res@trYMinF=vmin end if
+    if isvar("vmax") then res@trYMaxF=vmax end if
   else
     res@trYMinF=min(Xaxis)
     res@trYMaxF=max(Xaxis)
     ;res@trXMinF=min(all_fld)
     ;res@trXMaxF=max(all_fld)
+    if isvar("vmin") then res@trXMinF=vmin end if
+    if isvar("vmax") then res@trXMaxF=vmax end if
   end if
   
   ;---Thickness
@@ -300,6 +320,9 @@ begin
   end do
 
   res@tiMainString     = title                       ; add title
+  if (.not. isvar("units")) then 
+    if (isatt(fld,"units")) then units=fld@units else units="None" end if
+  end if
   
   ;---Resources for legend
   res@pmLegendDisplayMode    = "Always"              ; turn on legend
@@ -310,9 +333,8 @@ begin
   ;res@lgItemOrder           = (/1,0/)               ; reverse legend
   res@lgBoxMinorExtentF      = 0.2                   ; Shorten the legend lines (ncl default: 0.6)
   
-  ;---linp
-  logp=True
-  if (isvar("linp")) then if linp .eq. 1 then logp=False end if end if
+  ;---y axis style
+  if .not. isvar("y") then y="lin" end if
   
   if (.not. ismissing(str_match(coord,"time"))) .or. (.not. ismissing(str_match(coord,"Time"))) then 
     ;--------------------------------------------------
@@ -460,32 +482,46 @@ begin
           res@pmLegendParallelPosF   = 0.1        ; move right slightly 
           res@pmLegendOrthogonalPosF = -0.14      ; move up slightly 
 
-          if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
-            if (ax@positive .eq. "down") then 
-              res@trYReverse = True ; reverse Y-axis
-            end if
-            if logp then 
-              res@xyYStyle = "Log" 
-              set_pres_hgt_axes(ax,res,True)
-            end if
-
-            if isatt(fld, "long_name") then
-              if invXY then
-                res@tiYAxisString = fld@long_name 
-              else
-                res@tiXAxisString = fld@long_name
-              end if
-            end if
-            ; Read graphic resources list defined by user (with optional argument 'options')
-            if isvar("options") then
-              res_list(options, res)
-            end if
+          if ( (isatt(ax,"axis") .and. ((ax@axis .eq. "Z") .or. (ax@axis .eq. "z"))) \
+            .or. .not. ismissing(str_match(coord,"dept")) .or. (coord .eq. "sigma") \
+            .or. (coord .eq. "z") .or. (coord .eq. "Z") .or. (coord .eq. "plev") \
+            .or. (coord .eq. "lev") .or. (coord .eq. "level") .or. (coord .eq. "p") \
+            .or. (coord .eq. "pressure") ) then
 
             if invXY then
+              if (ax@positive .eq. "down") then 
+                res@trXReverse = True ; reverse X-axis
+              end if
+              if (y .eq. "log") then
+                res@xyXStyle = "Log" 
+              else
+                if (y .eq. "index") then  ; index linear 
+                  res@xyXStyle = "Irregular"
+                  res@xyXIrregularPoints = ax
+                end if
+              end if
+              if isatt(fld, "long_name") then res@tiYAxisString = fld@long_name + " (" + units + ")" end if
+              ;Read graphic resources list defined by user (with optional argument 'options')
+              if isvar("options") then res_list(options, res) end if
               plot = gsn_csm_xy(wks,ax,ndtooned(fld),res)
+
             else
+              if (ax@positive .eq. "down") then 
+                res@trYReverse = True ; reverse Y-axis
+              end if
+              if (y .eq. "log") then
+                res@xyYStyle = "Log" 
+                set_pres_hgt_axes(ax,res,True)
+              else
+                if (y .eq. "index") then  ; index linear 
+                  res@xyYStyle = "Irregular"
+                  res@xyYIrregularPoints = ax
+                end if
+              end if
+              if isatt(fld, "long_name") then res@tiXAxisString = fld@long_name + " (" + units + ")" end if
+              if isvar("options") then res_list(options, res) end if
               plot = gsn_csm_xy(wks,ndtooned(fld),ax,res) 
-            end if
+            end if ; invXY
           else
 
             if isatt(ax, "long_name") \
@@ -498,14 +534,12 @@ begin
             end if
             if isatt(fld, "long_name") then
               if invXY then
-                res@tiXAxisString = fld@long_name
+                res@tiXAxisString = fld@long_name + " (" + units + ")"
               else
-                res@tiYAxisString = fld@long_name
+                res@tiYAxisString = fld@long_name + " (" + units + ")"
               end if
             end if
-            if isvar("options") then
-              res_list(options, res)
-            end if
+            if isvar("options") then res_list(options, res) end if
             if invXY then
               plot = gsn_csm_xy(wks,ndtooned(fld),ax,res)
             else
@@ -525,23 +559,45 @@ begin
           res@pmLegendParallelPosF   = 0.1+line_labels_space*(mod(i,lgcols)) 
           res@pmLegendOrthogonalPosF = -0.14+0.05*(tointeger(i/lgcols))   
           
-          if (isatt(ax,"axis") .and. (ax@axis .eq. "Z")) then
-            if (ax@positive .eq. "down") then 
-              res@trYReverse = True ; reverse Y-axis
-            end if
-            if logp then 
-              res@xyYStyle = "Log" 
-              set_pres_hgt_axes(ax,res,True)
-            end if
- 
+          if ( (isatt(ax,"axis") .and. ((ax@axis .eq. "Z") .or. (ax@axis .eq. "z"))) \
+            .or. .not. ismissing(str_match(coord,"dept")) .or. (coord .eq. "sigma") \
+            .or. (coord .eq. "z") .or. (coord .eq. "Z") .or. (coord .eq. "plev") \
+            .or. (coord .eq. "lev") .or. (coord .eq. "level") .or. (coord .eq. "p") \
+            .or. (coord .eq. "pressure") ) then
+
             if invXY then
+              if (ax@positive .eq. "down") then 
+                res@trXReverse = True ; reverse X-axis
+              end if
+              if (y .eq. "log") then
+                res@xyXStyle = "Log" 
+              else
+                if (y .eq. "index") then  ; index linear 
+                  res@xyXStyle = "Irregular"
+                  res@xyXIrregularPoints = ax
+                end if
+              end if
+              if (i .eq. 1) .and. isvar("aux_options") then res_list(aux_options, res) end if
               over = gsn_csm_xy(wks,ax,ndtooned(fld),res)
             else
+              if (ax@positive .eq. "down") then 
+                res@trYReverse = True ; reverse Y-axis
+              end if
+              if (y .eq. "log") then
+                res@xyYStyle = "Log" 
+              else
+                if (y .eq. "index") then  ; index linear 
+                  res@xyYStyle = "Irregular"
+                  res@xyYIrregularPoints = ax
+                end if
+              end if
+              if (i .eq. 1) .and. isvar("aux_options") then res_list(aux_options, res) end if
               over = gsn_csm_xy(wks,ndtooned(fld),ax,res)
-            end if
+            end if ; invXY
 
           else
 
+            if (i .eq. 1) .and. isvar("aux_options") then res_list(aux_options, res) end if
             if invXY then
               over = gsn_csm_xy(wks,ndtooned(fld),ax,res)
             else
