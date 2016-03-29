@@ -133,7 +133,8 @@ Changes, newest first :
      :download:`cdftools_multivar <../examples/cdftools_multivar.py>`
      were added to the script which tests all examples
      :download:`test_examples <../testing/test_examples.sh>` 
-   - 'cpdfcrop' and 'cepscrop' tools are embarked in CliMAF distribution:
+   - cpdfcrop, which is used by operators 'cpdfcrop' and 'cepscrop'
+     tools, is embarked in CliMAF distribution:
      ``<your_climaf_installation_dir>/bin/pdfcrop``
    - Python 2.7 is required and tested in :download:`test_install
      <../testing/test_install.sh>`  

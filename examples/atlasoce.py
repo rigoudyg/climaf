@@ -6,35 +6,44 @@ desc="\n\nProto d'atlas oceanique (Nemo) en CliMAF (CMIP5 seulement pour l'insta
 from optparse import OptionParser
 parser = OptionParser(desc) ; parser.set_usage("%%prog [-h]\n%s" % desc)
 parser.add_option("-s", "--simulation", 
-                  help="simulation a traiter ",
+                  help="simulation to process ",
                   action="store",default="historical")
+parser.add_option("-i", "--index", 
+                  help="html index filename",
+                  action="store",default="index_oce.html")
+parser.add_option("-d", "--directory", 
+                  help="destination directory ", action="store")
+parser.add_option("-a", "--alt_dir_name", 
+                  help="disguise links to another dir ", action="store")
+parser.add_option("-u", "--root_url", 
+                  help="Root url for option -a",
+                  default="https://vesg.ipsl.upmc.fr", action="store")
 parser.add_option("-p", "--period", 
                   help="period after CliMAF syntax, as e.g. 1980-1987",
                   action="store",default="1980")
 parser.add_option("-v", "--variables", 
-                  help="liste des variables (separees par des virgules)", action="store",default="thetao,so")
-#parser.add_option("-o", "--pdf", 
-#                  help="nom du pdf de sortie (default: atlas_<SIMU>_<SAISON>.pdf)", action="store")
+                  help="variables list(comma separated)",
+                  action="store",default="thetao,so")
+#
 (opts, args) = parser.parse_args()
-if opts.simulation is None :
-    print "Must provide a simulation "
-    exit(0)
+
+# Some settings about data used (model and obs)
+#######################################################
+# Scaling de la MOC modele pour homogeneite avec obs RAPID
+calias("CMIP5","msftmyz",scale=1.e-3)
+
+# Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
+dataloc(project="ref_pcmdi",organization="generic",
+        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
+calias('ref_pcmdi','moc','stream_function_mar',filenameVar='moc')
 
 model=dict(project='CMIP5',model='CNRM-CM5', frequency="mon", 
            realm="ocean", table="Omon", version="latest", 
            period=opts.period, experiment=opts.simulation,simulation="r1i1p1")
 levitus=dict(project="ref_pcmdi", product='NODC-Levitus',clim_period='*')
 
-# Obs de MOC RAPID 
-# (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
-dataloc(project="ref_pcmdi",organization="generic",
-        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
-calias('ref_pcmdi','moc','stream_function_mar',filenameVar='moc')
-
-# Scaling de la MOC modele pour homogeneite avec obs RAPID
-calias("CMIP5","msftmyz",scale=1.e-3)
-
-
+# Basic functions
+#######################
 def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/mask'):
     """
     Given two dataset specifications, and an oceanic variable name,
@@ -61,7 +70,7 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     tmean_modvar=ccdo(modvar,operator='timavg -yearmonmean')
     tmean_obsvar=ccdo(obsvar,operator='yearmonmean') 
     
-    #- Compute vertical profiles 
+    #- Compute model profile using CdfTools (this requires some pre-processing)
     fixed_fields('ccdfmean_profile',
              ('mask.nc',    masks+'/ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',masks+'/ORCA1_mesh_hgr.nc'),
@@ -69,6 +78,8 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     cscript("rename_time","ncrename -d time,time_counter ${in} ${out}")
     aux=rename_time(tmean_modvar)
     vertprof_modvar=ccdfmean_profile(aux,pos_grid='T')
+
+    # Obs profile is simpler to compute, thanks to a regular grid
     vertprof_obsvar=ccdo(tmean_obsvar,operator='mermean -zonmean')
 
     #- Plot vertical profile of model & obs data
@@ -78,29 +89,32 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     return(myplot)
 
 
-def plot_atl_moc(model, variable="msftmyz", rank=1):
+def plot_basin_moc(model, variable="msftmyz", basin=1):
     # Plot a model MOC slice
     moc_model=ds(variable=variable, **model)
     moc_model_mean=time_average(moc_model)
-    # extraire le bassin de rang 'rank' (def: Atlantique=1)
-    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=rank)
+    # extraire le bassin de rang 'basin' (def: Atlantique=1)
+    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=basin)
     # masquer les valeurs 
     moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
     # Plot
-    plot_moc_slice=plot(moc_model_mean_atl_mask, title="MOC", y="index",
+    plot_moc_slice=plot(moc_model_mean_atl_mask, title="MOC", y="lin",
                         min=-10.,max=30.,delta=1.,scale=1e-3,units="Sv",options="trXMinF=-30.")
     return(plot_moc_slice)
 
 
 # Profil de MOC, vs Obs RAPID
-def moc_profile_vs_obs_rapid(model,variable="msftmyz",rank=1): 
+def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1): 
+    """ 
+    Model is a dict defining the model dataset (except variable)
+    """
     # Comparer les profil de MOC modele/RAPID a la latitude 26
     mod=model.copy()
     mod.update({'variable': variable})
     moc_model=ds(**mod)
     moc_model_mean=time_average(moc_model)
     #extraire le bassin Atlantique de la MOC modele
-    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=rank)
+    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=basin)
     #masquer les valeurs et extraire la latitude 26
     moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
     moc_model_26=slice(moc_model_mean_atl_mask, dim='lat', num=26.5)
@@ -112,47 +126,62 @@ def moc_profile_vs_obs_rapid(model,variable="msftmyz",rank=1):
                           y="lin", units="Sv", aux_options="xyLineColor='red'")
     return plot_profile_obs
 
-#pdffile="atlas_"+opts.simulation+"_"+opts.season+".pdf"
-#pdfargs=["pdfjam","--landscape","-o ",pdffile]
 
-# Initialisation de l'index html
+# Init html index
+#########################################################################
+#if opts.directory : atlas_dir=os.path.expanduser(opts.directory)
+ 
 index= header("Nemo CliMAF Atlas for "+opts.simulation+ " and period "+opts.period) 
-#index += cell('PDF',pdffile)
 index += section("ocean", level=4)
+
+# A table with one line per variable, showing its global average profile
+#########################################################################
 index += open_table()
 
+# Table title line
 index+=open_line('VARIABLE')+cell('profile')+cell('map')+close_line()
 lvars=opts.variables.split(',')
 
-atlas_dir=os.path.expanduser(cachedir+'/../atlas')
+# Loop on variables, one per line
 for variable  in lvars :
     profile=model_vs_obs_profile_oce(variable,model,levitus)
     index+=open_line(variable)+\
-            cell("",cfile(profile),thumbnail="70*70", hover=True, dirname=atlas_dir)
+            cell("",cfile(profile),thumbnail="70*70", hover=True, altdir=opts.alt_dir_name)
     close_line()
 index += close_table()
 
+# Some more plots
+#########################################################################
 index += vspace(2)
-
 moc_profile=moc_profile_vs_obs_rapid(model)
-moc_atl=plot_atl_moc(model)
-index+=line({"moc_profile":cfile(moc_profile), "moc_atl":cfile(moc_atl)},title="Autres:   ", hover=True, dirname=atlas_dir)
+moc_atl=plot_basin_moc(model,basin=1)
+index+=line({"moc_profile":cfile(moc_profile), "moc_atl":cfile(moc_atl)},
+            title="Autres:   ", hover=True, altdir=opts.alt_dir_name)
 
 
 index += trailer()
-out="index_example.html"
-with open(out,"w") as filout : filout.write(index)
-import os,os.path ; 
-print("Attendez un bon peu : lancemement de firefox sur Ciclad....")
-os.system("firefox file://"+os.path.abspath(os.path.curdir)+"/"+out+"&")
+import os 
+out=opts.index
+if opts.alt_dir_name :
+    outfile=cachedir+"/"+out
+    with open(outfile,"w") as filout : filout.write(index)
+    print("index actually writtten as : "+outfile)
+    print("may be seen at "+opts.root_url+outfile.replace(cachedir,opts.alt_dir_name))
+else :
+    with open(out,"w") as filout : filout.write(index)
+    print("The atlas is ready as %s"%out)
+    #print("You may copy it using : scp -r "+os.system("uname -n")+":%s ...."%(atlas_dir))
+    #print("Attendez un bon peu : lancemement de firefox sur Ciclad....")
+    #os.system("firefox file://"+os.path.abspath(os.path.curdir)+"/"+out+"&")
 
 
 
+def spare_code() :
+    # Example for defining a data organization in a project
+    cproject("dmc", "root")
+    cdef("root","/data/mcheval")
+    dataloc(project="dmc",organization="generic",url="${root}/${simulation}/${simulation}_1m_YYYYMMDD_YYYYMMDD_grid_${variable}.nc")
+    calias("dmc", 'tos',filenameVar='T')
+    tos=ds(project='dmc',simulation='O1IAF01',variable='tos',period='1980')
 
-# Example for defining a data organization in a project
-cproject("dmc", "root")
-cdef("root","/data/mcheval")
-dataloc(project="dmc",organization="generic",url="${root}/${simulation}/${simulation}_1m_YYYYMMDD_YYYYMMDD_grid_${variable}.nc")
-calias("dmc", 'tos',filenameVar='T')
-tos=ds(project='dmc',simulation='O1IAF01',variable='tos',period='1980')
 

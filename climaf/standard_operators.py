@@ -107,8 +107,6 @@ def load_standard_operators():
     if (os.system("type exiv2 >/dev/null 2>&1") == 0) :
         cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
     #    
-    cscript('cepscrop'     , 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; pdftops -eps tmpfile-crop.pdf ${out}; rm -f tmpfile.pdf tmpfile-crop.pdf ', format="eps")
-    #
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #
     cscript('slice',"ncks -O -F -v ${var} -d ${dim},${num},${num} ${in} tmp.nc ; ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
