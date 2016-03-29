@@ -79,7 +79,7 @@ def load_standard_operators():
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
             'units=\'\"${units}\"\' y=\'\"${y}\"\' colors=\'\"${colors}\"\' level=${level} time=${time} '
             'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
-            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
+            'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} fmt=\'\"${fmt}\"\' '
             'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} reverse=${reverse} '
             'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
             'tmYRLabelFontHeightF=${tmYRLabelFontHeightF} tiXAxisFontHeightF=${tiXAxisFontHeightF} '

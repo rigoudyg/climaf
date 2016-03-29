@@ -8,6 +8,14 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/03/29 :
+  
+  - Changes for standard operator ``plot`` : Tick marks are smartly
+    adapted to the time period duration for (t,z) profiles and the new
+    argument ``fmt`` to change this format is available (see
+    :doc:`scripts/plot`)   
+
+
 - 2016/03/25 :
 
   - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
