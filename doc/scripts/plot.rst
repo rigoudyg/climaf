@@ -90,6 +90,17 @@ General:
 
     For more details, see: https://www.ncl.ucar.edu/
 
+  - ``fmt``: a string specifying the format of the tick labels for
+    time axis in case of (t,z) profiles. This string is parsed as
+    follows: the '%' acts as the escape character. The single
+    character after every '%' is formatted according to the rule
+    described here: 
+
+    https://www.ncl.ucar.edu/Document/Functions/User_contributed/time_axis_labels.shtml
+
+    In case fmt is absent, a minimal algorithm exists which tries to
+    determine the format string depending on the time range length. 
+
 Main field:
 
   - colormap and its interpretation :

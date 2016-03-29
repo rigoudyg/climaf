@@ -6,6 +6,7 @@
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
+load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl" 
 
 ;--------------------------------------------------------------------------------------------
 undef("str_convert")
@@ -1266,12 +1267,19 @@ begin
       if (y .eq. "log") then
 
         print("using gsn_csm_pres_hgt")
-        if tz_profile .and. (isvar("invXY") .and. invXY) then  
+        if tz_profile then
           VarDim=getVarDimNames(fld) 
-          tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-          delete(fld)
-          fld=tr_fld
-          delete(tr_fld)
+          restick=True
+          if (isvar("invXY") .and. invXY) then  
+            tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
+            delete(fld)
+            fld=tr_fld
+            delete(tr_fld)
+          else
+            restick@ttmAxis="YL"  ; "XB" by default
+          end if
+          if (isvar("fmt")) then restick@ttmFormat=fmt end if
+          time_axis_labels(fld&$VarDim(0)$,res,restick)
         end if
         if isvar("options") then res_list(options, res) end if 
         plot0=gsn_csm_pres_hgt(wks,fld,res)
@@ -1304,12 +1312,19 @@ begin
           ;useless :
           ;res@sfYArray            = zdim
           res@trYReverse        = True ; reverse Y-axis          
-          if tz_profile .and. (isvar("invXY") .and. invXY) then  
+          if tz_profile then
             VarDim=getVarDimNames(fld) 
-            tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-            delete(fld)
-            fld=tr_fld
-            delete(tr_fld)
+            restick = True
+            if (isvar("invXY") .and. invXY) then  
+              tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
+              delete(fld)
+              fld=tr_fld
+              delete(tr_fld)
+            else
+              restick@ttmAxis="YL"  ; "XB" by default
+            end if
+            if (isvar("fmt")) then restick@ttmFormat=fmt end if
+            time_axis_labels(fld&$VarDim(0)$,res,restick)
           end if
           if isvar("options") then res_list(options, res) end if 
           plot0=gsn_csm_contour(wks,fld,res)
@@ -1339,12 +1354,19 @@ begin
             print("using gsn_csm_contour; y with data-linear spacing")
             res@trYReverse        = True ; reverse Y-axis
             res@gsnYAxisIrregular2Linear= True
-            if tz_profile .and. (isvar("invXY") .and. invXY) then  
+            if tz_profile then
               VarDim=getVarDimNames(fld) 
-              tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-              delete(fld)
-              fld=tr_fld
-              delete(tr_fld)
+              restick=True
+              if (isvar("invXY") .and. invXY) then  
+                tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
+                delete(fld)
+                fld=tr_fld
+                delete(tr_fld)
+              else
+                restick@ttmAxis="YL"  ; "XB" by default
+              end if
+              if (isvar("fmt")) then restick@ttmFormat=fmt end if
+              time_axis_labels(fld&$VarDim(0)$,res,restick)
             end if
             if isvar("options") then res_list(options, res) end if 
             plot0=gsn_csm_contour(wks,fld,res)
