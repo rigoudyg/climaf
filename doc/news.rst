@@ -8,11 +8,55 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
-- to_date:
+- 2016/03/25 - Version 0.13 :
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - new argument ``reverse`` to reverse colormap;
+    - a **change breaking backward compatibility** : optional argument
+      ``linp`` was renamed ``y`` and its default was modified (now
+      default is a vertical axis with data-linear spacing, so you have
+      to specify y="log" to obtain the same plot make without argument
+      linp before);
+    - ``min`` and ``max`` was extended to define the range of main
+      field axis for profiles; 
+    - this operator can now plot (t,z) profiles;
+    - bug fixes if data file only contains latitude or longitude;
+    - bug fixes to custom color of auxiliary field for profiles via
+      argument ``aux_options``  
+
+  - Changes for standard operator ``curves`` (see :doc:`scripts/curves`) :
+
+    - new arguments : 
+
+      - ``aux_options`` for setting NCL graphic resources directly for
+	auxiliary field (it is recommended to use this argument only
+	if you plot exactly two fields);
+      - ``min`` and ``max`` to define min and max values for main
+	field axis 
+    - a change breaking backward compatibility : optional argument
+      ``linp`` was renamed ``y``, a new axis style is proposed
+      (data-linear spacing) and its default was modified (now default
+      is a vertical axis with data-linear spacing, so you have to
+      specify y="log" to obtain the same plot make without argument
+      linp before);  
+    - add field unit after 'long_name' attribute of field in title of
+      field axis  
+
+  - New standard operators ``slice``, ``mask`` and ``ncpdq`` : see
+    :doc:`scripts/slice`, :doc:`scripts/mask` and :doc:`scripts/ncpdq`    
+
+ - A new example in the distribution : see :download:`atlasoce.py
+   <../examples/atlasoce.py>`    
+
+ - File 'angle_EM.nc' in 'tools' directory was renamed
+   :download:`angle_data_CNRM.nc <../tools/angle_data_CNRM.nc>` to be
+   compatible with the new project 'data_CNRM'  
 
   - Adapt to Ciclad new location for CMIP5 data, and improve install
     doc for Ciclad
- 
+
+
 - 2016/02/25 :
 
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :  

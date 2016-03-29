@@ -56,11 +56,11 @@ General:
       standard paper size by name, as e.g. 'A4'. Ncl uses a resolution
       of 72 dots per inch (dpi); default (ncl): 8.5x11 or "letter"
       (<=> 612x792 pixels)  
-  - ``linp`` : 
-
-    - 1 for getting a vertical axis with index-linear spacing, or
-    - -1 for getting a vertical axis with data-linear spacing, or
-    - default: vertical axis will have a logarithmic scale
+  - ``y`` : y axis style
+    
+    - "lin" (default) : data-linear spacing, or
+    - "index" : index-linear spacing, or
+    - "log" : logarithmic scale
   - ``proj`` : use it to request a stereopolar projection, as e.g. :
     "NH","SH60"...
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
@@ -97,7 +97,9 @@ Main field:
    - ``cmap`` : name of the Ncl colormap to use; see e.g. 
      https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness ;
      default (climaf) is 'BlueDarkRed18'
-   - ``min``, ``max`` , ``delta`` : min and max values and levels when applying the colormap, or 
+   - ``min``, ``max`` , ``delta`` : min and max values and 
+     levels when applying the colormap (or setting the axis 
+     for profiles), or
    - ``colors`` : list of levels used when applying colormap
      e.g. colors="260 270 280 290"
 
@@ -254,21 +256,21 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 
-     >>> # A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale (default)
-     >>> plot_cross1=plot(ta_zonal_mean,title='1 field cross-section without contours lines')
+     >>> # A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale (y=log")
+     >>> plot_cross1=plot(ta_zonal_mean, y="log", title='1 field cross-section without contours lines')
      >>> cshow(plot_cross1)
 
      >>> # A cross-section of one field, which contours lines following color fill
-     >>> plot_cross2=plot(ta_zonal_mean, contours=1, title='1 field (contours lines follow color filled contours)')
+     >>> plot_cross2=plot(ta_zonal_mean, y="log", contours=1, title='1 field (contours lines follow color filled contours)')
 
      >>> # A cross-section of one field, with used-controlled contours lines 
-     >>> plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='1 field (user control contours)')
+     >>> plot_cross3=plot(ta_zonal_mean, y="log", contours="240 245 250", title='1 field (user control contours)')
 
      >>> # A cross-section of two fields, with explicit contours levels for auxiliary field
-     >>> plot_cross4=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='2 fields (user control auxiliary field contours)') 
+     >>> plot_cross4=plot(ta_zonal_mean, ta_zonal_mean2, y="log", contours="240 245 250", title='2 fields (user control auxiliary field contours)') 
 
      >>> # A cross-section of two fields, with automatic contours levels for auxiliary field and a pressure-linear spacing for vertical axis 
-     >>> plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='2 fields (automatic contours levels for auxiliary field)')
+     >>> plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, y="index", title='2 fields (automatic contours levels for auxiliary field)')
     
      >>> # A cross-section with value selection of time step for all fields which have this dimension
      >>> # time selection is done for main and auxiliary field 
@@ -276,18 +278,24 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean") 
      >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
-     >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', linp=1, time=3000.) 
+     >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', y="index", time=3000.) 
+
   - A profile ::
 
+     >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
+     >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
+     >>> # Extraction of 'january_ta' sub box for auxiliary field
+     >>> cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) 
+     >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
      >>> ta_profile=ccdo(ta_zonal_mean,operator="mermean")
      >>> ta_profile2=ccdo(ta_zonal_mean2,operator="mermean")
 
-     >>> # One profile, with a logarithmic scale (default)
-     >>> plot_profile1=plot(ta_profile, title='A profile')
+     >>> # One profile, with a logarithmic scale
+     >>> plot_profile1=plot(ta_profile, y="log", title='A profile')
      >>> cshow(plot_profile1)
- 
-     >>> # Two profiles, with a index-linear spacing for vertical axis
-     >>> plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', linp=1)
+
+     >>> # Two profiles, with a data-linear spacing for vertical axis (default)
+     >>> plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles')
 
 .. _plot_more_args:
 
@@ -434,7 +442,7 @@ For profiles:
      >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
      >>> ta_profile=ccdo(ta_zonal_mean, operator="mermean")
-     >>> profile=plot(ta_profile, title='A profile with some adjustments', linp=1,
+     >>> profile=plot(ta_profile, title='A profile with some adjustments', y="index",
      >>> ... invXY=True, tmXBLabelFontHeightF=0.01, tmYLLabelFontHeightF=0.01) 
 
 **Side effects** : None

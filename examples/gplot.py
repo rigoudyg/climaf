@@ -150,8 +150,8 @@ ta_zonal_mean=ccdo(january_ta,operator="zonmean")     # main field
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # auxiliary field
 
-# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale (default)
-plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)')
+# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale 
+plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)', y="log")
 cshow(plot_cross1)
 
 # A cross-section of one field, which contours lines follow color filled contours
@@ -162,8 +162,8 @@ cshow(plot_cross2)
 plot_cross3=plot(ta_zonal_mean, contours="240 245 250", title='1 field (user-controled contours)')
 cshow(plot_cross3)
 
-# Same cross-section but with linp=1 (vertical axis will have a index-linear spacing, and logarithmic in pressure)
-plot_cross4=plot(ta_zonal_mean, linp=1, contours="240 245 250", title='1 field (user-controled contours)')
+# Same cross-section but with y="index" (vertical axis will have a index-linear spacing, and logarithmic in pressure)
+plot_cross4=plot(ta_zonal_mean, y="index", contours="240 245 250", title='1 field (user-controled contours)')
 cshow(plot_cross4)
 
 # A cross-section of two fields, with explicit contours levels for auxiliary field
@@ -171,8 +171,8 @@ plot_cross5=plot(ta_zonal_mean, ta_zonal_mean2, contours="240 245 250", title='2
 cshow(plot_cross5)
 
 # A cross-section of two fields, with automatic contours levels for auxiliary field
-# and a pressure-linear spacing and logarithmic in index for vertical axis (linp=-1)
-plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, linp=-1, title='2 fields (automatic contours levels for auxiliary field)')
+# and a pressure-linear spacing and logarithmic in index for vertical axis (y="lin", it is by default)
+plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, y="lin", title='2 fields (automatic contours levels for auxiliary field)')
 cshow(plot_cross6)
 
 # Two plots where (t,z,y) are not degenerated, with selection of time step and/or level step for all fields which have this dimension :
@@ -182,10 +182,10 @@ ta_zonal_mean=ccdo(january_ta,operator="zonmean") # => (t,z,y)
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # => (t,z,y)
 
-select_cross1=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting index 10 for time', linp=1, time=3000.) # time selection is done for main and auxiliary field => dim:=(z,y) => we have a cross-section
+select_cross1=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting index 10 for time', y="index", time=3000.) # time selection is done for main and auxiliary field => dim:=(z,y) => we have a cross-section
 cshow(select_cross1)
 
-select_cross2=plot(ta_zonal_mean, ta_zonal_mean2, title='Time and level selection => profile', linp=1, time=0, level=4) # time and level selection is done for two fields => dim:=(y) => we have a vertical profile 
+select_cross2=plot(ta_zonal_mean, ta_zonal_mean2, title='Time and level selection => profile', y="index", time=0, level=4) # time and level selection is done for two fields => dim:=(y) => we have a vertical profile 
 cshow(select_cross2) 
 
 
@@ -200,11 +200,22 @@ ta_zonal_mean2=ccdo(cross_field2, operator="zonmean")
 ta_profile=ccdo(ta_zonal_mean,operator="mermean")   # main field
 ta_profile2=ccdo(ta_zonal_mean2,operator="mermean") # auxiliary field
 
-# One profile, with a logarithmic scale (default)
-plot_profile1=plot(ta_profile, title='A profile')
+# One profile, with a logarithmic scale 
+plot_profile1=plot(ta_profile, title='A profile', y="log")
 cshow(plot_profile1)
 
-# Two profiles, with a index-linear spacing for vertical axis
-plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', linp=1)
+# Two profiles, with a index-linear spacing for vertical axis (default)
+plot_profile2=plot(ta_profile, ta_profile2, title='Two profiles', y="lin")
 cshow(plot_profile2)
+
+# A (t,z) profile, with a a logarithmic scale
+january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="1980")
+ta_zonal_mean=ccdo(january_ta, operator="zonmean") 
+cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
+ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
+ta_profile=ccdo(ta_zonal_mean,operator="mermean")   # main field
+ta_profile2=ccdo(ta_zonal_mean2,operator="mermean") # auxiliary field
+
+plot_profile3=plot(ta_profile, ta_profile2, title='Profiles (t,z)', y="log", invXY=True)
+cshow(plot_profile3)
 
