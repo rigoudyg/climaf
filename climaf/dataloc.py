@@ -423,7 +423,7 @@ def periodOfEmFile(filename,realm,freq):
         elif freq[0:2] =='da' : altfreq='d'
         else:
             raise Climaf_Data_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
-        patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8})_.*nc'
+        patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8}).*nc'
         beg=re.sub(patt,r'\1',filename)
         end=re.sub(patt,r'\2',filename)
         #clogger.debug("beg=%s,end=%s,fn=%s"%(beg,end,filename))
