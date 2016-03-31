@@ -94,7 +94,7 @@ def plot_basin_moc(model, variable="msftmyz", basin=1):
     moc_model=ds(variable=variable, **model)
     moc_model_mean=time_average(moc_model)
     # extraire le bassin de rang 'basin' (def: Atlantique=1)
-    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=basin)
+    moc_model_mean_atl=slice(moc_model_mean, dim='x', min=basin, max=basin)
     # masquer les valeurs 
     moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
     # Plot
@@ -114,10 +114,10 @@ def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1):
     moc_model=ds(**mod)
     moc_model_mean=time_average(moc_model)
     #extraire le bassin Atlantique de la MOC modele
-    moc_model_mean_atl=slice(moc_model_mean, dim='x', num=basin)
+    moc_model_mean_atl=slice(moc_model_mean, dim='x', min=basin, max=basin)
     #masquer les valeurs et extraire la latitude 26
     moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
-    moc_model_26=slice(moc_model_mean_atl_mask, dim='lat', num=26.5)
+    moc_model_26=slice(moc_model_mean_atl_mask, dim='lat', min=26.5, max=26.5)
     #
     moc_obs=ds(project="ref_pcmdi",variable='moc')
     moc_obs_mean=time_average(moc_obs)

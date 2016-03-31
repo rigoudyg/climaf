@@ -8,6 +8,12 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/03/31 :
+
+  - Change for standard operator ``slice`` : extract a slice on
+    specified dimension now at a given range instead of a given value
+    before (see :doc:`scripts/slice`)  
+
 - 2016/03/29 - Version 0.13 :
   
   - Changes for standard operator ``plot`` : Tick marks are smartly

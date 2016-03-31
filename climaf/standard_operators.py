@@ -109,7 +109,7 @@ def load_standard_operators():
     #    
     cscript('ncdump'     , 'ncdump -h ${in} ', format="txt")
     #
-    cscript('slice',"ncks -O -F -v ${var} -d ${dim},${num},${num} ${in} tmp.nc ; ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
+    cscript('slice',"ncks -O -F -v ${var} -d ${dim},${min},${max} ${in} tmp.nc ; ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
     #
     cscript("mask","cdo setctomiss,${miss} ${in} ${out}")
     #
