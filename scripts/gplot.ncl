@@ -338,8 +338,11 @@ begin
     
     ;We have a true cross-section, a horizontal map or a profile (t,z)
     if (ystyle .eq. "log") then useXY=False end if
-
-    if (.not.ismissing(Var_DimNames(0)) .and. (Var_DimNames(0) .eq. "lat")) .or. (isatt(field,"coordinates") .and. ((field@coordinates .eq. "lat lon") .or. (field@coordinates .eq. "lon lat"))) then
+    ;latname="lat"
+    if (.not.ismissing(Var_DimNames(0)) .and. (Var_DimNames(0) .eq. "lat")) \
+        .or. (.not.ismissing(Var_DimNames(1)) .and. (Var_DimNames(1) .eq. "lat")) \
+        .or. (isatt(field,"coordinates") .and. ((field@coordinates .eq. "lat lon")  \
+        .or. (field@coordinates .eq. "lon lat"))) then
       latname="lat"
       lonname="lon"
     end if
@@ -352,7 +355,8 @@ begin
       lonname="LON"
     end if
     if ( ismissing(str_match(Var_DimNames,"lat")) .and. ismissing(str_match(Var_DimNames,"LAT")) ) then
-      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
+      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) \
+        .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
         .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
              .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
         .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
@@ -399,7 +403,7 @@ begin
       if isfilevar(ffile,"nav_lat") then
         print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
       end if
-
+      ;print("latname="+latname)
       if ( isvar("latname") .and. ( .not. ismissing(str_match(Var_DimNames,latname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,latname))) ) ) ) then lat_dim=ffile->$latname$ end if
       if ( isvar("lonname") .and. ( .not. ismissing(str_match(Var_DimNames,lonname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lonname))) ) ) ) then lon_dim=ffile->$lonname$ end if	
     end if

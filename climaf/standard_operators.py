@@ -18,15 +18,30 @@ def load_standard_operators():
     The operators list also show in variable 'cscripts'
     They are documented elsewhere
     """
+    # For Surface Fluxes
+    cscript('cdo_ensavg', 'cdo -O ensavg ${mmin} ${out}',commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('cdo_ensmin', 'cdo -O ensmin ${mmin} ${out}',commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('cdo_ensmax', 'cdo -O ensmax ${mmin} ${out}',commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('cdo_gt','cdo gt ${in_1} ${in_2} ${out}',commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('cdo_lt','cdo lt ${in_1} ${in_2} ${out}',commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript("rename_time","ncrename -d time,time_counter ${in} ${out}")
+    #
+    cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('plus', 'cdo add ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     # Compute scripts
     #
-    
     cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
             scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
+    #
+    cscript('ccdo2','cdo ${operator} ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
