@@ -12,9 +12,9 @@ cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annua
 
 
 if onCiclad:
-    root="/data/jservon/Evaluation/ReferenceDatasets/PCMDI-MP/obs/*/${frequency}/${variable}/${product}/ac/"
+    root="/data/jservon/Evaluation/"
 if atTGCC:
-    root="/ccc/work/cont003/igcmg/igcmg/ReferenceDatasets/PCMDI-MP/obs/*/${frequency}/${variable}/${product}/ac/"
+    root="/ccc/work/cont003/igcmg/igcmg/IGCM/"
 
     
 cproject('ref_climatos', ('frequency','annual_cycle'), 'product', 'clim_period', ensemble=['product'],separator='%')
@@ -22,7 +22,7 @@ cdef('variable',     '*',           project='ref_climatos')
 cdef('product',      '*',           project='ref_climatos')
 cdef('clim_period',  '*',           project='ref_climatos')
 cdef('period',       'fx',          project='ref_climatos')
-pattern2=root+"${variable}_*mon_${product}_${clim_period}-clim.nc" 
+pattern2=root+"ReferenceDatasets/climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_${clim_period}-clim.nc" 
 dataloc(project='ref_climatos', organization='generic', url=pattern2)
 
 

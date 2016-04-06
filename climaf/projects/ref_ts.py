@@ -19,11 +19,11 @@ from climaf.site_settings import onCiclad, atTGCC
 cfreqs('ref_ts', {'monthly':'mo' , 'daily':'day' })
 
 if onCiclad:
-    root="/data/jservon/Evaluation/ReferenceDatasets/*/${frequency}/${variable}/"
+    root="/data/jservon/Evaluation/"
 if atTGCC:
-    root="/ccc/work/cont003/igcmg/igcmg/ReferenceDatasets/*/${frequency}/${variable}/"
+    root="/ccc/work/cont003/igcmg/igcmg/IGCM/"
 
 cproject('ref_ts', ('frequency','monthly'), ('product','*'), ('period','1900-2050'))
-pattern1=root+"${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
+pattern1=root+"ReferenceDatasets/ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
 dataloc(project='ref_ts', organization='generic', url=[pattern1])
 
