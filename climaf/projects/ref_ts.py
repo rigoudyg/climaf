@@ -22,6 +22,8 @@ if onCiclad:
     root="/data/jservon/Evaluation/"
 if atTGCC:
     root="/ccc/work/cont003/igcmg/igcmg/IGCM/"
+if atIdris:
+    root="/workgpfs/rech/psl/rpsl035/IGCM/"
 
 cproject('ref_ts', ('frequency','monthly'), ('product','*'), ('period','1900-2050'))
 pattern1=root+"ReferenceDatasets/ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"

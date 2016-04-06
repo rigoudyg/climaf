@@ -6,7 +6,7 @@ This module declares PCMDI reference products on ciclad data organization and sp
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC
+from climaf.site_settings import onCiclad, atTGCC, atIdris
 
 cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annual_cycle':'mo'})
 
@@ -15,7 +15,8 @@ if onCiclad:
     root="/data/jservon/Evaluation/"
 if atTGCC:
     root="/ccc/work/cont003/igcmg/igcmg/IGCM/"
-
+if atIdris:
+    root="/workgpfs/rech/psl/rpsl035/IGCM/"
     
 cproject('ref_climatos', ('frequency','annual_cycle'), 'product', 'clim_period', ensemble=['product'],separator='%')
 cdef('variable',     '*',           project='ref_climatos')
