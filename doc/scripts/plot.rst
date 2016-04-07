@@ -105,16 +105,20 @@ Main field:
 
   - colormap and its interpretation :
 
-   - ``cmap`` : name of the Ncl colormap to use; see e.g. 
+   - ``color`` : name of the Ncl colormap to use; see e.g. 
      https://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml#Aid_in_color_blindness ;
-     default (climaf) is 'BlueDarkRed18'
+     default (climaf) is 'BlueDarkRed18'. If you want to define your
+     own color map using named colors (be sure to include the
+     background and foreground colors), ``color`` must be a list of
+     named colors separated by comma, e.g. ``color`` =
+     "white,black,White,RoyalBlue,LightSkyBlue,PowderBlue,lightseagreen,PaleGreen,Wheat,Brown,Pink". 
    - ``min``, ``max`` , ``delta`` : min and max values and 
      levels when applying the colormap (or setting the axis 
      for profiles), or
    - ``colors`` : list of levels used when applying colormap
      e.g. colors="260 270 280 290"
 
-  - ``reverse`` : reverse colormap.
+  - ``reverse`` : set it to True to reverse colormap; default: False.
   - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
     offset); default = 1. and 0. (no scaling)
   - ``units`` : name of the main field units; used in the caption;
@@ -390,6 +394,8 @@ For map:
 
 For cross-sections:
 
+  - ``invXY`` : set it to True to invert X axis and Y axis; default
+    (climaf): False  
   - ``vcb`` : same as  for map
   - ``lbLabelFontHeightF`` : same as  for map
   - ``tmYLLabelFontHeightF`` : same as  for map
@@ -411,8 +417,7 @@ For cross-sections:
 
 For profiles:
 
-  - ``invXY`` : set it to True to invert X axis and Y axis; default
-    (climaf): False 
+  - ``invXY`` : same as for cross-section
   - ``tmYLLabelFontHeightF`` : same description as for map but
     different default; default (climaf): 0.008
   - ``tmXBLabelFontHeightF`` : same description as for map but

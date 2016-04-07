@@ -8,6 +8,18 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/04/07 :
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) : 
+
+    - add possibility to define your own color map using named colors
+      via ``color`` 
+    - bug fixes for argument ``reverse``
+    - you can now use argument ``invXY`` for cross-section
+    - bug fixes for y axis style when ``invXY`` is used for (t,z) profiles
+    - code re-design 
+
+
 - 2016/03/31 :
 
   - Change for standard operator ``slice`` : extract a slice on
