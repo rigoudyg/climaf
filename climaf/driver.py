@@ -476,18 +476,17 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     # Allowing for some formal parameters to be missing in the actual call:
     #
     # Discard remaining substrings looking like :
-    #  some_word='"${some_keyword}"'     , or:
-    #  '"${some_keyword}"'
+    #  some_word='"${some_keyword}"' , or simply : '"${some_keyword}"'
     template=re.sub(r'(\w*=)?(\'\")?\$\{\w*\}(\"\')?',r"",template)
     #
     # Discard remaining substrings looking like :
-    #  some_word=${some_keyword}          , or
-    #  ${some_keyword}
+    #  some_word=${some_keyword}  or  simply : ${some_keyword}
     template=re.sub(r"(\w*=)?\$\{\w*\}",r"",template)
     #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None :
-        subdict_ff=dict()
+        #subdict_ff=dict()
+        subdict_ff=scriptCall.parameters.copy()
         subdict_ff["model"]=modelOf(scriptCall.operands[0])
         subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
         subdict_ff["project"]=projectOf(scriptCall.operands[0])
@@ -497,24 +496,22 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         for ll,lt in l:
             #Replace input data placeholders with filenames for fixed fields
             template_ff_target=Template(lt).substitute(subdict_ff)
-            # symlink
+            # symlink if needed
             files_exist[ll]=False
-            if os.path.isfile(ll):      
-                files_exist[ll]=True
-            else:
-                os.system("ln -s "+template_ff_target+" "+ll)   
-            
-    # Launch script using command, and check termination 
-    #command="PATH=$PATH:"+operators.scriptsPath+template+fileVariables
-    #command="echo '\n\nstdout and stderr of script call :\n\t "+template+\
-    #         "\n\n'> scripts.out  ; "+ template+ " >> scripts.out 2>&1"
-
+            if os.path.isfile(ll): files_exist[ll]=True
+            else: os.system("ln -s "+template_ff_target+" "+ll)   
+    #
     tim1=time.time()
     clogger.info("Launching command:"+template)
     #
-    command=subprocess.Popen(template, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    repcom=command.wait()
-    #
+    try :
+        command=subprocess.Popen(template, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        repcom=command.wait()
+        #
+    except:
+        clogger.critical("Subprocess was interrupted")
+        repcom=1
+    
     logfile=open('last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
     command_std=""
@@ -524,13 +521,12 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         if script.outputFormat=="txt" : 
             sys.stdout.write(line)
     logfile.close()
-    
+
     # Clean fixed fields symbolic links
-    if script.fixedfields is not None :
-        l=script.fixedfields  #return paths: (linkname, targetname)
-        for ll,lt in l:
-            if files_exist[ll] == False:
-                os.system("rm -f "+ll)  
+    # (linkname, targetname)
+    if script.fixedfields :
+        for ll,lt in script.fixedfields:
+            if files_exist[ll] == False: os.system("rm -f "+ll)  
 
     if ( repcom == 0 ):
         if script.outputFormat not in operators.none_formats :
@@ -564,10 +560,6 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         clogger.error("Last lines of script output:\n"+comm2.stdout.read())
         raise Climaf_Driver_Error("Script failure for : %s. More details either in file "
                                   "./last.out or by re-runing with clog(\"debug\")" %template)
-        #raise Climaf_Driver_Error("See above (or scripts.out <=> clog('debug')) for analyzing "
-        #                          "script call failure for : %s "%template)
-
-
 
 def timePeriod(cobject) :
     """ Returns a time period for a CliMAF object : if object is a dataset, returns
