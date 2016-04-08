@@ -8,6 +8,11 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/04/08: 
+
+  - Bug fixes for example :download:`index_html.py
+    <../examples/index_html.py>` 
+
 - 2016/04/07 :
 
   - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) : 

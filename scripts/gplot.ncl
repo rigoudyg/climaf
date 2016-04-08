@@ -187,55 +187,6 @@ end
 
 ;--------------------------------------------------------------------------------------------
 
-undef("check_map")
-; Check if 'field' of rank 2 is a map
-function check_map(field:numeric)
-
-local vardims
-begin
-  
-  vardims = getVarDimNames(field)  ; getting dimensions from metadata
-  lat_names=(/"lat", "LAT", "latitude", "nav_lat"/)     
-  lon_names=(/"lon", "LON", "longitude", "nav_lon"/)   
-
-  map=False
-  
-  do i=0, dimsizes(lat_names)-1
-    if ( ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lon_names(i))))  \ 
-               .and. (.not. ismissing(str_match(field@coordinates,lat_names(i)))) ) \ 
-          .or. ( (.not. ismissing(str_match(vardims(0),lat_names(i)))) \ 
-               .and. (.not. ismissing(str_match(vardims(1),lon_names(i)))) ) \
-          .or. ( iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"standard_name") \
-               .and. (field&$vardims(0)$@standard_name .eq. "latitude") \
-               .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"standard_name") \
-               .and. (field&$vardims(1)$@standard_name .eq. "longitude") ) \
-          .or. (  iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"axis") \
-               .and. ( (field&$vardims(0)$@axis .eq. "y") .or. (field&$vardims(0)$@axis .eq. "Y") ) \
-               .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"axis") \
-               .and. ( (field&$vardims(1)$@axis .eq. "x") .or. (field&$vardims(1)$@axis .eq. "X") ) ) ) \
-          .or. ( ( iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"axis") \
-               .and. (ismissing(str_match(field&$vardims(0)$@axis,"Z")) .and. ismissing(str_match(field&$vardims(0)$@axis,"z"))) \
-               .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"axis") \
-               .and. (ismissing(str_match(field&$vardims(1)$@axis,"Z")) .and. ismissing(str_match(field&$vardims(1)$@axis,"z"))) ) \
-          .and. ( iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"standard_name") \
-               .and. ( ismissing(str_match(field&$vardims(0)$@standard_name,"depth")) \
-               .and. ismissing(str_match(field&$vardims(0)$@standard_name,"level")) \
-               .and. ismissing(str_match(field&$vardims(0)$@standard_name,"height")) ) \ 
-               .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"standard_name") \
-               .and. ( ismissing(str_match(field&$vardims(1)$@standard_name,"depth")) \
-               .and. ismissing(str_match(field&$vardims(1)$@standard_name,"level")) \
-               .and. ismissing(str_match(field&$vardims(1)$@standard_name,"height")) ) ) ) then
-          map=True 
-    end if
-  end do
-
-  delete(vardims)
-  return(map)
-
-end
-
-;--------------------------------------------------------------------------------------------
-
 undef("check_zaxis")
 ; Check if dimension 'k' of 'field' is a vertical axis
 function check_zaxis(field:numeric, k:integer)
@@ -247,18 +198,71 @@ begin
   zaxis=False
 
   if ( .not. ismissing(str_match(vardims(k),"dept")) \
-    .or. (vardims(k) .eq. "sigma") .or. (vardims(k) .eq. "z") .or. (vardims(k) .eq. "Z") \
-    .or. (vardims(k) .eq. "plev") .or. (vardims(k) .eq. "lev") .or. (vardims(k) .eq. "level") \
-    .or. (vardims(k) .eq. "p") .or. (vardims(k) .eq. "pressure") \
+    .or. ( .not. ismissing(vardims(k)) .and. ( (vardims(k) .eq. "sigma") \
+         .or. (vardims(k) .eq. "z") .or. (vardims(k) .eq. "Z") \
+         .or. (vardims(k) .eq. "plev") .or. (vardims(k) .eq. "lev") .or. (vardims(k) .eq. "level") \
+         .or. (vardims(k) .eq. "p") .or. (vardims(k) .eq. "pressure") ) ) \
     .or. ( iscoord(field,vardims(k)) .and. isatt(field&$vardims(k)$,"axis") \
-    .and. ((field&$vardims(k)$@axis .eq. "z") .or. (field&$vardims(k)$@axis .eq. "Z")) ) ) then
-    
+         .and. ((field&$vardims(k)$@axis .eq. "z") .or. (field&$vardims(k)$@axis .eq. "Z")) ) \
+    .or. ( iscoord(field,vardims(k)) .and. isatt(field&$vardims(k)$,"standard_name") \
+         .and. ( .not. ismissing(str_match(field&$vardims(k)$@standard_name,"depth")) \
+         .or. .not. ismissing(str_match(field&$vardims(k)$@standard_name,"level")) \
+         .or. .not. ismissing(str_match(field&$vardims(k)$@standard_name,"height")) ) ) ) then
     zaxis=True
   end if
-  
+ 
   delete(vardims)
   return(zaxis)
   
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("check_map")
+; Check if 'field' of rank 2 is a map, 'lat_tab' is the latitude array and the latitude variable 
+; name is 'lat_name' (same as for 'lon_tab' and 'lon_name')
+function check_map(field:numeric, lat_name:string, lon_name:string, lat_tab:numeric, lon_tab:numeric) 
+
+local vardims, zaxis_exist
+begin
+  
+  vardims = getVarDimNames(field)  ; getting dimensions from metadata
+  map=False
+  
+  ; check if one of dimensions is a vertical axis
+  zaxis_exist=False
+  do k=0,1
+    if check_zaxis(field, k) then
+      map=False
+      zaxis_exist=True
+    end if
+  end do
+ 
+  ; if any dimension is a vertical axis, we check if we have a map
+  if .not. zaxis_exist then
+    if ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lon_name)))  \ 
+         .and. (.not. ismissing(str_match(field@coordinates,lat_name))) \
+         .and. ( (isatt(lat_tab,"standard_name") .and. (lat_tab@standard_name .eq. "latitude") \
+               .and. isatt(lon_tab,"standard_name") .and. (lon_tab@standard_name .eq. "longitude")) \ 
+         .or. ( isatt(lat_tab,"axis") .and. ((lat_tab@axis .eq. "y") .or. (lat_tab@axis .eq. "Y")) \
+               .and. isatt(lon_tab,"axis") .and. ((lon_tab@axis .eq. "x") .or. (lon_tab@axis .eq. "X")) ) ) ) \
+      .or. ( (.not. ismissing(str_match(vardims(0),lat_name))) \ 
+               .and. (.not. ismissing(str_match(vardims(1),lon_name))) ) \
+      .or. ( iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"standard_name") \
+           .and. (field&$vardims(0)$@standard_name .eq. "latitude") \
+           .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"standard_name") \
+           .and. (field&$vardims(1)$@standard_name .eq. "longitude") ) \
+      .or. (  iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"axis") \
+           .and. ( (field&$vardims(0)$@axis .eq. "y") .or. (field&$vardims(0)$@axis .eq. "Y") ) \
+           .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"axis") \
+           .and. ( (field&$vardims(1)$@axis .eq. "x") .or. (field&$vardims(1)$@axis .eq. "X") ) ) then
+      map =True
+    end if
+  end if
+
+  delete(vardims)
+  return(map)
+
 end
 
 ;--------------------------------------------------------------------------------------------
@@ -382,9 +386,8 @@ begin
   ; We have a true cross-section, a horizontal map or a profile (t,z)
   if (rank .eq. 2) then
     delete(Var_DimNames)
-    Var_DimNames=getVarDimNames(field) 
-    horizontal=check_map(field) ; check if we have a horizontal map
-  
+    Var_DimNames=getVarDimNames(field)
+   
     if (ystyle .eq. "log") then useXY=False end if
    
     ; get latitude and/or longitude name
@@ -412,19 +415,6 @@ begin
             .or. (  iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"axis") \
             .and. ( (field&$Var_DimNames(k)$@axis .eq. "y") .or. (field&$Var_DimNames(k)$@axis .eq. "Y") ) ) then
             useLatDim=True
-          end if
-        end if
-      end do
-    end do
-    do k=0, 1
-      do i=0, dimsizes(lonnames)-1
-        if ismissing(str_match(Var_DimNames,lonnames(i))) then
-          if ( isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,lonnames(i))) ) \ 
-            .or. ( iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"standard_name") \
-            .and. (field&$Var_DimNames(k)$@standard_name .eq. "longitude") ) \
-            .or. (  iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"axis") \
-            .and. ( (field&$Var_DimNames(k)$@axis .eq. "x") .or. (field&$Var_DimNames(k)$@axis .eq. "X") ) ) then
-            useLonDim=True
           end if
         end if
       end do
@@ -468,6 +458,13 @@ begin
       if isvar("latname") then lat_dim=ffile->$latname$ end if
       if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
         
+    end if
+
+    ; check if we have a horizontal map
+    if isvar("latname") .and. isvar("lonname") then 
+      horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
+    else
+      horizontal=False
     end if
 
   end if ; rk eq 2
@@ -730,7 +727,7 @@ begin
         if (lon_exist_dummy .and. .not. lat_exist_dummy) then londim2=array2[1] end if
       end if
     end if
-  
+      
   end if ; AUX_FIELD is True
 
   ;-----------------------
@@ -1408,17 +1405,6 @@ begin
       
       time_pos=time_position(fld)
       
-      ;test=fspan(0.5,dimsizes(londim) - 1,362) 
-      ;print(test)
-      ;res@sfXArray            = lonFlip(londim)
-      ;res@sfXArray            = test; londim
-      ;res@sfDataArray=fld(0,:)
-      ;res@gsnAddCyclic        = False
-      ;res@trGridType          = "Irregular"
-      ;res@tmXBMode = "Explicit"
-      ;res@tmXBValues = test(::1)
-      ;res@tmXBLabels = ... 
-
       if (y .eq. "index") then
         print("using gsn_csm_contour; y with index-linear spacing")
         
