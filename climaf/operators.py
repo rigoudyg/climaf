@@ -378,7 +378,9 @@ class cscript():
 def fixed_fields(operator, *paths):
     """
     Declare that an operator (or a list of) needs fixed fields. CliMAF will
-    provide them to the operator at execution time through symbolic links 
+    provide them to the operator at execution time through symbolic links. 
+    This is 'set' type of operation, not an 'add' one : only the last call is
+    considered (it reset the list of fields)
 
     Parameters:
       operator (string, or list of strings) : name of the CliMAF operator.
