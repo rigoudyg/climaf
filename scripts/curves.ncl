@@ -13,7 +13,7 @@
 
 ; Usage:
 ;;;;;;;;;;
-; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. myscale=.. myoffset=.. y="log"  X_axis=.. invXY=..vmin=.. vmax=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
+; ncl curves.ncl infile=.. plotname=.. var=.. title=.. labels=.. colors=.. myscale=.. myoffset=.. myscale_aux=.. myoffset_aux=.. y="log"  X_axis=.. invXY=..vmin=.. vmax=.. fmt=.. lgcols=.. options=... format=.. trim=.. resolution=..
 ;
 ; infile, plotname and var are mandatory
 ;
@@ -27,6 +27,10 @@
 ; 
 ; myscale, myoffset : for scaling the input field (x -> x*scale + offset); default = 1. 
 ; and 0. (no scaling) 
+;
+; myscale_aux, myoffset_aux : for scaling the input auxiliary fields 
+; (x -> x*scale_aux + offset_aux); default = 'myscale' and 'myoffset' (main field scaling). 
+; These arguments will apply of the second to the nth field.
 ;
 ; units : name of the main field units; used in the caption; default is to use the 
 ; corresponding CF metadata
@@ -146,6 +150,8 @@ begin
   if (.not. isvar("X_axis")) then X_axis="real" end if
   if (.not. isvar("myscale")) then myscale=1.0 end if 
   if (.not. isvar("myoffset")) then myoffset=0.0 end if
+  if (.not. isvar("myscale_aux")) then myscale_aux=myscale end if
+  if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if 
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
   if (.not. isvar("invXY")) then invXY=False end if
@@ -472,13 +478,14 @@ begin
           end if
         end if
         
-        fld=fld*tofloat(myscale)+tofloat(myoffset)
-        
         ; Create plot
         res@xyLineColor = colornames(i)
         res@xyExplicitLegendLabels = "  "+tab_labels(i)
         
         if (i .eq. 0) then 
+          
+          fld=fld*tofloat(myscale)+tofloat(myoffset)
+          
           res@pmLegendParallelPosF   = 0.1        ; move right slightly 
           res@pmLegendOrthogonalPosF = -0.14      ; move up slightly 
 
@@ -548,8 +555,10 @@ begin
 
           end if  ; fld&$coord$@axis .eq. "Z"
 
-        else
+        else ; field '2' to 'n'
 
+          fld=fld*tofloat(myscale_aux)+tofloat(myoffset_aux)
+      
           if isvar("lgcols") then
             lgcols=lgcols
           else

@@ -8,6 +8,14 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/04/11:
+
+  - New arguments for standard operators ``plot`` (see
+    :doc:`scripts/plot`) and  ``curves`` (see :doc:`scripts/curves`) :
+    ``scale_aux`` and ``offset_aux`` to scale the input auxiliary
+    field for ``plot`` and to scale of the second to the nth
+    input auxiliary field for ``curves``.   
+
 - 2016/04/08: 
 
   - Bug fixes for example :download:`index_html.py

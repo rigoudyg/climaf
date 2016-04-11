@@ -119,7 +119,7 @@ Main field:
      e.g. colors="260 270 280 290"
 
   - ``reverse`` : set it to True to reverse colormap; default: False.
-  - ``scale``, ``offset`` : for scaling the input main field ( x -> x*scale +
+  - ``scale``, ``offset`` : for scaling the input main field (x -> x*scale +
     offset); default = 1. and 0. (no scaling)
   - ``units`` : name of the main field units; used in the caption;
     default is to use the corresponding CF metadata
@@ -161,6 +161,10 @@ Auxiliary field:
     contours="0 2 4 6", no region will be shaded because there is no
     full contours intervals which entirely match the constraints 'less
     than 1'
+
+  - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
+    field (x -> x*scale_aux + offset_aux); default = ``scale`` and
+    ``offset`` (main field scaling) 
 
 Vectors:
 

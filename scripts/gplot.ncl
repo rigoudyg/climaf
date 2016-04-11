@@ -598,6 +598,8 @@ begin
   
   if (.not. isvar("myscale")) then myscale=1.0 end if
   if (.not. isvar("myoffset")) then myoffset=0.0 end if
+  if (.not. isvar("myscale_aux")) then myscale_aux=myscale end if
+  if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
   LABELON=False
@@ -728,6 +730,8 @@ begin
       end if
     end if
       
+    fld2=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
+  
   end if ; AUX_FIELD is True
 
   ;-----------------------
