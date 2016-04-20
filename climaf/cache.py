@@ -9,6 +9,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 
 import sys, os, os.path, re, time, glob
 import pickle
+import uuid
 
 from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
@@ -141,8 +142,9 @@ def register(filename,crs):
             command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
                 (crs,version,filename,filename,filename,filename)
         if re.findall(".pdf$",filename) :
-            command="pdftk %s dump_data output rapport.txt && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> rapport.txt && pdftk %s update_info rapport.txt output %s.pdf && mv -f %s.pdf %s && rm -f rapport.txt"%\
-                (filename,crs,filename,filename,filename,filename)
+            tmpfile = str(uuid.uuid4())
+            command="pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> %s && pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s"%\
+                (filename,tmpfile,crs,tmpfile,filename,tmpfile,filename,filename,filename,tmpfile)
         if re.findall(".eps$",filename) :
             command='exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s'%\
                 (version,crs,filename)
