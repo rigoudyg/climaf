@@ -48,11 +48,15 @@ def load_standard_operators():
     #
     cscript('regrid' ,
             scriptpath+'regrid.sh ${in} ${in_2} ${out} ${option}',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridn' ,
             scriptpath+'regrid.sh ${in} ${cdogrid} ${out} ${option}',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
+    #
+    cscript('regridll',scriptpath+'regridll.sh ${in} ${out} ${cdogrid} '
+            '${latmin} ${latmax} ${lonmin} ${lonmax} ${remap_option}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('rescale' ,
             'cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}',

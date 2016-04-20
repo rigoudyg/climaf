@@ -8,6 +8,8 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+  - add operator ``regridll`` for regridding to a lat-lon box (see :doc:`scripts/plot`) 
+
 - 2016/03/29 - Version 0.13 :
   
   - Changes for standard operator ``plot`` : Tick marks are smartly

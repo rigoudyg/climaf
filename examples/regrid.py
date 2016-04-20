@@ -13,7 +13,11 @@ dg=ds(simulation="AMIPV6ALB2G", variable="tas", period="1980")
 dgr=regridn(dg,cdogrid="r90x45")
 ncview(dgr)
 
-# 2- regrid to the grid of another datset (here, a trivial case : same grid) :
+# 2- regrid to a latlon box of a regular,named, grid : use operator 'regridll'
+llbox_dg=regridll(dg,cdogrid="r180x90",latmin=-10.,latmax=10,lonmin=-180,lonmax=180)  
+ncview(llbox_dg)
+
+# 3- regrid to the grid of another datset (here, a trivial case : same grid) :
 # use operator 'regridn'
 dg2=ds(simulation="AMIPV6ALB2G", variable="rst", period="1980")
 dgr2=regrid(dg,dg2)
