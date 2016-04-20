@@ -15,6 +15,7 @@ Documented operators as of today :
     - :doc:`scripts/llbox`
     - :doc:`scripts/regrid`
     - :doc:`scripts/regridn`
+    - :doc:`scripts/regridll`
     - :doc:`scripts/time_average`
     - :doc:`scripts/space_average`
     - :doc:`scripts/minus`
