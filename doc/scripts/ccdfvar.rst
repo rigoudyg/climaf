@@ -44,7 +44,8 @@ example below).
 
   - main output : a netcdf file (variable : var_3D_cdfvar)
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>`  
 
   >>> # How to get required files for cdftools cdfmean binary
   >>> fixed_fields('ccdfvar',

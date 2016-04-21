@@ -63,7 +63,9 @@ below).
      - ``htrp`` : field heat transport
      - ``strp`` : field salt transport
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftransport.py
+<../../examples/cdftransport.py>`   
 
   >>> # Use "data_CNRM" project, where VT files (netcdf file with mean
   >>> # values of vt, vs, ut, us for heat and salt transport) are defined

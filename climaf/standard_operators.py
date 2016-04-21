@@ -22,8 +22,8 @@ def load_standard_operators():
     # Compute scripts
     #
     
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ', 
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True) 
     #
     cscript('ccdo',
             scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
@@ -139,35 +139,42 @@ def load_cdftools_operators():
     # cdfmean
     #
     cscript('ccdfmean',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_3D%s")    
-    #
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_3D%s", canSelectVar=True)    
+    #    
     cscript('ccdfmean_profile',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s")
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s", canSelectVar=True)
     #    
     cscript('ccdfvar',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_3D%s")
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_3D%s", canSelectVar=True)
     #    
     cscript('ccdfvar_profile',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_%s")
+            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_%s", canSelectVar=True)
     
     #
     # cdftransport : case where VT file must be given 
     #
     #cscript('ccdftransport',
     #        scriptpath+'cdftransport.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${in_6} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
-     #       canSelectVar=True)
-    
+    #       canSelectVar=True)    
     cscript('ccdftransport',
             scriptpath+'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
-            _var='vtrp', htrp_var='htrp', strp_var='strp', canSelectVar=True)  
+            _var='vtrp', htrp_var='htrp', strp_var='strp', canSelectVar=True)
+    
     #
     # cdfheatc 
     #
     cscript('ccdfheatc',
-            'echo ""; cdfheatc ${in} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}', _var="heatc", canSelectVar=True)
+            'echo ""; cdfheatc ${in} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; mv cdfheatc.nc ${out}; rm -f cdfheatc.nc', _var="heatc_2D,heatc_3D", canSelectVar=True)
     #
     cscript('ccdfheatcm',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; rm -f $tmp_file', _var="heatc", canSelectVar=True)
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc $tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; mv cdfheatc.nc ${out}; rm -f cdfheatc.nc $tmp_file', _var="heatc_2D,heatc_3D", canSelectVar=True)
+    
+    #
+    # cdfsaltc 
+    #
+    cscript('ccdfsaltc',
+            'echo ""; cdfsaltc ${in} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; mv cdfsaltc.nc ${out}; rm -f cdfsaltc.nc', _var="saltc_2D,saltc_3D", canSelectVar=True)
+    
     # 
     # cdfsections 
     #
@@ -176,6 +183,7 @@ def load_cdftools_operators():
     #
     cscript('ccdfsectionsm',
             scriptpath+'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}', _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1", sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
+
     #
     # cdfmxlheatc
     #
@@ -183,7 +191,8 @@ def load_cdftools_operators():
             'echo ""; cdfmxlheatc ${in} ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc', _var="somxlheatc", canSelectVar=True)
     #
     cscript('ccdfmxlheatcm',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file', _var="somxlheatc", canSelectVar=True) 
+            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file', _var="somxlheatc", canSelectVar=True)
+    
     #
     # cdfstd
     #
@@ -197,5 +206,15 @@ def load_cdftools_operators():
     # cdfvT ; a bit tricky about naming the output
     #
     cscript('ccdfvT', 'cdfvT ${in_1} ${in_2} ${in_3} ${in_4} -o ${out}', _var="vomevt,vomevs,vozout,vozous", canSelectVar=True)
+    
     #
-
+    # cdfzonalmean
+    #
+    cscript('ccdfzonalmean',
+            'cdfzonalmean ${in} ${point_type} -var ${var} ${opt}; varname=${var}; ncrename -v zo${varname:2}_glo,zo${var}_glo zonalmean.nc ${out}; rm -f zonalmean.nc', _var="zo%s_glo", canSelectVar=True)
+    #
+    # cdfzonalmean_bas
+    #
+    cscript('ccdfzonalmean_bas',
+            'cdfzonalmean ${in} ${point_type} new_maskglo.nc -var ${var} ${opt}; varname=${var}; ncks -O -v zo${varname:2}_${basin} zonalmean.nc tmpfile.nc; ncrename -v zo${varname:2}_${basin},zo${var}_${basin} tmpfile.nc ${out}; rm -f tmpfile.nc zonalmean.nc', _var="zo%s_${basin}", canSelectVar=True)
+    

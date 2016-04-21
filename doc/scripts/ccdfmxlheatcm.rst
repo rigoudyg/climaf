@@ -33,7 +33,8 @@ directory (use function :py:func:`~climaf.operators.fixed_fields()` for that; se
 
   - main output : a netcdf file (variable : somxlheatc (Joules/m2))
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>` 
 
   >>> # How to get required files for cdftools cdfmxlheatc binary
   >>> fixed_fields('ccdfmxlheatcm',

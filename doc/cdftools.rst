@@ -16,13 +16,19 @@ CdfTools
       - :doc:`scripts/ccdfmean_profile`
       - :doc:`scripts/ccdfvar`
       - :doc:`scripts/ccdfvar_profile`
-	
-    - operators dealing with heat content:
+    
+    - operators dealing with zonal mean:
+
+      - :doc:`scripts/ccdfzonalmean`
+      - :doc:`scripts/ccdfzonalmean_bas`
+
+    - operators dealing with heat and salt content:
 	  
       - :doc:`scripts/ccdfheatc`
       - :doc:`scripts/ccdfheatcm`
       - :doc:`scripts/ccdfmxlheatc`
       - :doc:`scripts/ccdfmxlheatcm`
+      - :doc:`scripts/ccdfsaltc`
 
     - operators dealing with transport:
 
@@ -36,4 +42,4 @@ CdfTools
    
     - :doc:`scripts/ccdfsections`
     - :doc:`scripts/ccdfsectionsm`
-
+   

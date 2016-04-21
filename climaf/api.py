@@ -87,3 +87,8 @@ from usual_functions import *
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 
 
+def cerr():
+    """ Display file 'last.out' (stdout and stderr of script call)
+    
+    """
+    os.system('cat last.out')

@@ -75,9 +75,7 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
              ('mask.nc',    masks+'/ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',masks+'/ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',masks+'/ORCA1_mesh_zgr.nc'))
-    cscript("rename_time","ncrename -d time,time_counter ${in} ${out}")
-    aux=rename_time(tmean_modvar)
-    vertprof_modvar=ccdfmean_profile(aux,pos_grid='T')
+    vertprof_modvar=ccdfmean_profile(tmean_modvar,pos_grid='T')
 
     # Obs profile is simpler to compute, thanks to a regular grid
     vertprof_obsvar=ccdo(tmean_obsvar,operator='mermean -zonmean')

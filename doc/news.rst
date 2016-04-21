@@ -8,6 +8,29 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+
+- 2016/04/21:
+
+  - New Drakkar CDFTools operators interfaced:
+    :doc:`scripts/ccdfzonalmean`, :doc:`scripts/ccdfzonalmean_bas`,
+    :doc:`scripts/ccdfsaltc` (see example :download:`cdftools.py
+    <../examples/cdftools.py>`)
+      
+  - Modification for example :download:`atlasoce.py
+    <../examples/atlasoce.py>` because CDFTools were modified 
+
+  - New function :py:func:`~climaf.api.cerr()` displays file
+    'last.out' (stdout and stderr of script call)  
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - Bug fixes when reading latitude and longitude in file
+      'coordinates.nc' for curvilinear grid;  
+    - and in this case, add 'standard_name' attributes for 'gphit' and
+      'glamt' in order to latitude and longitude arrays are interpreted
+      as latitude and longitude 
+
+
 - 2016/04/11:
 
   - New arguments for standard operators ``plot`` (see

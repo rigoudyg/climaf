@@ -103,12 +103,16 @@ def maketree(script_name, script, *operands, **parameters):
                 rep.variable=script.outputs['']%defaultVariable
             else:
                 rep.variable=script.outputs['']
+            template=Template(rep.variable)
+            rep.variable=template.substitute(parameters)
         else :
             son=classes.scriptChild(rep,outname)
             if "%s" in script.outputs[outname] :
                 son.variable=script.outputs[outname]%defaultVariable
             else:
                 son.variable=script.outputs[outname]
+            template=Template(son.variable)
+            son.variable=template.substitute(parameters)
             rep.outputs[outname]=son
             setattr(rep,outname,son)
     return rep

@@ -237,7 +237,7 @@ begin
       zaxis_exist=True
     end if
   end do
- 
+              
   ; if any dimension is a vertical axis, we check if we have a map
   if .not. zaxis_exist then
     if ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lon_name)))  \ 
@@ -426,21 +426,22 @@ begin
       if isfilepresent("coordinates.nc") then
         coord_file=addfile("coordinates.nc","r")
 
-	if isfilevar(ffile,"gphit") then 
+	if isfilevar(coord_file,"gphit") then 
            lat_dim=coord_file->gphit
 	   lat_dim_tmp=rm_single_dims(lat_dim)
 	   delete(lat_dim)
 	   lat_dim=lat_dim_tmp
 	   delete(lat_dim_tmp)
+           lat_dim@standard_name="latitude"
 	end if
-	if isfilevar(ffile,"glamt") then 	
+	if isfilevar(coord_file,"glamt") then 	
 	   lon_dim=coord_file->glamt
            lon_dim_tmp=rm_single_dims(lon_dim)
            delete(lon_dim)
            lon_dim=lon_dim_tmp
            delete(lon_dim_tmp)
+           lon_dim@standard_name="longitude"
 	end if
-
       else
 
         if isfilepresent("mesh_mask.nc") then
@@ -457,7 +458,6 @@ begin
 
       if isvar("latname") then lat_dim=ffile->$latname$ end if
       if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
-        
     end if
 
     ; check if we have a horizontal map
@@ -466,7 +466,7 @@ begin
     else
       horizontal=False
     end if
-
+    
   end if ; rk eq 2
 
   if (rank .eq. 1) then 

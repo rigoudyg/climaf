@@ -26,7 +26,7 @@ CliMAF optional arguments are the ones surrounded with '**'.
   - ``imin``, ``imax``, ``jmin``, ``jmax``,  ``kmin``, ``kmax`` :
     limit of a sub domain where the heat content will be calculated
    
-  - ``opt`` : may be used to pass key ``-full`` ( assume full step
+  - ``opt`` : may be used to pass key ``-full`` (assume full step
     model output instead of default partial steps)
        
 **Required files**: Files mesh_hgr.nc, mesh_zgr.nc, mask.nc must be in
@@ -35,9 +35,11 @@ example below).
 
 **Outputs**:
 
-  - main output : standard output
+  - main output : a netcdf file (variables : heatc_2D, heatc_3D) and
+    standard output
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>`  
 
   >>> # How to get required files for cdftools cdfheatc binary
   >>> fixed_fields('ccdfheatcm',
@@ -47,7 +49,7 @@ example below).
   >>> dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O") # dataset with salinity
   >>> dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature
   >>> my_cdfheatc=ccdfheatcm(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2,opt='-full')
-  >>> cfile(my_cdfheatc) # to compute the heat content in the specified area and get the result on standard output
+  >>> cfile(my_cdfheatc) # to compute the heat content in the specified area and get the result in a netcdf file
 
 **Implementation**: The operator is implemented as a binary using
 cdftools cdfheatc operator.  
