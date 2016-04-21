@@ -509,7 +509,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         repcom=command.wait()
         #
     except:
-        clogger.critical("Subprocess was interrupted")
+        clogger.error("Subprocess was interrupted")
         repcom=1
     
     logfile=open('last.out', 'w')
@@ -542,9 +542,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 #    set_variable(subdict["out_"+output], output, 'file')
             if ok : 
                 duration=time.time() - tim1
-                print("Done in %.1f s with script computation for %s "%\
-                          (duration,`scriptCall`),file=sys.stderr)
-                clogger.debug("Done in %.1f s with script computation for "
+                #print("Done in %.1f s with script computation for %s "%\
+                #          (duration,`scriptCall`),file=sys.stderr)
+                clogger.info("Done in %.1f s with script computation for "
                               "%s (command was :%s )"%\
                                   (duration,`scriptCall`,template))
                 return main_output_filename
@@ -647,6 +647,7 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
             return(cache.rename(objfile,crs))
         else :
             clogger.critical("Cannot evaluate "+`extract`)
+            exit()
     else :
         clogger.error("Can yet process only files - TBD")
 

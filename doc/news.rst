@@ -8,6 +8,15 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- Technical :
+  
+   - Files in cache are no longer stamped with CRS (this is reversible)
+   - disambiguating filenames in cache relies only on their length (60)
+   - scripts exec time is now only logged, at level 'info'
+   - critical errors now exit
+   
+  
+
 - 2016/03/29 - Version 0.13 :
   
   - Changes for standard operator ``plot`` : Tick marks are smartly
