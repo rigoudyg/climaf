@@ -5,8 +5,9 @@ Management of CliMAF standard operators
 import os
 
 from climaf import __path__ as cpath
-from climaf.operators import cscript
+from climaf.operators import cscript, fixed_fields
 from climaf.clogging import clogger
+from climaf.site_settings import onCiclad
 
 scriptpath=cpath[0]+"/../scripts/" 
 binpath=cpath[0]+"/../bin/" 
@@ -128,6 +129,12 @@ def load_standard_operators():
             ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
             ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
             ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
+    #
+    if onCiclad:
+        cscript("ml2pl", "/home/jservon/Evaluation/CliMAF/Atlas_LMDz/ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
+                commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+        fixed_fields("ml2pl",
+                ("press_levels.txt","/home/jservon/Evaluation/CliMAF/press_levels.txt"))
     #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()

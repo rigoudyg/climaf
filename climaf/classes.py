@@ -733,7 +733,10 @@ def select_projects(**kwargs):
     If kwargs['project'] is a list (has multiple values), select_projects loops on the projects
     until it finds a file containing the aliased variable name.
     """
-    p_list = kwargs['project']
+    if 'project' not in kwargs:
+        return kwargs
+    else:
+        p_list = kwargs['project']
     if not isinstance(p_list,list):
         p_list = [p_list]
     for project in p_list:
