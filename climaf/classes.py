@@ -743,7 +743,10 @@ def select_projects(**kwargs):
 	files = dat.baseFiles()
         if files:
             clogger.warning('-- File found for project '+project+ ' and '+`wkwargs`)
-            tmpVarInFile = varIsAliased(wkwargs['project'],wkwargs['variable'])[0]
+            try:
+                tmpVarInFile = varIsAliased(project,wkwargs['variable'])[0]
+            except:
+                tmpVarInFile = wkwargs['variable']
             if netcdfbasics.fileHasVar(files.split(" ")[0],tmpVarInFile):
    	        clogger.warning('-- Variable '+tmpVarInFile+' (aliased to variable '+wkwargs['variable']+') found in '+files.split(" ")[0])
                 return wkwargs
