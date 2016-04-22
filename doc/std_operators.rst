@@ -31,6 +31,7 @@ Documented operators as of today :
         - :doc:`scripts/regrid`
         - :doc:`scripts/regridn`
         - :doc:`functions/zonmean_interpolation`
+        - :doc:`scripts/ml2pl`
     - computing a difference with regridding (typically to compute model biases):
         - :doc:`functions/diff_regrid`
         - :doc:`functions/diff_regridn`

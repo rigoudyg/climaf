@@ -131,10 +131,9 @@ def load_standard_operators():
             ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
     #
     if onCiclad:
-        cscript("ml2pl", "/home/jservon/Evaluation/CliMAF/Atlas_LMDz/ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
+        cscript("ml2pl", scriptpath+"ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-        fixed_fields("ml2pl",
-                ("press_levels.txt","/home/jservon/Evaluation/CliMAF/press_levels.txt"))
+        fixed_fields("ml2pl",("press_levels.txt",scriptpath+"press_levels.txt"))
     #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()

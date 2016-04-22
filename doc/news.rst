@@ -8,6 +8,82 @@ Note : Issues with CliMAF and future work are documented at https://github.com/s
 
 Changes, newest first :
 
+- 2016/04/22 - Version 0.13 :
+
+  - New standard operators:
+
+      - ``ml2pl`` to interpolate a 3D variable on a model levels to pressure levels
+         
+         :doc:`scripts/ml2pl`
+
+      - ``ccdo2`` and ``ccdo_ens`` coming in addition of the very useful ``ccdo`` swiss knife; ``ccdo2`` takes two datasets as input, and ``ccdo_ens`` takes an ensemble of CliMAF datasets (built with ``eds`` or ``cens``)
+
+         :doc:`scripts/ccdo2`
+      
+         :doc:`scripts/ccdo_ens`
+
+  - A whole new set of functions, that are mainly 'science oriented' shortcuts specific use of CliMAF operators:
+
+      - ``add``, ``sub``, ``mul`` and ``div`` (now providing the 4 arithmetic operations; based on ``minus``, ``plus``, ``ccdo`` and ``ccdo2``)
+         Works between two CliMAF objects of same size, or between a CliMAF object and a constant (provided as string, float or integer)
+         
+         :doc:`functions/add`
+         
+         :doc:`functions/sub`
+
+         :doc:`functions/mul`
+         
+         :doc:`functions/div`
+
+      - ``apply_scale_offset`` to apply a scale and offset to a CliMAF object
+         
+         :doc:`functions/apply_scale_offset`
+
+      - ``diff_regrid`` and ``diff_regridn`` -> returns the difference between two CliMAF datasets after regridding
+         
+         Based on :doc:`scripts/regrid` and :doc:`scripts/regridn`
+         
+         :doc:`functions/diff_regrid`
+         
+         :doc:`functions/diff_regridn`
+
+      - ``clim_average`` that provides a simple way to compute climatological averages (annual mean, seasonal averages, one-month climatology...)
+         
+         :doc:`functions/clim_average`
+
+      - ``annual_cycle`` returns the 12-month climatological annual cycle of a CliMAF object
+         
+         :doc:`functions/annual_cycle`
+
+      - ``climato`` returns the annual mean climatology (shortcut to ``time_average``)
+         
+         :doc:`functions/climato`
+
+      - ``zonmean``, ``diff_zonmean`` and ``zonmean_interpolation`` to work on zonal mean fields
+         
+         :doc:`functions/zonmean`
+         
+         :doc:`functions/diff_zonmean`
+         
+         :doc:`functions/zonmean_interpolation`,
+
+  - Tow functions to display a plot in an IPython Notebook: ``iplot`` and ``implot``
+      
+      :doc:`functions/iplot`
+      
+      :doc:`functions/implot`
+
+  - Functions for an interactive use of ds() and projects:
+
+      - ``summary`` provides the file linked with a ds() request, and the pairs facet/values actually used by ds()
+         :doc:`functions/summary`
+
+      - ``projects`` returns the listing of the available projects with the associated facets (fancy version of cprojects)
+
+  - An example on how to use the operator ml2pl() : see :doc:`scripts:ml2pl`
+   :download:`ml2pl <../examples/ml2pl.py>`
+
+
 - 2016/03/29 - Version 0.13 :
   
   - Changes for standard operator ``plot`` : Tick marks are smartly

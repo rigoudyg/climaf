@@ -16,46 +16,47 @@ def apply_scale_offset(dat,scale,offset):
 
 def mul(dat1,dat2):
     """
-    Multiply dat1 by dat2
-    Shortcut to ccdo(dat1,dat2,operator='mul')
+    Multiply dat1 by dat2 ; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Shortcut to ccdo(dat1,dat2,operator='mul') and ccdo(dat,operator='mulc,'+c)
     """
-    return ccdo2(dat1,dat2,operator='mul')
+    if isinstance(dat2,(str,float,int)):
+       c = str(float(dat2)
+       return ccdo(dat,operator='mulc,'+c)
+    else: 
+       return ccdo2(dat1,dat2,operator='mul')
 
 def div(dat1,dat2):
     """
-    Divide dat1 by dat2
-    Shortcut to ccdo(dat1,dat2,operator='mul')
+    Divide dat1 by dat2 ; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Shortcut to ccdo(dat1,dat2,operator='div') and ccdo(dat,operator='divc,'+c)
     """
-    return ccdo2(dat1,dat2,operator='div')
+    if isinstance(dat2,(str,float,int)):
+       c = str(float(dat2)
+       return ccdo(dat,operator='divc,'+c)
+    else:
+       return ccdo2(dat1,dat2,operator='div')
 
-def mulc(dat,c):
+def add(dat1,dat2):
     """
-    Multiply dat by the scalar c
-    Shortcut to ccdo(dat,operator='mulc,'+str(c))
+    Add dat1 to dat2; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Shortcut to ccdo(dat,operator='addc,'+str(c)) and plus(dat1,dat2)
     """
-    return ccdo(dat,operator='mulc,'+str(c))
+    if isinstance(dat2,(str,float,int)):
+       c = str(float(dat2)
+       return ccdo(dat,operator='addc,'+c)
+    else:
+       return plus(dat1,dat2)
 
-def divc(dat,c):
+def sub(dat1,dat2):
     """
-    Divide dat by the scalar c
-    Shortcut to ccdo(dat,operator='divc,'+str(c))
+    Subtract dat2 to dat1; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Shortcut to ccdo(dat,operator='subc,'+str(c)) and minus(dat1,dat2)
     """
-    return ccdo(dat,operator='divc,'+str(c)) 
-
-
-def addc(dat,c):
-    """
-    Add the constant c to dat
-    Shortcut to ccdo(dat,operator='addc,'+str(c))
-    """
-    return ccdo(dat,operator='addc,'+str(c))
-
-def subc(dat,c):
-    """
-    Subtract the constant c to dat
-    Shortcut to ccdo(dat,operator='subc,'+str(c))
-    """
-    return ccdo(dat,operator='subc,'+str(c))
+    if isinstance(dat2,(str,float,int)):
+       c = str(float(dat2)
+       return ccdo(dat,operator='subc,'+c)
+    else:
+       return minus(dat1,dat2)
 
 
 
