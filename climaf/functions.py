@@ -20,7 +20,7 @@ def mul(dat1,dat2):
     Shortcut to ccdo(dat1,dat2,operator='mul') and ccdo(dat,operator='mulc,'+c)
     """
     if isinstance(dat2,(str,float,int)):
-       c = str(float(dat2)
+       c = str(float(dat2))
        return ccdo(dat,operator='mulc,'+c)
     else: 
        return ccdo2(dat1,dat2,operator='mul')
@@ -31,7 +31,7 @@ def div(dat1,dat2):
     Shortcut to ccdo(dat1,dat2,operator='div') and ccdo(dat,operator='divc,'+c)
     """
     if isinstance(dat2,(str,float,int)):
-       c = str(float(dat2)
+       c = str(float(dat2))
        return ccdo(dat,operator='divc,'+c)
     else:
        return ccdo2(dat1,dat2,operator='div')
@@ -42,7 +42,7 @@ def add(dat1,dat2):
     Shortcut to ccdo(dat,operator='addc,'+str(c)) and plus(dat1,dat2)
     """
     if isinstance(dat2,(str,float,int)):
-       c = str(float(dat2)
+       c = str(float(dat2))
        return ccdo(dat,operator='addc,'+c)
     else:
        return plus(dat1,dat2)
@@ -53,7 +53,7 @@ def sub(dat1,dat2):
     Shortcut to ccdo(dat,operator='subc,'+str(c)) and minus(dat1,dat2)
     """
     if isinstance(dat2,(str,float,int)):
-       c = str(float(dat2)
+       c = str(float(dat2))
        return ccdo(dat,operator='subc,'+c)
     else:
        return minus(dat1,dat2)
