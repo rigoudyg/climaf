@@ -4,7 +4,7 @@
  This is a first protoype, where the interpreter is Python itself
 
 
- """
+"""
 # Created : S.Senesi - 2014
 
 import re, string, copy, os.path
@@ -329,15 +329,15 @@ class cdataset(cobject):
         attval=processDatasetArgs(**kwargs)
         #
         # TBD : Next lines for backward compatibility, but should re-engineer 
-        self.project=attval["project"]
-        self.simulation=attval['simulation']
-        self.variable= attval['variable']
+        self.project   = attval["project"]
+        self.simulation= attval['simulation']
+        self.variable  = attval['variable']
         # alias is a n-plet : filevar, scale, offset, filenameVar, missing
-        self.period    =attval['period']
-        self.domain    =attval['domain']
+        self.period    = attval['period']
+        self.domain    = attval['domain']
         #
-        self.model    =attval.get('model',"*")
-        self.frequency=attval.get('frequency',"*")
+        self.model     = attval.get('model',"*")
+        self.frequency = attval.get('frequency',"*")
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
         if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
             self.period.fx=True
@@ -726,6 +726,35 @@ def allow_error_on_ds(allow=True) :
     allow_errors_on_ds_call=allow
     #print ('allow_errors_on_ds_call='+`allow_errors_on_ds_call`)
 
+import netcdfbasics
+
+def select_projects(**kwargs):
+    """
+    If kwargs['project'] is a list (has multiple values), select_projects loops on the projects
+    until it finds a file containing the aliased variable name.
+    """
+    p_list = kwargs['project']
+    if not isinstance(p_list,list):
+        p_list = [p_list]
+    for project in p_list:
+        wkwargs = kwargs.copy()
+        wkwargs.update(dict(project=project))
+        dat = cdataset(**wkwargs)
+	files = dat.baseFiles()
+        if files:
+            clogger.warning('-- File found for project '+project+ ' and '+`wkwargs`)
+            tmpVarInFile = varIsAliased(wkwargs['project'],wkwargs['variable'])[0]
+            if netcdfbasics.fileHasVar(files.split(" ")[0],tmpVarInFile):
+   	        clogger.warning('-- Variable '+tmpVarInFile+' (aliased to variable '+wkwargs['variable']+') found in '+files.split(" ")[0])
+                return wkwargs
+            else:
+                clogger.warning('-- The variable '+tmpVarInFile+' (aliased to variable '+wkwargs['variable']+') was not found in '+files.split(" ")[0])
+                clogger.warning('--> Try with another project than '+project+' or another variable name')
+        else:
+            clogger.warning('-- No file found for project '+project+ ' and '+`wkwargs`)
+    return kwargs
+
+
 def ds(*args,**kwargs) :
     """
     Returns a dataset from its full Climate Reference Syntax string. Example ::
@@ -742,7 +771,9 @@ def ds(*args,**kwargs) :
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
-    if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
+    if (len(args)==0) :
+       return cdataset(**select_projects(**kwargs))
+       #return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
     results=[]
     for cproj in cprojects : 
@@ -855,7 +886,7 @@ class cpage(cobject):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
-
+        
         Args:
         
           fig_lines (a list of lists of figure objects or an ensemble of figure objects):

@@ -11,46 +11,16 @@ For each operator, the content of the doc file is also made available in the Pyt
 
 Documented operators as of today : 
 
- - arithmetic operators:
-    - :doc:`scripts/plus`
-    - :doc:`scripts/minus`
-    - :doc:`functions/mul`
-    - :doc:`functions/div`
-    - :doc:`functions/mulc`
-    - :doc:`functions/divc`
-    - :doc:`functions/addc`
-    - :doc:`functions/divc`
-    - :doc:`functions/apply_scale_offset`
-
- - climate data operators:
-    - spatial operations:
-        - :doc:`scripts/llbox`
-        - :doc:`scripts/space_average`
-        - :doc:`functions/zonmean`
-    - regridding:
-        - :doc:`scripts/regrid`
-        - :doc:`scripts/regridn`
-        - :doc:`functions/zonmean_interpolation`
-    - computing a difference with regridding (typically to compute model biases):
-        - :doc:`functions/diff_regrid`
-        - :doc:`functions/diff_regridn`
-        - :doc:`functions/diff_zonmean`
-    - temporal operations:
-        - :doc:`scripts/time_average`
-        - :doc:`functions/clim_average`
-        - :doc:`functions/climato`
-        - :doc:`functions/annual_cycle`
-    - Others:
-        - :doc:`scripts/slice`
-        - :doc:`scripts/mask`
-
- - Functions to display an image in an IPython Notebook:
-    - :doc:`functions/iplot`
-    - :doc:`functions/implot`
-
  - basic functions:
-    - :doc:`functions/summary`
+    - :doc:`scripts/llbox`
+    - :doc:`scripts/regrid`
+    - :doc:`scripts/regridn`
+    - :doc:`scripts/time_average`
+    - :doc:`scripts/space_average`
+    - :doc:`scripts/minus`
     - :doc:`scripts/ncdump`
+    - :doc:`scripts/slice`
+    - :doc:`scripts/mask`
     - :doc:`scripts/ncpdq`
 
  - graphics:
@@ -117,7 +87,6 @@ Documented operators as of today :
 		   output page  
 
     - :doc:`scripts/plot`
-    - :doc:`functions/plot_params`
     - :doc:`scripts/curves`
     - :doc:`scripts/ncview`
     - :doc:`scripts/cpdfcrop`
@@ -125,8 +94,6 @@ Documented operators as of today :
 
  - swiss knife |sk| :
     - :doc:`scripts/ccdo`
-    - :doc:`scripts/ccdo2`
-    - :doc:`scripts/ccdo_ens`
 
  - example for two outputs :
     - :doc:`scripts/mean_and_std`
@@ -146,4 +113,3 @@ A name-sorted list :
   :glob:
 
   /scripts/*
-  /functions/*

@@ -18,14 +18,6 @@ def get_product(file):
     return product
 
 
-#cscript('cdo_ensavg', 'cdo ensavg ${mmin} ${out}')
-#cscript('cdo_ensmin', 'cdo ensmin ${mmin} ${out}')
-#cscript('cdo_ensmax', 'cdo ensmax ${mmin} ${out}')
-
-#cscript('cdo_gt','cdo gt ${in_1} ${in_2} ${out}')
-#cscript('cdo_lt','cdo lt ${in_1} ${in_2} ${out}')
-
-
 def stat_ref_ensemble_GB2015(var,climatology='annual_cycle',statistic='mean', region='Tropics'):
     """
     Returns a statistic on the ensemble of turbulent fluxes reference products defined in
@@ -38,13 +30,6 @@ def stat_ref_ensemble_GB2015(var,climatology='annual_cycle',statistic='mean', re
     For 'climatology', the user can choose among the values handled by clim_average (see help(clim_average))
     For 'statistic', the user can choose among 'mean' (uses 'avg' in cdo), 'min' and 'max'
     """
-    #cscript('cdo_ensavg', 'cdo ensavg ${mmin} ${out}')
-    #cscript('cdo_ensmin', 'cdo ensmin ${mmin} ${out}')
-    #cscript('cdo_ensmax', 'cdo ensmax ${mmin} ${out}')
-    
-    #cscript('cdo_gt','cdo gt ${in_1} ${in_2} ${out}')
-    #cscript('cdo_lt','cdo lt ${in_1} ${in_2} ${out}')
-
     # -- We get the list of files available in the ref_climatos project for variable var
     # -- From this list, we extract the names (ens_products) of the products to construct an ensemble with eds()
     listfiles = ds(project='ref_climatos', variable=var)
@@ -76,19 +61,16 @@ def stat_ref_ensemble_GB2015(var,climatology='annual_cycle',statistic='mean', re
     #
     # -> Return the ensemble statistic
     if statistic=='mean':
-        return cdo_ensavg(rgrd_ens_clim)
+        #return cdo_ensavg(rgrd_ens_clim)
+        return ccdo_ens(rgrd_ens_clim,operator='ensavg')
     if statistic=='min':
-        return cdo_ensmin(rgrd_ens_clim)
+        #return cdo_ensmin(rgrd_ens_clim)
+        return ccdo_ens(rgrd_ens_clim,operator='ensmin')
     if statistic=='max':
-        return cdo_ensmax(rgrd_ens_clim)
+        #return cdo_ensmax(rgrd_ens_clim)
+        return ccdo_ens(rgrd_ens_clim,operator='ensmax')
 
 def plot_bias_TurbFlux_vs_GB2015(dat,climatology='ANM', region = 'Tropics', customname='default', add_product_in_title=True, **kwargs):
-    #cscript('cdo_ensavg', 'cdo ensavg ${mmin} ${out}')
-    #cscript('cdo_ensmin', 'cdo ensmin ${mmin} ${out}')
-    #cscript('cdo_ensmax', 'cdo ensmax ${mmin} ${out}')
-    #
-    #cscript('cdo_gt','cdo gt ${in_1} ${in_2} ${out}')
-    #cscript('cdo_lt','cdo lt ${in_1} ${in_2} ${out}')
     #
     var = dat.variable
     period = dat.period
@@ -113,8 +95,10 @@ def plot_bias_TurbFlux_vs_GB2015(dat,climatology='ANM', region = 'Tropics', cust
     # -- Calcul du biais
     bias_clim = minus(wsim_clim,ref_clim)
     #
-    test_sup = cdo_gt(wsim_clim,max_clim)
-    test_inf = cdo_lt(wsim_clim,min_clim)
+    #test_sup = cdo_gt(wsim_clim,max_clim)
+    #test_inf = cdo_lt(wsim_clim,min_clim)
+    test_sup = ccdo2(wsim_clim,max_clim,operator='gt')
+    test_inf = ccdo2(wsim_clim,min_clim,operator='lt')
     test = plus(test_sup,test_inf)
     #
     # -- On fait un mask a partir de la moyenne d'ensemble des obs
@@ -150,7 +134,6 @@ def plot_bias_TurbFlux_vs_GB2015(dat,climatology='ANM', region = 'Tropics', cust
 
 
 def plot_climato_TurbFlux_GB2015(variable,dat,climatology='ANM', region='Tropics', customname='default', **kwargs):
-    #cscript('cdo_ensavg', 'cdo ensavg ${mmin} ${out}')
     #
     var = variable
     # -- Compute the climatology

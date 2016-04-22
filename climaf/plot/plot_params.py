@@ -1,13 +1,19 @@
 # -- Import the dictionnaries of plot params:
 from climaf.site_settings import *
 
+# --> Import the default CliMAF sets of plot params 
+# --> for atmosphere
+import atmos_plot_params
+# --> for ocean
+import ocean_plot_params
+
+# --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)
 if atCNRM:
-
-
-# --> for LMDZ
-import lmdz_dict_plot_params
-# --> for NEMO
-import nemo_dict_plot_params
+   import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
+   import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
+if atIPSL:
+   import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
+   import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
 
 def plot_params(variable,context, custom_plot_params=None) :
     """
@@ -24,10 +30,12 @@ def plot_params(variable,context, custom_plot_params=None) :
     }
 
     per_variable = {}
-    # --> Adding the LMDZ plot params 
-    per_variable.update(lmdz_dict_plot_params.dict_plot_params)
-    # --> Adding the NEMO plot params
-    per_variable.update(nemo_dict_plot_params.dict_plot_params)
+    # --> Adding the default plot params
+    per_variable.update(atmos_plot_params.dict_plot_params)
+    per_variable.update(ocean_plot_params.dict_plot_params)
+    # --> Then, add the plot params specific to the centers
+    per_variable.update(atmos_plot_params_centerspecs.dict_plot_params)
+    per_variable.update(ocean_plot_params_centerspecs.dict_plot_params)
     # --> If needed, adding a custom dictionnary of plot params
     if custom_plot_params:
        per_variable.update(custom_plot_params)

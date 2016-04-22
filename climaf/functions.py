@@ -4,6 +4,16 @@ from climaf.operators import *
 # -- Fonctions de plot interractives
 from IPython.display import Image
 
+
+def apply_scale_offset(dat,scale,offset):
+    """
+    Returns a CliMAF object after applying a scale and offset
+    ! Shortcut to: ccdo(ccdo(dat,operator='mulc,'+str(float(scale))),operator='addc,'+str(float(offset)))
+    """
+    return ccdo(ccdo(dat,operator='mulc,'+str(float(scale))),operator='addc,'+str(float(offset)))
+#
+
+
 def mul(dat1,dat2):
     """
     Multiply dat1 by dat2
@@ -51,9 +61,6 @@ def subc(dat,c):
 
 def iplot(map):
     """
-    Usage:
-    iplot(map)
-    
     Interactive version of plot for display in IPython Notebooks
     Similar to implot() but you provide a map (a CliMAF object produced with plot() )
     implot() takes directly a field as argument.
@@ -96,9 +103,6 @@ def getLevs(dat,zmin=0,zmax=100000,convertPressureUnit=None):
 
 def vertical_average(dat,zmin,zmax):
     """
-    Usage:
-    vertical_average(dat,zmin,zmax)
-    
     Computes a vertical average on the vertical levels between zmin and zmax
     """
     levs = getLevs(dat,zmin,zmax)
@@ -111,9 +115,6 @@ import numpy as np
 
 def implot(field,**kwargs):
     """
-    Usage:
-    implot(field,**kwargs)
-    
     Interactive version of plot for display in IPython Notebooks
     Similar to iplot() but you can directly provide a field (not a CliMAF object produced with plot() )
     """
@@ -122,18 +123,12 @@ def implot(field,**kwargs):
 
 def diff_regrid(dat1, dat2):
     """
-    Usage:
-    diff_regrid(dat1, dat2)
-    
     Regrids dat1 on dat2 and returns the difference between dat1 and dat2
     """
     return minus(regrid(dat1,dat2), dat2)
 
 def diff_regridn (data1, data2, cdogrid='n90'):
     """
-    Usage:
-    diff_regridn (dat1, dat2, cdogrid='n90')
-    
     Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2 
     """    
     return minus ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
@@ -141,9 +136,6 @@ def diff_regridn (data1, data2, cdogrid='n90'):
 
 def tableau(n_lin=1, n_col=1):
     """
-    Usage:
-    tableau(n_lin=1, n_col=1)
-
     Generates a table as used by cpage with n_lin rows and n_col columns.
     """
     view    = [[ None for i in range(n_col)] for j in range(n_lin)]
@@ -153,9 +145,6 @@ def tableau(n_lin=1, n_col=1):
 
 def annual_cycle(dat):
     """
-    Usage:
-    annual_cycle(dat)
-
     Computes the annual cycle as the 12 climatological months of dat
     (wrapper of ccdo)
     """
@@ -164,15 +153,13 @@ def annual_cycle(dat):
 
 def clim_average(dat,season):
     """
-    Usage:
-    clim_average(dat,season)
-    
     Computes the climatological average of dat on the specified months with 'season':
     - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
     - seasonal climatologies (for example, season = 'DJF' or 'djf' to compute the seasonal climatology over December_january-February;
     available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
     - individual monthly climatologies (for example, use season = 'january', 'jan', '1' or 1 to get the climatological January)
     Note that you can use upper case or lower case characters to specify the months or seasons.
+    - annual maximum or minimum (typically makes sense with the mixed layer depth)
     
     clim_average computes the annual cycle for you.
     """
@@ -225,22 +212,9 @@ def clim_average(dat,season):
     return avg
 
 
-def timestep(dat,timestep):
-    """
-    Usage:
-    timestep(dat,timestep)
-    
-    Returns the timestep-th time step from dat
-    """
-    return ccdo(dat,operator='selmon,'+str(timestep))
-
-
 
 def climato(dat):
     """
-    Usage:
-    climato(dat)
-    
     Computes the annual mean climatology of dat
     (user-friendly shortcut to CliMAF operator time_average(dat))
     """
@@ -249,9 +223,6 @@ def climato(dat):
 
 def summary(dat):
     """
-    Usage:
-    summary(dat)
-    
     Summary provides the informations on a CliMAF dataset obtained from dataset().
     It returns the path and filename, and the dictionary of pairs keyword-values associated with the CliMAF dataset.
     """
@@ -272,9 +243,6 @@ def summary(dat):
 
 def projects():
     """
-    Usage:
-    projects()
-    
     Lists available projects and their associated facets.
     """
     print '-- Available projects:'
@@ -285,9 +253,6 @@ def projects():
 #
 def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90'):
     """
-    Usage:
-    zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90')
-    
     Interpolates the zonal mean field dat1 via two possible ways:
     - either by providing a target zonal field dat2 => dat1 is regridded both horizontally and vertically on dat2
     - or by providing a list of vertical levels => dat1 is regridded horizontally on the cdo_horizontal_grid
@@ -383,9 +348,6 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
         
 def zonmean(dat):
     """
-    Usage:
-    zonmean(dat)
-    
     Return the zonal mean field of dat
     Shortcut to the command ccdo(dat,operator='zonmean')
     """
@@ -394,9 +356,6 @@ def zonmean(dat):
 
 def diff_zonmean(dat1,dat2):
     """
-    Usage:
-    diff_zonmean(dat1,dat2)
-    
     Returns the zonal mean bias of dat1 against dat2
     The function first computes the zonal means of dat1 and dat2.
     Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function zonmean_interpolation.

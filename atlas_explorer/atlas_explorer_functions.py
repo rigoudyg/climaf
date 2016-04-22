@@ -300,14 +300,6 @@ def check_ds(simulations, variables, return_file=False):
                 print file
 
 #
-def apply_scale_offset(dat,scale,offset):
-    """
-    Returns a CliMAF object after applying a scale and offset
-    ! Shortcut to: ccdo(ccdo(dat,operator='mulc,'+str(float(scale))),operator='addc,'+str(float(offset)))
-    """
-    return ccdo(ccdo(dat,operator='mulc,'+str(float(scale))),operator='addc,'+str(float(offset)))
-#
-
     
 def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
     """    
@@ -327,7 +319,7 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
     depending on the number of panels.
     It uses:
         - plot_params.py to find the default plotting parameters per variable and type of plot
-          (fullfield, bias, or model_model)
+          (full_field, bias, or model_model)
         - reference.py to find a default reference for a variable (function variable2reference)
     
     
@@ -395,7 +387,7 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
         'plot_bias'    : True
         'Metrics'      : False         # -- If True, it displays the metrics associated with the plot
         'ref_contours' : False         # -- If True, displays the contours of the reference over the bias map
-                                       #    It uses the contours defined in plot_params as 'colors' for 'fullfield'
+                                       #    It uses the contours defined in plot_params as 'colors' for 'full_field'
         'orientation' : 'landscape'    # -- Either 'landscape' or 'portrait'
         'nrow':None                    # -- Controls the number of rows of the multiplot
         'ncol':None                    # -- Controls the number of columns of the multiplot
@@ -911,17 +903,17 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
                 # -- and we add the plot_specs
                 print 'variable_plot_specs = ',variable_plot_specs
                 print 'plot_specs = ',plot_specs
-                tmp_plot_climato_specifs = plot_params(variable,'fullfield') ; tmp_plot_climato_specifs.update(plot_specs)
+                tmp_plot_climato_specifs = plot_params(variable,'full_field') ; tmp_plot_climato_specifs.update(plot_specs)
                 #
                 # -- Here, we give the possibility to pass arguments that are specific to a variable with kwargs
                 if 'custom_plot_specs' in kwargs:
                     if variable in kwargs['custom_plot_specs']:
-                        if 'fullfield' in kwargs['custom_plot_specs'][variable]:
-                            tmp_plot_climato_specifs.update(kwargs['custom_plot_specs'][variable]['fullfield'])
+                        if 'full_field' in kwargs['custom_plot_specs'][variable]:
+                            tmp_plot_climato_specifs.update(kwargs['custom_plot_specs'][variable]['full_field'])
                 #
                 # -- Print the arguments and do the plot
                 if plot_specs['ref_contours']:
-                    params_full_field = plot_params(variable,'fullfield')
+                    params_full_field = plot_params(variable,'full_field')
                     if 'offset' in params_full_field:
                         offset = params_full_field['offset']
                     else:
@@ -933,7 +925,7 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
                     # -- We apply the scale and offset with apply_scale_offset()
                     aux_ref = apply_scale_offset(climato_ref,scale,offset)
                     #
-                    # -- We add the contours defined in plot_params for the fullfield with 'colors'
+                    # -- We add the contours defined in plot_params for the full_field with 'colors'
                     # -- to the dictionary of specifs for the bias plot
                     if 'contours' in variable_plot_specs:
                         tmp_plot_climato_specifs.update({'contours':variable_plot_specs['contours']})
@@ -1009,11 +1001,11 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
                             tmp_plot_bias_specifs.update(kwargs['custom_plot_specs'][variable][difftype])
                 #
                 # -- If we want to add the contours of the ref to the bias map:
-                # --    - we get the contours from 'colors' specified in plot_params for fullfield
+                # --    - we get the contours from 'colors' specified in plot_params for full_field
                 # --    - because those contours are defined after applying an offset and/or scale,
                 # --      we have to apply the offset and scale to ref to display it
                 if draw_ref_contours:
-                    params_full_field = plot_params(variable,'fullfield')
+                    params_full_field = plot_params(variable,'full_field')
                     if 'offset' in params_full_field:
                         offset = params_full_field['offset']
                     else:
@@ -1025,7 +1017,7 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
                     # -- We apply the scale and offset with apply_scale_offset()
                     aux_ref = apply_scale_offset(climato_ref,scale,offset)
                     #
-                    # -- We add the contours defined in plot_params for the fullfield with 'colors'
+                    # -- We add the contours defined in plot_params for the full_field with 'colors'
                     # -- to the dictionary of specifs for the bias plot
                     if 'contours' in variable_plot_specs:
                         tmp_plot_bias_specifs.update({'contours':variable_plot_specs['contours']})
@@ -1166,324 +1158,6 @@ def climbias_explorer(panels, pages, show_last_plot=True, **kwargs):
     # -->
     # -->
     # --> End of climbias_explorer!!
-
-
-
-
-
-
-
-def climbias_explorer_back(panels, pages, show_last_plot=True, **kwargs):
-
-    # -- Name of the pdf file that will contain the atlas
-    pdffile        = kwargs['pdffile']          # -> Name of the pdf file produced by the present call of climbias_explorer
-    main_atlas_pdf = kwargs['main_atlas_pdf']   # -> Name of the pdf file that will gather several pdfs produced with explorer
-    orientation    = kwargs['orientation']      # -> orientation of the pdf
-    pdf_outdir     = kwargs['outdir']           # -> output directory for the atlas
-    if pdf_outdir=='':
-        pdf_outdir='./'
-    else:
-        if pdf_outdir[len(pdf_outdir)-1]!='/': pdf_outdir = pdf_outdir+'/'
-    pdf_pathandfilename = pdf_outdir+pdffile
-    
-    if orientation=='landscape':
-        pdf_orientation=orientation
-    else:
-        pdf_orientation='no-landscape'
-    #
-    import os
-    # -- Si on precise 'append':True et que le fichier que l'on veut concatener existe deja, soit:
-    # --    - on fait une copie du fichier existant (qui porte le nom du fichier final) et on lui donne un nom de fichier tmp
-    # --    - on a un nom de fichier main_atlas_pdf different de pdffile renseigne par l'utilisateur,
-    # --      et on utilise pdffile pour le fichier interm
-    if kwargs['append'] and os.path.isfile(pdf_pathandfilename):
-        if main_atlas_pdf!=pdffile:
-            tmp_pdf_pathandfilename = pdf_pathandfilename
-            pdf_pathandfilename = pdf_outdir+main_atlas_pdf
-        else:
-            # Creer un nouveau nom de fichier pour pdf_pathandfilename
-            tmp_pdf_pathandfilename = pdf_pathandfilename.replace('.pdf','-'+str(time.time()).replace('.','')+'.pdf')
-            # Faire un mv
-            os.rename(pdf_pathandfilename, tmp_pdf_pathandfilename)
-        # mettre le pdf_pathandfilename renomme dans la commande 
-        pdfcmd = 'pdfjam --'+pdf_orientation+' -o '+pdf_pathandfilename+' '+tmp_pdf_pathandfilename
-    else:    
-        pdfcmd = 'pdfjam --'+pdf_orientation+' -o '+pdf_pathandfilename
-    
-    # -- Get some graph specs
-    plot_climato = kwargs['plot_climato']
-    plot_bias = kwargs['plot_bias']
-
-    for page in pages:
-        
-        nrow = kwargs['nrow']
-        ncol = kwargs['ncol']
-        if plot_climato and plot_bias:
-            fig_lines = create_fig_lines(panels,orientation=orientation,plot_climato=True,nrow=nrow,ncol=ncol)
-        else:
-            fig_lines = create_fig_lines(panels,orientation=orientation,plot_climato=False,nrow=nrow,ncol=ncol)
-        nrow = np.shape(fig_lines)[0]
-        ncol = np.shape(fig_lines)[1]
-        byColumn=False
-        byRow=True
-        i=0
-        j=0
-        #
-        # -- Extraction of a geographical domain
-        
-        # -- Loop on the panels
-        for panel in panels:
-            
-            if ('model' or 'simulation' or 'login') in page:
-                print 'Simulation = ',page
-                simulation = page
-                print 'variable = ',panel
-                tmpvariable = panel
-            else:
-                print 'Simulation = ',panel
-                simulation = panel
-                print 'variable = ',page
-                tmpvariable = page
-            if isinstance(tmpvariable,dict):
-                variable = tmpvariable['variable']
-                variable_plot_specs = dict(tmpvariable.items())
-                variable_plot_specs.pop('variable')
-                if 'climatology' in variable_plot_specs:
-                    simulation.update({'climatology':variable_plot_specs['climatology']})
-                    variable_plot_specs.pop('climatology')
-            else:
-                variable = tmpvariable
-                variable_plot_specs = {}
-            #
-            
-            facet_values = {'variable':variable}
-            #
-            # --> if plot_bias: If we don't plot the bias, we do not get the reference
-            if plot_bias:
-                #
-                # -- Get the reference for the variable
-                ref_project = kwargs['ref_project']
-                if kwargs['reference']=={}:
-                    print variable
-                    print variable2reference(variable)
-                    ref = ds(**variable2reference(variable))
-                    summary(ref)
-                    difftype='bias' #; context = difftype
-                else:
-                    reference = kwargs['reference'].copy()
-                    difftype='model_model'
-                    reference.update({'variable':variable})
-                    ref = ds(**reference)
-                #if any(kwd in ref.kvp for kwd in ['model','simulation','login']) and ref.kvp['simulation']!=:
-                if 'product' not in ref.kvp:
-                    facet_values.update({'product':ref.kvp['simulation']})
-                    # -- TBD : something smarter than product:simulation??
-                else:
-                    facet_values.update({'product':ref.kvp['product']})
-                if 'clim_period' in ref.kvp:
-                    tmp_period = ref.kvp['clim_period']
-                else:
-                    tmp_period = str(ref.period)
-                facet_values.update({'period':tmp_period})
-                print summary(ref)
-
-            simulation.update({'variable':variable})
-            print simulation
-            sim = ds(**simulation)
-            #
-            # -- Get the time period
-            if 'clim_period' in simulation or sim.kvp['frequency'] in ['seasonal','annual_cycle']:
-                tmp_period = sim.kvp['clim_period']
-            else:
-                tmp_period = str(sim.period)
-            
-            # --> Case of sim is a reference dataset!!
-            # -- Here, it is a simulation
-            #if any(kwd in sim.kvp for kwd in ['model','simulation','login']):
-            if 'product' not in simulation:
-                print '-- simulation = '+sim.simulation
-                print '-- model = '+sim.model
-                facet_values.update({'model':sim.model,'simulation':sim.simulation,'period':tmp_period})
-                if 'CustomName' in simulation:
-                    facet_values.update({'simulation':simulation['CustomName']})
-            else:
-                # -- And here, it is a reference product
-                print '-- product = '+sim.product
-                facet_values.update({'product':sim.product,'period':tmp_period})
-                if 'CustomName' in simulation:
-                    facet_values.update({'product':simulation['CustomName']})                
-            print summary(sim)
-            print ''
-
-            # -- Compute the climatologies
-            if 'season' in simulation:
-                climarg = 'season'
-            else:
-                climarg = 'climatology'
-            if climarg in simulation:
-                tmp_climatology = simulation[climarg]
-            else:
-                tmp_climatology = kwargs['climatology']
-            if tmp_climatology in 'annual_mean':
-                tmp_climatology='ANM'
-            climato_sim = clim_average(sim,tmp_climatology)
-            if plot_bias:
-                climato_ref = clim_average(ref,tmp_climatology)
-            facet_values.update({'climatology':tmp_climatology})
-
-            plot_specs = dict(kwargs['plot_specs'].items())
-            plot_specs.update(variable_plot_specs)
-            Metrics = kwargs['Metrics']
-            ocean_variables = ['tos','sos','zos']
-            if variable in ocean_variables and plot_specs['mpCenterLonF']==0:
-                plot_specs.update({'mpCenterLonF':200})
-
-            # -- Compute the zonal mean for ua, va, ta or hus
-            zonmean_variables = ['ua','va','ta','hus']
-            if variable in zonmean_variables:
-                climato_sim = ccdo(climato_sim, operator='zonmean')
-                if plot_bias:
-                    climato_ref = ccdo(climato_ref, operator='zonmean')
-            
-            # -- Compute the bias map
-            variablekwargs = dict(kwargs.items())
-            variablekwargs.update(variable_plot_specs)
-            if plot_bias:
-                if variable in zonmean_variables:
-                    # -- Remapping vertical
-                    climato_ref = regridn(climato_ref,cdogrid="r360x180")
-                    climato_sim = regridn(climato_sim,cdogrid="r360x180")
-                    # -- Remapping horizontal
-                else:
-                    # -- Default
-                    if 'cdogrid' not in variablekwargs and 'remappingMethod' not in variablekwargs:
-                        if variable in ocean_variables:
-                            climato_ref = regridn(climato_ref,cdogrid="r360x180")
-                            climato_sim = regridn(climato_sim,cdogrid="r360x180")
-                        else:
-                            if variablekwargs['remapSimOnRef'] or 'remapSinOnRef' not in variablekwargs:
-                                climato_sim = regrid(climato_sim,climato_ref)
-                            else:
-                                climato_ref = regrid(climato_ref,climato_sim)
-                    else:
-                        remappingMethod = 'remapbil'
-                        if 'remappingMethod' in variablekwargs:
-                            remappingMethod = variablekwargs['remappingMethod']
-                        cdogrid = "r360x180"
-                        if 'cdogrid' in variablekwargs:
-                            cdogrid = variablekwargs['cdogrid']
-                            climato_ref = regridn(climato_ref,cdogrid=cdogrid,option=remappingMethod)
-                            climato_sim = regridn(climato_sim,cdogrid=cdogrid,option=remappingMethod)
-                        else:
-                            if variablekwargs['remapSimOnRef']:
-                                climato_sim = regridn(climato_sim,climato_ref,option=remappingMethod)
-                            else:
-                                climato_ref = regridn(climato_ref,climato_sim,option=remappingMethod)
-                bias_field = minus(climato_sim,climato_ref)
-
-
-            # -- Plot of the climatology
-            if plot_climato:
-                PlotMainTitle = kwargs['ClimPlotMainTitle']
-                UpperLeftTitle = kwargs['ClimUpperLeftTitle']
-                UpperRightTitle = kwargs['ClimUpperRightTitle']
-                CenterTitle = kwargs['ClimCenterTitle']
-
-                # -- Metrics on the bias map
-                if Metrics:
-                    climato_min_value = '%s' % float('%.3g' % cvalue(ccdo(climato_sim,operator='fldmin')) )
-                    climato_mean_value = '%s' % float('%.3g' % cvalue(ccdo(climato_sim,operator='fldavg')) )
-                    climato_max_value = '%s' % float('%.3g' % cvalue(ccdo(climato_sim,operator='fldmax')) )
-                    UpperRightTitle='min='+climato_min_value+' ; mean='+climato_mean_value+' ; max='+climato_max_value
-                    UpperLeftTitle='${climatology}'
-                    CenterTitle=''
-                #else:
-                tmp_plot_climato_specifs = plot_params(variable,'fullfield') ; tmp_plot_climato_specifs.update(plot_specs)
-                if 'custom_plot_specs' in kwargs:
-                    if variable in kwargs['custom_plot_specs']:
-                        if 'fullfield' in kwargs['custom_plot_specs'][variable]:
-                            tmp_plot_climato_specifs.update(kwargs['custom_plot_specs'][variable]['fullfield'])
-                print tmp_plot_climato_specifs
-                climato_plot      = plot(climato_sim,
-                                         title           = replace_facet_in_string(PlotMainTitle,facet_values),
-                                         gsnLeftString   = replace_facet_in_string(UpperLeftTitle,facet_values),
-                                         gsnRightString  = replace_facet_in_string(UpperRightTitle,facet_values),
-                                         gsnCenterString = replace_facet_in_string(CenterTitle,facet_values),
-                                         **tmp_plot_climato_specifs)
-
-            # -- Plot the bias
-            if plot_bias:
-                PlotMainTitle = kwargs['BiasPlotMainTitle']
-                UpperLeftTitle = kwargs['BiasUpperLeftTitle']
-                UpperRightTitle = kwargs['BiasUpperRightTitle']
-                CenterTitle = kwargs['BiasCenterTitle']    
-                
-                # -- Metrics on the bias map
-                if Metrics:
-                    bias_min_value = '%s' % float('%.3g' % cvalue(ccdo(bias_field,operator='fldmin')) )
-                    bias_max_value = '%s' % float('%.3g' % cvalue(ccdo(bias_field,operator='fldmax')) )
-                    bias_value = '%s' % float('%.3g' % cvalue(ccdo(bias_field,operator='fldmean')) )
-                    crmse_value = '%s' % float('%.3g' % CRMSE(climato_sim,climato_ref) )
-                    UpperRightTitle='min='+bias_min_value+'; max='+bias_max_value+'; bias='+bias_value+'; CRMSE='+crmse_value
-                    UpperLeftTitle='${climatology}'
-                    CenterTitle=''
-                tmp_plot_bias_specifs = plot_params(variable,difftype) ; tmp_plot_bias_specifs.update(plot_specs)
-                if 'custom_plot_specs' in kwargs:
-                    if variable in kwargs['custom_plot_specs']:
-                        if difftype in kwargs['custom_plot_specs'][variable]:
-                            tmp_plot_bias_specifs.update(kwargs['custom_plot_specs'][variable][difftype])
-
-                bias_plot         = plot(bias_field,
-                                         title           = replace_facet_in_string(PlotMainTitle,facet_values),
-                                         gsnLeftString   = replace_facet_in_string(UpperLeftTitle,facet_values),
-                                         gsnRightString  = replace_facet_in_string(UpperRightTitle,facet_values),
-                                         gsnCenterString = replace_facet_in_string(CenterTitle,facet_values),
-                                         **tmp_plot_bias_specifs)
-            #
-            if plot_climato and plot_bias:
-                if orientation=='portrait': 
-                    fig_lines[i][0] = climato_plot
-                    fig_lines[i][1] = bias_plot
-                if orientation=='landscape':
-                    fig_lines[0][i] = climato_plot
-                    fig_lines[1][i] = bias_plot
-                i=i+1
-            else:
-                if plot_climato:
-                    fig = climato_plot
-                if plot_bias:
-                    fig = bias_plot
-                fig_lines[i][j] = fig
-                if byRow:
-                    if i==(nrow-1):
-                        i=-1 ; j = j+1
-                    i = i+1
-                if byColumn:
-                    if j==(ncol-1):
-                        j=-1 ; i = i+1
-                    j = j+1
-        # Multiplot
-        page_title = kwargs['page_title']
-        title_specs = kwargs['title_specs']
-        multiplot = cpage(fig_lines, orientation=orientation, fig_trim=True, page_trim=True,
-                          title = replace_facet_in_string(page_title,facet_values), format='png',
-                          **title_specs)
-        pdfcmd = pdfcmd+' '+cfile(multiplot)
-        #pdfargs.append(cfile(multiplot))
-        #return iplot(multiplot)
-    # -- Create the pdf page
-    #print pdfargs
-    #subprocess.Popen(pdfargs, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    print pdfcmd
-    os.system(pdfcmd)
-    if kwargs['append'] and kwargs['remove_intermediate_atlas'] and os.path.isfile(tmp_pdf_pathandfilename):
-        os.remove(tmp_pdf_pathandfilename)
-    if show_last_plot:
-        return iplot(multiplot)
-    else:
-        return pdf_pathandfilename
-#
 
 
 

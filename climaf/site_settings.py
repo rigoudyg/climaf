@@ -6,6 +6,7 @@ Standard site settings for working with CliMAF.
 import os
 
 atCNRM   = False
+atIPSL   = False
 onCiclad = False
 atTGCC   = False
 onAda    = False
@@ -20,16 +21,21 @@ print 'Hostname:', HostName
 
 if os.path.exists ('/ccc')  :
     atTGCC   = True
+    atIPSL   = True
 if os.path.exists ('/cnrm') :
     atCNRM   = True
 if 'ciclad' in HostName     :
     onCiclad = True
+    atIPSL   = True
 if 'ada' in HostName        :
     onAda    = True   ; atIDRIS = True
+    atIPSL   = True
 if 'ergon' in HostName      :
     onErgon  = True   ; atIDRIS = True
+    atIPSL   = True
 if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.path.exists(Home+'/.spip') :
     onSpip = True
+    atIPSL   = True
     print 'Spip trouve'
     VolumesDir = os.getenv ('VolumesDir')
 

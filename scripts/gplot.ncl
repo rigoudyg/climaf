@@ -329,6 +329,10 @@ begin
            .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") \
            .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
            .and. (field&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+           .and. (field&$Var_DimNames(0)$@standard_name .eq. "Latitude") \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
+           .and. (field&$Var_DimNames(1)$@standard_name .eq. "Longitude") ) \
       .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
            .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) \
            .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
@@ -374,22 +378,24 @@ begin
       
       if isfilepresent("coordinates.nc") then
         coord_file=addfile("coordinates.nc","r")
-
-	if isfilevar(ffile,"gphit") then 
+        
+        if isfilevar(coord_file,"gphit") then
            lat_dim=coord_file->gphit
-	   lat_dim_tmp=rm_single_dims(lat_dim)
-	   delete(lat_dim)
-	   lat_dim=lat_dim_tmp
-	   delete(lat_dim_tmp)
-	end if
-	if isfilevar(ffile,"glamt") then 	
-	   lon_dim=coord_file->glamt
+           lat_dim_tmp=rm_single_dims(lat_dim)
+           delete(lat_dim)
+           lat_dim=lat_dim_tmp
+           delete(lat_dim_tmp)
+           lat_dim@standard_name="latitude"
+        end if
+        if isfilevar(coord_file,"glamt") then     
+           lon_dim=coord_file->glamt
            lon_dim_tmp=rm_single_dims(lon_dim)
            delete(lon_dim)
            lon_dim=lon_dim_tmp
            delete(lon_dim_tmp)
-	end if
-
+           lon_dim@standard_name="longitude"
+        end if
+        
       else
 
         if isfilepresent("mesh_mask.nc") then
