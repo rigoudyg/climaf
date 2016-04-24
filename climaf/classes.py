@@ -546,7 +546,8 @@ class cens(cobject,dict):
         return [ (l,self[l]) for l in self.order ]
 
     def copy(self):
-        e=cens(dict.copy(self),
+        import copy
+        e=cens(copy.deepcopy(self),
                order=[ m for m in self.order],
                sortfunc=self.sortfunc)
         return(e)
