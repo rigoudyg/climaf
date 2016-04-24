@@ -718,7 +718,8 @@ class ctree(cobject):
         clefs=self.parameters.keys()
         clefs.sort()
         for par in clefs :
-            rep += par+"="+`self.parameters[par]`+","
+            if par != 'member_label' :
+                rep += par+"="+`self.parameters[par]`+","
         rep += ")"
         rep=rep.replace(",)",")")
         return rep
