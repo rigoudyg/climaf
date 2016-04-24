@@ -209,12 +209,13 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             #   then assume it can also select on time and provide it with the address
             #   else : fetch the relevant selection of the data, and store it in cache
             clogger.debug("Dataset is remote " )
-            if (userflags.canOpenDap and format == 'file' ) :
+            if (userflags.canOpendap and format == 'file' ) :
                 clogger.debug("But user can OpenDAP " )
                 cdedent()
                 return(ds.adressOf())
             else :
                 clogger.debug("Must remote read and cache " )
+                raise Climaf_Driver_Error("Cannot acces dataset %s"%`cobject`)
                 rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
                 userflags.unset_selectors()
                 cdedent()

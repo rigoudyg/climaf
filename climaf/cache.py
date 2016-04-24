@@ -392,10 +392,9 @@ def csync(update=False) :
                 for fil in files_in_cache :
                     if fil not in files_in_index :
                         os.system("rm %"%fil)
-                    else :
-                        # Should also remove empty files, as soon as
-                        # file creation will be atomic enough 
-
+                    #else :
+                    # Should also remove empty files, as soon as
+                    # file creation will be atomic enough 
     # Save to disk
     try: 
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
