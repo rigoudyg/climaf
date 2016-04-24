@@ -169,18 +169,24 @@ def link(label,filename,thumbnail=None,hover=True) :
         
     return rep
 
-def cell(label,filename=None,thumbnail=None,hover=True,dirname=None) :
+def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None) :
     """ 
     Create a table cell with the provided label, which bears a link to
     the provided filename and possibly shows a thumbnail for the link
     with the provided thumbnail size (in pixels) and possibly display
     it when you mouse over it (with the provided hover size in pixels).
+
     If 'dirname' is not None, creates  a hard link in directory dirname 
     to file filename. This allow to generate a portable atlas in this 
     directory. Hard links are named after pattern 
     climaf_atlas<digit>.<extension>
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
+
+    If 'altdir' is not None (and 'dirname is None), the HREF links 
+    images in index to have their absolute path changed from 
+    $CLIMAF_CAcHE to 'altdir' (use case : when the Http server only knows 
+    another filesystem)
     """
     if dirname:
         os.system('mkdir -p '+dirname)
@@ -200,16 +206,19 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None) :
             os.link(filename,dirname+"/climaf_atlas"+str(nb)+filextension)
           
             return '<TD ALIGN=RIGHT>'+ \
-                   link(label,dirname+"/climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
+                   link(label,"climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
                    '</TD>\n'
 
     else:
-        
+        fn=filename
+        if altdir : 
+            from climaf import cachedir
+            fn=filename.replace(cachedir,altdir)
         return '<TD ALIGN=RIGHT>'+ \
-               link(label,filename,thumbnail,hover)+\
+               link(label,fn,thumbnail,hover)+\
                '</TD>\n'
 
-def line(dic,title="",thumbnail=None,hover=True,dirname=None):
+def line(dic,title="",thumbnail=None,hover=True, dirname=None,altdir=None):
     """
     Create an html line with labels from dic keys and links to
     filenames from dic values. Put a line title if provided. Replace
@@ -232,7 +241,7 @@ def line(dic,title="",thumbnail=None,hover=True,dirname=None):
         labels=dic.keys()
     rep=title
     for lab,fig in zip(labels,figures): 
-        rep+=cell(lab,fig,thumbnail,hover,dirname)
+        rep+=cell(lab,fig,thumbnail,hover,dirname,altdir)
     rep+=vspace()
     return rep
 
