@@ -377,8 +377,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             filevar,scale,offset,units,filenameVar,missing=op.alias
             if scriptCall.flags.canAlias and "," not in varOf(op) :
                 #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
-                subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),filevar,scale,offset)
-                subdict["var"]=filevar
+                subdict["var"]=string.Template(filevar).safe_substitute(op.kvp)
+                subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),subdict["var"],scale,offset)
             if units : subdict["units"]=units 
             if scriptCall.flags.canMissing and missing :
                 subdict["missing"]=missing
@@ -415,8 +415,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 filevar,scale,offset,units,filenameVar,missing =op.alias
                 if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
                         "," not in varOf(op):
-                    subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),filevar,scale,offset)
-                    subdict["var_%d"%i]=filevar
+                    subdict["var_%d"%i]=string.Template(filevar).safe_substitute(op.kvp)
+                    subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),subdict["var_%d"%i],scale,offset)
                 if units : subdict["units_%d"%i]=units 
                 if missing : subdict["missing_%d"%i]=missing
                 # Provide period selection if script allows for

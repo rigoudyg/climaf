@@ -429,7 +429,7 @@ class cdataset(cobject):
             dic=self.kvp.copy()
             if self.alias : 
                 filevar,scale,offset,units,filenameVar,missing=self.alias
-                dic["variable"]=filevar
+                dic["variable"]=string.Template(filevar).safe_substitute(dic)
                 if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
             self.files=dataloc.selectLocalFiles(**dic)
