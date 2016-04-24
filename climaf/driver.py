@@ -82,12 +82,13 @@ def capply_script (script_name, *operands, **parameters):
     if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
         # Must iterate on members
         reps=[]
-        for member,label in zip(operands[0].members,operands[0].labels) :
+        for label in operands[0].order:
+            member=operands[0][label]
             clogger.debug("processing member "+`member`)
             params=parameters.copy()
             params["member_label"]=label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
-        return(classes.cens(operands[0].labels,*reps))
+        return(classes.cens(dict(zip(operands[0].order,reps))))
     else: 
         return(maketree(script_name, script, *operands, **parameters))
             
@@ -313,11 +314,11 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             if ( format == 'file' ) : return (file)
             else : return cread(file)
         elif isinstance(cobject,classes.cens) :
-            rep=[]
-            for member in cobject.members :
-                rep.append(ceval(member,copy.copy(userflags),format,deep,recurse_list=recurse_list))
-            if (format=="file") : return(reduce(lambda x,y : x+" "+y, rep))
-            else : return rep
+            d=dict()
+            for member in cobject.order :
+                d[member]=ceval(cobject[member],copy.copy(userflags),format,deep,recurse_list=recurse_list)
+            if (format=="file") : return(reduce(lambda x,y : x+" "+y, [ d[m] for m in cobject.order ]))
+            else : return d
         else :
             raise Climaf_Driver_Error("Internal logic error")
     elif isinstance(cobject,str) :
@@ -387,7 +388,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                     "Script %s 's input #%s cannot accept ensemble %s"\
                         %(scriptCall.script,0,`op`))
             #subdict["labels"]=r'"'+reduce(lambda x,y : "'"+x+"' '"+y+"'", op.labels)+r'"'
-            subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.labels)
+            subdict["labels"]=reduce(lambda x,y : x+"$"+y, op.order)
         if op : 
             per=timePeriod(op)
             if per and not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
@@ -575,7 +576,7 @@ def timePeriod(cobject) :
         return timePeriod(cobject.father)
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
-        return timePeriod(cobject.members[0])
+        return timePeriod(cobject.values()[0])
     else : return None #clogger.error("unkown class for argument "+`cobject`)
                   
 def domainOf(cobject) :
@@ -599,7 +600,7 @@ def domainOf(cobject) :
         return domainOf(cobject.father)
     elif isinstance(cobject,classes.cens) :
         clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
-        return domainOf(cobject.members[0])
+        return domainOf(cobject.values()[0])
     elif cobject is None : return "none"
     else : clogger.error("Unkown class for argument "+`cobject`)
                   
@@ -618,7 +619,7 @@ def attributeOf(cobject,attrib) :
         val=getattr(cobject,attrib,None) 
         if val is not None : return val
         else : return(cobject.kvp.get(attrib))
-    elif isinstance(cobject,classes.cens) : return attributeOf(cobject.members[0],attrib)
+    elif isinstance(cobject,classes.cens) : return attributeOf(cobject.values()[0],attrib)
     elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
     elif isinstance(cobject,classes.ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
@@ -1108,7 +1109,7 @@ def efile(obj, filename, forced=False) :
         filename (str) : output filename. It will include a field for each 
          ensemble's member, with a variable name suffixed by the member
          label (e.g. : tas_CNRM-CM, tas_IPSL-CM... ) (more formally : 
-         'var(obj.members[n])'_'obj.labels[n]')
+         'var(obj.order[n])'_'obj.ens[order[n]]')
 
         forced (logical, optional) : if True, CliMAF will override the file
          'filename' if it already exists 
@@ -1123,7 +1124,8 @@ def efile(obj, filename, forced=False) :
             else:
                 raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
                 
-        for memb,lab in zip(obj.members,obj.labels):
+        for lab in obj.order:
+            memb=obj[lab]
             ffile=cfile(memb)
             
             f = tempfile.NamedTemporaryFile(suffix=".nc")

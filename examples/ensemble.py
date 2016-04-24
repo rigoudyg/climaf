@@ -3,39 +3,47 @@
 
 from climaf.api import *
 
-# Basic example : superimpose zonal profiles of tas for various periods of same simulation
+# Basic example : superimpose annual time series of tas for various periods of same simulation
 ############################################################################################
 
 # Define some objects. here, they are datasets for the same simulation but distinct periods
-j0=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1980")
-j1=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1981")
+cdef('project','example'); cdef('frequency','monthly')
+cdef('simulation',"AMIPV6ALB2G")
+cdef('variable',"tas")
+j0=ds(period="1980")
+j1=ds(period="1981")
 
-# Create an ensemble out of various objects. The list of labels must stand first
-e2=cens(['1980','1981'],j0,j1)
+# Create an ensemble out of various objects. Similar to dictionnaries
+e2=cens({'1980' : j0 ,'1981': j1})
 
 # You can operate on ensemble with operators that are not ensemble-capable
-# Then, CliMAF will simply loop operators on members, and forward the label list
+# Then, CliMAF will simply loop operators on members
 # Here, let us compute global average on the ensemble
 tas_ga=space_average(e2)
 
-# Ensemble-capable scripts are those which declares their main input using keyord ${mmin}
-# They receive the labels if they were declared with keyword ${labels}
+# An 'ensemble-capable' script is a script designed for processing an ensemble
+# Such scripts are declared to CLiMAF using keyord ${mmin} for their main input
+# They receive the labels/keys if they were declared with keyword ${labels}
 # 'curves' is such a script, devoted to plot xy curves
 p=curves(tas_ga,title="Surface Temperature global average")
 cshow(p)
 
-
-# Advanced example : create panel plot of various members, add a member, and compute anomalies
+# Advanced example : create plot panel of various members, add a member, and compute anomalies
 ###############################################################################################
 
-# Define some default values for using CMIP5 data for various realizations
-cdef("frequency","monthly") ;  cdef("project","CMIP5");
-cdef("model","CNRM-CM5") ; cdef("variable","tas"); 
-
-# Create an ensemble of datasets , more easily, with 'eds'; labels are automatic
-ens=eds(experiment="historical", period="1860", simulation=["r1i1p1","r2i1p1"])
-# The member labels are added to the 'title' value when looping a
-# non-ensemble-capable script on ensemble members :
+if atCNRM or on Ciclad : 
+    # Define some default values for using CMIP5 data for various realizations
+    cdef("project","CMIP5"); cdef("frequency","monthly") ;  
+    cdef("model","CNRM-CM5") ; cdef("variable","tas"); 
+    
+    # Create an ensemble of datasets , more easily, with 'eds'; labels are automatic
+    ens=eds(experiment="historical", period="1860", simulation=["r1i1p1","r2i1p1"])
+else:
+    ens=e2
+    
+# You can invoke a non-ensemble-capable script with an ensemble input
+# Looping is automatic. The result is also an ensemble
+# (additionnaly, each member label is added to the 'title' when looping)
 multiplot=plot(ens, title='tas')
 
 # Display all plots separately
@@ -45,10 +53,10 @@ cshow(multiplot)
 page=cpage(multiplot)
 cshow(page)
 
-# Add a member to an ensemble
-member=ds(experiment="historical", period="1860", simulation="r3i1p1")
-ens.members.append(member)
-ens.labels.append("r3i1p1")
+if atCNRM or on Ciclad :
+    # Add a member to an ensemble
+    member=ds(experiment="historical", period="1860", simulation="r3i1p1")
+    ens["r3i1p1"]=member
 
 # Compute ensemble mean thanks to CDO
 cscript("ensavg","cdo ensavg ${mmin} ${out}")
@@ -61,15 +69,20 @@ average=ensavg(ens)
 anomalies=minus(ens,average)
 cshow(cpage(plot(anomalies,title='tas')))
 
-# Note : if you want to extend an ensemble with the result of some
-# operation on this ensemble you have to take care of the dynmaic
-# nature of CliMAF objjetcs, that could lead to an infinite recursion
-# You would rather use copy.deepcopy to create the extendable ensemble 
 
-e2=cens(['1980','1981'],j0,j1)
+# BE CAUTIOUS WHEN EXTENDING AN ENSEMBLE
+#############################################
+# you shouldn't extend an ensemble with the result of some
+# operation on the same ensemble : because of the dynamic
+# nature of CliMAF objects, this could lead to an INFINITE RECURSION
+# You should rather use a copy to create the extended ensemble 
+
+myens=cens({'1980':j0 , '1981':j1})
+
 cscript('ecdo','cdo ${operator} ${mmin} ${out}')
-emin=ecdo(e2,operator='ensmin')
-import copy
-e3=copy.deepcopy(e2)
-e3.members.append(emin)
-e3.labels.append('emin')
+emin=ecdo(myens,operator='ensmin')
+emax=ecdo(myens,operator='ensmax')
+
+extended_ens=myens.copy()
+extended_ens['emin']=emin
+extended_ens['emax']=emax

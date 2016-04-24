@@ -444,11 +444,11 @@ class cdataset(cobject):
                         %(self.variable,self.crs))
         return(False)
 
-class cens(cobject):
-    def __init__(self, labels=None, *members ) :
-        """
-        Create a CliMAF object of class ``cens`` , i.e. an
-        ensemble of objects, with a list of labels attached
+class cens(cobject,dict):
+    def __init__(self, dic={}, order=None, sortfunc=None ) :
+        """Function cens creates a CliMAF object of class ``cens`` ,
+        i.e. a dict of objects, which keys are member labels, and
+        which members are ordered, using method :py:method: `set_order`
 
         In some cases, ensembles of datasets from the same project
         can also be built easily using :py:func:`~climaf.classes.eds()`
@@ -464,22 +464,21 @@ class cens(cobject):
            - if it is a script : with a string composed  by
              concatenating the corresponding input files; it will
              also provide the labels list to the script if its
-             declaration calls for it
+             declaration calls for it with keyword ${labels}
              (see :py:func:`~climaf.operators.cscript()`)
-           - if it is a Python function : with the list of
+           - if it is a Python function : with the dict of
              corresponding objects
 
          - if the operator is 'ensemble-dumb', CliMAF will loop
            applying it on each member, and will form a new ensemble
            with the results.
 
-        ``labels`` must be a list of strings, which describe what is
+        The dict keys must be label strings, which describe what is
         basically different among members. They are usually used by
         plot scripts to provide a caption allowing to identify each
-        dataset/object e.g using varied colors. The labels list is
-        propagated across operators application.
+        dataset/object e.g using various colors. 
 
-        Example:
+        Examples (see also :download:`ensemble.py`) :
         
         >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
         >>> cdef('variable','tas');cdef('frequency','monthly')
@@ -487,30 +486,96 @@ class cens(cobject):
         >>> ds1980=ds(period="1980")
         >>> ds1981=ds(period="1981")
         >>> #
-        >>> cens(['1980','1981'],ds1980,ds1981)
+        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 })
         >>> ncview(cens)  # will launch ncview once per member
-        
+        >>> 
+        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 }, order=['1981','1980'])
+        >>> myens.set_order(['1981','1980'])
+        >>>
+        >>> # Add a member
+        >>> cens['abcd']=ds(period="1982")
+
+        Limitations : Even if an ensemble is a dict, some dict methods
+        are not properly implemented (popitem, fromkeys) and function
+        iteritems does not use member order
+
+        You can write an ensemble to a file using function
+        :py:func:`~climaf.cache.efile`
+
         """
-        if not labels : 
-            raise Climaf_Classes_Error("Must provide a list of labels for members")
-        if isinstance(labels,cobject) :
-            raise Climaf_Classes_Error("First argument must be the list of labels for members")
-        if not all(map(lambda x : isinstance(x,str), labels)):
-            raise Climaf_Classes_Error("All labels must be strings")
-        if len(labels) != len(members) :
-            raise Climaf_Classes_Error("Must provide as many labels as members")
-        if not all(map(lambda x : isinstance(x,cobject), members)):
-            raise Climaf_Classes_Error("All members must be CliMAF objects")
-        self.members=list(members)
-        self.labels=labels
+        if not all(map(lambda x : isinstance(x,str), dic.keys())):
+            raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
+        if not all(map(lambda x : isinstance(x,cobject), dic.values())):
+            raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
+        self.sortfunc=sortfunc
+        #
+        dict.update(self,dic)
+        #
+        keylist=self.keys() ; keylist.sort()
+        if order : self.set_order(order,keylist)
+        elif sortfunc : self.order=sortfunc(keylist)
+        else : self.order=keylist
+        #
         self.crs=self.buildcrs()
         self.register()
 
+    def set_order(self,order,ordered_keylist=None):
+        ordered_list=[ o  for o in order ] ; ordered_list.sort()
+        if ordered_keylist is None:
+            ordered_keylist=self.keys() ; ordered_keylist.sort()
+        if ordered_list != ordered_keylist :
+            raise Climaf_Classes_Error(
+                "Order list does not match dict keys list : %s   and %s"%
+                (`ordered_list`,`ordered_keylist`))
+        self.order=order
+
+    def __setitem__(self,k,v):
+        if ( not isinstance(k,str)) : 
+            raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
+        if not isinstance(v,cobject) :
+            raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
+        dict.__setitem__(self,k,v)
+        if k not in self.order :
+            self.order.append(k)
+            if self.sortfunc :
+                self.order=self.sortfunc(self.keys())
+        self.crs=self.buildcrs()
+        self.register()
+        
+    def items(self):
+        return [ (l,self[l]) for l in self.order ]
+
+    def copy(self):
+        e=cens(dict.copy(self),
+               order=[ m for m in self.order],
+               sortfunc=self.sortfunc)
+        return(e)
+
+    def pop(self,key,default=None):
+        if key in self :
+            self.order.remove(key)
+            return dict.pop(self,key,default)
+        else : return default
+
+    def clear(self):
+        dict.clear(self)
+        self.order=[]
+        
+    def update(self,it) :
+        dict.update(self,it)
+        if isinstance(it,dict) :
+            for el,val in it.items(): self.order.append(el)
+        else:
+            for el,val in it: self.order.append(el)
+        if self.sortfunc : self.order=self.sortfunc(self.keys())
+        
     def buildcrs(self,crsrewrite=None,period=None) :
-        rep="cens("+`self.labels`+","
-        for m in self.members : rep+=m.buildcrs(crsrewrite=crsrewrite,period=period)+","
+        rep="cens({"
+        for m in self.order :
+            rep+="'"+m+"'"+":"+self[m].buildcrs(crsrewrite=crsrewrite,period=period)+","
+        rep=rep+"}"
+        rep=rep.replace(",}","}")
         rep=rep+")"
-        rep=rep.replace(",)",")")
         return rep
 
 
@@ -518,7 +583,7 @@ def eds(**kwargs):
     """
     Create a dataset ensemble using the same calling sequence as
     :py:func:`~climaf.classes.cdataset`, except that one of the facets
-    is a list, for defining the nsemble members; this facet must be among
+    is a list, which defines the ensemble members; this facet must be among
     the facets authorized for ensemble in the (single) project involved
 
     Example::
@@ -545,13 +610,12 @@ def eds(**kwargs):
         raise Climaf_Classes_Error("Must ask for an ensemble on exactly one attribute")
     #
     # Create an ensemble of datasets if applicable
-    labels=[]; members=[]
+    d=dict()
     for member in attval[listattr] :
         attval2=attval.copy()
         attval2[listattr]=member
-        members.append(cdataset(**attval2))
-        labels.append(member)
-    return cens(labels,*members)
+        d[member]=cdataset(**attval2)
+    return cens(d,order=listattr)
 
 def fds(filename, simulation=None, variable=None, period=None, model=None) :
     """
@@ -978,7 +1042,7 @@ class cpage(cobject):
                         "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
-            figs=list(fig_lines.members)
+            figs=[fig for fig in fig_lines.order]
 
             if not widths: widths=[1.]
             self.widths=widths
@@ -991,7 +1055,7 @@ class cpage(cobject):
             for l in heights :
                 line=[]
                 for c in widths :
-                    if len(figs) > 0 : line.append(figs.pop(0))
+                    if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
                     else : line.append(None)
                               
                 self.fig_lines.append(line)
@@ -1142,7 +1206,7 @@ class cpage_pdf(cobject):
                         "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
-            figs=list(fig_lines.members)
+            figs=[fig for fig in fig_lines.order]
 
             if not widths: widths=[1.]
             self.widths=widths
@@ -1155,7 +1219,7 @@ class cpage_pdf(cobject):
             for l in heights :
                 line=[]
                 for c in widths :
-                    if len(figs) > 0 : line.append(figs.pop(0))
+                    if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
                     else : line.append(None)
                               
                 self.fig_lines.append(line)
