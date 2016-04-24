@@ -27,7 +27,7 @@ safe=False
 #: The length of subdir names when segmenting cache filenames
 directoryNameLength=5
 #: Define whether we stamps the data files with their CRS
-stamping=False
+stamping=True
 #: The index associating filenames to CRS expressions
 crs2filename=dict()  
 
