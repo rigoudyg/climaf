@@ -775,8 +775,13 @@ def rebuild():
     files_in_cache=list_cache()
     crs2filename.clear()
     for files in files_in_cache:
-        crs2filename[getCRS(files)]=files
-
+        filecrs=getCRS(files)
+        if filecrs:
+            crs2filename[filecrs]=files
+        else:
+            os.system('rm -f '+files)
+            clogger.warning("File %s is removed"%files)
+            
     return(crs2filename)
     
 
