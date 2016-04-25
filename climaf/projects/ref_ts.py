@@ -19,7 +19,7 @@ Example of a 'ref_ts' project dataset declaration ::
 """
 
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs
+from climaf.classes import cproject, calias, cfreqs, cdef
 from climaf.site_settings import onCiclad, atTGCC, atIDRIS
 
 cfreqs('ref_ts', {'monthly':'mo' , 'daily':'day' })
@@ -32,6 +32,11 @@ if atIDRIS:
     root="/workgpfs/rech/psl/rpsl035/IGCM/"
 
 cproject('ref_ts', ('frequency','monthly'), ('product','*'), ('period','1900-2050'))
+cdef('variable'    , '*'            , project='ref_ts')
+cdef('product'     , '*'            , project='ref_ts')
+cdef('simulation'  , 'refproduct'   , project='ref_ts')
+cdef('period'      , '1980-2005'    , project='ref_ts')
+
 pattern1=root+"ReferenceDatasets/ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
 dataloc(project='ref_ts', organization='generic', url=[pattern1])
 
