@@ -46,7 +46,7 @@ nemo_timefix ()
     file=$1
     out=""
     if [[ $file =~ .*1[md].*grid_T_table2.2.nc ]] ; then 
-	if ncdump -h $file  | \grep -E -q '(float t_ave_01month|t_ave_00086400 )' ; then 
+	if ncdump -h $file  | \grep -E -q '(t_ave_01month|t_ave_00086400 )' ; then 
 	    var2rename=""
 	    if [[ $file =~ .*1m.*grid_T_table2.2.nc ]] ; then 
 		var2rename=t_ave_01month 

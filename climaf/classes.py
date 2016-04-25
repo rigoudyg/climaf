@@ -478,7 +478,7 @@ class cens(cobject,dict):
         plot scripts to provide a caption allowing to identify each
         dataset/object e.g using various colors. 
 
-        Examples (see also :download:`ensemble.py`) :
+        Examples (see also :download:`../examples/ensemble.py`) :
         
         >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
         >>> cdef('variable','tas');cdef('frequency','monthly')

@@ -362,6 +362,7 @@ def csync(update=False) :
 
     If arg `update` is True, additionnaly ensures consistency between files
     set and index content, either :
+
     - if cache.stamping is true, by reading CRS in all files
     - else, by removing files which are not in the index; this may erase 
       result files which have been computed by another running 
