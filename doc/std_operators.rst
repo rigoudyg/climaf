@@ -16,10 +16,8 @@ Documented operators as of today :
     - :doc:`scripts/minus`
     - :doc:`functions/mul`
     - :doc:`functions/div`
-    - :doc:`functions/mulc`
-    - :doc:`functions/divc`
-    - :doc:`functions/addc`
-    - :doc:`functions/divc`
+    - :doc:`functions/add`
+    - :doc:`functions/sub`
     - :doc:`functions/apply_scale_offset`
 
  - climate data operators:

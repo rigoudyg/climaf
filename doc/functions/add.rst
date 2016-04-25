@@ -1,5 +1,5 @@
-add: addition of two fields using CliMAF ccdo2 and CDO operator add
----------------------------------------------------------------------------
+add: addition between two CliMAF objects or between a CliMAF object and a constant
+------------------------------------------------------------------------------------
 
 Addition of two CliMAF object, or addition of the CliMAF object given as first argument and a constant as second argument (string, float or integer)
 

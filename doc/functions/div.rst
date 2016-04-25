@@ -1,4 +1,4 @@
-div : division of two fields using CliMAF ccdo2 and CDO operator div
+div : division between two CliMAF objects or between a CliMAF object and a constant 
 ---------------------------------------------------------------------------
 
 Division of two CliMAF object, or division of the CliMAF object given as first argument and a constant as second argument (string, float or integer)
