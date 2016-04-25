@@ -1,9 +1,0 @@
-
-
-stdout and stderr of script call :
-	 (ncl -Q /home/jservon/Evaluation/CliMAF/climaf_installs/climaf_0.13/climaf/../scripts/gplot.ncl main_file='"/prodigfs/ipslfs/dods/fabric/coding_sprint_NEMO/jerome/50868/7b70a/44182/c37ac/e9124/3453c/c8e02.nc"'     plotname='"/prodigfs/ipslfs/dods/fabric/coding_sprint_NEMO/jerome/ac046/c95ff/fcbb2/99b9e/17962/7d87b/40b01.png"' cmap='"precip3_16lev"'    main_var='"hfls"'    title='""'   mpCenterLonF=200      units='"W/m2"'  colors='"0 20 40 60 80 100 120 140 160 180 200"'    contours='"1"' focus='"ocean"'                tiMainFontHeightF=0.015  gsnLeftString='"1979-2005"' gsnRightString='"ANM"' gsnCenterString='"hfls"'  gsnStringFontHeightF=0.018  shade_above=0.5 options='"pmLabelBarWidthF=0.065|pmLabelBarOrthogonalPosF=0.01|lbLabelFontHeightF=0.01|tmXBLabelFontHeightF=0.01|tmYLLabelFontHeightF=0.01"' aux_options='"cnLineThicknessF=3"' shading_options='"gsnShadeHigh=17"' )
-
-(0)	---------------
-(0)	  MAIN FIELD  
-(0)	---------------
-(0)	using gsn_csm_contour_map_ce
