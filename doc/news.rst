@@ -4,9 +4,20 @@
 Whats' new
 ------------
 
-Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
-
 Changes, newest first :
+
+- Changes breaking upwad compatibility :
+
+  - Ensembles are not handled as dictionnaries. This allows to add and
+    pop members easily. The members can be ordered. See
+    :py:func:`~climaf.classes.cens`
+
+- Technical :
+  
+   - Files in cache are no longer stamped with CRS (this is reversible)
+   - disambiguating filenames in cache relies only on their length (60)
+   - scripts execution duration is now only logged, at level 'info'
+   - critical errors now exit
 
 - 2016/03/29 - Version 0.13 :
   
@@ -495,3 +506,6 @@ Changes, newest first :
   - log messages are tabulated
   - a log file is added, with own severity level, set by clog_file
   - operators with format=None are also evaluated as soon as applied - i.e. cshow no more needednon ncview(...)
+
+Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
+

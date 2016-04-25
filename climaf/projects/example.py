@@ -24,3 +24,5 @@ cfreqs('example',{'monthly':'mon' })
 data_pattern_L=cpath+"/../examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
 data_pattern_A=cpath+"/../examples/data/${simulation}/A/${simulation}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])
+
+#calias("example",'tas','tas_${frequency}')

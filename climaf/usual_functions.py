@@ -132,8 +132,8 @@ def climato(dat):
 def summary(dat):
     if 'baseFiles' not in dir(dat):
        print '-- Ensemble members:'
-       for m in dat.members:
-           for f in str.split(m.baseFiles(),' '): print f
+       for m in dat.order:
+           for f in str.split(dat[m].baseFiles(),' '): print f
            print 'Keys - values:'
            print m.kvp
            print '--'
