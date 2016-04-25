@@ -170,7 +170,7 @@ def cdef(attribute,value=None, project=None):
     if value is None :
         rep=cprojects[project].facet_defaults.get(attribute,None)
         if not rep :
-            rep=cprojects[None].facet_defaults.get(attribute,"N/A")
+            rep=cprojects[None].facet_defaults.get(attribute,"")
         return rep
     else :
         cprojects[project].facet_defaults[attribute]=value
