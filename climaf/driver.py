@@ -182,6 +182,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 (userflags.canAggregateTime or ds.periodHasOneFile()) and \
                 (userflags.canAlias         or ds.hasExactVariable()) and \
                 (userflags.canMissing       or ds.missingIsOK())      and \
+                (ds.hasOneMember()) and \
                 #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
                 (format == 'file')) :
                 clogger.debug("Delivering file set or sets is OK for the target use")
@@ -197,8 +198,12 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 ## clogger.debug(" Done with subsetting and caching data files")
                 ## cstore(extract) # extract should include the dataset def
                 ## return ceval(extract,userflags,format)
-                clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
-                extract=capply('select',ds)
+                if ds.hasOneMember() :
+                    clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
+                    extract=capply('select',ds)
+                else :
+                    clogger.debug("On multi-member datafiles , fetching/selection/aggregation is done using select_member - TBD")
+                    extract=capply('select_member',ds)
                 if extract is None : raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
                 rep=ceval(extract,userflags=userflags,format=format)
                 userflags.unset_selectors()
@@ -377,7 +382,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             filevar,scale,offset,units,filenameVar,missing=op.alias
             if scriptCall.flags.canAlias and "," not in varOf(op) :
                 #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
-                subdict["var"]=string.Template(filevar).safe_substitute(op.kvp)
+                subdict["var"]=Template(filevar).safe_substitute(op.kvp)
                 subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),subdict["var"],scale,offset)
             if units : subdict["units"]=units 
             if scriptCall.flags.canMissing and missing :
@@ -415,7 +420,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 filevar,scale,offset,units,filenameVar,missing =op.alias
                 if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
                         "," not in varOf(op):
-                    subdict["var_%d"%i]=string.Template(filevar).safe_substitute(op.kvp)
+                    subdict["var_%d"%i]=Template(filevar).safe_substitute(op.kvp)
                     subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),subdict["var_%d"%i],scale,offset)
                 if units : subdict["units_%d"%i]=units 
                 if missing : subdict["missing_%d"%i]=missing

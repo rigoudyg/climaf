@@ -14,25 +14,10 @@ setup (by ``import site_settings`` and ``import standard_projects``)
 
 from climaf.api import *
 
-# Declare facets (i.e. dataset attributes) for projet CMIP5
-# ACTUALLY, THIS IS BUILT-IN, AND NOT NEEDED - SEE NOTE AT FILE TOP
-cproject("CMIP5" ,"model","experiment", ("frequency","monthly"), ("table","*"),
-         ("realm","*"),("version","last"), ensemble=["model","simulation"])
-cdef("simulation","r1i1p1",project="CMIP5")
-
-# Define a list of root directories for CMIP5 data on IPLS's Ciclad file system
-urls_CMIP5_Ciclad=["/prodigfs/esg"]
-
-# Define a list of root directories for CNRM-CM CMIP5 data on CNRM's Lustre FS
-urls_CMIP5_CNRM=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", 
-                 "/cnrm/aster/data2/ESG/data5", "/cnrm/aster/data4/ESG/data6", 
-                 "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8"]
-
-# Declare locations for searching data for project CMIP5, experiment and
-# frequencies, and that data located in dirs listed in urls_CMIP5_CNRM
-# and urls_CMIP5_Ciclad is organized fter built-in scheme 'CMIP5_DRS'
-dataloc(project="CMIP5", organization="CMIP5_DRS", 
-        url=urls_CMIP5_CNRM+urls_CMIP5_Ciclad)
+# CMIP5 data are standard in CliMAF and defined that way : 
+#cproject("CMIP5" ,"model","experiment", ("frequency","monthly"), ("table","*"),
+#         ("realm","*"),("version","last"), ("simulation,"r1i1p1"), 
+#         ensemble=["model","simulation"])
 
 # Define default value for some dataset facets
 cdef("frequency","monthly") ;  cdef("project","CMIP5")

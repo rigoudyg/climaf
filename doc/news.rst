@@ -6,18 +6,22 @@ Whats' new
 
 Changes, newest first :
 
-- Changes breaking upwad compatibility :
+ - project 'em' is based on generic organization
+
+
+ - Changes breaking upwad compatibility :
 
   - Ensembles are not handled as dictionnaries. This allows to add and
     pop members easily. The members can be ordered. See
     :py:func:`~climaf.classes.cens`
 
-- Technical :
+ - Technical :
   
    - Files in cache are no longer stamped with CRS (this is reversible)
    - disambiguating filenames in cache relies only on their length (60)
    - scripts execution duration is now only logged, at level 'info'
    - critical errors now exit
+   - fix in mcdo.sh:nemo_timefix
 
 - 2016/03/29 - Version 0.13 :
   
