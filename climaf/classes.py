@@ -4,7 +4,7 @@
  This is a first protoype, where the interpreter is Python itself
 
 
- """
+"""
 # Created : S.Senesi - 2014
 
 import re, string, copy, os.path
@@ -329,15 +329,15 @@ class cdataset(cobject):
         attval=processDatasetArgs(**kwargs)
         #
         # TBD : Next lines for backward compatibility, but should re-engineer 
-        self.project=attval["project"]
-        self.simulation=attval['simulation']
-        self.variable= attval['variable']
+        self.project   = attval["project"]
+        self.simulation= attval['simulation']
+        self.variable  = attval['variable']
         # alias is a n-plet : filevar, scale, offset, filenameVar, missing
-        self.period    =attval['period']
-        self.domain    =attval['domain']
+        self.period    = attval['period']
+        self.domain    = attval['domain']
         #
-        self.model    =attval.get('model',"*")
-        self.frequency=attval.get('frequency',"*")
+        self.model     = attval.get('model',"*")
+        self.frequency = attval.get('frequency',"*")
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
         if (self.frequency=='seasonal' or self.frequency=='annual_cycle') :
             self.period.fx=True
@@ -448,7 +448,7 @@ class cens(cobject,dict):
     def __init__(self, dic={}, order=None, sortfunc=None ) :
         """Function cens creates a CliMAF object of class ``cens`` ,
         i.e. a dict of objects, which keys are member labels, and
-        which members are ordered, using method :py:method: `set_order`
+        which members are ordered, using method ``set_order``
 
         In some cases, ensembles of datasets from the same project
         can also be built easily using :py:func:`~climaf.classes.eds()`
@@ -792,6 +792,41 @@ def allow_error_on_ds(allow=True) :
     allow_errors_on_ds_call=allow
     #print ('allow_errors_on_ds_call='+`allow_errors_on_ds_call`)
 
+def select_projects(**kwargs):
+    """
+    If kwargs['project'] is a list (has multiple values), select_projects loops on the projects
+    until it finds a file containing the aliased variable name.
+    """
+    if 'project' not in kwargs:
+        return kwargs
+    else:
+        p_list = kwargs['project']
+    if not isinstance(p_list,list):
+        p_list = [p_list]
+    for project in p_list:
+        wkwargs = kwargs.copy()
+        wkwargs.update(dict(project=project))
+        dat = cdataset(**wkwargs)
+	files = dat.baseFiles()
+        if files:
+            clogger.info('-- File found for project '+project+ ' and '+`wkwargs`)
+            try:
+                tmpVarInFile = varIsAliased(project,wkwargs['variable'])[0]
+            except:
+                tmpVarInFile = wkwargs['variable']
+            if fileHasVar(files.split(" ")[0],tmpVarInFile):
+   	        clogger.info('-- Variable '+tmpVarInFile+' (aliased to variable '+
+                             wkwargs['variable']+') found in '+files.split(" ")[0])
+                return wkwargs
+            else:
+                clogger.info('-- Variable '+tmpVarInFile+
+                             ' (aliased to variable '+wkwargs['variable']+') was not found in '+files.split(" ")[0])
+                #clogger.info('--> Try with another project than '+project+' or another variable name')
+        else:
+            clogger.info('-- No file found for project '+project+ ' and '+`wkwargs`)
+    return kwargs
+
+
 def ds(*args,**kwargs) :
     """
     Returns a dataset from its full Climate Reference Syntax string. Example ::
@@ -808,7 +843,9 @@ def ds(*args,**kwargs) :
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
-    if (len(args)==0) : return cdataset(**kwargs) # Front-end to cdataset
+    if (len(args)==0) :
+       return cdataset(**select_projects(**kwargs))
+       #return cdataset(**kwargs) # Front-end to cdataset
     crs=args[0]
     results=[]
     for cproj in cprojects : 
@@ -921,7 +958,7 @@ class cpage(cobject):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
-
+        
         Args:
         
           fig_lines (a list of lists of figure objects or an ensemble of figure objects):

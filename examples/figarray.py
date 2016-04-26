@@ -58,7 +58,7 @@ cshow(page5)
 ###########################################################################
 # Define an ensemble with one single month of data per member
 tas81=ds(project="example", simulation="AMIPV6ALB2G", variable="tas",period="198101",frequency="monthly")
-ens=cens(['1980','1981'],tas,tas81)
+ens=cens({'1980':tas , '1981':tas81})
 
 # Define an ensemble of figures
 fig_ens=plot(ens,title="title")

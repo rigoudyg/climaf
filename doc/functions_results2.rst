@@ -4,6 +4,20 @@ cshow : dump an object or display a 'figure'
 .. autofunction:: climaf.driver.cshow
    :noindex:
 
+Functions for inspecting data
+--------------------------------
+
+:doc:`functions/summary`
+:doc:`scripts/ncdump`
+
+
+Functions to display an image 
+------------------------------------------------------
+
+:doc:`scripts/ncview`
+:doc:`functions/iplot`
+:doc:`functions/implot`
+
 cpage : create an array of figures (output: 'png' or 'pdf' figure)
 -------------------------------------------------------------------
 

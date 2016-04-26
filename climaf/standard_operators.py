@@ -5,8 +5,9 @@ Management of CliMAF standard operators
 import os
 
 from climaf import __path__ as cpath
-from climaf.operators import cscript
+from climaf.operators import cscript, fixed_fields
 from climaf.clogging import clogger
+from climaf.site_settings import onCiclad
 
 scriptpath=cpath[0]+"/../scripts/" 
 binpath=cpath[0]+"/../bin/" 
@@ -18,15 +19,19 @@ def load_standard_operators():
     The operators list also show in variable 'cscripts'
     They are documented elsewhere
     """
+    cscript("rename_time","ncrename -d time,time_counter ${in} ${out}")
     #
     # Compute scripts
     #
-    
     cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
             scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
+    #
+    cscript('ccdo2','cdo ${operator} ${in_1} ${in_2} ${out}')
+    #
+    cscript('ccdo_ens','cdo ${operator} ${mmin} ${out}')
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
@@ -122,6 +127,11 @@ def load_standard_operators():
             ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
             ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
             ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
+    #
+    if onCiclad:
+        cscript("ml2pl", scriptpath+"ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
+                commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+        fixed_fields("ml2pl",("press_levels.txt",scriptpath+"press_levels.txt"))
     #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()

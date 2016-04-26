@@ -407,6 +407,7 @@ def csync(update=False) :
 def cload(alt=None) :
     global crs2filename 
     global crs_not_yet_evaluable
+    rep=dict()
  
     if len(crs2filename) != 0 and not alt:
         Climaf_Cache_Error(

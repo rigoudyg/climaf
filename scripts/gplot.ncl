@@ -329,6 +329,10 @@ begin
            .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") \
            .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
            .and. (field&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+           .and. (field&$Var_DimNames(0)$@standard_name .eq. "Latitude") \
+           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
+           .and. (field&$Var_DimNames(1)$@standard_name .eq. "Longitude") ) \
       .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
            .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) \
            .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
@@ -338,8 +342,11 @@ begin
     
     ;We have a true cross-section, a horizontal map or a profile (t,z)
     if (ystyle .eq. "log") then useXY=False end if
-
-    if (.not.ismissing(Var_DimNames(0)) .and. (Var_DimNames(0) .eq. "lat")) .or. (isatt(field,"coordinates") .and. ((field@coordinates .eq. "lat lon") .or. (field@coordinates .eq. "lon lat"))) then
+    ;latname="lat"
+    if (.not.ismissing(Var_DimNames(0)) .and. (Var_DimNames(0) .eq. "lat")) \
+        .or. (.not.ismissing(Var_DimNames(1)) .and. (Var_DimNames(1) .eq. "lat")) \
+        .or. (isatt(field,"coordinates") .and. ((field@coordinates .eq. "lat lon")  \
+        .or. (field@coordinates .eq. "lon lat"))) then
       latname="lat"
       lonname="lon"
     end if
@@ -352,7 +359,8 @@ begin
       lonname="LON"
     end if
     if ( ismissing(str_match(Var_DimNames,"lat")) .and. ismissing(str_match(Var_DimNames,"LAT")) ) then
-      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
+      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) \
+        .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
         .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
              .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
         .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
@@ -370,22 +378,24 @@ begin
       
       if isfilepresent("coordinates.nc") then
         coord_file=addfile("coordinates.nc","r")
-
-	if isfilevar(ffile,"gphit") then 
+        
+        if isfilevar(coord_file,"gphit") then
            lat_dim=coord_file->gphit
-	   lat_dim_tmp=rm_single_dims(lat_dim)
-	   delete(lat_dim)
-	   lat_dim=lat_dim_tmp
-	   delete(lat_dim_tmp)
-	end if
-	if isfilevar(ffile,"glamt") then 	
-	   lon_dim=coord_file->glamt
+           lat_dim_tmp=rm_single_dims(lat_dim)
+           delete(lat_dim)
+           lat_dim=lat_dim_tmp
+           delete(lat_dim_tmp)
+           lat_dim@standard_name="latitude"
+        end if
+        if isfilevar(coord_file,"glamt") then     
+           lon_dim=coord_file->glamt
            lon_dim_tmp=rm_single_dims(lon_dim)
            delete(lon_dim)
            lon_dim=lon_dim_tmp
            delete(lon_dim_tmp)
-	end if
-
+           lon_dim@standard_name="longitude"
+        end if
+        
       else
 
         if isfilepresent("mesh_mask.nc") then
@@ -399,7 +409,7 @@ begin
       if isfilevar(ffile,"nav_lat") then
         print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
       end if
-
+      ;print("latname="+latname)
       if ( isvar("latname") .and. ( .not. ismissing(str_match(Var_DimNames,latname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,latname))) ) ) ) then lat_dim=ffile->$latname$ end if
       if ( isvar("lonname") .and. ( .not. ismissing(str_match(Var_DimNames,lonname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lonname))) ) ) ) then lon_dim=ffile->$lonname$ end if	
     end if
