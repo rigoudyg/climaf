@@ -719,7 +719,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             return compare_trees(tree1.father,tree2.father,
                                  func,filter_on_operator)
 
-allow_errors_on_ds_call=False
+allow_errors_on_ds_call=True #False
 
 def allow_error_on_ds(allow=True) :
     global allow_errors_on_ds_call
@@ -739,6 +739,7 @@ def ds(*args,**kwargs) :
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     """
+    global allow_errors_on_ds_call
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))

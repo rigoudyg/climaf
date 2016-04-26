@@ -2,6 +2,9 @@ from climaf.api import *
 from climaf.html import * 
 from climaf import cachedir
 
+# This example does work only on Ciclad
+if not onCiclad: exit(0)
+
 desc="\n\nProto d'atlas oceanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"
 from optparse import OptionParser
 parser = OptionParser(desc) ; parser.set_usage("%%prog [-h]\n%s" % desc)
