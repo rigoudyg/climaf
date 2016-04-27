@@ -32,6 +32,12 @@ def load_standard_operators():
     #
     cscript('ccdo_ens','cdo ${operator} ${mmin} ${out}')
     #
+    cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('plus', 'cdo add ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
     cscript('space_average',
             scriptpath+'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}', 
             commuteWithTimeConcatenation=True)

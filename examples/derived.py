@@ -22,11 +22,17 @@ cdef("period","1980-1981")
 # 'derived') . We call it 'crest' (which stand for Cloud Radiative
 # Effect in Shortwave at Top of atmosphere), from all-sky and
 # clear-sky sortwave fluxes
+
 # All the other dataset attributes were ste above by cdef()
 creShortTop=ds(variable="crest")
 
+# Declare a script that will be used in defining how to derive the new variable
+# Actually, this is a standard operator: 'minus' is equivalent to 'sub' (when
+# substracting two CliMAF objects) except that is a CliMAF operator)
+#cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
+
 # Say how you compute (or derive) variable 'crest' form variables 'rst' and 'rstcs', for all projects
-derive('*', 'crest','sub','rst','rstcs')
+derive('*', 'crest','minus','rst','rstcs')
 
 # Ask for actually compute the variable as a file
 my_file=cfile(creShortTop)

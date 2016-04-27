@@ -3,6 +3,10 @@ sub: substraction between two CliMAF objects or between a CliMAF object and a co
 
 Substraction of two CliMAF object, or subtraction of the CliMAF object given as first argument and a constant as second argument (string, float or integer)
 
+For some case, we need to use :doc:`minus <../scripts/minus>` which is
+equivalent to 'sub' (when substracting two CliMAF objects) except that
+is a CliMAF operator. 
+
 **References** : https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html
 
 **Provider / contact** : climaf at meteo dot fr

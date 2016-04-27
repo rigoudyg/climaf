@@ -8,11 +8,7 @@ Changes, newest first :
 
 - 2016/04/27:
 
-  - A **change breaking backward compatibility** : operator 'minus'
-    was replaced by :doc:`functions/sub`. 
-
   - A new function :doc:`functions/plot_params`
-
 
 
 - 2016/04/22 - Version 1.0 :
