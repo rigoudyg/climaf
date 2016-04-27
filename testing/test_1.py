@@ -21,7 +21,7 @@ class A_basic(unittest.TestCase):
     def test_1_print_dataset(self):
         pdg=`self.dg`
         print pdg
-        expected="ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')"
+        expected="ds('example%AMIPV6ALB2G%tas%1980-1981%global%monthly')"
         print expected
         self.assertEqual(pdg,expected, 
                          'Issue printing a very basic dataset')
@@ -32,7 +32,7 @@ class A_basic(unittest.TestCase):
         sd=`std`
         actual=sd
         print "actual=",sd
-        expected="mean_and_std(ds('example.AMIPV6ALB2G.tas.1980-1981.global.monthly')).sdev"
+        expected="mean_and_std(ds('example%AMIPV6ALB2G%tas%1980-1981%global%monthly')).sdev"
         print "expected=",expected
         self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
 
@@ -40,7 +40,7 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
         fil=cfile(std)
-        expected=climaf.cache.currentCache+'/d1a35/827e7/ea4ac/eeb5e/f2b68/4092d/43408.nc'
+        expected=climaf.cache.currentCache+'/d2571/8ca78/f6679/0980a/0c8a7/8ce5d/81426/de647/b178d/fe94e/f8723/a.nc'
         print "actual=",fil
         print "expected=",expected
         self.assertEqual(fil,expected,"Issue evaluating script application as a file")
@@ -82,7 +82,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def test_selecting_files(self):
         print `ds`
         my_file=cfile(self.ds); print "myfile = "+my_file
-        expected=climaf.cache.currentCache+'/9e/2.nc'
+        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
         print "expected = "+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
 

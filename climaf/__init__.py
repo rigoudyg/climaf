@@ -7,9 +7,9 @@ from __future__ import print_function
 # Created : S.Senesi - 2014
 
 __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators", "projects", "cmacro", "html", "usual_functions" ]
+          "operators", "period", "standard_operators", "projects", "cmacro", "html", "functions", "plot" ]
 
-version="0.13"
+version="1.0"
 
 import time,os
 
@@ -90,10 +90,11 @@ if not already_inited  and not onrtd :
     atexit.register(cmacro.write,macroFilename)
     atexit.register(cache.csync)
     tim("atexit")
-    # Check if exiv2 is installed
-    #
-    if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in operators.graphic_formats:
-        operators.graphic_formats.remove('eps')
-        print("exiv2 is not installed so you can not use 'eps' output format")
+    if cache.stamping :
+        # Check if exiv2 is installed
+        #
+        if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in operators.graphic_formats:
+            operators.graphic_formats.remove('eps')
+            print("exiv2 is not installed so you can not use 'eps' output format")
 
 

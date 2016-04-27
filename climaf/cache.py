@@ -10,21 +10,30 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 import sys, os, os.path, re, time, glob
 import pickle
 import uuid
+import hashlib
+from operator import itemgetter  
 
 from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro  import crewrite
 from clogging import clogger, dedent
 import operators
-from operator import itemgetter  
 
 currentCache=None
 cachedirs=None
+#: The length for truncating the hash value of CRS expressions when forming cache filenames
+fileNameLength=60
+#: Define whether we try to have safe naming of cache objects using adaptative filename length
+safe=False
+#: The length of subdir names when segmenting cache filenames
+directoryNameLength=5
+#: Define whether we stamps the data files with their CRS
+stamping=True
 #: The index associating filenames to CRS expressions
 crs2filename=dict()  
 
-#: A dict containing cache index entries (as listed on index file), which 
-# were up to now not interpretable, given the set of defined tporjects
+#: A dict containing cache index entries (as listed in index file), which 
+# were up to now not interpretable, given the set of defined projects
 crs_not_yet_evaluable=dict()
 
 def setNewUniqueCache(path,raz=True) :
@@ -41,6 +50,34 @@ def setNewUniqueCache(path,raz=True) :
     if (raz) : craz(hideError=True)
 
 def generateUniqueFileName(expression, operator=None, format="nc"):
+    if safe and stamping :
+        return generateUniqueFileName_safe(expression, operator=operator, format=format)
+    else :
+        return generateUniqueFileName_unsafe(expression, format=format)
+    
+def generateUniqueFileName_unsafe(expression, format="nc"):
+    """
+    Generate a filename path from string EXPRESSION and FILEFORMAT,
+    almost unique for the expression and the cache directory
+
+    This uses hashlib.sha224, which are truncated to fileNameLength. 
+
+    Generated names drive a structure where each directory name 
+    has dirNameLength characters
+    """
+    #
+    if format==None : return ""
+    prefix=""
+    full=hashlib.sha224(expression).hexdigest()
+    rep=currentCache+"/"+prefix+stringToPath(full[0 : fileNameLength - 1 ], directoryNameLength )+"."+format
+    rep=os.path.expanduser(rep)
+    # Create the relevant directory, so that user scripts don't have to care
+    dirn=os.path.dirname(rep)
+    if not os.path.exists(dirn) : os.makedirs(dirn)
+    clogger.debug("returning %s"%rep)
+    return(rep)
+
+def generateUniqueFileName_safe(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
     expression and the set of cache directories currently listed in cache.cachedirs 
     OPERATOR may be a function that provides a prefix, using EXPRESSION
@@ -54,16 +91,13 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
 
     Exits if uniqueness is unachievable (quite unexpectable !) """
     #
-    import hashlib
-    directoryNameLength=5
-    #
     if format==None : return ""
     prefix=""
     if operator is not None :
         prefix2=operator(expression)
         if prefix2 is not None : prefix=prefix2+"/"
     full=hashlib.sha224(expression).hexdigest()
-    number=36
+    number=fileNameLength
     guess=full[0 : number - 1 ]
     existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
     if existing : 
@@ -128,6 +162,10 @@ def register(filename,crs):
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
+    if not stamping :
+        clogger.debug('No stamping')
+        crs2filename[crs]=filename
+        return True 
     waited=0
     while waited < 20 and not os.path.exists(filename) :
         time.sleep(0.1)
@@ -155,6 +193,7 @@ def register(filename,crs):
             return True
         else : 
             clogger.critical("cannot stamp by %s"%command)
+            exit()
             return None
     else :
         clogger.error("file %s does not exist (for crs %s)"%(filename,crs))
@@ -172,7 +211,7 @@ def getCRS(filename) :
     elif re.findall(".eps$",filename) :
         form='exiv2 -p x %s | grep "CRS_def" | awk \'{for (i=4;i<=NF;i++) {print $i " "} }\' '
     else :
-        clogger.critical("unknown filetype for %s"%filename)
+        clogger.error("unknown filetype for %s"%filename)
         return None
     command=form%filename
     try:
@@ -191,7 +230,7 @@ def rename(filename,crs) :
     newfile=generateUniqueFileName(crs, format="nc")
     if newfile :
         l=[ c for c in crs2filename if crs2filename[c] == filename ]
-        for c in l : del(crs2filename[c]) 
+        for c in l : crs2filename.pop(c) 
         os.rename(filename,newfile)
         register(newfile,crs)
         return(newfile)
@@ -210,7 +249,6 @@ def hasMatchingObject(cobject,ds_func) :
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
-        import operators
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
     for crs in crs2filename.copy() :
@@ -321,26 +359,45 @@ def cdrop(obj, rm=True) :
 
 def csync(update=False) :
     """
-    Write cache dictionary to disk
+    Merges current in-memory cache index and current on-file cache index 
+    for updating both
 
-    If arg `update` is True, first updates dictionary from actual 
-    cache file content
+    If arg `update` is True, additionnaly ensures consistency between files
+    set and index content, either :
+
+    - if cache.stamping is true, by reading CRS in all files
+    - else, by removing files which are not in the index; this may erase 
+      result files which have been computed by another running 
+      instance of CliMAF
     """
+    #
     import pickle
     global cacheIndexFileName
 
-    # check if cache index is up to date; if not the 
-    # function 'rebuild' is called
+    # Merge index on file and index in memory
+    file_index=cload(True)
+    crs2filename.update(file_index)
+
+    # check if cache index is up to date; if not
+    # enforce consistency
     if update :
         clogger.info("Listing crs from files present in cache")
-        crs_in_cache=list_cache()
-        crs_in_cache.sort()
-        crs_in_index=crs2filename.values()
-        crs_in_index.sort()
-        if crs_in_index != crs_in_cache:
-            clogger.info("Rebuilding cache index")
-            rebuild()  
-
+        files_in_cache=list_cache()
+        files_in_cache.sort()
+        files_in_index=crs2filename.values()
+        files_in_index.sort()
+        if files_in_index != files_in_cache:
+            if stamping :
+                clogger.info("Rebuilding cache index from file content")
+                rebuild()
+            else :
+                clogger.info('Removing cache files which content is not known')
+                for fil in files_in_cache :
+                    if fil not in files_in_index :
+                        os.system("rm %"%fil)
+                    #else :
+                    # Should also remove empty files, as soon as
+                    # file creation will be atomic enough 
     # Save to disk
     try: 
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
@@ -349,16 +406,20 @@ def csync(update=False) :
     except:
         clogger.info("No cache index file yet")
 
-def cload() :
+def cload(alt=None) :
     global crs2filename 
     global crs_not_yet_evaluable
+    rep=dict()
  
-    if len(crs2filename) != 0 :
+    if len(crs2filename) != 0 and not alt:
         Climaf_Cache_Error(
             "attempt to reset file index - would lead to inconsistency !")
     try :
         cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "r")
-        crs2filename=pickle.load(cacheIndexFile)
+        if alt :
+            rep=pickle.load(cacheIndexFile)
+        else:
+            crs2filename=pickle.load(cacheIndexFile)
         cacheIndexFile.close()
     except:
         pass
@@ -393,6 +454,8 @@ def cload() :
                         "Or you can erase corresponding data by 'crm(pattern=...project name...)'"% \
                         (len(crs_not_yet_evaluable),`list(projects)`))
         allow_error_on_ds(False)
+    if alt :
+        return rep
         
 
 def cload_for_project(project):
@@ -773,12 +836,19 @@ def rebuild():
     
     """
     global crs2filename
-    
+
+    if not stamping :
+        clogger.warning("Cannot rebuild cache index, because we are not in 'stamping' mode")
+        return None
     files_in_cache=list_cache()
     crs2filename.clear()
     for files in files_in_cache:
-        crs2filename[getCRS(files)]=files
-
+        filecrs=getCRS(files)
+        if filecrs:
+            crs2filename[filecrs]=files
+        else:
+            os.system('rm -f '+files)
+            clogger.warning("File %s is removed"%files)
     return(crs2filename)
     
 

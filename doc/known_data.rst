@@ -21,20 +21,25 @@ projects.ocmip5
 
 .. automodule:: climaf.projects.ocmip5
 
-projects.ref_pcmdi
+projects.ref_climatos_and_ts
 -----------------------------------------------------------
 
-.. automodule:: climaf.projects.ref_pcmdi
-
-projects.ref_ipsl
------------------------------------------------------------
-
-.. automodule:: climaf.projects.ref_ipsl
+.. automodule:: climaf.projects.ref_climatos_and_ts
 
 projects.igcm_out
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.igcm_out
+
+projects.igcm_out_old
+-----------------------------------------------------------
+
+.. automodule:: climaf.projects.igcm_out_old
+
+projects.igcm_out_cmip
+-----------------------------------------------------------
+
+.. automodule:: climaf.projects.igcm_out_cmip
 
 projects.em 
 -----------------------------------------------------------

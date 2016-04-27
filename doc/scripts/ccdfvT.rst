@@ -33,7 +33,9 @@ There are not CliMAF optional arguments.
 
   - main output : a netcdf file (variables : vozout, vozous, vomevt and vomevs)
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>` and
+:download:`cdftransport.py <../../examples/cdftransport.py>` 
 
   >>> cdef("period","198807")
   >>> dt=ds(simulation="PRE6CPLCr2alb", variable="thetao", realm="O") # dataset with temperature

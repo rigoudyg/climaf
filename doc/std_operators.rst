@@ -1,30 +1,65 @@
 .. _standard_operators:
 
-Standard Operators
--------------------------------
+Standard operators and functions
+---------------------------------
 
-CliMAF includes a number of 'Standard Operators', which implement more or less basic climate diagnostics or utilities. This set increases
-with scientists contributions (see :ref:`how_to_contribute_a_script`). They are documented here, through
-individual documentation files in `REStructured Text format <http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_
-and following :download:`this example <scripts_template.rst>` which renders :doc:`as shows here <scripts_template>`. 
-For each operator, the content of the doc file is also made available in the Python on-line help (see :ref:`how_to_list_operators`).
+CliMAF includes a number of 'Standard Operators' and of 'Standard Functions', which implement more
+or less basic climate diagnostics or utilities. All do return CliMAF objects. Operators are implemented as external
+scripts or binaries, while functions are implemented as python
+functions. Other functions exists, which do not return CliMAF
+objects - see :doc:`API`
 
-Documented operators as of today : 
+The set of standard operators grows
+with scientists contributions (see
+:ref:`how_to_contribute_a_script`). They are documented here, through 
+individual documentation files in `REStructured Text format
+<http://docutils.sourceforge.net/docs/user/rst/quickref.html>`_ 
+and following :download:`this example <scripts_template.rst>` which
+renders :doc:`as shows here <scripts_template>`.  
+For each operator, the content of the doc file is also made available
+in the Python on-line help (see :ref:`how_to_list_operators`). 
 
- - basic functions:
-    - :doc:`scripts/llbox`
-    - :doc:`scripts/regrid`
-    - :doc:`scripts/regridn`
-    - :doc:`scripts/regridll`
-    - :doc:`scripts/time_average`
-    - :doc:`scripts/space_average`
+Documented operators and functions as of today : 
+
+ - arithmetic operators:
+    - :doc:`scripts/plus`
     - :doc:`scripts/minus`
-    - :doc:`scripts/ncdump`
-    - :doc:`scripts/slice`
-    - :doc:`scripts/mask`
-    - :doc:`scripts/ncpdq`
+    - :doc:`functions/mul`
+    - :doc:`functions/div`
+    - :doc:`functions/add`
+    - :doc:`functions/sub`
+    - :doc:`functions/apply_scale_offset`
 
- - graphics:
+ - swiss knives |sk| :
+    - :doc:`scripts/ccdo`
+    - :doc:`scripts/ccdo2`
+    - :doc:`scripts/ccdo_ens`
+
+ - climate data operators:
+    - spatial operations:
+        - :doc:`scripts/llbox`
+        - :doc:`scripts/space_average`
+        - :doc:`functions/zonmean`
+    - regridding:
+        - :doc:`scripts/regrid`
+        - :doc:`scripts/regridn`
+        - :doc:`functions/zonmean_interpolation`
+        - :doc:`scripts/ml2pl`
+    - computing a difference with regridding (typically to compute model biases):
+        - :doc:`functions/diff_regrid`
+        - :doc:`functions/diff_regridn`
+        - :doc:`functions/diff_zonmean`
+    - temporal operations:
+        - :doc:`scripts/time_average`
+        - :doc:`functions/clim_average`
+        - :doc:`functions/climato`
+        - :doc:`functions/annual_cycle`
+    - Others:
+        - :doc:`scripts/slice`
+        - :doc:`scripts/mask`
+        - :doc:`scripts/ncpdq`
+
+ - operators for creating figures :
 
      .. note:: Overview on the output format to be used for 'plot' and
 	       'curves' operators w.r.t. figure trimming :
@@ -88,13 +123,10 @@ Documented operators as of today :
 		   output page  
 
     - :doc:`scripts/plot`
+    - :doc:`functions/plot_params`
     - :doc:`scripts/curves`
-    - :doc:`scripts/ncview`
     - :doc:`scripts/cpdfcrop`
     - :doc:`scripts/cepscrop`
-
- - swiss knife |sk| :
-    - :doc:`scripts/ccdo`
 
  - example for two outputs :
     - :doc:`scripts/mean_and_std`
@@ -114,3 +146,4 @@ A name-sorted list :
   :glob:
 
   /scripts/*
+  /functions/*

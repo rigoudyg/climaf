@@ -1,5 +1,22 @@
-cshow : dump an object or display a 'figure'
---------------------------------------------
+
+functions for inspecting data :
+--------------------------------
+
+ - :doc:`functions/summary`
+ - :doc:`scripts/ncdump`
+ - cshow : dump an object (or display a 'figure')
+
+.. autofunction:: climaf.driver.cshow
+   :noindex:
+
+
+functions to display an image :
+------------------------------------------------------
+
+ - :doc:`scripts/ncview`
+ - :doc:`functions/iplot`
+ - :doc:`functions/implot`
+ - cshow 
 
 .. autofunction:: climaf.driver.cshow
    :noindex:

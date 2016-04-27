@@ -29,6 +29,10 @@ the script convert all time periods to first's one
     separated by whitespaces
   - ``scale``, ``offset`` : for scaling the input field (x ->
     x*scale + offset); default = 1. and 0. (no scaling) 
+  - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
+    fields (x -> x*scale_aux + offset_aux); default = ``scale`` and
+    ``offset`` (main field scaling). These arguments will apply of the
+    second to the nth field.
   - ``units`` : name of the main field units; used in the caption;
     default is to use the corresponding CF metadata
   - ``y`` : y axis style
@@ -56,7 +60,7 @@ the script convert all time periods to first's one
     determine the format string depending on the time range length.
   - ``lgcols`` : number of columns for legend; default: 3.
   - ``options``, ``aux_options`` : strings for setting NCL graphic
-    resources directly for main field and auxiliary field
+    resources directly for main field and auxiliary fields
     respectively. These resources are separated by "|", as e.g. : 
     ' options="tiMainString=lv|xyLineThicknessF=5.",
     aux_options="xyLineColor=red" '. It is recommended to use argument

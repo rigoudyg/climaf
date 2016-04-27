@@ -50,7 +50,8 @@ See also:
   - main output : a netcdf file (variable : IN-var_std, same units
     than input variables) 
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>` 
 
   >>> dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807-199810", realm="O") # some dataset, with whatever variable
   >>> my_cdfstd=ccdfstd(dmld)

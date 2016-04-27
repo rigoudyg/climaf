@@ -4,18 +4,149 @@
 Whats' new
 ------------
 
-Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
-
 Changes, newest first :
 
-  - add operator ``regridll`` for regridding to a lat-lon box (see :doc:`scripts/plot`) 
 
-- 2016/03/29 - Version 0.13 :
+
+- 2016/04/22 - Version 1.0 :
+
+- **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.
+  This allows to add and  pop members easily. The members can be ordered. See
+  :py:func:`~climaf.classes.cens`
+
+  - New standard operators:
+
+      - ``ml2pl`` to interpolate a 3D variable on a model levels to
+	pressure levels; works only if binary ml2pl is in your PATH
+         
+         - :doc:`scripts/ml2pl` and  :download:`an example using ml2pl <../examples/ml2pl.py>`
+
+      - ``ccdo2`` and ``ccdo_ens`` coming in addition to the very
+	useful ``ccdo`` swiss knife; ``ccdo2`` takes two datasets as
+	input, and ``ccdo_ens`` takes an ensemble of CliMAF datasets
+	(built with ``eds`` or ``cens``). Warning : ``ccdo_ens`` is not
+	yet optimized for large datsets which data for a single member
+	are spread over numerous files
+
+         - :doc:`scripts/ccdo2`
+      
+         - :doc:`scripts/ccdo_ens`
+
+      - ``regridll`` for regridding to a lat-lon box (see :doc:`scripts/regridll`) 
+
+  - A whole new set of functions, that are mainly 'science oriented'
+    shortcuts for specific use of CliMAF operators:
+
+      - ``add``, ``sub``, ``mul`` and ``div`` (now providing the 4
+	arithmetic operations). Work between two CliMAF objects of
+	same size, or between a CliMAF object and a constant (provided
+	as string, float or integer)
+         
+         - :doc:`functions/add`
+         
+         - :doc:`functions/sub`
+
+         - :doc:`functions/mul`
+         
+         - :doc:`functions/div`
+
+      - ``apply_scale_offset`` to apply a scale and offset to a CliMAF object
+         
+         - :doc:`functions/apply_scale_offset`
+
+      - ``diff_regrid`` and ``diff_regridn`` -> returns the difference between two CliMAF datasets after regridding
+         
+         ( based on :doc:`scripts/regrid` and :doc:`scripts/regridn` )
+         
+         - :doc:`functions/diff_regrid`
+         
+         - :doc:`functions/diff_regridn`
+
+      - ``clim_average`` provides a simple way to compute
+        climatological averages (annual mean, seasonal averages,
+        one-month climatology...)
+         
+         - :doc:`functions/clim_average`
+
+      - ``annual_cycle`` returns the 12-month climatological annual cycle of a CliMAF object
+         
+         - :doc:`functions/annual_cycle`
+
+      - ``climato`` returns the annual mean climatology (shortcut to ``time_average``)
+         
+         - :doc:`functions/climato`
+
+      - ``zonmean``, ``diff_zonmean`` and ``zonmean_interpolation`` to work on zonal mean fields
+         
+         - :doc:`functions/zonmean`
+         
+         - :doc:`functions/diff_zonmean`
+         
+         - :doc:`functions/zonmean_interpolation`,
+
+  - Two functions to display a plot in an IPython Notebook: ``iplot`` and ``implot``
+      
+      - :doc:`functions/iplot`
+      
+      - :doc:`functions/implot`
+
+  - Functions for an interactive use of ds() and projects:
+
+      - ``summary`` lists the files linked with a ds() request, and the pairs facet/values actually used by ds()
+
+        - :doc:`functions/summary`
+
+      - ``projects`` returns the listing of the available projects
+        with the associated facets (fancy version of cprojects)
+
+        - :py:func:`~climaf.functions.projects`
+
+  - New Drakkar CDFTools operators interfaced (see example :download:`cdftools.py
+    <../examples/cdftools.py>`):
+    - :doc:`scripts/ccdfzonalmean`,
+    - :doc:`scripts/ccdfzonalmean_bas`,
+    - :doc:`scripts/ccdfsaltc` 
+      
+  - Modification for example :download:`atlasoce.py
+    <../examples/atlasoce.py>` because CDFTools were modified 
+
+  - New function :py:func:`~climaf.api.cerr()` displays file
+    'last.out' (stdout and stderr of script call)  
+
+  - New arguments for standard operators ``plot`` (see
+    :doc:`scripts/plot`) and  ``curves`` (see :doc:`scripts/curves`) :
+    ``scale_aux`` and ``offset_aux`` to scale the input auxiliary
+    field for ``plot`` and to scale of the second to the nth
+    input auxiliary field for ``curves``.   
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - Tick marks are smartly adapted to the time period duration
+      for (t,z) profiles 
+    - new arg ``fmt`` to change time axis labels format 
+    - new arg ``color`` to define your own color map using named colors
+    - you can now use argument ``invXY`` for cross-section
+    - Bug fixes :
+    
+      - for argument ``reverse``
+      - when reading latitude and longitude in file 'coordinates.nc' for curvilinear grid;  
+      - for y axis style when ``invXY`` is used for (t,z) profiles
+
+  - Change for standard operator ``slice`` : extract a slice on
+    specified dimension now at a given range instead of a given value
+    before (see :doc:`scripts/slice`)  
+
+
+  - Technical :
   
-  - Changes for standard operator ``plot`` : Tick marks are smartly
-    adapted to the time period duration for (t,z) profiles and the new
-    argument ``fmt`` to change this format is available (see
-    :doc:`scripts/plot`)   
+    - it is possible to discard stamping of files in cache (see cache.stamping)
+    - disambiguating filenames in cache relies only on their length (60)
+    - scripts execution duration is now only logged, at level 'info'
+    - critical errors now exit
+    - fix in mcdo.sh:nemo_timefix
+    - project 'em' is based on generic organization
+    - re-design code of gplot.ncl
+
 
 
 - 2016/03/25 :
@@ -497,3 +628,6 @@ Changes, newest first :
   - log messages are tabulated
   - a log file is added, with own severity level, set by clog_file
   - operators with format=None are also evaluated as soon as applied - i.e. cshow no more needednon ncview(...)
+
+Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
+

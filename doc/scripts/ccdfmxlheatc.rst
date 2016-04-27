@@ -32,7 +32,9 @@ directory (use function :py:func:`~climaf.operators.fixed_fields()` for that; se
 
   - main output : a netcdf file (variable : somxlheatc (Joules/m2))
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools_multivar.py
+<../../examples/cdftools_multivar.py>`   
 
   >>> # Use "data_CNRM" project, where netcdf files with values of thetao and omlmax are defined
   >>> cdef("project","data_CNRM")

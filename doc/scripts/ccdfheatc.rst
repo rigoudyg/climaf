@@ -25,7 +25,7 @@ CliMAF optional arguments are the ones surrounded with '**'.
   - ``imin``, ``imax``, ``jmin``, ``jmax``,  ``kmin``, ``kmax`` :
     limit of a sub domain where the heat content will be calculated
    
-  - ``opt`` : may be used to pass key ``-full`` ( assume full step
+  - ``opt`` : may be used to pass key ``-full`` (assume full step
     model output instead of default partial steps)
        
 **Required files**: Files mesh_hgr.nc, mesh_zgr.nc, mask.nc must be in
@@ -34,9 +34,12 @@ example below).
 
 **Outputs**:
 
-  - main output : standard output
+  - main output : a netcdf file (variables : heatc_2D, heatc_3D) and
+    standard output 
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools_multivar.py
+<../../examples/cdftools_multivar.py>`   
 
   >>> # Use "data_CNRM" project, where netcdf files with values of so and thetao are defined
   >>> cdef("project","data_CNRM")
@@ -47,7 +50,7 @@ example below).
    ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
   >>> dT=ds(simulation="PRE6CPLCr2alb", variable="so,thetao", period="199807", realm="O")
   >>> my_cdfheatc=ccdfheatc(dT,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2,opt='-full')
-  >>> cfile(my_cdfheatc) # to compute the heat content in the specified area and get the result on standard output
+  >>> cfile(my_cdfheatc) # to compute the heat content in the specified area and get the result in a netcdf file
 
 **Implementation**: The operator is implemented as a binary using
 cdftools cdfheatc operator.  

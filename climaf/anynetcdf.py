@@ -13,5 +13,6 @@ except ImportError:
                 from scipy.io.netcdf import netcdf_file as ncf
             except ImportError:
                 clogger.critical("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
+                exit()
                 #raise Climaf_Netcdf_Error("Netcdf handling is yet available only with modules Scientific.IO.Netcdf or NetCDF4 or scipy.io.netcdf ")
 
