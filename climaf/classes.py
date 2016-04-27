@@ -546,8 +546,7 @@ class cens(cobject,dict):
         return [ (l,self[l]) for l in self.order ]
 
     def copy(self):
-        import copy
-        e=cens(copy.deepcopy(self),
+        e=cens(self,
                order=[ m for m in self.order],
                sortfunc=self.sortfunc)
         return(e)
@@ -616,7 +615,7 @@ def eds(**kwargs):
         attval2=attval.copy()
         attval2[listattr]=member
         d[member]=cdataset(**attval2)
-    return cens(d,order=listattr)
+    return cens(d,order=attval[listattr])
 
 def fds(filename, simulation=None, variable=None, period=None, model=None) :
     """

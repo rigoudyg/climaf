@@ -31,7 +31,7 @@ cshow(p)
 # Advanced example : create plot panel of various members, add a member, and compute anomalies
 ###############################################################################################
 
-if atCNRM or on Ciclad : 
+if atCNRM or onCiclad : 
     # Define some default values for using CMIP5 data for various realizations
     cdef("project","CMIP5"); cdef("frequency","monthly") ;  
     cdef("model","CNRM-CM5") ; cdef("variable","tas"); 
@@ -53,7 +53,7 @@ cshow(multiplot)
 page=cpage(multiplot)
 cshow(page)
 
-if atCNRM or on Ciclad :
+if atCNRM or onCiclad :
     # Add a member to an ensemble
     member=ds(experiment="historical", period="1860", simulation="r3i1p1")
     ens["r3i1p1"]=member

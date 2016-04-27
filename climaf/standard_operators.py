@@ -23,18 +23,8 @@ def load_standard_operators():
     #
     # Compute scripts
     #
-<<<<<<< variant A
     cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
->>>>>>> variant B
-    
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ', 
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True) 
-####### Ancestor
-    
-    cscript('select' ,scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins} ',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-======= end
     #
     cscript('ccdo',
             scriptpath+'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}')
