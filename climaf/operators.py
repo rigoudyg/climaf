@@ -427,7 +427,7 @@ def derive(project, derivedVar, Operator, *invars, **params) :
 
     'project' may be the wildcard : '*'
 
-    Example , assuming that operator 'minus' has been defined as ::
+    Example, assuming that operator 'minus' has been defined as ::
     
     >>> cscript('minus','cdo sub ${in_1} ${in_2} ${out}')
     

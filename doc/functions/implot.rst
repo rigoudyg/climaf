@@ -19,7 +19,7 @@ None
 **Climaf call example** ::
  
   >>> dat = ds(...)
-  >>> implot(climato(dat))
+  >>> implot(time_average(dat))
 
 **Side effects** : none
 

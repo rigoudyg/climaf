@@ -22,8 +22,8 @@ The user can use climaf/plot/atmos_plot_params.py as an example to create a cust
 **Climaf call example** ::
  
   >>> var = 'pr'
-  >>> climato_dat = climato(ds(variable=var, project='CMIP5', ...))       # here, the annual mean climatology of a CMIP5 dataset for variable var
-  >>> climato_ref = climato(ds(variable=var, project='ref_climatos',...)) # the annual mean climatology of a reference dataset for variable var
+  >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))       # here, the annual mean climatology of a CMIP5 dataset for variable var
+  >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...)) # the annual mean climatology of a reference dataset for variable var
 
   >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
   >>> climato_plot = plot(climato_dat, **plot_params(var,'full_field')) 

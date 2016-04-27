@@ -22,8 +22,8 @@ if onCiclad:
    #
    # 2 - Compute a bias map for the zonal mean
    ref = ds(project='ref_climatos', variable='ua', product='ERAINT')
-   climato_sim = climato(var_on_pl)
-   climato_ref = climato(ref)
+   climato_sim = time_average(var_on_pl)
+   climato_ref = time_average(ref)
    #
    # 3 - Do the plot
    test_plot = plot(diff_zonmean(climato_sim,climato_ref),zonmean(climato_ref),

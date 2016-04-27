@@ -6,6 +6,13 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/04/27:
+
+  - A **change breaking backward compatibility** : operator 'minus'
+    was replaced by :doc:`functions/sub`. 
+
+  - A new function :doc:`functions/plot_params`
+
 
 
 - 2016/04/22 - Version 1.0 :
@@ -25,7 +32,7 @@ Changes, newest first :
 	useful ``ccdo`` swiss knife; ``ccdo2`` takes two datasets as
 	input, and ``ccdo_ens`` takes an ensemble of CliMAF datasets
 	(built with ``eds`` or ``cens``). Warning : ``ccdo_ens`` is not
-	yet optimized for large datsets which data for a single member
+	yet optimized for large datasets which data for a single member
 	are spread over numerous files
 
          - :doc:`scripts/ccdo2`
@@ -72,10 +79,6 @@ Changes, newest first :
          
          - :doc:`functions/annual_cycle`
 
-      - ``climato`` returns the annual mean climatology (shortcut to ``time_average``)
-         
-         - :doc:`functions/climato`
-
       - ``zonmean``, ``diff_zonmean`` and ``zonmean_interpolation`` to work on zonal mean fields
          
          - :doc:`functions/zonmean`
@@ -103,6 +106,7 @@ Changes, newest first :
 
   - New Drakkar CDFTools operators interfaced (see example :download:`cdftools.py
     <../examples/cdftools.py>`):
+
     - :doc:`scripts/ccdfzonalmean`,
     - :doc:`scripts/ccdfzonalmean_bas`,
     - :doc:`scripts/ccdfsaltc` 

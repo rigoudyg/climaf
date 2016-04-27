@@ -1,5 +1,5 @@
-diff_regrid : regrids dat1 on dat2 and returns the difference (using regrid and minus)
----------------------------------------------------------------------------------------
+diff_regrid : regrids dat1 on dat2 and returns the difference (using regrid)
+-----------------------------------------------------------------------------
 
 Regrids dat1 on dat2 and returns the difference between dat1 and dat2
 
@@ -23,5 +23,5 @@ None
 
 **Side effects** : none
 
-**Implementation** : shortcut to 'minus(regrid(dat1,dat2), dat2)'
+**Implementation** : shortcut to 'sub(regrid(dat1,dat2), dat2)'
 

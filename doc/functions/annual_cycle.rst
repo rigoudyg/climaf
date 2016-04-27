@@ -18,7 +18,7 @@ None
 **Climaf call example** ::
  
   >>> dat= ....   # some dataset, with whatever variable
-  >>> annual_cycle_dat = annual_cycle(dat) #
+  >>> annual_cycle_dat = annual_cycle(dat) 
 
 **Side effects** : none
 

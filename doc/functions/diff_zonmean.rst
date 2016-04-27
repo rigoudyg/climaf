@@ -27,5 +27,6 @@ None
 
 **Side effects** : none
 
-**Implementation** : uses ccdo(...,operator='zonmean'), zonmean_interpolation and minus
+**Implementation** : uses ccdo(...,operator='zonmean'),
+ccdo2(...,operator='zonmean') and zonmean_interpolation  
 

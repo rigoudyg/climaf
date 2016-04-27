@@ -32,8 +32,8 @@ None
                 experiment='historical',table='Amon')
     >>> ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
 
-    >>> zonmean_dat = zonmean(climato(dat))
-    >>> zonmean_ref = zonmean(climato(ref))
+    >>> zonmean_dat = zonmean(time_average(dat))
+    >>> zonmean_ref = zonmean(time_average(ref))
 
     >>> dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
     >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')

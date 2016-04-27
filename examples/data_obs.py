@@ -52,7 +52,7 @@ pr_gpcc_regridded=regrid(pr_gpcp_avg,pr_gpcc_avg)
 
 # Compare GPCC and GPCC, with regridding
 ##########################################
-gpcc_minus_gpcc=minus(pr_gpcc_avg,pr_gpcc_regridded)
+gpcc_minus_gpcc=sub(pr_gpcc_avg,pr_gpcc_regridded)
 cshow(plot(gpcc_minus_gpcc, title="GPCC minus GPCC - [1979-1980]"))
 
 # ERAI

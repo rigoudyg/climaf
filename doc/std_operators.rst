@@ -22,8 +22,6 @@ in the Python on-line help (see :ref:`how_to_list_operators`).
 Documented operators and functions as of today : 
 
  - arithmetic operators:
-    - :doc:`scripts/plus`
-    - :doc:`scripts/minus`
     - :doc:`functions/mul`
     - :doc:`functions/div`
     - :doc:`functions/add`
@@ -43,6 +41,7 @@ Documented operators and functions as of today :
     - regridding:
         - :doc:`scripts/regrid`
         - :doc:`scripts/regridn`
+	- :doc:`scripts/regridll`
         - :doc:`functions/zonmean_interpolation`
         - :doc:`scripts/ml2pl`
     - computing a difference with regridding (typically to compute model biases):
@@ -52,7 +51,6 @@ Documented operators and functions as of today :
     - temporal operations:
         - :doc:`scripts/time_average`
         - :doc:`functions/clim_average`
-        - :doc:`functions/climato`
         - :doc:`functions/annual_cycle`
     - Others:
         - :doc:`scripts/slice`

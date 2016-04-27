@@ -51,24 +51,24 @@ def div(dat1,dat2):
 def add(dat1,dat2):
     """
     Add dat1 to dat2; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
-    Shortcut to ccdo(dat,operator='addc,'+str(c)) and plus(dat1,dat2)
+    Shortcut to ccdo(dat,operator='addc,'+str(c)) and ccdo2(dat1,dat2,operator='add')
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
        return ccdo(dat1,operator='addc,'+c)
     else:
-       return plus(dat1,dat2)
+       return ccdo2(dat1,dat2,operator='add')
 
 def sub(dat1,dat2):
     """
     Subtract dat2 to dat1; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
-    Shortcut to ccdo(dat,operator='subc,'+str(c)) and minus(dat1,dat2)
+    Shortcut to ccdo(dat,operator='subc,'+str(c)) and ccdo2(dat1,dat2,operator='sub')
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
        return ccdo(dat1,operator='subc,'+c)
     else:
-       return minus(dat1,dat2)
+       return ccdo2(dat1,dat2,operator='sub')
 
 
 
@@ -138,13 +138,13 @@ def diff_regrid(dat1, dat2):
     """
     Regrids dat1 on dat2 and returns the difference between dat1 and dat2
     """
-    return minus(regrid(dat1,dat2), dat2)
+    return sub(regrid(dat1,dat2), dat2)
 
 def diff_regridn (data1, data2, cdogrid='n90'):
     """
     Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2 
     """    
-    return minus ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
+    return sub ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
 
 
 def tableau(n_lin=1, n_col=1):
@@ -168,7 +168,7 @@ def clim_average(dat,season):
     """
     Computes climatological averages on the annual cycle of a dataset, on the months 
     specified with 'season', either:
-    - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
+    - the annual mean climatology (season => 'ann','annual','time_average','clim','climatology','annual_average','anm')
     - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology 
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
     - individual monthly climatologies (e.g. season = 'january', 'jan', '1' or 1 to get 
@@ -180,8 +180,8 @@ def clim_average(dat,season):
     clim_average computes the annual cycle for you.
     """
     #
-    if str(season).lower() in ['ann','annual','climato','clim','climatology','annual_average','anm','annual_mean']:
-        avg = climato(dat)
+    if str(season).lower() in ['ann','annual','time_average','clim','climatology','annual_average','anm','annual_mean']:
+        avg = time_average(dat)
     else:
         #
         # -- Compute the annual cycle
@@ -226,15 +226,6 @@ def clim_average(dat,season):
             avg = ccdo(scyc,operator='timmin')
     #
     return avg
-
-
-
-def climato(dat):
-    """
-    Computes the annual mean climatology of dat
-    (user-friendly shortcut to CliMAF operator time_average(dat))
-    """
-    return time_average(dat)
 
 
 def summary(dat):
@@ -284,8 +275,8 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
              experiment='historical',table='Amon')
     ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
     
-    zonmean_dat = zonmean(climato(dat))
-    zonmean_ref = zonmean(climato(ref))
+    zonmean_dat = zonmean(time_average(dat))
+    zonmean_ref = zonmean(time_average(ref))
     
     dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
     dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
@@ -383,6 +374,6 @@ def diff_zonmean(dat1,dat2):
 
     rgrd_dat1 = zonmean_interpolation(zonmean_dat1,zonmean_dat2)
     #
-    return minus(rgrd_dat1,zonmean_dat2)
+    return sub(rgrd_dat1,zonmean_dat2)
 
 

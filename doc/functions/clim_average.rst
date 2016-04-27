@@ -4,7 +4,7 @@ clim_average : climatology of a dataset on the specified season, month or for th
     Computes climatological averages on the annual cycle of a dataset, on the months 
     specified with 'season', either:
 
-    - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
+    - the annual mean climatology (season => 'ann','annual','time_average','clim','climatology','annual_average','anm')
 
     - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology 
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS

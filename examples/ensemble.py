@@ -62,11 +62,8 @@ if atCNRM or onCiclad :
 cscript("ensavg","cdo ensavg ${mmin} ${out}")
 average=ensavg(ens)
 
-# A standard operator :
-#cscript("minus","cdo sub ${in_1} ${in_2} ${out}")
-
 # Compute anomalies wrt to ensemble mean
-anomalies=minus(ens,average)
+anomalies=sub(ens,average)
 cshow(cpage(plot(anomalies,title='tas')))
 
 

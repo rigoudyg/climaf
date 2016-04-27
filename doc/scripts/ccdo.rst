@@ -20,7 +20,7 @@ Apply CDO on a single dataset or object, with a CDO operator as argument
 **Climaf call example** ::
  
   >>> ds= .... #some dataset, with whatever variable
-  >>> annual_cycle=ccdo(ds,operator='ymonavg') # 
+  >>> annual_cycle=ccdo(ds,operator='ymonavg') 
 
 **Side effects** : none
 

@@ -1,5 +1,5 @@
-diff_regridn : regrids two datasets on a common cdogrid and returns the difference (using regridn and minus)
---------------------------------------------------------------------------------------------------------------
+diff_regridn : regrids two datasets on a common cdogrid and returns the difference (using regridn)
+----------------------------------------------------------------------------------------------------
 
 Regrids dat1 on dat2 on a common grid and returns the difference between dat1 and dat2
 The default cdogrid is 'n90'
@@ -26,5 +26,5 @@ None
 
 **Side effects** : none
 
-**Implementation** : shortcut to 'minus ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))'
+**Implementation** : shortcut to 'sub ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))'
 

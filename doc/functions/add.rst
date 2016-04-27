@@ -28,5 +28,5 @@ None
 
 **Side effects** : none
 
-**Implementation** : shortcut to 'plus(ds1,ds2)' and ccdo(dat,operator='addc,'+c)
+**Implementation** : shortcut to ccdo2(dat1,dat2,operator='add') and ccdo(dat,operator='addc,'+c)
 

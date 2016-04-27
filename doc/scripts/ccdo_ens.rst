@@ -21,7 +21,7 @@ an ensemble of objects
 **Climaf call example** ::
  
   >>> ens = eds(....) #an ensemble of datasets
-  >>> ens_avg = ccdo_ens(ens,operator='ensavg') # 
+  >>> ens_avg = ccdo_ens(ens,operator='ensavg') 
 
 **Side effects** : none
 

@@ -117,7 +117,7 @@ the script convert all time periods to first's one
   >>> # Two time series
   >>> j0=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1980")
   >>> j1=ds(project='example',simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="1981")
-  >>> ens=cens(['1980','1981'],j0,j1)
+  >>> ens=cens({'1980':j0, '1981':j1})
   >>> tas_ga=space_average(ens)
   >>> # Time axis is "aligned"
   >>> p=curves(tas_ga,title="Surface Temperature global average",X_axis="aligned",fmt="%c",options="tiMainString=my_title|xyLineThicknessF=5.",
@@ -134,7 +134,7 @@ the script convert all time periods to first's one
   >>> d2=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1862")
   >>> d3=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1863")
   >>> d4=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1864")
-  >>> ens2=cens(['1960','1961','1962','1963','1964'],d0,d1,d2,d3,d4)
+  >>> ens2=cens({'1960':d0, '1961':d1, '1962':d2, '1963':d3, '1964':d4})
   >>> moy=space_average(ens2)
   >>> p=curves(moy,title="Surface Temperature global average") # Time axis is "real"
   >>> cshow(p)
@@ -144,7 +144,7 @@ the script convert all time periods to first's one
   >>> d1=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="186001", domain=[0,40,30,80])
   >>> ta_zonal_mean=ccdo(d0,operator="zonmean")
   >>> ta_zonal_mean1=ccdo(d1,operator="zonmean")
-  >>> ens=cens(['box1','box2'],ta_zonal_mean,ta_zonal_mean1)
+  >>> ens=cens({'box1':ta_zonal_mean,'box2':ta_zonal_mean1})
   >>> figens=curves(ens,title="zonal mean")
   >>> cshow(figens)
   >>> # Same as above and X and Y are inverted

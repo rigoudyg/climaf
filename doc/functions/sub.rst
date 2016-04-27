@@ -19,7 +19,7 @@ None
  
   >>> ds1= .... #some dataset, with whatever variable
   >>> ds2= .... #some other, compatible dataset
-  >>> ds1_minus_ds2 = sub(ds1,ds2) # ds1 - ds2 ; equivalent to minus(ds1,ds2)
+  >>> ds1_minus_ds2 = sub(ds1,ds2) # ds1 - ds2 
 
   >>> ds1= .... #some dataset, with whatever variable
   >>> c = '-1'  #a constant
@@ -28,5 +28,5 @@ None
 
 **Side effects** : none
 
-**Implementation** : shortcut to 'minus(dat1,dat1)' and ccdo(dat,operator='subc,'+c)
+**Implementation** : shortcut to ccdo2(dat1,dat2,operator='sub') and ccdo(dat,operator='subc,'+c)
 

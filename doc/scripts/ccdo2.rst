@@ -21,7 +21,7 @@ Apply CDO on two datasets or objects, with a CDO operator as argument
  
   >>> ds1= .... #some dataset, with whatever variable
   >>> ds2= .... #some dataset, with whatever variable
-  >>> ds1_ds2=ccdo2(ds1,ds2,operator='mul') # 
+  >>> ds1_ds2=ccdo2(ds1,ds2,operator='mul') 
 
 **Side effects** : none
 
