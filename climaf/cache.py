@@ -841,7 +841,20 @@ def rebuild():
     files_in_cache=list_cache()
     crs2filename.clear()
     for files in files_in_cache:
+<<<<<<< variant A
         crs2filename[getCRS(files)]=files
+>>>>>>> variant B
+        filecrs=getCRS(files)
+        if filecrs:
+            crs2filename[filecrs]=files
+        else:
+            os.system('rm -f '+files)
+            clogger.warning("File %s is removed"%files)
+            
+####### Ancestor
+        crs2filename[getCRS(files)]=files
+
+======= end
     return(crs2filename)
     
 

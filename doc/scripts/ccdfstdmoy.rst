@@ -52,7 +52,8 @@ See also:
   - secondary outputs and their names :
      - ``moy`` : field mean value (variable: IN-var, same units than input variables)
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>` 
 
   >>> duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O") # some dataset, with whatever variable
   >>> my_cdfstd_moy=ccdfstdmoy(duo)

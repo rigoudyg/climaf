@@ -69,7 +69,8 @@ resolution).
      - ``sig2`` : field potential density sigma 2
      - ``sig4`` : field potential density sigma 4
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools.py <../../examples/cdftools.py>` 
 
   >>> dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O") # dataset with salinity
   >>> dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") # dataset with temperature

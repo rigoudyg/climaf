@@ -10,9 +10,9 @@ Changes, newest first :
 
 - 2016/04/22 - Version 1.0 :
 
-  - **Ensembles are now handled as dictionnaries. This breaks upward compatibility**. This allows to add and
-    pop members easily. The members can be ordered. See
-    :py:func:`~climaf.classes.cens`
+- **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.
+  This allows to add and  pop members easily. The members can be ordered. See
+  :py:func:`~climaf.classes.cens`
 
   - New standard operators:
 
@@ -99,14 +99,42 @@ Changes, newest first :
 
         - :py:func:`~climaf.functions.projects`
 
+  - New Drakkar CDFTools operators interfaced (see example :download:`cdftools.py
+    <../examples/cdftools.py>`):
+    - :doc:`scripts/ccdfzonalmean`,
+    - :doc:`scripts/ccdfzonalmean_bas`,
+    - :doc:`scripts/ccdfsaltc` 
+      
+  - Modification for example :download:`atlasoce.py
+    <../examples/atlasoce.py>` because CDFTools were modified 
 
-  - Changes for standard operator ``plot`` : Tick marks are smartly
-    adapted to the time period duration for (t,z) profiles and the new
-    argument ``fmt`` to change this format is available (see
-    :doc:`scripts/plot`)   
+  - New function :py:func:`~climaf.api.cerr()` displays file
+    'last.out' (stdout and stderr of script call)  
 
+  - New arguments for standard operators ``plot`` (see
+    :doc:`scripts/plot`) and  ``curves`` (see :doc:`scripts/curves`) :
+    ``scale_aux`` and ``offset_aux`` to scale the input auxiliary
+    field for ``plot`` and to scale of the second to the nth
+    input auxiliary field for ``curves``.   
 
-   - Technical :
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - Tick marks are smartly adapted to the time period duration
+      for (t,z) profiles 
+    - new arg ``fmt`` to change time axis labels format 
+    - new arg ``color`` to define your own color map using named colors
+    - you can now use argument ``invXY`` for cross-section
+    - Bug fixes :
+    
+      - for argument ``reverse``
+      - when reading latitude and longitude in file 'coordinates.nc' for curvilinear grid;  
+      - for y axis style when ``invXY`` is used for (t,z) profiles
+
+  - Change for standard operator ``slice`` : extract a slice on
+    specified dimension now at a given range instead of a given value
+    before (see :doc:`scripts/slice`)  
+
+  - Technical :
   
     - it is possible to discard stamping of files in cache (see cache.stamping)
     - disambiguating filenames in cache relies only on their length (60)
@@ -114,6 +142,8 @@ Changes, newest first :
     - critical errors now exit
     - fix in mcdo.sh:nemo_timefix
     - project 'em' is based on generic organization
+    - re-design code of gplot.ncl
+
 
 
 - 2016/03/25 :

@@ -9,6 +9,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl" 
 
 ;--------------------------------------------------------------------------------------------
+
 undef("str_convert")
 ; Convert an input string into logical, integer, float or the same string
 function str_convert(str:string)
@@ -186,9 +187,89 @@ end
 
 ;--------------------------------------------------------------------------------------------
 
+undef("check_zaxis")
+; Check if dimension 'k' of 'field' is a vertical axis
+function check_zaxis(field:numeric, k:integer)
+
+local vardims
+begin
+  
+  vardims = getVarDimNames(field)  ; getting dimensions from metadata
+  zaxis=False
+
+  if ( .not. ismissing(str_match(vardims(k),"dept")) \
+    .or. ( .not. ismissing(vardims(k)) .and. ( (vardims(k) .eq. "sigma") \
+         .or. (vardims(k) .eq. "z") .or. (vardims(k) .eq. "Z") \
+         .or. (vardims(k) .eq. "plev") .or. (vardims(k) .eq. "lev") .or. (vardims(k) .eq. "level") \
+         .or. (vardims(k) .eq. "p") .or. (vardims(k) .eq. "pressure") ) ) \
+    .or. ( iscoord(field,vardims(k)) .and. isatt(field&$vardims(k)$,"axis") \
+         .and. ((field&$vardims(k)$@axis .eq. "z") .or. (field&$vardims(k)$@axis .eq. "Z")) ) \
+    .or. ( iscoord(field,vardims(k)) .and. isatt(field&$vardims(k)$,"standard_name") \
+         .and. ( .not. ismissing(str_match(field&$vardims(k)$@standard_name,"depth")) \
+         .or. .not. ismissing(str_match(field&$vardims(k)$@standard_name,"level")) \
+         .or. .not. ismissing(str_match(field&$vardims(k)$@standard_name,"height")) ) ) ) then
+    zaxis=True
+  end if
+ 
+  delete(vardims)
+  return(zaxis)
+  
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("check_map")
+; Check if 'field' of rank 2 is a map, 'lat_tab' is the latitude array and the latitude variable 
+; name is 'lat_name' (same as for 'lon_tab' and 'lon_name')
+function check_map(field:numeric, lat_name:string, lon_name:string, lat_tab:numeric, lon_tab:numeric) 
+
+local vardims, zaxis_exist
+begin
+  
+  vardims = getVarDimNames(field)  ; getting dimensions from metadata
+  map=False
+  
+  ; check if one of dimensions is a vertical axis
+  zaxis_exist=False
+  do k=0,1
+    if check_zaxis(field, k) then
+      map=False
+      zaxis_exist=True
+    end if
+  end do
+              
+  ; if any dimension is a vertical axis, we check if we have a map
+  if .not. zaxis_exist then
+    if ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lon_name)))  \ 
+         .and. (.not. ismissing(str_match(field@coordinates,lat_name))) \
+         .and. ( (isatt(lat_tab,"standard_name") .and. (lat_tab@standard_name .eq. "latitude") \
+               .and. isatt(lon_tab,"standard_name") .and. (lon_tab@standard_name .eq. "longitude")) \ 
+         .or. ( isatt(lat_tab,"axis") .and. ((lat_tab@axis .eq. "y") .or. (lat_tab@axis .eq. "Y")) \
+               .and. isatt(lon_tab,"axis") .and. ((lon_tab@axis .eq. "x") .or. (lon_tab@axis .eq. "X")) ) ) ) \
+      .or. ( (.not. ismissing(str_match(vardims(0),lat_name))) \ 
+               .and. (.not. ismissing(str_match(vardims(1),lon_name))) ) \
+      .or. ( iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"standard_name") \
+           .and. (field&$vardims(0)$@standard_name .eq. "latitude") \
+           .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"standard_name") \
+           .and. (field&$vardims(1)$@standard_name .eq. "longitude") ) \
+      .or. (  iscoord(field,vardims(0)) .and. isatt(field&$vardims(0)$,"axis") \
+           .and. ( (field&$vardims(0)$@axis .eq. "y") .or. (field&$vardims(0)$@axis .eq. "Y") ) \
+           .and. iscoord(field,vardims(1)) .and. isatt(field&$vardims(1)$,"axis") \
+           .and. ( (field&$vardims(1)$@axis .eq. "x") .or. (field&$vardims(1)$@axis .eq. "X") ) ) then
+      map =True
+    end if
+  end if
+
+  delete(vardims)
+  return(map)
+
+end
+
+;--------------------------------------------------------------------------------------------
+
 undef("field_reduce")
 ; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
-function field_reduce(filename:string, varname:string, ystyle:string, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical, tz_profile:logical)
+function field_reduce(filename:string, varname:string, ystyle:string, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical)
 
 local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
 begin
@@ -274,29 +355,16 @@ begin
       fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list)
         
       ; case where (t,z,y) or (t,z,x) are not degenerated
-      if (isvar("level")) .and. ( .not. ismissing(str_match(Var_DimNames(1),"dept")) \
-        .or. (Var_DimNames(1) .eq. "sigma") .or. (Var_DimNames(1) .eq. "z") .or. (Var_DimNames(1) .eq. "Z") \
-        .or. (Var_DimNames(1) .eq. "plev") .or. (Var_DimNames(1) .eq. "lev") .or. (Var_DimNames(1) .eq. "level") \
-        .or. (Var_DimNames(1) .eq. "p") .or. (Var_DimNames(1) .eq. "pressure") \
-        .or. ( iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
-        .and. ((field&$Var_DimNames(1)$@axis .eq. "z") .or. (field&$Var_DimNames(1)$@axis .eq. "Z")) ) ) then
-
+      if isvar("level") .and. check_zaxis(field,1) then
         delete(field)
         field=fldtmp
         delete(fldtmp)
-
         fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
       end if  
 
     else
       ; case where (z,y,x) are not degenerated
-      if (isvar("level")) .and. ( .not. ismissing(str_match(Var_DimNames(0),"dept")) \
-        .or. (Var_DimNames(0) .eq. "sigma") .or. (Var_DimNames(0) .eq. "z") .or. (Var_DimNames(0) .eq. "Z") \
-        .or. (Var_DimNames(0) .eq. "plev") .or. (Var_DimNames(0) .eq. "lev") .or. (Var_DimNames(0) .eq. "level") \
-        .or. (Var_DimNames(0) .eq. "p") .or. (Var_DimNames(0) .eq. "pressure") \
-        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
-        .and. ((field&$Var_DimNames(0)$@axis .eq. "z") .or. (field&$Var_DimNames(0)$@axis .eq. "Z")) ) ) then
-
+      if isvar("level") .and. check_zaxis(field,0) then
         fldtmp=data_select("level", level, field, Var_DimNames(0), extract_list)
        else
         ; case where no time/level arguments or 'bad' files
@@ -315,87 +383,65 @@ begin
  end if ; rk eq 3  
 
   ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
+  ; We have a true cross-section, a horizontal map or a profile (t,z)
   if (rank .eq. 2) then
     delete(Var_DimNames)
-    Var_DimNames=getVarDimNames(field) 
-    
-    if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lon"))) .or. (.not. ismissing(str_match(field@coordinates,"LON"))) ) \ 
-           .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
-      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"lat"))) \ 
-           .and. (.not. ismissing(str_match(Var_DimNames(1),"lon"))) ) \
-      .or. ( (.not. ismissing(str_match(Var_DimNames(0),"LAT"))) \ 
-           .and. (.not. ismissing(str_match(Var_DimNames(1),"LON"))) ) \
-      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-           .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") \
-           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
-           .and. (field&$Var_DimNames(1)$@standard_name .eq. "longitude") ) \
-      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-           .and. (field&$Var_DimNames(0)$@standard_name .eq. "Latitude") \
-           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"standard_name") \
-           .and. (field&$Var_DimNames(1)$@standard_name .eq. "Longitude") ) \
-      .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
-           .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) \
-           .and. iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") \
-           .and. ( (field&$Var_DimNames(1)$@axis .eq. "x") .or. (field&$Var_DimNames(1)$@axis .eq. "X") ) ) then
-      horizontal=True 
-    end if
-    
-    ;We have a true cross-section, a horizontal map or a profile (t,z)
+    Var_DimNames=getVarDimNames(field)
+   
     if (ystyle .eq. "log") then useXY=False end if
-    ;latname="lat"
-    if (.not.ismissing(Var_DimNames(0)) .and. (Var_DimNames(0) .eq. "lat")) \
-        .or. (.not.ismissing(Var_DimNames(1)) .and. (Var_DimNames(1) .eq. "lat")) \
-        .or. (isatt(field,"coordinates") .and. ((field@coordinates .eq. "lat lon")  \
-        .or. (field@coordinates .eq. "lon lat"))) then
-      latname="lat"
-      lonname="lon"
-    end if
-    if ( .not. ismissing(str_match(Var_DimNames,"latitude")) .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,"latitude"))) ) then
-      latname="latitude"
-      lonname="longitude"
-    end if
-    if ( .not. ismissing(str_match(Var_DimNames,"LAT")) .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,"LAT"))) ) then
-      latname="LAT"
-      lonname="LON"
-    end if
-    if ( ismissing(str_match(Var_DimNames,"lat")) .and. ismissing(str_match(Var_DimNames,"LAT")) ) then
-      if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) \
-        .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) \ 
-        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-             .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
-        .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
-             .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
-        useLatDim=True
-        if isfilevar(ffile,"nav_lat") then 
-          latname="nav_lat" 
-          lonname="nav_lon"
+   
+    ; get latitude and/or longitude name
+    latnames=(/"lat", "LAT", "latitude", "nav_lat"/)     ; dimnames(0,:)
+    lonnames=(/"lon", "LON", "longitude", "nav_lon"/)    ; dimnames(1,:)
+    dimnames=(/latnames, lonnames/)
+
+    do k=0,1 
+      do i=0, dimsizes(dimnames(k,:))-1
+        if ( .not. ismissing(str_match(Var_DimNames,dimnames(k,i))) \
+          .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,dimnames(k,i)))) ) then
+          if (k .eq. 0) then latname=latnames(i) end if
+          if (k .eq. 1) then lonname=lonnames(i) end if
         end if
-      end if
-    end if
+      end do
+    end do
+
+    ; for curvilinear grid
+    do k=0,1
+      do i=0, dimsizes(latnames)-1
+        if ismissing(str_match(Var_DimNames,latnames(i))) then 
+          if ( isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,latnames(i))) ) \ 
+            .or. ( iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"standard_name") \
+            .and. (field&$Var_DimNames(k)$@standard_name .eq. "latitude") ) \
+            .or. (  iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"axis") \
+            .and. ( (field&$Var_DimNames(k)$@axis .eq. "y") .or. (field&$Var_DimNames(k)$@axis .eq. "Y") ) ) then
+            useLatDim=True
+          end if
+        end if
+      end do
+    end do
    
     if ( isfilevar(ffile,"nav_lat") .and. isfilepresent("coordinates.nc") ) \ 
       .or. ( isfilevar(ffile,"nav_lat") .and. isfilepresent("mesh_mask.nc") ) then
       
       if isfilepresent("coordinates.nc") then
         coord_file=addfile("coordinates.nc","r")
-        
-        if isfilevar(coord_file,"gphit") then
+
+	if isfilevar(coord_file,"gphit") then 
            lat_dim=coord_file->gphit
-           lat_dim_tmp=rm_single_dims(lat_dim)
-           delete(lat_dim)
-           lat_dim=lat_dim_tmp
-           delete(lat_dim_tmp)
+	   lat_dim_tmp=rm_single_dims(lat_dim)
+	   delete(lat_dim)
+	   lat_dim=lat_dim_tmp
+	   delete(lat_dim_tmp)
            lat_dim@standard_name="latitude"
-        end if
-        if isfilevar(coord_file,"glamt") then     
-           lon_dim=coord_file->glamt
+	end if
+	if isfilevar(coord_file,"glamt") then 	
+	   lon_dim=coord_file->glamt
            lon_dim_tmp=rm_single_dims(lon_dim)
            delete(lon_dim)
            lon_dim=lon_dim_tmp
            delete(lon_dim_tmp)
            lon_dim@standard_name="longitude"
-        end if
-        
+	end if
       else
 
         if isfilepresent("mesh_mask.nc") then
@@ -409,11 +455,18 @@ begin
       if isfilevar(ffile,"nav_lat") then
         print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
       end if
-      ;print("latname="+latname)
-      if ( isvar("latname") .and. ( .not. ismissing(str_match(Var_DimNames,latname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,latname))) ) ) ) then lat_dim=ffile->$latname$ end if
-      if ( isvar("lonname") .and. ( .not. ismissing(str_match(Var_DimNames,lonname)) .or. ( isatt(field,"coordinates") .and. (.not. ismissing(str_match(field@coordinates,lonname))) ) ) ) then lon_dim=ffile->$lonname$ end if	
+
+      if isvar("latname") then lat_dim=ffile->$latname$ end if
+      if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
     end if
 
+    ; check if we have a horizontal map
+    if isvar("latname") .and. isvar("lonname") then 
+      horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
+    else
+      horizontal=False
+    end if
+    
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
@@ -422,11 +475,7 @@ begin
     hor_dim=field&$Var_DimNames(0)$
     vprofile=False
     useXY=True
-    if ( .not. ismissing(str_match(Var_DimNames(0),"dept")) .or. (Var_DimNames(0) .eq. "sigma") \
-      .or. (Var_DimNames(0) .eq. "z") .or. (Var_DimNames(0) .eq. "Z") \
-      .or. (Var_DimNames(0) .eq. "plev") .or. (Var_DimNames(0) .eq. "lev") .or. (Var_DimNames(0) .eq. "level") \
-      .or. (Var_DimNames(0) .eq. "p") .or. (Var_DimNames(0) .eq. "pressure") \
-      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") .and. ( (field&$Var_DimNames(0)$@axis .eq. "z") .or. (field&$Var_DimNames(0)$@axis .eq. "Z") ) ) ) then
+    if check_zaxis(field,0) then
       print("We have a vertical profile")
       vprofile=True
     end if
@@ -448,7 +497,6 @@ begin
        return([/field, lat_dim/]) 
     end if	 
     if .not. isvar("lon_dim") .and. .not. isvar("lat_dim") then  
-      tz_profile=True
       lat_exist=False
       lon_exist=False
       return([/field/])
@@ -459,12 +507,99 @@ end
 
 ;--------------------------------------------------------------------------------------------
 
+undef("field_transpose")
+; Transpose 'field' of rank 2
+function field_transpose(field:numeric)
+
+local VarDim, tr_fld
+begin
+  
+  VarDim=getVarDimNames(field) 
+  if .not. any(ismissing(VarDim)) then  
+    tr_fld=field($VarDim(1)$|:,$VarDim(0)$|:)
+  else
+    print("Field contains missing dimension names for the given variable " \
+    + "so 'invXY' will not invert X and Y axis")
+    tr_fld=field
+  end if
+  delete(VarDim)  
+  return(tr_fld)
+  
+end  
+
+;--------------------------------------------------------------------------------------------
+
+undef("time_labels")
+; If 'field' contains a time dimension, add additional resources to 'fct_res' to produce 
+; nicely-formatted time labels on time axis. This function only works if you have a time 
+; 'units' recognized by the cd_calendar function.
+procedure time_labels(field:numeric, fct_res:logical)
+
+local VarDim
+begin
+
+  VarDim=getVarDimNames(field)
+ 
+  do k=0, dimsizes(VarDim)-1
+    if ( .not. ismissing(str_match(VarDim(k),"time")) \
+      .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,"time"))) \
+      .or.  ( iscoord(field,VarDim(k)) .and. isatt(field&$VarDim(k)$,"standard_name") \
+      .and. (field&$VarDim(k)$@standard_name .eq. "time") )) then
+      
+      restick=True
+
+      if (k .eq. 0) then restick@ttmAxis="YL" end if ; "XB" by default 
+      if (isvar("fmt")) then restick@ttmFormat=fmt end if
+      time_axis_labels(field&$VarDim(k)$,fct_res,restick)           
+    end if
+  end do
+
+  return
+end
+
+;--------------------------------------------------------------------------------------------
+
+undef("time_position")
+; Return position of time dimension for 'field'
+function time_position(field:numeric)
+
+local VarDim
+begin
+  
+  VarDim=getVarDimNames(field) 
+
+  it=-1
+  do k=0, dimsizes(VarDim)-1
+    if ( .not. ismissing(str_match(VarDim(k),"time")) \
+      .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,"time"))) \
+      .or.  ( iscoord(field,VarDim(k)) .and. isatt(field&$VarDim(k)$,"standard_name") \
+      .and. (field&$VarDim(k)$@standard_name .eq. "time") )) then
+      it=it+k+1
+    end if
+  end do
+
+  delete(VarDim)  
+  return(it)
+
+end
+
+;--------------------------------------------------------------------------------------------
+
 
 begin
 
-  if (.not. isvar("cmap")) then cmap="BlueDarkRed18" end if
+  if (.not. isvar("colormap")) then colormap="BlueDarkRed18" end if
+  if isvar("colormap") .and. .not. ismissing(str_match(colormap,",")) then 
+    colornames=str_split(colormap,",")
+    delete(colormap)
+    colormap=colornames
+    delete(colornames)  
+  end if
+  
   if (.not. isvar("myscale")) then myscale=1.0 end if
   if (.not. isvar("myoffset")) then myoffset=0.0 end if
+  if (.not. isvar("myscale_aux")) then myscale_aux=myscale end if
+  if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
   LABELON=False
@@ -520,12 +655,11 @@ begin
   vprofile=False
   lat_exist=True  
   lon_exist=True
-  tz_profile=False
 
   ; Reading main field and reduction if necessary
   main_field_select=""
-  array=field_reduce(main_file, main_var, y, useXY, horizontal, useLatDim, vprofile, main_field_select, lat_exist, lon_exist, tz_profile)
-  
+  array=field_reduce(main_file, main_var, y, useXY, horizontal, useLatDim, vprofile, main_field_select, lat_exist, lon_exist)
+
   fld=array[0]
   if (ListCount(array) .eq. 2) .and. useXY then ; rk eq 1
     hdim=array[1]
@@ -561,7 +695,6 @@ begin
     power10=0
   end if
   
-  
   ;-----------------------
   ; Auxiliary field: fld2
   ;-----------------------
@@ -573,18 +706,16 @@ begin
     print("---------------------")
 
     useLatDim2=False
-    
     useXY_dummy=False
     horizontal_dummy=False
     vprofile_dummy=False
     lat_exist_dummy=True  
     lon_exist_dummy=True
-    tz_profile_dummy=False
-
+  
     ; Reading auxiliary field and reduction if necessary
     aux_field_select=""
-    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy, tz_profile_dummy)
-      
+    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy)
+ 
     fld2=array2[0]
     if (ListCount(array2) .eq. 2) .and. useXY_dummy then
       hdim2=array2[1]
@@ -598,6 +729,8 @@ begin
         if (lon_exist_dummy .and. .not. lat_exist_dummy) then londim2=array2[1] end if
       end if
     end if
+      
+    fld2=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
   
   end if ; AUX_FIELD is True
 
@@ -620,12 +753,11 @@ begin
     vprofile_dummy=False
     lat_exist_dummy=True
     lon_exist_dummy=True
-    tz_profile_dummy=False
 
     useLatDimv=False
     uselect=""
-    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy, tz_profile_dummy)
-      
+    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy)
+ 
     fld3=array3[0]
     if (ListCount(array3) .eq. 2) .and. useXY_dummy then
       print("Rank data for vector u is 1 !!! Vectors fields must have a rank >= 2 !")
@@ -643,7 +775,7 @@ begin
     ; Reading vector v and reduction if necessary
     useLatDimv=False
     vselect=""
-    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy, tz_profile_dummy)
+    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy)
 
     fld4=array4[0]
     if (ListCount(array4) .eq. 2) .and. useXY_dummy then
@@ -671,10 +803,10 @@ begin
         new_gcosv=rm_single_dims(gcosv)
         new_gsinv=rm_single_dims(gsinv)
         ; Rotation
-        x=fld3
-        y=fld4
-        fld3 = x * new_gcosu - y * new_gsinu
-        fld4 = x * new_gsinv + y * new_gcosv
+        vx=fld3
+        vy=fld4
+        fld3 = vx * new_gcosu - vy * new_gsinu
+        fld4 = vx * new_gsinv + vy * new_gcosv
       else
         print("File angles.nc cannot be accessed")
         status_exit(2)
@@ -727,7 +859,8 @@ begin
   ;  type@wkPDFResolution = 3600
   ;end if
   wks = gsn_open_wks(type,plotname)
-  gsn_define_colormap(wks,cmap) 
+  gsn_define_colormap(wks,colormap)
+
   i = NhlNewColor(wks,0.8,0.8,0.8)
   ; reverse colormap
   if (isvar("reverse") .and. reverse) then gsn_reverse_colormap(wks) end if
@@ -1274,138 +1407,86 @@ begin
       end if 
     else ; cross-section or (t,z) profile
       
-      if (y .eq. "log") then
-
-        print("using gsn_csm_pres_hgt")
-        if tz_profile then
-          VarDim=getVarDimNames(fld) 
-          restick=True
-          if (isvar("invXY") .and. invXY) then  
-            tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-            delete(fld)
-            fld=tr_fld
-            delete(tr_fld)
-          else
-            restick@ttmAxis="YL"  ; "XB" by default
-          end if
-          if (isvar("fmt")) then restick@ttmFormat=fmt end if
-          time_axis_labels(fld&$VarDim(0)$,res,restick)
-        end if
-        if isvar("options") then res_list(options, res) end if 
-        plot0=gsn_csm_pres_hgt(wks,fld,res)
-        if .not. AUX_FIELD then
-          if(LEVELS_CONTOURS) then
-            res2@tmYRMode = "Automatic" ; turn off special labels on right axis
-            if isvar("options") then res_list(options, res2) end if 
-            plot1=gsn_csm_pres_hgt(wks,fld,res2)
-          end if
+      time_pos=time_position(fld)
+      
+      if (y .eq. "index") then
+        print("using gsn_csm_contour; y with index-linear spacing")
+        
+        if ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+          res@trXReverse        = True ; reverse X-axis
         else
-          res2@tmYRMode = "Automatic"   ; turn off special labels on right axis
-          if tz_profile .and. (isvar("invXY") .and. invXY) then  
-            delete(VarDim)
-            VarDim=getVarDimNames(fld2) 
-            tr_fld2=fld2($VarDim(1)$|:,$VarDim(0)$|:)
-            delete(fld2)
-            fld2=tr_fld2
-            delete(tr_fld2)
-          end if 
-          if isvar("aux_options") then res_list(aux_options, res2) end if 
-          plot1=gsn_csm_pres_hgt(wks,fld2,res2)
-          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+          res@trYReverse        = True ; reverse Y-axis
         end if
-
-      else
-
-        if (y .eq. "index") then
-
-          print("using gsn_csm_contour; y with index-linear spacing")
-          ;useless :
-          ;res@sfYArray            = zdim
-          res@trYReverse        = True ; reverse Y-axis          
-          if tz_profile then
-            VarDim=getVarDimNames(fld) 
-            restick = True
-            if (isvar("invXY") .and. invXY) then  
-              tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-              delete(fld)
-              fld=tr_fld
-              delete(tr_fld)
-            else
-              restick@ttmAxis="YL"  ; "XB" by default
-            end if
-            if (isvar("fmt")) then restick@ttmFormat=fmt end if
-            time_axis_labels(fld&$VarDim(0)$,res,restick)
-          end if
-          if isvar("options") then res_list(options, res) end if 
-          plot0=gsn_csm_contour(wks,fld,res)
-          if .not. AUX_FIELD then
-            if(LEVELS_CONTOURS) then
-              if isvar("options") then res_list(options, res2) end if 
-              plot1=gsn_csm_contour(wks,fld,res2)
-            end if
-          else
-            if tz_profile .and. (isvar("invXY") .and. invXY) then  
-              delete(VarDim)
-              VarDim=getVarDimNames(fld2) 
-              tr_fld2=fld2($VarDim(1)$|:,$VarDim(0)$|:)
-              delete(fld2)
-              fld2=tr_fld2
-              delete(tr_fld2)
-            end if  
-            if isvar("aux_options") then res_list(aux_options, res2) end if 
-            plot1=gsn_csm_contour(wks,fld2,res2)
-            if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
-          end if
-
-        else 
-       
-          if (y .eq. "lin") then
+      end if
           
-            print("using gsn_csm_contour; y with data-linear spacing")
-            res@trYReverse        = True ; reverse Y-axis
-            res@gsnYAxisIrregular2Linear= True
-            if tz_profile then
-              VarDim=getVarDimNames(fld) 
-              restick=True
-              if (isvar("invXY") .and. invXY) then  
-                tr_fld=fld($VarDim(1)$|:,$VarDim(0)$|:)
-                delete(fld)
-                fld=tr_fld
-                delete(tr_fld)
-              else
-                restick@ttmAxis="YL"  ; "XB" by default
-              end if
-              if (isvar("fmt")) then restick@ttmFormat=fmt end if
-              time_axis_labels(fld&$VarDim(0)$,res,restick)
-            end if
-            if isvar("options") then res_list(options, res) end if 
-            plot0=gsn_csm_contour(wks,fld,res)
-            if .not. AUX_FIELD then
-              if(LEVELS_CONTOURS) then
-                res2@gsnYAxisIrregular2Linear= True
-                if isvar("options") then res_list(options, res2) end if 
-                plot1=gsn_csm_contour(wks,fld,res2)
-              end if
-            else              
-              res2@gsnYAxisIrregular2Linear= True
-              if tz_profile .and. (isvar("invXY") .and. invXY) then  
-                delete(VarDim)
-                VarDim=getVarDimNames(fld2) 
-                tr_fld2=fld2($VarDim(1)$|:,$VarDim(0)$|:)
-                delete(fld2)
-                fld2=tr_fld2
-                delete(tr_fld2)
-              end if 
-              if isvar("aux_options") then res_list(aux_options, res2) end if 
-              plot1=gsn_csm_contour(wks,fld2,res2)
-              if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
-            end if
+      if (y .eq. "lin") then
+        print("using gsn_csm_contour; y with data-linear spacing")
+        
+        if ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+          res@trXReverse        = True ; reverse X-axis
+          res@gsnXAxisIrregular2Linear= True
+          if ( (.not. AUX_FIELD .and. LEVELS_CONTOURS) .or. AUX_FIELD ) then res2@gsnXAxisIrregular2Linear= True end if
+        else
+          res@trYReverse        = True ; reverse Y-axis
+          res@gsnYAxisIrregular2Linear= True
+          if ( (.not. AUX_FIELD .and. LEVELS_CONTOURS) .or. AUX_FIELD ) then res2@gsnYAxisIrregular2Linear= True end if
+        end if
+      end if
 
+      if (y .eq. "log") then
+        print("using gsn_csm_pres_hgt")
+        
+        if .not. ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+
+          ; turn off special labels on right axis
+          if ( (.not. AUX_FIELD .and. LEVELS_CONTOURS) .or. AUX_FIELD ) then res2@tmYRMode = "Automatic" end if
+        end if
+      end if
+
+      if (isvar("invXY") .and. invXY) then
+        fld_tr=field_transpose(fld)
+        delete(fld)
+        fld=fld_tr
+        delete(fld_tr)
+        if AUX_FIELD then
+          fld2_tr=field_transpose(fld2)
+          delete(fld2)
+          fld2=fld2_tr
+          delete(fld2_tr)
+        end if
+      end if
+
+      time_labels(fld, res) ; if 'fld' has a time dimension, produce nicely-formatted time labels on time axis
+      
+      if isvar("options") then res_list(options, res) end if 
+      if (y .eq. "lin") .or. (y .eq. "index") then 
+        plot0=gsn_csm_contour(wks,fld,res)
+      else
+        if (y .eq. "log") then plot0=gsn_csm_pres_hgt(wks,fld,res) end if
+      end if
+      if .not. AUX_FIELD then
+        if (LEVELS_CONTOURS) then
+          if isvar("options") then res_list(options, res2) end if 
+          if (y .eq. "lin") .or. (y .eq. "index") then 
+            plot1=gsn_csm_contour(wks,fld,res2)
+          else
+            if (y .eq. "log") then plot1=gsn_csm_pres_hgt(wks,fld,res2) end if
           end if
         end if
+      else
+        if isvar("aux_options") then res_list(aux_options, res2) end if 
+        if (y .eq. "lin") .or. (y .eq. "index") then 
+          plot1=gsn_csm_contour(wks,fld2,res2)
+        else
+          if (y .eq. "log") then plot1=gsn_csm_pres_hgt(wks,fld2,res2) end if
+        end if
+        if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+      end if
 
-      end if 
-    end if
+    end if ; cross-section or (t,z) profile
     
   end if
 

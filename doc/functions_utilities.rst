@@ -5,6 +5,11 @@ Utility functions and variables
 .. default-domain:: python
 
 
+cerr : display the output of last operatior call 
+--------------------------------------------------
+
+.. autodata:: climaf.api.cerr
+
 cpath : path for CliMAF installation directory
 -----------------------------------------------
 

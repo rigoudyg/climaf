@@ -10,6 +10,8 @@
 #
 # - cdfmxlheatc (computed the heat content in the mixed layer)
 #
+# - cdfsaltc (computed the salt content in the mixed layer)
+#
 # - cdfstd =>
 #    * ccdfstd : computes the standard deviation of given variables
 #    * ccdfstdmoy : computes the mean value of the field, in addition to the standard deviation
@@ -19,6 +21,10 @@
 #
 # - cdfvT (computes the time average values for second order products
 #           V.T, V.S, U.T and U.S used in heat and salt transport computation)
+#
+# - cdfzonalmean =>
+#    * ccdfzonalmean : compute the global zonal mean of the given variable 
+#    * ccdfzonalmean_bas : compute the zonal mean of the given variable in a specified sub-basin 
 #
 
 #export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
@@ -44,7 +50,7 @@ dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard])
 # Declare how variables are scattered/groupes among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
-calias("data_CNRM","vo",filenameVar="grid_V_table2.3")
+calias("data_CNRM","vo,vmo",filenameVar="grid_V_table2.3")
 calias("data_CNRM","so,thetao,omlmax",filenameVar="grid_T_table2.2")
 
 # Define defaults facets for datasets 
@@ -55,10 +61,17 @@ cdef("frequency","monthly")
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
 #tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
-fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatcm','ccdfmxlheatcm'],
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatcm',\
+              'ccdfmxlheatcm','ccdfsaltc', 'ccdfzonalmean'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
+
+fixed_fields(['ccdfzonalmean_bas'],
+             ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
+             ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
+             ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'),
+             ('new_maskglo.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_new_maskglo.nc'))
 
 #-----------
 #  cdfmean
@@ -131,6 +144,10 @@ dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O
 my_cdfheatc=ccdfheatcm(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfheatc)
 
+# Select "heatc_2D" in multi-variable output file
+heatc_2D=select(my_cdfheatc, var="heatc_2D")
+ncdump(heatc_2D)
+
 #----------------
 #  cdfmxlheatc
 #----------------
@@ -147,6 +164,24 @@ dmldx=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="
 # Compute the heat content in the mixed layer
 my_cdfmxlheatc=ccdfmxlheatcm(dtho,dmldx)
 cfile(my_cdfmxlheatc)
+
+#-----------
+# cdfsaltc   
+#-----------
+#
+# CDFtools usage :
+# cdfsaltc  T-file ...
+#     ... [imin imax jmin jmax kmin kmax] [-full] 
+#
+# CliMAF usage (ccdfsaltc) :
+#
+
+# Define dataset with salinity 
+dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
+
+# Compute the salt content in the specified area
+my_cdfsaltc=ccdfsaltc(dso,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
+cfile(my_cdfsaltc)
 
 #-----------
 #  cdfstd
@@ -226,3 +261,42 @@ dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 # V.T, V.S, U.T and U.S used in heat and salt transport computation
 my_cdfvT=ccdfvT(dtho,dso,duo,dvo)
 cfile(my_cdfvT)
+
+# Select "vozous" in multi-variable output file
+vozous_var=select(my_cdfvT, var="vozous")
+ncdump(vozous_var)
+
+
+
+#----------------
+#  cdfzonalmean
+#----------------
+#
+# CDFtools usage :
+# cdfzonalmean IN-file point_type [ BASIN-file] [-debug]...
+# ...[-var var1,var2,..] [-max ] [-pdep | --positive_depths]
+#
+# CliMAF usage (ccdfzonalmean, ccdfzonalmean_bas) :
+#
+
+# For example, define dataset with meridional velocity component ("vo")
+dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
+# Compute the zonal mean of "vo"
+my_cdfzmean=ccdfzonalmean(dvo,point_type='V')
+cfile(my_cdfzmean)
+
+# Define dataset with ocean mass component ("vmo") for period "1998"
+dvmo=ds(simulation="PRE6CPLCr2alb", variable="vmo", period="1998", realm="O")
+# Compute the zonal mean of "vmo"
+my_cdfzmean2=ccdfzonalmean(dvmo,point_type='V')
+cfile(my_cdfzmean2)
+# Plot result
+plot_mycdfzmean2=plot(my_cdfzmean2,title='Zonal mean')
+cshow(plot_mycdfzmean2)
+
+# Now, compute the zonal mean of "vmo" in sub-basin 'atl' (file
+# 'new_maskglo.nc' is available via fixed_fields; see above)
+my_cdfzmean_bas=ccdfzonalmean_bas(dvmo,point_type='V',basin='atl')
+# Plot result
+plot_mycdfzmean_bas=plot(my_cdfzmean_bas,title='Zonal mean in sub-basin atl')
+cshow(plot_mycdfzmean_bas)

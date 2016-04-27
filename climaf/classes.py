@@ -785,7 +785,7 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             return compare_trees(tree1.father,tree2.father,
                                  func,filter_on_operator)
 
-allow_errors_on_ds_call=False
+allow_errors_on_ds_call=True #False
 
 def allow_error_on_ds(allow=True) :
     global allow_errors_on_ds_call

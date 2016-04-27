@@ -19,14 +19,12 @@ Set the given constant to missing value.
 
 **Climaf call example**::
  
-  >>> # This example only work on Ciclad
-
   >>> # Plot a model MOC slice
   >>> moc_model=ds(variable="msftmyz", project='CMIP5',model='CNRM-CM5', frequency="mon", realm="ocean",
-  >>> ... table="Omon", version="latest", period="1980", experiment="historical",simulation="r1i1p1")
+  >>> ... table="Omon", version="*", period="1980", experiment="historical",simulation="r1i1p1")
   >>> moc_model_mean=time_average(moc_model)
   >>> # Extract basin of rank 1 (def: Atlantic=1)
-  >>> moc_model_mean_atl=slice(moc_model_mean, dim='x', num=1)
+  >>> moc_model_mean_atl=slice(moc_model_mean, dim='x', min=1, max=1)
   >>> # Mask values
   >>> moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
   >>> # Plot 

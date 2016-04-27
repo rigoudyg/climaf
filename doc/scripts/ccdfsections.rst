@@ -68,7 +68,9 @@ resolution).
      - ``sig2`` : field potential density sigma 2
      - ``sig4`` : field potential density sigma 4
 
-**Climaf call example**:: 
+**Climaf call example**:: For more examples which are systematically
+tested, see :download:`cdftools_multivar.py
+<../../examples/cdftools_multivar.py>`
 
   >>> # Use "data_CNRM" project, where netcdf files with values of so, thetao and rhopoto are defined
   >>> cdef("project","data_CNRM")

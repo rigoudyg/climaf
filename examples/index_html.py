@@ -95,9 +95,10 @@ index += close_table()
 
 
 index += trailer()
-out="index_example.html"
+out=atlas_dir+"/index_example.html"
 with open(out,"w") as filout : filout.write(index)
 
-import os,os.path ; os.system("firefox file://"+os.path.abspath(os.path.curdir)+"/"+out+"&")
+import os,os.path ; os.system("firefox file://"+out+"&")
+
 
 
