@@ -21,7 +21,7 @@ class A_basic(unittest.TestCase):
     def test_1_print_dataset(self):
         pdg=`self.dg`
         print pdg
-        expected="ds('example%AMIPV6ALB2G%tas%1980-1981%global%monthly')"
+        expected="ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')"
         print expected
         self.assertEqual(pdg,expected, 
                          'Issue printing a very basic dataset')
@@ -32,7 +32,7 @@ class A_basic(unittest.TestCase):
         sd=`std`
         actual=sd
         print "actual=",sd
-        expected="mean_and_std(ds('example%AMIPV6ALB2G%tas%1980-1981%global%monthly')).sdev"
+        expected="mean_and_std(ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')).sdev"
         print "expected=",expected
         self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
 

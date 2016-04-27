@@ -8,12 +8,17 @@ Simulation names (or 'EXPIDs') are assumed to be unique in the
 namespace defined by the user's configuration file, which may include
 shared simulation
 
-Example for defining an EM dataset::
+Examples for defining an EM dataset::
 
- >>> tas=ds(project='em', simulation='GSAGNS1', variable='tas', period='1975-1976')
+ >>> tas= ds(project='em', simulation='GSAGNS1', variable='tas', period='1975-1976')
+ >>> pr = ds(project='em', simulation="C1P60", group="SC, variable="pr"   , period="1850")
 
- A number of Seaice fields are duly described with 1.e+20 as missing
- value (which is ill described in data files); see code for details
+See other examples in :download:`examples/data_em.py <../examples/data_em.py>`
+
+The location of ocean variables in the various grid_XX files is for now only partially declared to CliMAF
+
+A number of Seaice fields are duly described with 1.e+20 as missing
+value (which is ill described in data files); see code for details
 
 """
 # S.Senesi - april 2016
@@ -73,11 +78,31 @@ if atCNRM :
     ############################################
 
     # Describe how to locate some ocean variables in multi-variable data files
-    calias("em", 'tos' ,filenameVar='T_table2.2')
-    calias("em", 'sos' ,filenameVar='T_table2.2')
-    calias("em", 'to'  ,filenameVar='T_table2.2')
-    calias("em", 'so'  ,filenameVar='T_table2.2')
-    calias("em", 'zos' ,filenameVar='T_table2.2')
+    calias("em", 'sos' ,filenameVar='S*')
+    calias("em", 'so'  ,filenameVar='S*')
+    calias("em", 'fcalva' ,filenameVar='S*')
+    calias("em", 'fcalvg' ,filenameVar='S*')
+    calias("em", 'omlmax' ,filenameVar='S*')
+    calias("em", 'wfo' ,filenameVar='S*')
+    calias("em", 'friver' ,filenameVar='S*')
+    calias("em", 'e-p' ,filenameVar='S*')
+    calias("em", 'flake' ,filenameVar='S*')
+    
+    calias("em", 'to'  ,filenameVar='T*')
+    calias("em", 'tos' ,filenameVar='T*')
+    calias("em", 'tossq' ,filenameVar='T*')
+    calias("em", 'zos' ,filenameVar='T*')
+    calias("em", 'zossq' ,filenameVar='T*')
+    calias("em", 'nshfls' ,filenameVar='T*')
+    calias("em", 'rsntds' ,filenameVar='T*')
+    
+    calias("em", 'uo' ,filenameVar='U*')
+    calias("em", 'tauuo' ,filenameVar='U*')
+    calias("em", 'uos' ,filenameVar='U*')
+    calias("em", 'vo' ,filenameVar='V*')
+    calias("em", 'tauvo' ,filenameVar='V*')
+    calias("em", 'vos' ,filenameVar='V*')
+
     # .... to be continued
     
     # A fix for seaice missing values

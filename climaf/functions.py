@@ -168,7 +168,7 @@ def clim_average(dat,season):
     """
     Computes climatological averages on the annual cycle of a dataset, on the months 
     specified with 'season', either:
-    - the annual mean climatology (season => 'ann','annual','time_average','clim','climatology','annual_average','anm')
+    - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
     - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology 
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
     - individual monthly climatologies (e.g. season = 'january', 'jan', '1' or 1 to get 
@@ -180,7 +180,7 @@ def clim_average(dat,season):
     clim_average computes the annual cycle for you.
     """
     #
-    if str(season).lower() in ['ann','annual','time_average','clim','climatology','annual_average','anm','annual_mean']:
+    if str(season).lower() in ['ann','annual','climato','clim','climatology','annual_average','anm','annual_mean']:
         avg = time_average(dat)
     else:
         #

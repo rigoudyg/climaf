@@ -8,18 +8,22 @@ Changes, newest first :
 
 - 2016/04/27:
 
-  - A **change breaking backward compatibility** : operator 'minus'
-    was replaced by :doc:`functions/sub`. 
-
-  - A new function :doc:`functions/plot_params`
-
-
 
 - 2016/04/22 - Version 1.0 :
 
-- **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.
-  This allows to add and  pop members easily. The members can be ordered. See
-  :py:func:`~climaf.classes.cens`
+  - **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.
+    This allows to add and  pop members easily. The members can be ordered. See
+    :py:func:`~climaf.classes.cens`
+
+  - Another **change breaking backward compatibility** : operator 'minus'
+    was replaced by :doc:`functions/sub`. 
+
+  - Function :doc:`functions/plot_params` provides plot parameters
+    (colormap, values range, ...) for a number of known geophysical
+    variables, and allows its customization. The expectation is that
+    everybody will contribute values that can be shared, for improving
+    easy common intepretation of evaluation plots
+
 
   - New standard operators:
 
