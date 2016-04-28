@@ -43,5 +43,3 @@ cens : define an ensemble of objects
 
 .. autoclass:: climaf.classes.cens
 
-
-

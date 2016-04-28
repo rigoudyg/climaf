@@ -1,7 +1,13 @@
 add: addition between two CliMAF objects or between a CliMAF object and a constant
 ------------------------------------------------------------------------------------
 
-Addition of two CliMAF object, or addition of the CliMAF object given as first argument and a constant as second argument (string, float or integer)
+Addition of two CliMAF object, or addition of the CliMAF object given
+as first argument and a constant as second argument (string, float or
+integer).
+
+For some case, we need to use :doc:`plus <../scripts/plus>` which is
+equivalent to 'add' (when adding two CliMAF objects) except that is a
+CliMAF operator.  
 
 **References** : https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html
 

@@ -418,7 +418,7 @@ class coperator():
         clogger.error("Not yet developped")
 
 
-def derive(project, derivedVar, Operator, *invars, **params) :
+def derive(project, derivedVar, Operator, *invars, **params):
     """
     Define that 'derivedVar' is a derived variable in 'project', computed by
     applying 'Operator' to input streams which are datasets whose 

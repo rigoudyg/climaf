@@ -15,9 +15,6 @@ Changes, newest first :
     This allows to add and  pop members easily. The members can be ordered. See
     :py:func:`~climaf.classes.cens`
 
-  - Another **change breaking backward compatibility** : operator 'minus'
-    was replaced by :doc:`functions/sub`. 
-
   - Function :py:func:`~climaf.plot.plot_params.plot_params` provides plot parameters
     (colormap, values range, ...) for a number of known geophysical
     variables, and allows its customization. The expectation is that

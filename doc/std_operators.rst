@@ -3,11 +3,19 @@
 Standard operators and functions
 ---------------------------------
 
-CliMAF includes a number of 'Standard Operators' and of 'Standard Functions', which implement more
-or less basic climate diagnostics or utilities. All do return CliMAF objects. Operators are implemented as external
-scripts or binaries, while functions are implemented as python
-functions. Other functions exists, which do not return CliMAF
-objects - see :doc:`API`
+CliMAF includes a number of 'Standard Operators' and of 'Object Functions', which implement more
+or less basic climate diagnostics or utilities :
+
+  - All do return CliMAF objects. 
+  - Operators are implemented as external scripts or binaries, while
+    'object functions' are implemented as python functions. 
+  - operators can be used to define derived variables using
+    function :py:func:`~climaf.operators.derive` , while 'object
+    functions' cannot
+
+
+Other functions exists, which do not return CliMAF
+objects (and are not called 'object fucntions') - see :doc:`API`
 
 The set of standard operators grows
 with scientists contributions (see
@@ -19,14 +27,18 @@ renders :doc:`as shows here <scripts_template>`.
 For each operator, the content of the doc file is also made available
 in the Python on-line help (see :ref:`how_to_list_operators`). 
 
-Documented operators and functions as of today : 
+Documented operators and 'object functions' as of today : 
 
- - arithmetic operators:
+ - arithmetic operations provided as 'object functions' :
     - :doc:`functions/mul`
     - :doc:`functions/div`
     - :doc:`functions/add`
     - :doc:`functions/sub`
     - :doc:`functions/apply_scale_offset`
+
+ - arithmetic operations provided as operators :
+    - :doc:`scripts/plus`
+    - :doc:`scripts/minus`
 
  - swiss knives |sk| :
     - :doc:`scripts/ccdo`
@@ -37,21 +49,21 @@ Documented operators and functions as of today :
     - spatial operations:
         - :doc:`scripts/llbox`
         - :doc:`scripts/space_average`
-        - :doc:`functions/zonmean`
+        - object function :doc:`functions/zonmean`
     - regridding:
         - :doc:`scripts/regrid`
         - :doc:`scripts/regridn`
 	- :doc:`scripts/regridll`
-        - :doc:`functions/zonmean_interpolation`
+        - object function :doc:`functions/zonmean_interpolation`
         - :doc:`scripts/ml2pl`
-    - computing a difference with regridding (typically to compute model biases):
+    - object functions computing a difference with regridding (typically to compute model biases):
         - :doc:`functions/diff_regrid`
         - :doc:`functions/diff_regridn`
         - :doc:`functions/diff_zonmean`
     - temporal operations:
         - :doc:`scripts/time_average`
-        - :doc:`functions/clim_average`
-        - :doc:`functions/annual_cycle`
+        - object function :doc:`functions/clim_average`
+        - object function :doc:`functions/annual_cycle`
     - Others:
         - :doc:`scripts/slice`
         - :doc:`scripts/mask`
