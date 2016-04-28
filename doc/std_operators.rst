@@ -74,6 +74,8 @@ Documented operators and functions as of today :
 		 figure plot. Note that resolution unit is in inches
 		 or using a standard paper size by name
 		 
+.. _note_on_figure_pages:
+
      .. note:: Overview on method to create **a page with several
 	       CliMAF figures**: 
 
@@ -119,6 +121,8 @@ Documented operators and functions as of today :
 		   adjustment in the page, use **'cpage'** and
 		   increase resolution of each figure and also of 
 		   output page  
+
+.. _graphic_operators:
 
     - :doc:`scripts/plot`
     - :doc:`functions/plot_params`

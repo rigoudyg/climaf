@@ -19,12 +19,53 @@ if atIPSL:
    centerspecs=True
 
 def plot_params(variable,context, custom_plot_params=None) :
-    """
-    Return plot parameters as a dict(), according to LMDZ habits , for a given
-    variable and a context (among full_field, bias, model_model)
-    
-    The user can pass his own custom dictionnary of plot parameters with custom_plot_params.
+    """Returns a dictionary of default plotting parameters (isolines,
+    color palettes...) by variable and context, i.e. the full field
+    (full_field), bias (bias), or model-model difference
+    (model_model).
 
+    This type of dictionary is typically passed to plot with "**".
+
+    plot_params first loads a set of default CliMAF plotting parameters for
+    both 'atmos' and 'ocean'. 
+
+    Then, it updates with sets of parameters
+    that are specific to the centers (for instance CNRM or IPSL).
+
+    Eventually, it can take a custom dictionary as an argument; it
+    will use it to update the dictionary (i.e. override matching entries).
+    Such a dictionnary would be build such as the example 
+    at :download:`../climaf/plot/atmos_plot_params.py` 
+
+    Args: 
+      variable (string) : variable name;
+        The name of the geophysical variable to plot
+      context (string) : among 'full_field', 'bias', 'model_model';
+        The kind of plot
+      custom_plot_params : a user dictionnary that will override CliMAF default values
+
+    Returns : a python dictionary with plotting parameters to be 
+    used by plot() 
+
+    Call example ::
+ 
+    >>> var = 'pr'
+    >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))       # here, the annual mean climatology of a CMIP5 dataset for variable var
+    >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...)) # the annual mean climatology of a reference dataset for variable var
+    
+    >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
+    >>> niceplot_params=**plot_params(var,'full_field')
+    >>> climato_plot = plot(climato_dat, nice_plot_params) 
+    >>> bias_plot = plot(bias, **plot_params(var,'bias'))
+    
+    >>> my_custom_params = {'pr':{'bias':{'colors':'-10 -5 -2 -0.5 -0.2 -0.1 0 0.1 0.2 0.5 1 2 5 10'}}}
+    >>> bias_plot_custom_params = plot(bias, **plot_params(var,'bias',custom_plot_params=my_custom_params)
+    
+    >>> # How to import custom params stored in a my_custom_plot_param_file.py file in the working directory
+    >>> from my_custom_plot_param_file import dict_plot_params as my_custom_params
+    >>> bias_plot_custom_params = plot(bias, **plot_params(var,'bias',custom_plot_params=my_custom_params)
+    
+    
     """
 
     defaults = { 

@@ -2,9 +2,15 @@
 """
 CliMAF module ``html`` defines functions for building some html index
 giving acces to figure files, through links bearing a label or through
-thumbnails. It eases iterating over lines and columns in tables. **See
-an example in** :download:`index_html.py <../examples/index_html.py>`
-and :download:`its screen dump <../doc/html_index.png>`
+thumbnails. It eases iterating over lines and columns in tables. 
+
+
+**See a code example in** :download:`index_html.py <../examples/index_html.py>`
+or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |indexh|
+
+.. |indexh| image:: ../doc/html_index.png 
+  :scale: 20%
+
 
 """
 

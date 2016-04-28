@@ -112,11 +112,14 @@ Main field:
      background and foreground colors), ``color`` must be a list of
      named colors separated by comma, e.g. ``color`` =
      "white,black,White,RoyalBlue,LightSkyBlue,PowderBlue,lightseagreen,PaleGreen,Wheat,Brown,Pink". 
-   - ``min``, ``max`` , ``delta`` : min and max values and 
-     levels when applying the colormap (or setting the axis 
-     for profiles), or
-   - ``colors`` : list of levels used when applying colormap
-     e.g. colors="260 270 280 290"
+     See also :py:func:`~climaf.plot.plot_params.plot_params`
+   - either :
+
+     - ``min``, ``max`` , ``delta`` : min and max values and 
+       levels when applying the colormap (or setting the axis 
+       for profiles).     See also :py:func:`~climaf.plot.plot_params.plot_params`
+     - or``colors`` : list of levels used when applying colormap
+       e.g. colors="260 270 280 290"
 
   - ``reverse`` : set it to True to reverse colormap; default: False.
   - ``scale``, ``offset`` : for scaling the input main field (x -> x*scale +

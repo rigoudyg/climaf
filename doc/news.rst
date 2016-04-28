@@ -18,7 +18,7 @@ Changes, newest first :
   - Another **change breaking backward compatibility** : operator 'minus'
     was replaced by :doc:`functions/sub`. 
 
-  - Function :doc:`functions/plot_params` provides plot parameters
+  - Function :py:func:`~climaf.plot.plot_params.plot_params` provides plot parameters
     (colormap, values range, ...) for a number of known geophysical
     variables, and allows its customization. The expectation is that
     everybody will contribute values that can be shared, for improving
@@ -464,7 +464,7 @@ Changes, newest first :
     tables of links (or thumbnails) to image files; iterating on
     e.g. seasons and variables is handled by CliMAF. See :
     
-    - a screen_dump for such an index : |indx| 
+    - a screen dump for such an index : |indx| 
     - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
     - the package documentation : :py:mod:`climaf.html`
   - Function :py:func:`~climaf.driver.cfile` can create **hard
