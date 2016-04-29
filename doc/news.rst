@@ -45,60 +45,60 @@ Changes, newest first :
   - A whole new set of functions, that are mainly 'science oriented'
     shortcuts for specific use of CliMAF operators:
 
-      - ``add``, ``sub``, ``mul`` and ``div`` (now providing the 4
+      - ``fadd``, ``fsub``, ``fmul`` and ``fdiv`` (now providing the 4
 	arithmetic operations). Work between two CliMAF objects of
 	same size, or between a CliMAF object and a constant (provided
 	as string, float or integer)
          
-         - :doc:`functions/add`
+         - :py:func:`~climaf.functions.fadd`
          
-         - :doc:`functions/sub`
+         - :py:func:`~climaf.functions.fsub`
 
-         - :doc:`functions/mul`
+         - :py:func:`~climaf.functions.fmul`
          
-         - :doc:`functions/div`
+         - :py:func:`~climaf.functions.fdiv`
 
       - ``apply_scale_offset`` to apply a scale and offset to a CliMAF object
          
-         - :doc:`functions/apply_scale_offset`
+         - :py:func:`~climaf.functions.apply_scale_offset`
 
       - ``diff_regrid`` and ``diff_regridn`` -> returns the difference between two CliMAF datasets after regridding
          
          ( based on :doc:`scripts/regrid` and :doc:`scripts/regridn` )
          
-         - :doc:`functions/diff_regrid`
+         - :py:func:`~climaf.functions.diff_regrid`
          
-         - :doc:`functions/diff_regridn`
+         - :py:func:`~climaf.functions.diff_regridn`
 
       - ``clim_average`` provides a simple way to compute
         climatological averages (annual mean, seasonal averages,
         one-month climatology...)
          
-         - :doc:`functions/clim_average`
+         - :py:func:`~climaf.functions.clim_average`
 
       - ``annual_cycle`` returns the 12-month climatological annual cycle of a CliMAF object
          
-         - :doc:`functions/annual_cycle`
+         - :py:func:`~climaf.functions.annual_cycle`
 
       - ``zonmean``, ``diff_zonmean`` and ``zonmean_interpolation`` to work on zonal mean fields
          
-         - :doc:`functions/zonmean`
+         - :py:func:`~climaf.functions.zonmean`
          
-         - :doc:`functions/diff_zonmean`
+         - :py:func:`~climaf.functions.diff_zonmean`
          
-         - :doc:`functions/zonmean_interpolation`,
+         - :py:func:`~climaf.functions.zonmean_interpolation`,
 
   - Two functions to display a plot in an IPython Notebook: ``iplot`` and ``implot``
       
-      - :doc:`functions/iplot`
+      - :py:func:`~climaf.functions.iplot`
       
-      - :doc:`functions/implot`
+      - :py:func:`~climaf.functions.implot`
 
   - Functions for an interactive use of ds() and projects:
 
       - ``summary`` lists the files linked with a ds() request, and the pairs facet/values actually used by ds()
 
-        - :doc:`functions/summary`
+        - :py:func:`~climaf.functions.summary`
 
       - ``projects`` returns the listing of the available projects
         with the associated facets (fancy version of cprojects)

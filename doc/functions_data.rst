@@ -48,12 +48,6 @@ cprojects : dictionary of known projects
 
 .. autodata:: climaf.classes.cprojects
 
-projects : returns the list of projects available on the current server with their attributes
-------------------------------------------------------------------------------------------------
-
-.. autofunction:: climaf.functions.projects
-
-
 dataloc : describe data locations for a series of simulations
 --------------------------------------------------------------------------
 
@@ -68,11 +62,6 @@ derive : define a variable as computed from other variables
 --------------------------------------------------------------------------
 
 .. autofunction:: climaf.operators.derive 
-
-summary : returns the netcdf file with the pairs facets/values associated with a CliMAF dataset 
-------------------------------------------------------------------------------------------------
-
-.. autofunction:: climaf.functions.summary
 
 calias : define a variable as computed, in a project,  from another, single, variable
 ----------------------------------------------------------------------------------------

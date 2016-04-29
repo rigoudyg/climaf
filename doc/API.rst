@@ -40,3 +40,6 @@ even if they belong to another module
 .. toctree:: 
    functions_internals
 
+.. toctree::
+   functions_objects 
+
