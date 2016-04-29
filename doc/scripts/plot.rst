@@ -62,7 +62,16 @@ General:
     - "index" : index-linear spacing, or
     - "log" : logarithmic scale
   - ``proj`` : use it to request a stereopolar projection, as e.g. :
-    "NH","SH60"...
+    "NH","SH60"... default: cylindrical equidistant (or native grid,
+    see further below and example :ref:`Climaf call example
+    <native_grid2>`).  
+    
+    If you want to turn off the data re-projection when model is
+    already on a known native grid (currently Lambert only):   
+
+    - you must not use argument ``proj``,
+    - and you must proceed as explained at :ref:`Optional files
+      <native_grid>`.    
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
   - ``time``, ``level`` : for selecting time or level. This arguments
@@ -219,6 +228,17 @@ Vectors:
     dealer. At CNRM you may have a look at
     /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
 
+.. _native_grid:
+
+  - If you want to turn off the data re-projection when model is
+    already on a grid known to the plot script (as e.g. Lambert), you
+    should provide the metadata for this grid by bringing to the
+    script a file which includes it, and is locally named
+    'climaf_plot_grid.nc'. You do that using function
+    :py:func:`~climaf.operators.fixed_fields()`. Such file is not
+    included with CliMAF and must be sought by user. See example
+    :ref:`Climaf call example <native_grid2>`. 
+
 **Outputs** :
   - main output : a PNG or PDF figure
 
@@ -266,6 +286,24 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> plot_map5=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, 
      ... vcRefMagnitudeF=0.02, level=10, time=0) 
+
+.. _native_grid2:
+
+     >>> # A Map without data re-projection (model is already on a known native Lambert grid):
+     >>> tas=fds('/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc', period='197901-201112', variable='tas')
+     >>> moy_tas=time_average(tas) # time average of 'tas'
+     >>> # without bringing to the script the file which includes metadata for the native Lambert grid 
+     >>> # => with default cylindrical equidistant projection 
+     >>> proj=plot(moy_tas,title='ALADIN',min=-12,max=28,delta=2.5,vcb=False) 
+     >>> cshow(proj)
+     >>> # How to get required file which includes metadata for the native Lambert grid named 'climaf_plot_grid.nc'
+     >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
+     >>> # with bringing to the script this file => with default native grid (no re-projection)
+     >>> cdrop(proj) # to re-compute 'proj'
+     >>> cshow(proj)
+     >>> # with a "NH" projection
+     >>> projNH=plot(moy_tas,title='ALADIN - NH40',min=-12,max=28,delta=2.5,proj="NH40") 
+     >>> cshow(projNH)
 
   - A cross-section ::
 

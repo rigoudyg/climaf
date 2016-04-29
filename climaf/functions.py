@@ -351,8 +351,8 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
         else:
             print '--> Provide a list of vertical levels with vertical_levels'
     return regridded_dat1
-    
-        
+
+
 def zonmean(dat):
     """
     Return the zonal mean field of dat

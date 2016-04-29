@@ -6,6 +6,12 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/04/29:
+
+  - Add possibility to turn OFF the data re-projection when model is
+    already on a known native grid (currently Lambert only) for
+    standard operator ``plot`` (see :doc:`scripts/plot`)
+
 - 2016/04/27:
 
   - A new function :doc:`functions/plot_params`
