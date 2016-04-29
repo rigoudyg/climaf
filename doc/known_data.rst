@@ -11,83 +11,83 @@ CliMAF knows a bunch of datasets . Package  ``projects`` is devoted to that :
 
 .. automodule:: climaf.projects
 
-projects.cmip5 
+cmip5 
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.cmip5
 
-projects.ocmip5 
+ocmip5 
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.ocmip5
 
-projects.ref_climatos_and_ts
+ref_climatos_and_ts
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.ref_climatos_and_ts
 
-projects.igcm_out
+igcm_out
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.igcm_out
 
-projects.igcm_out_old
+igcm_out_old
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.igcm_out_old
 
-projects.igcm_out_cmip
+igcm_out_cmip
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.igcm_out_cmip
 
-projects.em 
+em 
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.em
 
-projects.example 
+example 
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.example
 
-projects.erai
+erai
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.erai
 
-projects.erai-land
+erai-land
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.erai_land
 
-projects.ceres
+ceres
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.ceres
 
-projects.cruts3
+cruts3
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.cruts3
 
-projects.gpcc
+gpcc
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.gpcc
 
-projects.gpcp
+gpcp
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.gpcp
 
 
-projects.obs4mips 
+obs4mips 
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.obs4mips
 
-projects.cami
+cami
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.cami

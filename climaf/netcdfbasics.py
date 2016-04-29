@@ -82,15 +82,15 @@ def timeLimits(filename) :
         raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
     #
     from anynetcdf import ncf
+    rep=None
     f=ncf(filename) 
     if 'time_bnds' in f.variables :
         tim=f.variables['time_bnds']
-        start=tim[0,0] ; end=tim[-1,1] 
-        ct=netcdftime.utime(tim.units, calendar=tim.calendar)
-        f.close()
-        return cperiod(ct.num2date(start),ct.num2date(end))
-    else:
-        f.close()
-        return None
+        if 'units' in dir(tim) :
+            start=tim[0,0] ; end=tim[-1,1] 
+            ct=netcdftime.utime(tim.units, calendar=tim.calendar)
+            return cperiod(ct.num2date(start),ct.num2date(end))
+    f.close()
+    return rep
     #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
         

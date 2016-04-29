@@ -8,10 +8,19 @@ Simulation names (or 'EXPIDs') are assumed to be unique in the
 namespace defined by the user's configuration file, which may include
 shared simulation
 
+Specific facets are : 
+  - root : root directory for private data files as declared to EM
+  - group : group of the simualtion (as declared to ECLIS)
+  - frequency : for now, only monthly is managed; it is the default
+  - realm : to speed up data search, and to resolve ambiguities. Usable values 
+    are 'A, Atmos, O, Ocean, I, SeaIce, L, Land. Unfortunately, for now, 
+    you have to know whether you data is on a private dir (use e.g. 'A') or a 
+    shared one (use e.g. Atmos). Default is '*' (costly). 
+
 Examples for defining an EM dataset::
 
- >>> tas= ds(project='em', simulation='GSAGNS1', variable='tas', period='1975-1976')
- >>> pr = ds(project='em', simulation="C1P60", group="SC, variable="pr"   , period="1850")
+ >>> tas= ds(project='em', simulation='GSAGNS1', variable='tas', period='1975-1976', realm="(A|Atmos)")
+ >>> pr = ds(project='em', simulation="C1P60", group="SC, variable="pr"   , period="1850", realm="(O|Ocean)"))
 
 See other examples in :download:`examples/data_em.py <../examples/data_em.py>`
 
@@ -35,7 +44,7 @@ if atCNRM :
     # REALMS, and we handle data FREQUENCY
     # 'root' stands for em root directory for alla experiment data (EM_NETCDF_DIR)
 
-    cproject("em","root","group","realm", "frequency",separator="|")
+    cproject("em","root","group","realm", "frequency",separator="$")
 
     # Describe data organization : file hierarchy and filename patterns
     ######################################################################
@@ -52,10 +61,10 @@ if atCNRM :
     
     # Shared simulations - example : group=SC
     pathg="/cnrm/aster/data1/simulations/${group}/"
-    pathgA=pathg+"Atmos/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
-    pathgL=pathg+"Land/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
-    pathgI=pathg+"Seaice/Origin/Monthly/${simulation}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8
-    pathgO=pathg+"Ocean/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" 
+    pathgA=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
+    pathgL=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
+    pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8
+    pathgO=pathg+"${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" 
     
     dataloc(project="em", organization="generic", url=[pathgA,pathgL,pathgI,pathgO])
     

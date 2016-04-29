@@ -801,7 +801,8 @@ def select_projects(**kwargs):
     else:
         p_list = kwargs['project']
     if not isinstance(p_list,list):
-        p_list = [p_list]
+        #p_list = [p_list]
+        return kwargs
     for project in p_list:
         wkwargs = kwargs.copy()
         wkwargs.update(dict(project=project))

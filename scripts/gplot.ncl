@@ -680,7 +680,10 @@ begin
   end if
   
   units=units 
-  fld=fld*tofloat(myscale)+tofloat(myoffset)
+  tmpfld=fld*tofloat(myscale)+tofloat(myoffset)
+  delete(fld)
+  fld=tmpfld
+  delete(tmpfld)
   
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
@@ -730,7 +733,10 @@ begin
       end if
     end if
       
-    fld2=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
+    tmpfld=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
+    delete(fld2)
+    fld2=tmpfld
+    delete(tmpfld)
   
   end if ; AUX_FIELD is True
 

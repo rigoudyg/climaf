@@ -1,5 +1,6 @@
 from climaf.api import *
 from climaf.operators import *
+from climaf import classes
 
 # -- Fonctions de plot interractives
 from IPython.display import Image
@@ -230,23 +231,29 @@ def clim_average(dat,season):
 
 def summary(dat):
     """
-    Summary provides the informations on a CliMAF dataset obtained from dataset().
-    It returns the path and filename, and the dictionary of pairs keyword-values associated with the CliMAF dataset.
+    Summary provides the informations on a CliMAF dataset or ensemble of datsets
+    It displays the path and filenames, and the dictionary of pairs keyword-values 
+    associated with the dataset.
     """
-    if 'baseFiles' not in dir(dat):
-       print '-- Ensemble members:'
-       for m in dat.members:
-           for f in str.split(m.baseFiles(),' '): print f
+    if isinstance(dat,classes.cens):
+       if (len(dat.keys()) > 0):
            print 'Keys - values:'
-           print m.kvp
+           print dat[dat.keys()[0]].kvp
+       print '-- Ensemble members:'
+       for m in dat.order:
+           print m
+           files=dat[m].baseFiles()
+           if files :
+               for f in str.split(files,' '): print f
            print '--'
-    else:
+    elif isinstance(dat,classes.cdataset):
 	if not dat.baseFiles():
-		print '-- No file found for:'
+	    print '-- No file found for:'
     	else:
-		for f in str.split(dat.baseFiles(),' '): print f
+            for f in str.split(dat.baseFiles(),' '): print f
     	return dat.kvp
-
+    else :
+        print "Cannot handle "+`dat`
 
 def projects():
     """

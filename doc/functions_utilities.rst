@@ -5,7 +5,7 @@ Utility functions and variables
 .. default-domain:: python
 
 
-cerr : display the output of last operatior call 
+cerr : display the output of last operator call 
 --------------------------------------------------
 
 .. autodata:: climaf.api.cerr
