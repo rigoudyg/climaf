@@ -30,15 +30,17 @@ in the Python on-line help (see :ref:`how_to_list_operators`).
 Documented operators and 'object functions' as of today : 
 
  - arithmetic operations provided as 'object functions' :
-    - :doc:`functions/mul`
-    - :doc:`functions/div`
-    - :doc:`functions/add`
-    - :doc:`functions/sub`
-    - :doc:`functions/apply_scale_offset`
+    - :py:func:`~climaf.functions.fadd`
+    - :py:func:`~climaf.functions.fsub`
+    - :py:func:`~climaf.functions.fmul`
+    - :py:func:`~climaf.functions.fdiv`
+    - :py:func:`~climaf.functions.apply_scale_offset`
 
  - arithmetic operations provided as operators :
     - :doc:`scripts/plus`
     - :doc:`scripts/minus`
+    - :doc:`scripts/multiply`
+    - :doc:`scripts/divide`
 
  - swiss knives |sk| :
     - :doc:`scripts/ccdo`
@@ -49,21 +51,21 @@ Documented operators and 'object functions' as of today :
     - spatial operations:
         - :doc:`scripts/llbox`
         - :doc:`scripts/space_average`
-        - object function :doc:`functions/zonmean`
+        - object function :py:func:`~climaf.functions.zonmean`
     - regridding:
         - :doc:`scripts/regrid`
         - :doc:`scripts/regridn`
 	- :doc:`scripts/regridll`
-        - object function :doc:`functions/zonmean_interpolation`
+        - object function :py:func:`~climaf.functions.zonmean_interpolation`
         - :doc:`scripts/ml2pl`
     - object functions computing a difference with regridding (typically to compute model biases):
-        - :doc:`functions/diff_regrid`
-        - :doc:`functions/diff_regridn`
-        - :doc:`functions/diff_zonmean`
+        - :py:func:`~climaf.functions.diff_regrid`
+        - :py:func:`~climaf.functions.diff_regridn`
+        - :py:func:`~climaf.functions.diff_zonmean`
     - temporal operations:
         - :doc:`scripts/time_average`
-        - object function :doc:`functions/clim_average`
-        - object function :doc:`functions/annual_cycle`
+        - object function :py:func:`~climaf.functions.clim_average`
+        - object function :py:func:`~climaf.functions.annual_cycle`
     - Others:
         - :doc:`scripts/slice`
         - :doc:`scripts/mask`

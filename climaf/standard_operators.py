@@ -38,6 +38,12 @@ def load_standard_operators():
     cscript('plus', 'cdo add ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
+    cscript('multiply', 'cdo mul ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
+    cscript('divide', 'cdo div ${in_1} ${in_2} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
     cscript('space_average',
             scriptpath+'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" "${missing}" ${ins}', 
             commuteWithTimeConcatenation=True)

@@ -25,11 +25,20 @@ def apply_scale_offset(dat,scale,offset):
 #
 
 
-def mul(dat1,dat2):
+def fmul(dat1,dat2):
     """
-    Multiply dat1 by dat2 ; dat2 can be either a CliMAF object of same dimension as dat1, 
-    or constant (string, float or integer).
+    Multiplication of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    and a constant as second argument (string, float or integer)
+
     Shortcut to ccdo(dat1,dat2,operator='mul') and ccdo(dat,operator='mulc,'+c)
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> ds2= .... #some other, compatible dataset
+      >>> ds1_times_ds2 = fmul(ds1,ds2) # ds1 * ds2
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> c = '-1'  #a constant
+      >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
@@ -37,11 +46,21 @@ def mul(dat1,dat2):
     else: 
        return ccdo2(dat1,dat2,operator='mul')
 
-def div(dat1,dat2):
+def fdiv(dat1,dat2):
     """
-    Divide dat1 by dat2 ; dat2 can be either a CliMAF object of same dimension as dat1, 
-    or constant (string, float or integer).
+    Division of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    and a constant as second argument (string, float or integer)
+
     Shortcut to ccdo(dat1,dat2,operator='div') and ccdo(dat,operator='divc,'+c)
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> ds2= .... #some other, compatible dataset
+      >>> ds1_by_ds2 = fdiv(ds1,ds2) # ds1 / ds2
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> c = '-1'  #a constant
+      >>> ds1_times_c = fdiv(ds1,c) # ds1 * c
+
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
@@ -49,10 +68,21 @@ def div(dat1,dat2):
     else:
        return ccdo2(dat1,dat2,operator='div')
 
-def add(dat1,dat2):
+def fadd(dat1,dat2):
     """
-    Add dat1 to dat2; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Addition of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    and a constant as second argument (string, float or integer)
+
     Shortcut to ccdo(dat,operator='addc,'+str(c)) and ccdo2(dat1,dat2,operator='add')
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> ds2= .... #some other, compatible dataset
+      >>> ds1_plus_ds2 = fadd(ds1,ds2) # ds1 + ds2
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> c = '-1'  #a constant
+      >>> ds1_plus_c = fadd(ds1,c) # ds1 + c
+
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
@@ -60,10 +90,21 @@ def add(dat1,dat2):
     else:
        return ccdo2(dat1,dat2,operator='add')
 
-def sub(dat1,dat2):
+def fsub(dat1,dat2):
     """
-    Subtract dat2 to dat1; dat2 can be either a CliMAF object of same dimension as dat1, or constant (string, float or integer)
+    Substraction of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    and a constant as second argument (string, float or integer)
+
     Shortcut to ccdo(dat,operator='subc,'+str(c)) and ccdo2(dat1,dat2,operator='sub')
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> ds2= .... #some other, compatible dataset
+      >>> ds1_minus_ds2 = fsub(ds1,ds2) # ds1 - ds2
+
+      >>> ds1= .... #some dataset, with whatever variable
+      >>> c = '-1'  #a constant
+      >>> ds1_minus_c = fsub(ds1,c) # ds1 - c
+
     """
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
@@ -75,9 +116,14 @@ def sub(dat1,dat2):
 
 def iplot(map):
     """
-    Interactive version of plot for display in IPython Notebooks
+    Interactive version of cshow() for display in IPython Notebooks
+
     Similar to implot() but you provide a figure (a CliMAF object produced with e.g. plot() )
     (while implot() takes a dataset as argument and invokes plot()).
+
+       >>> my_plot = plot(...)
+       >>> iplot(myplot)
+
     """
     return Image(filename=cfile(map))
 
@@ -131,6 +177,10 @@ def implot(field,**kwargs):
     """
     Interactive version of plot for display in IPython Notebooks
     Similar to iplot() except that you provide a dataset and a dict of plot arguments
+
+      >>> dat = ds(...)
+      >>> implot(time_average(dat))
+
     """
     return Image(filename=cfile(plot(field,**kwargs)))
 
@@ -138,14 +188,25 @@ def implot(field,**kwargs):
 def diff_regrid(dat1, dat2):
     """
     Regrids dat1 on dat2 and returns the difference between dat1 and dat2
+
+      >>> dat1= ....   # some dataset, with whatever variable
+      >>> dat2= ....   # some dataset, with the same variable as dat1
+      >>> diff_dat1_dat2 = diff_regrid(dat1,dat2)
+
     """
-    return sub(regrid(dat1,dat2), dat2)
+    return minus(regrid(dat1,dat2), dat2)
 
 def diff_regridn (data1, data2, cdogrid='n90'):
     """
-    Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2 
+    Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2
+  
+      >>> dat1= ....   # some dataset, with whatever variable
+      >>> dat2= ....   # some dataset, with the same variable as dat1
+      >>> diff_dat1_dat2 = diff_regridn(dat1,dat2) # -> uses cdogrid='n90'
+      >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90') # -> Returns the difference on 2 deg grid
+ 
     """    
-    return sub ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
+    return minus ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
 
 
 def tableau(n_lin=1, n_col=1):
@@ -161,6 +222,10 @@ def annual_cycle(dat):
     """
     Computes the annual cycle as the 12 climatological months of dat
     (wrapper of ccdo with operator ymonavg)
+
+      >>> dat= ....   # some dataset, with whatever variable
+      >>> annual_cycle_dat = annual_cycle(dat)
+
     """
     return ccdo(dat, operator="ymonavg")
 
@@ -169,6 +234,7 @@ def clim_average(dat,season):
     """
     Computes climatological averages on the annual cycle of a dataset, on the months 
     specified with 'season', either:
+
     - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
     - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology 
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
@@ -179,6 +245,13 @@ def clim_average(dat,season):
     Note that you can use upper case or lower case characters to specify the months or seasons.
     
     clim_average computes the annual cycle for you.
+
+      >>> dat= ....   # some dataset, with whatever variable
+      >>> climds_JFM = clim_average(dat,'JFM')         # The climatology of dat over January-February-March
+      >>> climds_ANM = clim_average(dat,'annual_mean') # The annual mean climatology
+      >>> climds_September = clim_average(dat,'September') # The annual mean climatology of September
+      >>> climds_September = clim_average(dat,9) # Same as previous example, with a float
+
     """
     #
     if str(season).lower() in ['ann','annual','climato','clim','climatology','annual_average','anm','annual_mean']:
@@ -234,6 +307,9 @@ def summary(dat):
     Summary provides the informations on a CliMAF dataset or ensemble of datsets
     It displays the path and filenames, and the dictionary of pairs keyword-values 
     associated with the dataset.
+
+      >>> dat= ds(....)   # some dataset, with whatever variable
+      >>> summary(dat) #
     """
     if isinstance(dat,classes.cens):
        if (len(dat.keys()) > 0):
@@ -277,16 +353,16 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
     Before the computations, the function checks the unit of the vertical axis;
     it is converted to Pa if necessary directly in the netcdf file(s) corresponding to dat1(2).
     
-    Examples:
-    dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
-             experiment='historical',table='Amon')
-    ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
-    
-    zonmean_dat = zonmean(time_average(dat))
-    zonmean_ref = zonmean(time_average(ref))
-    
-    dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
-    dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+       >>> dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
+                    experiment='historical',table='Amon')
+       >>> ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
+   
+       >>> zonmean_dat = zonmean(time_average(dat))
+       >>> zonmean_ref = zonmean(time_average(ref))
+   
+       >>> dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
+       >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+
     """
     
     from climaf.anynetcdf import ncf
@@ -363,7 +439,12 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
 def zonmean(dat):
     """
     Return the zonal mean field of dat
+
     Shortcut to the command ccdo(dat,operator='zonmean')
+
+       >>> ds= ....   # some dataset, with whatever variable
+       >>> ds_zonmean = zonmean(ds) # Zonal mean of ds()
+
     """
     return ccdo(dat,operator='zonmean')
 
@@ -371,9 +452,15 @@ def zonmean(dat):
 def diff_zonmean(dat1,dat2):
     """
     Returns the zonal mean bias of dat1 against dat2
+
     The function first computes the zonal means of dat1 and dat2.
     Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function zonmean_interpolation.
     It finally returns the bias field.
+
+      >>> ds1= ....   # some dataset, with whatever variable
+      >>> ds2= ....   # some dataset, with the same variable as ds1
+      >>> diff_zonmean_ds1_ds2 = diff_zonmean(ds1,ds2) # Zonal mean difference between ds1 and ds2
+
     """
     #
     zonmean_dat1 = ccdo(dat1, operator='zonmean')
@@ -381,6 +468,6 @@ def diff_zonmean(dat1,dat2):
 
     rgrd_dat1 = zonmean_interpolation(zonmean_dat1,zonmean_dat2)
     #
-    return sub(rgrd_dat1,zonmean_dat2)
+    return minus(rgrd_dat1,zonmean_dat2)
 
 

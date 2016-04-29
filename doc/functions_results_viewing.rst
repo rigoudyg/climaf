@@ -29,13 +29,17 @@ ncview: display a dataset
 -----------------------------
  - :doc:`scripts/ncview`
 
-iplot : show a figure in a NoteBook
---------------------------------------
- - :doc:`functions/iplot`
+iplot : Interactive version of cshow() for display in IPython Notebooks
+------------------------------------------------------------------------------------------------
 
-implot : plot an object and show the figure in NoteBook
-----------------------------------------------------------
- - :doc:`functions/implot`
+.. autofunction:: climaf.functions.iplot
+
+
+implot : Interactive version of plot() for display in IPython Notebooks
+------------------------------------------------------------------------------------------------
+
+.. autofunction:: climaf.functions.implot
+
 
 plot_params : get plot parameters for a variable and a context
 ----------------------------------------------------------------
