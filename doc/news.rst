@@ -6,9 +6,6 @@ Whats' new
 
 Changes, newest first :
 
-- 2016/04/27:
-
-
 - 2016/04/22 - Version 1.0 :
 
   - **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.
@@ -131,6 +128,10 @@ Changes, newest first :
     - new arg ``fmt`` to change time axis labels format 
     - new arg ``color`` to define your own color map using named colors
     - you can now use argument ``invXY`` for cross-section
+    - Add possibility to turn OFF the data re-projection when model is
+      already on a known native grid (currently Lambert only) 
+      (see :ref:`relevant § of the doc<native_grid>`)
+
     - Bug fixes :
     
       - for argument ``reverse``

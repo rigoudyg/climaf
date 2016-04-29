@@ -484,8 +484,11 @@ begin
         
         if (i .eq. 0) then 
           
-          fld=fld*tofloat(myscale)+tofloat(myoffset)
-          
+          tmpfld=fld*tofloat(myscale)+tofloat(myoffset)
+          delete(fld)
+          fld=tmpfld
+          delete(tmpfld)
+
           res@pmLegendParallelPosF   = 0.1        ; move right slightly 
           res@pmLegendOrthogonalPosF = -0.14      ; move up slightly 
 
@@ -557,7 +560,10 @@ begin
 
         else ; field '2' to 'n'
 
-          fld=fld*tofloat(myscale_aux)+tofloat(myoffset_aux)
+          tmpfld=fld*tofloat(myscale_aux)+tofloat(myoffset_aux)
+          delete(fld)
+          fld=tmpfld
+          delete(tmpfld)
       
           if isvar("lgcols") then
             lgcols=lgcols

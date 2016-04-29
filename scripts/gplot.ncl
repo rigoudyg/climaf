@@ -269,9 +269,9 @@ end
 
 undef("field_reduce")
 ; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
-function field_reduce(filename:string, varname:string, ystyle:string, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical)
+function field_reduce(filename:string, varname:string, ystyle:string, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical, proj_data:logical)
 
-local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim
+local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim, dimnames, latnames, lonnames, latname, lonname, coord_file, grid_file
 begin
   
   ; Reading the field 
@@ -380,8 +380,8 @@ begin
     delete(dime)
     dime=dimsizes(field)
     rank=dimsizes(dime)
- end if ; rk eq 3  
-
+  end if ; rk eq 3  
+  
   ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
   ; We have a true cross-section, a horizontal map or a profile (t,z)
   if (rank .eq. 2) then
@@ -419,43 +419,68 @@ begin
         end if
       end do
     end do
-   
-    if ( isfilevar(ffile,"nav_lat") .and. isfilepresent("coordinates.nc") ) \ 
-      .or. ( isfilevar(ffile,"nav_lat") .and. isfilepresent("mesh_mask.nc") ) then
+
+ 
+    if useLatDim then ; curvilinear grid
       
-      if isfilepresent("coordinates.nc") then
-        coord_file=addfile("coordinates.nc","r")
+      if isfilevar(ffile,"nav_lat") then 
+        if (isfilepresent("coordinates.nc") .or. isfilepresent("mesh_mask.nc")) then
+      
+          if isfilepresent("coordinates.nc") then
+            coord_file=addfile("coordinates.nc","r")
+            
+            if isfilevar(coord_file,"gphit") then 
+              lat_dim=coord_file->gphit
+              lat_dim_tmp=rm_single_dims(lat_dim)
+              delete(lat_dim)
+              lat_dim=lat_dim_tmp
+              delete(lat_dim_tmp)
+              lat_dim@standard_name="latitude"
+            end if
+            if isfilevar(coord_file,"glamt") then 	
+              lon_dim=coord_file->glamt
+              lon_dim_tmp=rm_single_dims(lon_dim)
+              delete(lon_dim)
+              lon_dim=lon_dim_tmp
+              delete(lon_dim_tmp)
+              lon_dim@standard_name="longitude"
+            end if
+          else
 
-	if isfilevar(coord_file,"gphit") then 
-           lat_dim=coord_file->gphit
-	   lat_dim_tmp=rm_single_dims(lat_dim)
-	   delete(lat_dim)
-	   lat_dim=lat_dim_tmp
-	   delete(lat_dim_tmp)
-           lat_dim@standard_name="latitude"
-	end if
-	if isfilevar(coord_file,"glamt") then 	
-	   lon_dim=coord_file->glamt
-           lon_dim_tmp=rm_single_dims(lon_dim)
-           delete(lon_dim)
-           lon_dim=lon_dim_tmp
-           delete(lon_dim_tmp)
-           lon_dim@standard_name="longitude"
-	end if
-      else
+            if isfilepresent("mesh_mask.nc") then
+              coord_file=addfile("mesh_mask.nc","r")
+              if isfilevar(ffile,"nav_lat") then lat_dim=coord_file->nav_lat end if
+              if isfilevar(ffile,"nav_lon") then lon_dim=coord_file->nav_lon end if
+              lat_dim@standard_name="latitude"
+              lon_dim@standard_name="longitude"
+            end if
+          
+          end if
 
-        if isfilepresent("mesh_mask.nc") then
-          coord_file=addfile("mesh_mask.nc","r")
-	  if isfilevar(ffile,"nav_lat") then lat_dim=coord_file->nav_lat end if
-	  if isfilevar(ffile,"nav_lon") then lon_dim=coord_file->nav_lon end if
+        else  ; files 'coordinates.nc' and 'mesh_mask.nc' not present
+          print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
+          if isvar("latname") then lat_dim=ffile->$latname$ end if
+          if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
         end if
+        
+      else ; curvilinear grid but not with nav_lat/nav_lon
+        
+        if ( .not. isvar("proj") .and. isfilepresent("climaf_plot_grid.nc") ) then
+          grid_file=addfile("climaf_plot_grid.nc","r")
+          if isfilevar(grid_file,"Lambert_Conformal") then 
+            proj_data=True ; contains map projection information
+            proj_data@projection_type="Lambert_Conformal"
+            proj_data@latitude_of_projection_origin=grid_file->Lambert_Conformal@latitude_of_projection_origin
+            ;proj_data@standard_parallel=grid_file->Lambert_Conformal@standard_parallel
+            proj_data@longitude_of_central_meridian=grid_file->Lambert_Conformal@longitude_of_central_meridian
+          end if
+        end if
+        if isvar("latname") then lat_dim=ffile->$latname$ end if
+        if isvar("lonname") then lon_dim=ffile->$lonname$ end if
 
       end if
-    else
-      if isfilevar(ffile,"nav_lat") then
-        print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
-      end if
 
+    else ; it is not a curvilinear grid
       if isvar("latname") then lat_dim=ffile->$latname$ end if
       if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
     end if
@@ -487,19 +512,19 @@ begin
   if (rank .eq. 1) then 
     return([/field, hor_dim/])
   else ;rk eq 2
-    if isvar("lon_dim") .and. isvar("lat_dim") then  return([/field, lat_dim, lon_dim/]) end if
+    if isvar("lon_dim") .and. isvar("lat_dim") then  return([/field, lat_dim, lon_dim, proj_data/]) end if
     if isvar("lon_dim") .and. .not. isvar("lat_dim") then  
        lat_exist=False
-       return([/field, lon_dim/]) 
+       return([/field, lon_dim, proj_data/]) 
     end if
     if .not. isvar("lon_dim") .and. isvar("lat_dim") then  
        lon_exist=False
-       return([/field, lat_dim/]) 
+       return([/field, lat_dim, proj_data/]) 
     end if	 
     if .not. isvar("lon_dim") .and. .not. isvar("lat_dim") then  
       lat_exist=False
       lon_exist=False
-      return([/field/])
+      return([/field, proj_data/])
     end if
   end if
   
@@ -602,6 +627,7 @@ begin
   if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
+ 
   LABELON=False
   RASTER=True 
 
@@ -655,22 +681,30 @@ begin
   vprofile=False
   lat_exist=True  
   lon_exist=True
+  proj_data=False ; for Lambert projection
 
   ; Reading main field and reduction if necessary
   main_field_select=""
-  array=field_reduce(main_file, main_var, y, useXY, horizontal, useLatDim, vprofile, main_field_select, lat_exist, lon_exist)
+  array=field_reduce(main_file, main_var, y, useXY, horizontal, useLatDim, vprofile, main_field_select, lat_exist, lon_exist, proj_data)
 
   fld=array[0]
   if (ListCount(array) .eq. 2) .and. useXY then ; rk eq 1
     hdim=array[1]
   else 
-    if (ListCount(array) .ge. 2) then ; ListCount eq 2 or 3 <=> rk eq 2
+    if (ListCount(array) .ge. 2) then ; ListCount eq 3 or 4 <=> rk eq 2
       if lat_exist .and. lon_exist then 
         latdim=array[1]
         londim=array[2]
+        proj_data=array[3]
       end if
-      if (lat_exist .and. .not. lon_exist) then latdim=array[1] end if
-      if (lon_exist .and. .not. lat_exist) then londim=array[1] end if
+      if (lat_exist .and. .not. lon_exist) then 
+        latdim=array[1] 
+        proj_data=array[2]
+      end if
+      if (lon_exist .and. .not. lat_exist) then 
+        londim=array[1] 
+        proj_data=array[2]
+      end if
     end if
   end if
  
@@ -714,10 +748,11 @@ begin
     vprofile_dummy=False
     lat_exist_dummy=True  
     lon_exist_dummy=True
-  
+    proj_data_dummy=False
+
     ; Reading auxiliary field and reduction if necessary
     aux_field_select=""
-    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy)
+    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
  
     fld2=array2[0]
     if (ListCount(array2) .eq. 2) .and. useXY_dummy then
@@ -759,10 +794,11 @@ begin
     vprofile_dummy=False
     lat_exist_dummy=True
     lon_exist_dummy=True
+    proj_data_dummy=False
 
     useLatDimv=False
     uselect=""
-    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy)
+    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
  
     fld3=array3[0]
     if (ListCount(array3) .eq. 2) .and. useXY_dummy then
@@ -781,7 +817,7 @@ begin
     ; Reading vector v and reduction if necessary
     useLatDimv=False
     vselect=""
-    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy)
+    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
 
     fld4=array4[0]
     if (ListCount(array4) .eq. 2) .and. useXY_dummy then
@@ -1083,7 +1119,7 @@ begin
         if useLatDim2 then
           if isvar("londim2") then res2@sfXArray = londim2 end if
           if isvar("latdim2") then res2@sfYArray = latdim2 end if
-          res2@gsnAddCyclic        = False
+          res2@gsnAddCyclic = False
         end if
       end if
      
@@ -1149,6 +1185,7 @@ begin
             ;delete(res@mpMaxLatF)
           end if 
         end if
+        
       else
         res@mpMinLatF                = min(latdim)
         res@mpMaxLatF                = max(latdim)
@@ -1174,6 +1211,44 @@ begin
         end if
 
       end if
+      
+      if proj_data then ; Lambert projection
+        
+        if (proj_data@projection_type .eq. "Lambert_Conformal") then 
+          
+          nlat=dimsizes(latdim(:,0))
+          nlon=dimsizes(londim(0,:))
+          
+          res@mpProjection = "LambertConformal"     ; Change map projection
+
+          ; Not sure why these values work for the parallels. Normally 
+          ; we would use the 'standard_parallel' attribute attached
+          ; to this variable.
+      
+          res@mpLambertParallel1F   = proj_data@latitude_of_projection_origin
+          res@mpLambertParallel2F   = proj_data@latitude_of_projection_origin
+          res@mpLambertMeridianF    = proj_data@longitude_of_central_meridian
+          
+          res@mpLimitMode           ="Corners"      
+          res@mpLeftCornerLatF      = latdim(0,0)           ;latdim(nlat-1,0)
+          res@mpLeftCornerLonF      = londim(0,0)           ;londim(nlat-1,0)
+          res@mpRightCornerLatF     = latdim(nlat-1,nlon-1) ;latdim(0,nlon-1)
+          res@mpRightCornerLonF     = londim(nlat-1,nlon-1) ;londim(0,nlon-1)
+       
+          ; usually, when data is placed onto a map, it is TRANSFORMED to the specified
+          ; projection. Since this model is already on a native lambert conformal grid,
+          ; we want to turn OFF the tranformation.
+        
+          res@tfDoNDCOverlay        = False         ; plot is smoother if TRUE
+          res@mpDataBaseVersion     = "MediumRes"   ; Better map outlines
+          res@pmTickMarkDisplayMode = "Always"      ; Turn on tickmarks
+            
+        else
+          print("Cannot describe grid to Ncl due to lack of auxiliary field. Let Ncl decide.")
+        end if
+        
+      end if
+
     end if ;end horizontal
     
     if VECT then 
@@ -1363,54 +1438,28 @@ begin
         res@gsnAddCyclic        = False
       end if
      
-      if (isvar("proj")) then 
+      print("using gsn_csm_contour_map")
+      if isvar("options") then res_list(options, res) end if 
+      if VECT then
+        plot0=gsn_csm_vector_scalar_map(wks,fld3,fld4,fld,res)
+      else
+        plot0=gsn_csm_contour_map(wks,fld,res)
+      end if
         
-        print("using gsn_csm_contour_map")
-        if isvar("options") then res_list(options, res) end if 
-        if VECT then
-          plot0=gsn_csm_vector_scalar_map(wks,fld3,fld4,fld,res)
-        else
-          plot0=gsn_csm_contour_map(wks,fld,res)
+      if .not. AUX_FIELD then
+        if (LEVELS_CONTOURS) then
+          if isvar("options") then res_list(options, res2) end if 
+          plot1=gsn_csm_contour(wks,fld,res2)
         end if
+      else
+        if isvar("aux_options") then res_list(aux_options, res2) end if 
+        plot1=gsn_csm_contour(wks,fld2,res2)
+        if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+      end if
+      ;if VECT then
+      ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
+      ;end if
         
-        if .not. AUX_FIELD then
-          if (LEVELS_CONTOURS) then
-            if isvar("options") then res_list(options, res2) end if 
-            plot1=gsn_csm_contour(wks,fld,res2)
-          end if
-        else
-          if isvar("aux_options") then res_list(aux_options, res2) end if 
-          plot1=gsn_csm_contour(wks,fld2,res2)
-          if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
-        end if
-        ;if VECT then
-        ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
-        ;end if
-        
-      else 
-        print("using gsn_csm_contour_map_ce")
-        if isvar("options") then res_list(options, res) end if 
-        if VECT then
-          plot0=gsn_csm_vector_scalar_map_ce(wks,fld3,fld4,fld,res)
-        else
-          plot0=gsn_csm_contour_map_ce(wks,fld,res)
-        end if
-
-        if .not. AUX_FIELD then
-          if (LEVELS_CONTOURS) then
-            if isvar("options") then res_list(options, res2) end if 
-            plot1=gsn_csm_contour(wks,fld,res2)
-          end if
-        else
-          if isvar("aux_options") then res_list(aux_options, res2) end if 
-          plot1=gsn_csm_contour(wks,fld2,res2)
-	  if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
-        end if
-        ;if VECT then
-        ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
-        ;end if
-
-      end if 
     else ; cross-section or (t,z) profile
       
       time_pos=time_position(fld)
