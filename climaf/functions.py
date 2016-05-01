@@ -16,7 +16,7 @@ def apply_scale_offset(dat,scale,offset):
       - to automatically scale and offset the data to S.I. units at
         input/reading stage; this si done by declaring scaling for
         each relevant variable in a project using function
-        :py:func:`~climaf.dataloc.calias`; it also allows to set the units
+        :py:func:`~climaf.classes.calias`; it also allows to set the units
       - if the S.I. units are not suitable for a plot, to use plot 
         operators arguments 'scale' and 'offset' to change the values
 
@@ -194,7 +194,7 @@ def diff_regrid(dat1, dat2):
       >>> diff_dat1_dat2 = diff_regrid(dat1,dat2)
 
     """
-    return minus(regrid(dat1,dat2), dat2)
+    return minus(regrid(dat1,dat2),dat2)
 
 def diff_regridn (data1, data2, cdogrid='n90'):
     """
@@ -206,7 +206,7 @@ def diff_regridn (data1, data2, cdogrid='n90'):
       >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90') # -> Returns the difference on 2 deg grid
  
     """    
-    return minus ( regridn( data1, cdogrid=cdogrid), regridn( data2, cdogrid=cdogrid ))
+    return minus(regridn(data1,cdogrid=cdogrid),regridn(data2,cdogrid=cdogrid))
 
 
 def tableau(n_lin=1, n_col=1):

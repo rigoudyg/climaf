@@ -9,11 +9,21 @@ Standard operators
 
 For documented standard operators see  :ref:`standard_operators`  
 
+Functions returning CliMAF objects 
+---------------------------------------
+For functions which looks like CLiMAF operators, see : :doc:`functions_objects`
+
 
 Non-standard operators
 -----------------------
 
 See :ref:`how_to_list_operators`
+
+
+--------------------------------------------------------------------------------------------------------
+Functions for creating new processing functions, or tuning their behaviour
+--------------------------------------------------------------------------------------------------------
+
 
 cscript : define a new CliMAF operator 
 -----------------------------------------------------------------------------------
@@ -38,8 +48,4 @@ cmacro : define a macro
 
 .. autofunction:: climaf.cmacro.macro
 
-cens : define an ensemble of objects
----------------------------------------------------
-
-.. autoclass:: climaf.classes.cens
 

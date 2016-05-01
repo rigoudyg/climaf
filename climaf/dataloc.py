@@ -17,7 +17,7 @@ from operator import itemgetter
 locs=[]
 
 class dataloc():
-    def __init__(self,organization='generic', url=None, project="*",model="*", simulation="*", 
+    def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*", 
                  realm="*", table="*", frequency="*"):
         """
         Create an entry in the data locations dictionary for an ensemble of datasets.
@@ -76,6 +76,8 @@ class dataloc():
         self.simulation=simulation
         self.frequency=frequency
         self.organization=organization
+        if organization not in ['EM', 'CMIP5_DRS', 'generic' ] :
+            raise Climaf_Data_Error("Cannot process organization "+organization)
         if (isinstance(url,list)) : self.urls=url
         else :
             if re.findall("^esgf://.*",url) : self.organization="ESGF"
@@ -197,7 +199,7 @@ def selectLocalFiles(**kwargs):
         elif (org == "generic") :
             rep.extend(selectGenericFiles(urls, **kwargs2))
         else :
-            raise Climaf_Data_Error("cannot process organization "+org+ \
+            raise Climaf_Data_Error("Cannot process organization "+org+ \
                 " for simulation "+simulation+" and model "+model+\
                 " of project "+project)
     if (not ofu) :

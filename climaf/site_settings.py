@@ -18,7 +18,7 @@ onSpip   = False
 HostName = os.uname()[1].strip().lower()
 Home    = os.getenv ('HOME')
 
-print 'Hostname:', HostName
+#print 'Hostname:', HostName
 
 if os.path.exists ('/ccc')  :
     atTGCC   = True

@@ -24,7 +24,18 @@ Examples for defining an EM dataset::
 
 See other examples in :download:`examples/data_em.py <../examples/data_em.py>`
 
-The location of ocean variables in the various grid_XX files is for now only partially declared to CliMAF
+The location of ocean variables in the various grid_XX files matches the case with :
+T_table_2.2, T_table_2.5, T_table_2.7, U_table_2.3, U_table_2.8, W_table2.3 ...
+Other cases should be described by another 'project'
+
+WARNING REGARDING OCEAN DATA : for a number of old simulations, there
+is an issue with the name of time coordinates, which lead to some
+nav_lat/nav_lon coordinates being discarded during CDO processing. You
+can tell CLiMAF to deal automatically with that, at the expense of
+computing time, by setting and exporting environment variable
+CLIMAF_FIX_NEMO_TIME to any value except 'no' BEFORE launching
+CliMAF. What CliMAF does in that case shows in
+:download:`../scripts/mcdo.sh` (see function nemo_timefix())
 
 A number of Seaice fields are duly described with 1.e+20 as missing
 value (which is ill described in data files); see code for details
@@ -44,7 +55,7 @@ if atCNRM :
     # REALMS, and we handle data FREQUENCY
     # 'root' stands for em root directory for alla experiment data (EM_NETCDF_DIR)
 
-    cproject("em","root","group","realm", "frequency",separator="$")
+    cproject("em","root","group","realm", "frequency",separator="|")
 
     # Describe data organization : file hierarchy and filename patterns
     ######################################################################
@@ -87,30 +98,66 @@ if atCNRM :
     ############################################
 
     # Describe how to locate some ocean variables in multi-variable data files
-    calias("em", 'sos' ,filenameVar='S*')
-    calias("em", 'so'  ,filenameVar='S*')
-    calias("em", 'fcalva' ,filenameVar='S*')
-    calias("em", 'fcalvg' ,filenameVar='S*')
-    calias("em", 'omlmax' ,filenameVar='S*')
-    calias("em", 'wfo' ,filenameVar='S*')
-    calias("em", 'friver' ,filenameVar='S*')
-    calias("em", 'e-p' ,filenameVar='S*')
-    calias("em", 'flake' ,filenameVar='S*')
+    #calias("em", 'sos' ,filenameVar='S*')
+    #calias("em", 'so'  ,filenameVar='S*')
+    #calias("em", 'fcalva' ,filenameVar='S*')
+    #calias("em", 'fcalvg' ,filenameVar='S*')
+    #calias("em", 'omlmax' ,filenameVar='S*')
+    #calias("em", 'wfo' ,filenameVar='S*')
+    #calias("em", 'friver' ,filenameVar='S*')
+    #calias("em", 'e-p' ,filenameVar='S*')
+    #calias("em", 'flake' ,filenameVar='S*')
     
-    calias("em", 'to'  ,filenameVar='T*')
-    calias("em", 'tos' ,filenameVar='T*')
-    calias("em", 'tossq' ,filenameVar='T*')
-    calias("em", 'zos' ,filenameVar='T*')
-    calias("em", 'zossq' ,filenameVar='T*')
-    calias("em", 'nshfls' ,filenameVar='T*')
-    calias("em", 'rsntds' ,filenameVar='T*')
+    calias("em", 'to'  ,offset=273.15,filenameVar='T_table2.2')
+    calias("em", 'tos' ,offset=273.15, filenameVar='T_table2.2')
+    calias("em", 'tossq' ,filenameVar='T_table2.2')
+    calias("em", 'zos' ,filenameVar='T_table2.2')
+    calias("em", 'zossq' ,filenameVar='T_table2.2')
+    calias("em", 'zosto' ,filenameVar='T_table2.2')
+    calias("em", 'omlmax' ,filenameVar='T_table2.2')
+    calias("em", 'pbo' ,filenameVar='T_table2.2')
+    calias("em", 'rhopoto' ,filenameVar='T_table2.2')
+    calias("em", 'so' ,filenameVar='T_table2.2')
+    calias("em", 'sos' ,filenameVar='T_table2.2')
+    calias("em", 'thetao' ,filenameVar='T_table2.2')
     
-    calias("em", 'uo' ,filenameVar='U*')
-    calias("em", 'tauuo' ,filenameVar='U*')
-    calias("em", 'uos' ,filenameVar='U*')
-    calias("em", 'vo' ,filenameVar='V*')
-    calias("em", 'tauvo' ,filenameVar='V*')
-    calias("em", 'vos' ,filenameVar='V*')
+    calias("em", 'emps' ,filenameVar='T_table2.5')
+    calias("em", 'evt' ,filenameVar='T_table2.5')
+    calias("em", 'evs' ,filenameVar='T_table2.5')
+    calias("em", 'ficeberg' ,filenameVar='T_table2.5')
+    calias("em", 'friver' ,filenameVar='T_table2.5')
+    calias("em", 'pr' ,filenameVar='T_table2.5')
+    calias("em", 'prsn' ,filenameVar='T_table2.5')
+    calias("em", 'prsnt' ,filenameVar='T_table2.5')
+    calias("em", 'wfcorr' ,filenameVar='T_table2.5')
+    calias("em", 'wfo' ,filenameVar='T_table2.5')
+
+    calias("em", 'hfcorr' ,filenameVar='T_table2.7')
+    calias("em", 'hfevapds' ,filenameVar='T_table2.7')
+    calias("em", 'hfrainds' ,filenameVar='T_table2.7')
+    calias("em", 'hfrunoffds' ,filenameVar='T_table2.7')
+    calias("em", 'nshfls' ,filenameVar='T_table2.7')
+    calias("em", 'rsntds' ,filenameVar='T_table2.7')
+
+    calias("em", 'umo' ,filenameVar='U_table2.3')
+    calias("em", 'uo' ,filenameVar='U_table2.3')
+    calias("em", 'hfx' ,filenameVar='U_table2.3')
+    calias("em", 'hfxba' ,filenameVar='U_table2.3')
+    calias("em", 'hfxdiff' ,filenameVar='U_table2.3')
+
+    calias("em", 'tauuo' ,filenameVar='U_table2.8')
+
+    calias("em", 'vmo' ,filenameVar='V_table2.3')
+    calias("em", 'vo' ,filenameVar='V_table2.3')
+    calias("em", 'hfy' ,filenameVar='V_table2.3')
+    calias("em", 'hfyba' ,filenameVar='V_table2.3')
+    calias("em", 'hfydiff' ,filenameVar='V_table2.3')
+
+    calias("em", 'tauvo' ,filenameVar='V_table2.8')
+
+    calias("em", 'wmo' ,filenameVar='W_table2.3')
+    calias("em", 'wmosq' ,filenameVar='W_table2.3')
+
 
     # .... to be continued
     

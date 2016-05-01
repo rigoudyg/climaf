@@ -32,6 +32,11 @@ eds : define an ensemble of datasets
 
 .. autofunction:: climaf.classes.eds
 
+cens : define an ensemble of objects
+---------------------------------------------------
+
+.. autoclass:: climaf.classes.cens
+
 fds : define a dataset from a data file 
 ---------------------------------------------------
 

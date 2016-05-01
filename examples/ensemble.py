@@ -26,6 +26,7 @@ tas_ga=space_average(e2)
 # They receive the labels/keys if they were declared with keyword ${labels}
 # 'curves' is such a script, devoted to plot xy curves
 p=curves(tas_ga,title="Surface Temperature global average")
+p=curves(tas_ga,title="Surface Temperature global average", X_axis="aligned")
 cshow(p)
 
 # Advanced example : create plot panel of various members, add a member, and compute anomalies
@@ -75,11 +76,6 @@ cshow(cpage(plot(anomalies,title='tas')))
 # You should rather use a copy to create the extended ensemble 
 
 myens=cens({'1980':j0 , '1981':j1})
-
-cscript('ecdo','cdo ${operator} ${mmin} ${out}')
-emin=ecdo(myens,operator='ensmin')
-emax=ecdo(myens,operator='ensmax')
-
+eavg=ccdo_ens(myens,operator='ensavg')
 extended_ens=myens.copy()
-extended_ens['emin']=emin
-extended_ens['emax']=emax
+extended_ens['avg']=eavg

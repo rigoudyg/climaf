@@ -707,7 +707,7 @@ begin
       end if
     end if
   end if
- 
+
   ; Reading main field unit, scaling the field and setting REDU
   if (.not. isvar("units")) then 
     if (isatt(fld,"units")) then units=fld@units else units="None" end if
@@ -722,11 +722,17 @@ begin
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
     power10=floattoint(log10(dim_max(ndtooned(fld))))
-    if power10.ge.4 then
-      fld=fld/10^power10
-      vmin=tofloat(vmin/10^power10)
-      vmax=tofloat(vmax/10^power10)
-      vdelta=tofloat(vdelta/10^power10)
+    if ismissing(power10) then 
+      print("Field has only missing values" )
+      power10=1
+      ;status_exit(1)
+    else
+      if power10.ge.4 then
+        fld=fld/10^power10
+        vmin=tofloat(vmin/10^power10)
+        vmax=tofloat(vmax/10^power10)
+        vdelta=tofloat(vdelta/10^power10)
+      end if
     end if
   else
     power10=0

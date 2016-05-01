@@ -434,6 +434,10 @@ class cdataset(cobject):
             clogger.debug("Looking with dic=%s"%`dic`)
             self.files=dataloc.selectLocalFiles(**dic)
         return self.files
+
+    def listfiles(self,force=False):
+        return self.baseFiles(force=force)
+
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
         in files (rather than being a derived, virtual variable)
@@ -1081,26 +1085,52 @@ class cpage(cobject):
                         "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
         else: # case of an ensemble (cens) 
-            figs=[fig for fig in fig_lines.order]
-
-            if not widths: widths=[1.]
-            self.widths=widths
-            if not heights :
-                heights=[]
-                for memb in figs: heights.append(round(1./len(figs),2))
-            self.heights=heights
-            
-            self.fig_lines=[]
-            for l in heights :
-                line=[]
-                for c in widths :
-                    if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
-                    else : line.append(None)
-                              
+            if not widths and not heights :
+                self.scatter_on_page([ fig_lines[label] for label in fig_lines.order])
+            else:
+                figs=[fig for fig in fig_lines.order]
+                if not widths: widths=[1.]
+                self.widths=widths
+                if not heights :
+                    heights=[]
+                    for memb in figs: heights.append(round(1./len(figs),2))
+                    self.heights=heights
+                    
+                    self.fig_lines=[]
+                    for l in heights :
+                        line=[]
+                        for c in widths :
+                            if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
+                            else : line.append(None)
+                            
                 self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
-               
+
+    def scatter_on_page(self,figs) :
+        """ Try to optimize nb of columns and lines, based on figs 
+        list length
+        """
+        n=len(figs)
+        if n == 1 or n==2 or n==3 : nx,ny=1,n
+        if n == 4                 : nx,ny=2,2
+        if n == 5 or n == 6   : nx,ny=2,3
+        if n == 7 or n == 8   : nx,ny=2,4
+        if n >= 9 and n <= 12  : nx,ny=3,4
+        if n >= 13 and n <= 15 : nx,ny=3,5
+        if n >=16 and n<=20     : nx,ny=4,5
+        if n >=21  : raise Climaf_Classes_Error("Too many figures in page")
+        lines=[]
+        for i in range(len(figs)) : 
+            if ( i %nx == 0) : 
+                line=[] ; lines.append(line)
+            line.append(figs[i])
+        j=len(line)
+        for i in range(j,nx) : line.append(None)
+        self.fig_lines=lines
+        self.widths =[ round(1./nx,2) for i in range(nx) ]
+        self.heights=[ round(1./ny,2) for i in range(ny) ]
+
     def buildcrs(self,crsrewrite=None,period=None):
         rep="cpage(["
         for line in self.fig_lines :

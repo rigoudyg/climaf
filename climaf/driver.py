@@ -84,7 +84,7 @@ def capply_script (script_name, *operands, **parameters):
         reps=[]
         for label in operands[0].order:
             member=operands[0][label]
-            clogger.debug("processing member "+`member`)
+            clogger.debug("processing member %s : "%label+`member`)
             params=parameters.copy()
             params["member_label"]=label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
@@ -325,6 +325,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         elif isinstance(cobject,classes.cens) :
             d=dict()
             for member in cobject.order :
+                # print ("evaluating member %s"%member)
                 d[member]=ceval(cobject[member],copy.copy(userflags),format,deep,recurse_list=recurse_list)
             if (format=="file") : return(reduce(lambda x,y : x+" "+y, [ d[m] for m in cobject.order ]))
             else : return d
@@ -470,6 +471,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             subdict["period_iso"]=init_period(scriptCall.parameters[p]).iso()
     subdict["crs"]=opscrs.replace("'","")
     #
+    #print("subdict="+`subdict`) 
     # Combine CRS and possibly member_label to provide/complement title 
     if 'title' not in subdict :
         if 'member_label' in subdict :
@@ -477,6 +479,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         else:
             subdict["title"]=subdict["crs"]
     else: 
+        #print("Got a member label : %s"%subdict['member_label'])
         if 'member_label' in subdict :
             subdict["title"]=subdict["title"]+" "+subdict['member_label']
             subdict.pop('member_label')
@@ -515,62 +518,37 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     tim1=time.time()
     clogger.info("Launching command:"+template)
     #
-    try :
-        command=subprocess.Popen(template, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-        repcom=command.wait()
-        #
-    except:
-        clogger.error("Subprocess was interrupted")
-        repcom=1
-    
     logfile=open('last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
-    command_std=""
-    for line in command.stdout:
-        command_std+=line
-        logfile.write(line)
-        if script.outputFormat=="txt" : 
-            sys.stdout.write(line)
-    logfile.close()
+    try :
+        subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
+    except subprocess.CalledProcessError, inst :
+        logfile.close()
+        raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
 
-    # Clean fixed fields symbolic links
-    # (linkname, targetname)
+    logfile.close()
+    # Clean fixed fields symbolic links (linkname, targetname)
     if script.fixedfields :
         for ll,lt in script.fixedfields:
             if files_exist[ll] == False: os.system("rm -f "+ll)  
-
-    if ( repcom == 0 ):
-        if script.outputFormat not in operators.none_formats :
-            
-            # Tagging output files with their CliMAF Reference Syntax definition
-            # Un-named main output
-            ok = cache.register(main_output_filename,scriptCall.crs)
-            # Named outputs
-            for output in scriptCall.outputs:
-                ok = ok and cache.register(subdict["out_"+output],\
-                                           scriptCall.crs+"."+output)
-                #if ok :
-                #    set_variable(subdict["out_"+output], output, 'file')
-            if ok : 
-                duration=time.time() - tim1
-                #print("Done in %.1f s with script computation for %s "%\
-                #          (duration,`scriptCall`),file=sys.stderr)
-                clogger.info("Done in %.1f s with script computation for "
-                              "%s (command was :%s )"%\
-                                  (duration,`scriptCall`,template))
-                return main_output_filename
-            else :                
-                raise Climaf_Driver_Error("Some output missing when executing "
+    # Handle ouptuts
+    if script.outputFormat=="txt" : os.system("cat last.out")
+    if script.outputFormat in operators.none_formats : return None
+    # Tagging output files with their CliMAF Reference Syntax definition
+    # 1 - Un-named main output
+    ok = cache.register(main_output_filename,scriptCall.crs)
+    # 2 - Named outputs
+    for output in scriptCall.outputs:
+        ok = ok and cache.register(subdict["out_"+output], scriptCall.crs+"."+output)
+    if ok : 
+        duration=time.time() - tim1
+        #print(...file=sys.stderr)
+        clogger.info("Done in %.1f s with script computation for "
+                     "%s (command was :%s )"% (duration,`scriptCall`,template))
+        return main_output_filename
+    else : 
+        raise Climaf_Driver_Error("Some output missing when executing "
                                           ": %s. \n See last.out"%template)
-        else :
-            clogger.debug("script %s has no output"%script.name)
-            return None
-    else:
-        clogger.debug("Full script output:\n"+command_std)
-        comm2=subprocess.Popen(["tail", "-n", "10", "last.out"], stdout=subprocess.PIPE)
-        clogger.error("Last lines of script output:\n"+comm2.stdout.read())
-        raise Climaf_Driver_Error("Script failure for : %s. More details either in file "
-                                  "./last.out or by re-runing with clog(\"debug\")" %template)
 
 def timePeriod(cobject) :
     """ Returns a time period for a CliMAF object : if object is a dataset, returns
