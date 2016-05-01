@@ -94,7 +94,9 @@ fi
 
 if [ "$alias" ] ; then 
     IFS=", " read var filevar scale offset <<< $alias 
-    selalias=-expr,"$var=${filevar}*${scale}+${offset};"
+    if [ $scale != 1 -o $offset != 0 ] ; then
+	selalias=-expr,"$var=${filevar}*${scale}+${offset};"
+    fi
 fi
 
 if [ "$vm" ] ; then 
@@ -121,7 +123,7 @@ for file in $files ; do
 	$CDO ${setmiss#-} $selalias $selregion $seldate ${selvar} \
 	    $file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
     else
-	if [ $alias ] ; then 
+	if [ $alias -a $selalias ] ; then 
 	    $CDO ${selalias#-} $selregion $seldate ${selvar} \
 		$file $tmp2  && [ -f $tmp2 ] && vfiles+=" "$tmp2 
 	else
