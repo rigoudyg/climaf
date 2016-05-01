@@ -41,12 +41,12 @@ nemo_timefix ()
 {
     # Rename alternate time_counter variables to 'time_counter' for some kind 
     # of Nemo outputs  (Nemo 3.2 had a bug when using IOIPSL ...)
-    # Echoes the name of a file with renamed variable (be it an unchanged file or a copy)
+    # Echoes the name of a file with renamed variable (be it a modified file or a copy)
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
     file=$1
     out=""
     if [[ $file =~ .*1[md].*grid_T_table2.2.nc ]] ; then 
-	if ncdump -h $file  | \grep -E -q '(t_ave_01month|t_ave_00086400 )' ; then 
+	if ncdump -h $file  | \grep -E -q '(coord.*t_ave_01month|t_ave_00086400 )' ; then 
 	    var2rename=""
 	    if [[ $file =~ .*1m.*grid_T_table2.2.nc ]] ; then 
 		var2rename=t_ave_01month 
@@ -60,7 +60,7 @@ nemo_timefix ()
 	    if [ "$var2rename" ] ; then 
 		out=$tmp/renamed_$(basename $file) ; rm -f $out 
 		ncks -3 $file $out 
-		ncrename -d .$var2rename,time_counter -v $var2rename,time_counter $out >&2
+		ncrename -d .$var2rename,time_counter -v .$var2rename,time_counter $out >&2
 		for lvar in $vars2d; do 
 		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
 		done
@@ -147,27 +147,32 @@ for file in $files ; do
 done
 
 
-# Then, assemble all datafiles in a single one before applying the operator 
-# (because it may be non-linear in time - e.g. eigenvectors )
 if [ "$vfiles" ] ; then 
     tmp3=$tmp/$(basename $0).nc ; rm -f $tmp3
     #
-    # Assemble all pieces in a single file, but avoid single file copy followed by rm ...
-    if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
-	cdo copy $vfiles $tmp3 && [ $vfiles_are_original -eq 0 ] && rm $vfiles 
-    else  # Only one file to process
-	if [ $vfiles_are_original -eq 1 ]
-	then cp $vfiles $tmp3 ; 
-	else mv $vfiles $tmp3 ; fi
+    # Then, assemble all datafiles in a single one before applying the operator 
+    # if it is non-linear in time - e.g. eigenvectors 
+    if [ ${timelinear:-no} == no ] ; then 
+        # avoid single file copy followed by rm ...
+	if [ $(echo $vfiles | wc -w) -gt 1 ] ; then 
+	    cdo copy $vfiles $tmp3 && [ $vfiles_are_original -eq 0 ] && rm $vfiles 
+	else  # Only one file to process
+	    if [ $vfiles_are_original -eq 1 ]
+	    then cp $vfiles $tmp3 ; 
+	    else mv $vfiles $tmp3 ; fi
+	fi
+        #
+        # Change units before applying further operations, if applicable
+	if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
+	#
+        # Apply operator if requested
+	if [ "$operator" ] ; then 
+	    cdo $operator $tmp3 $out && rm $tmp3 || exit 1
+	else mv $tmp3 $out ; fi
+    else
+	cdo $operator $vfiles $out
+	if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $out ; fi
     fi
-    #
-    # Change units before applying further operations, if applicable
-    if [ "$units" ] ; then ncatted -O -a units,$var,o,c,"$units" $tmp3 ; fi
-    
-    # Apply operator if requested
-    if [ "$operator" ] ; then 
-	cdo $operator $tmp3 $out && rm $tmp3 || exit 1
-    else mv $tmp3 $out ; fi
 else
     echo "Issue while selecting data from $files ">&2
     rm -fr $tmp
