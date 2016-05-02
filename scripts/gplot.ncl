@@ -404,7 +404,7 @@ begin
         end if
       end do
     end do
-
+   
     ; for curvilinear grid
     do k=0,1
       do i=0, dimsizes(latnames)-1
@@ -477,7 +477,7 @@ begin
         end if
         if isvar("latname") then lat_dim=ffile->$latname$ end if
         if isvar("lonname") then lon_dim=ffile->$lonname$ end if
-
+       
       end if
 
     else ; it is not a curvilinear grid
@@ -592,7 +592,7 @@ local VarDim
 begin
   
   VarDim=getVarDimNames(field) 
-
+ 
   it=-1
   do k=0, dimsizes(VarDim)-1
     if ( .not. ismissing(str_match(VarDim(k),"time")) \
@@ -715,10 +715,11 @@ begin
   
   units=units 
   tmpfld=fld*tofloat(myscale)+tofloat(myoffset)
+  copy_VarMeta(fld,tmpfld)
   delete(fld)
   fld=tmpfld
   delete(tmpfld)
-  
+
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
     power10=floattoint(log10(dim_max(ndtooned(fld))))
@@ -775,6 +776,7 @@ begin
     end if
       
     tmpfld=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
+    copy_VarMeta(fld2,tmpfld)
     delete(fld2)
     fld2=tmpfld
     delete(tmpfld)
@@ -1469,7 +1471,7 @@ begin
     else ; cross-section or (t,z) profile
       
       time_pos=time_position(fld)
-      
+
       if (y .eq. "index") then
         print("using gsn_csm_contour; y with index-linear spacing")
         

@@ -15,7 +15,7 @@ or less basic climate diagnostics or utilities :
 
 
 Other functions exists, which do not return CliMAF
-objects (and are not called 'object fucntions') - see :doc:`API`
+objects (and are not called 'object functions') - see :doc:`API`
 
 The set of standard operators grows
 with scientists contributions (see

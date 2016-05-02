@@ -485,6 +485,7 @@ begin
         if (i .eq. 0) then 
           
           tmpfld=fld*tofloat(myscale)+tofloat(myoffset)
+          copy_VarMeta(fld,tmpfld)
           delete(fld)
           fld=tmpfld
           delete(tmpfld)
@@ -561,6 +562,7 @@ begin
         else ; field '2' to 'n'
 
           tmpfld=fld*tofloat(myscale_aux)+tofloat(myoffset_aux)
+          copy_VarMeta(fld,tmpfld)
           delete(fld)
           fld=tmpfld
           delete(tmpfld)
