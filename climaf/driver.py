@@ -532,7 +532,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         for ll,lt in script.fixedfields:
             if files_exist[ll] == False: os.system("rm -f "+ll)  
     # Handle ouptuts
-    if script.outputFormat=="txt" : os.system("cat last.out")
+    if script.outputFormat=="txt" : 
+        with open("last.out",'r') as f:
+            for line in f.readlines() :
+                sys.stdout.write(line)
     if script.outputFormat in operators.none_formats : return None
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
