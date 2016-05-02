@@ -94,9 +94,7 @@ fi
 
 if [ "$alias" ] ; then 
     IFS=", " read var filevar scale offset <<< $alias 
-    if [ $scale != 1 -o $offset != 0 ] ; then
-	selalias=-expr,"$var=${filevar}*${scale}+${offset};"
-    fi
+    selalias=-expr,"$var=${filevar}*${scale}+${offset};"
 fi
 
 if [ "$vm" ] ; then 

@@ -2,7 +2,7 @@ from climaf.api import *
 from climaf.operators import *
 from climaf import classes
 
-# -- Fonctions de plot interractives
+# -- Fonctions de plot interactives : a importer dans l'API
 from IPython.display import Image
 
 
@@ -312,16 +312,22 @@ def summary(dat):
       >>> summary(dat) #
     """
     if isinstance(dat,classes.cens):
-       if (len(dat.keys()) > 0):
-           print 'Keys - values:'
-           print dat[dat.keys()[0]].kvp
-       print '-- Ensemble members:'
-       for m in dat.order:
-           print m
-           files=dat[m].baseFiles()
-           if files :
-               for f in str.split(files,' '): print f
-           print '--'
+        if (len(dat.keys()) > 0):
+            kvp=getattr(dat[dat.keys()[0]],'kvp',None)
+            if kvp :
+                print 'Keys - values:'
+                print kvp
+            print '-- Ensemble members:'
+        for m in dat.order:
+            obj=dat[m]
+            if isinstance(obj,climaf.classes.cdataset) :
+                print m
+                files=dat[m].baseFiles()
+                if files :
+                    for f in str.split(files,' '): print f
+            else : 
+                print(m+" : "+ `obj`)
+            print '--'
     elif isinstance(dat,classes.cdataset):
 	if not dat.baseFiles():
 	    print '-- No file found for:'
