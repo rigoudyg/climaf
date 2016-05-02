@@ -2,9 +2,6 @@ from climaf.api import *
 from climaf.operators import *
 from climaf import classes
 
-# -- Fonctions de plot interactives : a importer dans l'API
-from IPython.display import Image
-
 
 def apply_scale_offset(dat,scale,offset):
     """Returns a CliMAF object after applying a scale and offset
@@ -115,6 +112,9 @@ def fsub(dat1,dat2):
 
 
 def iplot(map):
+    # -- Fonctions de plot interactives : a importer dans l'API
+    from IPython.display import Image
+
     """
     Interactive version of cshow() for display in IPython Notebooks
 
@@ -174,6 +174,9 @@ def vertical_average(dat,zmin,zmax):
 import numpy as np
 
 def implot(field,**kwargs):
+    # -- Fonctions de plot interactives : a importer dans l'API
+    from IPython.display import Image
+
     """
     Interactive version of plot for display in IPython Notebooks
     Similar to iplot() except that you provide a dataset and a dict of plot arguments
