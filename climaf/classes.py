@@ -1094,16 +1094,16 @@ class cpage(cobject):
                 if not heights :
                     heights=[]
                     for memb in figs: heights.append(round(1./len(figs),2))
-                    self.heights=heights
+                self.heights=heights
                     
-                    self.fig_lines=[]
-                    for l in heights :
-                        line=[]
-                        for c in widths :
-                            if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
-                            else : line.append(None)
+                self.fig_lines=[]
+                for l in heights :
+                    line=[]
+                    for c in widths :
+                        if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
+                        else : line.append(None)
                             
-                self.fig_lines.append(line)
+                    self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
 

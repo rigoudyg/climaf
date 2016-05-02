@@ -64,7 +64,7 @@ cscript("ensavg","cdo ensavg ${mmin} ${out}")
 average=ensavg(ens)
 
 # Compute anomalies wrt to ensemble mean
-anomalies=sub(ens,average)
+anomalies=minus(ens,average)
 cshow(cpage(plot(anomalies,title='tas')))
 
 
