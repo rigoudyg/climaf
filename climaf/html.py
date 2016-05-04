@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 """
-CliMAF module ``html`` defines functions for building some html index
+CliMAF module ``html`` defines functions for building some html index 
 giving acces to figure files, through links bearing a label or through
 thumbnails. It eases iterating over lines and columns in tables. 
 
@@ -80,7 +80,7 @@ def close_table() :
     """
     return("</TABLE>\n")
 
-def open_line(title) :
+def open_line(title="") :
     return(' <TR>\n <TH ALIGN=LEFT> <li>'+title+'</li> </TH> \n')
 
 def close_line() :
@@ -175,6 +175,13 @@ def link(label,filename,thumbnail=None,hover=True) :
         
     return rep
 
+def link_on_its_own_line(label,filename,thumbnail=None,hover=True) :
+    """ Does the same as :py:func:`~climaf.html.link` ,but for a link which is 
+    sole on its own line 
+    """
+    return open_line()+link(label,filename,thumbnail=thumbnail,hover=hover)+close_line()
+
+
 def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None) :
     """ 
     Create a table cell with the provided label, which bears a link to
@@ -224,10 +231,11 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
                link(label,fn,thumbnail,hover)+\
                '</TD>\n'
 
-def line(dic,title="",thumbnail=None,hover=True, dirname=None,altdir=None):
+def line(list_of_pairs,title="",thumbnail=None,hover=True, dirname=None,altdir=None):
     """
-    Create an html line with labels from dic keys and links to
-    filenames from dic values. Put a line title if provided. Replace
+    Create an html line with labels and links from first args 
+    list_of_pairs (and when this is not a pair, only put the label). 
+    Put a line title if provided. Replace
     labels with thumbnail figures if arg thumbnail is set to a size
     (in pixels) and display figures when you mouse over it if arg
     hover is set to True or to a size (in pixels); in that case, dic
@@ -236,20 +244,17 @@ def line(dic,title="",thumbnail=None,hover=True, dirname=None,altdir=None):
     as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps'). 
     This allows to generate a portable atlas in dirname
     """
-    if thumbnail :
-        if isinstance(dic,dict) : 
-            figures=dic.values()
+    labels=[]
+    figures=[]
+    for e in list_of_pairs :
+        if isinstance(e,tuple) : 
+            label=e[0]; labels.append(label) ; figures.append(e[1])
         else : 
-            figures=dic.keys()
-        labels=figures # not actually used
-    else : 
-        figures=dic.values()
-        labels=dic.keys()
-    rep=title
+            label=e; labels.append(e) ; figures.append(None)
+    rep=open_line()+title
     for lab,fig in zip(labels,figures): 
         rep+=cell(lab,fig,thumbnail,hover,dirname,altdir)
-    rep+=vspace()
-    return rep
+    return rep+close_line()
 
 def flines(func,fargs, sargs, common_args=[], \
        other_fargs=[], other_sargs=[], thumbnail=None, hover=True, dirname=None, **kwargs):

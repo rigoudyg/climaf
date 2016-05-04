@@ -6,6 +6,16 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/05/04 - Version 1.0.1 : 
+
+  - html package : 
+    
+    - **Change interface for function** :py:func:`~climaf.html.line` : 
+      now use a list of pairs (label,figure_filename) as first arg
+    - add function :py:func:`~climaf.html.link_on_its_own_line`
+
+
+
 - 2016/04/22 - Version 1.0 :
 
   - **Ensembles are now handled as dictionnaries. This breaks upward compatibility**.

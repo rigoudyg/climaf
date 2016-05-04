@@ -4,7 +4,7 @@ functions for inspecting data
 
 summary : describe files associated with a dataset
 ---------------------------------------------------
- - :doc:`functions/summary`
+ - :py:func:`~climaf.functions.summary`
 
 ncdump : dump file header
 ------------------------------
@@ -100,6 +100,9 @@ html : package for creating an html index, with tables of links to figures
    :noindex:
 
 .. autofunction:: climaf.html.link
+   :noindex:
+
+.. autofunction:: climaf.html.link_on_its_own_line
    :noindex:
 
 .. autofunction:: climaf.html.cell

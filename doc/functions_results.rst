@@ -66,6 +66,8 @@ html : create an html index, with tables of links to figures
 
 .. autofunction:: climaf.html.link
 
+.. autofunction:: climaf.html.link_on_its_own_line
+
 .. autofunction:: climaf.html.cell
 
 .. autofunction:: climaf.html.fline
