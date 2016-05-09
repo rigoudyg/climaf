@@ -406,16 +406,19 @@ begin
     end do
 
     ; for curvilinear grid  
-    if ismissing(str_match(Var_DimNames,latname)) then
-      if ( isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,latname)) ) \ 
-        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-           .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
-        .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
-           .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
-        useLatDim=True
+    if isvar("latname") .and. ismissing(str_match(Var_DimNames,latname)) then
+      useLatDim=True
+    else
+      if .not. isvar("latname") then
+        if ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+             .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
+           .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+             .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
+          useLatDim=True
+        end if
       end if
     end if
-    
+
     if useLatDim then ; curvilinear grid
       
       if isfilevar(ffile,"nav_lat") then
