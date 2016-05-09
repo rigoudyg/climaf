@@ -47,6 +47,7 @@ Default values of the attributes:
 
 Example 1:
 - On Curie, access to a 'time series' dataset of the variable tas, providing values to all facets:
+
  >>> dat1 = ds(project='IGCM_OUT_CMIP',
                root='/ccc/store/cont003/dsm',
                login ='p86mart',
@@ -61,6 +62,7 @@ Example 1:
 	       period='1850-1900',
 	       variable='tas'
 	       )
+               
 Note that the following request returns the same files (but takes more time):
  >>> dat1 = ds(project='IGCM_OUT_CMIP',
                model='IPSLCM6',
@@ -73,6 +75,7 @@ Note that the following request returns the same files (but takes more time):
 Example 2:
 - On Curie, access to a 'SE_50Y' dataset of the variable tas, providing values to all facets;
 Note that we set frequency to 'seasonal' (or 'annual_cycle'), specify clim_period and clim_period_length (to specify either _50Y or _100Y)
+
  >>> dat2 = ds(project='IGCM_OUT_CMIP',
                login ='p86mart',
                model='IPSLCM6',

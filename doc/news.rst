@@ -6,6 +6,11 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/05/09:
+
+  - Bug fixes when using ``mpCenterLonF`` argument for standard
+    operator ``plot`` (see :doc:`scripts/plot`)    
+
 - 2016/05/04 - Version 1.0.1 : 
 
   - html package : 

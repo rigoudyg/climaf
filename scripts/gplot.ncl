@@ -404,26 +404,21 @@ begin
         end if
       end do
     end do
-   
-    ; for curvilinear grid
-    do k=0,1
-      do i=0, dimsizes(latnames)-1
-        if ismissing(str_match(Var_DimNames,latnames(i))) then 
-          if ( isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,latnames(i))) ) \ 
-            .or. ( iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"standard_name") \
-            .and. (field&$Var_DimNames(k)$@standard_name .eq. "latitude") ) \
-            .or. (  iscoord(field,Var_DimNames(k)) .and. isatt(field&$Var_DimNames(k)$,"axis") \
-            .and. ( (field&$Var_DimNames(k)$@axis .eq. "y") .or. (field&$Var_DimNames(k)$@axis .eq. "Y") ) ) then
-            useLatDim=True
-          end if
-        end if
-      end do
-    end do
 
- 
+    ; for curvilinear grid  
+    if ismissing(str_match(Var_DimNames,latname)) then
+      if ( isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,latname)) ) \ 
+        .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+           .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
+        .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+           .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
+        useLatDim=True
+      end if
+    end if
+    
     if useLatDim then ; curvilinear grid
       
-      if isfilevar(ffile,"nav_lat") then 
+      if isfilevar(ffile,"nav_lat") then
         if (isfilepresent("coordinates.nc") .or. isfilepresent("mesh_mask.nc")) then
       
           if isfilepresent("coordinates.nc") then
@@ -753,28 +748,28 @@ begin
     useXY_dummy=False
     horizontal_dummy=False
     vprofile_dummy=False
-    lat_exist_dummy=True  
-    lon_exist_dummy=True
+    lat_exist2=True  
+    lon_exist2=True
     proj_data_dummy=False
 
     ; Reading auxiliary field and reduction if necessary
     aux_field_select=""
-    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
+    array2=field_reduce(aux_file, aux_var, y, useXY_dummy, horizontal_dummy, useLatDim2, vprofile_dummy, aux_field_select, lat_exist2, lon_exist2, proj_data_dummy)
  
     fld2=array2[0]
     if (ListCount(array2) .eq. 2) .and. useXY_dummy then
       hdim2=array2[1]
     else 
-      if (ListCount(array) .ge. 2) then ; ListCount eq 2 or 3
-        if lat_exist_dummy .and. lon_exist_dummy then	
+      if (ListCount(array2) .ge. 2) then ; ListCount eq 3 or 4 <=> rk eq 2
+        if lat_exist2 .and. lon_exist2 then	
           latdim2=array2[1]	    
           londim2=array2[2]
         end if
-        if (lat_exist_dummy .and. .not. lon_exist_dummy) then latdim2=array2[1] end if
-        if (lon_exist_dummy .and. .not. lat_exist_dummy) then londim2=array2[1] end if
+        if (lat_exist2 .and. .not. lon_exist2) then latdim2=array2[1] end if
+        if (lon_exist2 .and. .not. lat_exist2) then londim2=array2[1] end if
       end if
     end if
-      
+
     tmpfld=fld2*tofloat(myscale_aux)+tofloat(myoffset_aux)
     copy_VarMeta(fld2,tmpfld)
     delete(fld2)
@@ -800,41 +795,43 @@ begin
     useXY_dummy=False
     horizontal_dummy=False
     vprofile_dummy=False
-    lat_exist_dummy=True
-    lon_exist_dummy=True
+    lat_exist3=True
+    lon_exist3=True
     proj_data_dummy=False
 
     useLatDimv=False
     uselect=""
-    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
+    array3=field_reduce(u_file, u_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, uselect, lat_exist3, lon_exist3, proj_data_dummy)
  
     fld3=array3[0]
     if (ListCount(array3) .eq. 2) .and. useXY_dummy then
       print("Rank data for vector u is 1 !!! Vectors fields must have a rank >= 2 !")
       status_exit(1)
     else 
-      if (ListCount(array) .ge. 2) then ; ListCount eq 2 or 3
+      if (ListCount(array3) .ge. 2) then ; ListCount eq 3 or 4 <=> rk eq 2
         ;latdimv=array3[1]
-        if (lat_exist_dummy .and. lon_exist_dummy) then londimv=array3[2] end if
-        if (lon_exist_dummy .and. .not. lat_exist_dummy) then londimv=array3[1] end if
+        if (lat_exist3 .and. lon_exist3) then londimv=array3[2] end if
+        if (lon_exist3 .and. .not. lat_exist3) then londimv=array3[1] end if
       end if
     end if
 
     print("-----> Vector v ")
     
     ; Reading vector v and reduction if necessary
+    lat_exist4=True
+    lon_exist4=True
     useLatDimv=False
     vselect=""
-    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist_dummy, lon_exist_dummy, proj_data_dummy)
+    array4=field_reduce(v_file, v_var, y, useXY_dummy, horizontal_dummy, useLatDimv, vprofile_dummy, vselect, lat_exist4, lon_exist4, proj_data_dummy)
 
     fld4=array4[0]
     if (ListCount(array4) .eq. 2) .and. useXY_dummy then
       print("Rank data for vector v is 1 !!! Vectors fields must have a rank >= 2 !")
       status_exit(1)
     else 
-      if (ListCount(array) .ge. 2) then ; ListCount eq 3
+      if (ListCount(array4) .ge. 2) then ; ListCount eq 3 or 4 <=> rk eq 2
         ;londimv=array4[2]
-        if lat_exist_dummy then latdimv=array4[1] end if
+        if lat_exist4 then latdimv=array4[1] end if
       end if
     end if
      
@@ -1087,7 +1084,7 @@ begin
             if (horizontal) then
               res2@gsnAddCyclic = False
               if useLatDim then
-                if isvar("londim") then res2@sfXArray = londim end if
+                if isvar("londim") then res2@sfXArray = londim end if          
                 if isvar("latdim") then res2@sfYArray = latdim end if
                 res2@gsnAddCyclic        = False
               end if
@@ -1195,8 +1192,10 @@ begin
         end if
         
       else
-        res@mpMinLatF                = min(latdim)
-        res@mpMaxLatF                = max(latdim)
+        if isvar("latdim") then
+          res@mpMinLatF                = min(latdim)
+          res@mpMaxLatF                = max(latdim)
+        end if
         if (isvar("mpCenterLonF")) then
           do while ((mpCenterLonF .gt. 180) .and. (mpCenterLonF .le. 360))
             mpCenterLonF=mpCenterLonF-360
@@ -1204,7 +1203,7 @@ begin
           if mpCenterLonF .gt. (max(londim)-180) then
             print("out of data range: mpCenterLonF + 180 > max(londim)")
           end if
-          if mpCenterLonF .lt. (max(londim)-180) then
+          if .not. useLatDim .and. ( mpCenterLonF .lt. (max(londim)-180) ) then ; for only rectilinear grids
             ; pivots about a user-specified longitude (rectilinear grids only)
             fld_flip=lonPivot(fld,mpCenterLonF+180) 
             delete(fld)
@@ -1212,10 +1211,13 @@ begin
             delete(fld_flip)
           end if
           res@mpCenterLonF=mpCenterLonF
+                    
         else
-          res@mpMinLonF                = min(londim)
-          res@mpMaxLonF                = max(londim)
-          res@mpCenterLonF=(min(londim)+max(londim))/2
+          if isvar("londim") then
+            res@mpMinLonF                = min(londim)
+            res@mpMaxLonF                = max(londim)
+            res@mpCenterLonF=(min(londim)+max(londim))/2
+          end if
         end if
 
       end if
@@ -1247,7 +1249,7 @@ begin
           ; projection. Since this model is already on a native lambert conformal grid,
           ; we want to turn OFF the tranformation.
         
-          res@tfDoNDCOverlay        = False         ; plot is smoother if TRUE
+          res@tfDoNDCOverlay        = False         ; plot is smoother if True
           res@mpDataBaseVersion     = "MediumRes"   ; Better map outlines
           res@pmTickMarkDisplayMode = "Always"      ; Turn on tickmarks
             
@@ -1258,7 +1260,7 @@ begin
       end if
 
     end if ;end horizontal
-    
+
     if VECT then 
       if (isvar("vcRefMagnitudeF")) then                ; define vector ref magnitude
         res@vcRefMagnitudeF=vcRefMagnitudeF
@@ -1296,8 +1298,8 @@ begin
       if (horizontal) then 
         res@gsnAddCyclic = False
         if useLatDimv then
-          res@vfXArray            = londimv
-          res@vfYArray            = latdimv
+          if isvar("londimv") then res@vfXArray = londimv end if
+          if isvar("latdimv") then res@vfYArray = latdimv end if
           res@gsnAddCyclic        = False
         end if
       end if
@@ -1441,11 +1443,11 @@ begin
       res@gsnAddCyclic = False
       if useLatDim then 
         ;res@trGridType          = "TriangularMesh"
-        res@sfXArray            = londim
-        res@sfYArray            = latdim
+        if isvar("londim") then res@sfXArray = londim end if
+        if isvar("latdim") then res@sfYArray = latdim end if
         res@gsnAddCyclic        = False
       end if
-     
+    
       print("using gsn_csm_contour_map")
       if isvar("options") then res_list(options, res) end if 
       if VECT then

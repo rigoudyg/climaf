@@ -229,7 +229,11 @@ Vectors:
     :py:func:`~climaf.operators.fixed_fields()`. Such files are not
     included with CliMAF and must be sought by your local Nemo
     dealer. At CNRM you may have a look at
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/. In this case, if
+    you also plot an auxiliary field, it only works if auxiliary field
+    is not a sub-region of the main field (because the latitude and
+    longitude arrays will be read in the same file that for main
+    field).  
 
 .. _native_grid:
 
@@ -240,7 +244,9 @@ Vectors:
     'climaf_plot_grid.nc'. You do that using function
     :py:func:`~climaf.operators.fixed_fields()`. Such file is not
     included with CliMAF and must be sought by user. See example
-    :ref:`Climaf call example <native_grid2>`. 
+    :ref:`Climaf call example <native_grid2>`. In this case, if you
+    also want to plot an auxiliary field, this second field must be on
+    the same grid as the main field.  
 
 **Outputs** :
   - main output : a PNG or PDF figure
