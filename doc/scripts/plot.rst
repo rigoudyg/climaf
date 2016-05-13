@@ -74,15 +74,32 @@ General:
       <native_grid>`.    
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
-  - ``time``, ``level`` : for selecting time or level. This arguments
-    apply on all fields which have time and/or level dimension. Set it
-    to: 
+  - ``date``, ``time``, ``level`` : for selecting date, time and/or
+    level. These arguments apply on all fields (**from 2D to 4D**)
+    which **have time and/or level dimension**. Set it to,  
 
-    - an integer if you want to select an index, 
-    - or a float if you want to select closest coordinate value,
-    - default: select the first time step if we have non-degenerated 
-      dimensions (t,z,y,x) ; select first time or level step if
-      field rank is 3.     
+    - for ``time`` and ``level``:
+
+      - an integer if you want to select an index (first index is 0), 
+      - or a float if you want to select closest coordinate
+	value. Warning: For ``time``, if the value has more than six
+	digits, there is big rounding errors. 
+ 
+    - for ``date``:
+
+      - a string in the format 'YYYY','YYYYMM', 'YYYYMMDD' or
+	'YYYYMMDDHH' e.g.: ``date`` =19810131. 
+
+    - default: for 4D fields (e.g. if we have non-degenerated
+      dimensions (t,z,y,x)), select the first time step; for 3D
+      fields, select first step of first coordinate (time or level). 
+    
+    Remarks: 
+    
+      - ``time`` and ``date`` arguments are incompatible;
+      - if you use both ``date`` (or ``time``) and ``level`` arguments
+	for 2D fields which have time and level dimensions, it is the
+	time extraction will be made.
 
   - ``options``, ``aux_options``, ``shading_options`` : strings for
     setting NCL graphic resources directly, for the various 
@@ -295,6 +312,10 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> plot_map5=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, 
      ... vcRefMagnitudeF=0.02, level=10, time=0) 
+     >>> # Same as above but with date selection
+     >>> plot_map6=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 19980131 for date', rotation=1, vcRefLengthF=0.002, 
+     ... vcRefMagnitudeF=0.02, level=10, date=19980131)
+
 
 .. _native_grid2:
 
@@ -422,15 +443,15 @@ For map:
   - ``gsnCenterString`` : adds a string just above the plot's upper
     boundary and centers it;
 
-    - if you select time and/or level (by optional arguments ``time``
-      and/or ``level``), set it to:  
+    - if you select date, time and/or level (by optional arguments
+      ``date``, ``time`` and/or ``level``), set it to:  
 
       - a string to add this given string (for example
 	gsnCenterString="" if you want turn off this sub-title), or 
-      - defaut (climaf): add select values for time and/or level for
-	main field
+      - defaut (climaf): add select values for date, time and/or level
+	for main field
       
-    - if you don't select time and/or level, set it to:
+    - if you don't select date, time and/or level, set it to:
     
       - a string to add this given string, or 
       - defaut (ncl): none; see
@@ -476,6 +497,9 @@ For profiles:
   - ``tiXAxisFontHeightF`` : same as  for map
   - ``tiYAxisFontHeightF`` : same as  for map
   - ``tiMainFontHeightF`` : same as  for map
+  - ``gsnLeftString`` : same as  for map
+  - ``gsnRightString`` : same as  for map
+  - ``gsnCenterString`` : same as  for map
 
 **More climaf call example** 
  

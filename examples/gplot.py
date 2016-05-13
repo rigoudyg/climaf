@@ -70,6 +70,11 @@ map_select2=plot(tas, sub_tas, uas, vas, title='Selecting level and time close t
                  vcRefLengthF=0.02, vcRefMagnitudeF=11.5, level=10., time=1400000.) # level selection has no impact on fields because they have not depth dimension, whereas time selection is done for all fields 
 cshow(map_select2)
 
+map_select3=plot(tas, sub_tas, uas, vas, title='Selecting level and time close to 10 and 19800131 respectively',
+                 vcRefLengthF=0.02, vcRefMagnitudeF=11.5, level=10., date=19800131) # level selection has no impact on fields because they have not depth dimension, whereas time selection is done for all fields 
+cshow(map_select3)
+
+
 #
 # This example will work on CNRM's Lustre. An only new feature is added: ROTATION of VECTORS from model grid on geographic grid
 #

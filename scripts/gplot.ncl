@@ -113,74 +113,120 @@ end
 undef("data_select")
 ; Select value 'arg' of optional argument 'arg_name' for dimension 'dim_field_name' of 'field' 
 ; and create a list, called 'select_list', of extracted values 
-function data_select(arg_name:string, arg:numeric, field:numeric, dim_field_name:string, select_list:string)
-
-local VarDimNames, dim, rk, index, value
+function data_select(arg_name:string, arg, field:numeric, dim_field_name:string, select_list:string)
+ 
+local VarDimNames, dim, rk, k, dim_pos, index, input_arg, utc_fld_time, utc_date, year, month, day, hour, value
 begin
-  
+
   VarDimNames = getVarDimNames(field)  ; getting dimensions from metadata
   dim=dimsizes(field)
   rk=dimsizes(dim)
+ 
+  ; get position of 'dim_field_name' for 'field' 
+  do k=0,dimsizes(VarDimNames)-1
+    if .not. ismissing(str_match(VarDimNames(k),dim_field_name)) then dim_pos=k end if
+  end do
 
+  ; compute index of selected value
   if isint(arg) then
-    print("Selecting index "+arg+" for "+arg_name+", i.e. "+arg_name+" = "+field&$dim_field_name$(arg))
-    if arg_name .eq. "time" then
-      ;value=cd_calendar(field&$dim_field_name$(arg),2) ; value returned will be in the format YYYYMMDD
-      utc_date=cd_calendar(field&$dim_field_name$(arg),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
-      year  = tointeger(utc_date(:,0))    ; Convert to integer for
-      month = tointeger(utc_date(:,1))    ; use sprinti 
-      day   = tointeger(utc_date(:,2))
-      value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) 
-    else
-      value=field&$dim_field_name$(arg)
-    end if
-    select_list=select_list+" "+arg_name+"="+value
-    if rk .eq. 4 then
-      new_fld=field(arg,:,:,:)     
-    else 
-      if rk .eq. 3 then
-        new_fld=field(arg,:,:)
-      else 
-        if rk .eq. 2 then
-          new_fld=field(arg,:)
-        end if ;rk eq 2
-      end if ; rk eq 3
-    end if ; rk eq 4
-    
+    index=arg
+
   else
     if isfloat(arg) then 
-      ; To convert date to a UT-referenced date => 'time' would be given in the format 'YYYYMM.': to be continued.  
-      ;utc_time=cd_calendar(field&$VarDimNames(0),1)
-      ;index=closest_val(time,utc_time)
-      ;print("Selecting time close to "+time+", i.e. time = "+utc_time(index))
       index=closest_val(arg,field&$dim_field_name$)
-      print("Selecting "+arg_name+" close to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index))
-      if arg_name .eq. "time" then
-        ;value=cd_calendar(field&$dim_field_name$(index),2) ;value returned will be in the format YYYYMMDD
-        utc_date=cd_calendar(field&$dim_field_name$(index),0) ; array returned will be of type float and dimensioned dimsizes(time)x6
-        year  = tointeger(utc_date(:,0))    ; Convert to integer for
-        month = tointeger(utc_date(:,1))    ; use sprinti 
-        day   = tointeger(utc_date(:,2))
-        value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) 
-      else
-        value=field&$dim_field_name$(index)
-      end if
-      select_list=select_list+" "+arg_name+"="+value
-      if rk .eq. 4 then
-        new_fld=field(index,:,:,:)     
-      else 
-        if rk .eq. 3 then
-          new_fld=field(index,:,:)
-        else 
-          if rk .eq. 2 then
-            new_fld=field(index,:)
-          end if ;rk eq 2
-        end if ; rk eq 3
-      end if ; rk eq 4
-      
-    end if ;arg is float
-  end if ;arg is integer
+
+    else
+      if isstring(arg) then 
+        if arg_name .eq. "date" then   ; 'date' is given in the format 'YYYY','YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'   
+          input_arg=arg(:)
+          ; convert time dimension of 'field' to a UT-referenced date in the format YYYYMMDDHH
+          utc_fld_time=cd_calendar(field&$dim_field_name$,3)
+       
+          ; convert time dimension of 'arg' in the format YYYYMMDDHH
+          if strlen(arg) .eq. 4 then     ; input value is in the format 'YYYY' so add 'MMDDHH'
+            arg=arg+"010101" 
+          else
+            if strlen(arg) .eq. 6 then   ; input value is in the format 'YYYYMM' so add 'DDHH' 
+              arg=arg+"0101"
+            else
+              if strlen(arg) .eq. 8 then ; input value is in the format 'YYYYMMDD' so add 'HH' 
+                arg=arg+"01"
+              else
+                if (strlen(arg) .gt. 10) .or. (strlen(arg) .lt. 4) .or. .not. ismissing(str_match(arg,".")) then
+                  print("'date' must be given in the format 'YYYY','YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'.")
+                  status_exit(1) 
+                end if
+              end if
+            end if
+          end if 
+          
+          index=closest_val(tointeger(arg), utc_fld_time)
+        end if
+
+      end if ; arg is string
+    end if ; arg is float
+  end if ; arg is integer
+
+  ; compute of new field with extraction at 'index'
+  if rk .eq. 4 then
+    if dim_pos .eq. 0 then new_fld=field(index,:,:,:) end if
+    if dim_pos .eq. 1 then new_fld=field(:,index,:,:) end if
+    if dim_pos .eq. 2 then new_fld=field(:,:,index,:) end if
+    if dim_pos .eq. 3 then new_fld=field(:,:,:,index) end if
+  else 
+    if rk .eq. 3 then
+      if dim_pos .eq. 0 then new_fld=field(index,:,:) end if
+      if dim_pos .eq. 1 then new_fld=field(:,index,:) end if
+      if dim_pos .eq. 2 then new_fld=field(:,:,index) end if
+    else 
+      if rk .eq. 2 then
+        if dim_pos .eq. 0 then new_fld=field(index,:) end if
+        if dim_pos .eq. 1 then new_fld=field(:,index) end if
+      end if ;rk eq 2
+    end if ; rk eq 3
+  end if ; rk eq 4
   
+  ; to print extracted value
+  if (arg_name .eq. "time") .or. (arg_name .eq. "date") then
+    
+    utc_date=cd_calendar(field&$dim_field_name$(index),0) ; array returned will be of type float 
+                                                          ; and dimensioned dimsizes(time)x6
+    year  = tointeger(utc_date(:,0))    ; Convert to integer for
+    month = tointeger(utc_date(:,1))    ; use sprinti 
+    day   = tointeger(utc_date(:,2))
+    hour  = tointeger(utc_date(:,3))
+
+    if ( (arg_name .eq. "date") .and. (strlen(input_arg) .eq. 10) ) \
+      .or. ( (arg_name .ne. "date") .and. hour .ne. 0 ) then 
+      value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) + "-H" + sprinti("%0.2i", hour) 
+    else
+      value = sprinti("%0.4i", year) + "/" + sprinti("%0.2i", month) + "/" + sprinti("%0.2i", day) 
+    end if
+
+  else
+    value=field&$dim_field_name$(index)
+  end if
+
+  if isint(arg) then
+    if arg_name .eq. "time" then
+      print("Selecting index "+arg+" for "+arg_name+", i.e. "+arg_name+" = "+field&$dim_field_name$(arg)+" <=> "+value)
+    else
+      print("Selecting index "+arg+" for "+arg_name+", i.e. "+arg_name+" = "+value)
+    end if
+
+  else
+    if isfloat(arg) .or. isstring(arg) then 
+      if (arg_name .eq. "date") .or. (arg_name .eq. "time") then
+        if arg_name .eq. "date" then arg=input_arg end if
+        print("Selecting "+arg_name+" close to "+arg+", i.e. "+arg_name+" = "+field&$dim_field_name$(index)+" <=> "+value)
+      else
+        print("Selecting "+arg_name+" close to "+arg+", i.e. "+arg_name+" = "+value)
+      end if
+    end if
+  end if
+  
+  select_list=select_list+" "+arg_name+"="+value
+
   return(new_fld)
   
 end
@@ -271,7 +317,7 @@ undef("field_reduce")
 ; Reduce rank of field called 'varname' in file 'filename' by adapting to various cases, output field is 2D or 1D
 function field_reduce(filename:string, varname:string, ystyle:string, useXY:logical, horizontal:logical, useLatDim:logical, vprofile:logical, extract_list:string, lat_exist:logical, lon_exist:logical, proj_data:logical)
 
-local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim, dimnames, latnames, lonnames, latname, lonname, coord_file, grid_file
+local ffile, field, Var_DimNames, dime, rank, new_field, fldtmp, index, hor_dim, lat_dim, lon_dim, dimnames, latnames, lonnames, latname, lonname, coord_file, grid_file, extract
 begin
   
   ; Reading the field 
@@ -322,12 +368,28 @@ begin
 ; should plot some Hovmoeller diagram
 ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ; case where (t,z,y,x) are not degenerated
-    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
-      .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-      .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
+    if (isvar("date") .or. isvar("time")) .and. ( (.not. ismissing(str_match(Var_DimNames(0),"time"))) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+      .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) ) then
     
-      fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list)
-  
+      if isvar("date") .and. .not. isvar("time") then
+        fldtmp=data_select("date", date, field, Var_DimNames(0), extract_list)
+      else
+        if isvar("time") .and. .not. isvar("date") then 
+          fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list) 
+        else
+          print("'date' and 'time' are incompatible. You only have to supply one of these arguments.")
+          status_exit(1) 
+        end if
+      end if
+
+      if isvar("level") .and. check_zaxis(field,1) then
+        delete(field)
+        field=fldtmp
+        delete(fldtmp)
+        fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
+      end if
+
     else
       ; case where no time argument or 'bad' files
       print("Selecting first time step")
@@ -346,150 +408,217 @@ begin
  
   ; Assume second dimension is depth. Select first level before further processing
   if (rank .eq. 3) then 
-    ;print("plotting a field with 2 horizontal dimensions")
+
     ; case where (t,y,x) or (t,z,y) or (t,z,x) are not degenerated
-    if ( (isvar("time")) .and. (.not. ismissing(str_match(Var_DimNames(0),"time"))) ) \
-      .or. ( (isvar("time")) .and. iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+    if (.not. ismissing(str_match(Var_DimNames(0),"time"))) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
       .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
-        
-      fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list)
-        
-      ; case where (t,z,y) or (t,z,x) are not degenerated
-      if isvar("level") .and. check_zaxis(field,1) then
-        delete(field)
-        field=fldtmp
-        delete(fldtmp)
-        fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
-      end if  
+
+      if isvar("date") .or. isvar("time") then 
+
+        if isvar("date") .and. .not. isvar("time") then
+          fldtmp=data_select("date", date, field, Var_DimNames(0), extract_list) 
+        else
+          if isvar("time") .and. .not. isvar("date") then 
+            fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list) 
+          else
+            print("'date' and 'time' are incompatible. You only have to supply one of these arguments.")
+            status_exit(1) 
+          end if
+        end if
+
+        ; case where (t,z,y) or (t,z,x) are not degenerated
+        if isvar("level") .and. check_zaxis(field,1) then
+          delete(field)
+          field=fldtmp
+          delete(fldtmp)
+          fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
+        end if  
+
+      else
+        if isvar("level") .and. check_zaxis(field,1) then
+          fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list)
+      
+        else
+          ; case where no time argument or 'bad' files
+          print("Selecting first time step")
+          fldtmp=field(0,:,:)
+        end if
+      end if
 
     else
       ; case where (z,y,x) are not degenerated
       if isvar("level") .and. check_zaxis(field,0) then
         fldtmp=data_select("level", level, field, Var_DimNames(0), extract_list)
-       else
-        ; case where no time/level arguments or 'bad' files
-        print("Selecting first time or level step")
+      else
+        ; case where no level argument or 'bad' files
+        print("Selecting first level step")
         fldtmp=field(0,:,:)
-      
       end if ; level
+
     end if ; time
 
     delete(field)
     field=fldtmp
     delete(fldtmp)
+    delete(Var_DimNames)
+    Var_DimNames = getVarDimNames(field) 
     delete(dime)
     dime=dimsizes(field)
     rank=dimsizes(dime)
-  end if ; rk eq 3  
-  
+  end if ; rk eq 3 
+
   ; field is now 2D, with one or two horizontal dimension(s). Last dim is assumed to be horizontal
   ; We have a true cross-section, a horizontal map or a profile (t,z)
   if (rank .eq. 2) then
-    delete(Var_DimNames)
-    Var_DimNames=getVarDimNames(field)
-   
-    if (ystyle .eq. "log") then useXY=False end if
-   
-    ; get latitude and/or longitude name
-    latnames=(/"lat", "LAT", "latitude", "nav_lat"/)     ; dimnames(0,:)
-    lonnames=(/"lon", "LON", "longitude", "nav_lon"/)    ; dimnames(1,:)
-    dimnames=(/latnames, lonnames/)
 
-    do k=0,1 
-      do i=0, dimsizes(dimnames(k,:))-1
-        if ( .not. ismissing(str_match(Var_DimNames,dimnames(k,i))) \
-          .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,dimnames(k,i)))) ) then
-          if (k .eq. 0) then latname=latnames(i) end if
-          if (k .eq. 1) then lonname=lonnames(i) end if
-        end if
-      end do
-    end do
+    extract=False
+    ; cases (t,*) or (z,*) with an extraction in time or level
+    if (.not. ismissing(str_match(Var_DimNames(0),"time"))) \
+      .or. ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+             .and. (field&$Var_DimNames(0)$@standard_name .eq. "time") ) then
 
-    ; for curvilinear grid  
-    if isvar("latname") .and. ismissing(str_match(Var_DimNames,latname)) then
-      useLatDim=True
-    else
-      if .not. isvar("latname") then
-        if ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
-             .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
-           .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
-             .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
-          useLatDim=True
-        end if
-      end if
-    end if
-
-    if useLatDim then ; curvilinear grid
-      
-      if isfilevar(ffile,"nav_lat") then
-        if (isfilepresent("coordinates.nc") .or. isfilepresent("mesh_mask.nc")) then
-      
-          if isfilepresent("coordinates.nc") then
-            coord_file=addfile("coordinates.nc","r")
-            
-            if isfilevar(coord_file,"gphit") then 
-              lat_dim=coord_file->gphit
-              lat_dim_tmp=rm_single_dims(lat_dim)
-              delete(lat_dim)
-              lat_dim=lat_dim_tmp
-              delete(lat_dim_tmp)
-              lat_dim@standard_name="latitude"
-            end if
-            if isfilevar(coord_file,"glamt") then 	
-              lon_dim=coord_file->glamt
-              lon_dim_tmp=rm_single_dims(lon_dim)
-              delete(lon_dim)
-              lon_dim=lon_dim_tmp
-              delete(lon_dim_tmp)
-              lon_dim@standard_name="longitude"
-            end if
+      if isvar("date") .or. isvar("time") then
+        if isvar("date") .and. .not. isvar("time") then
+          fldtmp=data_select("date", date, field, Var_DimNames(0), extract_list) 
+        else
+          if isvar("time") .and. .not. isvar("date") then
+            fldtmp=data_select("time", time, field, Var_DimNames(0), extract_list) 
           else
-
-            if isfilepresent("mesh_mask.nc") then
-              coord_file=addfile("mesh_mask.nc","r")
-              if isfilevar(ffile,"nav_lat") then lat_dim=coord_file->nav_lat end if
-              if isfilevar(ffile,"nav_lon") then lon_dim=coord_file->nav_lon end if
-              lat_dim@standard_name="latitude"
-              lon_dim@standard_name="longitude"
-            end if
-          
-          end if
-
-        else  ; files 'coordinates.nc' and 'mesh_mask.nc' not present
-          print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
-          if isvar("latname") then lat_dim=ffile->$latname$ end if
-          if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
-        end if
-        
-      else ; curvilinear grid but not with nav_lat/nav_lon
-        
-        if ( .not. isvar("proj") .and. isfilepresent("climaf_plot_grid.nc") ) then
-          grid_file=addfile("climaf_plot_grid.nc","r")
-          if isfilevar(grid_file,"Lambert_Conformal") then 
-            proj_data=True ; contains map projection information
-            proj_data@projection_type="Lambert_Conformal"
-            proj_data@latitude_of_projection_origin=grid_file->Lambert_Conformal@latitude_of_projection_origin
-            ;proj_data@standard_parallel=grid_file->Lambert_Conformal@standard_parallel
-            proj_data@longitude_of_central_meridian=grid_file->Lambert_Conformal@longitude_of_central_meridian
+            print("'date' and 'time' are incompatible. You only have to supply one of these arguments.")
+            status_exit(1) 
           end if
         end if
-        if isvar("latname") then lat_dim=ffile->$latname$ end if
-        if isvar("lonname") then lon_dim=ffile->$lonname$ end if
-       
+        extract=True
+
+      else
+        if isvar("level") .and. check_zaxis(field,1) then
+          fldtmp=data_select("level", level, field, Var_DimNames(1), extract_list) 
+          extract=True
+        end if
+      end if        
+    
+    else
+      if isvar("level") .and. check_zaxis(field,0) then 
+        fldtmp=data_select("level", level, field, Var_DimNames(0), extract_list)
+        extract=True
+      end if
+    end if
+
+    if extract then
+      delete(field)
+      field=fldtmp
+      delete(fldtmp)
+      delete(dime)
+      dime=dimsizes(field)
+      rank=dimsizes(dime)
+    end if
+  
+    if .not. extract then
+
+      if (ystyle .eq. "log") then useXY=False end if
+   
+      ; get latitude and/or longitude name
+      latnames=(/"lat", "LAT", "latitude", "nav_lat"/)     ; dimnames(0,:)
+      lonnames=(/"lon", "LON", "longitude", "nav_lon"/)    ; dimnames(1,:)
+      dimnames=(/latnames, lonnames/)
+
+      do k=0,1 
+        do i=0, dimsizes(dimnames(k,:))-1
+          if ( .not. ismissing(str_match(Var_DimNames,dimnames(k,i))) \
+            .or. (isatt(field,"coordinates") .and. .not. ismissing(str_match(field@coordinates,dimnames(k,i)))) ) then
+            if (k .eq. 0) then latname=latnames(i) end if
+            if (k .eq. 1) then lonname=lonnames(i) end if
+          end if
+        end do
+      end do
+
+      ; for curvilinear grid  
+      if isvar("latname") .and. ismissing(str_match(Var_DimNames,latname)) then
+        useLatDim=True
+      else
+        if .not. isvar("latname") then
+          if ( iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"standard_name") \
+               .and. (field&$Var_DimNames(0)$@standard_name .eq. "latitude") ) \
+             .or. (  iscoord(field,Var_DimNames(0)) .and. isatt(field&$Var_DimNames(0)$,"axis") \
+               .and. ( (field&$Var_DimNames(0)$@axis .eq. "y") .or. (field&$Var_DimNames(0)$@axis .eq. "Y") ) ) then
+            useLatDim=True
+          end if
+        end if
       end if
 
-    else ; it is not a curvilinear grid
-      if isvar("latname") then lat_dim=ffile->$latname$ end if
-      if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
-    end if
+      if useLatDim then ; curvilinear grid
+      
+        if isfilevar(ffile,"nav_lat") then
+          if (isfilepresent("coordinates.nc") .or. isfilepresent("mesh_mask.nc")) then
+            
+            if isfilepresent("coordinates.nc") then
+              coord_file=addfile("coordinates.nc","r")
+              
+              if isfilevar(coord_file,"gphit") then 
+                lat_dim=coord_file->gphit
+                lat_dim_tmp=rm_single_dims(lat_dim)
+                delete(lat_dim)
+                lat_dim=lat_dim_tmp
+                delete(lat_dim_tmp)
+                lat_dim@standard_name="latitude"
+              end if
+              if isfilevar(coord_file,"glamt") then 	
+                lon_dim=coord_file->glamt
+                lon_dim_tmp=rm_single_dims(lon_dim)
+                delete(lon_dim)
+                lon_dim=lon_dim_tmp
+                delete(lon_dim_tmp)
+                lon_dim@standard_name="longitude"
+              end if
+            else
 
-    ; check if we have a horizontal map
-    if isvar("latname") .and. isvar("lonname") then 
-      horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
-    else
-      horizontal=False
-    end if
+              if isfilepresent("mesh_mask.nc") then
+                coord_file=addfile("mesh_mask.nc","r")
+                if isfilevar(ffile,"nav_lat") then lat_dim=coord_file->nav_lat end if
+                if isfilevar(ffile,"nav_lon") then lon_dim=coord_file->nav_lon end if
+                lat_dim@standard_name="latitude"
+                lon_dim@standard_name="longitude"
+              end if
+          
+            end if
+
+          else  ; files 'coordinates.nc' and 'mesh_mask.nc' not present
+            print("File coordinates.nc or mesh_mask.nc cannot be accessed. We will use data file values.")
+            if isvar("latname") then lat_dim=ffile->$latname$ end if
+            if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
+          end if
+        
+        else ; curvilinear grid but not with nav_lat/nav_lon
+        
+          if ( .not. isvar("proj") .and. isfilepresent("climaf_plot_grid.nc") ) then
+            grid_file=addfile("climaf_plot_grid.nc","r")
+            if isfilevar(grid_file,"Lambert_Conformal") then 
+              proj_data=True ; contains map projection information
+              proj_data@projection_type="Lambert_Conformal"
+              proj_data@latitude_of_projection_origin=grid_file->Lambert_Conformal@latitude_of_projection_origin
+              ;proj_data@standard_parallel=grid_file->Lambert_Conformal@standard_parallel
+              proj_data@longitude_of_central_meridian=grid_file->Lambert_Conformal@longitude_of_central_meridian
+            end if
+          end if
+          if isvar("latname") then lat_dim=ffile->$latname$ end if
+          if isvar("lonname") then lon_dim=ffile->$lonname$ end if
+       
+        end if
+
+      else ; it is not a curvilinear grid
+        if isvar("latname") then lat_dim=ffile->$latname$ end if
+        if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
+      end if
+
+      ; check if we have a horizontal map
+      if isvar("latname") .and. isvar("lonname") then 
+        horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
+      else
+        horizontal=False
+      end if
     
+    end if ; extract is False
   end if ; rk eq 2
 
   if (rank .eq. 1) then 
@@ -554,14 +683,15 @@ end
 
 undef("time_labels")
 ; If 'field' contains a time dimension, add additional resources to 'fct_res' to produce 
-; nicely-formatted time labels on time axis. This function only works if you have a time 
-; 'units' recognized by the cd_calendar function.
-procedure time_labels(field:numeric, fct_res:logical)
+; nicely-formatted time labels on time axis (xaxis or yaxis depend on 'inv_axis'). This 
+; function only works if you have a time 'units' recognized by the cd_calendar function.
+procedure time_labels(field:numeric, fct_res:logical, inv_axis:logical)
 
-local VarDim
+local VarDim, rnk, restick
 begin
 
   VarDim=getVarDimNames(field)
+  rnk=dimsizes(dimsizes(field))
  
   do k=0, dimsizes(VarDim)-1
     if ( .not. ismissing(str_match(VarDim(k),"time")) \
@@ -571,7 +701,11 @@ begin
       
       restick=True
 
-      if (k .eq. 0) then restick@ttmAxis="YL" end if ; "XB" by default 
+      if ( (rnk .eq. 2) .and. .not. inv_axis ) \
+        .or. ( (rnk .eq. 1) .and. inv_axis ) then 
+        restick@ttmAxis="YL"  ; "XB" by default 
+      end if 
+
       if (isvar("fmt")) then restick@ttmFormat=fmt end if
       time_axis_labels(field&$VarDim(k)$,fct_res,restick)           
     end if
@@ -625,7 +759,8 @@ begin
   if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
- 
+  if (.not. isvar("invXY")) then invXY=False end if
+  
   LABELON=False
   RASTER=True 
 
@@ -959,10 +1094,11 @@ begin
     end if
 
     if .not. isvar("gsnCenterString") then
-      if ( isvar("time") .or. isvar("level") ) then
+      if ( isvar("date") .or. isvar("time") .or. isvar("level") ) then
         main_field_select=str_left_strip(main_field_select) ; strips leading spaces from the input strings
         main_field_select=str_sub_str(main_field_select," ",", ") 
         main_field_select=str_sub_str(main_field_select,"time","t")
+        main_field_select=str_sub_str(main_field_select,"date","t")
         main_field_select=str_sub_str(main_field_select,"level","l")
         res@gsnCenterString = main_field_select     
       end if
@@ -1333,8 +1469,32 @@ begin
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColor = "black"
     xyres@tiMainString       = title
-    if isatt(fld,"long_name") then xyres@gsnLeftString=fld@long_name end if
-    xyres@gsnRightString=units 
+
+    if isvar("gsnLeftString") then
+      xyres@gsnLeftString = gsnLeftString
+    else
+      if isatt(fld,"long_name") then xyres@gsnLeftString=fld@long_name end if
+    end if
+
+    if isvar("gsnRightString") then
+      xyres@gsnRightString=gsnRightString
+    else
+      if isatt(fld,"units") then xyres@gsnRightString=units end if
+    end if
+
+    if .not. isvar("gsnCenterString") then
+      if ( isvar("date") .or. isvar("time") .or. isvar("level") ) then
+        main_field_select=str_left_strip(main_field_select) ; strips leading spaces from the input strings
+        main_field_select=str_sub_str(main_field_select," ",", ") 
+        main_field_select=str_sub_str(main_field_select,"time","t")
+        main_field_select=str_sub_str(main_field_select,"date","t")
+        main_field_select=str_sub_str(main_field_select,"level","l")
+        xyres@gsnCenterString = main_field_select     
+      end if
+    else 
+      xyres@gsnCenterString = gsnCenterString
+    end if
+ 
     if isvar("tiMainFontHeightF") then
       xyres@tiMainFontHeightF=tiMainFontHeightF
     end if
@@ -1354,7 +1514,7 @@ begin
     if isvar("tiYAxisFontHeightF") then
       xyres@tiYAxisFontHeightF=tiYAxisFontHeightF
     end if
-   
+
     ; auxiliary field
     if AUX_FIELD then
       xyres2 = True
@@ -1369,8 +1529,8 @@ begin
       xyres@txFontThicknessF = 3.0
     end if
     
-    if vprofile then
-      if (isvar("invXY") .and. invXY) then
+    if vprofile then ; case fld(z)
+      if invXY then
         xyres@trXReverse = True ; reverse X-axis
         xaxis=hdim
         yaxis=fld
@@ -1403,7 +1563,7 @@ begin
       if isvar("options") then res_list(options, xyres) end if
       plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
       if AUX_FIELD then
-        if (isvar("invXY") .and. invXY) then
+        if invXY then
           xaxis2=hdim2
           yaxis2=fld2
         else
@@ -1414,8 +1574,8 @@ begin
         plot1=gsn_csm_xy(wks,xaxis2,yaxis2,xyres2)
       end if
 
-    else
-      if (isvar("invXY") .and. invXY) then
+    else ; case fld(t), fld(x) or fld(y)
+      if invXY then
         xaxis=fld
         yaxis=hdim
         if isvar("vmin") then xyres@trXMinF=vmin end if
@@ -1426,10 +1586,12 @@ begin
         if isvar("vmin") then xyres@trYMinF=vmin end if
         if isvar("vmax") then xyres@trYMaxF=vmax end if
       end if
+      ; if 'fld' has a time dimension (i.e. fld(t)), produce nicely-formatted time labels on time axis
+      time_labels(fld, xyres, invXY) 
       if isvar("options") then res_list(options, xyres) end if 
       plot0=gsn_csm_xy(wks,xaxis,yaxis,xyres)
       if AUX_FIELD then
-        if (isvar("invXY") .and. invXY) then
+        if invXY then
           xaxis2=fld2
           yaxis2=hdim2
         else
@@ -1480,8 +1642,8 @@ begin
       if (y .eq. "index") then
         print("using gsn_csm_contour; y with index-linear spacing")
         
-        if ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
-          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+        if ( (invXY .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. invXY .and. (time_pos .eq. 0)) ) then
           res@trXReverse        = True ; reverse X-axis
         else
           res@trYReverse        = True ; reverse Y-axis
@@ -1491,8 +1653,8 @@ begin
       if (y .eq. "lin") then
         print("using gsn_csm_contour; y with data-linear spacing")
         
-        if ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
-          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+        if ( (invXY .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. invXY .and. (time_pos .eq. 0)) ) then
           res@trXReverse        = True ; reverse X-axis
           res@gsnXAxisIrregular2Linear= True
           if ( (.not. AUX_FIELD .and. LEVELS_CONTOURS) .or. AUX_FIELD ) then res2@gsnXAxisIrregular2Linear= True end if
@@ -1506,15 +1668,15 @@ begin
       if (y .eq. "log") then
         print("using gsn_csm_pres_hgt")
         
-        if .not. ( ((isvar("invXY") .and. invXY) .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
-          .or. (.not. (isvar("invXY") .and. invXY) .and. (time_pos .eq. 0)) ) then
+        if .not. ( (invXY .and. ( (time_pos .eq. -1) .or. (time_pos .eq. 1) )) \
+          .or. (.not. invXY .and. (time_pos .eq. 0)) ) then
 
           ; turn off special labels on right axis
           if ( (.not. AUX_FIELD .and. LEVELS_CONTOURS) .or. AUX_FIELD ) then res2@tmYRMode = "Automatic" end if
         end if
       end if
 
-      if (isvar("invXY") .and. invXY) then
+      if invXY then
         fld_tr=field_transpose(fld)
         delete(fld)
         fld=fld_tr
@@ -1527,7 +1689,7 @@ begin
         end if
       end if
 
-      time_labels(fld, res) ; if 'fld' has a time dimension, produce nicely-formatted time labels on time axis
+      time_labels(fld, res, invXY) ; if 'fld' has a time dimension, produce nicely-formatted time labels on time axis
       
       if isvar("options") then res_list(options, res) end if 
       if (y .eq. "lin") .or. (y .eq. "index") then 
