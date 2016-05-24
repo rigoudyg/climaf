@@ -150,8 +150,8 @@ begin
   if (.not. isvar("X_axis")) then X_axis="real" end if
   if (.not. isvar("myscale")) then myscale=1.0 end if 
   if (.not. isvar("myoffset")) then myoffset=0.0 end if
-  if (.not. isvar("myscale_aux")) then myscale_aux=myscale end if
-  if (.not. isvar("myoffset_aux")) then myoffset_aux=myoffset end if 
+  if (.not. isvar("myscale_aux")) then myscale_aux=1.0 end if
+  if (.not. isvar("myoffset_aux")) then myoffset_aux=0.0 end if 
   if (.not. isvar("type")) then type="png" end if
   if (.not. isvar("trim")) then trim=True end if
   if (.not. isvar("invXY")) then invXY=False end if

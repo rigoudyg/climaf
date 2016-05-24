@@ -30,9 +30,9 @@ the script convert all time periods to first's one
   - ``scale``, ``offset`` : for scaling the input field (x ->
     x*scale + offset); default = 1. and 0. (no scaling) 
   - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
-    fields (x -> x*scale_aux + offset_aux); default = ``scale`` and
-    ``offset`` (main field scaling). These arguments will apply of the
-    second to the nth field.
+    fields (x -> x*scale_aux + offset_aux); default = 1. and 0. (no
+    scaling). These arguments will apply of the second to the nth
+    field. 
   - ``units`` : name of the main field units; used in the caption;
     default is to use the corresponding CF metadata
   - ``y`` : y axis style
@@ -64,9 +64,13 @@ the script convert all time periods to first's one
     respectively. These resources are separated by "|", as e.g. : 
     ' options="tiMainString=lv|xyLineThicknessF=5.",
     aux_options="xyLineColor=red" '. It is recommended to use argument
-    ``aux_options`` only if you plot exactly two fields. 
+    ``aux_options`` only if you plot exactly two fields. Warning: all
+    graphic resources set by ``options`` are applied to all fields,
+    and graphic resources set by ``aux_options`` overwrite it for the
+    second to the nth field. 
+
     These resources have higher priority than CliMAF default ones,
-    which are :  
+    which are :    
 
     - txFontHeightF = 0.010
     - tmXBLabelFontHeightF=0.008

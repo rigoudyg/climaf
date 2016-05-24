@@ -22,8 +22,10 @@ Additional fields (optional):
 Warnings: 
 
 - Order of all data dimensions is supposed to be time, height, lat,
-  lon. Only first time step is used. Only the first vertical dimension
-  is used if the two other dimensions are not degenerated.   
+  lon. Only first time step is used for 4D or 3D fields if there is no
+  specified extraction. Only the first vertical dimension is used if
+  height is the first coordinate, if there is no specified level
+  extraction and if the two other dimensions are not degenerated.   
 
 - Order of input datasets is supposed to be main field, auxiliary field and
   vectors datasets. The last ones can be omitted. If you want to omit
@@ -192,8 +194,8 @@ Auxiliary field:
     than 1'
 
   - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
-    field (x -> x*scale_aux + offset_aux); default = ``scale`` and
-    ``offset`` (main field scaling) 
+    field (x -> x*scale_aux + offset_aux); default = 1. and 0. (no
+    scaling) 
 
 Vectors:
 
