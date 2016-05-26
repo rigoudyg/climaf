@@ -29,7 +29,7 @@
 ; and 0. (no scaling) 
 ;
 ; myscale_aux, myoffset_aux : for scaling the input auxiliary fields 
-; (x -> x*scale_aux + offset_aux); default = 'myscale' and 'myoffset' (main field scaling). 
+; (x -> x*scale_aux + offset_aux); default = 1. and 0. (no scaling). 
 ; These arguments will apply of the second to the nth field.
 ;
 ; units : name of the main field units; used in the caption; default is to use the 

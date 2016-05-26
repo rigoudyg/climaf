@@ -268,7 +268,7 @@ Vectors:
     the same grid as the main field.  
 
 **Outputs** :
-  - main output : a PNG or PDF figure
+  - main output : a PNG or PDF or EPS figure
 
 **Climaf call example** For more examples which are systematically
 tested, see :download:`gplot.py <../../examples/gplot.py>` and

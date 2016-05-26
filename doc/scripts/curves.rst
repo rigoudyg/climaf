@@ -2,7 +2,8 @@ curves : plot multiple profiles (along p, lat, lon, time, ...)
 ---------------------------------------------------------------
 
 Plot a series of xy curves (along time, lat, lon or pressure/z_index)
-for an ensemble dataset using NCL 
+for an ensemble dataset using NCL, and allowing for tuning a number of
+graphic attributes   
 
 **References** : http://www.ncl.ucar.edu
 
@@ -113,8 +114,7 @@ the script convert all time periods to first's one
       612x792 in pixels)   
   
 **Outputs** :
-
-  - main output : a PNG or PDF figure
+  - main output : a PNG or PDF or EPS figure
 
 **Climaf call example**::
  
@@ -164,3 +164,7 @@ the script convert all time periods to first's one
   >>> # Same as above and X and Y are inverted
   >>> a=curves(ta_profile, title='A profile',y="index",invXY=True) 
   >>> cshow(a)
+
+**Side effects** : None
+
+**Implementation** : Basic use of ncl: gsn_csm_xy

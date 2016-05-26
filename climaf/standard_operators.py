@@ -131,7 +131,7 @@ def load_standard_operators():
     #
     cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
     #
-    # timesection : to plot hovmoller diagrams
+    # timesection : to plot hovmueller diagrams
     #
     cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
             ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
