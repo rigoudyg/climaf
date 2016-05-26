@@ -92,7 +92,7 @@ def load_standard_operators():
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
             'units=\'\"${units}\"\' y=\'\"${y}\"\' colors=\'\"${colors}\"\' level=${level} time=${time} '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
+            'date=\'\"${date}\"\' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
             'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} fmt=\'\"${fmt}\"\' '
             'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} reverse=${reverse} '
             'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
@@ -131,7 +131,7 @@ def load_standard_operators():
     #
     cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
     #
-    # timesection : to plot hovmoller diagrams
+    # timesection : to plot hovmueller diagrams
     #
     cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
             ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '

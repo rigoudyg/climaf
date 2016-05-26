@@ -4,7 +4,7 @@ This module declares two 'projects' :
 
   - 'ref_climatos', for the climatological annual cycles and 
   - 'ref_ts', for the 'time series' (one variable evolving with time) 
-of a set of reference products as managed by J. Servonnat at IPSL.
+    of a set of reference products as managed by J. Servonnat at IPSL.
 
 This archive is available on Ciclad (IPSL), Curie (TGCC) and Ada (IDRIS), and /cnrm and at Cerfacs
 

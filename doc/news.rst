@@ -6,6 +6,24 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/05/24:
+
+  - Change default for arguments ``scale_aux`` and ``offset_aux`` for
+    standard operators ``plot`` (see :doc:`scripts/plot`) and
+    ``curves`` (see :doc:`scripts/curves`): no scaling instead of main
+    field scaling  
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - add argument ``date`` for selecting date in the format 'YYYY',
+      'YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'  
+    - ``time``, ``date`` and ``level`` extractions apply on all fields
+      now from 2D to 4D, instead of only 3D and 4D  
+    - log messages, when a time or level extraction is made, are also
+      performed 
+    - Bug fixes when using ``mpCenterLonF`` argument
+ 
+
 - 2016/05/04 - Version 1.0.1 : 
 
   - html package : 
