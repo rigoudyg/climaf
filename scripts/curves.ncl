@@ -313,19 +313,23 @@ begin
   end if 
    
   ;---Titles and labels
-  if .not. isvar("title") then title="title" end if
-
   tab_labels=new(n,string)
   do i=0,n-1 tab_labels(i)="no_label" end do
-  if .not. isvar("labels") then labels=title end if
+  if .not. isvar("labels") then 
+    if isvar("title") then 
+      labels=title
+    else
+      labels="no_label"
+    end if
+  end if
   tmp_labels=str_split(labels,"$")
   do i=0,dimsizes(tmp_labels)-1 
     if i .lt. n then
       tab_labels(i)=tmp_labels(i) 
     end if
   end do
-
-  res@tiMainString     = title                       ; add title
+  
+  if isvar("title") then res@tiMainString = title end if ; add title
   if (.not. isvar("units")) then 
     if (isatt(fld,"units")) then units=fld@units else units="None" end if
   end if

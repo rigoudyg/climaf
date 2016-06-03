@@ -1064,8 +1064,7 @@ begin
     res@gsnSpreadColorEnd   = -2
 
     ; Main title
-    if (.not. isvar("title")) then title=main_var end if 
-    res@tiMainString  = title
+    if isvar("title") then res@tiMainString  = title end if
 
     if isvar("tiMainFont") then
       res@tiMainFont = tiMainFont ;22 <=> "helvetica-bold"
@@ -1468,7 +1467,7 @@ begin
     xyres@txFontHeightF = 0.010
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColor = "black"
-    xyres@tiMainString       = title
+    if isvar("title") then xyres@tiMainString = title end if
 
     if isvar("gsnLeftString") then
       xyres@gsnLeftString = gsnLeftString

@@ -105,7 +105,9 @@ def load_standard_operators():
             'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
             'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' '
             'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} )', format="graph")
-    # 
+    #
+    # curves: plot a series of xy curves (along time, lat, lon or pressure/z_index) for an ensemble
+    #
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'y=\'\"${y}\"\' labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' units=\'\"${units}\"\' '
@@ -113,6 +115,15 @@ def load_standard_operators():
             'lgcols=${lgcols} myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' '
             'resolution=\'\"${resolution}\"\' trim=${trim} invXY=${invXY} vmin=${min} vmax=${max} '
             'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} )', format="graph")
+    #
+    # hovm : to plot Hovmoller diagrams
+    #
+    cscript('hovm', '(ncl -Q '+scriptpath+'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${var}\"\' '
+            ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
+            ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
+            ' mean_axis=\'\"${mean_axis}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' '
+            ' fmt=\'\"${fmt}\"\' )',format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #
@@ -130,14 +141,6 @@ def load_standard_operators():
     cscript("mask","cdo setctomiss,${miss} ${in} ${out}")
     #
     cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
-    #
-    # timesection : to plot hovmueller diagrams
-    #
-    cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
-            ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
-            ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
-            ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
-            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
     #
     if onCiclad:
         cscript("ml2pl", scriptpath+"ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",

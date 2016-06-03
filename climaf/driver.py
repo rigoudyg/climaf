@@ -476,9 +476,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if 'title' not in subdict :
         if 'member_label' in subdict :
             subdict["title"]=subdict['member_label']
-        else:
-            subdict["title"]=subdict["crs"]
-    else: 
+#        else:
+#            subdict["title"]=subdict["crs"]
+    else:
         #print("Got a member label : %s"%subdict['member_label'])
         if 'member_label' in subdict :
             subdict["title"]=subdict["title"]+" "+subdict['member_label']
