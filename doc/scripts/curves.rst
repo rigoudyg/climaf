@@ -15,15 +15,18 @@ graphic attributes
     only one non-degenerated dimension. Members can have different
     vector size.  
 
-Remark : If x axis is time and time units are different among members,
-the script convert all time periods to first's one
+Remarks : 
 
-**Mandatory arguments**: None (but ``title`` is recommended)
+- If x axis is time and time units are different among members, the
+  script convert all time periods to first's one.
+- Order of all data dimensions is supposed to be time, height, lat,
+  lon.  
+
+**Mandatory arguments**: None
 
 **Optional arguments**:
 
-  - ``title`` : string for graphic title; optional : CliMAF will
-    provide the CRS of the dataset 
+  - ``title`` : string for graphic title; default: no title
   - ``labels`` : a string with one label per member, separated by
     character '$'
   - ``colors`` : a string with one NCL color name per member,

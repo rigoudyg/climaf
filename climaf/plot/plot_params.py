@@ -102,6 +102,8 @@ def hovm_params(SSTbox_name) :
 
     Arg:
       SSTbox_name (string) : SST/climate box name.
+      The available boxes are: 'NINO3-4', 'NINO1-2', 'NINO3', 'NINO4', 'GRL',
+      'NATL', 'SAT' and 'TPA'.
 
     Returns : a python dictionary with domain parameters ('latS',
     'latN', 'lonW', 'lonE') to be used by hovm() 

@@ -1,5 +1,5 @@
 # Example for general-purpose plot using NCL
-# Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
+# Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 
 from climaf.api import *
 craz()

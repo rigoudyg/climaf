@@ -32,14 +32,13 @@ Warnings:
   the scalar field but not the verctor components, use value None for
   the scalar dataset
 
-**Mandatory arguments**: None (but ``title`` is recommended)
+**Mandatory arguments**: None
 
 **Optional arguments** (see also :ref:`More plot optional arguments <plot_more_args>` )       
 
 General:
 
-  - ``title`` : string for graphic title; optional : CliMAF will
-    provide the CRS of the dataset
+  - ``title`` : string for graphic title; default: no title
   - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
     default: 'png'. For 'png' format, all the surrounding extra white
     space are cropped with optional argument ``trim`` (but not for

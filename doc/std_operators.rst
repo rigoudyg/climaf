@@ -139,8 +139,10 @@ Documented operators and 'object functions' as of today :
 .. _graphic_operators:
 
     - :doc:`scripts/plot`
-    - :doc:`functions/plot_params`
+    - :py:func:`~climaf.plot.plot_params.plot_params`
     - :doc:`scripts/curves`
+    - :doc:`scripts/hovm`
+    - :py:func:`~climaf.plot.plot_params.hovm_params`
     - :doc:`scripts/cpdfcrop`
     - :doc:`scripts/cepscrop`
 

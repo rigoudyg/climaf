@@ -1,7 +1,7 @@
 ;******************************************************************
 ; Plot Hovmoller diagrams
 ; Usage and interfacing : see CliMAF doc 
-; http://climaf.readthedocs.org/en/latest/scripts/hovmoller.html
+; http://climaf.readthedocs.org/en/latest/scripts/hovm.html
 
 ; Second version - may 2016
 ;******************************************************************
@@ -81,24 +81,6 @@ function LatLon_names(ffile, field)
 
 local latnames, lonnames, dimnames, i, k
 begin
-;  latname="lat"
-;  lonname="lon"
-;  if .not.ismissing(str_match(getvardims(field),"latitude")) then
-;    latname="latitude"
-;    lonname="longitude"
-;  end if
-;  if .not. ismissing(str_match(getvardims(field),"LAT")) then
-;    latname="LAT"
-;    lonname="LON"
-;  end if
-;  if (ismissing(str_match(getvardims(field),"lat"))) .and. (ismissing(str_match(getvardims(field),"LAT"))) then
-;    if ( isatt(field,"coordinates") .and. ( (.not. ismissing(str_match(field@coordinates,"lat"))) .or. (.not. ismissing(str_match(field@coordinates,"LAT"))) ) ) then
-;      if isfilevar(ffile,"nav_lat") then 
-;        latname="nav_lat" 
-;        lonname="nav_lon"
-;      end if
-;    end if
-;  end if
 
   latnames=(/"lat", "LAT", "latitude", "nav_lat"/)     ; dimnames(0,:)
   lonnames=(/"lon", "LON", "longitude", "nav_lon"/)    ; dimnames(1,:)
@@ -258,7 +240,7 @@ undef("check_lat_axis")
 ; and the latitude variable name is 'lat_name'
 function check_lat_axis(field:numeric, i:integer, lat_name:string, lat_tab:numeric) 
 
-local vardims, zaxis_exist;, k
+local vardims, zaxis_exist
 begin
   
   vardims = getVarDimNames(field)  ; getting dimensions from metadata
@@ -344,24 +326,11 @@ begin
   lon_dim=ffile->$LatLon(1)$ 
 
   if dimsizes(Var_DimNames) .eq. 3 then
-;    LatLon= LatLon_names(ffile, field)
-;    LatLon=latlon
 
     if (mean_axis .eq. "Lat") then
-
       if check_zaxis(field,1) then
-;      if ( .not. ismissing(str_match(Var_DimNames(1),"depth")) .or. (Var_DimNames(1) .eq. "sigma") \
-;        .or. (Var_DimNames(1) .eq. "z") .or. (Var_DimNames(1) .eq. "Z") \
-;        .or. (Var_DimNames(1) .eq. "plev") .or. (Var_DimNames(1) .eq. "lev") .or. (Var_DimNames(1) .eq. "level") \
-;        .or. (Var_DimNames(1) .eq. "p") .or. (Var_DimNames(1) .eq. "pressure") \
-;        .or. ( iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") .and. ( (field&$Var_DimNames(1)$@axis .eq. "z") .or. (field&$Var_DimNames(1)$@axis .eq. "Z") ) ) ) then
         ; No reorder: (t,z,y)
         X = field($Var_DimNames(0)$|:,$Var_DimNames(1)$|:,{$LatLon(0)$|latS:latN})
-;      else if .not.ismissing(str_match(Var_DimNames(2),"lon")) .or. .not.ismissing(str_match(Var_DimNames(2),"LON")) \
-;        .or. ( iscoord(field,Var_DimNames(2)) .and. isatt(field&$Var_DimNames(2)$,"standard_name") \
-;        .and. (field&$Var_DimNames(2)$@standard_name .eq. "longitude") ) \
-;        .or. ( iscoord(field,Var_DimNames(2)) .and. isatt(field&$Var_DimNames(2)$,"axis") \
-;        .and. ( (field&$Var_DimNames(2)$@axis .eq. "x") .or. (field&$Var_DimNames(2)$@axis .eq. "X") ) ) then
       else if check_lon_axis(field,2,LatLon(1),lon_dim) then
         ; Reorder: (t,y,x) -> (t,x,y)
         field = lonFlip(field)
@@ -372,19 +341,9 @@ begin
       if (mean_axis .eq. "Lon") then
         ; --> No reorder 
         field = lonFlip(field)
-;        if ( .not. ismissing(str_match(Var_DimNames(1),"depth")) .or. (Var_DimNames(1) .eq. "sigma") \
-;          .or. (Var_DimNames(1) .eq. "z") .or. (Var_DimNames(1) .eq. "Z") \
-;          .or. (Var_DimNames(1) .eq. "plev") .or. (Var_DimNames(1) .eq. "lev") .or. (Var_DimNames(1) .eq. "level") \
-;          .or. (Var_DimNames(1) .eq. "p") .or. (Var_DimNames(1) .eq. "pressure") \
-;          .or. ( iscoord(field,Var_DimNames(1)) .and. isatt(field&$Var_DimNames(1)$,"axis") .and. ( (field&$Var_DimNames(1)$@axis .eq. "z") .or. (field&$Var_DimNames(1)$@axis .eq. "Z") ) ) ) then
         if check_zaxis(field,1) then
           ; (t,z,x)
           X = field($Var_DimNames(0)$|:,$Var_DimNames(1)$|:,{$LatLon(1)$|lonE:lonW})
-;        else if .not.ismissing(str_match(Var_DimNames(2),"lon")) .or. .not.ismissing(str_match(Var_DimNames(2),"LON")) \
-;          .or. ( iscoord(field,Var_DimNames(2)) .and. isatt(field&$Var_DimNames(2)$,"standard_name") \
-;          .and. (field&$Var_DimNames(2)$@standard_name .eq. "longitude") ) \
-;          .or. ( iscoord(field,Var_DimNames(2)) .and. isatt(field&$Var_DimNames(2)$,"axis") \
-;          .and. ( (field&$Var_DimNames(2)$@axis .eq. "x") .or. (field&$Var_DimNames(2)$@axis .eq. "X") ) ) then
         else if check_lon_axis(field,2,LatLon(1),lon_dim) then
           ; (t,y,x)
           X = field($Var_DimNames(0)$|:,{$LatLon(0)$|latS:latN}, {$LatLon(1)$|lonE:lonW})
@@ -417,7 +376,6 @@ begin
   else
     fld = ffile->$var$
   end if
-;  LatLon= LatLon_names(ffile, fld)
   lat_array=ffile->$LatLon(0)$ 
   lon_array=ffile->$LatLon(1)$ 
 
@@ -469,20 +427,20 @@ begin
         status_exit(1)
       end if
       end if 
-      new_fld= data_axavg(ffile, ds, mean_axis, latS, latN, lonE, lonW, LatLon)
+      new_fld=data_axavg(ffile, ds, mean_axis, latS, latN, lonE, lonW, LatLon)
 
     else if mean_axis .eq. "Lon" then
       print("rank= "+rk+"-> mean on x axis")
       if isvar("zpoint") .and. .not.isvar("xpoint") .and. .not.isvar("ypoint") then
-        ds= data_select("level", zpoint, fld, vardim(1), extract_list)
+        ds=data_select("level", zpoint, fld, vardim(1), extract_list)
       else if isvar("ypoint")  .and. .not.isvar("xpoint") .and. .not.isvar("zpoint") then
-        ds= data_select("latitude", ypoint, fld, vardim(2), extract_list)
+        ds=data_select("latitude", ypoint, fld, vardim(2), extract_list)
       else
         print("You must specify zpoint or ypoint"+cr)
         status_exit(1)
       end if
       end if
-      new_fld= data_axavg(ffile, ds, mean_axis, latS, latN, lonE, lonW, LatLon)
+      new_fld=data_axavg(ffile, ds, mean_axis, latS, latN, lonE, lonW, LatLon)
 
     else    ; mean_axis= Point
       if isvar("zpoint") .and. isvar("ypoint") .and. isvar("xpoint") then
@@ -512,19 +470,9 @@ begin
 
       dimvar=getvardims(tmp)
 
-;      if .not.ismissing(str_match(dimvar(1),"lat")) .or. .not.ismissing(str_match(dimvar(1),"LAT")) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"standard_name") \
-;        .and. (tmp&$dimvar(1)$@standard_name .eq. "latitude") ) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"axis") \
-;        .and. ( (tmp&$dimvar(1)$@axis .eq. "y") .or. (tmp&$dimvar(1)$@axis .eq. "Y") ) ) then
       if check_lat_axis(tmp,1,LatLon(0),lat_array) then
         new_fld = tmp($dimvar(0)$|:,{$LatLon(0)$|latS:latN})
 
-;      else if .not.ismissing(str_match(dimvar(1),"lon")) .or. .not.ismissing(str_match(dimvar(1),"LON")) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"standard_name") \
-;        .and. (tmp&$dimvar(1)$@standard_name .eq. "longitude") ) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"axis") \
-;        .and. ( (tmp&$dimvar(1)$@axis .eq. "x") .or. (tmp&$dimvar(1)$@axis .eq. "X") ) ) then
       else if check_lon_axis(tmp,1,LatLon(1),lon_array) then
         tmp = lonFlip(tmp)
         new_fld = tmp($dimvar(0)$|:,{$LatLon(1)$|lonE:lonW})
@@ -543,7 +491,7 @@ begin
       if isvar("zpoint") .or. isvar("xpoint") .or. isvar("ypoint") then
         print(cr+"Warning: selected points are not considered because rank=3 and a mean on one of axis is done"+cr)
       end if
-      new_fld= data_axavg(ffile, fld, mean_axis, latS, latN, lonE, lonW, LatLon)
+      new_fld=data_axavg(ffile, fld, mean_axis, latS, latN, lonE, lonW, LatLon)
     else      ; mean_axis= Point
       if ( isvar("zpoint") .and. isvar("ypoint") .and. isvar("xpoint") )\
         .or. (isvar("xpoint") .and. isvar("ypoint" ) ) \
@@ -557,27 +505,13 @@ begin
 
       if isvar("xpoint") \
         .and. check_lon_axis(fld,2,LatLon(1),lon_array) then
-;        .and. ( .not.ismissing(str_match(vardim(2),"lon")) .or. .not.ismissing(str_match(vardim(2),"LON")) \
-;        .or. ( iscoord(fld,vardim(2)) .and. isatt(fld&$vardim(2)$,"standard_name") \
-;        .and. (fld&$vardim(2)$@standard_name .eq. "longitude") ) \
-;        .or. ( iscoord(fld,vardim(2)) .and. isatt(fld&$vardim(2)$,"axis") \
-;        .and. ( (fld&$vardim(2)$@axis .eq. "x") .or. (fld&$vardim(2)$@axis .eq. "X") ) ) ) then
 
         tmp=data_select("longitude", xpoint, fld, vardim(2), extract_list)
       else if isvar("ypoint") then
-;        if .not.ismissing(str_match(vardim(1),"lat")) .or. .not.ismissing(str_match(vardim(1),"LAT")) \
-;          .or. ( iscoord(fld,vardim(1)) .and. isatt(fld&$vardim(1)$,"standard_name") \
-;          .and. (fld&$vardim(1)$@standard_name .eq. "latitude") ) \
-;          .or. ( iscoord(fld,vardim(1)) .and. isatt(fld&$vardim(1)$,"axis") \
-;          .and. ( (fld&$vardim(1)$@axis .eq. "y") .or. (fld&$vardim(1)$@axis .eq. "Y") ) ) then
+
         if check_lat_axis(fld,1,LatLon(0),lat_array) then
           tmp=data_select("latitude", ypoint, fld, vardim(1), extract_list)
           
-;        else if .not.ismissing(str_match(vardim(2),"lat")) .or. .not.ismissing(str_match(vardim(2),"LAT")) \
-;          .or. ( iscoord(fld,vardim(2)) .and. isatt(fld&$vardim(2)$,"standard_name") \
-;          .and. (fld&$vardim(2)$@standard_name .eq. "latitude") ) \
-;          .or. ( iscoord(fld,vardim(2)) .and. isatt(fld&$vardim(2)$,"axis") \
-;          .and. ( (fld&$vardim(2)$@axis .eq. "y") .or. (fld&$vardim(2)$@axis .eq. "Y") ) ) then
         else if check_lat_axis(fld,2,LatLon(0),lat_array) then
           tmp=data_select("latitude", ypoint, fld, vardim(2), extract_list)
         else
@@ -588,12 +522,6 @@ begin
  
       else if isvar("zpoint") \
         .and. check_zaxis(fld,1) then
-;        .and. ( .not. ismissing(str_match(vardim(1),"depth")) .or. (vardim(1) .eq. "sigma") \
-;        .or. (vardim(1) .eq. "z") .or. (vardim(1) .eq. "Z") \
-;        .or. (vardim(1) .eq. "plev") .or. (vardim(1) .eq. "lev") .or. (vardim(1) .eq. "level") \
-;        .or. (vardim(1) .eq. "p") .or. (vardim(1) .eq. "pressure") \
-;        .or. ( iscoord(fld,vardim(1)) .and. isatt(fld&$vardim(1)$,"axis") .and. ( (fld&$vardim(1)$@axis .eq. "z") .or. (fld&$vardim(1)$@axis .eq. "Z") ) ) ) then
-
         tmp=data_select("level", zpoint, fld, vardim(1), extract_list)
       else
         print("The dimension selected is missing.")
@@ -603,19 +531,9 @@ begin
       end if
 
       dimvar=getvardims(tmp)
-;      if .not.ismissing(str_match(dimvar(1),"lat")) .or. .not.ismissing(str_match(dimvar(1),"LAT")) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"standard_name") \
-;        .and. (tmp&$dimvar(1)$@standard_name .eq. "latitude") ) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"axis") \
-;        .and. ( (tmp&$dimvar(1)$@axis .eq. "y") .or. (tmp&$dimvar(1)$@axis .eq. "Y") ) ) then
+
       if check_lat_axis(tmp,1,LatLon(0),lat_array) then
         new_fld = tmp($dimvar(0)$|:,{$LatLon(0)$|latS:latN})
-
-;      else if .not.ismissing(str_match(dimvar(1),"lon")) .or. .not.ismissing(str_match(dimvar(1),"LON")) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"standard_name") \
-;        .and. (tmp&$dimvar(1)$@standard_name .eq. "longitude") ) \
-;        .or. ( iscoord(tmp,dimvar(1)) .and. isatt(tmp&$dimvar(1)$,"axis") \
-;        .and. ( (tmp&$dimvar(1)$@axis .eq. "x") .or. (tmp&$dimvar(1)$@axis .eq. "X") ) ) then
       else if check_lon_axis(tmp,1,LatLon(1),lon_array)
         tmp = lonFlip(tmp)
         new_fld = tmp($dimvar(0)$|:,{$LatLon(1)$|lonE:lonW})
@@ -657,15 +575,10 @@ begin
   cr = tochar(10)
   carriage = "~C~"       ; A string with a carriage ~C~ return in it
   mean_axis_names=(/"Lat","Lon","Point"/)
-;  if (.not. isvar("mean_axis"))  then
-;    print("You must specify at least 'mean_axis' argument which can be Lat, Lon or Point"+cr)
-;    status_exit(1)
-;  else 
   if isvar("mean_axis") .and. ismissing(str_match(mean_axis_names,mean_axis)) then 
     print("argument 'mean_axis' can be only 'Lat', 'Lon' or 'Point' (mean_axis="+mean_axis+")")
     status_exit(1)
   end if
-;  end if
 
   if (.not.isvar("colormap")) then colormap="amwg256" end if
   if (.not.isvar("reverse")) then reverse=False end if
@@ -684,7 +597,6 @@ begin
       dim_select="" 
       LatLon=LatLon_names(ffile, ffile->$var$)
       if .not. ( isvar("latS") .and. isvar("latN") .and. isvar("lonE") .and. isvar("lonW") ) then
-;        LatLon=LatLon_names(ffile, ffile->$var$)
         latS=min(ffile->$LatLon(0)$)
         latN=max(ffile->$LatLon(0)$)
         lonE=max(ffile->$LatLon(1)$)
@@ -736,11 +648,11 @@ begin
       width = stringtofloat(nb_pixels_or_inches(0))
       height = stringtofloat(nb_pixels_or_inches(1))
       
-      if type .eq. "png" then ;image resolution in pixels
+      if type .eq. "png" then ; image resolution in pixels
         type@wkWidth = width
         type@wkHeight = height
       else 
-        if (type .eq. "pdf") .or. (type .eq. "eps") then ;image resolution in inches
+        if (type .eq. "pdf") .or. (type .eq. "eps") then ; image resolution in inches
           type@wkPaperWidthF  = width 
           type@wkPaperHeightF = height
         end if
@@ -811,12 +723,6 @@ begin
   ;res@pmLabelBarOrthogonalPosF = -.001          ; move label bar closer
   res@lbLabelFont = "helvetica"
   res@lbLabelFontHeightF = .02
-;  dimv= getvardims(Xfld)
-;  if ( .not. ismissing(str_match(dimv(1),"depth")) .or. (dimv(1) .eq. "sigma") \
-;    .or. (dimv(1) .eq. "z") .or. (dimv(1) .eq. "Z") \
-;    .or. (dimv(1) .eq. "plev") .or. (dimv(1) .eq. "lev") .or. (dimv(1) .eq. "level") \
-;    .or. (dimv(1) .eq. "p") .or. (dimv(1) .eq. "pressure") \
-;    .or. ( iscoord(Xfld,dimv(1)) .and. isatt(Xfld&$dimv(1)$,"axis") .and. ( (Xfld&$dimv(1)$@axis .eq. "z") .or. (Xfld&$dimv(1)$@axis .eq. "Z") ) ) ) then
   ;
   ; Y and X axis 
   if invXY then

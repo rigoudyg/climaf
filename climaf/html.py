@@ -172,7 +172,7 @@ def link(label,filename,thumbnail=None,hover=True) :
       
     else:
         rep=label
-        
+
     return rep
 
 def link_on_its_own_line(label,filename,thumbnail=None,hover=True) :
@@ -198,7 +198,7 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
 
     If 'altdir' is not None (and 'dirname is None), the HREF links 
     images in index to have their absolute path changed from 
-    $CLIMAF_CAcHE to 'altdir' (use case : when the Http server only knows 
+    $CLIMAF_CACHE to 'altdir' (use case : when the Http server only knows 
     another filesystem)
     """
     if dirname:
@@ -221,12 +221,16 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             return '<TD ALIGN=RIGHT>'+ \
                    link(label,"climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
                    '</TD>\n'
+        else: #lv 
+            return '<TD ALIGN=RIGHT>'+ \
+            link(label,filename,thumbnail,hover)+\
+            '</TD>\n'                
 
     else:
         fn=filename
-        if altdir : 
+        if altdir and fn: #lv
             from climaf import cachedir
-            fn=filename.replace(cachedir,altdir)
+            fn=filename.replace(cachedir,altdir) 
         return '<TD ALIGN=RIGHT>'+ \
                link(label,fn,thumbnail,hover)+\
                '</TD>\n'
@@ -246,13 +250,14 @@ def line(list_of_pairs,title="",thumbnail=None,hover=True, dirname=None,altdir=N
     """
     labels=[]
     figures=[]
+
     for e in list_of_pairs :
         if isinstance(e,tuple) : 
             label=e[0]; labels.append(label) ; figures.append(e[1])
         else : 
             label=e; labels.append(e) ; figures.append(None)
     rep=open_line()+title
-    for lab,fig in zip(labels,figures): 
+    for lab,fig in zip(labels,figures):
         rep+=cell(lab,fig,thumbnail,hover,dirname,altdir)
     return rep+close_line()
 

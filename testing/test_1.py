@@ -40,10 +40,16 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
         fil=cfile(std)
-        expected=climaf.cache.currentCache+'/d2571/8ca78/f6679/0980a/0c8a7/8ce5d/81426/de647/b178d/fe94e/f8723/a.nc'
-        print "actual=",fil
+#        expected=climaf.cache.currentCache+'/d2571/8ca78/f6679/0980a/0c8a7/8ce5d/81426/de647/b178d/fe94e/f8723/a.nc'
+        expected='.nc'
+        _,filext=os.path.splitext(fil)
+        print "actual=",filext
+#        print "actual=",fil
         print "expected=",expected
-        self.assertEqual(fil,expected,"Issue evaluating script application as a file")
+        self.assertEqual(filext,expected,"Issue evaluating script application as a file: file is not a NetCDF")
+        fileincache=climaf.cache.currentCache in fil
+        self.assertTrue(fileincache,"Issue evaluating script application as a file: file is not in climaf current cache")
+#        self.assertEqual(fil,expected,"Issue evaluating script application as a file")
 
     def test_4_plotting(self):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script

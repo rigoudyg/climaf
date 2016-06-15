@@ -5,6 +5,22 @@ Whats' new
 ------------
 
 Changes, newest first :
+ 
+- 2016/06/15:
+
+  - New standard operator ``hovm`` for **plotting Hovmöller diagrams**
+    (time/lat or lon, or time/level) for any SST/climate boxes and
+    provides many customization parameters; see :doc:`scripts/hovm`
+
+  - Function :py:func:`~climaf.plot.plot_params.hovm_params` provides
+    domain for some SST/climate boxes
+
+  - Changes for default argument ``title``: if no title value is
+    provided when invoking graphic operators, no title will be
+    displayed (before, the value of CRS expression for an object was
+    provided under special keyword ``title``) 
+
+  - Bug fixes in test install
 
 - 2016/05/24:
 

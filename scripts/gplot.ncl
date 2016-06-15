@@ -1,5 +1,5 @@
 ; General-purpose plot using NCL, for use in CliMAF. 
-; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
+; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 
 ; Second version : L.Vignon - november 2015
 
