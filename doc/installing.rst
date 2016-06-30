@@ -57,8 +57,15 @@ Configuring CliMAF
    verbosity level on stderr (resp. on file climaf.log); defaults to
    'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
 
- - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will automatic fix  CNRM’s Nemo old data time_axis issues. This adresses the wrong time coordinate variable t_ave_01month and t_ave_00086400. This will add processing cost
+ - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will
+   automatic fix CNRM’s Nemo old data time_axis issues. This adresses
+   the wrong time coordinate variable t_ave_01month and
+   t_ave_00086400. This will add processing cost
 
+ - CLIMAF_FIX_ALADIN_COORD : if set to anything but 'no', this will
+   automatic fix Aladin outputs attribute 'coordinates' issues. This
+   adresses the wrong variable attribute 'coordinates' with 'lat lon'
+   to 'latitude longitude'.
 
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
   functions; this will be executed at the end of climaf import; the code 

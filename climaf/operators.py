@@ -385,10 +385,10 @@ def fixed_fields(operator, *paths):
     Parameters:
       operator (string, or list of strings) : name of the CliMAF operator.
       paths (couples) : a number of couples composed of the filename as expected
-        by the operator
-        and a path for the data; the path  may uses placeholders : ${model}, ${project}
-        ${simulation} and ${realm}, which will be replaced by the corresponding facet
-        values for the first operand of the target operator.
+        by the operator and a path for the data;
+        the path may uses placeholders : ${model}, ${project}, ${simulation},
+        ${realm} and ${grid}, which will be replaced by the corresponding
+        facet values for the first operand of the target operator.
 
     Returns:
       None

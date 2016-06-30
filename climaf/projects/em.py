@@ -1,4 +1,4 @@
-"""This module declares project em , base on data organization 'generic'
+"""This module declares project em, base on data organization 'generic'
 
 EM (Experiment Manager) is a tool used at CNRM for moving simulation post-processed data
 from the HPSS to the local filesystem, and to organize it in a file hierarchy governed by a few

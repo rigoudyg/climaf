@@ -142,11 +142,15 @@ dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O
 
 # Compute the heat content in the specified area
 my_cdfheatc=ccdfheatcm(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
-cfile(my_cdfheatc)
+cfile(my_cdfheatc) # multi-variable output file: "heatc_2D" and "heatc_3D"
 
-# Select "heatc_2D" in multi-variable output file
-heatc_2D=select(my_cdfheatc, var="heatc_2D")
+# Select and extract "heatc_2D" in multi-variable output file, and plot profile
+heatc_2D=ccdo(my_cdfheatc, operator='selname,heatc_2D')
 ncdump(heatc_2D)
+
+heatc_2D.variable="heatc_2D" # replace list of variable, i.e. 'heatc_2D,heatc_3D', by 'heatc_2D'
+my_plot5=plot(heatc_2D)
+cshow(my_plot5)
 
 #----------------
 #  cdfmxlheatc
@@ -176,12 +180,22 @@ cfile(my_cdfmxlheatc)
 # CliMAF usage (ccdfsaltc) :
 #
 
+#export CLIMAF_FIX_NEMO_TIME='on'
+
 # Define dataset with salinity 
-dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
+dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="1998", realm="O")
 
 # Compute the salt content in the specified area
 my_cdfsaltc=ccdfsaltc(dso,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfsaltc)
+
+# Select and extract "saltc_3D" in multi-variable output file, and plot profile
+saltc_3D=select(my_cdfsaltc, var="saltc_3D")
+ncdump(saltc_3D)
+
+saltc_3D.variable="saltc_3D" # replace list of variable, i.e. 'saltc_2D,saltc_3D', by 'saltc_3D'
+my_plot6=plot(saltc_3D)
+cshow(my_plot6)
 
 #-----------
 #  cdfstd
@@ -262,11 +276,13 @@ dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 my_cdfvT=ccdfvT(dtho,dso,duo,dvo)
 cfile(my_cdfvT)
 
-# Select "vozous" in multi-variable output file
-vozous_var=select(my_cdfvT, var="vozous")
+# Select and extract "vozous" in multi-variable output file, and plot map
+vozous_var=select(my_cdfvT, var="vozous,nav_lat,nav_lon")
 ncdump(vozous_var)
 
-
+vozous_var.variable="vozous" # replace list of variable, i.e. 'vomevt,vomevs,vozout,vozous', by 'vozous'
+my_plot7=plot(vozous_var)
+cshow(my_plot7)
 
 #----------------
 #  cdfzonalmean

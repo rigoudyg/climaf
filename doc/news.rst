@@ -6,6 +6,23 @@ Whats' new
 
 Changes, newest first :
 
+- 2016/06/30:
+
+  - Input for function :py:func:`~climaf.operators.fixed_fields()`,
+    which allows to provide fixed fields to operators: path of fixed
+    fields may depend now also on grid of operator's first operand
+
+  - automatic fix of Aladin outputs attribute 'coordinates' issues,
+    provided you set environment variable CLIMAF_FIX_ALADIN_COORD to
+    anything but ‘no’. This adresses the wrong variable attribute
+    'coordinates' with 'lat lon' to 'latitude longitude'
+    (:download:`../scripts/mcdo.sh <../scripts/mcdo.sh>`, see function
+    aladin_coordfix()) 
+
+  - exiv2 (Image metadata manipulation tool) is embarked in CliMAF
+    distribution: ``<your_climaf_installation_dir>/bin/exiv2``  
+
+
 - 2016/05/24:
 
   - Change default for arguments ``scale_aux`` and ``offset_aux`` for

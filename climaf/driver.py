@@ -505,6 +505,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
         subdict_ff["project"]=projectOf(scriptCall.operands[0])
         subdict_ff["realm"]=realmOf(scriptCall.operands[0])
+        subdict_ff["grid"]=gridOf(scriptCall.operands[0])
         l=script.fixedfields #return paths: (linkname, targetname)
         files_exist=dict()
         for ll,lt in l:
@@ -600,6 +601,7 @@ def modelOf(cobject) : return attributeOf(cobject,"model")
 def simulationOf(cobject) : return attributeOf(cobject,"simulation")
 def projectOf(cobject) : return attributeOf(cobject,"project")
 def realmOf(cobject) : return attributeOf(cobject,"realm")
+def gridOf(cobject) : return attributeOf(cobject,"grid")
 
 def attributeOf(cobject,attrib) :
     """ Returns the attribute for a CliMAF object : if object is a dataset, returns

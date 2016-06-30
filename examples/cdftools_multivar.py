@@ -70,6 +70,14 @@ dT1=ds(simulation="PRE6CPLCr2alb", variable="so,thetao", period="199807", realm=
 my_cdfheatc=ccdfheatc(dT1,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfheatc)
 
+# Select and extract "heatc_2D" in multi-variable output file, and plot profile
+heatc_2D=ccdo(my_cdfheatc, operator='selname,heatc_2D')
+ncdump(heatc_2D)
+
+heatc_2D.variable="heatc_2D" # replace list of variable, i.e. 'heatc_2D,heatc_3D', by 'heatc_2D'
+plot_my_cdfheatc=plot(heatc_2D)
+cshow(plot_my_cdfheatc)
+
 #----------------
 #  cdfmxlheatc
 #----------------
