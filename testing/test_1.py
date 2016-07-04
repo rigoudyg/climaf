@@ -40,16 +40,10 @@ class A_basic(unittest.TestCase):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
         fil=cfile(std)
-#        expected=climaf.cache.currentCache+'/d2571/8ca78/f6679/0980a/0c8a7/8ce5d/81426/de647/b178d/fe94e/f8723/a.nc'
-        expected='.nc'
-        _,filext=os.path.splitext(fil)
-        print "actual=",filext
-#        print "actual=",fil
+        expected=climaf.cache.currentCache+'/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
+        print "actual=",fil
         print "expected=",expected
-        self.assertEqual(filext,expected,"Issue evaluating script application as a file: file is not a NetCDF")
-        fileincache=climaf.cache.currentCache in fil
-        self.assertTrue(fileincache,"Issue evaluating script application as a file: file is not in climaf current cache")
-#        self.assertEqual(fil,expected,"Issue evaluating script application as a file")
+        self.assertEqual(fil,expected,"Issue evaluating script application as a file")
 
     def test_4_plotting(self):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
@@ -121,7 +115,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
 
     def test_selecting_files(self):
         my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63.nc'
+        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
         print "actual="+my_file
         print "expected="+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
@@ -147,7 +141,7 @@ class C_OCMIP5_CIclad(unittest.TestCase):
         self.file=mfile
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
-        expected=climaf.cache.currentCache+'/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015.nc'
+        expected=climaf.cache.currentCache+'/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
         print self.file
         print expected
         self.assertEqual(self.file,expected,'Issue')
