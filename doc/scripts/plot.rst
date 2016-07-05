@@ -6,9 +6,55 @@ profile (along lat, lon or pressure/z_index ) of one or two fields and
 draw vectors plot over a map, using NCL, and allowing for tuning a
 number of graphic attributes  
 
+.. topic:: Table of contents:
+
+  - :ref:`References <references>`
+  - :ref:`Provider / contact <provider>`
+  - :ref:`Inputs <inputs>`
+  - :ref:`Mandatory arguments <mandatory_arguments>`
+  - :ref:`Optional arguments <optional_arguments>`
+
+    - :ref:`General <general_opt_args>`
+    - :ref:`Main field <main_field_opt_args>`
+    - :ref:`Main field and/or auxiliary field
+      <main_and_aux_field_opt_args>`  
+    - :ref:`Auxiliary field <aux_field_opt_args>`
+    - :ref:`Vectors <vectors_opt_args>`
+  - :ref:`Required files <required_files>`
+  - :ref:`Optional files <optional_files>`
+
+    - :ref:`For uncomplete 'nav_lat' or 'nav_lon' coordinates issue
+      <navlat_issue>`    
+    - :ref:`For plotting data on native grid <native_grid>`
+  - :ref:`Outputs <outputs>`
+  - :ref:`Climaf call example <example>`
+
+    - :ref:`Maps <maps_example>`
+    - :ref:`Cross-sections <cross_sections_example>`
+    - :ref:`Profiles <profiles_example>`
+  - :ref:`More optional arguments <plot_more_args>`
+
+    - :ref:`For map <map_more_args>`
+    - :ref:`For cross-sections <cross-sections_more_args>`
+    - :ref:`For profiles <profiles_more_args>`
+  - :ref:`More climaf call example <more_example>`
+
+    - :ref:`Maps <more_maps_example>`
+    - :ref:`Cross-sections <more_cross_sections_example>`
+    - :ref:`Profiles <more_profiles_example>`
+  - :ref:`Side effects <side_effects>`
+  - :ref:`Implementation <implementation>`
+
+ 
+.. _references:
+
 **References** : http://www.ncl.ucar.edu
 
+.. _provider:
+
 **Provider / contact** : climaf at meteo dot fr
+
+.. _inputs:
 
 **Inputs** (in the order of CliMAF call):
 
@@ -32,9 +78,15 @@ Warnings:
   the scalar field but not the verctor components, use value None for
   the scalar dataset
 
+.. _mandatory_arguments:
+
 **Mandatory arguments**: None
 
+.. _optional_arguments:
+
 **Optional arguments** (see also :ref:`More plot optional arguments <plot_more_args>` )       
+
+.. _general_opt_args:
 
 General:
 
@@ -128,6 +180,8 @@ General:
     In case fmt is absent, a minimal algorithm exists which tries to
     determine the format string depending on the time range length. 
 
+.. _main_field_opt_args:
+
 Main field:
 
   - colormap and its interpretation :
@@ -158,6 +212,8 @@ Main field:
     https://www.ncl.ucar.edu/Document/Graphics/Resources/mp.shtml#mpCenterLonF ;
     default (climaf): (minimum longitude+maximum longitude)/2. 
 
+.. _main_and_aux_field_opt_args:
+
 Main field and/or auxiliary field:
 
   - ``contours`` : 
@@ -178,6 +234,8 @@ Main field and/or auxiliary field:
 	ncl mode; see e.g.
 	http://www.ncl.ucar.edu/Document/Graphics/Resources/cn.shtml#cnLevelSelectionMode
 
+.. _aux_field_opt_args:
+
 Auxiliary field:
 
   - ``shade_below``, ``shade_above`` : shade contour regions for 
@@ -195,6 +253,8 @@ Auxiliary field:
   - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
     field (x -> x*scale_aux + offset_aux); default = 1. and 0. (no
     scaling) 
+
+.. _vectors_opt_args:
 
 Vectors:
 
@@ -228,6 +288,8 @@ Vectors:
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
 
+.. _required_files:
+
 **Required files** 
   - If rotation is set to 1, file 'angles.nc' must be made available
     to the script: use function fixed_fields() for that (see example
@@ -236,9 +298,12 @@ Vectors:
     <../../tools/angle_data_CNRM.nc>` and :download:`angle.ncl
     <../../tools/angle.ncl>`       
 
-.. _navlat_issue:
+.. _optional_files:
 
 **Optional files**
+
+.. _navlat_issue:
+
   - If the field to plot is from Nemo and has uncomplete nav_lat or
     nav_lon coordinates, you should provide correct values by bringing
     to the script a file locally named either 'coordinates.nc' or
@@ -266,13 +331,19 @@ Vectors:
     also want to plot an auxiliary field, this second field must be on
     the same grid as the main field.  
 
+.. _outputs:
+
 **Outputs** :
   - main output : a PNG or PDF or EPS figure
+
+.. _example:
 
 **Climaf call example** For more examples which are systematically
 tested, see :download:`gplot.py <../../examples/gplot.py>` and
 :download:`test_gplot.py <../../testing/test_gplot.py>`    
- 
+
+.. _maps_example:
+
   - Maps ::
 
      >>> duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
@@ -336,7 +407,9 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> projNH=plot(moy_tas,title='ALADIN - NH40',min=-12,max=28,delta=2.5,proj="NH40") 
      >>> cshow(projNH)
 
-  - A cross-section ::
+.. _cross_sections_example:
+
+  - Cross-sections ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
@@ -368,7 +441,9 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
      >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', y="index", time=3000.) 
 
-  - A profile ::
+.. _profiles_example:
+
+  - Profiles ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
@@ -388,6 +463,8 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
 .. _plot_more_args:
 
 **More optional arguments**:
+
+.. _map_more_args:
 
 For map:
 
@@ -465,6 +542,8 @@ For map:
     e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnStringFontHeightF
     ; default (climaf): 0.012
 
+.. _cross-sections_more_args:
+
 For cross-sections:
 
   - ``invXY`` : set it to True to invert X axis and Y axis; default
@@ -488,6 +567,8 @@ For cross-sections:
   - ``gsnStringFont`` : same as  for map
   - ``gsnStringFontHeightF`` : same as  for map
 
+.. _profiles_more_args:
+
 For profiles:
 
   - ``invXY`` : same as for cross-section
@@ -502,7 +583,11 @@ For profiles:
   - ``gsnRightString`` : same as  for map
   - ``gsnCenterString`` : same as  for map
 
+.. _more_example:
+
 **More climaf call example** 
+
+.. _more_maps_example:
  
   - Maps ::
 
@@ -522,14 +607,18 @@ For profiles:
      >>> ... lbLabelFontHeightF=0.012, gsnPolarLabelFontHeightF=0.015, 
      >>> ... tiMainFont="helvetica", tiMainFontHeightF=0.03, tiMainPosition="Left", gsnLeftString="")
 
-  - A cross-section ::
+.. _more_cross_sections_example:
+
+  - Cross-sections ::
 
      >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
      >>> cross=plot(ta_zonal_mean,title='A cross-section with some adjustments',
      >>> ... tiMainFont="helvetica",tiMainFontHeightF=0.030,tiMainPosition="Center", gsnStringFontHeightF=0.015)
 
-  - A profile ::
+.. _more_profiles_example:
+
+  - Profiles ::
       
      >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
@@ -537,7 +626,11 @@ For profiles:
      >>> profile=plot(ta_profile, title='A profile with some adjustments', y="index",
      >>> ... invXY=True, tmXBLabelFontHeightF=0.01, tmYLLabelFontHeightF=0.01) 
 
+.. _side_effects:
+
 **Side effects** : None
+
+.. _implementation:
 
 **Implementation** : Basic use of ncl: gsn_csm_pres_hgt, gsn_csm_xy,
 gsn_csm_contour_map, gsn_csm_contour_map_ce, gsn_csm_contour,

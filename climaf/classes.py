@@ -490,14 +490,14 @@ class cens(cobject,dict):
         >>> ds1980=ds(period="1980")
         >>> ds1981=ds(period="1981")
         >>> #
-        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 })
-        >>> ncview(cens)  # will launch ncview once per member
+        >>> myens=cens({'1980':ds1980 , '1981':ds1981 })
+        >>> ncview(myens)  # will launch ncview once per member
         >>> 
-        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 }, order=['1981','1980'])
+        >>> myens=cens({'1980':ds1980 , '1981':ds1981 }, order=['1981','1980'])
         >>> myens.set_order(['1981','1980'])
         >>>
         >>> # Add a member
-        >>> cens['abcd']=ds(period="1982")
+        >>> myens['abcd']=ds(period="1982")
 
         Limitations : Even if an ensemble is a dict, some dict methods
         are not properly implemented (popitem, fromkeys) and function

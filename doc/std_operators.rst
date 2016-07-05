@@ -164,4 +164,3 @@ A name-sorted list :
   :glob:
 
   /scripts/*
-  /functions/*
