@@ -6,7 +6,10 @@ Whats' new
 
 Changes, newest first :
  
-- 2016/06/15:
+- 2016/07/11:
+
+  - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
+    time data conversion is necessary 
 
   - New standard operator ``hovm`` for **plotting Hovmöller diagrams**
     (time/lat or lon, or time/level) for any SST/climate boxes and

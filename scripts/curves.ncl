@@ -211,12 +211,12 @@ begin
           print("Warning: Files have not the same standard_name for coordinate variable "+coord)
           ;status_exit(1) ; it is possible that standard_name are not the same but it is the same coordinate variable (ex: lat & latitude)
         end if   
-
+      
 	; time conversion if necessary (useless if X_axis is not real so add condition ?)
         if ( ( (.not. ismissing(str_match(fld&$coord$@standard_name,"Time"))) .or. (.not. ismissing(str_match(fld&$coord$@standard_name,"time"))) ) \
           .or. ( (.not. ismissing(str_match(coord,"Time"))) .or. (.not. ismissing(str_match(coord,"time"))) ) ) \
           .and. isatt(fld&$coord$,"units") .and. (fld&$coord$@units .ne. unit_first_file) then
-          fld&$coord$=cd_convert(fld&$coord$, unit_first_file) 
+          fld&$coord$=cd_convert(fld&$coord$, unit_first_file)
         end if
 
 	; data vector for X axis
@@ -241,10 +241,16 @@ begin
 
           end if ; X_axis is "real"
         end if ; i eq 0
-    
+
       end if ; dime(dim) .gt. 1
     end do ; dim
   end do ; file
+  qsort(Xaxis)
+  tmpXaxis=get_unique_values(Xaxis)
+  copy_VarMeta(Xaxis,tmpXaxis)
+  delete(Xaxis)
+  Xaxis=tmpXaxis
+  delete(tmpXaxis)
  
   ;---Resources for "left" variable
   res=True
@@ -470,6 +476,14 @@ begin
         found=True
 
         coord=Var_DimNames(dim)
+
+        ; Time conversion if necessary (useless if X_axis is not real so add condition ?)
+        if ( ( (.not. ismissing(str_match(fld&$coord$@standard_name,"Time"))) .or. (.not. ismissing(str_match(fld&$coord$@standard_name,"time"))) ) \
+          .or. ( (.not. ismissing(str_match(coord,"Time"))) .or. (.not. ismissing(str_match(coord,"time"))) ) ) \
+          .and. isatt(fld&$coord$,"units") .and. (fld&$coord$@units .ne. unit_first_file) then
+          fld&$coord$=cd_convert(fld&$coord$, unit_first_file)
+        end if
+
         ; Store coordinate in 'ax'
         if ( X_axis .eq. "real" ) then
           ;ax:=fld&$coord$
@@ -477,11 +491,11 @@ begin
           ax=fld&$coord$
         else
           ; Take first file as reference for X axis if X_axis .eq. "aligned"
-          if (i .eq. 0 ) then 
+          if (i .eq. 0) then 
             ax=fld&$coord$
           end if
         end if
-        
+
         ; Create plot
         res@xyLineColor = colornames(i)
         res@xyExplicitLegendLabels = "  "+tab_labels(i)
