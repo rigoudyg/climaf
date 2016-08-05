@@ -76,7 +76,19 @@ Warning: Order of all data dimensions is supposed to be time, height, lat, lon.
     ``lonW``, ``lonE``) to be passed to ``hovm`` operator with '**'
     (see example :ref:`Climaf call example <climate_boxes_example>`).
 
-  - ``title``: string for graphic title; default: period + domain definition
+  - ``title``: string for graphic title; default: period + domain
+    definition
+
+    Remarks: the ~ character has a special meaning in NCL strings. It
+    represents a function code. See function codes example page
+    http://www.ncl.ucar.edu/Applications/fcodes.shtml for (more)
+    examples of function codes. Particularly: 
+
+    - The ~C~ will put a carriage return to the title. By default it
+      is left justified. If you need it centered, you will have to add
+      spaces.
+    - Use a ~Z#~ to resize text in mid-stream. The # refers to the
+      percent of normal. 
   
   - ``color``: name of the Ncl colormap to use; see
     e.g. http://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml;

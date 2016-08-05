@@ -29,6 +29,10 @@ Changes, newest first :
 
   - Bug fixes in test install
 
+  - Bug fixes for ``plot`` (see :doc:`scripts/plot`) when using
+    argument 'proj' with an empty string
+
+
 - 2016/05/24:
 
   - Change default for arguments ``scale_aux`` and ``offset_aux`` for

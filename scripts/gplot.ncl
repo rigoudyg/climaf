@@ -1312,7 +1312,7 @@ begin
         res@mpLandFillColor="grey" 
       end if
       
-      if (isvar("proj")) then 
+      if (isvar("proj") .and. proj .ne. "") then 
         prj = getSubString( proj,0,1 )
         if ( prj .eq. "NH" .or. prj .eq. "SH" ) then
           res@gsnPolar=prj

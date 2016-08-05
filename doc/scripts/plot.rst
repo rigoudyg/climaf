@@ -91,6 +91,18 @@ Warnings:
 General:
 
   - ``title`` : string for graphic title; default: no title
+
+    Remarks: the ~ character has a special meaning in NCL strings. It
+    represents a function code. See function codes example page
+    http://www.ncl.ucar.edu/Applications/fcodes.shtml for (more)
+    examples of function codes. Particularly: 
+
+    - The ~C~ will put a carriage return to the title. By default it
+      is left justified. If you need it centered, you will have to add
+      spaces.
+    - Use a ~Z#~ to resize text in mid-stream. The # refers to the
+      percent of normal. 
+
   - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
     default: 'png'. For 'png' format, all the surrounding extra white
     space are cropped with optional argument ``trim`` (but not for
