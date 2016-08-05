@@ -193,13 +193,18 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
     to file filename. This allow to generate a portable atlas in this 
     directory. Hard links are named after pattern 
     climaf_atlas<digit>.<extension>
+    
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
 
     If 'altdir' is not None (and 'dirname is None), the HREF links 
-    images in index to have their absolute path changed from 
+    images in index have the prefix of their absolute path changed from 
     $CLIMAF_CACHE to 'altdir' (use case : when the Http server only knows 
-    another filesystem)
+    another filesystem). Example:
+
+    - CLIMAF_CACHE=/prodigfs/ipslfs/dods/fabric/coding_sprint_NEMO/stephane
+    - URL https://vesg.ipsl.upmc.fr **/thredds/fileServer/IPSLFS/fabric/coding_sprint_NEMO/stephane/** .../fig.png
+
     """
     if dirname:
         os.system('mkdir -p '+dirname)

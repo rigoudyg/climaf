@@ -59,6 +59,8 @@ Main functions are :
 
  - ``clog_file``: tune verbosity for log file
 
+ - ``check_time_consistency``: check time consistency of first variable of a dataset or an ensemble
+
 """
 # Created : S.Senesi - 2014
 
@@ -76,7 +78,7 @@ from projects import *
 #
 from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
+from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile, check_time_consistency
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc

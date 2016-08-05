@@ -6,7 +6,11 @@ Whats' new
 
 Changes, newest first :
  
-- 2016/07/11:
+- 2016/08/05:
+
+  - New function :py:func:`~climaf.driver.check_time_consistency`
+    check time consistency of first variable of a dataset or ensemble
+    members. 
 
   - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
     time data conversion is necessary 
