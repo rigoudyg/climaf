@@ -20,7 +20,7 @@ import operators
 import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import *# init_period
+from climaf.period import init_period, cperiod
 from climaf import xdg_bin
 
 def capply(climaf_operator, *operands, **parameters):
