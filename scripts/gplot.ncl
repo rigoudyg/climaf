@@ -611,6 +611,16 @@ begin
         if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
       end if
 
+      ; correction for data with 'units' attribute equal to "degrees" for latitude and longitude
+      if isvar("lat_dim") .and. isatt(lat_dim,"units") .and. (lat_dim@units .eq. "degrees") then
+        lat_dim@units = "degrees_north"
+        field&$latname$@units = "degrees_north"
+      end if
+      if isvar("lon_dim") .and. isatt(lon_dim,"units") .and. (lon_dim@units .eq. "degrees") then
+        lon_dim@units = "degrees_east"
+        field&$lonname$@units = "degrees_east"
+      end if
+
       ; check if we have a horizontal map
       if isvar("latname") .and. isvar("lonname") then 
         horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
@@ -1611,7 +1621,7 @@ begin
         if isvar("latdim") then res@sfYArray = latdim end if
         res@gsnAddCyclic        = False
       end if
-    
+ 
       print("using gsn_csm_contour_map")
       if isvar("options") then res_list(options, res) end if 
       if VECT then
