@@ -6,7 +6,11 @@ Whats' new
 
 Changes, newest first :
  
-- 2016/08/05:
+- 2016/09/09:
+
+  - New standard operator ``ccdfmean_profile_box`` to compute the
+    vertical profile of horizontal means for 3D fields on a given
+    geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
 
   - New function :py:func:`~climaf.driver.check_time_consistency`
     check time consistency of first variable of a dataset or ensemble
@@ -72,7 +76,6 @@ Changes, newest first :
     variables, and allows its customization. The expectation is that
     everybody will contribute values that can be shared, for improving
     easy common intepretation of evaluation plots
-
 
   - New standard operators:
 

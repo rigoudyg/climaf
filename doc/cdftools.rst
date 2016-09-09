@@ -14,6 +14,7 @@ CdfTools
 
       - :doc:`scripts/ccdfmean`
       - :doc:`scripts/ccdfmean_profile`
+      - :doc:`scripts/ccdfmean_profile_box`
       - :doc:`scripts/ccdfvar`
       - :doc:`scripts/ccdfvar_profile`
     

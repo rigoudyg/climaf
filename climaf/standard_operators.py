@@ -165,7 +165,9 @@ def load_cdftools_operators():
     #    
     cscript('ccdfmean_profile',
             'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s", canSelectVar=True)
-    #    
+    #
+    cscript('ccdfmean_profile_box', 'cdfmean ${in} ${var} ${pos_grid} $(cdffindij ${lonmin} ${lonmax} ${latmin} ${latmax} -c mask.nc -p ${pos_grid} | sed -n 3p) ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s")
+    #
     cscript('ccdfvar',
             'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_3D%s", canSelectVar=True)
     #    
