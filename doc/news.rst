@@ -8,6 +8,16 @@ Changes, newest first :
  
 - 2016/09/09:
 
+  - Technical : 
+
+    - the writing of CRS is now made in a temporary file before being
+      saved in CliMAF outfile in order to avoid having problems in the
+      writing of CRS during several CliMAF calls (particularly for PDF
+      files)  
+    - a new shell script is available to clean corrupted PDF files
+      i.e. without CRS (see :download:`clean_pdf.sh
+      <../scripts/clean_pdf.sh>`)  
+
   - New standard operator ``ccdfmean_profile_box`` to compute the
     vertical profile of horizontal means for 3D fields on a given
     geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  

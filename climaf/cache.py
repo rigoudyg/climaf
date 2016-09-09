@@ -150,12 +150,15 @@ def searchFile(path):
                 return None
             return candidate
 
-def register(filename,crs):
+def register(filename,crs,outfilename=None):
     """ 
     Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
     metadata 'CLiMAF' with CliMAF version and ref URL
 
     Records this FILE in dict crs2filename
+
+    If OUTFILENAME is not None, FILENAME is a temporary file and
+    it's OUTFILENAME which is recorded in dict crs2filename
 
     Silently skip non-existing files
     """
@@ -187,10 +190,21 @@ def register(filename,crs):
             command='exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s'%\
                 (version,crs,filename)
         clogger.debug("trying stamping by %s"%command)
-        if ( os.system(command) == 0 ) :
-            crs2filename[crs]=filename
+        if ( os.system(command) == 0 ) :     
             clogger.info("%s registered as %s"%(crs,filename))
-            return True
+            if outfilename:
+                cmd = 'mv %s %s && rm -f %s'%(filename,outfilename,filename)
+                if ( os.system(cmd) == 0 ):
+                    clogger.info("move %s as %s and removed %s"%(filename,outfilename,filename))
+                    crs2filename[crs]=outfilename
+                    return True
+                else:
+                    clogger.critical("cannot move by"%cmd)
+                    exit()
+                    return None
+            else:
+                crs2filename[crs]=filename
+                return True
         else : 
             clogger.critical("cannot stamp by %s"%command)
             exit()
@@ -198,6 +212,7 @@ def register(filename,crs):
     else :
         clogger.error("file %s does not exist (for crs %s)"%(filename,crs))
 
+    
 def getCRS(filename) :
     """ Returns the CRS expression found in FILENAME's meta-data"""
     import subprocess

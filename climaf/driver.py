@@ -350,7 +350,6 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     """
     script=operators.scripts[scriptCall.operator]
     template=Template(script.command)
-
     # Evaluate input data 
     invalues=[]
     sizes=[]
@@ -454,15 +453,19 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             output_fmt=script.outputFormat
         # Compute a filename for each ouptut
         # Un-named main output
-        main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
-                                                          format=output_fmt) 
+        main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
+  
         subdict["out"]=main_output_filename
         subdict["out_"+varOf(scriptCall)]=main_output_filename
+
+        subdict["out_final"]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
+        subdict["out_final_"+varOf(scriptCall)]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
+        
         # Named outputs
         for output in scriptCall.outputs:
-            subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
+            subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
+            subdict["out_final_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
                                                          format=output_fmt) 
-                        
     # Account for script call parameters
     for p in scriptCall.parameters : 
         #clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
@@ -539,16 +542,16 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if script.outputFormat in operators.none_formats : return None
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
-    ok = cache.register(main_output_filename,scriptCall.crs)
+    ok = cache.register(main_output_filename,scriptCall.crs, subdict["out_final"])
     # 2 - Named outputs
     for output in scriptCall.outputs:
-        ok = ok and cache.register(subdict["out_"+output], scriptCall.crs+"."+output)
+        ok = ok and cache.register(subdict["out_"+output], scriptCall.crs+"."+output, subdict["out_final_"+output])
     if ok : 
         duration=time.time() - tim1
         #print(...file=sys.stderr)
         clogger.info("Done in %.1f s with script computation for "
                      "%s (command was :%s )"% (duration,`scriptCall`,template))
-        return main_output_filename
+        return subdict["out_final"] #main_output_filename
     else : 
         raise Climaf_Driver_Error("Some output missing when executing "
                                           ": %s. \n See last.out"%template)
