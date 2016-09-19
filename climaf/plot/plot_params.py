@@ -92,3 +92,40 @@ def plot_params(variable,context, custom_plot_params=None) :
             if cont in var_entry : rep.update(var_entry[cont])
     return rep
         
+
+
+def hovm_params(SSTbox_name) :
+    """Returns a dictionary with domain definition of SST/climate
+    specified box for plotting Hovmoller diagrams
+
+    This type of dictionary is typically passed to 'hovm' operator with "**".
+
+    Arg:
+      SSTbox_name (string) : SST/climate box name.
+      The available boxes are: 'NINO3-4', 'NINO1-2', 'NINO3', 'NINO4', 'GRL',
+      'NATL', 'SAT' and 'TPA'.
+
+    Returns : a python dictionary with domain parameters ('latS',
+    'latN', 'lonW', 'lonE') to be used by hovm() 
+
+    Call example ::
+ 
+    >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
+    >>> # We plot a Hovmoller diagram (t,y) at longitude close to 10 for 'NINO1-2' domain
+    >>> hov_diag=hovm(tas, mean_axis='Point', xpoint=10., title='Temperature', **hovm_params('NINO1-2'))
+    >>> cfile(hov_diag)
+    
+    """
+
+    SST_boxes = {
+       'NINO3-4' :  {'latS': ' -5.', 'latN': '5.' , 'lonW': '-170.', 'lonE': '-120.'},
+       'NINO1-2' :  {'latS': '-10.', 'latN': '0.' , 'lonW': '-90.' , 'lonE': '-80.' }, 
+       'NINO3'   :  {'latS': '-5.' , 'latN': '5.' , 'lonW': '-150.', 'lonE': '-90.' }, 
+       'NINO4'   :  {'latS': '-5.' , 'latN': '5.' , 'lonW': '-160.', 'lonE': '-150.'}, 
+       'GRL'     :  {'latS': '40.' , 'latN': '60.', 'lonW': '-60.' , 'lonE': '-30.' }, 
+       'NATL'    :  {'latS': '20.' , 'latN': '85.', 'lonW': '-90.' , 'lonE': '30.'  }, 
+       'SAT'     :  {'latS': '6.'  , 'latN': '18.', 'lonW': '-30.' , 'lonE': '10.'  },
+       'TPA'     :  {'latS': '20.' , 'latN': '85.', 'lonW': '-90.' , 'lonE': '30.'  }, 
+       }
+    
+    if SSTbox_name in SST_boxes : return (SST_boxes[SSTbox_name])

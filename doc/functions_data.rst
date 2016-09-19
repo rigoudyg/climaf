@@ -17,7 +17,7 @@ ds : define a dataset object (actually a front-end for ``cdataset``)
 
 .. autofunction:: climaf.classes.ds
 
-cdataset :: define a dataset object 
+cdataset : define a dataset object 
 --------------------------------------------------------------------------
 
 .. autoclass:: climaf.classes.cdataset

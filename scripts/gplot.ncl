@@ -1,5 +1,5 @@
 ; General-purpose plot using NCL, for use in CliMAF. 
-; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
+; Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 
 ; Second version : L.Vignon - november 2015
 
@@ -611,6 +611,16 @@ begin
         if isvar("lonname") then lon_dim=ffile->$lonname$ end if	
       end if
 
+      ; correction for data with 'units' attribute equal to "degrees" for latitude and longitude
+      if isvar("lat_dim") .and. isatt(lat_dim,"units") .and. (lat_dim@units .eq. "degrees") then
+        lat_dim@units = "degrees_north"
+        field&$latname$@units = "degrees_north"
+      end if
+      if isvar("lon_dim") .and. isatt(lon_dim,"units") .and. (lon_dim@units .eq. "degrees") then
+        lon_dim@units = "degrees_east"
+        field&$lonname$@units = "degrees_east"
+      end if
+
       ; check if we have a horizontal map
       if isvar("latname") .and. isvar("lonname") then 
         horizontal=check_map(field, latname, lonname, lat_dim, lon_dim) 
@@ -1064,8 +1074,7 @@ begin
     res@gsnSpreadColorEnd   = -2
 
     ; Main title
-    if (.not. isvar("title")) then title=main_var end if 
-    res@tiMainString  = title
+    if isvar("title") then res@tiMainString  = title end if
 
     if isvar("tiMainFont") then
       res@tiMainFont = tiMainFont ;22 <=> "helvetica-bold"
@@ -1313,7 +1322,7 @@ begin
         res@mpLandFillColor="grey" 
       end if
       
-      if (isvar("proj")) then 
+      if (isvar("proj") .and. proj .ne. "") then 
         prj = getSubString( proj,0,1 )
         if ( prj .eq. "NH" .or. prj .eq. "SH" ) then
           res@gsnPolar=prj
@@ -1468,7 +1477,7 @@ begin
     xyres@txFontHeightF = 0.010
     xyres@xyLineThicknesses = 3.0 ;(/ 2.0, 3.0/)
     xyres@xyLineColor = "black"
-    xyres@tiMainString       = title
+    if isvar("title") then xyres@tiMainString = title end if
 
     if isvar("gsnLeftString") then
       xyres@gsnLeftString = gsnLeftString
@@ -1612,7 +1621,7 @@ begin
         if isvar("latdim") then res@sfYArray = latdim end if
         res@gsnAddCyclic        = False
       end if
-    
+ 
       print("using gsn_csm_contour_map")
       if isvar("options") then res_list(options, res) end if 
       if VECT then

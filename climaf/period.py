@@ -103,8 +103,7 @@ class cperiod():
         if (self.fx) :return(False)
         #raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end :
-            return cperiod(self.start,included.start), 
-        cperiod(included.end,self.end)
+            return cperiod(self.start,included.start), cperiod(included.end,self.end)
     #
     def intersects(self,other) :
         """ 

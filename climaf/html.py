@@ -172,7 +172,7 @@ def link(label,filename,thumbnail=None,hover=True) :
       
     else:
         rep=label
-        
+
     return rep
 
 def link_on_its_own_line(label,filename,thumbnail=None,hover=True) :
@@ -193,13 +193,18 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
     to file filename. This allow to generate a portable atlas in this 
     directory. Hard links are named after pattern 
     climaf_atlas<digit>.<extension>
+    
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
 
     If 'altdir' is not None (and 'dirname is None), the HREF links 
-    images in index to have their absolute path changed from 
-    $CLIMAF_CAcHE to 'altdir' (use case : when the Http server only knows 
-    another filesystem)
+    images in index have the prefix of their absolute path changed from 
+    $CLIMAF_CACHE to 'altdir' (use case : when the Http server only knows 
+    another filesystem). Example:
+
+    - CLIMAF_CACHE=/prodigfs/ipslfs/dods/fabric/coding_sprint_NEMO/stephane
+    - URL https://vesg.ipsl.upmc.fr **/thredds/fileServer/IPSLFS/fabric/coding_sprint_NEMO/stephane/** .../fig.png
+
     """
     if dirname:
         os.system('mkdir -p '+dirname)
@@ -221,12 +226,16 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             return '<TD ALIGN=RIGHT>'+ \
                    link(label,"climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
                    '</TD>\n'
+        else: #lv 
+            return '<TD ALIGN=RIGHT>'+ \
+            link(label,filename,thumbnail,hover)+\
+            '</TD>\n'                
 
     else:
         fn=filename
-        if altdir : 
+        if altdir and fn: #lv
             from climaf import cachedir
-            fn=filename.replace(cachedir,altdir)
+            fn=filename.replace(cachedir,altdir) 
         return '<TD ALIGN=RIGHT>'+ \
                link(label,fn,thumbnail,hover)+\
                '</TD>\n'
@@ -246,13 +255,14 @@ def line(list_of_pairs,title="",thumbnail=None,hover=True, dirname=None,altdir=N
     """
     labels=[]
     figures=[]
+
     for e in list_of_pairs :
         if isinstance(e,tuple) : 
             label=e[0]; labels.append(label) ; figures.append(e[1])
         else : 
             label=e; labels.append(e) ; figures.append(None)
     rep=open_line()+title
-    for lab,fig in zip(labels,figures): 
+    for lab,fig in zip(labels,figures):
         rep+=cell(lab,fig,thumbnail,hover,dirname,altdir)
     return rep+close_line()
 

@@ -5,6 +5,65 @@ Whats' new
 ------------
 
 Changes, newest first :
+ 
+- 2016/09/09:
+
+  - Technical : 
+
+    - the writing of CRS is now made in a temporary file before being
+      saved in CliMAF outfile in order to avoid having problems in the
+      writing of CRS during several CliMAF calls (particularly for PDF
+      files)  
+    - a new shell script is available to clean corrupted PDF files
+      i.e. without CRS (see :download:`clean_pdf.sh
+      <../scripts/clean_pdf.sh>`)  
+
+  - New standard operator ``ccdfmean_profile_box`` to compute the
+    vertical profile of horizontal means for 3D fields on a given
+    geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
+
+  - New function :py:func:`~climaf.driver.check_time_consistency`
+    check time consistency of first variable of a dataset or ensemble
+    members. 
+
+  - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
+    time data conversion is necessary 
+
+  - New standard operator ``hovm`` for **plotting Hovmöller diagrams**
+    (time/lat or lon, or time/level) for any SST/climate boxes and
+    provides many customization parameters; see :doc:`scripts/hovm`
+
+  - Function :py:func:`~climaf.plot.plot_params.hovm_params` provides
+    domain for some SST/climate boxes
+
+  - Changes for default argument ``title``: if no title value is
+    provided when invoking graphic operators, no title will be
+    displayed (before, the value of CRS expression for an object was
+    provided under special keyword ``title``) 
+
+  - Bug fixes in test install
+
+  - Bug fixes for ``plot`` (see :doc:`scripts/plot`) when using
+    argument 'proj' with an empty string
+
+
+- 2016/05/24:
+
+  - Change default for arguments ``scale_aux`` and ``offset_aux`` for
+    standard operators ``plot`` (see :doc:`scripts/plot`) and
+    ``curves`` (see :doc:`scripts/curves`): no scaling instead of main
+    field scaling  
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - add argument ``date`` for selecting date in the format 'YYYY',
+      'YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'  
+    - ``time``, ``date`` and ``level`` extractions apply on all fields
+      now from 2D to 4D, instead of only 3D and 4D  
+    - log messages, when a time or level extraction is made, are also
+      performed 
+    - Bug fixes when using ``mpCenterLonF`` argument
+ 
 
 - 2016/06/30:
 
@@ -62,7 +121,6 @@ Changes, newest first :
     variables, and allows its customization. The expectation is that
     everybody will contribute values that can be shared, for improving
     easy common intepretation of evaluation plots
-
 
   - New standard operators:
 

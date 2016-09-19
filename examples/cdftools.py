@@ -3,6 +3,7 @@
 # - cdfmean =>
 #    * ccdfmean : computes the mean value of the field, 2D or 3D (output: excluded profile)
 #    * ccdfmean_profile : vertical profile of horizontal means for 3D fields (output: excluded mean value)
+#    * ccdfmean_profile_box : vertical profile of horizontal means for 3D fields on a given geographical domain (output: excluded mean value)
 #    * ccdfvar : computes the spatial variance, 2D or 3D (output: excluded mean value, profile and profile of variance)
 #    * ccdfvar_profile : vertical profile of spatial variance (output: excluded mean value, profile and variance)
 #
@@ -61,8 +62,8 @@ cdef("frequency","monthly")
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
 #tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
 tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
-fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatcm',\
-              'ccdfmxlheatcm','ccdfsaltc', 'ccdfzonalmean'],
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfmean_profile_box','ccdfvar','ccdfvar_profile',\
+              'ccdfheatcm','ccdfmxlheatcm','ccdfsaltc','ccdfzonalmean'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
@@ -81,7 +82,7 @@ fixed_fields(['ccdfzonalmean_bas'],
 # cdfmean  IN-file IN-var T|U|V|F|W [imin imax jmin jmax kmin kmax]
 #        ... [-full] [-var] [-zeromean] 
 #
-# CliMAF usage (ccdfmean, ccdfmean_profile, ccdfvar, ccdfvar_profile) :
+# CliMAF usage (ccdfmean, ccdfmean_profile, ccdfmean_profile_box, ccdfvar, ccdfvar_profile) :
 #
 
 # Define dataset with sea water x velocity ("uo")
@@ -96,6 +97,10 @@ cfile(my_cdfmean3)
 # Compute vertical profile
 my_cdfmean_prof=ccdfmean_profile(duo,pos_grid='U')
 cfile(my_cdfmean_prof)
+
+# Compute vertical profile on geographical domain [35.4,39,-14,-10]
+my_cdfmean_prof_box=ccdfmean_profile_box(duo,pos_grid='U',latmin=35.4,latmax=39,lonmin=-14,lonmax=-10,kmin=1,kmax=2)
+cfile(my_cdfmean_prof_box)
 
 # Compute spatial variance
 my_cdfvar=ccdfvar(duo,pos_grid='U')
