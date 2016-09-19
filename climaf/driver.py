@@ -1140,9 +1140,9 @@ def efile(obj, filename, forced=False) :
 def check_time_consistency(any):
     """
     Check time consistency of first variable of a dataset or ensemble members:
-     - check if first data interval is coherent with dataset frequency
+     - check if first data time interval is consistent with dataset frequency
      - check if file data have a gap
-     - check if period of data files included dataset period
+     - check if period ocovered by data files actually includes the whole of dataset period
 
     Arg: a dataset or an ensemble
      
@@ -1181,50 +1181,51 @@ def check_time_consistency(any):
 
     # Returns the list of files which include the data for the dataset
     # or for each member of the ensemble
-    files=''  
     if isinstance(any,climaf.classes.cens):
         rep=True
         for memb in any:
-            clogger.info('Member: %s'%memb)
+            #clogger.info('Member: %s'%memb)
             rep=check_time_consistency(any[memb]) and rep
         return rep
-
     elif isinstance(any,climaf.classes.cdataset):
-    	if not any.baseFiles():
-	    clogger.error('No file found for: %s'%any)
-    	else:
-            files=any.baseFiles()
+        files=any.baseFiles()
+    	if not files:
+	    #clogger.error('No file found for: %s'%any)
+            return(False)
     else :
         clogger.error("Cannot handle %s" %any)
-
+    #
     if files:
         filedate=[]
         clogger.debug("List of selected files: %s"%files)
 
+        var=str.split(varOf(any),',')[0] 
         # Concatenate all data files
         for filename in str.split(files,' '):
             fileobj=ncf(filename)
-
-            var=str.split(varOf(any),',')[0] 
-            if any.project in classes.aliases and var in classes.aliases[any.project]: var=classes.aliases[any.project][var][0]
-
+            #
+            if any.project in classes.aliases and var in classes.aliases[any.project]:
+                var=classes.aliases[any.project][var][0]
+            #
             dimname=''
             for dim in fileobj.variables[var].dimensions:  
-                if 'time' in dim:
-                    dimname=dim
+                if 'time' in dim: dimname=dim
             if not dimname: clogger.error('No time dimension for variable %s'%var)
             time_obj=fileobj.variables[dimname]  
-
-            filedate=np.concatenate((filedate,num2date(time_obj.getValue(),units=time_obj.units,calendar=time_obj.calendar)))
+            filedate=np.concatenate((filedate,num2date(time_obj.getValue(),\
+                                   units=time_obj.units,calendar=time_obj.calendar)))
             
         clogger.debug('Time data of selected files: %s'%filedate)
 
         # Check if first data interval is coherent with dataset frequency
         filedate_delta=(filedate[1]-filedate[0]).total_seconds()
 
-        if ( (any.frequency == 'monthly' or not any.frequency) and (filedate_delta > 32.*24.*3600 and filedate_delta <= 29.*24.*3600.) ) \
-           or ( any.frequency == 'yearly' and (filedate_delta >= 366.*24.*3600. and filedate_delta < 365.*24.*3600.) ) \
-           or ( any.frequency == 'decadal' and (filedate_delta >= 3660.*24.*3600. and filedate_delta < 3650.*24.*3600.) ):
+        if ( (any.frequency == 'monthly' or not any.frequency) and \
+             (filedate_delta > 31.*24.*3600 and filedate_delta < 28.*24.*3600.) ) \
+           or ( any.frequency == 'yearly' and \
+                (filedate_delta > 366.*24.*3600. and filedate_delta < 365.*24.*3600.) ) \
+           or ( any.frequency == 'decadal' and \
+                (filedate_delta > 3653.*24.*3600. and filedate_delta < 3651.*24.*3600.) ):
         
             clogger.warning('First data interval (= %f days) is not coherent with dataset frequency (i.e. %s)'\
                             %(filedate_delta/(24.*3600.),any.frequency))
@@ -1240,24 +1241,26 @@ def check_time_consistency(any):
                             %(filedate_delta/3600.,float(any.frequency[0])))
 
         # Check if file data have a gap
-        i=1
+        i=0
         cpt=0
         while i < len(filedate)-1:
-            if (filedate[i+1]-filedate[i]).total_seconds() != filedate_delta:
-                if cpt < 5:
-                    if any.frequency == 'monthly' or not any.frequency or any.frequency == 'yearly' or any.frequency == 'decadal':
-                        clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days instead of %.0f days (<=> 1st data interval)' \
-                                      %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/(24.*3600.),filedate_delta/(24.*3600.)))
-                    elif any.frequency == 'daily' or any.frequency == '6h'or any.frequency == '3h' or any.frequency == '1h' \
-                         or any.frequency == '3Hourly' or any.frequency == '6Hourly':
-                        clogger.error('File data have a gap between indexes %i and %i: delta = %.0f hours instead of %.0f hours (<=> 1st data interval)' \
-                                      %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/3600.,filedate_delta/3600.))
-                    
-                cpt+=1
-                
             i+=1
-     
-        # Compute recovery period of data files
+            if (filedate[i+1]-filedate[i]).total_seconds() != filedate_delta:
+                cpt+=1
+                if cpt < 5:
+                    if any.frequency == 'monthly' or not any.frequency or \
+                       any.frequency == 'yearly' or any.frequency == 'decadal':
+                        clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days'+\
+                                      'instead of %.0f days (<=> 1st data interval)' \
+                                %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/(24.*3600.),filedate_delta/(24.*3600.)))
+                    elif any.frequency == 'daily' or any.frequency == '6h'or \
+                         any.frequency == '3h' or any.frequency == '1h' or \
+                         any.frequency == '3Hourly' or any.frequency == '6Hourly':
+                        clogger.error('File data have a gap between indexes %i and %i:'+\
+                                      'delta = %.0f hours instead of %.0f hours (<=> 1st data interval)' \
+                                %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/3600.,filedate_delta/3600.))
+        #
+        # Compute period covered by data files
         if any.frequency == 'monthly' or not any.frequency:  
             filedate[0]=filedate[0].replace(day=01)
             if filedate[-1].month > 11 :
@@ -1286,14 +1289,15 @@ def check_time_consistency(any):
                 else: # 'cell_methods' attribute defined with the value 'time: mean'
                     freq=filedate_delta/3600.
 
-                filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
-                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 ) 
+                filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + \
+                                ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
+                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
+                                ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 ) 
 
-            else: # instant
-
+            else: # assume it is instant data
                 freq=filedate_delta/3600.
-#                filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
-                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - 2*freq*60 )
+                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
+                    ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - 2*freq*60 )
 
         elif any.frequency == 'yearly' or any.frequency == 'decadal':
             filedate[0]=filedate[0].replace(month=01)
@@ -1306,17 +1310,21 @@ def check_time_consistency(any):
             clogger.error('Check time consistency with a frequency equal to %s has no sense' %any.frequency)      
 
         else:
-            clogger.error('Dataset frequency is non-standard: frequency = %s. Normalized frequency values are: decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle' %any.frequency)
-
-        clogger.debug('Recovery period of selected files: %s'%filedate)
-
+            clogger.error('Dataset frequency is non-standard: frequency = %s. '+\
+                          'Normalized frequency values are: decadal, yearly, monthly, '+\
+                          'daily, 6h, 3h, fx and annual_cycle' %any.frequency)
+        #
+        # Check period of datafiles vs dataset period
+        clogger.debug('Period covered by selected files: %s'%filedate)
         file_period=cperiod(start=filedate[0],end=filedate[-1])
-             
+        #
         if file_period.includes(any.period):
-            clogger.info("Time data in datafiles (i.e. %s) includes time data of dataset (i.e. %s) => dataset are consistent." %(file_period,any.period))
+            clogger.info("Time data in datafiles (i.e. %s) includes time data of "+\
+                         "dataset (i.e. %s) => dataset are consistent." %(file_period,any.period))
             return(True)
         else:
-            clogger.info("Time data in datafiles (i.e. %s) don't include time data of dataset (i.e. %s) => dataset are not consistent." %(file_period,any.period))
+            clogger.info("Time data in datafiles (i.e. %s) don't include time data of"+\
+                         "dataset (i.e. %s) => dataset are not consistent." %(file_period,any.period))
             return(False)
         
         

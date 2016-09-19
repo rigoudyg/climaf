@@ -191,11 +191,11 @@ def register(filename,crs,outfilename=None):
                 (version,crs,filename)
         clogger.debug("trying stamping by %s"%command)
         if ( os.system(command) == 0 ) :     
-            clogger.info("%s registered as %s"%(crs,filename))
             if outfilename:
-                cmd = 'mv %s %s && rm -f %s'%(filename,outfilename,filename)
+                cmd = 'mv %s %s '%(filename,outfilename)
                 if ( os.system(cmd) == 0 ):
-                    clogger.info("move %s as %s and removed %s"%(filename,outfilename,filename))
+                    clogger.info("move %s as %s "%(filename,outfilename))
+                    clogger.info("%s registered as %s"%(crs,outfilename))
                     crs2filename[crs]=outfilename
                     return True
                 else:
@@ -203,6 +203,7 @@ def register(filename,crs,outfilename=None):
                     exit()
                     return None
             else:
+                clogger.info("%s registered as %s"%(crs,filename))
                 crs2filename[crs]=filename
                 return True
         else : 

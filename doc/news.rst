@@ -8,12 +8,10 @@ Changes, newest first :
  
 - 2016/09/09:
 
-  - Technical : 
+  - Fix issue occurring in parallel runs (especially for PDF outputs): 
 
-    - the writing of CRS is now made in a temporary file before being
-      saved in CliMAF outfile in order to avoid having problems in the
-      writing of CRS during several CliMAF calls (particularly for PDF
-      files)  
+    - the scripts output files now have temporay unique names until
+      they are fully tagged with their CRS and moved to the cache  
     - a new shell script is available to clean corrupted PDF files
       i.e. without CRS (see :download:`clean_pdf.sh
       <../scripts/clean_pdf.sh>`)  
@@ -45,25 +43,6 @@ Changes, newest first :
 
   - Bug fixes for ``plot`` (see :doc:`scripts/plot`) when using
     argument 'proj' with an empty string
-
-
-- 2016/05/24:
-
-  - Change default for arguments ``scale_aux`` and ``offset_aux`` for
-    standard operators ``plot`` (see :doc:`scripts/plot`) and
-    ``curves`` (see :doc:`scripts/curves`): no scaling instead of main
-    field scaling  
-
-  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
-
-    - add argument ``date`` for selecting date in the format 'YYYY',
-      'YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'  
-    - ``time``, ``date`` and ``level`` extractions apply on all fields
-      now from 2D to 4D, instead of only 3D and 4D  
-    - log messages, when a time or level extraction is made, are also
-      performed 
-    - Bug fixes when using ``mpCenterLonF`` argument
- 
 
 - 2016/06/30:
 

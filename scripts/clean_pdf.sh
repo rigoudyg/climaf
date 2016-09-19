@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-Usage="clean_pdf.sh last_changed_time"
+Usage="clean_pdf.sh [ last_changed_time ]"
 #
 # Remove pdf files without CliMAF Reference Syntax (CRS) 
 # which status was last changed LAST_CHANGED_TIME*24 hours ago

@@ -8,18 +8,18 @@ boxes are available to be passed to this operator (see below in
 
 The various cases are:
 
-- Time [y-axis or x-axis] vs. Lon [x-axis or y-axis] : if exists, mean
+- Time vs. Lon (or reverse) : if exists, mean
   or section at a given point on Lat, and section at a given point on
   height, or    
-- Time [y-axis or x-axis] vs. Lat [x-axis or y-axis] : if exists, mean
+- Time vs. Lat (or reverse) : if exists, mean
   or section at a given point on Lon, and section at a given point on
   height, or   
-- Time [y-axis or x-axis] vs. Height [x-axis or y-axis] : if exists,
+- Time vs. Height (or reverse) : if exists,
   mean or section at a given point on Lat/Lon. 
 
 Remark: If data grid is curvilinear, you have to do a projection on a
 rectilinear grid before using ``hovm``, otherwise the mean on Lat or
-Lon axis will be rough.  
+Lon axis will be rough/wrong.  
 
 **References** : https://www.ncl.ucar.edu/Applications/time_lon.shtml
 
