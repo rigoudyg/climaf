@@ -20,9 +20,9 @@ Changes, newest first :
     vertical profile of horizontal means for 3D fields on a given
     geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
 
-  - New function :py:func:`~climaf.driver.check_time_consistency`
+  - New function :py:func:`~climaf.classes.check_time_consistency`
     check time consistency of first variable of a dataset or ensemble
-    members. 
+    members.
 
   - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
     time data conversion is necessary 
