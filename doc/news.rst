@@ -10,7 +10,7 @@ Changes, newest first :
 
   - Fix issue occurring in parallel runs (especially for PDF outputs): 
 
-    - the scripts output files now have temporay unique names until
+    - the scripts output files now have temporary unique names until
       they are fully tagged with their CRS and moved to the cache  
     - a new shell script is available to clean corrupted PDF files
       i.e. without CRS (see :download:`clean_pdf.sh
