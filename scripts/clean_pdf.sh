@@ -11,10 +11,20 @@ set -x
 
 age=$1
 
+cachedir=$CLIMAF_CACHE
+
+if [ -z "$cachedir" ]; then 
+    if [[ $(uname -n) == ciclad* ]]; then 
+	cachedir=/data/$USER/climaf_cache
+    else
+	cachedir=$HOME/tmp/climaf_cache
+    fi
+fi
+
 if [ "$age" ] ; then 
-    find_cmd=$(find . -name '*.pdf' -ctime $age)
+    find_cmd=$(find $cachedir -name '*.pdf' -ctime $age)
 else
-    find_cmd=$(find . -name '*.pdf')
+    find_cmd=$(find $cachedir -name '*.pdf')
 fi
 
 for file in $find_cmd 
