@@ -449,6 +449,7 @@ class cdataset(cobject):
                         %(self.variable,self.crs))
         return(False)
 
+
 class cens(cobject,dict):
     def __init__(self, dic={}, order=None, sortfunc=None ) :
         """Function cens creates a CliMAF object of class ``cens`` ,
@@ -1432,7 +1433,7 @@ def check_time_consistency(any):
         filedate=[]
         clogger.debug("List of selected files: %s"%files)
 
-        var=str.split(climaf.driver.varOf(any),',')[0] 
+        var=str.split(varOf(any),',')[0] 
         # Concatenate all data files
         for filename in str.split(files,' '):
             fileobj=ncf(filename)
@@ -1564,6 +1565,58 @@ def check_time_consistency(any):
             clogger.info("Time data in datafiles (i.e. %s) don't include time data of " %file_period +\
                          "dataset (i.e. %s) => dataset are not consistent." %any.period)
             return(False)
+
+
+def domainOf(cobject) :
+    """ Returns a domain for a CliMAF object : if object is a dataset, returns
+    its domain, otherwise returns domain of first operand
+    """
+    if isinstance(cobject,cdataset) : 
+	if type(cobject.domain) is list :
+            rep=""
+            for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
+            rep="%s%d"%(rep,cobject.domain[-1])
+            return(rep)
+	else : 
+	    if cobject.domain == "global" : return ""
+	    else : return(cobject.domain)
+    elif isinstance(cobject,ctree) :
+        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
+        return domainOf(cobject.operands[0])
+    elif isinstance(cobject,scriptChild) :
+        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
+        return domainOf(cobject.father)
+    elif isinstance(cobject,cens) :
+        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
+        return domainOf(cobject.values()[0])
+    elif cobject is None : return "none"
+    else : clogger.error("Unkown class for argument "+`cobject`)
+             
+def varOf(cobject) : return attributeOf(cobject,"variable")
+def modelOf(cobject) : return attributeOf(cobject,"model")
+def simulationOf(cobject) : return attributeOf(cobject,"simulation")
+def projectOf(cobject) : return attributeOf(cobject,"project")
+def realmOf(cobject) : return attributeOf(cobject,"realm")
+def gridOf(cobject) : return attributeOf(cobject,"grid")
+
+def attributeOf(cobject,attrib) :
+    """ Returns the attribute for a CliMAF object : if object is a dataset, returns
+    its attribute property, otherwise returns attribute of first operand
+    """
+    if isinstance(cobject,cdataset) : 
+        val=getattr(cobject,attrib,None) 
+        if val is not None : return val
+        else : return(cobject.kvp.get(attrib))
+    elif isinstance(cobject,cens) : return attributeOf(cobject.values()[0],attrib)
+    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
+    elif isinstance(cobject,ctree) :
+        clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
+        return attributeOf(cobject.operands[0],attrib)
+    elif isinstance(cobject,climaf.cmacro.cdummy) :
+        return "dummy"
+    elif isinstance(cobject,cpage) or isinstance(cobject,cpage_pdf) : return None
+    elif cobject is None : return ''
+    else : raise Climaf_Classes_Error("Unknown class for argument "+`cobject`)
 
         
 class Climaf_Classes_Error(Exception):

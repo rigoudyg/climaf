@@ -76,9 +76,9 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf,check_time_consistency
+from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf,check_time_consistency,varOf
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
+from driver    import ceval, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
