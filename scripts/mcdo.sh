@@ -59,13 +59,20 @@ nemo_timefix ()
 	    fi
 	    if [ "$var2rename" ] ; then 
 		out=$tmp/renamed_$(basename $file) ; rm -f $out 
-		ncks -3 $file $out 
-		ncrename -d .$var2rename,time_counter -v .$var2rename,time_counter $out >&2
+		if [[ $(ncdump -k $file) == 'classic' ]] ; then
+		    temp=$file
+		else
+		    temp=$out
+		    ncks -3 $file $temp 
+		fi
+		ncrename -d .$var2rename,time_counter -v .$var2rename,time_counter $temp $out >&2
 		for lvar in $vars2d; do 
-		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+#		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+		    ncatted -a coordinates,$lvar,m,c,'nav_lat nav_lon' $out >&2
 		done
 		for lvar in $vars3d; do 
-		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+#		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+		    ncatted -a coordinates,$lvar,m,c,'deptht nav_lat nav_lon' $out >&2
 		done
 		if [ -w $file ] ; then mv -f $out $file ; out="" ; fi
 	    fi
@@ -143,7 +150,7 @@ for file in $files ; do
     [ "$seldate" ] && seldate=$seldatebase" "$(clim_timefix $file) 
     #
     # If requested, fix time_counter for Nemo outputs. Feature not yet tested !!
-    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file)
+    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file) 
     # If requested, fix attribute 'coordinates' of file variable for Aladin outputs.
     [ "${CLIMAF_FIX_ALADIN_COORD:-no}" != no ] && file=$(aladin_coordfix $file)
     #

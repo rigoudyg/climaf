@@ -30,9 +30,4 @@ csync
 
 .. autofunction:: climaf.cache.csync
 
-check_time_consistency: check time consistency of first variable of a dataset or an ensemble
-----------------------------------------------------------------------------------------------
-
-.. autofunction:: climaf.classes.check_time_consistency
-
 

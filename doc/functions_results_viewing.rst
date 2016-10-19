@@ -4,7 +4,7 @@ functions for inspecting data
 
 summary : describe files associated with a dataset
 ---------------------------------------------------
- - :py:func:`~climaf.functions.summary`
+.. autofunction:: climaf.functions.summary
 
 ncdump : dump file header
 ------------------------------
