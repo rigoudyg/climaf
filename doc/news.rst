@@ -6,7 +6,7 @@ Whats' new
 
 Changes, newest first :
  
-- 2016/09/09:
+- 2016/10/28:
 
   - Fix issue occurring in parallel runs (especially for PDF outputs): 
 
@@ -20,9 +20,9 @@ Changes, newest first :
     vertical profile of horizontal means for 3D fields on a given
     geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
 
-  - New function :py:func:`~climaf.classes.check_time_consistency`
-    check time consistency of first variable of a dataset or ensemble
-    members.
+  - New method of :py:class:`~climaf.classes.cdataset` class:
+    :py:meth:`~climaf.classes.cdataset.check` checks time consistency
+    of first variable of a dataset or ensemble members  
 
   - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
     time data conversion is necessary 
