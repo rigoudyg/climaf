@@ -10,7 +10,7 @@ CliMAF macros module :
 
 import sys, os
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds
+from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens
 from clogging import clogger, dedent
 
 #: Dictionary of macros
@@ -104,6 +104,10 @@ def macro(name,cobj,lobjects=[]):
         rep=cpage(cobj.widths, cobj.heights,
                   [ map(macro, [ None for fig in line ], line) for line in cobj.fig_lines ] ,
                   cobj.orientation)
+    elif isinstance(cobj,cens) :      
+        d=dict()
+        for k,v in zip(cobj.keys(),map(macro,[ None for o in cobj.values()],cobj.values())) : d[k]=v
+        rep=cens(d)                
     elif cobj is None : return None
     else :
         clogger.error("Cannot yet handle object :%s", `cobj`)
