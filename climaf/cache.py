@@ -30,7 +30,9 @@ directoryNameLength=5
 #: Define whether we stamps the data files with their CRS
 stamping=True
 #: The index associating filenames to CRS expressions
-crs2filename=dict()  
+crs2filename=dict()
+#: The dictionary associating CRS expressions to their evaluation 
+crs2eval=dict()
 
 #: A dict containing cache index entries (as listed in index file), which 
 # were up to now not interpretable, given the set of defined projects
@@ -180,8 +182,13 @@ def register(filename,crs,outfilename=None):
             command="ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s"%\
                 (crs,version,filename)
         if re.findall(".png$",filename) :
-            command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
-                (crs,version,filename,filename,filename,filename)
+            if re.findall("%",crs):
+                crs2=crs.replace("%","\%")
+                command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
+                         (crs2,version,filename,filename,filename,filename)
+            else:
+                command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
+                         (crs,version,filename,filename,filename,filename)
         if re.findall(".pdf$",filename) :
             tmpfile = str(uuid.uuid4())
             command="pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> %s && pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s"%\
@@ -267,18 +274,24 @@ def hasMatchingObject(cobject,ds_func) :
     def op_squeezes_time(operator):
         return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
     #
+    global crs2eval
+    key_to_rm=list()
     for crs in crs2filename.copy() :
-        try: 
-            co=eval(crs, sys.modules['__main__'].__dict__)
-            altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
-            if altperiod :
-                if os.path.exists(crs2filename[crs]) :
-                    return co,altperiod
-                else :
-                    clogger.debug("Removing %s from cache index, because file is missing",crs)
-                    crs2filename.pop(crs)
-        except :
-            pass # usually case of a CRS which project is not currently defined
+        co=crs2eval.get(crs,None)
+        if co is None:
+            try: 
+                co=eval(crs, sys.modules['__main__'].__dict__)
+                crs2eval[crs]=co
+            except:
+                pass # usually case of a CRS which project is not currently defined
+        altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
+        if altperiod :
+            if os.path.exists(crs2filename[crs]) :
+                return co,altperiod
+            else :
+                clogger.debug("Removing %s from cache index, because file is missing",crs)
+                key_to_rm.append(crs)
+    for el in key_to_rm: crs2filename.pop(el)
     return None,None
 
 def hasIncludingObject(cobject) :
@@ -297,14 +310,14 @@ def hasBeginObject(cobject) :
 def hasExactObject(cobject) :
     # First read index from file if it is yet empty
     # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
-    if cobject.crs in crs2filename :
-        f=crs2filename[cobject.crs]
+    f=crs2filename.get(cobject.crs,None)
+    if f:
         if os.path.exists(f) :
             return f
         else :
             clogger.debug("Dropping cobject.crs from cache index, because file si missing")
             crs2filename.pop(cobject.crs)
-
+    
 def complement(crsb, crse, crs) :
     """ Extends time period of file object of CRSB (B for 'begin')
     with file object of CRSE (E for 'end') for creating file object of

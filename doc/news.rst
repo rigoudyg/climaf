@@ -6,6 +6,11 @@ Whats' new
 
 Changes, newest first :
  
+- 2016/12/14:
+
+  - Significant improvement of cache performance (70 times as fast for
+    a cache containing more than 8000 objects)
+
 - 2016/10/28:
 
   - Fix issue occurring in parallel runs (especially for PDF outputs): 
