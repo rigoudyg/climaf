@@ -1,6 +1,6 @@
 """
 
-This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
+This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original ERAI variables set (aliasing)**
 
@@ -23,7 +23,7 @@ from climaf.site_settings import atCNRM
 if atCNRM:
     cproject('erai',('grid','_'), ('frequency','monthly'))  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127' 
 
-    root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
+    root="/cnrm/amacs/DATA/OBS/netcdf/${frequency}"
     patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}YYYY-YYYY.nc"   #for original grid
     patmonth2=root+"_mean/erai/erai_???_mm_${variable}.${grid}.YYYY-YYYY.nc" #for other grids e.g. : grid ='T42' or 'T127'
     patday1=root+"/erai/ei_${variable}${grid}YYYY-YYYY.nc"   #for original grid

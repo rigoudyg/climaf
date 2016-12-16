@@ -324,7 +324,7 @@ Vectors:
     :py:func:`~climaf.operators.fixed_fields()`. Such files are not
     included with CliMAF and must be sought by your local Nemo
     dealer. At CNRM you may have a look at
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/. In this case, if
+    /cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/. In this case, if
     you also plot an auxiliary field, it only works if auxiliary field
     is not a sub-region of the main field (because the latitude and
     longitude arrays will be read in the same file that for main
@@ -404,14 +404,14 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
 .. _native_grid2:
 
      >>> # A Map without data re-projection (model is already on a known native Lambert grid):
-     >>> tas=fds('/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc', period='197901-201112', variable='tas')
+     >>> tas=fds('/cnrm/est/COMMON/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc', period='197901-201112', variable='tas')
      >>> moy_tas=time_average(tas) # time average of 'tas'
      >>> # without bringing to the script the file which includes metadata for the native Lambert grid 
      >>> # => with default cylindrical equidistant projection 
      >>> proj=plot(moy_tas,title='ALADIN',min=-12,max=28,delta=2.5,vcb=False) 
      >>> cshow(proj)
      >>> # How to get required file which includes metadata for the native Lambert grid named 'climaf_plot_grid.nc'
-     >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
+     >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/est/COMMON/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
      >>> # with bringing to the script this file => with default native grid (no re-projection)
      >>> cdrop(proj) # to re-compute 'proj'
      >>> cshow(proj)

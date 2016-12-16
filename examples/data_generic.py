@@ -3,7 +3,7 @@ Example for CliMAF access to data organized in various ways, using the
 data organization called 'generic' :
 
 - data according to CAMI atlas naming scheme at CNRM such as :
-/cnrm/aster/data1/UTILS/cami/V1.7/climlinks/CAYAN/hfls_1m_194601_199803_CAYAN.nc
+/cnrm/est/COMMON/cami/V1.7/climlinks/CAYAN/hfls_1m_194601_199803_CAYAN.nc
 
 - data sample distributed with CliMAF
 
@@ -11,7 +11,7 @@ data organization called 'generic' :
 /prodigfs/OCMIP5/OUTPUT/IPSL/IPSL-CM4/CTL/mon/CACO3/CACO3_IPSL_IPSL-CM4_CTL_1860-1869.nc
 
 - data organized according to OBS4MIPS data at CNRM such as :
-/cnrm/vdr/DATA/Obs4MIPs/netcdf/monthly_mean/clt_MODIS_L3_C5_200003-201109.nc
+/cnrm/amacs/DATA/Obs4MIPs/netcdf/monthly_mean/clt_MODIS_L3_C5_200003-201109.nc
 
 """
 
@@ -30,7 +30,7 @@ if atCNRM :
     cproject("CAMIOBS",separator="_")
     
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
-    CAMIOBS_root="/cnrm/aster/data1/UTILS/cami/V1.7/climlinks/"
+    CAMIOBS_root="/cnrm/est/COMMON/cami/V1.7/climlinks/"
     
     # Pattern for matching CAMI obs data files and their directory. 
     # We choose to use facet 'model' to carry the observation source
@@ -109,7 +109,7 @@ if atCNRM :
     
     cproject("OBS4MIPS","frequency")
 
-    pattern="/cnrm/vdr/DATA/Obs4MIPs/netcdf/${frequency}/"+\
+    pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/"+\
             "${variable}_${simulation}_*_YYYYMM-YYYYMM.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
@@ -130,7 +130,7 @@ if (my_file is None) : exit(1)
 
 # define a pattern for accessing fixed fields (here we use a set of fixed fields from CMIP5,
 # but this is not mandatory)
-pattern_fx_CNRM_CM5="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"+\
+pattern_fx_CNRM_CM5="/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/"+\
     "CNRM-CM5/piControl/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 
 # Tell which model use that fixed fields
@@ -142,7 +142,7 @@ sftlf=ds(model="CNRM-CM5", variable="sftlf", frequency="fx")
 if atCNRM: print sftlf.baseFiles()
 
 # If a given experiment has modified fixed fields, you may write::
-pattern_fx_CNRM_CM5_lgm="/cnrm/aster/data*/ESG/data*/CMIP5/output1/CNRM-CERFACS/"+\
+pattern_fx_CNRM_CM5_lgm="/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/"+\
     "CNRM-CM5/lgm/fx/*/fx/r0i0p0/v20130826/${variable}/${variable}_fx_CNRM-CM5_*nc"
 dataloc(model="CNRM-CM5",simulation="LGM", frequency="fx",organization="generic",
         url=[pattern_fx_CNRM_CM5_lgm])

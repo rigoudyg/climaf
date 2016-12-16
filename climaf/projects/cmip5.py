@@ -29,11 +29,8 @@ cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })
 urls_CMIP5=None
 
 if atCNRM :
-    # Declare a list of root directories for CNRM-CM CMIP5 data on CNRM's Lustre file system.
-    urls_CMIP5=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", 
-                "/cnrm/aster/data2/ESG/data5", "/cnrm/aster/data4/ESG/data6", 
-                "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8",
-                "/cnrm/aster/data2/ESG/vdr"]
+    # Declare the directory for CNRM-CM CMIP5 data on CNRM's Lustre file system.
+    urls_CMIP5=["/cnrm/cmip/cnrm/ESG/CMIP5"]
 if onCiclad :
     # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
     urls_CMIP5=["/prodigfs/project/"]

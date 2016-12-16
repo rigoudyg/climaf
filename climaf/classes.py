@@ -476,7 +476,7 @@ class cdataset(cobject):
     
         >>> # Define a new project for 'em' data with 3 hours frequency in particular     
         >>> cproject('em_3h','root','group','realm','frequency',separator='|')
-        >>> path='/cnrm/aster/data1/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc' 
+        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc' 
         >>> dataloc(project='em_3h', organization='generic', url=path)
     
         >>> # Dataset with 3h frequency for 'tas' variable (instant) 

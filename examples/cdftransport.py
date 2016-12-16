@@ -11,14 +11,14 @@ if 'ccdfmean' not in cscripts :
 cproject('data_CNRM')
 
 # For 'standard' Nemo output files (actually, they are easier accessible using project "EM")
-#root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
-root1="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+#root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 
 # For VT files from Monitoring
-#root2="/cnrm/aster/data3/aster/chevalli/Monitoring/Results/NO_SAVE/PRE6/SORTIE/PRE6/${simulation}/MONITOR/VT/"
-root2="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/VT/"
+#root2="/cnrm/ioga/Users/chevallier/chevalli/Monitoring/Results/NO_SAVE/PRE6/SORTIE/PRE6/${simulation}/MONITOR/VT/"
+root2="/cnrm/est/COMMON/climaf/test_data/${simulation}/VT/"
 url_nemo_monitoring=root2+suffix
 #
 dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard,url_nemo_monitoring])
@@ -46,8 +46,8 @@ dx=ds(variable=products)
 
 # Tell how to bring required fixed files to cdftransport
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
-#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
+#tpath='/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/est/COMMON/climaf/test_data/fixed/'
 fixed_fields('ccdftransport',
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))

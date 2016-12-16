@@ -1,6 +1,6 @@
 """
 
-This module declares GPCC data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
+This module declares GPCC data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original GPCC variables set**
 
@@ -24,7 +24,7 @@ from climaf.site_settings import atCNRM
 if atCNRM:
     cproject('gpcc','grid')  # grid writes as '05d', '1d' or 'T127'
 
-    url_gpcc="/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/gpcc/GPCC.Reanalysis.${grid}.nc"
+    url_gpcc="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/gpcc/GPCC.Reanalysis.${grid}.nc"
     dataloc(project='gpcc', organization='generic', url=[url_gpcc])
 
 

@@ -1,6 +1,6 @@
 """
 
-This module declares GPCP data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
+This module declares GPCP data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original GPCP variables set (aliasing/scaling)**
 
@@ -26,7 +26,7 @@ from climaf.site_settings import atCNRM
 if atCNRM:
     cproject('gpcp','grid', ('frequency','monthly'), separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'
 
-    root="/cnrm/vdr/DATA/OBS/netcdf/${frequency}"
+    root="/cnrm/amacs/DATA/OBS/netcdf/${frequency}"
     patmonth=root+"_mean/gpcp/${variable}_gpcp.${grid}.nc"
     patday  =root+"/gpcp/${variable}_gpcp.${grid}.nc"
     dataloc(project='gpcp', organization='generic', url=[patmonth,patday])

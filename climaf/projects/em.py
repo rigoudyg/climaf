@@ -71,7 +71,7 @@ if atCNRM :
     dataloc(project="em", organization="generic", url=[pathA,pathL,pathI,pathO,pathO2])
     
     # Shared simulations - example : group=SC
-    pathg="/cnrm/aster/data1/simulations/${group}/"
+    pathg="/cnrm/cmip/cnrm/simulations/${group}/"
     pathgA=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
     pathgL=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
     pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8

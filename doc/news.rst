@@ -8,6 +8,8 @@ Changes, newest first :
  
 - 2016/12/14:
 
+  - Update paths for CNRM data on Lustre
+
   - Significant improvement of cache performance (70 times as fast for
     a cache containing more than 8000 objects)
 
@@ -354,7 +356,7 @@ Changes, newest first :
        <../examples/cdftransport.py>`: a new project 'data_CNRM' was
        declared instead of 'NEMO' old project; this new project
        uses data available at CNRM in a dedicated directory
-       "/cnrm/aster/data1/UTILS/climaf/test_data", which contains both
+       "/cnrm/est/COMMON/climaf/test_data", which contains both
        Nemo raw outputs, monitoring outputs (with VT-files) and fixed
        fields. 
 
@@ -388,7 +390,7 @@ Changes, newest first :
     file, for dealing with Nemo data files having un-complete
     'nav_lat' and 'nav_lon'. See :ref:`navlat issues with plot
     <navlat_issue>`.  Such files are available e.g. at CNRM in
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/ 
   - Change for :py:func:`~climaf.classes.cpage`  :
 
    - argument ``orientation`` is now deprecated and preferably
