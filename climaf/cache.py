@@ -182,13 +182,9 @@ def register(filename,crs,outfilename=None):
             command="ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s"%\
                 (crs,version,filename)
         if re.findall(".png$",filename) :
-            if re.findall("%",crs):
-                crs2=crs.replace("%","\%")
-                command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
-                         (crs2,version,filename,filename,filename,filename)
-            else:
-                command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
-                         (crs,version,filename,filename,filename,filename)
+            crs2=crs.replace("%","\%")
+            command="convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s"%\
+                (crs2,version,filename,filename,filename,filename)
         if re.findall(".pdf$",filename) :
             tmpfile = str(uuid.uuid4())
             command="pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> %s && pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s"%\

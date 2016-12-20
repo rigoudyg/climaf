@@ -8,19 +8,18 @@ Changes, newest first :
  
 - 2016/12/14:
 
-  - Update paths for CNRM data on Lustre
+  - Update paths for CNRM (due to restructuring Lustre file system)
 
-  - Significant improvement of cache performance (70 times as fast for
+  - Significant improvement of cache performance (70 times faster for
     a cache containing more than 8000 objects)
-
-- 2016/10/28:
 
   - Fix issue occurring in parallel runs (especially for PDF outputs): 
 
     - the scripts output files now have temporary unique names until
-      they are fully tagged with their CRS and moved to the cache  
+      they are fully tagged with their CRS and moved to the cache
+
     - a new shell script is available to clean corrupted PDF files
-      i.e. without CRS (see :download:`clean_pdf.sh
+      in cache - i.e. without CRS (see :download:`clean_pdf.sh
       <../scripts/clean_pdf.sh>`)  
 
   - New standard operator ``ccdfmean_profile_box`` to compute the
@@ -43,8 +42,8 @@ Changes, newest first :
 
   - Changes for default argument ``title``: if no title value is
     provided when invoking graphic operators, no title will be
-    displayed (before, the value of CRS expression for an object was
-    provided under special keyword ``title``) 
+    displayed (formerly, the CRS expression for an object was
+    provided as a default value for ``title``) 
 
   - Bug fixes in test install
 
@@ -60,7 +59,7 @@ Changes, newest first :
   - automatic fix of Aladin outputs attribute 'coordinates' issues,
     provided you set environment variable CLIMAF_FIX_ALADIN_COORD to
     anything but ‘no’. This adresses the wrong variable attribute
-    'coordinates' with 'lat lon' to 'latitude longitude'
+    'coordinates' with 'lat lon' instead of 'latitude longitude'
     (:download:`../scripts/mcdo.sh <../scripts/mcdo.sh>`, see function
     aladin_coordfix()) 
 
