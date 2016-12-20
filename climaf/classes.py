@@ -14,7 +14,7 @@ from period    import init_period, cperiod
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
-import climaf
+from cmacro import cdummy
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -1635,7 +1635,7 @@ def attributeOf(cobject,attrib) :
     elif isinstance(cobject,ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return attributeOf(cobject.operands[0],attrib)
-    elif isinstance(cobject,climaf.cmacro.cdummy) :
+    elif isinstance(cobject,cdummy) :
         return "dummy"
     elif isinstance(cobject,cpage) or isinstance(cobject,cpage_pdf) : return None
     elif cobject is None : return ''
