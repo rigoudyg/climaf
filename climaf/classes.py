@@ -14,7 +14,6 @@ from period    import init_period, cperiod
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
-from cmacro import cdummy
 
 #: Dictionary of declared projects (type is cproject)
 cprojects=dict()
@@ -200,6 +199,17 @@ class cobject():
     def erase(self):
         del(cobjects[self.crs])
         clogger.debug("Object deleted ; crs = %s"%(self.crs))
+
+
+class cdummy(cobject):
+    def __init__(self):
+        """
+        cdummy class represents dummy arguments in the CRS
+        """
+        pass
+    def buildcrs(self,period=None,crsrewrite=None):
+        return('ARG')
+
 
 def processDatasetArgs(**kwargs) :
     """
