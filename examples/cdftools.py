@@ -41,8 +41,8 @@ if 'ccdfmean' not in cscripts :
 cproject('data_CNRM')
 
 # For 'standard' Nemo output files (actually, they are better accessible using project "EM")
-#root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
-root1="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+#root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 #
@@ -60,8 +60,8 @@ cdef("frequency","monthly")
 
 # How to get fixed files for all cdftools binaries
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
-#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
+#tpath='/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/est/COMMON/climaf/test_data/fixed/'
 fixed_fields(['ccdfmean','ccdfmean_profile','ccdfmean_profile_box','ccdfvar','ccdfvar_profile',\
               'ccdfheatcm','ccdfmxlheatcm','ccdfsaltc','ccdfzonalmean'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
@@ -72,7 +72,7 @@ fixed_fields(['ccdfzonalmean_bas'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'),
-             ('new_maskglo.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_new_maskglo.nc'))
+             ('new_maskglo.nc','/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_new_maskglo.nc'))
 
 #-----------
 #  cdfmean

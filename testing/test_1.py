@@ -68,16 +68,15 @@ def skipUnless_CNRM_Lustre():
 class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
-        # Declare a list of root directories for CMIP5 data on CNRM's Lustre file system.
-        urls_CMIP5_CNRM=["/cnrm/aster/data2/ESG/data1", "/cnrm/aster/data2/ESG/data2", "/cnrm/aster/data2/ESG/data5",
-                         "/cnrm/aster/data4/ESG/data6", "/cnrm/aster/data4/ESG/data7", "/cnrm/aster/data4/ESG/data8"]
-        dataloc(project="CMIP5", organization="CMIP5_DRS", url=urls_CMIP5_CNRM)
+        # Declare the directory for CMIP5 data on CNRM's Lustre file system.
+        url_CMIP5_CNRM=["/cnrm/cmip/cnrm/ESG/CMIP5"]
+        dataloc(project="CMIP5", organization="CMIP5_DRS", url=url_CMIP5_CNRM)
         cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 
     def test_identifying_files(self):
         files=self.ds.baseFiles()
-        self.assertEqual(files,"/cnrm/aster/data2/ESG/data1/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc", 'Issue accessing 1cptCO2 data files')
+        self.assertEqual(files,"/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc", 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
         print `ds`

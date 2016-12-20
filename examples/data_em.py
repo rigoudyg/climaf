@@ -14,7 +14,7 @@ if not atCNRM : exit(0)
 cdef("project","em")
 
 # What is my EM root directory (EM_NETCDF_DIR) 
-cdef("root","/cnrm/aster/data3/aster/senesi/NO_SAVE/expes",project="em") ;  
+cdef("root","/cnrm/est/USERS/senesi/NO_SAVE/expes",project="em") ;  
 
 # Define some datasets based on private experiments
 

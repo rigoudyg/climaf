@@ -59,8 +59,6 @@ Main functions are :
 
  - ``clog_file``: tune verbosity for log file
 
- - ``check_time_consistency``: check time consistency of first variable of a dataset or an ensemble
-
 """
 # Created : S.Senesi - 2014
 
@@ -76,9 +74,9 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf
+from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf,varOf
 from cmacro    import macro,cmacros
-from driver    import ceval, varOf, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile, check_time_consistency
+from driver    import ceval, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc

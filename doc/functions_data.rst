@@ -22,6 +22,16 @@ cdataset : define a dataset object
 
 .. autoclass:: climaf.classes.cdataset
 
+:py:meth:`cdataset.check: check time consistency of a dataset <climaf.classes.cdataset.check>`
+====================================================================================================
+
+.. automethod:: climaf.classes.cdataset.check
+
+:py:meth:`cdataset.listfiles: returns the list of (local) files of a dataset <climaf.classes.cdataset.listfiles>`
+===================================================================================================================
+
+.. automethod:: climaf.classes.cdataset.listfiles
+
 cdef : define some default values for datasets attributes
 --------------------------------------------------------------------------
 

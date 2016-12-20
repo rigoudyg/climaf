@@ -10,7 +10,7 @@ Installing (or using an installed version, at CNRM or IPSL)
 - If working on IPSL's Ciclad, at CNRM or on MF's Beaufix HPC machine, you do not need to install CliMAF; just 
   do as indicated below (as e.g. in section :ref:`running_inter`), replacing ``<some_installation_dir>`` by :
 
-  - ``/cnrm/aster/data1/UTILS/climaf/current`` at CNRM
+  - ``/cnrm/est/COMMON/climaf/current`` at CNRM
 
   - ``~senesi/climaf`` on Beaufix
 

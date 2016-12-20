@@ -1,6 +1,6 @@
 """
 This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for
-all frequencies; see file:///cnrm/vdr/DATA/Obs4MIPs/doc/
+all frequencies; see file:///cnrm/amacs/DATA/Obs4MIPs/doc/
 
 Additional attribute for OBS4MIPS datasets  : 'frequency'
 
@@ -20,7 +20,7 @@ if os.path.exists('/cnrm'):
     # Frequency alias
     cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
     #
-    pattern="/cnrm/vdr/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_YYYYMM-YYYYMM.nc"
+    pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_YYYYMM-YYYYMM.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
 

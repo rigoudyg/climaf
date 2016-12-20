@@ -57,7 +57,7 @@ if atIDRIS:
 if atCerfacs:
     root="/data8/datamg/Ciclad/ReferenceDatasets/"
 if atCNRM:
-    root="/cnrm/aster/data1/UTILS/climaf/reference_datasets_from_IPSL/"
+    root="/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
     
 cproject('ref_climatos', ('frequency','annual_cycle'), 'product', 'clim_period', ensemble=['product'],separator='%')
 cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annual_cycle':'mo'})

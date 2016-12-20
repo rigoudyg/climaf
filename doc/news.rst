@@ -6,11 +6,18 @@ Whats' new
 
 Changes, newest first :
  
-- 2016/09/09:
+- 2016/12/14:
+
+  - Update paths for CNRM data on Lustre
+
+  - Significant improvement of cache performance (70 times as fast for
+    a cache containing more than 8000 objects)
+
+- 2016/10/28:
 
   - Fix issue occurring in parallel runs (especially for PDF outputs): 
 
-    - the scripts output files now have temporay unique names until
+    - the scripts output files now have temporary unique names until
       they are fully tagged with their CRS and moved to the cache  
     - a new shell script is available to clean corrupted PDF files
       i.e. without CRS (see :download:`clean_pdf.sh
@@ -20,9 +27,9 @@ Changes, newest first :
     vertical profile of horizontal means for 3D fields on a given
     geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
 
-  - New function :py:func:`~climaf.driver.check_time_consistency`
-    check time consistency of first variable of a dataset or ensemble
-    members. 
+  - New method of :py:class:`~climaf.classes.cdataset` class:
+    :py:meth:`~climaf.classes.cdataset.check` checks time consistency
+    of first variable of a dataset or ensemble members  
 
   - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
     time data conversion is necessary 
@@ -349,7 +356,7 @@ Changes, newest first :
        <../examples/cdftransport.py>`: a new project 'data_CNRM' was
        declared instead of 'NEMO' old project; this new project
        uses data available at CNRM in a dedicated directory
-       "/cnrm/aster/data1/UTILS/climaf/test_data", which contains both
+       "/cnrm/est/COMMON/climaf/test_data", which contains both
        Nemo raw outputs, monitoring outputs (with VT-files) and fixed
        fields. 
 
@@ -383,7 +390,7 @@ Changes, newest first :
     file, for dealing with Nemo data files having un-complete
     'nav_lat' and 'nav_lon'. See :ref:`navlat issues with plot
     <navlat_issue>`.  Such files are available e.g. at CNRM in
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/ 
   - Change for :py:func:`~climaf.classes.cpage`  :
 
    - argument ``orientation`` is now deprecated and preferably

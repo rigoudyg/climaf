@@ -82,7 +82,7 @@ if atCNRM:
     # Declare "data_CNRM" project with some 'standard' Nemo output files
     # (actually, they are easier accessible using project "EM")
     cproject('data_CNRM')
-    root="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+    root="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
     suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
     data_url=root+suffix
     dataloc(project='data_CNRM',organization='generic',url=data_url)

@@ -20,8 +20,8 @@ if 'ccdfmean' not in cscripts :
 cproject('data_CNRM')
 
 # For 'standard' Nemo output files (actually, they are better accessible using project "EM")
-#root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
-root1="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+#root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 #
@@ -45,8 +45,8 @@ cdef("period","199807")
 
 # How to get fixed files for all cdftools binaries
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
-#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
+#tpath='/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/est/COMMON/climaf/test_data/fixed/'
 fixed_fields(['ccdfheatc','ccdfmxlheatc'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),

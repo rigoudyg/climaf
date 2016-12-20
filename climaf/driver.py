@@ -96,7 +96,7 @@ def maketree(script_name, script, *operands, **parameters):
     rep=classes.ctree(script_name, script, *operands, **parameters)
     # TBD Analyze script inputs cardinality vs actual arguments
     # Create one child for each output
-    defaultVariable=varOf(operands[0])
+    defaultVariable=classes.varOf(operands[0])
         #defaultPeriod=operands[0].period
     for outname in script.outputs :
         if outname is None  or outname=='' :
@@ -247,7 +247,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             clogger.info("Object found in cache: %s is at %s:  "%(cobject.crs,filename))
             cdedent()
             if format=='file' : return filename
-            else: return cread(filename,varOf(cobject))
+            else: return cread(filename,classes.varOf(cobject))
         if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cpage_pdf) and \
                not isinstance(cobject,classes.cens) :
             #
@@ -294,7 +294,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
                 cdedent()
                 if ( format == 'file' ) : return (file)
-                else : return cread(file,varOf(cobject))
+                else : return cread(file,classes.varOf(cobject))
             elif cobject.operator in operators.operators :
                 obj=ceval_operator(cobject,deep)
                 cdedent()
@@ -381,13 +381,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
         #if scriptCall.flags.canSelectVar :
-        subdict["var"]=varOf(op)
+        subdict["var"]=classes.varOf(op)
         if isinstance(op,classes.cdataset) and op.alias:
             filevar,scale,offset,units,filenameVar,missing=op.alias
-            if scriptCall.flags.canAlias and "," not in varOf(op) :
-                #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
+            if scriptCall.flags.canAlias and "," not in classes.varOf(op) :
+                #if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
                 subdict["var"]=Template(filevar).safe_substitute(op.kvp)
-                subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),subdict["var"],scale,offset)
+                subdict["alias"]="%s,%s,%.4g,%.4g"%(classes.varOf(op),subdict["var"],scale,offset)
             if units : subdict["units"]=units 
             if scriptCall.flags.canMissing and missing :
                 subdict["missing"]=missing
@@ -404,7 +404,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 subdict["period"]=str(per)
                 subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
-            subdict["domain"]=domainOf(op)
+            subdict["domain"]=classes.domainOf(op)
     i=0
     for op in scriptCall.operands :
         if op : opscrs += op.crs+" - "
@@ -419,13 +419,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             label,multiple,serie=script.inputs[i]
             subdict[ label ]=infile
             # Provide the name of the variable in input file if script allows for
-            subdict["var_%d"%i]=varOf(op)
+            subdict["var_%d"%i]=classes.varOf(op)
             if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
-                if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                        "," not in varOf(op):
+                if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
+                        "," not in classes.varOf(op):
                     subdict["var_%d"%i]=Template(filevar).safe_substitute(op.kvp)
-                    subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),subdict["var_%d"%i],scale,offset)
+                    subdict["alias_%d"%i]="%s %s %f %f"%(classes.varOf(op),subdict["var_%d"%i],scale,offset)
                 if units : subdict["units_%d"%i]=units 
                 if missing : subdict["missing_%d"%i]=missing
                 # Provide period selection if script allows for
@@ -434,7 +434,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if not per.fx and per != "":
                     subdict["period_%d"%i]=str(per)
                     subdict["period_iso_%d"%i]=per.iso()
-            subdict["domain_%d"%i]=domainOf(op)
+            subdict["domain_%d"%i]=classes.domainOf(op)
     clogger.debug("subdict for operands is "+`subdict`)
     # substitution is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
@@ -456,10 +456,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
   
         subdict["out"]=main_output_filename
-        subdict["out_"+varOf(scriptCall)]=main_output_filename
+        subdict["out_"+classes.varOf(scriptCall)]=main_output_filename
 
         subdict["out_final"]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
-        subdict["out_final_"+varOf(scriptCall)]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
+        subdict["out_final_"+classes.varOf(scriptCall)]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
         
         # Named outputs
         for output in scriptCall.outputs:
@@ -504,11 +504,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if script.fixedfields is not None :
         #subdict_ff=dict()
         subdict_ff=scriptCall.parameters.copy()
-        subdict_ff["model"]=modelOf(scriptCall.operands[0])
-        subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
-        subdict_ff["project"]=projectOf(scriptCall.operands[0])
-        subdict_ff["realm"]=realmOf(scriptCall.operands[0])
-        subdict_ff["grid"]=gridOf(scriptCall.operands[0])
+        subdict_ff["model"]=classes.modelOf(scriptCall.operands[0])
+        subdict_ff["simulation"]=classes.simulationOf(scriptCall.operands[0])
+        subdict_ff["project"]=classes.projectOf(scriptCall.operands[0])
+        subdict_ff["realm"]=classes.realmOf(scriptCall.operands[0])
+        subdict_ff["grid"]=classes.gridOf(scriptCall.operands[0])
         l=script.fixedfields #return paths: (linkname, targetname)
         files_exist=dict()
         for ll,lt in l:
@@ -572,59 +572,7 @@ def timePeriod(cobject) :
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(cobject.values()[0])
     else : return None #clogger.error("unkown class for argument "+`cobject`)
-                  
-def domainOf(cobject) :
-    """ Returns a domain for a CliMAF object : if object is a dataset, returns
-    its domain, otherwise returns domain of first operand
-    """
-    if isinstance(cobject,classes.cdataset) : 
-	if type(cobject.domain) is list :
-            rep=""
-            for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
-            rep="%s%d"%(rep,cobject.domain[-1])
-            return(rep)
-	else : 
-	    if cobject.domain == "global" : return ""
-	    else : return(cobject.domain)
-    elif isinstance(cobject,classes.ctree) :
-        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
-        return domainOf(cobject.operands[0])
-    elif isinstance(cobject,classes.scriptChild) :
-        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
-        return domainOf(cobject.father)
-    elif isinstance(cobject,classes.cens) :
-        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
-        return domainOf(cobject.values()[0])
-    elif cobject is None : return "none"
-    else : clogger.error("Unkown class for argument "+`cobject`)
-                  
-
-def varOf(cobject) : return attributeOf(cobject,"variable")
-def modelOf(cobject) : return attributeOf(cobject,"model")
-def simulationOf(cobject) : return attributeOf(cobject,"simulation")
-def projectOf(cobject) : return attributeOf(cobject,"project")
-def realmOf(cobject) : return attributeOf(cobject,"realm")
-def gridOf(cobject) : return attributeOf(cobject,"grid")
-
-def attributeOf(cobject,attrib) :
-    """ Returns the attribute for a CliMAF object : if object is a dataset, returns
-    its attribute property, otherwise returns attribute of first operand
-    """
-    if isinstance(cobject,classes.cdataset) : 
-        val=getattr(cobject,attrib,None) 
-        if val is not None : return val
-        else : return(cobject.kvp.get(attrib))
-    elif isinstance(cobject,classes.cens) : return attributeOf(cobject.values()[0],attrib)
-    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
-    elif isinstance(cobject,classes.ctree) :
-        clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
-        return attributeOf(cobject.operands[0],attrib)
-    elif isinstance(cobject,cmacro.cdummy) :
-        return "dummy"
-    elif isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) : return None
-    elif cobject is None : return ''
-    else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
-
+ 
                   
 def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_list) :
     """ Extract object INCLUDED from (existing) object INCLUDER,
@@ -1124,7 +1072,7 @@ def efile(obj, filename, forced=False) :
             ffile=cfile(memb)
             
             f = tempfile.NamedTemporaryFile(suffix=".nc")
-            command="ncrename -O -v %s,%s_%s %s %s"%(varOf(memb), varOf(memb), lab, ffile, f.name)
+            command="ncrename -O -v %s,%s_%s %s %s"%(classes.varOf(memb), classes.varOf(memb), lab, ffile, f.name)
             if ( os.system(command) != 0 ) :
                 raise Climaf_Driver_Error("ncrename failed : %s" %command)         
             
@@ -1137,197 +1085,6 @@ def efile(obj, filename, forced=False) :
         clogger.warning("objet is not a 'cens' objet")
 
 
-def check_time_consistency(any):
-    """
-    Check time consistency of first variable of a dataset or ensemble members:
-     - check if first data time interval is consistent with dataset frequency
-     - check if file data have a gap
-     - check if period ocovered by data files actually includes the whole of dataset period
-
-    Arg: a dataset or an ensemble
-     
-    Returns: True if period of data files included dataset period, False otherwise.
-
-    Examples:
-    
-    >>> # Dataset with monthly frequency  
-    >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas',period='1980-1981')
-    >>> res1=check_time_consistency(tas)
-    >>>
-    >>> # Ensemble with monthly frequency  
-    >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
-    >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
-    >>> ens=cens({'1980':j0, '1981':j1})
-    >>> res2=check_time_consistency(ens)
-    
-    >>> # Define a new project for 'em' data with 3 hours frequency in particular     
-    >>> cproject('em_3h','root','group','realm', 'frequency',separator='|')
-    >>> path='/cnrm/aster/data1/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc' 
-    >>> dataloc(project='em_3h', organization='generic', url=path)
-    
-    >>> # Dataset with 3h frequency for 'tas' variable (instant) 
-    >>> tas_3h=ds(project='em_3h',variable='tas',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
-    >>> res3=check_time_consistency(tas_3h)
-     
-    >>> # Dataset with 3h frequency for 'pr' variable (time mean) 
-    >>> pr_3h=ds(project='em_3h',variable='pr',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
-    >>> res4=check_time_consistency(pr_3h)   
-    
-    """
-    from anynetcdf import ncf
-    from datetime import datetime, timedelta
-    from netCDF4 import num2date
-    import numpy as np
-
-    # Returns the list of files which include the data for the dataset
-    # or for each member of the ensemble
-    if isinstance(any,climaf.classes.cens):
-        rep=True
-        for memb in any:
-            #clogger.info('Member: %s'%memb)
-            rep=check_time_consistency(any[memb]) and rep
-        return rep
-    elif isinstance(any,climaf.classes.cdataset):
-        files=any.baseFiles()
-    	if not files:
-	    #clogger.error('No file found for: %s'%any)
-            return(False)
-    else :
-        clogger.error("Cannot handle %s" %any)
-    #
-    if files:
-        filedate=[]
-        clogger.debug("List of selected files: %s"%files)
-
-        var=str.split(varOf(any),',')[0] 
-        # Concatenate all data files
-        for filename in str.split(files,' '):
-            fileobj=ncf(filename)
-            #
-            if any.project in classes.aliases and var in classes.aliases[any.project]:
-                var=classes.aliases[any.project][var][0]
-            #
-            dimname=''
-            for dim in fileobj.variables[var].dimensions:  
-                if 'time' in dim: dimname=dim
-            if not dimname: clogger.error('No time dimension for variable %s'%var)
-            time_obj=fileobj.variables[dimname]  
-            filedate=np.concatenate((filedate,num2date(time_obj.getValue(),\
-                                   units=time_obj.units,calendar=time_obj.calendar)))
-            
-        clogger.debug('Time data of selected files: %s'%filedate)
-
-        # Check if first data interval is coherent with dataset frequency
-        filedate_delta=(filedate[1]-filedate[0]).total_seconds()
-
-        if ( (any.frequency == 'monthly' or not any.frequency) and \
-             (filedate_delta > 31.*24.*3600 and filedate_delta < 28.*24.*3600.) ) \
-           or ( any.frequency == 'yearly' and \
-                (filedate_delta > 366.*24.*3600. and filedate_delta < 365.*24.*3600.) ) \
-           or ( any.frequency == 'decadal' and \
-                (filedate_delta > 3653.*24.*3600. and filedate_delta < 3651.*24.*3600.) ):
-        
-            clogger.warning('First data interval (= %f days) is not coherent with dataset frequency (i.e. %s)'\
-                            %(filedate_delta/(24.*3600.),any.frequency))
-
-        elif any.frequency == 'daily' and filedate_delta != 86400.:
-            clogger.warning('First data interval (= %f hours) is not coherent with dataset frequency (i.e. %s)'\
-                            %(filedate_delta/3600.,any.frequency))
-
-        elif (any.frequency == '6h'or any.frequency == '3h' or any.frequency == '1h' \
-              or any.frequency == '3Hourly' or any.frequency == '6Hourly') \
-              and filedate_delta != float(any.frequency[0])*3600.:
-            clogger.warning('First data interval (= %f hours) is different to dataset frequency (i.e. %f)'\
-                            %(filedate_delta/3600.,float(any.frequency[0])))
-
-        # Check if file data have a gap
-        i=0
-        cpt=0
-        while i < len(filedate)-1:
-            i+=1
-            if (filedate[i+1]-filedate[i]).total_seconds() != filedate_delta:
-                cpt+=1
-                if cpt < 5:
-                    if any.frequency == 'monthly' or not any.frequency or \
-                       any.frequency == 'yearly' or any.frequency == 'decadal':
-                        clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days'+\
-                                      'instead of %.0f days (<=> 1st data interval)' \
-                                %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/(24.*3600.),filedate_delta/(24.*3600.)))
-                    elif any.frequency == 'daily' or any.frequency == '6h'or \
-                         any.frequency == '3h' or any.frequency == '1h' or \
-                         any.frequency == '3Hourly' or any.frequency == '6Hourly':
-                        clogger.error('File data have a gap between indexes %i and %i:'+\
-                                      'delta = %.0f hours instead of %.0f hours (<=> 1st data interval)' \
-                                %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/3600.,filedate_delta/3600.))
-        #
-        # Compute period covered by data files
-        if any.frequency == 'monthly' or not any.frequency:  
-            filedate[0]=filedate[0].replace(day=01)
-            if filedate[-1].month > 11 :
-                filedate[-1]=filedate[-1].replace(year=filedate[-1].year+1)
-                filedate[-1]=filedate[-1].replace(month=01)
-                filedate[-1]=filedate[-1].replace(day=01)
-            else:
-                filedate[-1]=filedate[-1].replace(month=filedate[-1].month+1)
-                filedate[-1]=filedate[-1].replace(day=01)
-
-        elif any.frequency == 'daily':
-            filedate[0]=filedate[0].replace(hour=00)
-            filedate[-1]=filedate[-1].replace(hour=00)
-            filedate[-1]=filedate[-1] + timedelta(days=1)
-              
-        elif any.frequency == '6h'or any.frequency == '3h' or any.frequency == '1h' \
-                 or any.frequency == '3Hourly' or any.frequency == '6Hourly':
-           
-            if 'cell_methods' in fileobj.variables[var].__dict__ : # time mean 
-
-                regex=re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
-                cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
-                if cell_meth_att:
-                    if cell_meth_att.group(2) == 'hours': freq=float(cell_meth_att.group(1))
-                    elif cell_meth_att.group(2) == 'minutes': freq=float(cell_meth_att.group(1))/60.
-                else: # 'cell_methods' attribute defined with the value 'time: mean'
-                    freq=filedate_delta/3600.
-
-                filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + \
-                                ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
-                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
-                                ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 ) 
-
-            else: # assume it is instant data
-                freq=filedate_delta/3600.
-                filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
-                    ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - 2*freq*60 )
-
-        elif any.frequency == 'yearly' or any.frequency == 'decadal':
-            filedate[0]=filedate[0].replace(month=01)
-            filedate[0]=filedate[0].replace(day=01)
-            filedate[-1]=filedate[-1].replace(month=01)
-            filedate[-1]=filedate[-1].replace(day=01)
-            filedate[-1]=filedate[-1] + timedelta(years=1)
-   
-        elif any.frequency == 'fx' or any.frequency == 'annual_cycle':
-            clogger.error('Check time consistency with a frequency equal to %s has no sense' %any.frequency)      
-
-        else:
-            clogger.error('Dataset frequency is non-standard: frequency = %s. '+\
-                          'Normalized frequency values are: decadal, yearly, monthly, '+\
-                          'daily, 6h, 3h, fx and annual_cycle' %any.frequency)
-        #
-        # Check period of datafiles vs dataset period
-        clogger.debug('Period covered by selected files: %s'%filedate)
-        file_period=cperiod(start=filedate[0],end=filedate[-1])
-        #
-        if file_period.includes(any.period):
-            clogger.info("Time data in datafiles (i.e. %s) includes time data of "+\
-                         "dataset (i.e. %s) => dataset are consistent." %(file_period,any.period))
-            return(True)
-        else:
-            clogger.info("Time data in datafiles (i.e. %s) don't include time data of"+\
-                         "dataset (i.e. %s) => dataset are not consistent." %(file_period,any.period))
-            return(False)
-        
-        
 class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
