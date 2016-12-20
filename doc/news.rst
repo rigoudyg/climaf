@@ -10,10 +10,12 @@ Changes, newest first :
 
   - Update paths for CNRM (due to restructuring Lustre file system)
 
-  - Significant improvement of cache performance (70 times faster for
-    a cache containing more than 8000 objects)
+  - **Significant improvement of cache performance** (70 times faster for
+    a cache containing more than 8000 objects). You must reset your
+    cache for getting the improvement. You may use 'rm -fR
+    $CLIMAF_CACHE' or function :py:func:`~climaf.cache.craz` 
 
-  - Fix issue occurring in parallel runs (especially for PDF outputs): 
+  - **Fix issue occurring in parallel runs** (especially for PDF outputs): 
 
     - the scripts output files now have temporary unique names until
       they are fully tagged with their CRS and moved to the cache
