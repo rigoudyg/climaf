@@ -10,20 +10,11 @@ CliMAF macros module :
 
 import sys, os
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens
+from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 from clogging import clogger, dedent
 
 #: Dictionary of macros
 cmacros=dict()
-
-class cdummy(cobject):
-    def __init__(self):
-        """
-        cdummy class represents dummy arguments in the CRS
-        """
-        pass
-    def buildcrs(self,period=None,crsrewrite=None):
-        return('ARG')
 
 def macro(name,cobj,lobjects=[]):
     """
