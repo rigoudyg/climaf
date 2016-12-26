@@ -277,10 +277,10 @@ def hasMatchingObject(cobject,ds_func) :
         if co is None:
             try: 
                 co=eval(crs, sys.modules['__main__'].__dict__)
+                if co: crs2eval[crs]=co
             except:
                 pass # usually case of a CRS which project is not currently defined
         if co :
-            crs2eval[crs]=co
             altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
             if altperiod :
                 if os.path.exists(crs2filename[crs]) :
