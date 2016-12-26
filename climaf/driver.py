@@ -1,4 +1,4 @@
-s""" 
+""" 
 CliMAF driver
 
 There is quite a lot of things to document here. Maybe at a later stage ....
