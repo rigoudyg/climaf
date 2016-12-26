@@ -69,7 +69,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def setUp(self) :
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
         # Declare the directory for CMIP5 data on CNRM's Lustre file system.
-        url_CMIP5_CNRM=["/cnrm/cmip/cnrm/ESG/CMIP5"]
+        url_CMIP5_CNRM=["/cnrm/cmip/cnrm/ESG"]
         dataloc(project="CMIP5", organization="CMIP5_DRS", url=url_CMIP5_CNRM)
         cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
         self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")

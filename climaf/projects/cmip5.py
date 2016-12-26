@@ -30,7 +30,7 @@ urls_CMIP5=None
 
 if atCNRM :
     # Declare the directory for CNRM-CM CMIP5 data on CNRM's Lustre file system.
-    urls_CMIP5=["/cnrm/cmip/cnrm/ESG/CMIP5"]
+    urls_CMIP5=["/cnrm/cmip/cnrm/ESG"]
 if onCiclad :
     # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
     urls_CMIP5=["/prodigfs/project/"]

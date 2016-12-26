@@ -3,7 +3,7 @@ Example for CliMAF access to data organized in various ways, using the
 data organization called 'generic' :
 
 - data according to CAMI atlas naming scheme at CNRM such as :
-/cnrm/est/COMMON/cami/V1.7/climlinks/CAYAN/hfls_1m_194601_199803_CAYAN.nc
+/cnrm/est/COMMON/cami/V1.8/climlinks/CAYAN/hfls_1m_194601_199803_CAYAN.nc
 
 - data sample distributed with CliMAF
 
@@ -30,7 +30,7 @@ if atCNRM :
     cproject("CAMIOBS",separator="_")
     
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
-    CAMIOBS_root="/cnrm/est/COMMON/cami/V1.7/climlinks/"
+    CAMIOBS_root="/cnrm/est/COMMON/cami/V1.8/climlinks/"
     
     # Pattern for matching CAMI obs data files and their directory. 
     # We choose to use facet 'model' to carry the observation source
