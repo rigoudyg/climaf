@@ -1,4 +1,4 @@
-""" 
+s""" 
 CliMAF driver
 
 There is quite a lot of things to document here. Maybe at a later stage ....
@@ -272,12 +272,14 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             if it : 
                 clogger.info("partial result found in cache for %s : %s"%\
                              (cobject.crs,it.crs))
+                clogger.debug("comp_period="+`comp_period`)
                 begcrs=it.crs
-                # Turn object for begin in complement object for end, and eval it
-                it.setperiod(comp_period)
-                ceval(it,userflags,format,deep,derived_list,recurse_list)
+                # Build complement object for end, and eval it
+                comp=copy.deepcopy(it)
+                comp.setperiod(comp_period)
+                ceval(comp,userflags,format,deep,derived_list,recurse_list)
                 if (format == 'file') :
-                    rep=cache.complement(begcrs,it.crs,cobject.crs)
+                    rep=cache.complement(begcrs,comp.crs,cobject.crs)
                     cdedent()
                     return rep
                 else : raise Climaf_Driver_Error("cannot yet complement except for files")

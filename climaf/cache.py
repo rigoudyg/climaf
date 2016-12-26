@@ -272,7 +272,7 @@ def hasMatchingObject(cobject,ds_func) :
     #
     global crs2eval
     key_to_rm=list()
-    for crs in crs2filename.copy() :
+    for crs in crs2filename :
         co=crs2eval.get(crs,None)
         if co is None:
             try: 
@@ -280,13 +280,14 @@ def hasMatchingObject(cobject,ds_func) :
                 crs2eval[crs]=co
             except:
                 pass # usually case of a CRS which project is not currently defined
-        altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
-        if altperiod :
-            if os.path.exists(crs2filename[crs]) :
-                return co,altperiod
-            else :
-                clogger.debug("Removing %s from cache index, because file is missing",crs)
-                key_to_rm.append(crs)
+        if co :
+            altperiod=compare_trees(co,cobject, ds_func,op_squeezes_time)
+            if altperiod :
+                if os.path.exists(crs2filename[crs]) :
+                    return co,altperiod
+                else :
+                    clogger.debug("Removing %s from cache index, because file is missing",crs)
+                    key_to_rm.append(crs)
     for el in key_to_rm: crs2filename.pop(el)
     return None,None
 
