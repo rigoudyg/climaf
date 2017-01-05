@@ -194,11 +194,13 @@ class cobject():
     def __repr__(self):
         return self.buildcrs()
     def register(self):
-        cobjects[self.crs]=self
+        pass
+        #cobjects[self.crs]=self
         #clogger.debug("Object Created ; crs = %s"%(self.crs))
     def erase(self):
-        del(cobjects[self.crs])
-        clogger.debug("Object deleted ; crs = %s"%(self.crs))
+        pass
+        #del(cobjects[self.crs])
+        #clogger.debug("Object deleted ; crs = %s"%(self.crs))
 
 
 class cdummy(cobject):
