@@ -1747,24 +1747,24 @@ begin
       print("X and Y coordinates of the polyline must have the same length.")
       status_exit(2)
     end if
+  
+    xpts=(/tofloat(str_split(polyline_x,","))/)
+    ypts=(/tofloat(str_split(polyline_y,","))/)
+ 
+    resp                  = True            
+    resp@gsLineColor      = "red"                    ; color of lines
+    resp@gsLineThicknessF = 3.0                      ; thickness of lines
+
+    if isvar("polyline_options") then res_list(polyline_options, resp) end if
+ 
+    ; create array of dummy graphic variables
+    dum = new(polysize-1,graphic)
+
+    ; draw each line separately, each line must contain two points
+    do i = 0, polysize-2
+      dum(i)=gsn_add_polyline(wks,plot0,xpts(i:i+1),ypts(i:i+1),resp)      
+    end do
   end if
-
-  xpts=(/tofloat(str_split(polyline_x,","))/)
-  ypts=(/tofloat(str_split(polyline_y,","))/)
- 
-  resp                  = True            
-  resp@gsLineColor      = "red"                    ; color of lines
-  resp@gsLineThicknessF = 3.0                      ; thickness of lines
-
-  if isvar("polyline_options") then res_list(polyline_options, resp) end if
- 
-  ; create array of dummy graphic variables
-  dum = new(polysize-1,graphic)
-
-  ; draw each line separately, each line must contain two points
-  do i = 0, polysize-2
-    dum(i)=gsn_add_polyline(wks,plot0,xpts(i:i+1),ypts(i:i+1),resp)      
-  end do
   ; end polyline
   
   draw(plot0)
