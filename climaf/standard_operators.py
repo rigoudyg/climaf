@@ -104,7 +104,8 @@ def load_standard_operators():
             'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} '
             'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
             'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' '
-            'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} )', format="graph")
+            'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} xpolyline=\'\"${xpolyline}\"\' '
+            'ypolyline=\'\"${ypolyline}\"\' polyline_options=\'\"${polyline_options}\"\' )', format="graph")
     #
     # curves: plot a series of xy curves (along time, lat, lon or pressure/z_index) for an ensemble
     #
