@@ -5,7 +5,13 @@ Whats' new
 ------------
 
 Changes, newest first :
- 
+
+- 2017/01/24:
+
+  - New arguments for standard operator ``plot`` (see
+    :doc:`scripts/plot`) : ``xpolyline``, ``ypolyline`` and
+    ``polyline_options`` for adding a polyline to the plot 
+
 - 2016/12/14:
 
   - Update paths for CNRM (due to restructuring Lustre file system)

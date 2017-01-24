@@ -139,6 +139,17 @@ General:
       <native_grid>`.    
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
+  - ``xpolyline``, ``ypolyline`` : for adding a polyline to the plot;
+    set ``xpolyline`` and ``ypolyline`` to a list of
+    the same length containing the X and Y coordinates of the
+    polyline, respectively.
+  
+    If you are adding the polyline to a map, then X should correspond
+    to longitude values, and Y to latitude values, as e.g.:
+    ``xpolyline`` = "-90.0, -45.0, -45.0, -90.0, -90.0", ``ypolyline``
+    = "30.0, 30.0, 0.0, 0.0, 30.0". 
+    For more details, see:
+    http://www.ncl.ucar.edu/Document/Graphics/Interfaces/gsn_add_polyline.shtml 
   - ``date``, ``time``, ``level`` : for selecting date, time and/or
     level. These arguments apply on all fields (**from 2D to 4D**)
     which **have time and/or level dimension**. Set it to,  
@@ -152,7 +163,7 @@ General:
  
     - for ``date``:
 
-      - a string in the format 'YYYY','YYYYMM', 'YYYYMMDD' or
+      - a string in the format 'YYYY', 'YYYYMM', 'YYYYMMDD' or
 	'YYYYMMDDHH' e.g.: ``date`` =19810131. 
 
     - default: for 4D fields (e.g. if we have non-degenerated
@@ -166,19 +177,23 @@ General:
 	for 2D fields which have time and level dimensions, it is the
 	time extraction will be made.
 
-  - ``options``, ``aux_options``, ``shading_options`` : strings for
-    setting NCL graphic resources directly, for the various 
-    fields (resources are separated by "|"). These lists have higher
-    priority than the CliMAF default ones. Each field has its own
-    options argument, e.g. :  
+  - ``options``, ``aux_options``, ``shading_options``,
+    ``polyline_options`` : strings for setting NCL graphic resources
+    directly, for the various fields (resources are separated by
+    "|"). These lists have higher priority than the CliMAF default
+    ones. Each field has its own options argument, e.g. :  
 
     - ``options`` for main field and vectors, e.g. :
       'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
     - ``aux_options`` for auxiliary field, e.g. :
       'aux_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2"'     
     - ``shading_options`` for auxiliary field shading, e.g. :
-      'shading_options="gsnShadeHigh=3|gsnShadeLow =5"'   
+      'shading_options="gsnShadeHigh=3|gsnShadeLow=5"'   
+    - ``polyline_options`` for adding a polyline to the plot, e.g. :
+      'polyline_options="gsLineColor=blue|gsLineThicknessF=2.0"' 
 
+    Warning: do not put space inside these lists.
+    
     For more details, see: https://www.ncl.ucar.edu/
 
   - ``fmt``: a string specifying the format of the tick labels for
@@ -396,9 +411,10 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> plot_map5=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, 
      ... vcRefMagnitudeF=0.02, level=10, time=0) 
-     >>> # Same as above but with date selection
+     >>> # Same as above but with date selection, and addition of a box
      >>> plot_map6=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 19980131 for date', rotation=1, vcRefLengthF=0.002, 
-     ... vcRefMagnitudeF=0.02, level=10, date=19980131)
+     ... vcRefMagnitudeF=0.02, level=10, date=19980131,
+     ... xpolyline="45.0, 90.0, 90.0, 45.0, 45.0",ypolyline="30.0, 30.0, 0.0, 0.0, 30.0", polyline_options='gsLineColor=blue')
 
 
 .. _native_grid2:

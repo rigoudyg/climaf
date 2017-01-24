@@ -30,9 +30,11 @@ plot_map2=plot(tas, None, uas, vas, title='1 field (user-controled contours) + v
                contours='230 235 240 245 250 255 260 265 270 275 280', vcRefLengthF=0.03, vcRefMagnitudeF=11.5)
 cshow(plot_map2)
 
-# A Map of two fields and vectors, with explicit contours levels for auxiliary field
+# A Map of two fields and vectors, with explicit contours levels for auxiliary field, and addition of a box
 plot_map3=plot(tas, sub_tas, uas, vas, title='2 fields (user-controled auxiliary field contours) + vectors',
-               contours='230 235 240 245 250 255 260 265 270', vcRefLengthF=0.02, vcRefMagnitudeF=11.5)
+               contours='230 235 240 245 250 255 260 265 270', vcRefLengthF=0.02, vcRefMagnitudeF=11.5,
+               xpolyline="45.0, 90.0, 90.0, 45.0, 45.0",ypolyline="30.0, 30.0, 0.0, 0.0, 30.0",
+               polyline_options='gsLineColor=blue')
 cshow(plot_map3)
 
 # A Map of two fields and vectors, with automatic contours levels for auxiliary field 
@@ -155,8 +157,9 @@ ta_zonal_mean=ccdo(january_ta,operator="zonmean")     # main field
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # auxiliary field
 
-# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale 
-plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)', y="log")
+# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale, and addition of a box 
+plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)', y="log",
+                 xpolyline="-60.0, -30.0, -30.0, -60.0, -60.0",ypolyline="70.0, 70.0, 50.0, 50.0, 70.0")
 cshow(plot_cross1)
 
 # A cross-section of one field, which contours lines follow color filled contours

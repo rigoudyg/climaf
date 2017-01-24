@@ -1740,16 +1740,16 @@ begin
   ;
   ; Attach a polyline to the plot
   ;
-  if isvar("polyline_x") .and. isvar("polyline_y") then
-    if dimsizes(str_split(polyline_x,",")) .eq. dimsizes(str_split(polyline_y,",")) then
-      polysize=dimsizes(str_split(polyline_x,","))
+  if isvar("xpolyline") .and. isvar("ypolyline") then
+    if dimsizes(str_split(xpolyline,",")) .eq. dimsizes(str_split(ypolyline,",")) then
+      polysize=dimsizes(str_split(xpolyline,","))
     else
       print("X and Y coordinates of the polyline must have the same length.")
       status_exit(2)
     end if
   
-    xpts=(/tofloat(str_split(polyline_x,","))/)
-    ypts=(/tofloat(str_split(polyline_y,","))/)
+    xpts=(/tofloat(str_split(xpolyline,","))/)
+    ypts=(/tofloat(str_split(ypolyline,","))/)
  
     resp                  = True            
     resp@gsLineColor      = "red"                    ; color of lines
