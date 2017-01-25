@@ -6,12 +6,16 @@ Whats' new
 
 Changes, newest first :
 
-- 2017/01/24:
+- 2017/01/25:
 
   - New arguments for standard operator ``plot`` (see
     :doc:`scripts/plot`) : ``xpolyline``, ``ypolyline`` and
     ``polyline_options`` for adding a polyline to the plot 
 
+  - The scripts output files, which have temporary unique names until
+    they are fully tagged with their CRS and moved to the cache, are
+    now located in cache (instead of /tmp) 
+    
 - 2016/12/14:
 
   - Update paths for CNRM (due to restructuring Lustre file system)
