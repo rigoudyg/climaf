@@ -455,8 +455,10 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             output_fmt=script.outputFormat
         # Compute a filename for each ouptut
         # Un-named main output
-        main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
-  
+        #main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
+        tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs, format=output_fmt))
+        main_output_filename="%s_%i%s"%(tmpfile,os.getpid(),tmpfile_fmt) 
+
         subdict["out"]=main_output_filename
         subdict["out_"+classes.varOf(scriptCall)]=main_output_filename
 
@@ -465,7 +467,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         
         # Named outputs
         for output in scriptCall.outputs:
-            subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
+            #subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
+            tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs, format=output_fmt))
+            subdict["out_"+output]="%s_%i%s"%(tmpfile,os.getpid(),tmpfile_fmt)
             subdict["out_final_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
                                                          format=output_fmt) 
     # Account for script call parameters

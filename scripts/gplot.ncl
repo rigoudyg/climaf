@@ -1737,6 +1737,36 @@ begin
   ;  overlay(plot0,plot2)  
   ;end if
 
+  ;
+  ; Attach a polyline to the plot
+  ;
+  if isvar("xpolyline") .and. isvar("ypolyline") then
+    if dimsizes(str_split(xpolyline,",")) .eq. dimsizes(str_split(ypolyline,",")) then
+      polysize=dimsizes(str_split(xpolyline,","))
+    else
+      print("X and Y coordinates of the polyline must have the same length.")
+      status_exit(2)
+    end if
+  
+    xpts=(/tofloat(str_split(xpolyline,","))/)
+    ypts=(/tofloat(str_split(ypolyline,","))/)
+ 
+    resp                  = True            
+    resp@gsLineColor      = "red"                    ; color of lines
+    resp@gsLineThicknessF = 3.0                      ; thickness of lines
+
+    if isvar("polyline_options") then res_list(polyline_options, resp) end if
+ 
+    ; create array of dummy graphic variables
+    dum = new(polysize-1,graphic)
+
+    ; draw each line separately, each line must contain two points
+    do i = 0, polysize-2
+      dum(i)=gsn_add_polyline(wks,plot0,xpts(i:i+1),ypts(i:i+1),resp)      
+    end do
+  end if
+  ; end polyline
+  
   draw(plot0)
   
   frame(wks)
