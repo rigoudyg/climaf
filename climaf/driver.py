@@ -468,10 +468,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         # Named outputs
         for output in scriptCall.outputs:
             #subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
-            tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs, format=output_fmt))
+            tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs+"."+output, format=output_fmt))
             subdict["out_"+output]="%s_%i%s"%(tmpfile,os.getpid(),tmpfile_fmt)
             subdict["out_final_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
-                                                         format=output_fmt) 
+                                                         format=output_fmt)
+
     # Account for script call parameters
     for p in scriptCall.parameters : 
         #clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))

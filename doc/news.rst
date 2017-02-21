@@ -6,6 +6,9 @@ Whats' new
 
 Changes, newest first :
 
+- 2017/02/21:
+  - Bug fixes about a rarely used case
+
 - 2017/01/25:
 
   - New arguments for standard operator ``plot`` (see
