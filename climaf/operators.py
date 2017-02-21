@@ -385,10 +385,10 @@ def fixed_fields(operator, *paths):
     Parameters:
       operator (string, or list of strings) : name of the CliMAF operator.
       paths (couples) : a number of couples composed of the filename as expected
-        by the operator
-        and a path for the data; the path  may uses placeholders : ${model}, ${project}
-        ${simulation} and ${realm}, which will be replaced by the corresponding facet
-        values for the first operand of the target operator.
+        by the operator and a path for the data;
+        the path may uses placeholders : ${model}, ${project}, ${simulation},
+        ${realm} and ${grid}, which will be replaced by the corresponding
+        facet values for the first operand of the target operator.
 
     Returns:
       None
@@ -399,7 +399,7 @@ def fixed_fields(operator, *paths):
         ... ('mesh_zgr.nc','/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc'))
 
        >>> fixed_fields('plot',
-        ... ('coordinates.nc','/cnrm/aster/data3/aster/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
+        ... ('coordinates.nc','/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
 
     """
     if not isinstance(operator,list):

@@ -59,13 +59,20 @@ nemo_timefix ()
 	    fi
 	    if [ "$var2rename" ] ; then 
 		out=$tmp/renamed_$(basename $file) ; rm -f $out 
-		ncks -3 $file $out 
-		ncrename -d .$var2rename,time_counter -v .$var2rename,time_counter $out >&2
+		if [[ $(ncdump -k $file) == 'classic' ]] ; then
+		    temp=$file
+		else
+		    temp=$out
+		    ncks -3 $file $temp 
+		fi
+		ncrename -d .$var2rename,time_counter -v .$var2rename,time_counter $temp $out >&2
 		for lvar in $vars2d; do 
-		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+#		    ncatted -a coordinates,$lvar,m,c,'time_counter nav_lat nav_lon' $out >&2
+		    ncatted -a coordinates,$lvar,m,c,'nav_lat nav_lon' $out >&2
 		done
 		for lvar in $vars3d; do 
-		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+#		    ncatted -a coordinates,$lvar,m,c,'time_counter deptht nav_lat nav_lon' $out >&2
+		    ncatted -a coordinates,$lvar,m,c,'deptht nav_lat nav_lon' $out >&2
 		done
 		if [ -w $file ] ; then mv -f $out $file ; out="" ; fi
 	    fi
@@ -73,6 +80,32 @@ nemo_timefix ()
     fi
     if [ $out ]; then echo $out ; else echo $file ; fi 
 }
+
+aladin_coordfix ()
+{
+    # Rename attribute 'coordinates' of file variable $filevar to 'latitude longitude'
+    # for some kind of ALADIN outputs which have 'lat lon' (or 'lon lat') for attribute 'coordinates'
+    # of file variable (particularly for outputs created with post-treatment tool called 'postald') 
+    # Echoes the name of a file with renamed variable attribute (be it a modified file or a copy)
+    # Creates an alternate file in $tmp if no write permission and renaming is actually useful
+    file=$1
+    out=""
+
+    if [[ $file =~ .*ALADIN.*.nc && ( ! $file =~ .*r1i1p1.*.nc || ! $file =~ .*MED-11.*.nc ) ]] ; then 
+
+	if ncdump -h $file | \grep -E -q '(coord.*lon lat|coord.*lat lon)' \
+	    && ncdump -h $file | \grep -E -q '(float longitude|float latitude)' ; then 
+
+	    out=$tmp/renamed_$(basename $file) ; rm -f $out 
+	    ncks -3 $file $out 
+	    ncatted -a coordinates,$filevar,o,c,'latitude longitude' $out >&2 
+	    if [ -w $file ] ; then mv -f $out $file ; out="" ; fi
+
+	fi
+    fi
+    if [ $out ]; then echo $out ; else echo $file ; fi 
+}
+
 
 # For the time being, at most sites, must use NetCDF3 file format chained CDO
 # operations because NetCDF4 is not threadsafe there
@@ -95,6 +128,8 @@ fi
 if [ "$alias" ] ; then 
     IFS=", " read var filevar scale offset <<< $alias 
     selalias=-expr,"$var=${filevar}*${scale}+${offset};"
+else
+    filevar=$var
 fi
 
 if [ "$vm" ] ; then 
@@ -115,7 +150,9 @@ for file in $files ; do
     [ "$seldate" ] && seldate=$seldatebase" "$(clim_timefix $file) 
     #
     # If requested, fix time_counter for Nemo outputs. Feature not yet tested !!
-    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file)
+    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file) 
+    # If requested, fix attribute 'coordinates' of file variable for Aladin outputs.
+    [ "${CLIMAF_FIX_ALADIN_COORD:-no}" != no ] && file=$(aladin_coordfix $file)
     #
     if [ $setmiss ] ; then 
 	$CDO ${setmiss#-} $selalias $selregion $seldate ${selvar} \

@@ -1,5 +1,5 @@
 # Example for general-purpose plot using NCL
-# Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
+# Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 
 from climaf.api import *
 craz()
@@ -30,9 +30,11 @@ plot_map2=plot(tas, None, uas, vas, title='1 field (user-controled contours) + v
                contours='230 235 240 245 250 255 260 265 270 275 280', vcRefLengthF=0.03, vcRefMagnitudeF=11.5)
 cshow(plot_map2)
 
-# A Map of two fields and vectors, with explicit contours levels for auxiliary field
+# A Map of two fields and vectors, with explicit contours levels for auxiliary field, and addition of a box
 plot_map3=plot(tas, sub_tas, uas, vas, title='2 fields (user-controled auxiliary field contours) + vectors',
-               contours='230 235 240 245 250 255 260 265 270', vcRefLengthF=0.02, vcRefMagnitudeF=11.5)
+               contours='230 235 240 245 250 255 260 265 270', vcRefLengthF=0.02, vcRefMagnitudeF=11.5,
+               xpolyline="45.0, 90.0, 90.0, 45.0, 45.0",ypolyline="30.0, 30.0, 0.0, 0.0, 30.0",
+               polyline_options='gsLineColor=blue')
 cshow(plot_map3)
 
 # A Map of two fields and vectors, with automatic contours levels for auxiliary field 
@@ -70,6 +72,11 @@ map_select2=plot(tas, sub_tas, uas, vas, title='Selecting level and time close t
                  vcRefLengthF=0.02, vcRefMagnitudeF=11.5, level=10., time=1400000.) # level selection has no impact on fields because they have not depth dimension, whereas time selection is done for all fields 
 cshow(map_select2)
 
+map_select3=plot(tas, sub_tas, uas, vas, title='Selecting level and time close to 10 and 19800131 respectively',
+                 vcRefLengthF=0.02, vcRefMagnitudeF=11.5, level=10., date=19800131) # level selection has no impact on fields because they have not depth dimension, whereas time selection is done for all fields 
+cshow(map_select3)
+
+
 #
 # This example will work on CNRM's Lustre. An only new feature is added: ROTATION of VECTORS from model grid on geographic grid
 #
@@ -77,7 +84,7 @@ if atCNRM:
     # Declare "data_CNRM" project with some 'standard' Nemo output files
     # (actually, they are easier accessible using project "EM")
     cproject('data_CNRM')
-    root="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+    root="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
     suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
     data_url=root+suffix
     dataloc(project='data_CNRM',organization='generic',url=data_url)
@@ -150,8 +157,9 @@ ta_zonal_mean=ccdo(january_ta,operator="zonmean")     # main field
 cross_field2=llbox(january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150) # extraction of 'january_ta' sub box for auxiliary field
 ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") # auxiliary field
 
-# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale 
-plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)', y="log")
+# A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale, and addition of a box 
+plot_cross1=plot(ta_zonal_mean,title='1 field cross-section (without contours lines)', y="log",
+                 xpolyline="-60.0, -30.0, -30.0, -60.0, -60.0",ypolyline="70.0, 70.0, 50.0, 50.0, 70.0")
 cshow(plot_cross1)
 
 # A cross-section of one field, which contours lines follow color filled contours

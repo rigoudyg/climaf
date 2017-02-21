@@ -50,7 +50,7 @@ begin
   end if
   end if
   if conf.eq."ORCA1" then
-   repfile="/cnrm/aster/data1/UTILS/CDAT5/Data/mesh_mask_NEMO1.2.nc"
+   repfile="/cnrm/est/COMMON/CDAT5/Data/mesh_mask_NEMO1.2.nc"
    nx=292
    ny=362
   end if 

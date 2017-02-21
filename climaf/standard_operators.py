@@ -92,7 +92,7 @@ def load_standard_operators():
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
             'units=\'\"${units}\"\' y=\'\"${y}\"\' colors=\'\"${colors}\"\' level=${level} time=${time} '
-            'proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
+            'date=\'\"${date}\"\' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
             'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} fmt=\'\"${fmt}\"\' '
             'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} reverse=${reverse} '
             'tmYLLabelFontHeightF=${tmYLLabelFontHeightF} tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
@@ -104,8 +104,11 @@ def load_standard_operators():
             'gsnStringFont=\'\"${gsnStringFont}\"\' gsnStringFontHeightF=${gsnStringFontHeightF} '
             'shade_below=${shade_below} shade_above=${shade_above} options=\'\"${options}\"\' '
             'aux_options=\'\"${aux_options}\"\' shading_options=\'\"${shading_options}\"\' '
-            'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} )', format="graph")
-    # 
+            'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} xpolyline=\'\"${xpolyline}\"\' '
+            'ypolyline=\'\"${ypolyline}\"\' polyline_options=\'\"${polyline_options}\"\' )', format="graph")
+    #
+    # curves: plot a series of xy curves (along time, lat, lon or pressure/z_index) for an ensemble
+    #
     cscript('curves'     , '(ncl -Q '+ scriptpath +'curves.ncl infile=\'\"${mmin}\"\' '
             'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
             'y=\'\"${y}\"\' labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' units=\'\"${units}\"\' '
@@ -113,6 +116,15 @@ def load_standard_operators():
             'lgcols=${lgcols} myscale=${scale} myoffset=${offset} type=\'\"${format}\"\' '
             'resolution=\'\"${resolution}\"\' trim=${trim} invXY=${invXY} vmin=${min} vmax=${max} '
             'myscale_aux=${scale_aux} myoffset_aux=${offset_aux} )', format="graph")
+    #
+    # hovm : to plot Hovmoller diagrams
+    #
+    cscript('hovm', '(ncl -Q '+scriptpath+'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${var}\"\' '
+            ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
+            ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
+            ' mean_axis=\'\"${mean_axis}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' '
+            ' fmt=\'\"${fmt}\"\' )',format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
     #
@@ -130,14 +142,6 @@ def load_standard_operators():
     cscript("mask","cdo setctomiss,${miss} ${in} ${out}")
     #
     cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
-    #
-    # timesection : to plot hovmoller diagrams
-    #
-    cscript('timesection', 'ncl '+scriptpath+'timesection.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' '
-            ' var=\'\"${var}\"\' latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' lonE=\'\"${lonE}\"\' '
-            ' cmap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} units=\'\"${units}\"\' reverse=${reverse} '
-            ' axmean=\'\"${axmean}\"\' xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} '
-            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} options=\'\"${options}\"\' ',format="graph")
     #
     if onCiclad:
         cscript("ml2pl", scriptpath+"ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
@@ -162,7 +166,9 @@ def load_cdftools_operators():
     #    
     cscript('ccdfmean_profile',
             'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s", canSelectVar=True)
-    #    
+    #
+    cscript('ccdfmean_profile_box', 'cdfmean ${in} ${var} ${pos_grid} $(cdffindij ${lonmin} ${lonmax} ${latmin} ${latmax} -c mask.nc -p ${pos_grid} | sed -n 3p) ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt', _var="mean_%s")
+    #
     cscript('ccdfvar',
             'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x -v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt', _var="var_3D%s", canSelectVar=True)
     #    

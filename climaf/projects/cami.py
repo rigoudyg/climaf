@@ -1,6 +1,6 @@
 """
 This module declares how to access observation datasets organized 'a la CAMI' at CNRM,
-at /cnrm/aster/data1/UTILS/cami/V1.7/climlinks/
+at /cnrm/est/COMMON/cami/V1.8/climlinks/
 
 Example ::
 
@@ -15,7 +15,7 @@ from climaf.classes import cproject, calias, cdef
 cproject("CAMIOBS" , "product", separator="_")
 
 # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
-CAMIOBS_root="/cnrm/aster/data1/UTILS/cami/V1.7/climlinks/"
+CAMIOBS_root="/cnrm/est/COMMON/cami/V1.8/climlinks/"
 
 # Pattern for matching CAMI obs data files and their directory. 
 # We choose to use facet 'model' to carry the observation source

@@ -6,9 +6,55 @@ profile (along lat, lon or pressure/z_index ) of one or two fields and
 draw vectors plot over a map, using NCL, and allowing for tuning a
 number of graphic attributes  
 
+.. topic:: Table of contents:
+
+  - :ref:`References <references>`
+  - :ref:`Provider / contact <provider>`
+  - :ref:`Inputs <inputs>`
+  - :ref:`Mandatory arguments <mandatory_arguments>`
+  - :ref:`Optional arguments <optional_arguments>`
+
+    - :ref:`General <general_opt_args>`
+    - :ref:`Main field <main_field_opt_args>`
+    - :ref:`Main field and/or auxiliary field
+      <main_and_aux_field_opt_args>`  
+    - :ref:`Auxiliary field <aux_field_opt_args>`
+    - :ref:`Vectors <vectors_opt_args>`
+  - :ref:`Required files <required_files>`
+  - :ref:`Optional files <optional_files>`
+
+    - :ref:`For uncomplete 'nav_lat' or 'nav_lon' coordinates issue
+      <navlat_issue>`    
+    - :ref:`For plotting data on native grid <native_grid>`
+  - :ref:`Outputs <outputs>`
+  - :ref:`Climaf call example <example>`
+
+    - :ref:`Maps <maps_example>`
+    - :ref:`Cross-sections <cross_sections_example>`
+    - :ref:`Profiles <profiles_example>`
+  - :ref:`More optional arguments <plot_more_args>`
+
+    - :ref:`For map <map_more_args>`
+    - :ref:`For cross-sections <cross-sections_more_args>`
+    - :ref:`For profiles <profiles_more_args>`
+  - :ref:`More climaf call example <more_example>`
+
+    - :ref:`Maps <more_maps_example>`
+    - :ref:`Cross-sections <more_cross_sections_example>`
+    - :ref:`Profiles <more_profiles_example>`
+  - :ref:`Side effects <side_effects>`
+  - :ref:`Implementation <implementation>`
+
+ 
+.. _references:
+
 **References** : http://www.ncl.ucar.edu
 
+.. _provider:
+
 **Provider / contact** : climaf at meteo dot fr
+
+.. _inputs:
 
 **Inputs** (in the order of CliMAF call):
 
@@ -22,22 +68,41 @@ Additional fields (optional):
 Warnings: 
 
 - Order of all data dimensions is supposed to be time, height, lat,
-  lon. Only first time step is used. Only the first vertical dimension
-  is used if the two other dimensions are not degenerated.   
+  lon. Only first time step is used for 4D or 3D fields if there is no
+  specified extraction. Only the first vertical dimension is used if
+  height is the first coordinate, if there is no specified level
+  extraction and if the two other dimensions are not degenerated.   
 
 - Order of input datasets is supposed to be main field, auxiliary field and
   vectors datasets. The last ones can be omitted. If you want to omit
   the scalar field but not the verctor components, use value None for
   the scalar dataset
 
-**Mandatory arguments**: None (but ``title`` is recommended)
+.. _mandatory_arguments:
+
+**Mandatory arguments**: None
+
+.. _optional_arguments:
 
 **Optional arguments** (see also :ref:`More plot optional arguments <plot_more_args>` )       
 
+.. _general_opt_args:
+
 General:
 
-  - ``title`` : string for graphic title; optional : CliMAF will
-    provide the CRS of the dataset
+  - ``title`` : string for graphic title; default: no title
+
+    Remarks: the ~ character has a special meaning in NCL strings. It
+    represents a function code. See function codes example page
+    http://www.ncl.ucar.edu/Applications/fcodes.shtml for (more)
+    examples of function codes. Particularly: 
+
+    - The ~C~ will put a carriage return to the title. By default it
+      is left justified. If you need it centered, you will have to add
+      spaces.
+    - Use a ~Z#~ to resize text in mid-stream. The # refers to the
+      percent of normal. 
+
   - ``format`` : graphic output format, either 'png', 'pdf' or 'eps';
     default: 'png'. For 'png' format, all the surrounding extra white
     space are cropped with optional argument ``trim`` (but not for
@@ -74,29 +139,61 @@ General:
       <native_grid>`.    
   - ``focus`` : set it to 'land' (resp. 'ocean') if you want to plot
     only on land (resp. ocean) 
-  - ``time``, ``level`` : for selecting time or level. This arguments
-    apply on all fields which have time and/or level dimension. Set it
-    to: 
+  - ``xpolyline``, ``ypolyline`` : for adding a polyline to the plot;
+    set ``xpolyline`` and ``ypolyline`` to a list of
+    the same length containing the X and Y coordinates of the
+    polyline, respectively.
+  
+    If you are adding the polyline to a map, then X should correspond
+    to longitude values, and Y to latitude values, as e.g.:
+    ``xpolyline`` = "-90.0, -45.0, -45.0, -90.0, -90.0", ``ypolyline``
+    = "30.0, 30.0, 0.0, 0.0, 30.0". 
+    For more details, see:
+    http://www.ncl.ucar.edu/Document/Graphics/Interfaces/gsn_add_polyline.shtml 
+  - ``date``, ``time``, ``level`` : for selecting date, time and/or
+    level. These arguments apply on all fields (**from 2D to 4D**)
+    which **have time and/or level dimension**. Set it to,  
 
-    - an integer if you want to select an index, 
-    - or a float if you want to select closest coordinate value,
-    - default: select the first time step if we have non-degenerated 
-      dimensions (t,z,y,x) ; select first time or level step if
-      field rank is 3.     
+    - for ``time`` and ``level``:
 
-  - ``options``, ``aux_options``, ``shading_options`` : strings for
-    setting NCL graphic resources directly, for the various 
-    fields (resources are separated by "|"). These lists have higher
-    priority than the CliMAF default ones. Each field has its own
-    options argument, e.g. :  
+      - an integer if you want to select an index (first index is 0), 
+      - or a float if you want to select closest coordinate
+	value. Warning: For ``time``, if the value has more than six
+	digits, there is big rounding errors. 
+ 
+    - for ``date``:
+
+      - a string in the format 'YYYY', 'YYYYMM', 'YYYYMMDD' or
+	'YYYYMMDDHH' e.g.: ``date`` =19810131. 
+
+    - default: for 4D fields (e.g. if we have non-degenerated
+      dimensions (t,z,y,x)), select the first time step; for 3D
+      fields, select first step of first coordinate (time or level). 
+    
+    Remarks: 
+    
+      - ``time`` and ``date`` arguments are incompatible;
+      - if you use both ``date`` (or ``time``) and ``level`` arguments
+	for 2D fields which have time and level dimensions, it is the
+	time extraction will be made.
+
+  - ``options``, ``aux_options``, ``shading_options``,
+    ``polyline_options`` : strings for setting NCL graphic resources
+    directly, for the various fields (resources are separated by
+    "|"). These lists have higher priority than the CliMAF default
+    ones. Each field has its own options argument, e.g. :  
 
     - ``options`` for main field and vectors, e.g. :
       'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
     - ``aux_options`` for auxiliary field, e.g. :
       'aux_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2"'     
     - ``shading_options`` for auxiliary field shading, e.g. :
-      'shading_options="gsnShadeHigh=3|gsnShadeLow =5"'   
+      'shading_options="gsnShadeHigh=3|gsnShadeLow=5"'   
+    - ``polyline_options`` for adding a polyline to the plot, e.g. :
+      'polyline_options="gsLineColor=blue|gsLineThicknessF=2.0"' 
 
+    Warning: do not put space inside these lists.
+    
     For more details, see: https://www.ncl.ucar.edu/
 
   - ``fmt``: a string specifying the format of the tick labels for
@@ -109,6 +206,8 @@ General:
 
     In case fmt is absent, a minimal algorithm exists which tries to
     determine the format string depending on the time range length. 
+
+.. _main_field_opt_args:
 
 Main field:
 
@@ -140,6 +239,8 @@ Main field:
     https://www.ncl.ucar.edu/Document/Graphics/Resources/mp.shtml#mpCenterLonF ;
     default (climaf): (minimum longitude+maximum longitude)/2. 
 
+.. _main_and_aux_field_opt_args:
+
 Main field and/or auxiliary field:
 
   - ``contours`` : 
@@ -160,6 +261,8 @@ Main field and/or auxiliary field:
 	ncl mode; see e.g.
 	http://www.ncl.ucar.edu/Document/Graphics/Resources/cn.shtml#cnLevelSelectionMode
 
+.. _aux_field_opt_args:
+
 Auxiliary field:
 
   - ``shade_below``, ``shade_above`` : shade contour regions for 
@@ -175,8 +278,10 @@ Auxiliary field:
     than 1'
 
   - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
-    field (x -> x*scale_aux + offset_aux); default = ``scale`` and
-    ``offset`` (main field scaling) 
+    field (x -> x*scale_aux + offset_aux); default = 1. and 0. (no
+    scaling) 
+
+.. _vectors_opt_args:
 
 Vectors:
 
@@ -210,6 +315,8 @@ Vectors:
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
 
+.. _required_files:
+
 **Required files** 
   - If rotation is set to 1, file 'angles.nc' must be made available
     to the script: use function fixed_fields() for that (see example
@@ -218,9 +325,12 @@ Vectors:
     <../../tools/angle_data_CNRM.nc>` and :download:`angle.ncl
     <../../tools/angle.ncl>`       
 
-.. _navlat_issue:
+.. _optional_files:
 
 **Optional files**
+
+.. _navlat_issue:
+
   - If the field to plot is from Nemo and has uncomplete nav_lat or
     nav_lon coordinates, you should provide correct values by bringing
     to the script a file locally named either 'coordinates.nc' or
@@ -229,7 +339,11 @@ Vectors:
     :py:func:`~climaf.operators.fixed_fields()`. Such files are not
     included with CliMAF and must be sought by your local Nemo
     dealer. At CNRM you may have a look at
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/. In this case, if
+    you also plot an auxiliary field, it only works if auxiliary field
+    is not a sub-region of the main field (because the latitude and
+    longitude arrays will be read in the same file that for main
+    field).  
 
 .. _native_grid:
 
@@ -240,15 +354,23 @@ Vectors:
     'climaf_plot_grid.nc'. You do that using function
     :py:func:`~climaf.operators.fixed_fields()`. Such file is not
     included with CliMAF and must be sought by user. See example
-    :ref:`Climaf call example <native_grid2>`. 
+    :ref:`Climaf call example <native_grid2>`. In this case, if you
+    also want to plot an auxiliary field, this second field must be on
+    the same grid as the main field.  
+
+.. _outputs:
 
 **Outputs** :
-  - main output : a PNG or PDF figure
+  - main output : a PNG or PDF or EPS figure
+
+.. _example:
 
 **Climaf call example** For more examples which are systematically
 tested, see :download:`gplot.py <../../examples/gplot.py>` and
 :download:`test_gplot.py <../../testing/test_gplot.py>`    
- 
+
+.. _maps_example:
+
   - Maps ::
 
      >>> duo=ds(project="EM",simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
@@ -289,18 +411,23 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> sub_thetao=llbox(thetao, latmin=30, latmax=80, lonmin=-60, lonmax=0) 
      >>> plot_map5=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 0 for time', rotation=1, vcRefLengthF=0.002, 
      ... vcRefMagnitudeF=0.02, level=10, time=0) 
+     >>> # Same as above but with date selection, and addition of a box
+     >>> plot_map6=plot(thetao, sub_thetao, duo, dvo, title='Selecting index 10 for level and 19980131 for date', rotation=1, vcRefLengthF=0.002, 
+     ... vcRefMagnitudeF=0.02, level=10, date=19980131,
+     ... xpolyline="45.0, 90.0, 90.0, 45.0, 45.0",ypolyline="30.0, 30.0, 0.0, 0.0, 30.0", polyline_options='gsLineColor=blue')
+
 
 .. _native_grid2:
 
      >>> # A Map without data re-projection (model is already on a known native Lambert grid):
-     >>> tas=fds('/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc', period='197901-201112', variable='tas')
+     >>> tas=fds('/cnrm/est/COMMON/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc', period='197901-201112', variable='tas')
      >>> moy_tas=time_average(tas) # time average of 'tas'
      >>> # without bringing to the script the file which includes metadata for the native Lambert grid 
      >>> # => with default cylindrical equidistant projection 
      >>> proj=plot(moy_tas,title='ALADIN',min=-12,max=28,delta=2.5,vcb=False) 
      >>> cshow(proj)
      >>> # How to get required file which includes metadata for the native Lambert grid named 'climaf_plot_grid.nc'
-     >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/aster/data1/UTILS/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
+     >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/est/COMMON/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
      >>> # with bringing to the script this file => with default native grid (no re-projection)
      >>> cdrop(proj) # to re-compute 'proj'
      >>> cshow(proj)
@@ -308,7 +435,9 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> projNH=plot(moy_tas,title='ALADIN - NH40',min=-12,max=28,delta=2.5,proj="NH40") 
      >>> cshow(projNH)
 
-  - A cross-section ::
+.. _cross_sections_example:
+
+  - Cross-sections ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
@@ -340,7 +469,9 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> ta_zonal_mean2=ccdo(cross_field2, operator="zonmean") 
      >>> plot_cross6=plot(ta_zonal_mean, ta_zonal_mean2, title='Selecting time closed to 3000', y="index", time=3000.) 
 
-  - A profile ::
+.. _profiles_example:
+
+  - Profiles ::
 
      >>> january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta,operator="zonmean")
@@ -360,6 +491,8 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
 .. _plot_more_args:
 
 **More optional arguments**:
+
+.. _map_more_args:
 
 For map:
 
@@ -416,15 +549,15 @@ For map:
   - ``gsnCenterString`` : adds a string just above the plot's upper
     boundary and centers it;
 
-    - if you select time and/or level (by optional arguments ``time``
-      and/or ``level``), set it to:  
+    - if you select date, time and/or level (by optional arguments
+      ``date``, ``time`` and/or ``level``), set it to:  
 
       - a string to add this given string (for example
 	gsnCenterString="" if you want turn off this sub-title), or 
-      - defaut (climaf): add select values for time and/or level for
-	main field
+      - defaut (climaf): add select values for date, time and/or level
+	for main field
       
-    - if you don't select time and/or level, set it to:
+    - if you don't select date, time and/or level, set it to:
     
       - a string to add this given string, or 
       - defaut (ncl): none; see
@@ -436,6 +569,8 @@ For map:
     gsnLeftString, gsnCenterString and gsnRightString; see
     e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/gsn.shtml#gsnStringFontHeightF
     ; default (climaf): 0.012
+
+.. _cross-sections_more_args:
 
 For cross-sections:
 
@@ -460,6 +595,8 @@ For cross-sections:
   - ``gsnStringFont`` : same as  for map
   - ``gsnStringFontHeightF`` : same as  for map
 
+.. _profiles_more_args:
+
 For profiles:
 
   - ``invXY`` : same as for cross-section
@@ -470,8 +607,15 @@ For profiles:
   - ``tiXAxisFontHeightF`` : same as  for map
   - ``tiYAxisFontHeightF`` : same as  for map
   - ``tiMainFontHeightF`` : same as  for map
+  - ``gsnLeftString`` : same as  for map
+  - ``gsnRightString`` : same as  for map
+  - ``gsnCenterString`` : same as  for map
+
+.. _more_example:
 
 **More climaf call example** 
+
+.. _more_maps_example:
  
   - Maps ::
 
@@ -491,14 +635,18 @@ For profiles:
      >>> ... lbLabelFontHeightF=0.012, gsnPolarLabelFontHeightF=0.015, 
      >>> ... tiMainFont="helvetica", tiMainFontHeightF=0.03, tiMainPosition="Left", gsnLeftString="")
 
-  - A cross-section ::
+.. _more_cross_sections_example:
+
+  - Cross-sections ::
 
      >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
      >>> cross=plot(ta_zonal_mean,title='A cross-section with some adjustments',
      >>> ... tiMainFont="helvetica",tiMainFontHeightF=0.030,tiMainPosition="Center", gsnStringFontHeightF=0.015)
 
-  - A profile ::
+.. _more_profiles_example:
+
+  - Profiles ::
       
      >>> january_ta=ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="198001")
      >>> ta_zonal_mean=ccdo(january_ta, operator="zonmean")
@@ -506,7 +654,11 @@ For profiles:
      >>> profile=plot(ta_profile, title='A profile with some adjustments', y="index",
      >>> ... invXY=True, tmXBLabelFontHeightF=0.01, tmYLLabelFontHeightF=0.01) 
 
+.. _side_effects:
+
 **Side effects** : None
+
+.. _implementation:
 
 **Implementation** : Basic use of ncl: gsn_csm_pres_hgt, gsn_csm_xy,
 gsn_csm_contour_map, gsn_csm_contour_map_ce, gsn_csm_contour,

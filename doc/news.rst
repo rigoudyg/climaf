@@ -6,6 +6,100 @@ Whats' new
 
 Changes, newest first :
 
+- 2017/02/21:
+  - Bug fixes about a rarely used case
+
+- 2017/01/25:
+
+  - New arguments for standard operator ``plot`` (see
+    :doc:`scripts/plot`) : ``xpolyline``, ``ypolyline`` and
+    ``polyline_options`` for adding a polyline to the plot 
+
+  - The scripts output files, which have temporary unique names until
+    they are fully tagged with their CRS and moved to the cache, are
+    now located in cache (instead of /tmp) 
+    
+- 2016/12/14:
+
+  - Update paths for CNRM (due to restructuring Lustre file system)
+
+  - **Significant improvement of cache performance** (70 times faster for
+    a cache containing more than 8000 objects). You must reset your
+    cache for getting the improvement. You may use 'rm -fR
+    $CLIMAF_CACHE' or function :py:func:`~climaf.cache.craz` 
+
+  - **Fix issue occurring in parallel runs** (especially for PDF outputs): 
+
+    - the scripts output files now have temporary unique names until
+      they are fully tagged with their CRS and moved to the cache
+
+    - a new shell script is available to clean corrupted PDF files
+      in cache - i.e. without CRS (see :download:`clean_pdf.sh
+      <../scripts/clean_pdf.sh>`)  
+
+  - New standard operator ``ccdfmean_profile_box`` to compute the
+    vertical profile of horizontal means for 3D fields on a given
+    geographical domain (see :doc:`scripts/ccdfmean_profile_box`)  
+
+  - New method of :py:class:`~climaf.classes.cdataset` class:
+    :py:meth:`~climaf.classes.cdataset.check` checks time consistency
+    of first variable of a dataset or ensemble members  
+
+  - Bug fixes for operator ``curves`` (see :doc:`scripts/curves`) when
+    time data conversion is necessary 
+
+  - New standard operator ``hovm`` for **plotting Hovmöller diagrams**
+    (time/lat or lon, or time/level) for any SST/climate boxes and
+    provides many customization parameters; see :doc:`scripts/hovm`
+
+  - Function :py:func:`~climaf.plot.plot_params.hovm_params` provides
+    domain for some SST/climate boxes
+
+  - Changes for default argument ``title``: if no title value is
+    provided when invoking graphic operators, no title will be
+    displayed (formerly, the CRS expression for an object was
+    provided as a default value for ``title``) 
+
+  - Bug fixes in test install
+
+  - Bug fixes for ``plot`` (see :doc:`scripts/plot`) when using
+    argument 'proj' with an empty string
+
+- 2016/06/30:
+
+  - Input for function :py:func:`~climaf.operators.fixed_fields()`,
+    which allows to provide fixed fields to operators: path of fixed
+    fields may depend now also on grid of operator's first operand
+
+  - automatic fix of Aladin outputs attribute 'coordinates' issues,
+    provided you set environment variable CLIMAF_FIX_ALADIN_COORD to
+    anything but ‘no’. This adresses the wrong variable attribute
+    'coordinates' with 'lat lon' instead of 'latitude longitude'
+    (:download:`../scripts/mcdo.sh <../scripts/mcdo.sh>`, see function
+    aladin_coordfix()) 
+
+  - exiv2 (Image metadata manipulation tool) is embarked in CliMAF
+    distribution: ``<your_climaf_installation_dir>/bin/exiv2``  
+
+
+- 2016/05/24:
+
+  - Change default for arguments ``scale_aux`` and ``offset_aux`` for
+    standard operators ``plot`` (see :doc:`scripts/plot`) and
+    ``curves`` (see :doc:`scripts/curves`): no scaling instead of main
+    field scaling  
+
+  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`) :
+
+    - add argument ``date`` for selecting date in the format 'YYYY',
+      'YYYYMM', 'YYYYMMDD' or 'YYYYMMDDHH'  
+    - ``time``, ``date`` and ``level`` extractions apply on all fields
+      now from 2D to 4D, instead of only 3D and 4D  
+    - log messages, when a time or level extraction is made, are also
+      performed 
+    - Bug fixes when using ``mpCenterLonF`` argument
+ 
+
 - 2016/05/04 - Version 1.0.1 : 
 
   - html package : 
@@ -27,7 +121,6 @@ Changes, newest first :
     variables, and allows its customization. The expectation is that
     everybody will contribute values that can be shared, for improving
     easy common intepretation of evaluation plots
-
 
   - New standard operators:
 
@@ -277,7 +370,7 @@ Changes, newest first :
        <../examples/cdftransport.py>`: a new project 'data_CNRM' was
        declared instead of 'NEMO' old project; this new project
        uses data available at CNRM in a dedicated directory
-       "/cnrm/aster/data1/UTILS/climaf/test_data", which contains both
+       "/cnrm/est/COMMON/climaf/test_data", which contains both
        Nemo raw outputs, monitoring outputs (with VT-files) and fixed
        fields. 
 
@@ -311,7 +404,7 @@ Changes, newest first :
     file, for dealing with Nemo data files having un-complete
     'nav_lat' and 'nav_lon'. See :ref:`navlat issues with plot
     <navlat_issue>`.  Such files are available e.g. at CNRM in
-    /cnrm/aster/data3/aster/chevalli/Partage/NEMO/
+    /cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/ 
   - Change for :py:func:`~climaf.classes.cpage`  :
 
    - argument ``orientation`` is now deprecated and preferably

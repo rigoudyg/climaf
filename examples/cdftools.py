@@ -3,6 +3,7 @@
 # - cdfmean =>
 #    * ccdfmean : computes the mean value of the field, 2D or 3D (output: excluded profile)
 #    * ccdfmean_profile : vertical profile of horizontal means for 3D fields (output: excluded mean value)
+#    * ccdfmean_profile_box : vertical profile of horizontal means for 3D fields on a given geographical domain (output: excluded mean value)
 #    * ccdfvar : computes the spatial variance, 2D or 3D (output: excluded mean value, profile and profile of variance)
 #    * ccdfvar_profile : vertical profile of spatial variance (output: excluded mean value, profile and variance)
 #
@@ -40,8 +41,8 @@ if 'ccdfmean' not in cscripts :
 cproject('data_CNRM')
 
 # For 'standard' Nemo output files (actually, they are better accessible using project "EM")
-#root1="/cnrm/aster/data3/aster/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
-root1="/cnrm/aster/data1/UTILS/climaf/test_data/${simulation}/O/"
+#root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
+root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
 url_nemo_standard=root1+suffix  
 #
@@ -59,10 +60,10 @@ cdef("frequency","monthly")
 
 # How to get fixed files for all cdftools binaries
 # (this can use wildcards ${model}, ${project}, ${simulation}, ${realm})
-#tpath='/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/'
-tpath='/cnrm/aster/data1/UTILS/climaf/test_data/fixed/'
-fixed_fields(['ccdfmean','ccdfmean_profile','ccdfvar','ccdfvar_profile','ccdfheatcm',\
-              'ccdfmxlheatcm','ccdfsaltc', 'ccdfzonalmean'],
+#tpath='/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/'
+tpath='/cnrm/est/COMMON/climaf/test_data/fixed/'
+fixed_fields(['ccdfmean','ccdfmean_profile','ccdfmean_profile_box','ccdfvar','ccdfvar_profile',\
+              'ccdfheatcm','ccdfmxlheatcm','ccdfsaltc','ccdfzonalmean'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
@@ -71,7 +72,7 @@ fixed_fields(['ccdfzonalmean_bas'],
              ('mask.nc',tpath+'ORCA1_mesh_mask.nc'),
              ('mesh_hgr.nc',tpath+'ORCA1_mesh_hgr.nc'),
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'),
-             ('new_maskglo.nc','/cnrm/aster/data3/aster/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_new_maskglo.nc'))
+             ('new_maskglo.nc','/cnrm/ioga/Users/chevallier/chevalli/Monitoring/MONITORING_v3.1/config/ORCA1_new_maskglo.nc'))
 
 #-----------
 #  cdfmean
@@ -81,7 +82,7 @@ fixed_fields(['ccdfzonalmean_bas'],
 # cdfmean  IN-file IN-var T|U|V|F|W [imin imax jmin jmax kmin kmax]
 #        ... [-full] [-var] [-zeromean] 
 #
-# CliMAF usage (ccdfmean, ccdfmean_profile, ccdfvar, ccdfvar_profile) :
+# CliMAF usage (ccdfmean, ccdfmean_profile, ccdfmean_profile_box, ccdfvar, ccdfvar_profile) :
 #
 
 # Define dataset with sea water x velocity ("uo")
@@ -96,6 +97,10 @@ cfile(my_cdfmean3)
 # Compute vertical profile
 my_cdfmean_prof=ccdfmean_profile(duo,pos_grid='U')
 cfile(my_cdfmean_prof)
+
+# Compute vertical profile on geographical domain [35.4,39,-14,-10]
+my_cdfmean_prof_box=ccdfmean_profile_box(duo,pos_grid='U',latmin=35.4,latmax=39,lonmin=-14,lonmax=-10,kmin=1,kmax=2)
+cfile(my_cdfmean_prof_box)
 
 # Compute spatial variance
 my_cdfvar=ccdfvar(duo,pos_grid='U')
@@ -142,11 +147,15 @@ dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O
 
 # Compute the heat content in the specified area
 my_cdfheatc=ccdfheatcm(dso,dtho,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
-cfile(my_cdfheatc)
+cfile(my_cdfheatc) # multi-variable output file: "heatc_2D" and "heatc_3D"
 
-# Select "heatc_2D" in multi-variable output file
-heatc_2D=select(my_cdfheatc, var="heatc_2D")
+# Select and extract "heatc_2D" in multi-variable output file, and plot profile
+heatc_2D=ccdo(my_cdfheatc, operator='selname,heatc_2D')
 ncdump(heatc_2D)
+
+heatc_2D.variable="heatc_2D" # replace list of variable, i.e. 'heatc_2D,heatc_3D', by 'heatc_2D'
+my_plot5=plot(heatc_2D)
+cshow(my_plot5)
 
 #----------------
 #  cdfmxlheatc
@@ -176,12 +185,22 @@ cfile(my_cdfmxlheatc)
 # CliMAF usage (ccdfsaltc) :
 #
 
+#export CLIMAF_FIX_NEMO_TIME='on'
+
 # Define dataset with salinity 
-dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
+dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="1998", realm="O")
 
 # Compute the salt content in the specified area
 my_cdfsaltc=ccdfsaltc(dso,imin=100,imax=102,jmin=117,jmax=118,kmin=1,kmax=2)
 cfile(my_cdfsaltc)
+
+# Select and extract "saltc_3D" in multi-variable output file, and plot profile
+saltc_3D=select(my_cdfsaltc, var="saltc_3D")
+ncdump(saltc_3D)
+
+saltc_3D.variable="saltc_3D" # replace list of variable, i.e. 'saltc_2D,saltc_3D', by 'saltc_3D'
+my_plot6=plot(saltc_3D)
+cshow(my_plot6)
 
 #-----------
 #  cdfstd
@@ -262,11 +281,13 @@ dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 my_cdfvT=ccdfvT(dtho,dso,duo,dvo)
 cfile(my_cdfvT)
 
-# Select "vozous" in multi-variable output file
-vozous_var=select(my_cdfvT, var="vozous")
+# Select and extract "vozous" in multi-variable output file, and plot map
+vozous_var=select(my_cdfvT, var="vozous,nav_lat,nav_lon")
 ncdump(vozous_var)
 
-
+vozous_var.variable="vozous" # replace list of variable, i.e. 'vomevt,vomevs,vozout,vozous', by 'vozous'
+my_plot7=plot(vozous_var)
+cshow(my_plot7)
 
 #----------------
 #  cdfzonalmean

@@ -49,6 +49,7 @@ Default values of the attributes:
 
 Example 1:
 - On Curie, access to a 'time series' dataset of the variable tas, providing values to all facets:
+
  >>> dat1 = ds(project='IGCM_OUT',
                root='/ccc/store/cont003/dsm',
                login ='p86mart',
@@ -63,6 +64,7 @@ Example 1:
 	       period='1850-1900',
 	       variable='tas'
 	       )
+               
 Note that the following request returns the same files (but takes more time):
  >>> dat1 = ds(project='IGCM_OUT',
                model='IPSLCM6',
@@ -75,6 +77,7 @@ Note that the following request returns the same files (but takes more time):
 Example 2:
 - On Curie, access to a 'SE_50Y' dataset of the variable tas, providing values to all facets;
 Note that we set frequency to 'seasonal' (or 'annual_cycle'), specify clim_period and clim_period_length (to specify either _50Y or _100Y)
+
  >>> dat2 = ds(project='IGCM_OUT',
                login ='p86mart',
                model='IPSLCM6',
@@ -92,6 +95,7 @@ Note that we set frequency to 'seasonal' (or 'annual_cycle'), specify clim_perio
 The attributes 'model', 'simulation' and 'clim_period' can be used to define ensembles with eds().
 Example 3:
 - On Curie, define an ensemble with simulations 'O1T09V01','O1T09V02','O1T09V03':
+
  >>> dat_ens = eds(project='IGCM_OUT',
                    model='IPSLCM6',
                    simulation=['O1T09V01','O1T09V02','O1T09V03'],

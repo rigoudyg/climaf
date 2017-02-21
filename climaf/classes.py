@@ -85,7 +85,7 @@ class cproject():
 
         A default value for a given facet can be specified, by providing a tuple
         (facet_name,default_value) instead of the facet name. This default value is
-        however of lower priority than the value set using :py:func:`cdef`
+        however of lower priority than the value set using :py:func:`~climaf.classes.cdef`
 
         A project can be declared as having non-standard variable
         names in datafiles, or variables that should undergo re-scaling; see
@@ -194,11 +194,24 @@ class cobject():
     def __repr__(self):
         return self.buildcrs()
     def register(self):
-        cobjects[self.crs]=self
+        pass
+        #cobjects[self.crs]=self
         #clogger.debug("Object Created ; crs = %s"%(self.crs))
     def erase(self):
-        del(cobjects[self.crs])
-        clogger.debug("Object deleted ; crs = %s"%(self.crs))
+        pass
+        #del(cobjects[self.crs])
+        #clogger.debug("Object deleted ; crs = %s"%(self.crs))
+
+
+class cdummy(cobject):
+    def __init__(self):
+        """
+        cdummy class represents dummy arguments in the CRS
+        """
+        pass
+    def buildcrs(self,period=None,crsrewrite=None):
+        return('ARG')
+
 
 def processDatasetArgs(**kwargs) :
     """
@@ -323,7 +336,6 @@ class cdataset(cobject):
           >>>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
           >>>           simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
         
-        
         """
         #
         attval=processDatasetArgs(**kwargs)
@@ -423,6 +435,7 @@ class cdataset(cobject):
     
     def baseFiles(self,force=False):
         """ Returns the list of (local) files which include the data for the dataset
+        
         Use cached value unless called with arg force=True
         """
         if (force and self.project != 'file') or self.files is None :
@@ -436,6 +449,10 @@ class cdataset(cobject):
         return self.files
 
     def listfiles(self,force=False):
+        """ Returns the list of (local) files which include the data for the dataset
+        
+        Use cached value unless called with arg force=True
+        """
         return self.baseFiles(force=force)
 
     def hasRawVariable(self) :
@@ -447,6 +464,196 @@ class cdataset(cobject):
         clogger.debug("TBD: actually test variables in files, rather than assuming that variable %s is virtual for dataset %s"\
                         %(self.variable,self.crs))
         return(False)
+
+    def check(self):
+        """
+        Check time consistency of first variable of a dataset or ensemble members:
+        - check if first data time interval is consistent with dataset frequency
+        - check if file data have a gap
+        - check if period covered by data files actually includes the whole of dataset period
+          
+        Returns: True if period of data files included dataset period, False otherwise.
+        
+        Examples:
+    
+        >>> # Dataset with monthly frequency  
+        >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas',period='1980-1981')
+        >>> res1=tas.check()
+        >>>
+        >>> # Ensemble with monthly frequency  
+        >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
+        >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
+        >>> ens=cens({'1980':j0, '1981':j1})
+        >>> res2=ens.check()
+    
+        >>> # Define a new project for 'em' data with 3 hours frequency in particular     
+        >>> cproject('em_3h','root','group','realm','frequency',separator='|')
+        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc' 
+        >>> dataloc(project='em_3h', organization='generic', url=path)
+    
+        >>> # Dataset with 3h frequency for 'tas' variable (instant) 
+        >>> tas_3h=ds(project='em_3h',variable='tas',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
+        >>> res3=tas_3h.check()
+     
+        >>> # Dataset with 3h frequency for 'pr' variable (time mean) 
+        >>> pr_3h=ds(project='em_3h',variable='pr',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
+        >>> res4=pr_3h.check()   
+        
+        """
+        from anynetcdf import ncf
+        from datetime import datetime, timedelta
+        from netCDF4 import num2date
+        import numpy as np
+        
+        # Returns the list of files which include the data for the dataset
+        # or for each member of the ensemble
+        if isinstance(self,cdataset):
+            files=self.baseFiles()
+            if not files:
+                clogger.error('No file found for: %s'%self)
+                return(False)
+        else :
+            clogger.error("Cannot handle %s" %self)
+            return
+        #
+        if files:
+            filedate=[]
+            clogger.debug("List of selected files: %s"%files)
+            
+            var=str.split(varOf(self),',')[0] 
+            # Concatenate all data files
+            for filename in str.split(files,' '):
+                fileobj=ncf(filename)
+                #
+                if self.project in aliases and var in aliases[self.project]:
+                    var=aliases[self.project][var][0]
+                #
+                dimname=''
+                for dim in fileobj.variables[var].dimensions:  
+                    if 'time' in dim: dimname=dim
+                if not dimname: clogger.error('No time dimension for variable %s'%var)
+                time_obj=fileobj.variables[dimname]  
+                filedate=np.concatenate((filedate,num2date(time_obj.getValue(),\
+                                        units=time_obj.units,calendar=time_obj.calendar)))
+            
+            clogger.debug('Time data of selected files: %s'%filedate)
+
+            # Check if first data time interval is consistent with dataset frequency
+            if len(filedate) > 1 :
+                filedate_delta=(filedate[1]-filedate[0]).total_seconds()
+            else:
+                clogger.error('Time dimension is degenerated.')
+                return
+
+            if ( (self.frequency == 'monthly' or not self.frequency) and \
+                 (filedate_delta > 31.*24.*3600 or filedate_delta <= 29.*24.*3600.) ) \
+               or ( self.frequency == 'yearly' and \
+                    (filedate_delta > 366.*24.*3600. or filedate_delta < 365.*24.*3600.) ) \
+               or ( self.frequency == 'decadal' and \
+                    (filedate_delta > 3653.*24.*3600. or filedate_delta < 3651.*24.*3600.) ):
+        
+                clogger.warning('First data time interval (= %.1f days) is not consistent with dataset frequency (i.e. %s)'\
+                                %(filedate_delta/(24.*3600.),self.frequency))
+
+            elif self.frequency == 'daily' and filedate_delta != 86400.:
+                clogger.warning('First data time interval (= %.2f hours) is not consistent with dataset frequency (i.e. %s)'\
+                                %(filedate_delta/3600.,self.frequency))
+
+            elif (self.frequency == '6h'or self.frequency == '3h' or self.frequency == '1h' \
+                  or self.frequency == '3Hourly' or self.frequency == '6Hourly') \
+                  and filedate_delta != float(self.frequency[0])*3600.:
+                clogger.warning('First data time interval (= %.2f hours) is different to dataset frequency (i.e. %.2f)'\
+                                %(filedate_delta/3600.,float(self.frequency[0])))
+
+            # Check if file data have a gap
+            i=0
+            cpt=0
+            while i < len(filedate)-2:
+                i+=1
+                if (filedate[i+1]-filedate[i]).total_seconds() != filedate_delta:
+                    cpt+=1
+                    if cpt < 5:
+                        if self.frequency == 'monthly' or not self.frequency or \
+                           self.frequency == 'yearly' or self.frequency == 'decadal':
+                            clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days '\
+                                          %(i,i+1,(filedate[i+1]-filedate[i]).total_seconds()/(24.*3600.)) +\
+                                          'instead of %.0f days (<=> 1st data interval)'\
+                                          %(filedate_delta/(24.*3600.)))
+                        elif self.frequency == 'daily' or self.frequency == '6h'or \
+                             self.frequency == '3h' or self.frequency == '1h' or \
+                             self.frequency == '3Hourly' or self.frequency == '6Hourly':
+                            clogger.error('File data have a gap between indexes %i and %i: '%(i,i+1) +\
+                                          'delta = %.0f hours instead of %.0f hours (<=> 1st data interval)' \
+                                          %((filedate[i+1]-filedate[i]).total_seconds()/3600.,filedate_delta/3600.))
+            #
+            # Compute period covered by data files
+            if self.frequency == 'monthly' or not self.frequency:  
+                filedate[0]=filedate[0].replace(day=01)
+                if filedate[-1].month > 11 :
+                    filedate[-1]=filedate[-1].replace(year=filedate[-1].year+1)
+                    filedate[-1]=filedate[-1].replace(month=01)
+                    filedate[-1]=filedate[-1].replace(day=01)
+                else:
+                    filedate[-1]=filedate[-1].replace(month=filedate[-1].month+1)
+                    filedate[-1]=filedate[-1].replace(day=01)
+
+            elif self.frequency == 'daily':
+                filedate[0]=filedate[0].replace(hour=00)
+                filedate[-1]=filedate[-1].replace(hour=00)
+                filedate[-1]=filedate[-1] + timedelta(days=1)
+              
+            elif self.frequency == '6h'or self.frequency == '3h' or self.frequency == '1h' \
+                      or self.frequency == '3Hourly' or self.frequency == '6Hourly':
+           
+                if 'cell_methods' in fileobj.variables[var].__dict__ : # time mean 
+
+                    regex=re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
+                    cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
+                    if cell_meth_att:
+                        if cell_meth_att.group(2) == 'hours': freq=float(cell_meth_att.group(1))
+                        elif cell_meth_att.group(2) == 'minutes': freq=float(cell_meth_att.group(1))/60.
+                    else: # 'cell_methods' attribute defined with the value 'time: mean'
+                        freq=filedate_delta/3600.
+
+                    filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + \
+                                    ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
+                    filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
+                                    ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 ) 
+
+                else: # assume it is instant data
+                    freq=filedate_delta/3600.
+                    filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
+                        ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - 2*freq*60 )
+
+            elif self.frequency == 'yearly' or self.frequency == 'decadal':
+                filedate[0]=filedate[0].replace(month=01)
+                filedate[0]=filedate[0].replace(day=01)
+                filedate[-1]=filedate[-1].replace(month=01)
+                filedate[-1]=filedate[-1].replace(day=01)
+                filedate[-1]=filedate[-1] + timedelta(years=1)
+   
+            elif self.frequency == 'fx' or self.frequency == 'annual_cycle':
+                clogger.error('Check time consistency with a frequency equal to %s has no sense' %self.frequency)      
+
+            else:
+                clogger.error('Dataset frequency is non-standard: frequency = %s. ' %self.frequency +\
+                              'Normalized frequency values are: decadal, yearly, monthly, '+\
+                              'daily, 6h, 3h, fx and annual_cycle')
+            #
+            # Check period of datafiles vs dataset period
+            clogger.debug('Period covered by selected files: %s'%filedate)
+            file_period=cperiod(start=filedate[0],end=filedate[-1])
+            #
+            if file_period.includes(self.period):
+                clogger.info("Time data in datafiles (i.e. %s) includes time data of " %file_period +\
+                             "dataset (i.e. %s) => dataset are consistent." %self.period)
+                return(True)
+            else:
+                clogger.info("Time data in datafiles (i.e. %s) don't include time data of " %file_period +\
+                             "dataset (i.e. %s) => dataset are not consistent." %self.period)
+                return(False)
+
+
 
 class cens(cobject,dict):
     def __init__(self, dic={}, order=None, sortfunc=None ) :
@@ -490,14 +697,14 @@ class cens(cobject,dict):
         >>> ds1980=ds(period="1980")
         >>> ds1981=ds(period="1981")
         >>> #
-        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 })
-        >>> ncview(cens)  # will launch ncview once per member
+        >>> myens=cens({'1980':ds1980 , '1981':ds1981 })
+        >>> ncview(myens)  # will launch ncview once per member
         >>> 
-        >>> myens=cens({'1980':ds1980 ; '1981':ds1981 }, order=['1981','1980'])
+        >>> myens=cens({'1980':ds1980 , '1981':ds1981 }, order=['1981','1980'])
         >>> myens.set_order(['1981','1980'])
         >>>
         >>> # Add a member
-        >>> cens['abcd']=ds(period="1982")
+        >>> myens['abcd']=ds(period="1982")
 
         Limitations : Even if an ensemble is a dict, some dict methods
         are not properly implemented (popitem, fromkeys) and function
@@ -581,6 +788,33 @@ class cens(cobject,dict):
         rep=rep.replace(",}","}")
         rep=rep+")"
         return rep
+
+    def check(self):
+        """
+        Check time consistency of first variable for each member of the ensemble :
+        - check if first data time interval is consistent with dataset frequency
+        - check if file data have a gap
+        - check if period covered by data files actually includes the whole of dataset period
+        
+        Returns: True if period of data files included dataset period, False otherwise.
+        
+        Example:
+    
+        >>> # Ensemble with monthly frequency  
+        >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
+        >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
+        >>> ens=cens({'1980':j0, '1981':j1})
+        >>> res=ens.check()
+        
+        """
+        
+        # Call 'check' method of 'cdataset' for each member of the ensemble
+        rep=True
+        for memb in self:
+            #clogger.info('Member: %s'%memb)
+            rep=self[memb].check() and rep
+        return rep
+        
 
 
 def eds(**kwargs):
@@ -1368,6 +1602,58 @@ def browse_tree(cobj,func,results):
         return
 
 
+def domainOf(cobject) :
+    """ Returns a domain for a CliMAF object : if object is a dataset, returns
+    its domain, otherwise returns domain of first operand
+    """
+    if isinstance(cobject,cdataset) : 
+	if type(cobject.domain) is list :
+            rep=""
+            for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
+            rep="%s%d"%(rep,cobject.domain[-1])
+            return(rep)
+	else : 
+	    if cobject.domain == "global" : return ""
+	    else : return(cobject.domain)
+    elif isinstance(cobject,ctree) :
+        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
+        return domainOf(cobject.operands[0])
+    elif isinstance(cobject,scriptChild) :
+        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
+        return domainOf(cobject.father)
+    elif isinstance(cobject,cens) :
+        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
+        return domainOf(cobject.values()[0])
+    elif cobject is None : return "none"
+    else : clogger.error("Unkown class for argument "+`cobject`)
+             
+def varOf(cobject) : return attributeOf(cobject,"variable")
+def modelOf(cobject) : return attributeOf(cobject,"model")
+def simulationOf(cobject) : return attributeOf(cobject,"simulation")
+def projectOf(cobject) : return attributeOf(cobject,"project")
+def realmOf(cobject) : return attributeOf(cobject,"realm")
+def gridOf(cobject) : return attributeOf(cobject,"grid")
+
+def attributeOf(cobject,attrib) :
+    """ Returns the attribute for a CliMAF object : if object is a dataset, returns
+    its attribute property, otherwise returns attribute of first operand
+    """
+    if isinstance(cobject,cdataset) : 
+        val=getattr(cobject,attrib,None) 
+        if val is not None : return val
+        else : return(cobject.kvp.get(attrib))
+    elif isinstance(cobject,cens) : return attributeOf(cobject.values()[0],attrib)
+    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
+    elif isinstance(cobject,ctree) :
+        clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
+        return attributeOf(cobject.operands[0],attrib)
+    elif isinstance(cobject,cdummy) :
+        return "dummy"
+    elif isinstance(cobject,cpage) or isinstance(cobject,cpage_pdf) : return None
+    elif cobject is None : return ''
+    else : raise Climaf_Classes_Error("Unknown class for argument "+`cobject`)
+
+        
 class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

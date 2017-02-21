@@ -33,7 +33,7 @@ if atCNRM :
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs,cdef
     
-    # example : /cnrm/aster/data3/aster/voldoire/NO_SAVE/PRE6/CPLTEA623O45
+    # example : /cnrm/ioga/Users/voldoire/NO_SAVE/PRE6/CPLTEA623O45
 
     # In project 'emn36', there is a ROOT location, data is organized in
     # REALMS, and we handle data FREQUENCY
@@ -51,7 +51,7 @@ if atCNRM :
     dataloc(project="emn36", organization="generic", url=[pathI,pathO])
     
     # Shared simulations 
-    pathg="/cnrm/aster/data1/simulations/${group}/"
+    pathg="/cnrm/cmip/cnrm/simulations/${group}/"
     pathgI=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_icemod.nc" 
     pathgO=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" 
     dataloc(project="emn36", organization="generic", url=[pathgI,pathgO])

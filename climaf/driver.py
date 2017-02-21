@@ -20,7 +20,7 @@ import operators
 import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import init_period
+from climaf.period import init_period, cperiod
 from climaf import xdg_bin
 
 def capply(climaf_operator, *operands, **parameters):
@@ -96,7 +96,7 @@ def maketree(script_name, script, *operands, **parameters):
     rep=classes.ctree(script_name, script, *operands, **parameters)
     # TBD Analyze script inputs cardinality vs actual arguments
     # Create one child for each output
-    defaultVariable=varOf(operands[0])
+    defaultVariable=classes.varOf(operands[0])
         #defaultPeriod=operands[0].period
     for outname in script.outputs :
         if outname is None  or outname=='' :
@@ -247,7 +247,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             clogger.info("Object found in cache: %s is at %s:  "%(cobject.crs,filename))
             cdedent()
             if format=='file' : return filename
-            else: return cread(filename,varOf(cobject))
+            else: return cread(filename,classes.varOf(cobject))
         if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cpage_pdf) and \
                not isinstance(cobject,classes.cens) :
             #
@@ -272,12 +272,14 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             if it : 
                 clogger.info("partial result found in cache for %s : %s"%\
                              (cobject.crs,it.crs))
+                clogger.debug("comp_period="+`comp_period`)
                 begcrs=it.crs
-                # Turn object for begin in complement object for end, and eval it
-                it.setperiod(comp_period)
-                ceval(it,userflags,format,deep,derived_list,recurse_list)
+                # Build complement object for end, and eval it
+                comp=copy.deepcopy(it)
+                comp.setperiod(comp_period)
+                ceval(comp,userflags,format,deep,derived_list,recurse_list)
                 if (format == 'file') :
-                    rep=cache.complement(begcrs,it.crs,cobject.crs)
+                    rep=cache.complement(begcrs,comp.crs,cobject.crs)
                     cdedent()
                     return rep
                 else : raise Climaf_Driver_Error("cannot yet complement except for files")
@@ -294,7 +296,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 file=ceval_script(cobject,deep,recurse_list=recurse_list) # Does return a filename, or list of filenames
                 cdedent()
                 if ( format == 'file' ) : return (file)
-                else : return cread(file,varOf(cobject))
+                else : return cread(file,classes.varOf(cobject))
             elif cobject.operator in operators.operators :
                 obj=ceval_operator(cobject,deep)
                 cdedent()
@@ -350,7 +352,6 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     """
     script=operators.scripts[scriptCall.operator]
     template=Template(script.command)
-
     # Evaluate input data 
     invalues=[]
     sizes=[]
@@ -382,13 +383,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
         #if scriptCall.flags.canSelectVar :
-        subdict["var"]=varOf(op)
+        subdict["var"]=classes.varOf(op)
         if isinstance(op,classes.cdataset) and op.alias:
             filevar,scale,offset,units,filenameVar,missing=op.alias
-            if scriptCall.flags.canAlias and "," not in varOf(op) :
-                #if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
+            if scriptCall.flags.canAlias and "," not in classes.varOf(op) :
+                #if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
                 subdict["var"]=Template(filevar).safe_substitute(op.kvp)
-                subdict["alias"]="%s,%s,%.4g,%.4g"%(varOf(op),subdict["var"],scale,offset)
+                subdict["alias"]="%s,%s,%.4g,%.4g"%(classes.varOf(op),subdict["var"],scale,offset)
             if units : subdict["units"]=units 
             if scriptCall.flags.canMissing and missing :
                 subdict["missing"]=missing
@@ -405,7 +406,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 subdict["period"]=str(per)
                 subdict["period_iso"]=per.iso()
         if scriptCall.flags.canSelectDomain :
-            subdict["domain"]=domainOf(op)
+            subdict["domain"]=classes.domainOf(op)
     i=0
     for op in scriptCall.operands :
         if op : opscrs += op.crs+" - "
@@ -420,13 +421,13 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             label,multiple,serie=script.inputs[i]
             subdict[ label ]=infile
             # Provide the name of the variable in input file if script allows for
-            subdict["var_%d"%i]=varOf(op)
+            subdict["var_%d"%i]=classes.varOf(op)
             if isinstance(op,classes.cdataset) and op.alias :
                 filevar,scale,offset,units,filenameVar,missing =op.alias
-                if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                        "," not in varOf(op):
+                if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
+                        "," not in classes.varOf(op):
                     subdict["var_%d"%i]=Template(filevar).safe_substitute(op.kvp)
-                    subdict["alias_%d"%i]="%s %s %f %f"%(varOf(op),subdict["var_%d"%i],scale,offset)
+                    subdict["alias_%d"%i]="%s %s %f %f"%(classes.varOf(op),subdict["var_%d"%i],scale,offset)
                 if units : subdict["units_%d"%i]=units 
                 if missing : subdict["missing_%d"%i]=missing
                 # Provide period selection if script allows for
@@ -435,7 +436,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
                 if not per.fx and per != "":
                     subdict["period_%d"%i]=str(per)
                     subdict["period_iso_%d"%i]=per.iso()
-            subdict["domain_%d"%i]=domainOf(op)
+            subdict["domain_%d"%i]=classes.domainOf(op)
     clogger.debug("subdict for operands is "+`subdict`)
     # substitution is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
@@ -454,15 +455,24 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             output_fmt=script.outputFormat
         # Compute a filename for each ouptut
         # Un-named main output
-        main_output_filename=cache.generateUniqueFileName(scriptCall.crs,
-                                                          format=output_fmt) 
+        #main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
+        tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs, format=output_fmt))
+        main_output_filename="%s_%i%s"%(tmpfile,os.getpid(),tmpfile_fmt) 
+
         subdict["out"]=main_output_filename
-        subdict["out_"+varOf(scriptCall)]=main_output_filename
+        subdict["out_"+classes.varOf(scriptCall)]=main_output_filename
+
+        subdict["out_final"]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
+        subdict["out_final_"+classes.varOf(scriptCall)]=cache.generateUniqueFileName(scriptCall.crs, format=output_fmt) 
+        
         # Named outputs
         for output in scriptCall.outputs:
-            subdict["out_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
-                                                         format=output_fmt) 
-                        
+            #subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
+            tmpfile,tmpfile_fmt=os.path.splitext(cache.generateUniqueFileName(scriptCall.crs+"."+output, format=output_fmt))
+            subdict["out_"+output]="%s_%i%s"%(tmpfile,os.getpid(),tmpfile_fmt)
+            subdict["out_final_"+output]=cache.generateUniqueFileName(scriptCall.crs+"."+output,\
+                                                         format=output_fmt)
+
     # Account for script call parameters
     for p in scriptCall.parameters : 
         #clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
@@ -476,9 +486,9 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if 'title' not in subdict :
         if 'member_label' in subdict :
             subdict["title"]=subdict['member_label']
-        else:
-            subdict["title"]=subdict["crs"]
-    else: 
+#        else:
+#            subdict["title"]=subdict["crs"]
+    else:
         #print("Got a member label : %s"%subdict['member_label'])
         if 'member_label' in subdict :
             subdict["title"]=subdict["title"]+" "+subdict['member_label']
@@ -501,10 +511,11 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if script.fixedfields is not None :
         #subdict_ff=dict()
         subdict_ff=scriptCall.parameters.copy()
-        subdict_ff["model"]=modelOf(scriptCall.operands[0])
-        subdict_ff["simulation"]=simulationOf(scriptCall.operands[0])
-        subdict_ff["project"]=projectOf(scriptCall.operands[0])
-        subdict_ff["realm"]=realmOf(scriptCall.operands[0])
+        subdict_ff["model"]=classes.modelOf(scriptCall.operands[0])
+        subdict_ff["simulation"]=classes.simulationOf(scriptCall.operands[0])
+        subdict_ff["project"]=classes.projectOf(scriptCall.operands[0])
+        subdict_ff["realm"]=classes.realmOf(scriptCall.operands[0])
+        subdict_ff["grid"]=classes.gridOf(scriptCall.operands[0])
         l=script.fixedfields #return paths: (linkname, targetname)
         files_exist=dict()
         for ll,lt in l:
@@ -539,16 +550,16 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     if script.outputFormat in operators.none_formats : return None
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
-    ok = cache.register(main_output_filename,scriptCall.crs)
+    ok = cache.register(main_output_filename,scriptCall.crs, subdict["out_final"])
     # 2 - Named outputs
     for output in scriptCall.outputs:
-        ok = ok and cache.register(subdict["out_"+output], scriptCall.crs+"."+output)
+        ok = ok and cache.register(subdict["out_"+output], scriptCall.crs+"."+output, subdict["out_final_"+output])
     if ok : 
         duration=time.time() - tim1
         #print(...file=sys.stderr)
         clogger.info("Done in %.1f s with script computation for "
                      "%s (command was :%s )"% (duration,`scriptCall`,template))
-        return main_output_filename
+        return subdict["out_final"] #main_output_filename
     else : 
         raise Climaf_Driver_Error("Some output missing when executing "
                                           ": %s. \n See last.out"%template)
@@ -568,58 +579,7 @@ def timePeriod(cobject) :
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(cobject.values()[0])
     else : return None #clogger.error("unkown class for argument "+`cobject`)
-                  
-def domainOf(cobject) :
-    """ Returns a domain for a CliMAF object : if object is a dataset, returns
-    its domain, otherwise returns domain of first operand
-    """
-    if isinstance(cobject,classes.cdataset) : 
-	if type(cobject.domain) is list :
-            rep=""
-            for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
-            rep="%s%d"%(rep,cobject.domain[-1])
-            return(rep)
-	else : 
-	    if cobject.domain == "global" : return ""
-	    else : return(cobject.domain)
-    elif isinstance(cobject,classes.ctree) :
-        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
-        return domainOf(cobject.operands[0])
-    elif isinstance(cobject,classes.scriptChild) :
-        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
-        return domainOf(cobject.father)
-    elif isinstance(cobject,classes.cens) :
-        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
-        return domainOf(cobject.values()[0])
-    elif cobject is None : return "none"
-    else : clogger.error("Unkown class for argument "+`cobject`)
-                  
-
-def varOf(cobject) : return attributeOf(cobject,"variable")
-def modelOf(cobject) : return attributeOf(cobject,"model")
-def simulationOf(cobject) : return attributeOf(cobject,"simulation")
-def projectOf(cobject) : return attributeOf(cobject,"project")
-def realmOf(cobject) : return attributeOf(cobject,"realm")
-
-def attributeOf(cobject,attrib) :
-    """ Returns the attribute for a CliMAF object : if object is a dataset, returns
-    its attribute property, otherwise returns attribute of first operand
-    """
-    if isinstance(cobject,classes.cdataset) : 
-        val=getattr(cobject,attrib,None) 
-        if val is not None : return val
-        else : return(cobject.kvp.get(attrib))
-    elif isinstance(cobject,classes.cens) : return attributeOf(cobject.values()[0],attrib)
-    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
-    elif isinstance(cobject,classes.ctree) :
-        clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
-        return attributeOf(cobject.operands[0],attrib)
-    elif isinstance(cobject,cmacro.cdummy) :
-        return "dummy"
-    elif isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) : return None
-    elif cobject is None : return ''
-    else : raise Climaf_Driver_Error("Unknown class for argument "+`cobject`)
-
+ 
                   
 def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_list) :
     """ Extract object INCLUDED from (existing) object INCLUDER,
@@ -1119,7 +1079,7 @@ def efile(obj, filename, forced=False) :
             ffile=cfile(memb)
             
             f = tempfile.NamedTemporaryFile(suffix=".nc")
-            command="ncrename -O -v %s,%s_%s %s %s"%(varOf(memb), varOf(memb), lab, ffile, f.name)
+            command="ncrename -O -v %s,%s_%s %s %s"%(classes.varOf(memb), classes.varOf(memb), lab, ffile, f.name)
             if ( os.system(command) != 0 ) :
                 raise Climaf_Driver_Error("ncrename failed : %s" %command)         
             
@@ -1131,7 +1091,7 @@ def efile(obj, filename, forced=False) :
     else:
         clogger.warning("objet is not a 'cens' objet")
 
-        
+
 class Climaf_Driver_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

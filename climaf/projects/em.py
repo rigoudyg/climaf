@@ -1,4 +1,4 @@
-"""This module declares project em , base on data organization 'generic'
+"""This module declares project em, base on data organization 'generic'
 
 EM (Experiment Manager) is a tool used at CNRM for moving simulation post-processed data
 from the HPSS to the local filesystem, and to organize it in a file hierarchy governed by a few
@@ -71,7 +71,7 @@ if atCNRM :
     dataloc(project="em", organization="generic", url=[pathA,pathL,pathI,pathO,pathO2])
     
     # Shared simulations - example : group=SC
-    pathg="/cnrm/aster/data1/simulations/${group}/"
+    pathg="/cnrm/cmip/cnrm/simulations/${group}/"
     pathgA=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
     pathgL=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
     pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8

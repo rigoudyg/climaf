@@ -2,7 +2,8 @@ curves : plot multiple profiles (along p, lat, lon, time, ...)
 ---------------------------------------------------------------
 
 Plot a series of xy curves (along time, lat, lon or pressure/z_index)
-for an ensemble dataset using NCL 
+for an ensemble dataset using NCL, and allowing for tuning a number of
+graphic attributes   
 
 **References** : http://www.ncl.ucar.edu
 
@@ -14,15 +15,30 @@ for an ensemble dataset using NCL
     only one non-degenerated dimension. Members can have different
     vector size.  
 
-Remark : If x axis is time and time units are different among members,
-the script convert all time periods to first's one
+Remarks : 
 
-**Mandatory arguments**: None (but ``title`` is recommended)
+- If x axis is time and time units are different among members, the
+  script convert all time periods to first's one.
+- Order of all data dimensions is supposed to be time, height, lat,
+  lon.  
+
+**Mandatory arguments**: None
 
 **Optional arguments**:
 
-  - ``title`` : string for graphic title; optional : CliMAF will
-    provide the CRS of the dataset 
+  - ``title`` : string for graphic title; default: no title
+
+    Remarks: the ~ character has a special meaning in NCL strings. It
+    represents a function code. See function codes example page
+    http://www.ncl.ucar.edu/Applications/fcodes.shtml for (more)
+    examples of function codes. Particularly: 
+
+    - The ~C~ will put a carriage return to the title. By default it
+      is left justified. If you need it centered, you will have to add
+      spaces.
+    - Use a ~Z#~ to resize text in mid-stream. The # refers to the
+      percent of normal. 
+
   - ``labels`` : a string with one label per member, separated by
     character '$'
   - ``colors`` : a string with one NCL color name per member,
@@ -30,9 +46,9 @@ the script convert all time periods to first's one
   - ``scale``, ``offset`` : for scaling the input field (x ->
     x*scale + offset); default = 1. and 0. (no scaling) 
   - ``scale_aux``, ``offset_aux`` : for scaling the input auxiliary
-    fields (x -> x*scale_aux + offset_aux); default = ``scale`` and
-    ``offset`` (main field scaling). These arguments will apply of the
-    second to the nth field.
+    fields (x -> x*scale_aux + offset_aux); default = 1. and 0. (no
+    scaling). These arguments will apply of the second to the nth
+    field. 
   - ``units`` : name of the main field units; used in the caption;
     default is to use the corresponding CF metadata
   - ``y`` : y axis style
@@ -64,9 +80,13 @@ the script convert all time periods to first's one
     respectively. These resources are separated by "|", as e.g. : 
     ' options="tiMainString=lv|xyLineThicknessF=5.",
     aux_options="xyLineColor=red" '. It is recommended to use argument
-    ``aux_options`` only if you plot exactly two fields. 
+    ``aux_options`` only if you plot exactly two fields. Warning: all
+    graphic resources set by ``options`` are applied to all fields,
+    and graphic resources set by ``aux_options`` overwrite it for the
+    second to the nth field. 
+
     These resources have higher priority than CliMAF default ones,
-    which are :  
+    which are :    
 
     - txFontHeightF = 0.010
     - tmXBLabelFontHeightF=0.008
@@ -109,8 +129,7 @@ the script convert all time periods to first's one
       612x792 in pixels)   
   
 **Outputs** :
-
-  - main output : a PNG or PDF figure
+  - main output : a PNG or PDF or EPS figure
 
 **Climaf call example**::
  
@@ -160,3 +179,7 @@ the script convert all time periods to first's one
   >>> # Same as above and X and Y are inverted
   >>> a=curves(ta_profile, title='A profile',y="index",invXY=True) 
   >>> cshow(a)
+
+**Side effects** : None
+
+**Implementation** : Basic use of ncl: gsn_csm_xy

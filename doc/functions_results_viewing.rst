@@ -4,7 +4,7 @@ functions for inspecting data
 
 summary : describe files associated with a dataset
 ---------------------------------------------------
- - :py:func:`~climaf.functions.summary`
+.. autofunction:: climaf.functions.summary
 
 ncdump : dump file header
 ------------------------------
@@ -45,6 +45,13 @@ plot_params : get plot parameters for a variable and a context
 ----------------------------------------------------------------
 
 .. autofunction:: climaf.plot.plot_params.plot_params
+
+
+hovm_params : provide some SST/climate boxes for plotting Hovmoller diagrams 
+-----------------------------------------------------------------------------
+
+.. autofunction:: climaf.plot.plot_params.hovm_params
+
 
 cshow : display a figure using 'display'
 ---------------------------------------------

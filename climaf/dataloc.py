@@ -158,7 +158,7 @@ def selectLocalFiles(**kwargs):
       identify data organization and data store urls for these (facet,value) 
       pairs
 
-    - check that data organization si sa known one, i.e. is one of 'generic', 
+    - check that data organization is as known one, i.e. is one of 'generic', 
       CMIP5_DRS' or 'EM'
     
     - derive relevant filenames search function such as as :

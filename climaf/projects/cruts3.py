@@ -1,6 +1,6 @@
 """
 
-This module declares CRUTS3 data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/vdr/DATA/OBS/netcdf/
+This module declares CRUTS3 data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original CRUTS3 variables set**
 
@@ -23,8 +23,8 @@ from climaf.site_settings import atCNRM
 if atCNRM:
     cproject('cruts3','grid')  # no grid writes as '', otherwise as e.g. 'T127'
 
-    url1_cruts3="/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/cruts3/${variable}_cru_ts_3${grid}.nc"  #for original grid
-    url2_cruts3="/cnrm/vdr/DATA/OBS/netcdf/monthly_mean/cruts3/${variable}_cru_ts_3.${grid}.nc" #for other grids write e.g. as : grid ='T127'
+    url1_cruts3="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/cruts3/${variable}_cru_ts_3${grid}.nc"  #for original grid
+    url2_cruts3="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/cruts3/${variable}_cru_ts_3.${grid}.nc" #for other grids write e.g. as : grid ='T127'
     dataloc(project='cruts3', organization='generic', url=[url1_cruts3,url2_cruts3])
 
 
