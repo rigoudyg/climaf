@@ -7,7 +7,7 @@ Whats' new
 Changes, newest first :
 
 - 2017/02/21:
-  - Bug fixes about a rarely used case
+  - Fixes a bug about a rarely used case (operator secondary outputs)
 
 - 2017/01/25:
 
