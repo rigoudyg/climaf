@@ -434,7 +434,8 @@ class cdataset(cobject):
         return missing is None
     
     def baseFiles(self,force=False):
-        """ Returns the list of (local) files which include the data for the dataset
+        """ Returns the list of (local or remote) files which include the data
+        for the dataset
         
         Use cached value unless called with arg force=True
         """
@@ -445,11 +446,13 @@ class cdataset(cobject):
                 dic["variable"]=string.Template(filevar).safe_substitute(dic)
                 if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
-            self.files=dataloc.selectLocalFiles(**dic)
+            self.files=dataloc.selectFiles(**dic)
+            
         return self.files
 
     def listfiles(self,force=False):
-        """ Returns the list of (local) files which include the data for the dataset
+        """ Returns the list of (local or remote) files which include the data
+        for the dataset
         
         Use cached value unless called with arg force=True
         """

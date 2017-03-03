@@ -13,6 +13,9 @@ from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
 from operator import itemgetter
+import ftplib as ftp  
+import getpass 
+import netrc  
 
 locs=[]
 
@@ -28,7 +31,7 @@ class dataloc():
           simulation (str,optional): simulation name
           frequency (str,optional): frequency
           organization (str): name of the organization type, among 
-           those handled by :py:func:`~climaf.dataloc.selectLocalFiles`
+           those handled by :py:func:`~climaf.dataloc.selectFiles`
           url (list of strings): list of URLS for the data root directories
 
         Each entry in the dictionary allows to store :
@@ -50,7 +53,7 @@ class dataloc():
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
            
-         - the set of attribute values which which simulation's data are 
+         - the set of attribute values which simulation's data are 
            stored at that URLS and with that organization
 
         For the sake of brievity, each attribute can have the '*'
@@ -85,7 +88,8 @@ class dataloc():
         self.urls = map(os.path.expanduser,self.urls)
         alt=[]
         for u in self.urls :
-            if u[0] != '$' : alt.append(os.path.abspath(u))
+            #if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
+            if u[0] != '$' and ':' not in u: alt.append(os.path.abspath(u))             
             else : alt.append(u)
         self.urls=alt
         # Register new dataloc only if not already registered
@@ -147,10 +151,10 @@ def isLocal(project, model, simulation, frequency) :
             if re.findall(".*:.*",l) : rep=False
     return rep
 
-def selectLocalFiles(**kwargs):
+def selectFiles(**kwargs):
     """
-    Returns the shortest list of (local) files which include the data
-    for the list of (facet,value) pairs provided
+    Returns the shortest list of (local or remote) files which include
+    the data for the list of (facet,value) pairs provided
 
     Method : 
     
@@ -218,8 +222,6 @@ def selectLocalFiles(**kwargs):
     # Assemble filenames in one single string
     return(string.join(rep))
 
-# u="/home/stephane/Bureau/climaf/examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
-# selectGenericFiles(simulation="AMIPV6ALBG2", variable="tas", period="1980", urls=[u])
 
 def selectGenericFiles(urls, **kwargs):
     """
@@ -232,8 +234,10 @@ def selectGenericFiles(urls, **kwargs):
      - contain the ``variable`` provided in kwargs
 
      - match the `period`` provided in kwargs
-
+    
     In the pattern strings, no keyword is mandatory
+    However, for remote files, filename pattern should include ${varname}, which is
+    instanciated by variable name or ``filenameVar`` (given via `calias`)
 
     Example :
 
@@ -270,24 +274,39 @@ def selectGenericFiles(urls, **kwargs):
     #
     for l in urls :
         # Instantiate keywords in pattern with attributes values
-        template=Template(l).safe_substitute(**kwargs)
+        if re.findall(".*:.*",l) : # remote data
+            template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
+        else: # local data
+            template=Template(l).safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
-        temp2=template ; 
+        temp2=template ;
         for k in lkeys : temp2=temp2.replace(k,dt[k])
-        lfiles=glob.glob(temp2)
-        clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
+        if re.findall(".*:.*",l) : # check if data is remote
+            lfiles=glob_remote_data(l, temp2)
+            clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
+        else: # local data
+            lfiles=glob.glob(temp2)
+            clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
         # If unsuccessful using varname, try with filenameVar
         if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
             kwargs['variable']=kwargs['filenameVar']
-            template=Template(l).safe_substitute(**kwargs)
+            
+            if re.findall(".*:.*",l) : # remote data
+                template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
+            else: # local data
+                template=Template(l).safe_substitute(**kwargs)    
             temp2=template
             for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
-            lfiles=glob.glob(temp2)
-            clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
+            if re.findall(".*:.*",l) : # check if data is remote
+                lfiles=glob_remote_data(l, temp2)
+                clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
+            else: # local data
+                lfiles=glob.glob(temp2)
+                clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
 
         # Construct regexp for extracting dates from filename
         regexp=None
@@ -328,39 +347,99 @@ def selectGenericFiles(urls, **kwargs):
             else :
                 if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
                     kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
-                    if (l.find("${variable}")>=0) or variable=='*' or \
-                       fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) : 
+                    # local data
+                    if not re.findall(".*:.*",l) and \
+                       ( (l.find("${variable}")>=0) or variable=='*' or \
+                         fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) ) :
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
+                    # remote data
+                    elif re.findall(".*:.*",l) :
+                        if (l.split(":")[-1].find("${variable}")>=0) or variable=='*' or \
+                           (variable != altvar and (f.find(altvar)>=0) ):
+                            clogger.debug("adding fixed field :"+':'.join(l.split(":")[0:-1])+':'+f)
+                            rep.append(':'.join(l.split(":")[0:-1])+':'+f)
+                        else:
+                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(':'.join(l.split(":")[0:-1])+':'+f))
                 else :
-                    clogger.warning("Cannot yet filter files re. time using only file content. TBD")
+                    clogger.info("Cannot yet filter files re. time using only file content.")
                     rep.append(f)
+            
             if (fperiod and period.intersects(fperiod)) or not regexp :
                 clogger.debug('Period is OK - Considering variable filtering on %s and %s for %s'%(variable,altvar,f)) 
                 # Filter against variable 
                 if (l.find("${variable}")>=0):
                     clogger.debug('appending %s based on variable in filename'%f)
                     rep.append(f)
-                    continue
-                if (f not in rep) and \
-                   (variable=='*' or "," in variable or fileHasVar(f,variable) or \
-                    (altvar != variable and fileHasVar(f,altvar))) :
-                    # Should check time period in the file if not regexp
-                    clogger.debug('appending %s based on multi-var or var exists in file '%f)
-                    rep.append(f)
-                    continue
+                    continue    
+                if (f not in rep):
+                    # local data
+                    if not re.findall(".*:.*",l) and \
+                        (variable=='*' or "," in variable or fileHasVar(f,variable) or \
+                        (altvar != variable and fileHasVar(f,altvar))) :
+                        # Should check time period in the file if not regexp
+                        clogger.debug('appending %s based on multi-var or var exists in file '%f)
+                        rep.append(f)
+                        continue
+                    # remote data
+                    elif re.findall(".*:.*",l) : 
+                        if variable=='*' or "," in variable or \
+                            (variable != altvar and (f.find(altvar)>=0) ):
+                            # Should check time period in the file if not regexp
+                            clogger.debug('appending %s based on multi-var or var exists in file '%(':'.join(l.split(":")[0:-1])+':'+f))
+                            rep.append(':'.join(l.split(":")[0:-1])+':'+f)
+                            continue
+                        else:
+                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(':'.join(l.split(":")[0:-1])+':'+f))
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)
                 else:
                     if not period.intersects(fperiod) :
                         clogger.debug('not appending %s because period doesn t intersect %s'%(f,period))
-
+                        
     return rep
 
 
+def glob_remote_data(url, pattern) :
+    """
+    Returns a list of path names that match pattern, for remote data
+    located at url
+    """
+   
+    for el in url.split(":"):
+        if re.findall("@",el):
+            host=el.split("@")[-1]
+            username=el.split("@")[0]
+    
+    secrets = netrc.netrc()
+
+    if username:
+        if host in secrets.hosts:
+            login, account, password = secrets.authenticators( host )
+            if login != username: password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
+        else:
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))            
+    else:
+        if host in secrets.hosts:
+            username, account, password = secrets.authenticators( host )
+        else:
+            username = raw_input('Enter login : ')
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
+
+    try : 
+        connect=ftp.FTP(host,username,password)
+        listfiles=connect.nlst(pattern)
+        connect.quit()
+        return(listfiles)
+    except ftp.all_errors as err_ftp:
+        print err_ftp
+        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
+
+
+    
 def selectEmFiles(**kwargs) :
-    #POur A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
+    #Pour A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
     simulation=kwargs['simulation']
     frequency=kwargs['frequency']
     variable=kwargs['variable']
