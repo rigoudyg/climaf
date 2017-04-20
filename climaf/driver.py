@@ -538,16 +538,20 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
 
     logfile.close()
     #
-    # For remote files, replace ds.files, which contains remote filename, by local filename to can use ds.check()
+    # For remote files, we supply ds.locfiles by local filename to can use ds.check()
     if isinstance(op,classes.cdataset) and not ( op.isLocal() or op.isCached() ):
-        #lv#remote_cachedir='/home/vignonl/tmp/climaf_cache/remote_data'
         local_filename=[]
         for el in op.baseFiles().split(" "):
-            for elt in el.split(":"):
-                if re.findall("@",elt):
-                    hostname=elt.split("@")[-1]
-                    local_filename.append(os.path.expanduser(cache.currentCache)+'/remote_data/'+hostname+os.path.abspath(el.split(":")[-1]))
-        op.files=' '.join(local_filename)
+            if len(el.split(":")) == 3:
+                k=1
+            else:
+                k=0
+            if re.findall("@",el.split(":")[k]):
+                hostname=el.split(":")[k].split("@")[-1]
+            else:
+                hostname=el.split(":")[k]
+            local_filename.append(os.path.expanduser(climaf.remote_cachedir)+'/'+hostname+os.path.abspath(el.split(":")[-1]))
+        op.locfiles=' '.join(local_filename)
     #
     # Clean fixed fields symbolic links (linkname, targetname)
     if script.fixedfields :
@@ -722,7 +726,6 @@ def noselect(userflags, ds, format) :
         (userflags.canAlias         or ds.hasExactVariable()) and \
         (userflags.canMissing       or ds.missingIsOK())      and \
         (ds.hasOneMember()) and \
-        #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
         (format == 'file')) :
 
         can_select=True

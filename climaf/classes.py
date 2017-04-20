@@ -371,6 +371,7 @@ class cdataset(cobject):
         self.crs=self.buildcrs()
         # 
         self.files=None
+        self.locfiles=None
         self.register()
 
     def setperiod(self,period) :
@@ -511,9 +512,14 @@ class cdataset(cobject):
         # Returns the list of files which include the data for the dataset
         # or for each member of the ensemble
         if isinstance(self,cdataset):
-            files=self.baseFiles()
+            if self.isLocal() or self.isCached() :
+                files=self.baseFiles()
+            else:
+                files=self.locfiles
             if not files:
                 clogger.error('No file found for: %s'%self)
+                if not ( self.isLocal() or self.isCached() ):
+                    clogger.warning('For remote data, you have to do at first "cfile(%s)"'%self)                
                 return(False)
         else :
             clogger.error("Cannot handle %s" %self)

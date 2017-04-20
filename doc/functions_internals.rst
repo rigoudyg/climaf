@@ -14,13 +14,13 @@ of time
 
 .. autofunction:: climaf.period.init_period
 
-selectLocalFiles 
+selectFiles 
 ----------------------------
 
 This function should not be called directly ; it is presented here mainly for documenting the list of
 organizations it can handle for function  :py:class:`~climaf.dataloc.dataloc`
 
-.. autofunction:: climaf.dataloc.selectLocalFiles
+.. autofunction:: climaf.dataloc.selectFiles
 
 
 selectGenericFiles 

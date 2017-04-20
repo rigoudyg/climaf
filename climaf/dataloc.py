@@ -30,14 +30,54 @@ class dataloc():
           model (str,optional): model name
           simulation (str,optional): simulation name
           frequency (str,optional): frequency
-          organization (str): name of the organization type, among 
-           those handled by :py:func:`~climaf.dataloc.selectFiles`
-          url (list of strings): list of URLS for the data root directories
+          organization (str): name of the organization type, among those handled by :py:func:`~climaf.dataloc.selectFiles`
+          url (list of strings): list of URLS for the data root directories, local or remote
 
         Each entry in the dictionary allows to store :
         
-         - a list of path or URLS, which are root paths for
-           finding some sets of datafiles which share a file organization scheme
+         - a list of path or URLS (local or remote), which are root paths for
+           finding some sets of datafiles which share a file organization scheme.
+
+           - For remote data:
+           
+             url is supposed to be in the format 'protocol:user@host:path', but
+             'protocol' and 'user' are optional. So, url can also be 'user@host:path'
+             or 'protocol:host:path' or 'host:path'. ftp is default protocol.
+
+             If 'user' is given:
+           
+             - if 'host' is in $HOME/.netrc file, CliMAF check if corresponding
+               'login is the same of 'user'. If it is, CliMAF get associated
+               password; otherwise it prompt the user for entering password;
+             - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
+               user for entering password.
+
+             If 'user' is not given:
+           
+             - if 'host' is in $HOME/.netrc file, CliMAF get corresponding 'login'
+               as 'user' and also get associated password;
+             - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
+               user for entering 'user' and 'password'.
+
+             Remark: The .netrc file contains login and password used by the
+             auto-login process. It generally resides in the user's home directory
+             ($HOME/.netrc). So, it is highly recommended to supply this information
+             in .netrc file not to have to enter password in every request.
+
+             Warning: python netrc module does not handle multiple entries for a
+             single host. So, if netrc file has two entries for the same host, the
+             netrc module only returns the last entry.
+
+             We define two kinds of host: hosts with incremental files, e.g.
+             'beaufix'; and the others.
+
+             If one or all files returned by function :py:meth:`~climaf.classes.cdataset.listfiles`
+             are found in cache:
+
+             - in case of hosts with incremental files, files are only transferred
+               if their date on server is more recent than that found in cache;
+             - for other hosts, files found in cache are used
+
          - the name for the corresponding data files organization scheme. The current set of known
            schemes is :
 
@@ -55,6 +95,11 @@ class dataloc():
            
          - the set of attribute values which simulation's data are 
            stored at that URLS and with that organization
+           
+           For remote files, filename pattern should include ${varname}, which is instanciated
+           by variable name or filenameVar (given via :py:func:`~climaf.classes.calias()`),
+           because files are not transferred to check if they contain the variable
+           
 
         For the sake of brievity, each attribute can have the '*'
         wildcard value; when using the dictionary, the most specific
@@ -69,6 +114,14 @@ class dataloc():
          - and declaring an exception for one simulation (here, both location and organization are supposed to be different)::
             
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+
+         - and declaring a project to access remote data (on multiple servers)::
+
+            >>> cproject('MY_REMOTE_DATA', ('frequency', 'monthly'), separator='|')
+            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/L/${simulation}SFXYYYY.nc',
+            ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc']),
+            >>> calias('MY_REMOTE_DATA','tas','tas',filenameVar='2T')
+            >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')        
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
@@ -235,10 +288,11 @@ def selectGenericFiles(urls, **kwargs):
 
      - match the `period`` provided in kwargs
     
-    In the pattern strings, no keyword is mandatory
-    However, for remote files, filename pattern should include ${varname}, which is
-    instanciated by variable name or ``filenameVar`` (given via `calias`)
-
+    In the pattern strings, no keyword is mandatory. However, for remote files,
+    filename pattern should include ${varname}, which is instanciated by variable
+    name or ``filenameVar`` (given via :py:func:`~climaf.classes.calias()`), because
+    files are not transferred to check if they contain the variable
+    
     Example :
 
     >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
@@ -284,10 +338,10 @@ def selectGenericFiles(urls, **kwargs):
         temp2=template ;
         for k in lkeys : temp2=temp2.replace(k,dt[k])
         if re.findall(".*:.*",l) : # check if data is remote
-            lfiles=glob_remote_data(l, temp2)
+            lfiles=sorted(glob_remote_data(l, temp2))
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
         else: # local data
-            lfiles=glob.glob(temp2)
+            lfiles=sorted(glob.glob(temp2))
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
         # If unsuccessful using varname, try with filenameVar
@@ -302,10 +356,10 @@ def selectGenericFiles(urls, **kwargs):
             for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
             if re.findall(".*:.*",l) : # check if data is remote
-                lfiles=glob_remote_data(l, temp2)
+                lfiles=sorted(glob_remote_data(l, temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
             else: # local data
-                lfiles=glob.glob(temp2)
+                lfiles=sorted(glob.glob(temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
 
         # Construct regexp for extracting dates from filename
@@ -406,12 +460,19 @@ def glob_remote_data(url, pattern) :
     Returns a list of path names that match pattern, for remote data
     located at url
     """
-   
-    for el in url.split(":"):
-        if re.findall("@",el):
-            host=el.split("@")[-1]
-            username=el.split("@")[0]
     
+    if len(url.split(":")) == 3:
+        k=1
+    else:
+        k=0
+
+    if re.findall("@",url.split(":")[k]):
+        username=url.split(":")[k].split("@")[0]
+        host=url.split(":")[k].split("@")[-1]
+    else:
+        username=''
+        host=url.split(":")[k]
+
     secrets = netrc.netrc()
 
     if username:
@@ -424,7 +485,7 @@ def glob_remote_data(url, pattern) :
         if host in secrets.hosts:
             username, account, password = secrets.authenticators( host )
         else:
-            username = raw_input('Enter login : ')
+            username = raw_input("Enter login for host '%s': " %host)
             password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
 
     try : 
