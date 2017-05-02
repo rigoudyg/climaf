@@ -6,6 +6,12 @@ Whats' new
 
 Changes, newest first :
 
+- 2017/05/02:
+
+  - Change ncl default for operator ``curves`` (see
+    :doc:`scripts/curves`): plot axis range is now between minimum and
+    maximum of all fields (instead of first member of ensemble) 
+  
 - 2017/04/18:
   
   - Access to remote data are now possible via ftp protocol for

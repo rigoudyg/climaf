@@ -176,7 +176,13 @@ begin
       print("File "+infile+" does not include variable "+var)
       status_exit(1)
     end if
-    
+    if (i .eq. 0) then
+      fld_min=min(fld)
+      fld_max=max(fld)
+    end if
+    if (fld_min .gt. min(fld)) then fld_min=min(fld) end if
+    if (fld_max .lt. max(fld)) then fld_max=max(fld) end if
+   
     ;fld=fld*tofloat(myscale)+tofloat(myoffset)
     
     Var_DimNames = getvardims(fld)  ; getting dimensions from metadata
@@ -284,13 +290,15 @@ begin
     .or. (coord .eq. "lev") .or. (coord .eq. "level") .or. (coord .eq. "p") .or. (coord .eq. "pressure") ) .and. invXY ) then
     res@trXMinF=min(Xaxis)
     res@trXMaxF=max(Xaxis)
+    res@trYMinF=fld_min
+    res@trYMaxF=fld_max
     if isvar("vmin") then res@trYMinF=vmin end if
     if isvar("vmax") then res@trYMaxF=vmax end if
   else
     res@trYMinF=min(Xaxis)
     res@trYMaxF=max(Xaxis)
-    ;res@trXMinF=min(all_fld)
-    ;res@trXMaxF=max(all_fld)
+    res@trXMinF=fld_min
+    res@trXMaxF=fld_max
     if isvar("vmin") then res@trXMinF=vmin end if
     if isvar("vmax") then res@trXMaxF=vmax end if
   end if
