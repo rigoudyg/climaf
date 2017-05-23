@@ -18,7 +18,7 @@ Changes, newest first :
     example. See :py:class:`~climaf.dataloc.dataloc` to know how to
     describe a project for remote data. The environment variable
     'CLIMAF_REMOTE_CACHE' stores results for remote data (defaults to
-    ~/tmp/climaf_cache/remote_data), see :ref:`installing` 
+    $CLIMAF_CACHE/remote_data), see :ref:`installing` 
 
 - 2017/02/21:
       

@@ -371,7 +371,7 @@ class cdataset(cobject):
         self.crs=self.buildcrs()
         # 
         self.files=None
-        self.locfiles=None
+        self.local_copies_of_remote_files=None
         self.register()
 
     def setperiod(self,period) :
@@ -515,7 +515,7 @@ class cdataset(cobject):
             if self.isLocal() or self.isCached() :
                 files=self.baseFiles()
             else:
-                files=self.locfiles
+                files=self.local_copies_of_remote_files
             if not files:
                 clogger.error('No file found for: %s'%self)
                 if not ( self.isLocal() or self.isCached() ):

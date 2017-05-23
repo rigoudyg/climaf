@@ -27,6 +27,12 @@ units=sys.argv[7]
 vm=sys.argv[8]
 files=sys.argv[9:]
 
+#SSLV : a reecrire plus lisible par
+#host=
+#user=
+#if not host_user.has_key(hots) ...
+# ....
+
 # Dictionary of input files for each pair (host,user)
 host_user=dict()
 
@@ -148,29 +154,35 @@ for host,username in host_user2:
         if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) or host in dynamic_host:            
             filename=os.path.basename(ffile)
             dir=os.path.dirname(ffile)
-            if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+dir): os.makedirs(os.path.expanduser(remote_cachedir)+'/'+host+dir)
+            if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+dir):
+                os.makedirs(os.path.expanduser(remote_cachedir)+'/'+host+dir)
             connect.cwd(dir)
-            if host in dynamic_host and os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile): 
+            if host in dynamic_host and \
+               os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile): 
                 filetransfer=False
                 resp=connect.sendcmd("MDTM %s" %filename)
                 if resp[0] == '2':
                     remote_timestamp = time.mktime(datetime.datetime.strptime(resp[4:18],"%Y%m%d%H%M%S").timetuple())
-                    local_file_datetime=datetime.datetime.fromtimestamp(os.stat(os.path.expanduser(remote_cachedir)+'/'+host+ffile).st_mtime)
+                    local_file_datetime=datetime.datetime.fromtimestamp(os.stat(os.path.expanduser(remote_cachedir)+\
+                                '/'+host+ffile).st_mtime)
                     local_file_ut_datetime=local_file_datetime.replace(tzinfo=tz.tzlocal()).astimezone(tz.gettz('UTC'))
                     if time.mktime(local_file_ut_datetime.timetuple()) >= remote_timestamp:
-                        print 'Most recent file found in cache: %s is at %s \n'%(ffile,os.path.expanduser(remote_cachedir)+'/'+host+ffile)
+                        print 'Most recent file found in cache: %s is at %s \n'%\
+                            (ffile,os.path.expanduser(remote_cachedir)+'/'+host+ffile)
                     else:
-                        print 'File found in cache %s is older than %s \n'%(os.path.expanduser(remote_cachedir)+'/'+host+ffile,ffile)
+                        print 'File found in cache %s is older than %s \n'%\
+                            (os.path.expanduser(remote_cachedir)+'/'+host+ffile,ffile)
                         filetransfer=True
 #                        connect.retrbinary('RETR '+filename, open(os.path.expanduser(remote_cachedir)+'/'+host+ffile, 'wb').write)
 #                        os.utime(os.path.expanduser(remote_cachedir)+'/'+host+ffile, (timestamp, timestamp))
                 else: filetransfer=True
-            if ( host in dynamic_host and os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) and filetransfer ) or \
-                   not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) :
+            if ( host in dynamic_host and \
+                 os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) and \
+                 filetransfer ) or \
+                 not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) :
                 print 'File %s transfered \n'%ffile
                 connect.retrbinary('RETR '+filename, open(os.path.expanduser(remote_cachedir)+'/'+host+ffile, 'wb').write)
                 #if host in dynamic_host and filetransfer: os.utime(os.path.expanduser(remote_cachedir)+'/'+host+ffile, (timestamp, timestamp)) 
-                
            
         else:
             print 'File found in cache: %s is at %s \n'%(ffile,os.path.expanduser(remote_cachedir)+'/'+host+ffile)
@@ -185,10 +197,8 @@ def remote_to_local_filename(url):
     Return local filename of remote file
     """
 
-    if len(url.split(":")) == 3:
-        k=1
-    else:
-        k=0
+    if len(url.split(":")) == 3: k=1
+    else: k=0
 
     if re.findall("@",url.split(":")[k]):
         hostname=url.split(":")[k].split("@")[-1]

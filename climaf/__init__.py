@@ -60,10 +60,8 @@ if not already_inited  and not onrtd :
     print ("Cache directory set to : "+cachedir+" (use $CLIMAF_CACHE if set) ",file=sys.stderr)
     tim("set cache")
     # Decide for cache location for remote data
-    if site_settings.onCiclad :
-        default_remote_cache="/data/"+os.getenv("USER")+"/climaf_cache/remote_data"
-    else: default_remote_cache="~/tmp/climaf_cache/remote_data"
-    remote_cachedir=os.getenv("CLIMAF_REMOTE_CACHE",default_remote_cache)
+    # SSLV - faisons plus direct :
+    remote_cachedir=os.getenv("CLIMAF_REMOTE_CACHE",cachedir+"/remote_data")
     print ("Cache directory for remote data set to : "+remote_cachedir+" (use $CLIMAF_REMOTE_CACHE if set) ",file=sys.stderr)
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main

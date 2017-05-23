@@ -42,15 +42,16 @@ class dataloc():
            
              url is supposed to be in the format 'protocol:user@host:path', but
              'protocol' and 'user' are optional. So, url can also be 'user@host:path'
-             or 'protocol:host:path' or 'host:path'. ftp is default protocol.
+             or 'protocol:host:path' or 'host:path'. ftp is default protocol (and 
+             the only one which is yet managed, AMOF).
 
              If 'user' is given:
            
              - if 'host' is in $HOME/.netrc file, CliMAF check if corresponding
-               'login is the same of 'user'. If it is, CliMAF get associated
-               password; otherwise it prompt the user for entering password;
-             - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
-               user for entering password.
+               'login == 'user'. If it is, CliMAF get associated
+               password; otherwise it will prompt the user for entering password;
+             - if 'host' is not present in $HOME/.netrc file, CliMAF will prompt 
+               the user for entering password.
 
              If 'user' is not given:
            
@@ -68,15 +69,15 @@ class dataloc():
              single host. So, if netrc file has two entries for the same host, the
              netrc module only returns the last entry.
 
-             We define two kinds of host: hosts with incremental files, e.g.
+             We define two kinds of host: hosts with evolving files, e.g.
              'beaufix'; and the others.
 
-             If one or all files returned by function :py:meth:`~climaf.classes.cdataset.listfiles`
-             are found in cache:
+             For any file returned by function :py:meth:`~climaf.classes.cdataset.listfiles`
+             which is found in cache:
 
-             - in case of hosts with incremental files, files are only transferred
-               if their date on server is more recent than that found in cache;
-             - for other hosts, files found in cache are used
+             - in case of hosts with dynamic files, the file is transferred only
+               if its date on server is more recent than that found in cache;
+             - for other hosts, the file found in cache is used
 
          - the name for the corresponding data files organization scheme. The current set of known
            schemes is :
@@ -96,9 +97,9 @@ class dataloc():
          - the set of attribute values which simulation's data are 
            stored at that URLS and with that organization
            
-           For remote files, filename pattern should include ${varname}, which is instanciated
+           For remote files, filename pattern must include ${varname}, which is instanciated
            by variable name or filenameVar (given via :py:func:`~climaf.classes.calias()`),
-           because files are not transferred to check if they contain the variable
+           for the sake of efficiency. Please complain if this is inadequate
            
 
         For the sake of brievity, each attribute can have the '*'
@@ -127,6 +128,7 @@ class dataloc():
 
                 
         """
+        ## SSLV : as-tu teste la syntaxe "hendrix:~vignon/L/${simulation.....
         self.project=project
         self.model=model
         self.simulation=simulation
@@ -289,10 +291,10 @@ def selectGenericFiles(urls, **kwargs):
      - match the `period`` provided in kwargs
     
     In the pattern strings, no keyword is mandatory. However, for remote files,
-    filename pattern should include ${varname}, which is instanciated by variable
-    name or ``filenameVar`` (given via :py:func:`~climaf.classes.calias()`), because
-    files are not transferred to check if they contain the variable
-    
+    filename pattern must include ${varname}, which is instanciated by variable
+    name or ``filenameVar`` (given via :py:func:`~climaf.classes.calias()`); this is  
+    for the sake of efficiency (please complain if inadequate)
+   
     Example :
 
     >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
@@ -408,7 +410,8 @@ def selectGenericFiles(urls, **kwargs):
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                     # remote data
-                    elif re.findall(".*:.*",l) :
+                    else :
+                        # SSLV : as-tu teste un cas avec fxed_field remote ??
                         if (l.split(":")[-1].find("${variable}")>=0) or variable=='*' or \
                            (variable != altvar and (f.find(altvar)>=0) ):
                             clogger.debug("adding fixed field :"+':'.join(l.split(":")[0:-1])+':'+f)
@@ -440,7 +443,7 @@ def selectGenericFiles(urls, **kwargs):
                         if variable=='*' or "," in variable or \
                             (variable != altvar and (f.find(altvar)>=0) ):
                             # Should check time period in the file if not regexp
-                            clogger.debug('appending %s based on multi-var or var exists in file '%(':'.join(l.split(":")[0:-1])+':'+f))
+                            clogger.debug('appending %s based on multi-var or altvar '%(':'.join(l.split(":")[0:-1])+':'+f))
                             rep.append(':'.join(l.split(":")[0:-1])+':'+f)
                             continue
                         else:
@@ -461,10 +464,8 @@ def glob_remote_data(url, pattern) :
     located at url
     """
     
-    if len(url.split(":")) == 3:
-        k=1
-    else:
-        k=0
+    if len(url.split(":")) == 3: k=1
+    else: k=0
 
     if re.findall("@",url.split(":")[k]):
         username=url.split(":")[k].split("@")[0]

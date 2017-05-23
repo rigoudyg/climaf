@@ -53,10 +53,8 @@ Configuring CliMAF
    and those final results which are not explicitly copied elsewhere;
    defaults to ~/tmp/climaf_cache. 
 
- - CLIMAF_REMOTE_CACHE : a directory for remote data used for storing
-   intermediate results, and those final results which are not
-   explicitly copied elsewhere; defaults to
-   ~/tmp/climaf_cache/remote_data. 
+ - CLIMAF_REMOTE_CACHE : a directory used for storing local copies
+   of remote data; defaults to $CLIMAF_CACHE/remote_data. 
  
  - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
    verbosity level on stderr (resp. on file climaf.log); defaults to
