@@ -180,15 +180,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                     set_variable(derived_value, ds.variable, format=format)
                 cdedent()
                 return(derived_value)
-            elif ((userflags.canSelectVar   or ds.oneVarPerFile()   ) and \
-                (userflags.canSelectTime    or ds.periodIsFine()    ) and \
-                (userflags.canSelectDomain  or ds.domainIsFine()    ) and \
-                (userflags.canAggregateTime or ds.periodHasOneFile()) and \
-                (userflags.canAlias         or ds.hasExactVariable()) and \
-                (userflags.canMissing       or ds.missingIsOK())      and \
-                (ds.hasOneMember()) and \
-                #(userflags.doSqueezeMembers or ds.hasOneMember()) and 
-                (format == 'file')) :
+            elif noselect(userflags, ds, format) :
                 clogger.debug("Delivering file set or sets is OK for the target use")
                 cdedent()
                 rep=ds.baseFiles()
@@ -225,11 +217,17 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return(ds.adressOf())
             else :
                 clogger.debug("Must remote read and cache " )
-                raise Climaf_Driver_Error("Cannot acces dataset %s"%`cobject`)
-                rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
-                userflags.unset_selectors()
-                cdedent()
-                return rep
+                if noselect(userflags, ds, format) :    
+                    clogger.debug("Delivering file set or sets is OK for the target use")
+                    cdedent()
+                    rep=ds.baseFiles()
+                    if not rep : raise Climaf_Driver_Error("No file found for %s"%`ds`)
+                    return(rep) 
+                else:
+                    rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
+                    userflags.unset_selectors()
+                    cdedent()
+                    return rep
     #
     elif isinstance(cobject,classes.ctree) or isinstance(cobject,classes.scriptChild) or \
              isinstance(cobject,classes.cpage) or isinstance(cobject,classes.cpage_pdf) or \
@@ -379,7 +377,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         op=scriptCall.operands[0]
         #print("processing 0, op=%s"%`op`)
         infile=invalues[0]
-        if not all(map(os.path.exists,infile.split(" "))) :
+        if (scriptCall.operator != 'remote_select') and \
+               not all(map(os.path.exists,infile.split(" "))) :
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:"%(infile))
         subdict[ label ]=infile
         #if scriptCall.flags.canSelectVar :
@@ -412,8 +411,8 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         if op : opscrs += op.crs+" - "
         #print("processing %s, i=%d"%(`op`,i))
         infile=invalues[i]
-        if infile is not '' and \
-                not all(map(os.path.exists,infile.split(" "))) :
+        if (scriptCall.operator != 'remote_select') and infile is not '' and \
+               not all(map(os.path.exists,infile.split(" "))) :
             raise Climaf_Driver_Error("Internal error : some input file "
                                       "does not exist among %s:"%(infile))
         i+=1
@@ -529,7 +528,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     tim1=time.time()
     clogger.info("Launching command:"+template)
     #
-    logfile=open('last.out', 'w')
+    logfile=open('last.out', 'w')   
     logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
     try :
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
@@ -538,6 +537,22 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
 
     logfile.close()
+    #
+    # For remote files, we supply ds.locfiles by local filename to can use ds.check()
+    if isinstance(op,classes.cdataset) and not ( op.isLocal() or op.isCached() ):
+        local_filename=[]
+        for el in op.baseFiles().split(" "):
+            if len(el.split(":")) == 3:
+                k=1
+            else:
+                k=0
+            if re.findall("@",el.split(":")[k]):
+                hostname=el.split(":")[k].split("@")[-1]
+            else:
+                hostname=el.split(":")[k]
+            local_filename.append(os.path.expanduser(climaf.remote_cachedir)+'/'+hostname+os.path.abspath(el.split(":")[-1]))
+        op.locfiles=' '.join(local_filename)
+    #
     # Clean fixed fields symbolic links (linkname, targetname)
     if script.fixedfields :
         for ll,lt in script.fixedfields:
@@ -693,7 +708,31 @@ def set_variable(obj, varname, format) :
         clogger.warning('TBD - Cannot yet set the varname for MaskedArray')
     else :
         clogger.error('Cannot handle format %s'%format)
+
+def noselect(userflags, ds, format) :
+    """ Check the capability of the user process (USERFLAGS)
+    and a set of attribute values of dataset (DS)
+
+    Return True if the user can select the data and aggregate time,
+    and requested FORMAT is 'file', and False otherwise          
+    """
     
+    can_select=False
+    
+    if ((userflags.canSelectVar     or ds.oneVarPerFile()   ) and \
+        (userflags.canSelectTime    or ds.periodIsFine()    ) and \
+        (userflags.canSelectDomain  or ds.domainIsFine()    ) and \
+        (userflags.canAggregateTime or ds.periodHasOneFile()) and \
+        (userflags.canAlias         or ds.hasExactVariable()) and \
+        (userflags.canMissing       or ds.missingIsOK())      and \
+        (ds.hasOneMember()) and \
+        (format == 'file')) :
+
+        can_select=True
+
+    return(can_select)
+
+
 # Commodity functions
 #########################
 

@@ -193,7 +193,6 @@ def init_period(dates) :
             if (ehour > 23) :
                 ehour=0
                 eday=eday+1
-            eday=1 ; ehour=0 
         eminute = 0
     else:
         #clogger.debug("len(end)=%d"%len(end))

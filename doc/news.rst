@@ -6,7 +6,22 @@ Whats' new
 
 Changes, newest first :
 
+- 2017/05/02:
+
+  - Change ncl default for operator ``curves`` (see
+    :doc:`scripts/curves`): plot axis range is now between minimum and
+    maximum of all fields (instead of first member of ensemble) 
+  
+- 2017/04/18:
+  
+  - Access to remote data are now possible via ftp protocol for
+    example. See :py:class:`~climaf.dataloc.dataloc` to know how to
+    describe a project for remote data. The environment variable
+    'CLIMAF_REMOTE_CACHE' stores results for remote data (defaults to
+    ~/tmp/climaf_cache/remote_data), see :ref:`installing` 
+
 - 2017/02/21:
+      
   - Fixes a bug about a rarely used case (operator secondary outputs)
 
 - 2017/01/25:
