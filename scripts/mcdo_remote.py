@@ -14,6 +14,7 @@ from Tkinter import *
 # Climaf 
 from climaf import __path__ as cpath, remote_cachedir
 from climaf.clogging import clogger, dedent as cdedent
+from climaf.dataloc import remote_to_local_filename
 
 scriptpath=cpath[0]+"/../scripts/" 
 
@@ -27,24 +28,18 @@ units=sys.argv[7]
 vm=sys.argv[8]
 files=sys.argv[9:]
 
-#SSLV : a reecrire plus lisible par
-#host=
-#user=
-#if not host_user.has_key(hots) ...
-# ....
-
 # Dictionary of input files for each pair (host,user)
 host_user=dict()
 
 for i in files:
-    if len(i.split(":")) == 3:
-        k=1
-    else:
-        k=0
+    if len(i.split(":")) == 3: k=1
+    else: k=0
+    host_key=i.split(":")[k].split("@")[-1]
+    user_key=i.split(":")[k].split("@")[0]
     if re.findall("@",i.split(":")[k]):
-        if not host_user.has_key((i.split(":")[k].split("@")[-1],i.split(":")[k].split("@")[0])):
-            host_user[(i.split(":")[k].split("@")[-1],i.split(":")[k].split("@")[0])]=[]
-        host_user[(i.split(":")[k].split("@")[-1],i.split(":")[k].split("@")[0])].append(i.split(":")[-1])
+        if not host_user.has_key((host_key,user_key)):
+            host_user[(host_key,user_key)]=[]
+        host_user[(host_key,user_key)].append(i.split(":")[-1])
     else:
         if not host_user.has_key((i.split(":")[k],'')): host_user[(i.split(":")[k],'')]=[]
         host_user[(i.split(":")[k],'')].append(i.split(":")[-1])
@@ -188,25 +183,6 @@ for host,username in host_user2:
             print 'File found in cache: %s is at %s \n'%(ffile,os.path.expanduser(remote_cachedir)+'/'+host+ffile)
 
     connect.quit()
-
-
-def remote_to_local_filename(url):
-    """
-    url: an url of remote data
-
-    Return local filename of remote file
-    """
-
-    if len(url.split(":")) == 3: k=1
-    else: k=0
-
-    if re.findall("@",url.split(":")[k]):
-        hostname=url.split(":")[k].split("@")[-1]
-    else:
-        hostname=url.split(":")[k]
-        
-    local_filename=os.path.expanduser(remote_cachedir)+'/'+hostname+os.path.abspath(url.split(":")[-1])
-    return(local_filename)
 
 
 loc_files=[]

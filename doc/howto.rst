@@ -42,7 +42,7 @@ hierarchy for your data using templates with keyowrds, such as in:
   
   >>> dataloc(project="MY_PROJECT", organization="generic", url=["/home/stephane/data/MY_PROJECT/${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc"])
 
-- for remote data::
+- for remote data (yet only ftp)::
 
   >>> cproject("MY_REMOTE_DATA", ('frequency', "monthly"), separator='|')
   >>> dataloc(project="MY_REMOTE_DATA", organization="generic",
@@ -53,44 +53,8 @@ hierarchy for your data using templates with keyowrds, such as in:
   where url is supposed to be in the format "*protocol:user@*
   host:path", but "protocol" and "user" are optional (that is to say
   part in italics is optional). So, url can also be "user@host:path"
-  or "protocol:host:path" or "host:path". ftp is default protocol.
-  
-  If 'user' is given:
-    - if 'host' is in $HOME/.netrc file, CliMAF check if corresponding
-      'login' is the same of 'user'. If it is, CliMAF get associated
-      password; otherwise it prompt the user for entering password;  
-    - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
-      user for entering password. 
-  If 'user' is not given:
-    - if 'host' is in $HOME/.netrc file, CliMAF get corresponding
-      'login' as 'user' and also get associated password;
-    - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
-      user for entering 'user' and 'password'. 
-    
-  Remark: The .netrc file contains login and password used by the
-  auto-login process. It generally resides in the user’s home
-  directory ($HOME/.netrc). So, it is highly recommended to supply
-  this information in .netrc file not to have to enter password in
-  every request. 
-    
-  Warning: python netrc module does not handle multiple entries for a
-  single host. So, if netrc file has two entries for the same host,
-  the netrc module only returns the last entry.  
-
-  We define two kinds of host: 
-    - hosts with incremental files, e.g. 'beaufix';
-    - and the others.
-    
-  If one or all files returned by function :py:meth:`~climaf.classes.cdataset.listfiles` are found in cache: 
-      - in case of hosts with incremental files, files are only
-	transferred if their date on server is more recent than that
-	found in cache;       
-      - for other hosts, files found in cache are used
-
-  For remote files, filename pattern should include ${varname}, which
-  is instanciated by variable name or filenameVar (given via
-  :py:func:`~climaf.classes.calias()`), because files are not
-  transferred to check if they contain the variable  
+  or "protocol:host:path" or "host:path". ftp is default protocol
+  (using $HOME/.netrc file). 
 	
 See examples in the section on data access at :ref:`examples` ; see function :py:class:`~climaf.dataloc.dataloc` for reference.
 

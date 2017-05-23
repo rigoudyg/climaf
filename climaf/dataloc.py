@@ -128,7 +128,6 @@ class dataloc():
 
                 
         """
-        ## SSLV : as-tu teste la syntaxe "hendrix:~vignon/L/${simulation.....
         self.project=project
         self.model=model
         self.simulation=simulation
@@ -363,7 +362,6 @@ def selectGenericFiles(urls, **kwargs):
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
-
         # Construct regexp for extracting dates from filename
         regexp=None
         #print "template before searching dates : "+template
@@ -410,8 +408,7 @@ def selectGenericFiles(urls, **kwargs):
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                     # remote data
-                    else :
-                        # SSLV : as-tu teste un cas avec fxed_field remote ??
+                    elif re.findall(".*:.*",l) :
                         if (l.split(":")[-1].find("${variable}")>=0) or variable=='*' or \
                            (variable != altvar and (f.find(altvar)>=0) ):
                             clogger.debug("adding fixed field :"+':'.join(l.split(":")[0:-1])+':'+f)
@@ -497,6 +494,26 @@ def glob_remote_data(url, pattern) :
     except ftp.all_errors as err_ftp:
         print err_ftp
         raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
+
+
+def remote_to_local_filename(url):
+    """
+    url: an url of remote data
+
+    Return local filename of remote file
+    """
+    from climaf import remote_cachedir
+
+    if len(url.split(":")) == 3: k=1
+    else: k=0
+
+    if re.findall("@",url.split(":")[k]):
+        hostname=url.split(":")[k].split("@")[-1]
+    else:
+        hostname=url.split(":")[k]
+        
+    local_filename=os.path.expanduser(remote_cachedir)+'/'+hostname+os.path.abspath(url.split(":")[-1])
+    return(local_filename)
 
 
     
