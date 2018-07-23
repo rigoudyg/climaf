@@ -20,7 +20,7 @@ Home    = os.getenv ('HOME')
 
 #print 'Hostname:', HostName
 
-if os.path.exists ('/ccc')  :
+if os.path.exists ('/ccc') and not os.path.exists ('/data')  :
     atTGCC   = True
     atIPSL   = True
 if os.path.exists ('/cnrm') :

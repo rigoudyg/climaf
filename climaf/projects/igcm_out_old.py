@@ -102,22 +102,25 @@ from climaf.site_settings import atTGCC, onCiclad, onSpip
 
 
 root = None
+login= None
 if atTGCC:
    # Declare a list of root directories for IPSL data at TGCC
-   root="/ccc/store/cont003/dsm"
+   root="/ccc/store/cont003/thredds"
 if onCiclad :
    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-   root="/data/jservon/IPSL_DATA/SIMULATIONS"
+   root="/prodigfs"
+   login="fabric"
 if onSpip:
    # Declare a list of root directories for IPSL data at TGCC
    root="/Users/marti/Volumes/CURIE/ccc/store/cont003/dsm"
    print 'igcm_out : declaration root sur Spip : ', root
 
-if root :
-   
+if root:
+
    p=cproject("IGCM_OUT_old", "root", "login", "model", "status", "experiment", "simulation", "DIR", "OUT", "ave_length", "frequency", "period", "clim_period", "clim_period_length", ensemble=["model","simulation","clim_period"], separator="%")
-   
+
    cdef('root'               , root       ,  project='IGCM_OUT_old')
+   if login: cdef('login' , login, project='IGCM_OUT_old')
    cdef('clim_period'        , '????_????',  project='IGCM_OUT_old')
    cdef('clim_period_length' , '*'        ,  project='IGCM_OUT_old') # --> Takes the following values: '*', '' (to access only to SE), '_50Y', '_100Y'
    cdef('ave_length'         , '*'        ,  project='IGCM_OUT_old') # --> Takes the following values: MO, DA...
@@ -131,24 +134,25 @@ if root :
    cdef('DIR'                , '*'        ,  project='IGCM_OUT_old') # --> ATM, OCE, SRF...
    cdef('login'              , '*'        ,  project='IGCM_OUT_old')
    cdef('period'             , 'fx'       ,  project='IGCM_OUT_old')
-   
-   
+
+
    # Frequency alias
-   cfreqs('IGCM_OUT_old', {'monthly':'1M' , 'daily':'1D' , 'seasonal':'SE', 'annual_cycle':'SE'})
-   
+   cfreqs('IGCM_OUT_old', {'monthly':'1M' , 'daily':'1D' , 'seasonal':'SE', 'annual_cycle':'SE', 'yearly':'1Y'})
+
    urls_IGCM_OUT_old=[
       "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
-      "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc"
+      "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
+      "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
+      "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
    ]
-   
-   
-   # Next command will lead to explore all directories in 'urls_IGCM_OUT_old'
-   # for searching data for a CliMAF dataset (by function ds) except if 
+
+
+   # Next command will lead to explore all directories in 'urls_IGCM_OUT'
+   # for searching data for a CliMAF dataset (by function ds) except if
    # a more specific dataloc entry matches the arguments to 'ds'
    dataloc(project="IGCM_OUT_old", organization="generic", url=urls_IGCM_OUT_old)
-   
-   
-   # -- Note:
+
+
    # -- In the project IGCM_OUT_old, we have defined aliases for both the CMIP variable names (aliased to the old igcm names when necessary)
    # -- and the old IGCM names to take advantage of the mechanisms behind calias (scale, offset, filenameVar)
    
@@ -168,8 +172,8 @@ if root :
    calias("IGCM_OUT_old", 'hc300'   ,'sohtc300' ,   scale=1.E-9 , filenameVar='grid_T')
    
    # ICE
-   calias("IGCM_OUT_old", 'sic'   ,    'siconc',   scale=100 , filenameVar="icemod") 
-   calias("IGCM_OUT_old", 'sit'   ,    'sithic'              , filenameVar="icemod") 
+   calias("IGCM_OUT_old", 'sic'   ,    'soicecov',   scale=100 , filenameVar="icemod") 
+   calias("IGCM_OUT_old", 'sit'   ,    'iicethic'              , filenameVar="icemod") 
    
    # ATM general variables
    calias("IGCM_OUT_old", 'pr'      ,'precip'  ,filenameVar='histmth')

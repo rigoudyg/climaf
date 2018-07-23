@@ -51,7 +51,7 @@ def fileHasVar(filename,varname):
     """
     from anynetcdf import ncf
     rep=False
-    clogger.debug("opening "+filename+" for checkin if has variable"+varname)
+    clogger.debug("opening "+filename+" for checkin if has variable "+varname)
     fileobj=ncf(filename)
     vars=fileobj.variables
     if isinstance(vars,dict ) : vars=vars.keys()
@@ -61,6 +61,44 @@ def fileHasVar(filename,varname):
             break
     fileobj.close()
     return(rep)
+
+def fileHasDim(filename,dimname):
+    """
+    returns True if FILENAME has dimension dimname
+    """
+    from anynetcdf import ncf
+    rep=False
+    clogger.debug("opening "+filename+" for checkin if has dimension "+dimname)
+    fileobj=ncf(filename)
+    dims=fileobj.dimensions
+    vars=fileobj.variables
+    if isinstance(dims,dict ) : dims=dims.keys()
+    if isinstance(vars,dict ) : vars=vars.keys()
+    dims = dims + vars
+    for filedim in dims :
+        if filedim == dimname :
+            rep=True
+            break
+    fileobj.close()
+    return(rep)
+
+def dimsOfFile(filename):
+    """
+    returns the list of dimensions of the netcdf file filename
+    """
+    from anynetcdf import ncf
+    rep=False
+    clogger.debug("opening "+filename+" for checking the dimensions")
+    fileobj=ncf(filename)
+    dims=fileobj.dimensions
+    if isinstance(dims,dict ) : dims=dims.keys()
+    fileobj.close()
+    return(dims)
+
+
+
+
+
 
 def model_id(filename):
     """ 
