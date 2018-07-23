@@ -138,7 +138,9 @@ if  root :
    
    urls_IGCM_OUT_CMIP=[
       "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
-      "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc"
+      "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
+      "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
+      "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc"
    ]
    
    
@@ -180,8 +182,16 @@ if  root :
    calias("IGCM_OUT_CMIP", 'uas'     ,filenameVar='histmth')
    calias("IGCM_OUT_CMIP", 'vas'     ,filenameVar='histmth')
    calias("IGCM_OUT_CMIP", 'sfcWind' ,filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 't2m', 'tas'      ,filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'precip'      ,filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'nettop'      ,filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'bils'      ,filenameVar='histmth')
    
    # 3D Variables
+   calias("IGCM_OUT_CMIP", 'vitu'  , filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'vitv'  , filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'vitw'  , filenameVar='histmth')
+   calias("IGCM_OUT_CMIP", 'temp'  , filenameVar='histmth')
    calias("IGCM_OUT_CMIP", 'ta'  , filenameVar='histmthNMC')
    calias("IGCM_OUT_CMIP", 'ua'  , filenameVar='histmthNMC')
    calias("IGCM_OUT_CMIP", 'va'  , filenameVar='histmthNMC')

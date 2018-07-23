@@ -23,6 +23,7 @@ aliases=dict()
 
 #: Dictionary of frequency names dictionaries
 frequencies=dict()
+realms = dict()
 
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
@@ -371,7 +372,6 @@ class cdataset(cobject):
         self.crs=self.buildcrs()
         # 
         self.files=None
-        self.local_copies_of_remote_files=None
         self.register()
 
     def setperiod(self,period) :
@@ -435,8 +435,7 @@ class cdataset(cobject):
         return missing is None
     
     def baseFiles(self,force=False):
-        """ Returns the list of (local or remote) files which include the data
-        for the dataset
+        """ Returns the list of (local) files which include the data for the dataset
         
         Use cached value unless called with arg force=True
         """
@@ -447,13 +446,11 @@ class cdataset(cobject):
                 dic["variable"]=string.Template(filevar).safe_substitute(dic)
                 if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
-            self.files=dataloc.selectFiles(**dic)
-            
+            self.files=dataloc.selectLocalFiles(**dic)
         return self.files
 
     def listfiles(self,force=False):
-        """ Returns the list of (local or remote) files which include the data
-        for the dataset
+        """ Returns the list of (local) files which include the data for the dataset
         
         Use cached value unless called with arg force=True
         """
@@ -512,14 +509,9 @@ class cdataset(cobject):
         # Returns the list of files which include the data for the dataset
         # or for each member of the ensemble
         if isinstance(self,cdataset):
-            if self.isLocal() or self.isCached() :
-                files=self.baseFiles()
-            else:
-                files=self.local_copies_of_remote_files
+            files=self.baseFiles()
             if not files:
                 clogger.error('No file found for: %s'%self)
-                if not ( self.isLocal() or self.isCached() ):
-                    clogger.warning('For remote data, you have to do at first "cfile(%s)"'%self)                
                 return(False)
         else :
             clogger.error("Cannot handle %s" %self)
@@ -1130,6 +1122,26 @@ def cfreqs(project,dic) :
     """
     #
     frequencies[project]=dic
+
+
+def crealms(project,dic) :
+    """
+    Allow to declare a dictionary specific to ``project`` for matching
+    ``normalized`` realm names to project-specific realm names
+
+    Normalized realm names are :
+      atmos, ocean, land, seaice
+
+    When defining a dataset, any reference to a non-standard
+    frequency will be left unchanged both in the datset's CRS and
+    when trying to access corresponding datafiles
+
+    Examples::
+
+    >>> cfreqs('CMIP5',{'atmos':'ATM' , 'ocean':'OCE' })
+    """
+    #
+    realms[project]=dic
 
 
 def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,missing=None,filenameVar=None) :
