@@ -172,7 +172,7 @@ def register(filename,crs,outfilename=None):
         crs2filename[crs]=filename
         return True 
     waited=0
-    while waited < 20 and not os.path.exists(filename) :
+    while waited < 50 and not os.path.exists(filename) :
         time.sleep(0.1)
         waited += 1
     #time.sleep(0.5)
