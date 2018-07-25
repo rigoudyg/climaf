@@ -225,6 +225,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 else:
                     clogger.debug("Must remote read and cache " )
                     rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
+                    ds.files=rep
                     userflags.unset_selectors()
                     cdedent()
                     return rep
@@ -355,8 +356,14 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     sizes=[]
     for op in scriptCall.operands :
         if op :
-            inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
+            if scriptCall.operator!='remote_select' and \
+               isinstance(op,classes.cdataset) and \
+               not (op.isLocal() or op.isCached()) :
+                inValue=ceval(op,format='file',deep=deep)
+            else:
+                inValue=ceval(op,userflags=scriptCall.flags,format='file',deep=deep,
                           recurse_list=recurse_list)
+            clogger.debug("evaluating %s operand %s as %s"%(scriptCall.operator,op,inValue))
             if inValue is None or inValue is "" :
                 raise Climaf_Driver_Error("When evaluating %s : value for %s is None"\
                                       %(scriptCall.script,`op`))
