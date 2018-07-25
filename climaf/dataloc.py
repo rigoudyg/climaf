@@ -330,38 +330,41 @@ def selectGenericFiles(urls, **kwargs):
     for l in urls :
         # Instantiate keywords in pattern with attributes values
         if re.findall(".*:.*",l) : # remote data
+            remote_prefix=':'.join(l.split(":")[0:-1])+':'
             template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
         else: # local data
+            remote_prefix=None
             template=Template(l).safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template ;
         for k in lkeys : temp2=temp2.replace(k,dt[k])
-        if re.findall(".*:.*",l) : # check if data is remote
+        if remote_prefix : 
             lfiles=sorted(glob_remote_data(l, temp2))
-            clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
+            clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
         # If unsuccessful using varname, try with filenameVar
         if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
+            # Change value of facet 'variable'
             kwargs['variable']=kwargs['filenameVar']
-            
-            if re.findall(".*:.*",l) : # remote data
+            if remote_prefix is not None : # remote data
                 template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
             else: # local data
                 template=Template(l).safe_substitute(**kwargs)    
             temp2=template
             for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
-            if re.findall(".*:.*",l) : # check if data is remote
+            if remote_prefix is not None : # 
                 lfiles=sorted(glob_remote_data(l, temp2))
-                clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),':'.join(l.split(":")[0:-1])+':'+temp2))
+                clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
+        #
         # Construct regexp for extracting dates from filename
         regexp=None
         #print "template before searching dates : "+template
@@ -388,8 +391,7 @@ def selectGenericFiles(urls, **kwargs):
                 regexp0=regexp.replace("*",".*").replace("?",r".")
                 #print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp0,r'\1',f)
-                if start==f:
-                    raise Climaf_Data_Error("Start period not found") #? 
+                if start==f: raise Climaf_Data_Error("Start period not found") #? 
                 if hasEnd :
                     end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
@@ -402,19 +404,19 @@ def selectGenericFiles(urls, **kwargs):
                 if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
                     kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
                     # local data
-                    if not re.findall(".*:.*",l) and \
+                    if not remote_prefix is not None and \
                        ( (l.find("${variable}")>=0) or variable=='*' or \
                          fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) ) :
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                     # remote data
-                    elif re.findall(".*:.*",l) :
+                    elif remote_prefix is not None :
                         if (l.split(":")[-1].find("${variable}")>=0) or variable=='*' or \
                            (variable != altvar and (f.find(altvar)>=0) ):
-                            clogger.debug("adding fixed field :"+':'.join(l.split(":")[0:-1])+':'+f)
-                            rep.append(':'.join(l.split(":")[0:-1])+':'+f)
+                            clogger.debug("adding fixed field :"+remote_prefix+f)
+                            rep.append(remote_prefix+f)
                         else:
-                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(':'.join(l.split(":")[0:-1])+':'+f))
+                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(remote_prefix+f))
                 else :
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     rep.append(f)
@@ -424,11 +426,11 @@ def selectGenericFiles(urls, **kwargs):
                 # Filter against variable 
                 if (l.find("${variable}")>=0):
                     clogger.debug('appending %s based on variable in filename'%f)
-                    rep.append(f)
+                    rep.append(remote_prefix+f)
                     continue    
                 if (f not in rep):
                     # local data
-                    if not re.findall(".*:.*",l) and \
+                    if remote_prefix is None and \
                         (variable=='*' or "," in variable or fileHasVar(f,variable) or \
                         (altvar != variable and fileHasVar(f,altvar))) :
                         # Should check time period in the file if not regexp
@@ -436,15 +438,17 @@ def selectGenericFiles(urls, **kwargs):
                         rep.append(f)
                         continue
                     # remote data
-                    elif re.findall(".*:.*",l) : 
+                    elif remote_prefix is not None : 
                         if variable=='*' or "," in variable or \
                             (variable != altvar and (f.find(altvar)>=0) ):
                             # Should check time period in the file if not regexp
-                            clogger.debug('appending %s based on multi-var or altvar '%(':'.join(l.split(":")[0:-1])+':'+f))
-                            rep.append(':'.join(l.split(":")[0:-1])+':'+f)
+                            clogger.debug('appending %s based on multi-var or altvar '%(remote_prefix+f))
+                            rep.append(remote_prefix+f)
                             continue
                         else:
-                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(':'.join(l.split(":")[0:-1])+':'+f))
+                            mess="For remote files, filename pattern (%s) should include"%(remote_prefix+f))
+                            mess+=" ${varname} (which is instanciated by variable name or filenameVar)"
+                            raise Climaf_Data_Error(mess)
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)
