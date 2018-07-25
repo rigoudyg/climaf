@@ -446,7 +446,7 @@ def selectGenericFiles(urls, **kwargs):
                             rep.append(remote_prefix+f)
                             continue
                         else:
-                            mess="For remote files, filename pattern (%s) should include"%(remote_prefix+f))
+                            mess="For remote files, filename pattern (%s) should include"%(remote_prefix+f)
                             mess+=" ${varname} (which is instanciated by variable name or filenameVar)"
                             raise Climaf_Data_Error(mess)
             else:
