@@ -333,7 +333,7 @@ def selectGenericFiles(urls, **kwargs):
             remote_prefix=':'.join(l.split(":")[0:-1])+':'
             template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
         else: # local data
-            remote_prefix=None
+            remote_prefix=""
             template=Template(l).safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
@@ -351,14 +351,14 @@ def selectGenericFiles(urls, **kwargs):
         if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
             # Change value of facet 'variable'
             kwargs['variable']=kwargs['filenameVar']
-            if remote_prefix is not None : # remote data
+            if remote_prefix : # remote data
                 template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
             else: # local data
                 template=Template(l).safe_substitute(**kwargs)    
             temp2=template
             for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
-            if remote_prefix is not None : # 
+            if remote_prefix : # 
                 lfiles=sorted(glob_remote_data(l, temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
             else: # local data
@@ -404,19 +404,19 @@ def selectGenericFiles(urls, **kwargs):
                 if ( 'frequency' in kwargs and ((kwargs['frequency']=="fx") or \
                     kwargs['frequency']=="seasonnal" or kwargs['frequency']=="annual_cycle" )) :
                     # local data
-                    if not remote_prefix is not None and \
+                    if remote_prefix and \
                        ( (l.find("${variable}")>=0) or variable=='*' or \
                          fileHasVar(f,variable) or (variable != altvar and fileHasVar(f,altvar)) ) :
                         clogger.debug("adding fixed field :"+f)
                         rep.append(f)
                     # remote data
-                    elif remote_prefix is not None :
+                    elif remote_prefix is not "" :
                         if (l.split(":")[-1].find("${variable}")>=0) or variable=='*' or \
                            (variable != altvar and (f.find(altvar)>=0) ):
                             clogger.debug("adding fixed field :"+remote_prefix+f)
                             rep.append(remote_prefix+f)
                         else:
-                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%(remote_prefix+f))
+                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%f)
                 else :
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     rep.append(f)
@@ -430,7 +430,7 @@ def selectGenericFiles(urls, **kwargs):
                     continue    
                 if (f not in rep):
                     # local data
-                    if remote_prefix is None and \
+                    if remote_prefix and \
                         (variable=='*' or "," in variable or fileHasVar(f,variable) or \
                         (altvar != variable and fileHasVar(f,altvar))) :
                         # Should check time period in the file if not regexp
@@ -438,7 +438,7 @@ def selectGenericFiles(urls, **kwargs):
                         rep.append(f)
                         continue
                     # remote data
-                    elif remote_prefix is not None : 
+                    elif remote_prefix  : 
                         if variable=='*' or "," in variable or \
                             (variable != altvar and (f.find(altvar)>=0) ):
                             # Should check time period in the file if not regexp

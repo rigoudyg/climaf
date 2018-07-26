@@ -438,12 +438,12 @@ class cdataset(cobject):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
         
-        Use cached value unless called with arg force=True
+        Use cached value (i.e. attribute 'files') unless called with arg force=True
         """
         if (force and self.project != 'file') or self.files is None :
             dic=self.kvp.copy()
             if self.alias : 
-                filevar,scale,offset,units,filenameVar,missing=self.alias
+                filevar,_,_,_,filenameVar,_=self.alias
                 dic["variable"]=string.Template(filevar).safe_substitute(dic)
                 if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
