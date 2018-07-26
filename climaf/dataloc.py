@@ -650,7 +650,9 @@ def selectCmip5DrsFiles(urls, **kwargs) :
         totry=['merge/','output/','output?/','main/','']
         for p in totry :
             pattern1=l+"/"+project+"/"+p+"*/"+model # one * for modelling center
-            if len(glob.glob(pattern1))>0 : break
+            joker_version="*"
+            patternv=pattern1+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation+"/"+joker_version+"/"+variable
+            if len(glob.glob(patternv))>0 : break
         patternv=pattern1+"/"+experiment+"/"+freqd+"/"+realm+"/"+table+"/"+simulation
         # Get version directories list
         ldirs=glob.glob(patternv)
