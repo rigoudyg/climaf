@@ -455,7 +455,11 @@ def selectGenericFiles(urls, **kwargs):
                 else:
                     if not period.intersects(fperiod) :
                         clogger.debug('not appending %s because period doesn t intersect %s'%(f,period))
-                        
+
+        # Break on first url with any matching data
+        if len(rep)>0 :
+            clogger.debug('url %s does match for '%l + `kwargs`)
+            break
     return rep
 
 

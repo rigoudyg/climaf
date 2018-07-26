@@ -390,14 +390,13 @@ class cdataset(cobject):
         return rep
 
     def isLocal(self) :
-        model=getattr(self,"model","*")
-        return(dataloc.isLocal(project=self.project, model=model, \
-                               simulation=self.simulation, frequency=self.frequency))
+        return self.baseFiles().find(":")<0
+        
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached
         
         """
-        clogger.error("TBD - remote datasets are not yet cached")
+        #clogger.error("TBD - remote datasets are not yet cached")
         rep=False
         return rep
 
@@ -434,6 +433,15 @@ class cdataset(cobject):
         filevar,scale,offset,units,filenameVar,missing=self.alias
         return missing is None
     
+    def selectFiles(self):
+        dic=self.kvp.copy()
+        if self.alias : 
+            filevar,_,_,_,filenameVar,_=self.alias
+            dic["variable"]=string.Template(filevar).safe_substitute(dic)
+            if filenameVar : dic["filenameVar"]=filenameVar
+        clogger.debug("Looking with dic=%s"%`dic`)
+        self.files=dataloc.selectFiles(**dic)
+
     def baseFiles(self,force=False):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
@@ -441,14 +449,7 @@ class cdataset(cobject):
         Use cached value (i.e. attribute 'files') unless called with arg force=True
         """
         if (force and self.project != 'file') or self.files is None :
-            dic=self.kvp.copy()
-            if self.alias : 
-                filevar,_,_,_,filenameVar,_=self.alias
-                dic["variable"]=string.Template(filevar).safe_substitute(dic)
-                if filenameVar : dic["filenameVar"]=filenameVar
-            clogger.debug("Looking with dic=%s"%`dic`)
-            self.files=dataloc.selectFiles(**dic)
-            
+            self.selectFiles()
         return self.files
 
     def listfiles(self,force=False):
