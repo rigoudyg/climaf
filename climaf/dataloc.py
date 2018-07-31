@@ -16,6 +16,8 @@ from operator import itemgetter
 import ftplib as ftp  
 import getpass 
 import netrc  
+from functools import partial
+
 
 locs=[]
 
@@ -341,7 +343,7 @@ def selectGenericFiles(urls, **kwargs):
         temp2=template ;
         for k in lkeys : temp2=temp2.replace(k,dt[k])
         if remote_prefix : 
-            lfiles=sorted(glob_remote_data(l, temp2))
+            lfiles=sorted(glob_remote_data(remote_prefix, temp2))
             clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
@@ -359,7 +361,7 @@ def selectGenericFiles(urls, **kwargs):
             for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
             if remote_prefix : # 
-                lfiles=sorted(glob_remote_data(l, temp2))
+                lfiles=sorted(glob_remote_data(remote_prefix, temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
@@ -463,21 +465,66 @@ def selectGenericFiles(urls, **kwargs):
     return rep
 
 
-def glob_remote_data(url, pattern) :
+def ftpmatch(connect, url) :
+    """
+    Returns a list of files matching url with wildcars "*"  "?" on a remote machine
+    """
+    def parse_list_line(line, subdirs=[], files=[]):
+        parts = line.split(None, 8)
+        if line.startswith("d"):
+            return subdirs.append(parts[-1])
+        elif line.startswith("-"):
+            return files.append(parts[-1])
+        else :
+            return
+
+    if url.find('*') < 0 and  url.find('?') < 0 :
+        lpath_match = [url]
+    else :
+        lurl = url.split("/")
+        for n, elt in enumerate(lurl) :
+            if elt.find('*') >= 0 or elt.find('?') >= 0 : 
+                break 
+
+        prefixpath = os.path.join('/',*lurl[:n]).rstrip("/")
+        patt = lurl[n].replace("*",".*").replace("?",r".")
+
+        lpath_match = []
+        # Filename stage
+        if len(lurl) == (n+1) :
+            all_files=[]
+            cb = partial(parse_list_line, files=all_files)
+            connect.dir(prefixpath, cb)
+            for lfile in all_files :
+                if re.match(patt,lfile) is not None :
+                    lpath_match += [ os.path.join(prefixpath,lfile) ]
+        # directory stage 
+        else :
+            all_subdirs=[]
+            cb = partial(parse_list_line, subdirs=all_subdirs)
+            connect.dir(prefixpath, cb)
+            for sdir in all_subdirs :
+                if re.match(patt,sdir) is not None : 
+                    lpath_match += ftpmatch( connect, os.path.join(prefixpath,sdir,*lurl[n+1:]))
+    return lpath_match
+
+
+def glob_remote_data(remote, pattern) :
     """
     Returns a list of path names that match pattern, for remote data
-    located at url
+    located atremote 
     """
     
-    if len(url.split(":")) == 3: k=1
+    if len(remote.split(":")) == 3: k=1
     else: k=0
+    k=0
 
-    if re.findall("@",url.split(":")[k]):
-        username=url.split(":")[k].split("@")[0]
-        host=url.split(":")[k].split("@")[-1]
+    if re.findall("@",remote.split(":")[k]):
+        username=remote.split(":")[k].split("@")[0]
+        host=remote.split(":")[k].split("@")[-1]
     else:
         username=''
-        host=url.split(":")[k]
+        host=remote.split(":")[k]
 
     secrets = netrc.netrc()
 
@@ -495,13 +542,13 @@ def glob_remote_data(url, pattern) :
             password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
 
     try : 
-        connect=ftp.FTP(host,username,password)
-        listfiles=connect.nlst(pattern)
+        connect = ftp.FTP(host,username,password)
+        listfiles = ftpmatch(connect, pattern)
         connect.quit()
         return(listfiles)
     except ftp.all_errors as err_ftp:
         print err_ftp
-        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
+        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(pattern,host,username))
 
 
 def remote_to_local_filename(url):
