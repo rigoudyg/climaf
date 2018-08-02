@@ -224,8 +224,6 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             nb = randrange(1,10000000000)
             while nb in nbs: nb = randrange(1,10000000000)
             nbs.append(nb)
-            # !!!
-            print '"/climaf_atlas"+str(nb)+filextension" = ',"/climaf_atlas"+str(nb)+filextension
             os.link(filename,dirname+"/climaf_atlas"+str(nb)+filextension)
             # -- Create/append the index file in the output directory that will provide
             # -- the CRS with the new png file (climaf_atlas...png)

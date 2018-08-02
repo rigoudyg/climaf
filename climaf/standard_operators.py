@@ -152,7 +152,7 @@ def load_standard_operators():
     #
     cscript('get_oneVar','ncks -v ${var} ${in} ${out}')
     cscript('cncks','ncks -v ${var} ${in} ${out}')
-    cscript('cnco','${operator} ${arg} ${in} ${out}')
+    #cscript('cnco','${operator} ${arg} ${in} ${out}')
     #
     # ensemble_ts_plot
     cscript('ensemble_ts_plot','python '+scriptpath+'ensemble_time_series_plot.py --filenames="${mmin}" --outfig=${out} '+\
@@ -170,6 +170,7 @@ def load_standard_operators():
         '--text_verticalalignment="${text_verticalalignment}" '+\
         '--text_horizontalalignment="${text_horizontalalignment}" '+\
         '--legend_colors="${leg_colors}" --legend_labels="${legend_labels}" '+\
+        '--title="${title}" --title_fontsize="${title_fontsize}" '+\
         '--left_string="${left_string}" --right_string="${right_string}" --center_string="${center_string}" '+\
         '--left_string_fontsize="${left_string_fontsize}" --right_string_fontsize="${right_string_fontsize}" --center_string_fontsize="${center_string_fontsize}" '+\
         '--legend_loc="${legend_loc}" --legend_xy_pos="${legend_xy_pos}" --legend_labels="${legend_labels}" --legend_colors="${legend_colors}" '+\

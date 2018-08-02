@@ -57,9 +57,11 @@ parser.add_argument('--tick_size', action='store', default="", help='Ticks size'
 
 parser.add_argument('--fig_size', action='store', default="", help='Size of the figure in inches => width*height Ex: 15*5')
 
+parser.add_argument('--title', action='store', default=None, help='Title')
 parser.add_argument('--left_string', action='store', default=None, help='Left string')
 parser.add_argument('--right_string', action='store', default=None, help='Right string')
 parser.add_argument('--center_string', action='store', default=None, help='Center string')
+parser.add_argument('--title_fontsize', action='store', default="", help='Title size')
 parser.add_argument('--left_string_fontsize', action='store', default="", help='Left string size')
 parser.add_argument('--right_string_fontsize', action='store', default="", help='Right string size')
 parser.add_argument('--center_string_fontsize', action='store', default="", help='Center string size')
@@ -93,6 +95,7 @@ parser.add_argument('--vertical_lines_colors', action='store', default=None, hel
 
 # -- Default values
 default_left_string_fontsize = 30.
+default_title_fontsize = 30.
 default_center_string_fontsize = 20.
 default_right_string_fontsize = 20.
 default_tick_size = 15.
@@ -153,10 +156,11 @@ import numpy as np
 if args.colors:
     colors = str.split(args.colors,',')
 else:
-    colors=['blue', 'orange', 'green', 'red', 'purple', 'brown',
-            'pink', 'gray', 'olive', 'cyan',
-            'blue', 'orange', 'green', 'red', 'purple', 'brown',
-            'pink', 'gray', 'olive', 'cyan']
+    colors=['royalblue', 'red', 'green', 'mediumturquoise', 'orange',
+                        'navy', 'limegreen', 'steelblue', 'fuchsia',
+                        'blue', 'goldenrod', 'yellowgreen', 'blueviolet', 'darkgoldenrod', 'darkgreen',
+                        'mediumorchid', 'lightslategray', 'gold', 'chartreuse', 'saddlebrown', 'tan',
+                        'tomato', 'mediumvioletred', 'mediumspringgreen', 'firebrick']
 
 # -- Line width
 if args.lw: 

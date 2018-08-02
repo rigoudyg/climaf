@@ -23,6 +23,8 @@ aliases=dict()
 
 #: Dictionary of frequency names dictionaries
 frequencies=dict()
+
+#: Dictionary of realms names dictionaries
 realms = dict()
 
 class cproject():
@@ -372,6 +374,7 @@ class cdataset(cobject):
         self.crs=self.buildcrs()
         # 
         self.files=None
+        self.local_copies_of_remote_files=None
         self.register()
 
     def setperiod(self,period) :
@@ -435,7 +438,8 @@ class cdataset(cobject):
         return missing is None
     
     def baseFiles(self,force=False):
-        """ Returns the list of (local) files which include the data for the dataset
+        """ Returns the list of (local or remote) files which include the data
+        for the dataset
         
         Use cached value unless called with arg force=True
         """
@@ -446,11 +450,13 @@ class cdataset(cobject):
                 dic["variable"]=string.Template(filevar).safe_substitute(dic)
                 if filenameVar : dic["filenameVar"]=filenameVar
             clogger.debug("Looking with dic=%s"%`dic`)
-            self.files=dataloc.selectLocalFiles(**dic)
+            self.files=dataloc.selectFiles(**dic)
+            
         return self.files
 
     def listfiles(self,force=False):
-        """ Returns the list of (local) files which include the data for the dataset
+        """ Returns the list of (local or remote) files which include the data
+        for the dataset
         
         Use cached value unless called with arg force=True
         """
@@ -509,9 +515,14 @@ class cdataset(cobject):
         # Returns the list of files which include the data for the dataset
         # or for each member of the ensemble
         if isinstance(self,cdataset):
-            files=self.baseFiles()
+            if self.isLocal() or self.isCached() :
+                files=self.baseFiles()
+            else:
+                files=self.local_copies_of_remote_files
             if not files:
                 clogger.error('No file found for: %s'%self)
+                if not ( self.isLocal() or self.isCached() ):
+                    clogger.warning('For remote data, you have to do at first "cfile(%s)"'%self)                
                 return(False)
         else :
             clogger.error("Cannot handle %s" %self)

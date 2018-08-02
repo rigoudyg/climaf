@@ -10,6 +10,11 @@ the built-in data definitions described at :py:mod:`~climaf.projects`.
 You may need to come back to this section for reference
 
 
+cscalar : returns a scalar value (float) in python (using cMA)
+------------------------------------------------------------------------------------------------
+
+.. autofunction:: climaf.functions.cscalar
+
 
 fadd : add two CliMAF objects or a CliMAF object and a constant 
 ------------------------------------------------------------------------------------------------
@@ -65,10 +70,10 @@ clim_average : Computes climatological averages on the annual cycle of a dataset
 .. autofunction:: climaf.functions.clim_average
 
 
-zonmean_interpolation : Interpolates a zonal mean field (two possible ways) before computing a difference
+lonlatpres_interpolation : Interpolates a lon/lat/pres field (two possible ways) 
 ----------------------------------------------------------------------------------------------------------
 
-.. autofunction:: climaf.functions.zonmean_interpolation
+.. autofunction:: climaf.functions.lonlatpres_interpolation
 
 
 zonmean : Return the zonal mean field of dat
@@ -77,8 +82,8 @@ zonmean : Return the zonal mean field of dat
 .. autofunction:: climaf.functions.zonmean
 
 
-diff_zonmean : Returns the zonal mean bias of dat1 against dat2
-------------------------------------------------------------------------------------------------
+diff_zonmean : Returns the zonal mean bias of dat1 against dat2 (based on lonlatpres_interpolation)
+-------------------------------------------------------------------------------------------------------
 
 .. autofunction:: climaf.functions.diff_zonmean
 

@@ -1,9 +1,17 @@
 from climaf.api import *
 from climaf.operators import *
 from climaf import classes
+from clogging  import clogger
 
 def cscalar(dat):
-    return cMA(dat)[0][0][0]
+    """ Returns a scalar value using cMA (and not a masked array,
+        to avoid the subsetting that is generally needed).
+    """
+    ma = cMA(dat)
+    if len(ma.shape)==1: return cMA(dat)[0]
+    if len(ma.shape)==2: return cMA(dat)[0][0]
+    if len(ma.shape)==3: return cMA(dat)[0][0][0]
+    if len(ma.shape)==4: return cMA(dat)[0][0][0][0]
 
 
 def apply_scale_offset(dat,scale,offset):
@@ -154,7 +162,6 @@ def getLevs(dat,zmin=0,zmax=100000,convertPressureUnit=None):
     except:
         levValues = fileobj[levname][0:len(fileobj[levname])]
     for lev in levValues:
-        #print lev
         if min_lev <= lev <= max_lev:
             if convertPressureUnit:
                if convertPressureUnit=='hPaToPa':
@@ -173,7 +180,7 @@ def vertical_average(dat,zmin,zmax):
     Computes a vertical average on the vertical levels between zmin and zmax
     """
     levs = getLevs(dat,zmin,zmax)
-    print ' --> Compute average on the following vertical levels : '+levs
+    clogger.debug(' --> Compute average on the following vertical levels : '+levs)
     tmp = ccdo(dat, operator="'vertmean -sellevel,'+levs'")
     return tmp
 
@@ -209,11 +216,13 @@ def diff_regrid(dat1, dat2):
 def diff_regridn (data1, data2, cdogrid='n90', option='remapbil'):
     """
     Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2
+    The user can specify the cdo regridding method with the argument option (as in regridn(); default is option='remapbil').
   
       >>> dat1= ....   # some dataset, with whatever variable
       >>> dat2= ....   # some dataset, with the same variable as dat1
-      >>> diff_dat1_dat2 = diff_regridn(dat1,dat2) # -> uses cdogrid='n90'
+      >>> diff_dat1_dat2 = diff_regridn(dat1,dat2) # -> uses cdogrid='n90' and option='remapbil'
       >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90') # -> Returns the difference on 2 deg grid
+      >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90', option='remapdis') # -> Returns the difference on 2 deg grid regridded with the remapdis CDO method
  
     """    
     return minus(regridn(data1,cdogrid=cdogrid,option=option),regridn(data2,cdogrid=cdogrid,option=option))
@@ -365,6 +374,111 @@ def projects():
         print 'Facets =>',cprojects[key]
 
 #
+def lonlatpres_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True): 
+    """
+    Interpolates a lon/lat/pres field dat1 via two possible ways:
+    - either by providing a target lon/lat/pres field dat2 => dat1 is regridded both horizontally and vertically on dat2
+    - or by providing a list of vertical levels => dat1 is regridded horizontally on the cdo_horizontal_grid
+    (default='r1x90'), and vertically on the list of vertical levels
+    The user can provide the vertical levels (in Pa) like this:
+    vertical_levels=[100000,85000,50000,20000,...] # or
+    vertical_levels='100000,85000,50000,20000'
+    Before the computations, the function checks the unit of the vertical axis;
+    it is converted to Pa if necessary directly in the netcdf file(s) corresponding to dat1(2).
+    
+       >>> dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
+                    experiment='historical',table='Amon')
+       >>> ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
+   
+       >>> zonmean_dat = zonmean(time_average(dat))
+       >>> zonmean_ref = zonmean(time_average(ref))
+   
+       >>> dat_interpolated_on_ref = lonlatpres_interpolation(zonmean_dat,zonmean_ref)
+       >>> dat_interpolated_on_list_of_levels = lonlatpres_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+
+    """
+    
+    from climaf.anynetcdf import ncf
+    from climaf import cachedir
+     
+    file1 = cfile(dat1)
+    clogger.debug('file1 = %s' %file1)
+    ncfile1 = ncf(file1)
+    
+    # -- First, we check the unit of the vertical dimension of file1
+    levname1=None
+    for varname in ncfile1.variables:
+        if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
+            levname1=varname
+    if not levname1:
+        clogger.debug('Name of the vertical axis not found for dat1')
+    levunits1 = ncfile1.variables[levname1].units
+    if levunits1.lower() in ['hpa','millibar','mbar','hectopascal']:
+        # -- Multiplier par 100
+        cscript('convert_plev_hPa_to_Pa','ncap2 -As "'+levname1+'='+levname1+'*100" ${in} '+cachedir+'/convert_to_Pa_tmp.nc ; ncatted -O -a units,'+levname1+',o,c,Pa '+cachedir+'/convert_to_Pa_tmp.nc ; mv '+cachedir+'/convert_to_Pa_tmp.nc ${out}')
+        dat1 = climaf.operators.convert_plev_hPa_to_Pa(dat1)
+    # -> The vertical axis of file1 is now set to Pa
+    #
+    # -- Second, we check the unit of the vertical dimension of file2
+    if dat2:
+        file2 = cfile(dat2)
+        clogger.debug('file2 = %s' %file2)
+        ncfile2 = ncf(file2)
+        
+        levname2=None
+        for varname in ncfile2.variables:
+            if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
+                levname2=varname
+        clogger.debug('levname2 = %s' %levname2)
+        if not levname2:
+            clogger.debug('Name of the vertical axis not found for dat2')
+        levunits2  = ncfile2.variables[levname2].units
+        clogger.debug('ncfile2 = %s' %ncfile2)
+        try:
+           levValues2 = ncfile2.variables[levname2].getValue()
+        except:
+           try:
+              levValues2 = ncfile2.variables[levname2].data
+           except:
+              levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])] 
+        if levunits2.lower() in ['hpa','millibar','mbar','hectopascal']:
+            # -- Multiplier par 100
+            cscript('convert_plev_hPa_to_Pa','ncap2 -As "'+levname2+'='+levname2+'*100" ${in} '+cachedir+'/convert_to_Pa_tmp.nc ; ncatted -O -a units,'+levname2+',o,c,Pa '+cachedir+'/convert_to_Pa_tmp.nc ; mv '+cachedir+'/convert_to_Pa_tmp.nc ${out}')
+            dat2 = climaf.operators.convert_plev_hPa_to_Pa(dat2)
+
+            # -> The vertical axis of file2 is now set to Pa in the netcdf file
+            scale = 100.0
+        else:
+            scale = 1.0
+        #
+        # --> We get the values of the vertical levels of dat2 (from the original file, that's why we apply a scale)
+        levels = ''
+        for lev in levValues2:
+            levels = levels+','+str(lev*scale)
+        #
+        # --> We can now interpolate dat1 on dat2 verticaly and horizontally
+        if horizontal_regridding:
+           regridded_dat1 = ccdo(regrid(dat1,dat2,option='remapbil'),operator='intlevel'+levels)
+        else:
+           regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
+    else:
+        if vertical_levels:
+            if isinstance(vertical_levels,list):
+                levels=''
+                for lev in vertical_levels:
+                    levels = levels+','+str(lev)
+            else:
+                levels = ','+vertical_levels
+            if horizontal_regridding:
+               regridded_dat1 = ccdo(regridn(dat1,cdogrid=cdo_horizontal_grid),operator='intlevel'+levels)
+            else:
+               regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
+        else:
+            clogger.error('--> Provide a list of vertical levels with vertical_levels')
+    return regridded_dat1
+
+
+
 
 def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True):
     """
@@ -377,119 +491,6 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
     vertical_levels='100000,85000,50000,20000'
     Before the computations, the function checks the unit of the vertical axis;
     it is converted to Pa if necessary directly in the netcdf file(s) corresponding to dat1(2).
-    
-       >>> dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
-                    experiment='historical',table='Amon')
-       >>> ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
-   
-       >>> zonmean_dat = zonmean(time_average(dat))
-       >>> zonmean_ref = zonmean(time_average(ref))
-   
-       >>> dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
-       >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
-
-    """
-    
-    from climaf.anynetcdf import ncf
-    
-    file1 = cfile(dat1)
-    print 'file1 = ',file1 
-    ncfile1 = ncf(file1)
-    
-    # -- First, we check the unit of the vertical dimension of file1
-    levname1=None
-    for varname in ncfile1.variables:
-        if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
-            levname1=varname
-    if not levname1:
-        print 'Name of the vertical axis not found for dat1'
-    levunits1 = ncfile1.variables[levname1].units
-    if levunits1.lower() in ['hpa','millibar','mbar','hectopascal']:
-        # -- Multiplier par 100
-        cmd1 = 'ncap2 -As "'+levname1+'='+levname1+'*100" '+file1+' '+file1
-        cmd2 = 'ncatted -O -a units,'+levname1+',o,c,Pa '+file1
-        print cmd1
-        print cmd2
-        os.system(cmd1)
-        os.system(cmd2)
-    # -> The vertical axis of file1 is now set to Pa
-    #
-    # -- Second, we check the unit of the vertical dimension of file2
-    if dat2:
-        file2 = cfile(dat2)
-        print 'file2 = ',file2
-        ncfile2 = ncf(file2)
-        
-        levname2=None
-        for varname in ncfile2.variables:
-            if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
-                levname2=varname
-        print 'levname2 = ',levname2
-        if not levname2:
-            print 'Name of the vertical axis not found for dat2'
-        levunits2  = ncfile2.variables[levname2].units
-        print 'ncfile2 = ',ncfile2
-        #print 'dir(ncfile2.variables[levname2]) = ',dir(ncfile2.variables[levname2])
-        #print 'ncfile2.variables[levname2].getValue() = ',ncfile2.variables[levname2].getValue()
-        try:
-           levValues2 = ncfile2.variables[levname2].getValue()
-        except:
-           try:
-              levValues2 = ncfile2.variables[levname2].data
-           except:
-              levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])] 
-        if levunits2.lower() in ['hpa','millibar','mbar','hectopascal']:
-            # -- Multiplier par 100
-            cmd1 = 'ncap2 -As "'+levname2+'='+levname2+'*100" '+file2+' '+file2
-            cmd2 = 'ncatted -O -a units,'+levname2+',o,c,Pa '+file2
-            print cmd1
-            print cmd2
-            os.system(cmd1)
-            os.system(cmd2)
-            # -> The vertical axis of file2 is now set to Pa in the netcdf file
-            scale = 100.0
-        else:
-            scale = 1.0
-        #
-        # --> We get the values of the vertical levels of dat2 (from the original file, that's why we apply a scale)
-        levels = ''
-        for lev in levValues2:
-            levels = levels+','+str(lev*scale)
-        #
-        # --> We can now interpolate dat1 on dat2 verticaly and horizontally
-        print levels
-        if horizontal_regridding:
-           regridded_dat1 = ccdo(regrid(dat1,dat2,option='remapdis'),operator='intlevel'+levels)
-        else:
-           regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
-    else:
-        if vertical_levels:
-            if isinstance(vertical_levels,list):
-                levels=''
-                for lev in vertical_levels:
-                    levels = levels+','+str(lev)
-            else:
-                levels = ','+vertical_levels
-            if horizontal_regridding:
-               regridded_dat1 = ccdo(regridn(dat1,cdogrid=cdo_horizontal_grid),operator='intlevel'+levels)
-            else:
-               regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
-        else:
-            print '--> Provide a list of vertical levels with vertical_levels'
-    return regridded_dat1
-
-
-def vertical_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True):
-    """
-    Interpolates the zonal mean field dat1 via two possible ways:
-    - either by providing a target zonal field dat2 => dat1 is regridded both horizontally and vertically on dat2
-    - or by providing a list of vertical levels => dat1 is regridded horizontally on the cdo_horizontal_grid
-    (default='r1x90'), and vertically on the list of vertical levels
-    The user can provide the vertical levels (in Pa) like this:
-    vertical_levels=[100000,85000,50000,20000,...] # or
-    vertical_levels='100000,85000,50000,20000'
-    Before the computations, the function checks the unit of the vertical axis;
-    it is converted to Pa if necessary directly in the netcdf file(s) corresponding to dat1(2).
 
        >>> dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
                     experiment='historical',table='Amon')
@@ -502,94 +503,8 @@ def vertical_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gr
        >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
 
     """
-
-    from climaf.anynetcdf import ncf
-
-    file1 = cfile(dat1)
-    ncfile1 = ncf(file1)
-
-    # -- First, we check the unit of the vertical dimension of file1
-    levname1=None
-    for varname in ncfile1.variables:
-        if varname.lower() in ['level','levels','lev','levs','depth','deptht','plev'] or 'plev' in varname.lower():
-            levname1=varname
-    if not levname1:
-        print 'Name of the vertical axis not found for dat1'
-    levunits1 = ncfile1.variables[levname1].units
-    if levunits1.lower() in ['hpa','millibar','mbar','hectopascal']:
-        # -- Multiplier par 100
-        cmd1 = 'ncap2 -As "'+levname1+'='+levname1+'*100" '+file1+' '+file1
-        cmd2 = 'ncatted -O -a units,'+levname1+',o,c,Pa '+file1
-        print cmd1
-        print cmd2
-        os.system(cmd1)
-        os.system(cmd2)
-    # -> The vertical axis of file1 is now set to Pa
-    #
-    # -- Second, we check the unit of the vertical dimension of file2
-    if dat2:
-        file2 = cfile(dat2)
-        print 'file2 = ',file2
-        ncfile2 = ncf(file2)
-
-        levname2=None
-        for varname in ncfile2.variables:
-            if varname.lower() in ['level','levels','lev','levs','depth','deptht','plev'] or 'plev' in varname.lower():
-                levname2=varname
-        print 'levname2 = ',levname2
-        if not levname2:
-            print 'Name of the vertical axis not found for dat2'
-        levunits2  = ncfile2.variables[levname2].units
-        print 'ncfile2 = ',ncfile2
-        #print 'dir(ncfile2.variables[levname2]) = ',dir(ncfile2.variables[levname2])
-        #print 'ncfile2.variables[levname2].getValue() = ',ncfile2.variables[levname2].getValue()
-        try:
-           levValues2 = ncfile2.variables[levname2].getValue()
-        except:
-           try:
-              levValues2 = ncfile2.variables[levname2].data
-           except:
-              levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])]
-        if levunits2.lower() in ['hpa','millibar','mbar','hectopascal']:
-            # -- Multiplier par 100
-            cmd1 = 'ncap2 -As "'+levname2+'='+levname2+'*100" '+file2+' '+file2
-            cmd2 = 'ncatted -O -a units,'+levname2+',o,c,Pa '+file2
-            print cmd1
-            print cmd2
-            os.system(cmd1)
-            os.system(cmd2)
-            # -> The vertical axis of file2 is now set to Pa in the netcdf file
-            scale = 100.0
-        else:
-            scale = 1.0
-        #
-        # --> We get the values of the vertical levels of dat2 (from the original file, that's why we apply a scale)
-        levels = ''
-        for lev in levValues2:
-            levels = levels+','+str(lev*scale)
-        #
-        # --> We can now interpolate dat1 on dat2 verticaly and horizontally
-        print levels
-        if horizontal_regridding:
-           regridded_dat1 = ccdo(regrid(dat1,dat2,option='remapdis'),operator='intlevel'+levels)
-           #regridded_dat1 = ccdo(regrid(dat1,dat2),operator='intlevel'+levels)
-        else:
-           regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
-    else:
-        if vertical_levels:
-            if isinstance(vertical_levels,list):
-                levels=''
-                for lev in vertical_levels:
-                    levels = levels+','+str(lev)
-            else:
-                levels = ','+vertical_levels
-            if horizontal_regridding:
-               regridded_dat1 = ccdo(regridn(dat1,cdogrid=cdo_horizontal_grid),operator='intlevel'+levels)
-            else:
-               regridded_dat1 = ccdo(dat1,operator='intlevel'+levels)
-        else:
-            print '--> Provide a list of vertical levels with vertical_levels'
-    return regridded_dat1
+    
+    return lonlatpres_interpolation(dat1,dat2,vertical_levels,cdo_horizontal_grid='r1x90',horizontal_regridding=horizontal_regridding)
 
 
 
@@ -612,7 +527,7 @@ def diff_zonmean(dat1,dat2):
     Returns the zonal mean bias of dat1 against dat2
 
     The function first computes the zonal means of dat1 and dat2.
-    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function zonmean_interpolation.
+    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function lonlatpres_interpolation.
     It finally returns the bias field.
 
       >>> ds1= ....   # some dataset, with whatever variable
@@ -624,8 +539,94 @@ def diff_zonmean(dat1,dat2):
     zonmean_dat1 = ccdo(dat1, operator='zonmean')
     zonmean_dat2 = ccdo(dat2, operator='zonmean')
 
-    rgrd_dat1 = zonmean_interpolation(zonmean_dat1,zonmean_dat2)
+    rgrd_dat1 = lonlatpres_interpolation(zonmean_dat1,zonmean_dat2)
     #
     return minus(rgrd_dat1,zonmean_dat2)
+
+
+def convert_list_to_string(dum,separator1=',', separator2='|'):
+    string = ''
+    if isinstance(dum,list):
+        for elt in dum:
+            concat_elt = elt
+            if isinstance(elt, list):
+                substring = ''
+                for elt2 in elt:
+                    if substring=='':
+                        substring = str(elt2)
+                    else:
+                        substring += separator1+str(elt2)
+                concat_elt = substring
+                if string=='':
+                    string = concat_elt
+                else:
+                    string += separator2+concat_elt
+            else:
+                if string=='':
+                    string = str(concat_elt)
+                else:
+                    string += separator1+str(concat_elt)
+
+        return string
+    else:
+        return dum
+
+
+
+def ts_plot(ts, **kwargs):
+    """
+    ts_plot is a user-friendly interface for the climaf operator ensemble_ts_plot.
+    It takes the same arguments as ensemble_ts_plot, and:
+       - converts lists to comma-separated strings (typical input for ensemble_ts_plot)
+       - can take as input:
+            * a single CliMAF object dataset alone
+            * a dictionary with a name and a single CliMAF object
+            * a list of dictionaries or CliMAF objects
+            * a CliMAF ensemble
+       - is able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
+    
+    See the documentation of ensemble_ts_plot for the details on all possible options.
+    
+    """
+    # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot 
+    if not isinstance(ts, climaf.classes.cens):
+       # -- Case 1: it's a single CliMAF dataset
+       if not isinstance(ts, list):
+          if not isinstance(ts, dict):
+             ts_name = ts.crs
+             ens_ts = cens({ts_name:ts})
+          else:
+             ens_ts = cens(ts)
+       else:
+          # -- If the user provides a list, we make a loop on the elements
+          # -- to create an ensemble with named members
+          elts_order = []
+          elts_dict = dict()
+          for ts_elt in ts:
+              if isinstance(ts_elt,dict):
+                 elts_order.append(ts_elt.keys()[0])
+                 elts_dict.update(ts_elt)
+              else:
+                 ts_name = ts.crs
+                 elts_order.append(ts_name)
+                 elts_dict.update({ts_name:ts_elt})
+          ens_ts = cens(elts_dict, order=elts_order)
+          ens_ts.set_order(elts_order)
+          
+    else:
+       ens_ts = ts.copy()
+    # -- Convert lists to string
+    w_kwargs = kwargs.copy()
+    for kwarg in w_kwargs:
+        w_kwargs[kwarg] = convert_list_to_string(w_kwargs[kwarg])
+    if 'title' in w_kwargs:
+       w_kwargs.update(dict(left_string=w_kwargs['title']))
+       w_kwargs.pop('title')
+       if 'title_fontsize' in w_kwargs:
+          w_kwargs.update(dict(left_string_fontsize=w_kwargs['title_fontsize']))
+          w_kwargs.pop('title_fontsize')
+
+    return ensemble_ts_plot(ens_ts, **w_kwargs)
+
 
 

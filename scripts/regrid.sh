@@ -13,7 +13,7 @@ fieldgrid=$2
 fieldout=$3
 option=${4:-remapbil}
 if [ -f $fieldgrid ] ; then 
-    cdo griddes $fieldgrid > climaf_tmp_grid
+    cdo griddes $fieldgrid > climaf_tmp_grid_$$
     cdo $option,climaf_tmp_grid_$$ $fieldin $fieldout 
     rm climaf_tmp_grid_$$
 else

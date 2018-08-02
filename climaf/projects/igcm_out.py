@@ -158,13 +158,11 @@ if root:
 
    if onCiclad:   
      urls_IGCM_OUT=[
-        #"/ccc/work/cont003/thredds/p86denv/CMIP6.v2/ATM/${variable}_Amon_IPSL-CM6A-LR_historical_r2i1p1f1_gr_YYYYMM-YYYYMM.nc",
         "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
         "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
      ]
    if atTGCC:
      urls_IGCM_OUT=[
-        #"/ccc/work/cont003/thredds/p86denv/CMIP6.v2/ATM/${variable}_Amon_IPSL-CM6A-LR_historical_r2i1p1f1_gr_YYYYMM-YYYYMM.nc",
         "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
         "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
      ]
