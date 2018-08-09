@@ -56,7 +56,7 @@ Documented operators and 'object functions' as of today :
         - :doc:`scripts/regrid`
         - :doc:`scripts/regridn`
 	- :doc:`scripts/regridll`
-        - object function :py:func:`~climaf.functions.zonmean_interpolation`
+        - object function :py:func:`~climaf.functions.lonlatpres_interpolation`
         - :doc:`scripts/ml2pl`
     - object functions computing a difference with regridding (typically to compute model biases):
         - :py:func:`~climaf.functions.diff_regrid`
@@ -66,6 +66,8 @@ Documented operators and 'object functions' as of today :
         - :doc:`scripts/time_average`
         - object function :py:func:`~climaf.functions.clim_average`
         - object function :py:func:`~climaf.functions.annual_cycle`
+    - statistical operators:
+        - :doc:`scripts/cLinearRegression`
     - Others:
         - :doc:`scripts/slice`
         - :doc:`scripts/mask`
@@ -141,6 +143,8 @@ Documented operators and 'object functions' as of today :
     - :doc:`scripts/plot`
     - :py:func:`~climaf.plot.plot_params.plot_params`
     - :doc:`scripts/curves`
+    - :doc:`scripts/ensemble_ts_plot`
+    - :doc:`climaf/function/ts_plot`
     - :doc:`scripts/hovm`
     - :py:func:`~climaf.plot.plot_params.hovm_params`
     - :doc:`scripts/cpdfcrop`
