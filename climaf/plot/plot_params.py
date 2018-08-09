@@ -6,16 +6,20 @@ from climaf.site_settings import *
 import atmos_plot_params
 # --> for ocean
 import ocean_plot_params
+# --> for land
+import land_plot_params
 
 centerspecs=False
 # --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)
 if atCNRM:
    import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
    import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
+   import land_plot_params_CNRM as land_plot_params_centerspecs
    centerspecs=True
 if atIPSL:
    import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
    import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
+   import land_plot_params_IPSL as land_plot_params_centerspecs
    centerspecs=True
 
 def plot_params(variable,context, custom_plot_params=None) :
@@ -77,19 +81,34 @@ def plot_params(variable,context, custom_plot_params=None) :
     # --> Adding the default plot params
     per_variable.update(atmos_plot_params.dict_plot_params)
     per_variable.update(ocean_plot_params.dict_plot_params)
+    per_variable.update(land_plot_params.dict_plot_params)
     if centerspecs : 
        # --> Then, add the plot params specific to the centers
        per_variable.update(atmos_plot_params_centerspecs.dict_plot_params)
        per_variable.update(ocean_plot_params_centerspecs.dict_plot_params)
+       per_variable.update(land_plot_params_centerspecs.dict_plot_params)
     # --> If needed, adding a custom dictionnary of plot params
     if custom_plot_params:
        per_variable.update(custom_plot_params)
     #
     rep=defaults.copy()
+    # -- If the variable name is in the list of variables:
     if variable in per_variable : 
         var_entry=per_variable[variable]
         for cont in [ 'default', context ] :
             if cont in var_entry : rep.update(var_entry[cont])
+    else:
+       print 'Message from plot_params: '+variable+' is not in the list of defined plot parameters'
+       # -- if not, we try to split 
+       tmp_variable = str.split(variable,'_')[0]
+       if tmp_variable in per_variable :
+          print 'We will use the plot parameters of '+tmp_variable
+          var_entry=per_variable[tmp_variable]
+          for cont in [ 'default', context ] :
+              if cont in var_entry : rep.update(var_entry[cont])
+       else:
+          print 'Message from plot_params: '+variable+' is not in the list of defined plot parameters'
+          print 'We will use the default plot parameters.'
     return rep
         
 

@@ -90,3 +90,9 @@ cfreqs : declare non-standard frequency names, for a project
 
 .. autofunction:: climaf.classes.cfreqs
 
+
+crealms : declare non-standard realm names, for a project
+--------------------------------------------------------------------------
+
+.. autofunction:: climaf.classes.crealms
+

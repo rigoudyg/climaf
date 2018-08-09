@@ -24,6 +24,9 @@ aliases=dict()
 #: Dictionary of frequency names dictionaries
 frequencies=dict()
 
+#: Dictionary of realms names dictionaries
+realms = dict()
+
 class cproject():
     def __init__(self,name,  *args, **kwargs) :
         """
@@ -1130,6 +1133,26 @@ def cfreqs(project,dic) :
     """
     #
     frequencies[project]=dic
+
+
+def crealms(project,dic) :
+    """
+    Allow to declare a dictionary specific to ``project`` for matching
+    ``normalized`` realm names to project-specific realm names
+
+    Normalized realm names are :
+      atmos, ocean, land, seaice
+
+    When defining a dataset, any reference to a non-standard
+    frequency will be left unchanged both in the datset's CRS and
+    when trying to access corresponding datafiles
+
+    Examples::
+
+    >>> cfreqs('CMIP5',{'atmos':'ATM' , 'ocean':'OCE' })
+    """
+    #
+    realms[project]=dic
 
 
 def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,missing=None,filenameVar=None) :
