@@ -297,9 +297,6 @@ def clim_average(dat,season):
 
         if selmonths:
             avg = ccdo(scyc,operator='timmean -seltimestep,'+selmonths)
-            #avg = ccdo(scyc,operator='timmean -selmon,'+selmonths)
-            #avg = time_average(ccdo(scyc,operator='selmon,'+selmonths))
-            #avg = time_average(ccdo(scyc,operator='seltimestep,'+selmonths))
         #
         #
         # -- Individual months
@@ -575,18 +572,33 @@ def convert_list_to_string(dum,separator1=',', separator2='|'):
 
 def ts_plot(ts, **kwargs):
     """
-    ts_plot is a user-friendly interface for the climaf operator ensemble_ts_plot.
-    It takes the same arguments as ensemble_ts_plot, and:
-       - converts lists to comma-separated strings (typical input for ensemble_ts_plot)
-       - can take as input:
+    ts_plot is a python-user-friendly interface for the climaf operator ensemble_ts_plot.
+    It takes the same arguments as ensemble_ts_plot, but you can pass python lists
+    instead of comma-separared strings.:
+       It can take as input:
             * a single CliMAF object dataset alone
             * a dictionary with a name and a single CliMAF object
             * a list of dictionaries or CliMAF objects
             * a CliMAF ensemble
-       - is able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
+       It is also able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
     
     See the documentation of ensemble_ts_plot for the details on all possible options.
-    
+
+    Examples:
+
+       >>> ds= ....   # some dataset, with whatever variable
+       >>> ts_ds = space_avarege(ds) # Compute the space average
+       >>> p1 = ts_plot(ts_ds) # -- Simply provide the CliMAF object
+       >>> p2 = ts_plot({'my_dataset':ts_ds}) # -- Same as above but specify the name associated with the time series in the plot
+       >>> p3 = ts_plot([ts_ds1,ts_ds2,ts_ds3])
+       >>> p4 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ]) # -- provide multiple time series in a given order with names
+       >>> p5 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ], title='Three Time series', colors=['black','blue','red']) # -- Same as above with lines colors and title
+
+       >>> ens_ts = cens({'ts_ds1':ts_ds1, 'ts_ds2':ts_ds2, 'ts_ds3':ts_ds3}, order=['ts_ds1','ts_ds2','ts_ds3'])
+       >>> ens_ts.set_order(['ts_ds1','ts_ds2','ts_ds3'])
+       >>> p4bis = ts_plot(ens_ts) # -- Same result as p4 above but providing a CliMAF ensemble with specified order
+
+
     """
     # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot 
     if not isinstance(ts, climaf.classes.cens):
