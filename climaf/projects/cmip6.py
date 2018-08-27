@@ -67,11 +67,10 @@ if root:
 
      # Declare final organization on Lustre /cnrm
      path_pattern="${root}/${mip}/${institute}/${model}/${experiment}/${simulation}/${table}/${variable}/${gr}/${version}/"
-     dataloc(project="CMIP6",organization='generic',url=[path_pattern+file_pattern])
-
      # Declare temporary organization on Lustre /cnrm
-     path_pattern="${root}/${model}/*/${model}_${experiment}_${simulation}/"
-     dataloc(project="CMIP6",organization='generic',url=[path_pattern+file_pattern])
+     path_pattern2="${root}/${model}/*/${model}_${experiment}_${simulation}/"
+     #
+     dataloc(project="CMIP6",organization='generic',url=[path_pattern+file_pattern,path_pattern2+file_pattern])
 
   calias('CMIP6', 'tos', offset=273.15)
   calias('CMIP6', 'thetao', offset=273.15)

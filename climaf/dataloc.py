@@ -121,7 +121,7 @@ class dataloc():
          - and declaring a project to access remote data (on multiple servers)::
 
             >>> cproject('MY_REMOTE_DATA', ('frequency', 'monthly'), separator='|')
-            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/L/${simulation}SFXYYYY.nc',
+            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFXYYYY.nc',
             ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc']),
             >>> calias('MY_REMOTE_DATA','tas','tas',filenameVar='2T')
             >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')        
