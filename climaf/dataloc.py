@@ -323,10 +323,10 @@ def selectGenericFiles(urls, **kwargs):
     variable=kwargs['variable']
     altvar=kwargs.get('filenameVar',variable)
     # a dict and an ordered list of date globbing patterns
-    dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????")
+    dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????",YYYYMMDDHH="??????????")
     lkeys=dt.keys() ; lkeys.sort(reverse=True)
     # a dict and an ordered list for matching dates
-    dr=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})")
+    dr=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})", YYYYMMDDHH="([0-9]{10})")
     rkeys=dr.keys() ; rkeys.sort(reverse=True)
     #
     for l in urls :
