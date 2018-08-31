@@ -6,6 +6,25 @@ Whats' new
 
 Changes, newest first :
 
+- 2018/08/02:
+
+  - Modifications in ``lonlatpres_interpolation`` (ex-zonmean_interpolation) to make it more generic
+    and suitable for CliMAF
+    :py:func:`~climaf.functions.lonlatpres_interpolation`
+
+  - Added ``crealms`` to have a mechanism of alias on the realms names (as for the frequencies)
+
+  - when creating a portable atlas (directory containing the html index with the figures,
+    using the 'dirname' option of cell()), we now have an index file in the directory
+    listing all the figures of the atlas with their CRS. This allows any tool to parse
+    this index and filter the figures with keywords (in the CRS).
+
+  - ``cscalar``: this function returns a float in python when applied on a CliMAF object
+    that is supposed to have one single value. It uses cMA to import a masked array
+    and returns only the float.
+    :py:func:`~climaf.functions.cscalar`
+
+
 - 2017/05/02:
 
   - Change ncl default for operator ``curves`` (see
