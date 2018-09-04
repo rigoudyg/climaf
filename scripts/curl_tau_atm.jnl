@@ -1,0 +1,21 @@
+
+SET MODE DESPERATE
+SET MEMORY/SIZE=2000
+! ferret -script curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon -d LAT,lat -v LAT,lat -d TIME_COUNTER,time_counter -v TIME_COUNTER,time_counter -v CURLTAU,curltau ${out} ; ncatted -O -a coordinates,curltau,o,c,time_counter lat lon -a long_name,curltau,o,c,Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU[D=1,Y=@DDC]) ${out}
+
+
+! -- Get the arguments = tauu.nc, tauv.nc, out.nc
+let tauufile="$1"
+let tauvfile="$2"
+let outfile="$3"
+
+! -- Load files
+use "`tauufile`"
+use "`tauvfile`"
+
+! -- Compute the wind stress curl
+let curltau = tauv[d=2,x=@ddc]-tauu[d=1,y=@ddc]
+
+! -- Save the netcdf file
+save/file="`outfile`" curltau
+
