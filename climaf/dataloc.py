@@ -669,12 +669,12 @@ def selectCmip5DrsFiles(urls, **kwargs) :
             for f in lfiles :
                 if freqd != 'fx' :
                     #clogger.debug("checking period for "+ f)
-                    if frequency=='day':
+                    if freqd=='day':
                        regex=r'^.*([0-9]{8}-[0-9]{8}).nc$'
-                    elif frequency=='mo':
+                    elif freqd=='mon':
                        #regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
                        regex=r'^.*([0-9]{6}-[0-9]{6}).nc$'
-                    elif frequency=='yr':
+                    elif freqd=='yr':
                        regex=r'^.*([0-9]{4}-[0-9]{4}).nc$'
                     fileperiod=init_period(re.sub(regex,r'\1',f))
                     if (fileperiod and period.intersects(fileperiod)) :
