@@ -371,7 +371,7 @@ def projects():
         print 'Facets =>',cprojects[key]
 
 #
-def lonlatpres_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True): 
+def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True): 
     """
     Interpolates a lon/lat/pres field dat1 via two possible ways:
     - either by providing a target lon/lat/pres field dat2 => dat1 is regridded both horizontally and vertically on dat2
@@ -390,8 +390,8 @@ def lonlatpres_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
        >>> zonmean_dat = zonmean(time_average(dat))
        >>> zonmean_ref = zonmean(time_average(ref))
    
-       >>> dat_interpolated_on_ref = lonlatpres_interpolation(zonmean_dat,zonmean_ref)
-       >>> dat_interpolated_on_list_of_levels = lonlatpres_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+       >>> dat_interpolated_on_ref = lonlatvert_interpolation(zonmean_dat,zonmean_ref)
+       >>> dat_interpolated_on_list_of_levels = lonlatvert_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
 
     """
     
@@ -501,7 +501,7 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
 
     """
     
-    return lonlatpres_interpolation(dat1,dat2,vertical_levels,cdo_horizontal_grid='r1x90',horizontal_regridding=horizontal_regridding)
+    return lonlatvert_interpolation(dat1,dat2,vertical_levels,cdo_horizontal_grid='r1x90',horizontal_regridding=horizontal_regridding)
 
 
 
@@ -524,7 +524,7 @@ def diff_zonmean(dat1,dat2):
     Returns the zonal mean bias of dat1 against dat2
 
     The function first computes the zonal means of dat1 and dat2.
-    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function lonlatpres_interpolation.
+    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function lonlatvert_interpolation.
     It finally returns the bias field.
 
       >>> ds1= ....   # some dataset, with whatever variable
@@ -536,7 +536,7 @@ def diff_zonmean(dat1,dat2):
     zonmean_dat1 = ccdo(dat1, operator='zonmean')
     zonmean_dat2 = ccdo(dat2, operator='zonmean')
 
-    rgrd_dat1 = lonlatpres_interpolation(zonmean_dat1,zonmean_dat2)
+    rgrd_dat1 = lonlatvert_interpolation(zonmean_dat1,zonmean_dat2)
     #
     return minus(rgrd_dat1,zonmean_dat2)
 
