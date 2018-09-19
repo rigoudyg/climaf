@@ -11,7 +11,7 @@ __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", 
 
 version="1.1"
 
-import time,os
+import time,os, os.path
 
 def tim(string=None):
     """
@@ -43,10 +43,13 @@ if not already_inited  and not onrtd :
     tim("atexit")
     #
     import clogging, site_settings, cache, standard_operators, cmacro, operators
+    from driver import logdir
     tim("imports")
     print("Climaf version = "+version,file=sys.stderr)
+    driver.logdir=os.path.expanduser(os.getenv("CLIMAF_LOG_DIR","."))
     #
     # Set default logging levels
+    clogging.logdir=os.path.expanduser(os.getenv("CLIMAF_LOG_DIR","."))
     clogging.clog(os.getenv("CLIMAF_LOG_LEVEL","warning"))
     clogging.clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL","info"))
     tim("loggings")

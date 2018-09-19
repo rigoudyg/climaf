@@ -1,5 +1,7 @@
 import logging
 
+logdir="."
+
 class MyFormatter(logging.Formatter):
     def format(self, record):
         record.levelname = record.levelname.lower()
@@ -50,7 +52,7 @@ def clog(level=None) :
 
 def clog_file(level=None) :
     """
-    Sets the verbosity level for CliMAF log messages on file climaf.log
+    Sets the verbosity level for CliMAF log messages on file CLIMAF_LOG_DIR/climaf.log
 
    Args:
      level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
@@ -68,7 +70,7 @@ def clog_file(level=None) :
             
     if exist_file_handler==False:
         #print "ajout d un FileHandler"
-        fh = logging.FileHandler('climaf.log',mode='w') 
+        fh = logging.FileHandler(logdir+"/"+'climaf.log',mode='w') 
         if level : fh.setLevel(transl(level))
         fh.setFormatter(formatter)
         clogger.addHandler(fh)

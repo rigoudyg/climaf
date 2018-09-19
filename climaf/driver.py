@@ -23,6 +23,8 @@ from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod
 from climaf import xdg_bin
 
+logdir="."
+
 def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
     
@@ -535,7 +537,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
     tim1=time.time()
     clogger.info("Launching command:"+template)
     #
-    logfile=open('last.out', 'w')   
+    logfile=open(logdir+'/last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t "+template+"\n\n")
     try :
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
@@ -559,7 +561,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
             if files_exist[ll] == False: os.system("rm -f "+ll)  
     # Handle ouptuts
     if script.outputFormat=="txt" : 
-        with open("last.out",'r') as f:
+        with open(logdir+"/last.out",'r') as f:
             for line in f.readlines() :
                 sys.stdout.write(line)
     if script.outputFormat in operators.none_formats : return None
@@ -577,7 +579,7 @@ def ceval_script (scriptCall,deep,recurse_list=[]):
         return subdict["out_final"] #main_output_filename
     else : 
         raise Climaf_Driver_Error("Some output missing when executing "
-                                          ": %s. \n See last.out"%template)
+                                          ": %s. \n See %s/last.out"%(template,logdir))
 
 def timePeriod(cobject) :
     """ Returns a time period for a CliMAF object : if object is a dataset, returns

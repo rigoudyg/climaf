@@ -6,6 +6,10 @@ Whats' new
 
 Changes, newest first :
 
+- 2018/09/19:
+  - Allow to choose log directory (for files climaf.log and last.out),
+    using environment variable CLIMAF_LOG_DIR
+
 - 2017/05/02:
 
   - Change ncl default for operator ``curves`` (see
