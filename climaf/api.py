@@ -92,4 +92,4 @@ def cerr():
     """ Display file 'last.out' (stdout and stderr of last operator call)
     
     """
-    os.system('cat last.out')
+    os.system('cat '+logdir+'/last.out')
