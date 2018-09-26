@@ -6,7 +6,13 @@ Whats' new
 
 Changes, newest first :
 
-- 2018/08/02:
+
+- 2018/09/04:
+
+  - New operators:
+    * ``ensemble_ts_plot`` (:doc:`scripts/ensemble_ts_plot`), with python-user-friendly shortcut ``ts_plot`` (:py:func:`~climaf.functions.ts_plot`): an alternative to ``curves`` (:doc:`scripts/curves`) for time series, with more possibilities for customization
+    * ``cLinearRegression`` (:doc:`scripts/cLinearRegression`): computes linear regressions between two lon/lat/time datasets (same size) or between a time series and a lon/lat/time 
+    * ``curl_tau_atm`` (:doc:`scripts/curl_tau_atm`):to compute the wind stress curl on regular grids (typically atmospheric grids)
 
   - Modifications in ``lonlatpres_interpolation`` (ex-zonmean_interpolation) to make it more generic
     and suitable for CliMAF
@@ -23,6 +29,8 @@ Changes, newest first :
     that is supposed to have one single value. It uses cMA to import a masked array
     and returns only the float.
     :py:func:`~climaf.functions.cscalar`
+
+  - Bug fix on ds() for the access to daily datasets with the CMIP5 project
 
 
 - 2017/05/02:

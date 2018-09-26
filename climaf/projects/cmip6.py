@@ -1,8 +1,8 @@
 """
-This module declares locations for searching data for IPSL CMIP6 outputs produced by libIGCM for all frequencies,
-on Ciclad.
+This module declares locations for searching data for CMIP6 outputs produced by 
+libIGCM or Eclis for all frequencies.
 
-Contact: jerome.servonnat@lsce.ipsl.fr
+Contact: jerome.servonnat@lsce.ipsl.fr, senesi@meteo.fr
 
 """
 
@@ -12,65 +12,45 @@ from climaf.classes import cproject, calias, cfreqs, cdef
 from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 
-
 root = None
-login= None
 if atTGCC:
    # Declare a list of root directories for IPSL data at TGCC
-   root="/ccc/store/cont003/thredds"
+   root="/ccc/work/cont003/cmip6/cmip6"
 if onCiclad :
    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-   root="/ccc/store/cont003/thredds"
-   login="fabric"
-if onSpip:
-   # Declare a list of root directories for IPSL data at TGCC
-   root="/Users/marti/Volumes/CURIE/ccc/store/cont003/dsm"
-   print 'igcm_out : declaration root sur Spip : ', root
+   root="/ccc/work/cont003/cmip6/cmip6"
 if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
-   root="/cnrm/cmip/CMIP6"
+   root="/cnrm/cmip"
 
 if root:
-
-  # -- Declare a 'CMIP' CliMAF project (a replicate of the CMIP5 project)
-  # ---------------------------------------------------------------------------- >
-  cproject('CMIP6', ('frequency','monthly'), 'model', 'realm', 'table', 'experiment', \
-           'gr', 'root', 'version', 'mip','institute',\
-           ensemble=['model','simulation'],separator='%')
-
-  # -- Set the aliases for the frequency
-  cfreqs('CMIP6', {'monthly':'mon'})
-  
-  # --> systematic arguments = simulation, frequency, variable
-  # -- Set default values
-  cdef('simulation'  , 'r1i1p1f2'     , project='CMIP6')
+  ## -- Declare a 'CMIP5_bis' CliMAF project (a replicate of the CMIP5 project)
+  ## ---------------------------------------------------------------------------- >
+  cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization', 'grid', 'version', ensemble=['model','realization'],separator='%')
+  ## --> systematic arguments = simulation, frequency, variable
+  ## -- Set the aliases for the frequency
+  ## -- Set default values
+  cdef('root'         , root          , project='CMIP6')
+  cdef('institute'    , '*'           , project='CMIP6')
+  cdef('mip'          , '*'           , project='CMIP6')
+  #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
+  cdef('grid'         , 'g*'          , project='CMIP6')
+  if atCNRM:
+      cdef('realization'  , 'r1i1p1f2'    , project='CMIP6')
+  else:
+      cdef('realization'  , 'r1i1p1f1'    , project='CMIP6')
   cdef('experiment'  , 'historical'   , project='CMIP6')
-  cdef('table'       , '*'            , project='CMIP6')
-  cdef('realm'       , '*'            , project='CMIP6')
-  cdef('gr'          , 'g*'           , project='CMIP6')
-  cdef('root'        , '/prodigfs'    , project='CMIP6')
   cdef('version'     , 'latest'       , project='CMIP6')
-  cdef('mip'         , '*'            , project='CMIP6')
-  cdef('institute'   , '*'            , project='CMIP6')
 
-  
-  # -- Define the pattern
-  pattern="${root}/${model}/${experiment}/${frequency}/${realm}/${table}/${simulation}/latest/${variable}/${variable}_${table}_${model}_${experiment}_${simulation}_YYYYMM-YYYYMM.nc"
-  if not atCNRM :
-     pattern1="${root}/*/${variable}_${table}_${model}_${experiment}_${simulation}_${gr}_YYYYMM-YYYYMM.nc"
-     pattern2="${root}/${variable}_${table}_${model}_${experiment}_${simulation}_${gr}_YYYYMM-YYYYMM.nc"
-     # -- call the dataloc CliMAF function
-     dataloc(project='CMIP6', organization='generic', url=[pattern1,pattern2])
-  else :
-     cdef('root'        , root            , project='CMIP6')
-     file_pattern="${variable}_${table}_${model}_${experiment}_${simulation}_${gr}_YYYYMM-YYYYMM.nc"
 
-     # Declare final organization on Lustre /cnrm
-     path_pattern="${root}/${mip}/${institute}/${model}/${experiment}/${simulation}/${table}/${variable}/${gr}/${version}/"
-     # Declare temporary organization on Lustre /cnrm
-     path_pattern2="${root}/${model}/*/${model}_${experiment}_${simulation}/"
-     #
-     dataloc(project="CMIP6",organization='generic',url=[path_pattern+file_pattern,path_pattern2+file_pattern])
+  ## -- Define the patterns
+  base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
+  patterns=[]
+  for date_format in [ "YYYY-YYYY" ,"YYYYMM-YYYYMM" , "YYYYMMDD-YYYYMMDD" , "YYYYMMDDHHMM-YYYYMMDDHHMM" ] :
+      patterns.append(base_pattern + date_format + ".nc")
+
+  ## -- call the dataloc CliMAF function
+  dataloc(project='CMIP6', organization='generic', url=patterns)
 
   calias('CMIP6', 'tos', offset=273.15)
   calias('CMIP6', 'thetao', offset=273.15)
@@ -82,5 +62,7 @@ if root:
   calias('CMIP6', 'PO4', 'po4')
   calias('CMIP6', 'Si', 'si')
   calias('CMIP6', 'O2', 'o2')
+
+
 
 
