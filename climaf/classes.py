@@ -393,7 +393,10 @@ class cdataset(cobject):
         return rep
 
     def isLocal(self) :
-        return self.baseFiles().find(":")<0
+        #return self.baseFiles().find(":")<0
+        model=getattr(self,"model","*")
+        return(dataloc.isLocal(project=self.project, model=model, \
+                               simulation=self.simulation, frequency=self.frequency))
         
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached

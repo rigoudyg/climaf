@@ -437,7 +437,7 @@ def selectGenericFiles(urls, **kwargs):
                     continue    
                 if (f not in rep):
                     # local data
-                    if remote_prefix and \
+                    if not remote_prefix and \
                         (variable=='*' or "," in variable or fileHasVar(f,variable) or \
                         (altvar != variable and fileHasVar(f,altvar))) :
                         # Should check time period in the file if not regexp
