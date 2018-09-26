@@ -18,9 +18,9 @@ scripts="index_html.py data_generic.py plotmap.py basic_oce.py latlonbox.py \
 # Add some scripts, depending on the data available at each site
 if [[ $(uname -n) == lx* || $(uname -n) == sx* ]]; then 
     # CNRM
-    scripts=$scripts" data_cmip5drs.py ensemble.py data_obs.py cdftools.py cdftools_multivar.py cdftransport.py"
+    scripts=$scripts" data_cmip5drs.py data_cmip6drs.py ensemble.py data_obs.py cdftools.py cdftools_multivar.py cdftransport.py"
     # Add scripts depending on user-configured data
-    [ $(whoami) = senesi ] && scripts=$scripts" data_em.py seaice.py"
+    #[ $(whoami) = senesi ] && scripts=$scripts" data_em.py seaice.py"
 elif [[ $(uname -n) == ciclad* ]]; then 
     # Ciclad
     scripts=$scripts" data_cmip5drs.py ensemble.py"
