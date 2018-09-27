@@ -146,10 +146,56 @@ def load_standard_operators():
     #
     cscript("ncpdq","ncpdq ${arg} ${in} ${out}")
     #
+    # Add nav_lon and nav_lat to a file
+    cscript('add_nav_lat','cp ${in} ${out} ; ncks -A ${nav_lat_file} ${out} ; ncatted -O -a coordinates,${var},o,c,"${coordinates}" ${out}')
+    cscript('add_nav_lon_nav_lat_from_mesh_mask','cp ${in} ${out} ; ncks -A -v nav_lon,nav_lat ${mesh_mask_file} ${out}')
+    #
+    cscript('get_oneVar','ncks -v ${var} ${in} ${out}')
+    cscript('cncks','ncks -v ${var} ${in} ${out}')
+    #cscript('cnco','${operator} ${arg} ${in} ${out}')
+    #
+    # ensemble_ts_plot
+    cscript('ensemble_ts_plot','python '+scriptpath+'ensemble_time_series_plot.py --filenames="${mmin}" --outfig=${out} '+\
+        '--labels=\'\"${labels}\"\' --variable=${var} --colors="${colors}" --min="${min}" --max="${max}" --lw="${lw}" '+\
+        '--offset="${offset}" --scale="${scale}" '+\
+        '--highlight_period="${highlight_period}" '+\
+        '--highlight_period_lw="${highlight_period_lw}" '+\
+        '--xlabel="${xlabel}" --ylabel="${ylabel}" '+\
+        '--xlabel_fontsize="${xlabel_fontsize}" --ylabel_fontsize="${ylabel_fontsize}" '+\
+        '--xlim="${xlim}" --ylim="${ylim}" '+\
+        '--tick_size="${tick_size}" '+\
+        '--text="${text}" '+\
+        '--text_fontsize="${text_fontsize}" '+\
+        '--text_colors="${text_colors}" '+\
+        '--text_verticalalignment="${text_verticalalignment}" '+\
+        '--text_horizontalalignment="${text_horizontalalignment}" '+\
+        '--legend_colors="${leg_colors}" --legend_labels="${legend_labels}" '+\
+        '--title="${title}" --title_fontsize="${title_fontsize}" '+\
+        '--left_string="${left_string}" --right_string="${right_string}" --center_string="${center_string}" '+\
+        '--left_string_fontsize="${left_string_fontsize}" --right_string_fontsize="${right_string_fontsize}" --center_string_fontsize="${center_string_fontsize}" '+\
+        '--legend_loc="${legend_loc}" --legend_xy_pos="${legend_xy_pos}" --legend_labels="${legend_labels}" --legend_colors="${legend_colors}" '+\
+        '--legend_fontsize="${legend_fontsize}" --legend_ncol="${legend_ncol}" --legend_lw="${legend_lw}" '+\
+        '--draw_legend="${draw_legend}" --legend_frame="${legend_frame}" '+\
+        '--append_custom_legend_to_default="${append_custom_legend_to_default}" '+\
+        '--left_margin="${left_margin}" --right_margin="${right_margin}" --top_margin="${top_margin}" --bottom_margin="${bottom_margin}" '+\
+        '--horizontal_lines_values="${horizontal_lines_values}" --horizontal_lines_styles="${horizontal_lines_styles}" '+\
+        '--horizontal_lines_lw="${horizontal_lines_lw}" --horizontal_lines_colors="${horizontal_lines_colors}" '+\
+        '--vertical_lines_values="${vertical_lines_values}" --vertical_lines_styles="${vertical_lines_styles}" '+\
+        '--vertical_lines_lw="${vertical_lines_lw}" --vertical_lines_colors="${vertical_lines_colors}" '+\
+        '--fig_size="${fig_size}" ', format='png')
+    #
+    # cLinearRegression
+    cscript('cLinearRegression','python '+scriptpath+'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} --yvariable ${var_2} --outfile ${out}', _var='slope')
+    #
+    # ml2pl (only on Ciclad)
     if onCiclad:
         cscript("ml2pl", scriptpath+"ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
         fixed_fields("ml2pl",("press_levels.txt",scriptpath+"press_levels.txt"))
+    #
+    # curl_tau_atm
+    cscript('curl_tau_atm', 'ferret -script '+scriptpath+'curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon -d LAT,lat -v LAT,lat -v CURLTAU,curltau ${out} ; ncatted -O -a coordinates,curltau,o,c,"time lat lon" -a long_name,curltau,o,c,"Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU[D=1,Y=@DDC])" ${out}', _var='curltau')
+
     #   
     if (os.system("type cdfmean >/dev/null 2>&1")== 0 ) :
         load_cdftools_operators()

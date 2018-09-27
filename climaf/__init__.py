@@ -7,9 +7,10 @@ from __future__ import print_function
 # Created : S.Senesi - 2014
 
 __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators", "projects", "cmacro", "html", "functions", "plot" ]
+          "operators", "period", "standard_operators", "projects", "cmacro", "html", "functions", "plot",
+          "derived_variables" ]
 
-version="1.1"
+version="1.2"
 
 import time,os, os.path
 

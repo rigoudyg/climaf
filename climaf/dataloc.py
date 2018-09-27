@@ -250,6 +250,11 @@ def selectFiles(**kwargs):
             normfreq=kwargs2['frequency'] 
             if normfreq in classes.frequencies[project]: 
                 kwargs2['frequency']=classes.frequencies[project][normfreq]
+        # JS # Convert normalized realm to project-specific realm if applicable
+        if "realm" in kwargs and project in classes.realms :
+            normrealm=kwargs2['realm']
+            if normrealm in classes.realms[project]:
+                kwargs2['realm']=classes.realms[project][normrealm]
         #
         # Call organization-specific routine
         if (org == "EM") :
@@ -432,7 +437,7 @@ def selectGenericFiles(urls, **kwargs):
                     continue    
                 if (f not in rep):
                     # local data
-                    if remote_prefix and \
+                    if not remote_prefix and \
                         (variable=='*' or "," in variable or fileHasVar(f,variable) or \
                         (altvar != variable and fileHasVar(f,altvar))) :
                         # Should check time period in the file if not regexp
@@ -549,6 +554,61 @@ def glob_remote_data(remote, pattern) :
     except ftp.all_errors as err_ftp:
         print err_ftp
         raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(pattern,host,username))
+
+
+def remote_to_local_filename(url):
+    """
+    url: an url of remote data
+
+    Return local filename of remote file
+    """
+    from climaf import remote_cachedir
+
+    if len(url.split(":")) == 3: k=1
+    else: k=0
+
+    return rep
+
+
+def glob_remote_data(url, pattern) :
+    """
+    Returns a list of path names that match pattern, for remote data
+    located at url
+    """
+    
+    if len(url.split(":")) == 3: k=1
+    else: k=0
+
+    if re.findall("@",url.split(":")[k]):
+        username=url.split(":")[k].split("@")[0]
+        host=url.split(":")[k].split("@")[-1]
+    else:
+        username=''
+        host=url.split(":")[k]
+
+    secrets = netrc.netrc()
+
+    if username:
+        if host in secrets.hosts:
+            login, account, password = secrets.authenticators( host )
+            if login != username: password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
+        else:
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))            
+    else:
+        if host in secrets.hosts:
+            username, account, password = secrets.authenticators( host )
+        else:
+            username = raw_input("Enter login for host '%s': " %host)
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
+
+    try : 
+        connect=ftp.FTP(host,username,password)
+        listfiles=connect.nlst(pattern)
+        connect.quit()
+        return(listfiles)
+    except ftp.all_errors as err_ftp:
+        print err_ftp
+        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
 
 
 def remote_to_local_filename(url):
@@ -726,7 +786,13 @@ def selectCmip5DrsFiles(urls, **kwargs) :
             for f in lfiles :
                 if freqd != 'fx' :
                     #clogger.debug("checking period for "+ f)
-                    regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
+                    if freqd=='day':
+                       regex=r'^.*([0-9]{8}-[0-9]{8}).nc$'
+                    elif freqd=='mon':
+                       #regex=r'^.*([0-9]{4}[0-9]{2}-[0-9]{4}[0-9]{2}).nc$'
+                       regex=r'^.*([0-9]{6}-[0-9]{6}).nc$'
+                    elif freqd=='yr':
+                       regex=r'^.*([0-9]{4}-[0-9]{4}).nc$'
                     fileperiod=init_period(re.sub(regex,r'\1',f))
                     if (fileperiod and period.intersects(fileperiod)) :
                         rep.append(f)

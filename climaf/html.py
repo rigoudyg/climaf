@@ -16,6 +16,9 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 
 import os, re, glob 
 from climaf import __path__ as cpath
+from climaf.cache import getCRS
+import pickle
+
 
 def header(title,style_file=None) :
     """ Returns text for an html document header, with provided
@@ -37,10 +40,11 @@ def header(title,style_file=None) :
         <hr/> <!--- this draws a line --->
         """
     if style_file is not None :
-        style=\
-          """<link rel="stylesheet" href=""" +\
-          style_file +\
-          """ type="text/css"/>"""
+        with open(style_file) as fic :
+            style=\
+              """<style type="text/css" media=screen>"""+\
+              fic.read()+\
+              """</style>"""
     else:
         with open(cpath[0]+"/cami_style_css") as fic :
             style=\
@@ -212,16 +216,35 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             tmpfilename,filextension=os.path.splitext(os.path.basename(filename))
             
             regex=re.compile('([a-z]+)\_([a-z]+)([0-9]+)')
-            nb=0
-            if glob.glob(dirname+"/climaf_atlas*"):
-                for i in glob.glob(dirname+"/climaf_atlas*"):
-                    res=regex.search(i)
-                    nb=max(int(res.group(3)),nb)
-                nb=nb+1
-            else:
-                nb=1
-     
+            # !!! # -- Make a new nb that is unique to avoid the issues with images
+            #          in the cache of the browser
+            from datetime import datetime
+            nbs = []
+            from random import randrange
+            nb = randrange(1,10000000000)
+            while nb in nbs: nb = randrange(1,10000000000)
+            nbs.append(nb)
             os.link(filename,dirname+"/climaf_atlas"+str(nb)+filextension)
+            # -- Create/append the index file in the output directory that will provide
+            # -- the CRS with the new png file (climaf_atlas...png)
+            index_atlas = dirname+"/index_atlas"
+            index_dict = {getCRS(filename):"climaf_atlas"+str(nb)+filextension}
+            CRS_of_file = getCRS(filename)
+            #
+            if not os.path.isfile(index_atlas):
+               # -- Create the dictionary
+               tt = index_dict 
+            else:
+               # -- Read the content of the index
+               atlas_index_r = file(os.path.expanduser(index_atlas), "r")
+               tt = pickle.load(atlas_index_r)
+               atlas_index_r.close()
+               # -- Append the file
+               tt.update(index_dict)
+            # -- Save the file
+            atlas_index_w = file(os.path.expanduser(index_atlas), "w")
+            pickle.dump(tt,atlas_index_w)
+            atlas_index_w.close()
           
             return '<TD ALIGN=RIGHT>'+ \
                    link(label,"climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
@@ -412,7 +435,7 @@ def fline(func,farg, sargs, title=None, \
 
 
 def cinstantiate(objin,filout=None,should_exec=True) :
-    """ Read file or string 'objin', extract parts of text surrounded by '£',
+    """ Read file or string 'objin', extract parts of text surrounded by 'Â£',
     evaluate them as Python assignments or expressions, replaces
     expressions with the result of evaluation, and :
      - either returns the whole, modified, file content
@@ -449,8 +472,8 @@ def cinstantiate(objin,filout=None,should_exec=True) :
     else:
         print("Input is not a file nor a string"+`flux`)
         return(None)
-    #re.sub(r"£([^£]*)£",repl,"aa£pp=6£bb£`pp`£cc\ndd£`pp`£")
-    rep=re.sub(u"£([^£]*)£",exec_and_discard_test,flux)
+    #re.sub(r"Â£([^Â£]*)Â£",repl,"aaÂ£pp=6Â£bbÂ£`pp`Â£cc\nddÂ£`pp`Â£")
+    rep=re.sub(u"Â£([^Â£]*)Â£",exec_and_discard_test,flux)
     rep=re.sub(u"&([^&]*)&",replace_text_with_evaluation,rep)
     if filout :
         with open(filout,'w') as ficout :
@@ -458,7 +481,8 @@ def cinstantiate(objin,filout=None,should_exec=True) :
     else:
         return rep
 
-
+# TODO : a function which copy all images referenced by the index, and modifies
+# the index accordingly (for 'saving' the image package)
 def compareCompanion():
     """ Includes the compareCompanion Javascript functionality
         developed by Patrick Brockmann (patrick.brockmann@lsce.ipsl.fr)
@@ -468,6 +492,7 @@ def compareCompanion():
         displaid is controlled with a slider (in the lower right corner)
     """
     return(' <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js"></script>\n <script type="text/javascript" src="https://cdn.rawgit.com/PBrockmann/compareCompanion/master/compareCompanion.js"></script> \n')
+
 
 
 class Climaf_Html_Error(Exception):

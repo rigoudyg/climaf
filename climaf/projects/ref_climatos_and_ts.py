@@ -60,7 +60,7 @@ if atCNRM:
     root="/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
     
 cproject('ref_climatos', ('frequency','annual_cycle'), 'product', 'clim_period', ensemble=['product'],separator='%')
-cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annual_cycle':'mo'})
+cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annual_cycle':'mo','yearly':'yr'})
 
 cdef('variable'    , '*'            , project='ref_climatos')
 cdef('product'     , '*'            , project='ref_climatos')
@@ -69,7 +69,8 @@ cdef('simulation'  , 'refproduct'   , project='ref_climatos')
 cdef('period'      , 'fx'           , project='ref_climatos')
 
 if (root) :
-    pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_${clim_period}-clim.nc" 
+    #pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc" 
+    pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_*${clim_period}-clim.nc"
     dataloc(project='ref_climatos', organization='generic', url=pattern2)
 
 
@@ -83,6 +84,13 @@ cdef('variable'    , '*'            , project='ref_ts')
 cdef('product'     , '*'            , project='ref_ts')
 cdef('simulation'  , 'refproduct'   , project='ref_ts')
 cdef('period'      , '1980-2005'    , project='ref_ts')
+
+calias('ref_climatos', 'O2', scale=44.64)
+# Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
+#dataloc(project="ref_climatos",organization="generic",
+#        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
+calias(project='ref_climatos',variable='moc',fileVariable='stream_function_mar',filenameVar='moc')
+calias(project='ref_ts',variable='moc',fileVariable='stream_function_mar',filenameVar='moc')
 
 if (root) :
     pattern1=root+"ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
