@@ -10,7 +10,7 @@ __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", 
           "operators", "period", "standard_operators", "projects", "cmacro", "html", "functions", "plot",
           "derived_variables" ]
 
-version="1.1"
+version="1.2"
 
 import time,os
 
