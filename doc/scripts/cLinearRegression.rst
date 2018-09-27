@@ -1,5 +1,5 @@
 cLinearRegression : performs a linear regression between X and Y
----------------------------------------------------
+----------------------------------------------------------------
 
 cLinearRegression performs a linear regression Y = aX + b between two fields X and Y. They can be either spatio-temporal fields (same grids) or just time series. Y can be a spatio-temporal field, and X can be a time series.
 This operator is based on cdutil (CDAT).

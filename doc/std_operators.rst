@@ -144,7 +144,7 @@ Documented operators and 'object functions' as of today :
     - :py:func:`~climaf.plot.plot_params.plot_params`
     - :doc:`scripts/curves`
     - :doc:`scripts/ensemble_ts_plot`
-    - :doc:`climaf/function/ts_plot`
+    - :py:func::`~climaf.function.ts_plot`
     - :doc:`scripts/hovm`
     - :py:func:`~climaf.plot.plot_params.hovm_params`
     - :doc:`scripts/cpdfcrop`
