@@ -34,7 +34,8 @@
 
 # Absolute path to Fortran executable:
 #executable=/data/guez/Compil_prod/Ml2pl/ml2pl
-executable=$CLIMAF/scripts/ml2pl
+#executable=$CLIMAF/scripts/ml2pl
+executable=$(dirname *0)/ml2pl
 
 USAGE="usage: ml2pl.sh [OPTION]... input-file output-file [pressure_file]
 Interpolates NetCDF variables from model levels to pressure levels.
