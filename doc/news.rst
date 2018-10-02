@@ -6,7 +6,12 @@ Whats' new
 
 Changes, newest first :
 
-- 2018/09/27:
+- V1.2.1:
+
+  - Introduce doc for project CMIP6 : :py:mod:`~climaf.projects.cmip6`
+
+
+- V1.2:
 
   - New operators:
   

@@ -11,6 +11,11 @@ CliMAF knows a bunch of datasets . Package  ``projects`` is devoted to that :
 
 .. automodule:: climaf.projects
 
+cmip6 
+-----------------------------------------------------------
+
+.. automodule:: climaf.projects.cmip6
+
 cmip5 
 -----------------------------------------------------------
 

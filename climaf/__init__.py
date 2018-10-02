@@ -34,8 +34,10 @@ if (os.system("type xdg-open >/dev/null 2>&1")== 0) :
 already_inited=False
 onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+
 if not already_inited  and not onrtd : 
     import sys
+    from climaf.driver import logdir
     #
     already_inited=True
     #
@@ -44,10 +46,9 @@ if not already_inited  and not onrtd :
     tim("atexit")
     #
     import clogging, site_settings, cache, standard_operators, cmacro, operators
-    from driver import logdir
     tim("imports")
     print("Climaf version = "+version,file=sys.stderr)
-    driver.logdir=os.path.expanduser(os.getenv("CLIMAF_LOG_DIR","."))
+    logdir=os.path.expanduser(os.getenv("CLIMAF_LOG_DIR","."))
     #
     # Set default logging levels
     clogging.logdir=os.path.expanduser(os.getenv("CLIMAF_LOG_DIR","."))
