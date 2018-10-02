@@ -1,3 +1,2 @@
 netcdf4
-ftplib
 numpy
