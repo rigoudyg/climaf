@@ -7,8 +7,8 @@ from __future__ import print_function
 # Created : S.Senesi - 2014
 
 __all__=[ "site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
-          "operators", "period", "standard_operators", "projects", "cmacro", "html", "functions", "plot",
-          "derived_variables" ]
+          "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
+          "projects", "derived_variables" ]
 
 version="1.2"
 
@@ -68,7 +68,6 @@ if not already_inited  and not onrtd :
     print ("Cache directory for remote data set to : "+remote_cachedir+" (use $CLIMAF_REMOTE_CACHE if set) ",file=sys.stderr)
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
-    exec("from climaf.projects  import *") in sys.modules['__main__'].__dict__
     tim("execs_projects")
     exec("from climaf.classes   import ds, eds, cens, fds") in sys.modules['__main__'].__dict__
     tim("execs_classes")
@@ -76,6 +75,7 @@ if not already_inited  and not onrtd :
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
+    exec("from climaf.projects  import *") in sys.modules['__main__'].__dict__
     #
     # Read and execute user config file
     conf_file=os.path.expanduser("~/.climaf")

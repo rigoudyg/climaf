@@ -235,7 +235,7 @@ def getCRS(filename) :
     command=form%filename
     try:
         rep=subprocess.check_output(command, shell=True).replace('\n','')
-        if (rep == "" ) : 
+        if (rep == "" ) and ('Empty.png' not in filename) : 
             clogger.error("file %s is not well formed (no CRS)"%filename)
         if re.findall(".nc$",filename) : rep=rep.replace(r"\'",r"'")
     except:
