@@ -110,7 +110,7 @@ aladin_coordfix ()
 
 # For the time being, at most sites, must use NetCDF3 file format chained CDO
 # operations because NetCDF4 is not threadsafe there
-if [[ $(uname -n ) == ciclad* ]] ; then CDO="cdo" ; else CDO="cdo -f nc" ; fi
+if [[ $(uname -n ) == ciclad* ]] ; then CDO="cdo -O " ; else CDO="cdo -O -f nc" ; fi
 
 # Prepare CDO operator strings
 
