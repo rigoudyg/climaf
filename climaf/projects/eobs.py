@@ -1,22 +1,10 @@
 """
 
 This module declares the project E-OBS : 
-This archive is available on Ciclad (IPSL), Curie (TGCC) and Ada (IDRIS), and /cnrm and at Cerfacs
+This archive is available on Ciclad (IPSL)
 
 The specific attributes are:
-
-
-Default values of the attributes for time_series (**ref_ts**) :
-
-- product : '*'
-- period : '1900-2050'
-- frequency : 'monthly'
-
-Example of a 'ref_ts' project dataset declaration ::
-
- >>> cdef('project','ref_ts')
- >>> d=ds(variable='tas',period='198001'....)
-
+- grid : '*'
 
 
 """
