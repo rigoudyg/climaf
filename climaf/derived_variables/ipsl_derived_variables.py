@@ -145,6 +145,9 @@ derive('*', 'va_Atl_sect', 'ccdo', 'va', operator='sellonlatbox,'+Atl_sect)
 derive('*', 'ta_Atl_sect', 'ccdo', 'ta', operator='sellonlatbox,'+Atl_sect)
 derive('*', 'hus_Atl_sect', 'ccdo', 'hus', operator='sellonlatbox,'+Atl_sect)
 
+# -- DTR
+derive('*','dtr','minus','tasmax','tasmin')
+derive('*','tasrange','minus','tasmax','tasmin')
 
 
 

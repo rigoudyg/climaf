@@ -40,7 +40,9 @@ if root:
 
 
   ## -- Define the pattern
-  pattern="${root}/CMIP6/CMIP/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc"
+  pattern=["${root}/CMIP6/CMIP/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc", 
+           "${root}/CMIP6/CMIP/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMMDD-YYYYMMDD.nc"]
+
   ## --> Note that the YYYYMM-YYYYMM string means that the period is described in the filename and that CliMAF can
   ## --> perform period selection among the files it found in the directory (can be YYYY, YYYYMM, YYYYMMDD).
   ## --> You can use an argument like ${years} instead if you just want to do string matching (no smart period selection)

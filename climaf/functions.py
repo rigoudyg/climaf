@@ -405,7 +405,7 @@ def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
     # -- First, we check the unit of the vertical dimension of file1
     levname1=None
     for varname in ncfile1.variables:
-        if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
+        if varname.lower() in ['level','levels','lev','levs','depth','deptht','olevel'] or 'plev' in varname.lower():
             levname1=varname
     if not levname1:
         clogger.debug('Name of the vertical axis not found for dat1')
@@ -424,7 +424,7 @@ def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
         
         levname2=None
         for varname in ncfile2.variables:
-            if varname.lower() in ['level','levels','lev','levs','depth','deptht'] or 'plev' in varname.lower():
+            if varname.lower() in ['level','levels','lev','levs','depth','deptht','olevel'] or 'plev' in varname.lower():
                 levname2=varname
         clogger.debug('levname2 = %s' %levname2)
         if not levname2:
