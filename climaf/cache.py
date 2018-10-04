@@ -172,7 +172,7 @@ def register(filename,crs,outfilename=None):
         crs2filename[crs]=filename
         return True 
     waited=0
-    while waited < 20 and not os.path.exists(filename) :
+    while waited < 50 and not os.path.exists(filename) :
         time.sleep(0.1)
         waited += 1
     #time.sleep(0.5)
@@ -235,7 +235,7 @@ def getCRS(filename) :
     command=form%filename
     try:
         rep=subprocess.check_output(command, shell=True).replace('\n','')
-        if (rep == "" ) : 
+        if (rep == "" ) and ('Empty.png' not in filename) : 
             clogger.error("file %s is not well formed (no CRS)"%filename)
         if re.findall(".nc$",filename) : rep=rep.replace(r"\'",r"'")
     except:

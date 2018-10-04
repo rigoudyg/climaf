@@ -70,10 +70,10 @@ clim_average : Computes climatological averages on the annual cycle of a dataset
 .. autofunction:: climaf.functions.clim_average
 
 
-lonlatpres_interpolation : Interpolates a lon/lat/pres field (two possible ways) 
+lonlatvert_interpolation : Interpolates a lon/lat/pres field (two possible ways) 
 ----------------------------------------------------------------------------------------------------------
 
-.. autofunction:: climaf.functions.lonlatpres_interpolation
+.. autofunction:: climaf.functions.lonlatvert_interpolation
 
 
 zonmean : Return the zonal mean field of dat

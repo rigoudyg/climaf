@@ -56,9 +56,13 @@ Configuring CliMAF
  - CLIMAF_REMOTE_CACHE : a directory used for storing local copies
    of remote data; defaults to $CLIMAF_CACHE/remote_data. 
  
+ - CLIMAF_LOG_DIR : for setting the directory holdong climaf logs
+   (defaults to current working directory
+
  - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
    verbosity level on stderr (resp. on file climaf.log); defaults to
-   'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog` for details
+   'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog`
+   (resp. :py:func:`~climaf.clogging.clog_file`) for details
 
  - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will
    automatic fix CNRM’s Nemo old data time_axis issues. This adresses

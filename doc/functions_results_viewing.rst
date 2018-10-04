@@ -41,6 +41,12 @@ implot : Interactive version of plot() for display in IPython Notebooks
 .. autofunction:: climaf.functions.implot
 
 
+ts_plot : Shortcut for ensemble_ts_plot
+-------------------------------------------------------------------------------------
+
+.. autofunction:: climaf.functions.ts_plot
+
+
 plot_params : get plot parameters for a variable and a context
 ----------------------------------------------------------------
 

@@ -33,7 +33,7 @@ Remarks :
    - ``offset``, ``scale``: apply an offset and a scale to all your time series
    - ``xlim``: Provide the start date and end date to force the X axis. Ex: 1950-01-01,2005-12-31
    - ``ylim``: Provide the interval for the Y axis
-   #- time_offset', action='store', default=None, help='Add a time offset to the beginning of the time series')
+   - ``time_offset`` : Add a time offset to the beginning of the time series
    - ``text``: add some text in the plot; the user provides a triplet separared with commas x,y,text; separate the triplets with | if you want to provide multiple texts. Ex: x1,y1,text1|x2,y2,text2
    - ``text_fontsize``: fontsize of the text (separate with commas if provide several
    - ``text_colors``: color of the text (separate with commas if provide several)

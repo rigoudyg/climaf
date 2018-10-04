@@ -63,6 +63,7 @@ Some of the examples can be run anywhere, as they use the data sample installed 
 
 Others show how to acces some known data sets on CNRM or IPSL file system :
  
+  - :download:`data_cmip6drs.py  <../examples/data_cmip6drs.py>`    : access data which are organized using the CMIP5 Data Reference Syntax 
   - :download:`data_cmip5drs.py  <../examples/data_cmip5drs.py>`    : access data which are organized using the CMIP5 Data Reference Syntax 
   - :download:`data_generic.py <../examples/data_generic.py>`     : using the 'generic' type of organization on various examples : 
      - OCMIP5 data on Ciclad

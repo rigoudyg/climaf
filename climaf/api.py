@@ -80,7 +80,7 @@ from driver    import ceval, cfile, cshow, cMA, cvalue, cimport, cexport,calias,
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
 from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
-from clogging  import clogger, clog, clog_file
+from clogging  import clogger, clog, clog_file, logdir
 from site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 from plot.plot_params import plot_params, hovm_params
 from plot.varlongname import varlongname
@@ -94,4 +94,4 @@ def cerr():
     """ Display file 'last.out' (stdout and stderr of last operator call)
     
     """
-    os.system('cat last.out')
+    os.system('cat '+logdir+'/last.out')

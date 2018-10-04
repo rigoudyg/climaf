@@ -17,6 +17,7 @@ import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs,cdef
 from climaf.site_settings import atCNRM, onCiclad
+from climaf.operators import derive
 
 p=cproject("CMIP5" ,"model","experiment", ("frequency","monthly"),
            ("table","*"),("realm","*"),("version","last"),
@@ -40,3 +41,7 @@ if urls_CMIP5 :
     # for searching data for a CliMAF dataset (by function ds) except if 
     # a more specific dataloc entry matches the arguments to 'ds'
     dataloc(project="CMIP5", organization="CMIP5_DRS", url=urls_CMIP5)
+
+
+calias('CMIP5', 'hflsevap', 'hfls', scale=1./2.5e6 )
+derive('CMIP5', 'pme', 'minus', 'pr' ,'hflsevap')

@@ -571,18 +571,21 @@ def convert_list_to_string(dum,separator1=',', separator2='|'):
 
 
 def ts_plot(ts, **kwargs):
-    """
-    ts_plot is a python-user-friendly interface for the climaf operator ensemble_ts_plot.
-    It takes the same arguments as ensemble_ts_plot, but you can pass python lists
-    instead of comma-separared strings.:
-       It can take as input:
-            * a single CliMAF object dataset alone
-            * a dictionary with a name and a single CliMAF object
-            * a list of dictionaries or CliMAF objects
-            * a CliMAF ensemble
-       It is also able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
+    """ 
+    A python-user-friendly interface for the climaf operator :doc:`scripts/ensemble_ts_plot`.
+
+    It takes the same arguments, but you can pass python lists
+    instead of comma-separared strings.
+
+    It can take as input:
+            - a single CliMAF object dataset alone
+            - a dictionary with a name and a single CliMAF object
+            - a list of dictionaries or CliMAF objects
+            - a CliMAF ensemble
+
+    It is also able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
     
-    See the documentation of ensemble_ts_plot for the details on all possible options.
+    See the documentation of :doc:`scripts/ensemble_ts_plot` for the details on all possible options.
 
     Examples:
 

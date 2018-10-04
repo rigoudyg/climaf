@@ -1,54 +1,64 @@
 """
-This module declares locations for searching data for IPSL CMIP6 outputs produced by libIGCM for all frequencies,
-on Ciclad.
+This module declares locations for searching data for CMIP6 outputs produced by 
+libIGCM or Eclis for all frequencies.
 
-Contact: jerome.servonnat@lsce.ipsl.fr
+Attributes for CMIP6 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
+
+Syntax for these attributes is described in `the CMIP6 DRS document <https://goo.gl/v1drZl>`_
+
+Example for a CMIP6 dataset declaration ::
+
+ >>> tas1pc=ds(project='CMIP6', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon', realization='r3i1p1f2', period='1860-1861')
+
+
 
 """
 
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs, crealms, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip
-
+from climaf.classes import cproject, calias, cfreqs, cdef
+from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 
 root = None
-login= None
 if atTGCC:
    # Declare a list of root directories for IPSL data at TGCC
    root="/ccc/work/cont003/cmip6/cmip6"
 if onCiclad :
    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
    root="/ccc/work/cont003/cmip6/cmip6"
+if atCNRM:
+   # Declare a list of root directories for IPSL data at TGCC
+   root="/cnrm/cmip"
 
 if root:
   ## -- Declare a 'CMIP5_bis' CliMAF project (a replicate of the CMIP5 project)
   ## ---------------------------------------------------------------------------- >
-  cproject('CMIP6', ('frequency','monthly'), 'root', 'model', 'institute', 'table', 'experiment', 'realization', 'grid', 'version', ensemble=['model','realization'],separator='%')
+  cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization', 'grid', 'version', ensemble=['model','realization'],separator='%')
   ## --> systematic arguments = simulation, frequency, variable
   ## -- Set the aliases for the frequency
-  cfreqs('CMIP6', {'monthly':'mon', 'yearly':'yr', 'daily':'day'})
   ## -- Set default values
   cdef('root'         , root          , project='CMIP6')
   cdef('institute'    , '*'           , project='CMIP6')
-  cdef('grid'         , 'gr'          , project='CMIP6')
-  cdef('realization'  , 'r1i1p1f1'    , project='CMIP6')
-  cdef('frequency'   , 'monthly'      , project='CMIP6')
+  cdef('mip'          , '*'           , project='CMIP6')
+  #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
+  cdef('grid'         , 'g*'          , project='CMIP6')
+  if atCNRM:
+      cdef('realization'  , 'r1i1p1f2'    , project='CMIP6')
+  else:
+      cdef('realization'  , 'r1i1p1f1'    , project='CMIP6')
   cdef('experiment'  , 'historical'   , project='CMIP6')
   cdef('version'     , 'latest'       , project='CMIP6')
 
 
-  ## -- Define the pattern
-  pattern=["${root}/CMIP6/CMIP/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc", 
-           "${root}/CMIP6/CMIP/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMMDD-YYYYMMDD.nc"]
+  ## -- Define the patterns
+  base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
+  patterns=[]
+  for date_format in [ "YYYY-YYYY" ,"YYYYMM-YYYYMM" , "YYYYMMDD-YYYYMMDD" , "YYYYMMDDHHMM-YYYYMMDDHHMM" ] :
+      patterns.append(base_pattern + date_format + ".nc")
 
-  ## --> Note that the YYYYMM-YYYYMM string means that the period is described in the filename and that CliMAF can
-  ## --> perform period selection among the files it found in the directory (can be YYYY, YYYYMM, YYYYMMDD).
-  ## --> You can use an argument like ${years} instead if you just want to do string matching (no smart period selection)
-  #
   ## -- call the dataloc CliMAF function
-  dataloc(project='CMIP6', organization='generic', url=pattern)
+  dataloc(project='CMIP6', organization='generic', url=patterns)
 
   calias('CMIP6', 'tos', offset=273.15)
   calias('CMIP6', 'thetao', offset=273.15)
