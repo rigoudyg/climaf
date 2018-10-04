@@ -162,6 +162,8 @@ else:
                         'mediumorchid', 'lightslategray', 'gold', 'chartreuse', 'saddlebrown', 'tan',
                         'tomato', 'mediumvioletred', 'mediumspringgreen', 'firebrick']
 
+colors = colors + colors
+
 # -- Line width
 if args.lw: 
     lw_list = str.split(args.lw,',')
@@ -221,20 +223,24 @@ for pathfilename in filenames_list:
             break
     time_test = dat.variables[tname][:]
     t_unit = dat.variables[tname].units # get unit  "days since 1950-01-01T00:00:00Z"
-    try :
+    if 'months' in t_unit:
+       x = np.array(range(1,13))
+       datevar = []
+    else:
+      try :
         t_cal = dat.variables[tname].calendar
-    except AttributeError : # Attribute doesn't exist
+      except AttributeError : # Attribute doesn't exist
         t_cal = u"gregorian" # or standard
-    datevar = []
-    cdftime = netcdftime.utime(t_unit)#
-    #, calendar=u"gregorian")
-    # -- Garde-fou calendar
-    if not isinstance(cdftime.num2date(time_test)[0], datetime.datetime):
-       cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
-    datevar.append(cdftime.num2date(time_test))
-    print 'datevar = ',datevar
-    #
-    x = np.array(datevar)[0,:]
+      datevar = []
+      cdftime = netcdftime.utime(t_unit)#
+      #, calendar=u"gregorian")
+      # -- Garde-fou calendar
+      if not isinstance(cdftime.num2date(time_test)[0], datetime.datetime):
+         cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
+      datevar.append(cdftime.num2date(time_test))
+      print 'datevar = ',datevar
+      #
+      x = np.array(datevar)[0,:]
     y = test_dat[:,0,0]
     handles_for_legend.append(
         #plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
