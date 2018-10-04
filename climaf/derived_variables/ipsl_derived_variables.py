@@ -12,9 +12,6 @@ from climaf.api import derive, calias
 #calias("ref_climatos", 'gpptot', 'gpp')
 
 
-# -- DTR
-derive('*','dtr','minus','tasmax','tasmin')
-derive('*','tasrange','minus','tasmax','tasmin')
 
 
 

@@ -1,5 +1,9 @@
 from climaf.api import derive, calias
 
+# -- DTR
+derive('*','dtr','minus','tasmax','tasmin')
+derive('*','tasrange','minus','tasmax','tasmin')
+
 # -- Radiative SW Total at TOA
 derive('*','rstt','minus','rsdt','rsut')
 derive('*','rst','minus','rsdt','rsut')
