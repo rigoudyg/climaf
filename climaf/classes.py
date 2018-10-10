@@ -256,7 +256,10 @@ def processDatasetArgs(**kwargs) :
              attval['simulation']=='r0i0p0' or attval['frequency']=='fx') :
             attval['table']='fx' ; attval['period']='fx' 
             attval['simulation']='r0i0p0' ; attval['frequency']='fx'
-    #
+    # Special processing for CMIP6  : facet 'simulation' is forbidden (must use 'realization')
+    if (attval['project'] == 'CMIP6')  and 'simulation' in kwargs :
+        raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'")
+    
     errmsg=""
     for facet in cprojects[project].facets :
         if attval[facet] is None :
