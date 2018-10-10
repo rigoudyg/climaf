@@ -245,7 +245,7 @@ def processDatasetArgs(**kwargs) :
             else : listval=[val]
             for lval in listval :
                 if isinstance(lval,str) and lval.find(sep) >= 0 :
-                    Climaf_Classes_Error(
+                    raise Climaf_Classes_Error(
                         "You cannot use character '%s' when setting '%s=%s' because "
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
