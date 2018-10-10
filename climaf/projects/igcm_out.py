@@ -396,9 +396,6 @@ if root:
    
    # -- P - E
    calias('IGCM_OUT', 'hflsevap', 'hfls', scale=-1./2.5e6, filenameVar='histmth')
-   derive('IGCM_OUT', 'pme', 'minus', 'pr' ,'hflsevap')
+   #derive('IGCM_OUT', 'pme', 'minus', 'pr' ,'hflsevap')
    
    
-   # -- Land surfaces
-   derive("IGCM_OUT", 'auto_resp', 'plus', 'growth_resp', 'maint_resp')
-   derive("IGCM_OUT", 'autoresp', 'plus', 'growth_resp', 'maint_resp')

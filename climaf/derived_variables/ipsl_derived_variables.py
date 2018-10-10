@@ -9,8 +9,6 @@ from climaf.api import derive, calias
 #calias("IGCM_OUT", 'cfracgpp', 'gpp' ,filenameVar='stomate_ipcc_history')
 #derive("IGCM_OUT", 'gpptot', 'divide', 'cfracgpp','Contfrac')
 # -> alias for the obs
-#calias("ref_climatos", 'gpptot', 'gpp')
-
 
 
 
