@@ -253,7 +253,6 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else: return cread(filename,classes.varOf(cobject))
         if not isinstance(cobject,classes.cpage) and not isinstance(cobject,classes.cpage_pdf) and \
                not isinstance(cobject,classes.cens) :
-            #
             clogger.debug("Searching cache for including object for : " + `cobject`)
             ########################################################################
             it,altperiod=cache.hasIncludingObject(cobject)
@@ -261,11 +260,14 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             #it=None
             if it :
                 clogger.info("Including object found in cache : %s"%(it.crs))
-                clogger.info("Selecting "+`cobject`+" out of it")
-                # Just select (if necessary for the user) the portion relevant to the request
-                rep=ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list)
-                cdedent()
-                return rep
+                if (format == 'file') :
+                    clogger.info("Selecting "+`cobject`+" out of it")
+                    # Just select (if necessary for the user) the portion relevant to the request
+                    rep=ceval_select(it,cobject,userflags,format,deep,derived_list, recurse_list)
+                    cdedent()
+                    return rep
+                else :
+                    clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use including object found for : "%format + `cobject`)
             #
             clogger.debug("Searching cache for begin  object for : " + `cobject`)
             ########################################################################
@@ -281,11 +283,10 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 comp=copy.deepcopy(it)
                 comp.setperiod(comp_period)
                 ceval(comp,userflags,format,deep,derived_list,recurse_list)
-                if (format == 'file') :
-                    rep=cache.complement(begcrs,comp.crs,cobject.crs)
-                    cdedent()
-                    return rep
-                else : raise Climaf_Driver_Error("cannot yet complement except for files")
+                rep=cache.complement(begcrs,comp.crs,cobject.crs)
+                cdedent()
+                if (format == 'file') : return rep
+                else : return ceval(cobject)
             #
             clogger.info("nothing relevant found in cache for %s"%cobject.crs)
         #
@@ -1114,7 +1115,7 @@ def efile(obj, filename, forced=False) :
         if os.path.isfile(filename):
             if forced:
                 os.system("rm -rf %s" %filename)
-                clogger.warning("File '%s' already exists and was overriding" %filename)
+                clogger.warning("File '%s' already existed and has been overriden" %filename)
             else:
                 raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
                 
