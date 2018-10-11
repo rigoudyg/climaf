@@ -282,7 +282,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 # Build complement object for end, and eval it
                 comp=copy.deepcopy(it)
                 comp.setperiod(comp_period)
-                ceval(comp,userflags,format,deep,derived_list,recurse_list)
+                evalcomp=ceval(comp,userflags,format,deep,derived_list,recurse_list)
+                set_variable(evalcomp,cobject.variable, format=format)
                 rep=cache.complement(begcrs,comp.crs,cobject.crs)
                 cdedent()
                 if (format == 'file') : return rep
