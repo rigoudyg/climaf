@@ -250,15 +250,19 @@ def processDatasetArgs(**kwargs) :
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed"%(sep,facet,val,project))
             #print "initalizing facet %s with value"%(facet,val)
-    # Special processing for CMIP5 fixed fields : handling redundancy in facets
     if (attval['project'] == 'CMIP5'):
+        # Allow for a synonym for 'simulation' in CMIP5 : 'member'
+        if 'member' in kwargs and kwargs['member'] not in [None, '']:
+            attval['simulation']=kwargs['member']
+            clogger.info('Attribute "member" in project CMIP5 has been translated to "simulation"')
+        # Special processing for CMIP5 fixed fields : handling redundancy in facets
         if ( attval['table']=='fx' or attval['period']=='fx' or 
              attval['simulation']=='r0i0p0' or attval['frequency']=='fx') :
             attval['table']='fx' ; attval['period']='fx' 
             attval['simulation']='r0i0p0' ; attval['frequency']='fx'
     # Special processing for CMIP6  : facet 'simulation' is forbidden (must use 'realization')
-    if (attval['project'] == 'CMIP6')  and 'simulation' in kwargs :
-        raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'")
+    if (attval['project'] == 'CMIP6')  and 'simulation' in kwargs and kwargs['simulation'] is not '':
+        raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'. This if for kwargs=%s"%`kwargs`)
     
     errmsg=""
     for facet in cprojects[project].facets :
@@ -270,6 +274,7 @@ def processDatasetArgs(**kwargs) :
     #
     #print "kw="+`kwargs`
     for facet in attval :
+        #print "checking facet %s"%facet
         # Facet specific processing
         if facet=='period' :
             if not isinstance(attval['period'],cperiod) :
@@ -277,11 +282,6 @@ def processDatasetArgs(**kwargs) :
                     attval['period']=init_period(attval['period'])
                 except :
                     raise Climaf_Classes_Error("Cannot interpret period for %s"%`attval['period']`)
-            #else :
-            #    print "%s is a cperiod"%`attval['period']`
-        #elif facet=='domain' and not type(attval['domain']) is str :
-        #    # May be a list
-        #    attval['domain']=eval(attval['domain'])
         # Check for typing or user's logic errors
         if not facet in cprojects[project].facets :
             e="Project %s doesn't have facet %s"%(project,facet)

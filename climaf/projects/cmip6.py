@@ -32,9 +32,10 @@ if atCNRM:
    root="/cnrm/cmip"
 
 if root:
-  ## -- Declare a 'CMIP5_bis' CliMAF project (a replicate of the CMIP5 project)
-  ## ---------------------------------------------------------------------------- >
-  cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization', 'grid', 'version', ensemble=['model','realization'],separator='%')
+  ## -- Declare a 'CMIP6 CliMAF project 
+  ## ------------------------------------ >
+  cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
+           'grid', 'version', ensemble=['model','realization'],separator='%')
   ## --> systematic arguments = simulation, frequency, variable
   ## -- Set the aliases for the frequency
   ## -- Set default values
@@ -52,7 +53,8 @@ if root:
 
 
   ## -- Define the patterns
-  base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
+  base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
+  base_pattern+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
   patterns=[]
   for date_format in [ "YYYY-YYYY" ,"YYYYMM-YYYYMM" , "YYYYMMDD-YYYYMMDD" , "YYYYMMDDHHMM-YYYYMMDDHHMM" ] :
       patterns.append(base_pattern + date_format + ".nc")
