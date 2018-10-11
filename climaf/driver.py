@@ -84,13 +84,15 @@ def capply_script (script_name, *operands, **parameters):
     if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
         # Must iterate on members
         reps=[]
-        for label in operands[0].order:
-            member=operands[0][label]
+        first=operands[0]
+        order=first.order
+        for label in order:
+            member=first[label]
             clogger.debug("processing member %s : "%label+`member`)
             params=parameters.copy()
             params["member_label"]=label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
-        return(classes.cens(dict(zip(operands[0].order,reps))))
+        return(classes.cens(dict(zip(order,reps)),order))
     else: 
         return(maketree(script_name, script, *operands, **parameters))
             
@@ -330,6 +332,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             for member in cobject.order :
                 # print ("evaluating member %s"%member)
                 d[member]=ceval(cobject[member],copy.copy(userflags),format,deep,recurse_list=recurse_list)
+            d.order=cobject.order
             if (format=="file") : return(reduce(lambda x,y : x+" "+y, [ d[m] for m in cobject.order ]))
             else : return d
         else :

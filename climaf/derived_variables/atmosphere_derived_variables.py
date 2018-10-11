@@ -1,4 +1,4 @@
-from climaf.api import derive, calias
+from climaf.api import derive
 
 # -- DTR
 derive('*','dtr','minus','tasmax','tasmin')
