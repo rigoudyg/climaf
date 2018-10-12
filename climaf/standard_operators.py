@@ -94,7 +94,7 @@ def load_standard_operators():
             'title=\'\"${title}\"\' myscale=${scale} myoffset=${offset} mpCenterLonF=${mpCenterLonF} '
             'vcRefMagnitudeF=${vcRefMagnitudeF} vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
             'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' vcLineArrowColor=\'\"${vcLineArrowColor}\"\' '
-            'units=\'\"${units}\"\' y=\'\"${y}\"\' colors=\'\"${colors}\"\' level=${level} time=${time} '
+            'units=\'\"${units}\"\' y=\'\"${y}\"\' ccolors=\'\"${colors}\"\' level=${level} time=${time} '
             'date=\'\"${date}\"\' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' focus=\'\"${focus}\"\' '
             'type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} fmt=\'\"${fmt}\"\' '
             'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} reverse=${reverse} '
