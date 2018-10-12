@@ -64,10 +64,9 @@ if root:
 
   calias('CMIP6', 'tos', offset=273.15)
   calias('CMIP6', 'thetao', offset=273.15)
+  calias('CMIP6', 'sivolu', 'sivol')
   calias('CMIP6', 'sic', 'siconc')
   calias('CMIP6', 'sit', 'sithick')
-  calias('CMIP6', 'wfo', 'wfonocorr')
-  calias('CMIP6', 'sivolu', 'sivol')
   calias('CMIP6', 'NO3', 'no3')
   calias('CMIP6', 'PO4', 'po4')
   calias('CMIP6', 'Si', 'si')
