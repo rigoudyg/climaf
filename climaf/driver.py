@@ -334,7 +334,6 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             for member in cobject.order :
                 # print ("evaluating member %s"%member)
                 d[member]=ceval(cobject[member],copy.copy(userflags),format,deep,recurse_list=recurse_list)
-            d.order=cobject.order
             if (format=="file") : return(reduce(lambda x,y : x+" "+y, [ d[m] for m in cobject.order ]))
             else : return d
         else :
