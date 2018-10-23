@@ -85,17 +85,17 @@ for file in $files ; do
     [ "${CLIMAF_FIX_ALADIN_COORD:-no}" != no ] && file=$(aladin_coordfix $file)
     #
     # Construct CDO operators chain as needed, optimizing operations list and order
-    if [[ $file == ${filevar} ]] ; then 
+    if [[ $file == *${filevar}_* ]] ; then 
 	# varname is in filename -> assume seldate before selvar is best
-	ops=$setmiss" "$setunits" "$selalias" "$selregion" "$selvar" "$seldate
+	ops=$setmiss" "$setunits" "$selalias" "$selvar" "$seldate" "$selregion
     else
 	# varname is not in filename -> assume selvar before selvar is best
-	ops=$setmiss" "$setunits" "$selalias" "$selregion" "$seldate" "$selvar
+	ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selvar" "$selregion
     fi
     #
     if [ "${ops// /}" ] ; then
 	# There is some operator to apply
-	[ $single_file = yes ] && [ $operator ] && ops="-"${operator}" "$ops
+	[ $single_file = yes ] && [ $operator ] && ops="-"${operator}" "$ops 
 	$CDO $ops $file $tmp2 && [ -f $tmp2 ] && vfiles+=" "$tmp2
     else
 	# Just keep the file as is
@@ -126,7 +126,7 @@ if [ "$vfiles" ] ; then
 	    fi
             #
             # Apply operator if requested
-	    if [ "$operator" && $single_file -eq 0 ] ; then 
+	    if [ "$operator" ] ; then 
 		cdo $operator $tmp3 $out && rm $tmp3 || exit 1
 	    else mv $tmp3 $out ; fi
 	else
