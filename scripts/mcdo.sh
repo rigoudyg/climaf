@@ -21,9 +21,9 @@ alias=$1 ; shift
 units=$1 ; shift
 vm=$1 ; shift
 
-tmp=$(mktemp -d -t climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
+tmp=$(mktemp -d -t $CLIMAF_CACHE/climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
 # Option -t/--tmpdir is not available at all sites -> test result
-[ $? -ne 0 ] && tmp=$(mktemp -d  climaf_mcdo_XXXXXX) 
+[ $? -ne 0 ] && tmp=$(mktemp -d  $CLIMAF_CACHE/climaf_mcdo_XXXXXX) 
 
 
 clim_timefix ()
