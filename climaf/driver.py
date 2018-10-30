@@ -146,7 +146,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     (i.e. not natives) in upstream evaluations. It avoids to loop endlessly
     """
     if format != 'MaskedArray' and format != 'file' and format != 'txt' : 
-        raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s"%', '.join([repr(x) for x in operators.graphic_formats]))
+        raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s"%\
+                                  ', '.join([repr(x) for x in operators.graphic_formats]))
     #
     if userflags is None : userflags=operators.scriptFlags()
     #
@@ -198,14 +199,24 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 ## clogger.debug(" Done with subsetting and caching data files")
                 ## cstore(extract) # extract should include the dataset def
                 ## return ceval(extract,userflags,format)
-                if ds.hasOneMember() :
-                    clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
-                    extract=capply('select',ds)
+                if format == 'file' or format == "MaskedArray" :
+                    if ds.hasOneMember() :
+                        clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
+                        extract=capply('select',ds)
+                    else :
+                        clogger.debug("On multi-member datafiles , fetching/selection/aggregation is done using select_member - TBD")
+                        extract=capply('select_member',ds)
+                    if extract is None :
+                        raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
+                    rep=ceval(extract,userflags=userflags,format=format)
+                #elif format="MaskedArray" :
+                #    if ds.hasOneMember() :
+                #        clogger.debug("Selection + aggregation for MA output using cread for %s"%ds)
+                #        rep=cread(ds.baseFiles(),classes.varOf(ds),period="%s"%ds.period)
+                #    else:
+                #        raise Climaf_Driver_Error("Cannot yet read multi-member dataset in MA format" + `ds`)
                 else :
-                    clogger.debug("On multi-member datafiles , fetching/selection/aggregation is done using select_member - TBD")
-                    extract=capply('select_member',ds)
-                if extract is None : raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
-                rep=ceval(extract,userflags=userflags,format=format)
+                    raise Climaf_Driver_Error("Untractable output format %s"%format)
                 userflags.unset_selectors()
                 cdedent()
                 return rep
@@ -625,7 +636,7 @@ def ceval_select(includer,included,userflags,format,deep,derived_list,recurse_li
         clogger.error("Can yet process only files - TBD")
 
 
-def cread(datafile,varname=None):
+def cread(datafile,varname=None, period=None):
     import re
     if not datafile : return(None)
     if re.findall(".png$",datafile) or \
@@ -637,6 +648,7 @@ def cread(datafile,varname=None):
         clogger.debug("reading NetCDF file %s"%datafile)
         if varname is None: varname=varOfFile(datafile)
         if varname is None: raise Climaf_Driver_Error("")
+        if period is not None : clog.warning("Cannot yet select on period (%s) using CMa for files %s - TBD"%(period,files))
         from anynetcdf import ncf
         fileobj=ncf(datafile)
         #import netCDF4
