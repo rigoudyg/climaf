@@ -336,17 +336,17 @@ def selectGenericFiles(urls, **kwargs):
     #
     for l in urls :
         # Instantiate keywords in pattern with attributes values
-        if re.findall(".*:.*",l) : # remote data
+        remote_prefix="" ;
+        if re.findall(".*:.*",l) :
             remote_prefix=':'.join(l.split(":")[0:-1])+':'
-            template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
-        else: # local data
-            remote_prefix=""
-            template=Template(l).safe_substitute(**kwargs)
+        basename=l.split(":")[-1] # This discard the remote_prefix if any
+        my_template=Template(basename)
+        template=my_template.safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
-        temp2=template ;
-        for k in lkeys : temp2=temp2.replace(k,dt[k])
+        temp2=template ; for k in lkeys : temp2=temp2.replace(k,dt[k])
+        # Do globbing with plain varname
         if remote_prefix : 
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))
             clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
@@ -358,13 +358,10 @@ def selectGenericFiles(urls, **kwargs):
         if len(lfiles)==0 and "filenameVar" in kwargs and kwargs['filenameVar'] :
             # Change value of facet 'variable'
             kwargs['variable']=kwargs['filenameVar']
-            if remote_prefix : # remote data
-                template=Template(l.split(":")[-1]).safe_substitute(**kwargs)
-            else: # local data
-                template=Template(l).safe_substitute(**kwargs)    
-            temp2=template
-            for k in lkeys : temp2=temp2.replace(k,dt[k])
+            template=my_template.safe_substitute(**kwargs)
+            temp2=template ; for k in lkeys : temp2=temp2.replace(k,dt[k])
             #
+            # Do globbing with fileVarname
             if remote_prefix : # 
                 lfiles=sorted(glob_remote_data(remote_prefix, temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
