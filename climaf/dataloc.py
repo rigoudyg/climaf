@@ -136,7 +136,7 @@ class dataloc():
         self.frequency=frequency
         self.organization=organization
         if organization not in ['EM', 'CMIP5_DRS', 'generic' ] :
-            raise Climaf_Data_Error("Cannot process organization "+organization)
+            raise classes.Climaf_Error("Cannot process organization "+organization)
         if (isinstance(url,list)) : self.urls=url
         else :
             if re.findall("^esgf://.*",url) : self.organization="ESGF"
@@ -264,7 +264,7 @@ def selectFiles(**kwargs):
         elif (org == "generic") :
             rep.extend(selectGenericFiles(urls, **kwargs2))
         else :
-            raise Climaf_Data_Error("Cannot process organization "+org+ \
+            raise classes.Climaf_Error("Cannot process organization "+org+ \
                 " for simulation "+simulation+" and model "+model+\
                 " of project "+project)
     if (not ofu) :
@@ -398,7 +398,7 @@ def selectGenericFiles(urls, **kwargs):
                 regexp0=regexp.replace("*",".*").replace("?",r".")
                 #print "regexp for extracting dates : "+regexp
                 start=re.sub(regexp0,r'\1',f)
-                if start==f: raise Climaf_Data_Error("Start period not found") #? 
+                if start==f: raise classes.Climaf_Error("Start period not found") #? 
                 if hasEnd :
                     end=re.sub(regexp0,r'\2',f)
                     fperiod=init_period("%s-%s"%(start,end))
@@ -423,7 +423,7 @@ def selectGenericFiles(urls, **kwargs):
                             clogger.debug("adding fixed field :"+remote_prefix+f)
                             rep.append(remote_prefix+f)
                         else:
-                            raise Climaf_Data_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%f)
+                            raise classes.Climaf_Error("For remote files, filename pattern (%s) should include ${varname} (which is instanciated by variable name or filenameVar)"%f)
                 else :
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     rep.append(f)
@@ -455,7 +455,7 @@ def selectGenericFiles(urls, **kwargs):
                         else:
                             mess="For remote files, filename pattern (%s) should include"%(remote_prefix+f)
                             mess+=" ${varname} (which is instanciated by variable name or filenameVar)"
-                            raise Climaf_Data_Error(mess)
+                            raise classes.Climaf_Error(mess)
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)
@@ -553,7 +553,7 @@ def glob_remote_data(remote, pattern) :
         return(listfiles)
     except ftp.all_errors as err_ftp:
         print err_ftp
-        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(pattern,host,username))
+        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" %(pattern,host,username))
 
 
 def remote_to_local_filename(url):
@@ -608,7 +608,7 @@ def glob_remote_data(url, pattern) :
         return(listfiles)
     except ftp.all_errors as err_ftp:
         print err_ftp
-        raise Climaf_Data_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
+        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" %(url,host,username))
 
 
 def remote_to_local_filename(url):
@@ -692,12 +692,12 @@ def periodOfEmFile(filename,realm,freq):
                 speriod="%s01-%s12"%(year,year)
                 return init_period(speriod)
         else:
-                raise Climaf_Data_Error("can yet handle only monthly frequency for realms A and L - TBD")
+                raise classes.Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
     elif (realm == 'O' or realm == 'I' ) :
         if freq=='monthly' or freq=='mon' or freq=='' : altfreq='m'
         elif freq[0:2] =='da' : altfreq='d'
         else:
-            raise Climaf_Data_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
+            raise classes.Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt=r'^.*_1'+altfreq+r'_([0-9]{8})_*([0-9]{8}).*nc'
         beg=re.sub(patt,r'\1',filename)
         end=re.sub(patt,r'\2',filename)
@@ -705,7 +705,7 @@ def periodOfEmFile(filename,realm,freq):
         if (end==filename or beg==filename) : return None
         return init_period("%s-%s"%(beg,end))
     else:
-        raise Climaf_Data_Error("unexpected realm "+realm)
+        raise classes.Climaf_Error("unexpected realm "+realm)
 
         
 
@@ -801,15 +801,6 @@ def selectCmip5DrsFiles(urls, **kwargs) :
                     rep.append(f)
 
     return rep
-
-
-class Climaf_Data_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-    def __str__(self):
-        return `self.valeur`
 
 
 def test2() :

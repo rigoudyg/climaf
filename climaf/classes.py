@@ -1701,6 +1701,15 @@ class Climaf_Classes_Error(Exception):
     def __str__(self):
         return `self.valeur`
 
+class Climaf_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        dedent(100)
+    def __str__(self):
+        return `self.valeur`
+
+
 def test():
 #    clogger.basicConfig(level=clogger.DEBUG) 
 #    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
