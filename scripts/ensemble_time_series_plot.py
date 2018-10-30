@@ -241,7 +241,9 @@ for pathfilename in filenames_list:
       print 'datevar = ',datevar
       #
       x = np.array(datevar)[0,:]
-    y = test_dat[:,0,0]
+    #y = test_dat[:,0,0]
+    y = np.squeeze(test_dat)
+    if len(y.shape) > 1 : print "input data is not 1D"
     handles_for_legend.append(
         #plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
         #     label=labels_list[filenames_list.index(pathfilename)])[0]
