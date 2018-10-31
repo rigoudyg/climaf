@@ -6,6 +6,10 @@ Whats' new
 
 Changes, newest first :
 
+- V1.2.6:
+
+  - a versatile datafiles exploration method is associated to datasets: see :py:meth:`~climaf.classes.cdataset.explore` 
+
 - V1.2.2:
 
   - Introduce doc for project CMIP6 : :py:mod:`~climaf.projects.cmip6`

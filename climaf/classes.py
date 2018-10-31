@@ -341,6 +341,9 @@ class cdataset(cobject):
 
           >>>  cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
           >>>           simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
+
+        You may use wildcard ('*') in attribute values, and use  :py:meth:`~climaf.classes.cdataset.explore`
+        for having CliMAF doing something sensible matching such attributes with available data
         
         """
         #
@@ -439,17 +442,109 @@ class cdataset(cobject):
     
     def missingIsOK(self):
         if (alias is None) : return True
-        filevar,scale,offset,units,filenameVar,missing=self.alias
+        _,_,_,_,_,missing=self.alias
         return missing is None
     
-    def selectFiles(self):
+    def explore(self,option=None):
+        """
+        Versatile datafile exploration for a dataset which possibly has jokers (*) in attributes. 
+        ``option`` can be :
+        
+          - 'choices' for returning a dict which keys are joker attributes and entries 
+            are values list
+          - 'resolve' for returning a NEW DATASET with instanciated attributes (if uniquely)
+          - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of a 
+            single attribute
+          - None (or missing) for just identifying and storing dataset files list (while  
+            ensuring non-ambiguity check for joker attributes)
+
+        This features works only for projects which organization is of type 'generic'
+
+        Toy example ::
+
+          >>> rst=ds(project="example", simulation="*", variable="rst", period="1980-1981")
+          >>> rst
+          ds('example|*|rst|1980-1981|global|monthly')
+          
+          >>> rst.explore('choices')
+          {'simulation': ['AMIPV6ALB2G']}
+          
+          >>> instanciated_dataset=rst.explore('resolve')
+          >>> instanciated_dataset
+          ds('example|AMIPV6ALB2G|rst|1980-1981|global|monthly')
+          
+          >>> my_ensemble=rst.explore('ensemble')
+          error    : "Creating an ensemble does not make sense because all joker attributes have a single possible value ({'simulation': ['AMIPV6ALB2G']})"
+
+        Real life example for options ``choices`` and ``ensemble`` ::
+
+          >>> rst=ds(project="CMIP6", model='*', experiment="*ontrol*", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
+          >>> clog('info')
+          >>> rst.explore('choices')
+          info     : Attribute institute has matching value CNRM-CERFACS
+          info     : Attribute experiment has multiple values : set(['piClim-control', 'piControl'])
+          info     : Attribute grid has matching value gr
+          info     : Attribute realization has matching value r1i1p1f2
+          info     : Attribute mip has multiple values : set(['CMIP', 'RFMIP'])
+          info     : Attribute model has multiple values : set(['CNRM-ESM2-1', 'CNRM-CM6-1'])
+          {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+
+          # Let us further select by setting experiment=piCOntrol
+          >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
+          >>> mrst.explore('choices')
+          {'institute': ['CNRM-CERFACS'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], 'grid': ['gr'], 'realization': ['r1i1p1f2']}
+          >>> small_ensemble=mrst.explore('ensemble')
+          >>> small_ensemble
+          cens({
+                'CNRM-ESM2-1':ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-ESM2-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest'),
+                'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')
+               })
+
+
+        """
         dic=self.kvp.copy()
         if self.alias : 
             filevar,_,_,_,filenameVar,_=self.alias
             dic["variable"]=string.Template(filevar).safe_substitute(dic)
             if filenameVar : dic["filenameVar"]=filenameVar
         clogger.debug("Looking with dic=%s"%`dic`)
-        self.files=dataloc.selectFiles(**dic)
+        jokers=None
+        if option is not None : jokers=dict()
+        files=dataloc.selectFiles(return_jokers=jokers,**dic)
+        #
+        joker_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
+        if option == 'resolve' :
+            clogger.debug("Trying to resolve on attributes %s"%joker_attributes_list)
+            for kw in jokers :
+                dic[kw]=jokers[kw][0]
+                if len(jokers[kw]) > 1 :
+                    raise Climaf_Classes_Error("Joker attribute %s is ambiguous %s"%(kw,jokers[kw]))
+            return ds(**dic)
+        elif option == 'choices' :
+            clogger.debug("Listing possible values for  %s"%joker_attributes_list)
+            return jokers
+        elif option == 'ensemble' :
+            clogger.debug("Trying to create an ensemble on attributes %s"%joker_attributes_list)
+            ensemble_kw=None
+            for kw in jokers :
+                if len(jokers[kw]) > 1 :
+                    if ensemble_kw is not None :
+                        raise \
+                            Climaf_Classes_Error("Cannot create an ensemble, because there are at least"+\
+                                                 " two possible attributes for defining it : %s and %s"%\
+                                                 (ensemble_kw,kw))
+                    else: ensemble_kw=kw
+                    dic[kw]=jokers[kw]
+                else:
+                    dic[kw]=jokers[kw][0]
+            if ensemble_kw is None :
+                raise Climaf_Classes_Error("Creating an ensemble does not make sense because all joker"+\
+                                           "attributes have a single possible value (%s)"%jokers)
+            return eds(**dic)
+        elif option == None :
+            self.files=files
+        else:
+            raise Climaf_Classes_Error("Unknown option %s"%(option))
 
     def baseFiles(self,force=False):
         """ Returns the list of (local or remote) files which include the data
@@ -458,7 +553,7 @@ class cdataset(cobject):
         Use cached value (i.e. attribute 'files') unless called with arg force=True
         """
         if (force and self.project != 'file') or self.files is None :
-            self.selectFiles()
+            self.explore()
         return self.files
 
     def listfiles(self,force=False):
@@ -1096,6 +1191,7 @@ def ds(*args,**kwargs) :
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
+    You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
     """
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")

@@ -207,7 +207,7 @@ def isLocal(project, model, simulation, frequency) :
             if re.findall(".*:.*",l) : rep=False
     return rep
 
-def selectFiles(**kwargs):
+def selectFiles(return_jokers=None, **kwargs):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
@@ -244,6 +244,8 @@ def selectFiles(**kwargs):
     if ( len(ofu) == 0 ) :
         clogger.warning("no datalocation found for %s %s %s %s "%(project, model, simulation, frequency))
     for org,freq,urls in ofu :
+        if return_jokers is not None and org is not "generic" :
+            classes.Climaf_Error("Can handle multipe facet query only for organization=generic ")
         kwargs2=kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies :
@@ -262,7 +264,7 @@ def selectFiles(**kwargs):
         elif (org == "CMIP5_DRS") :
             rep.extend(selectCmip5DrsFiles(urls,**kwargs2))
         elif (org == "generic") :
-            rep.extend(selectGenericFiles(urls, **kwargs2))
+            rep.extend(selectGenericFiles(urls, return_jokers=return_jokers, **kwargs2))
         else :
             raise classes.Climaf_Error("Cannot process organization "+org+ \
                 " for simulation "+simulation+" and model "+model+\
@@ -284,7 +286,7 @@ def selectFiles(**kwargs):
     return(string.join(rep))
 
 
-def selectGenericFiles(urls, **kwargs):
+def selectGenericFiles(urls, return_jokers=None,**kwargs):
     """
     Allow to describe a ``generic`` file organization : the list of files returned 
     by this function is composed of files which :
@@ -327,12 +329,14 @@ def selectGenericFiles(urls, **kwargs):
     if type(period) is str : period=init_period(period)
     variable=kwargs['variable']
     altvar=kwargs.get('filenameVar',variable)
-    # a dict and an ordered list of date globbing patterns
-    dt=dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????",YYYYMMDDHH="??????????")
-    lkeys=dt.keys() ; lkeys.sort(reverse=True)
-    # a dict and an ordered list for matching dates
-    dr=dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})", YYYYMMDDHH="([0-9]{10})")
-    rkeys=dr.keys() ; rkeys.sort(reverse=True)
+    #
+    # dicts of date patterns, for globbing and for regexp
+    date_glob_patt  = dict(YYYY="????",YYYYMM="??????",YYYYMMDD="????????",
+                           YYYYMMDDHH="??????????",YYYYMMDDHHMM="????????????")
+    date_regexp_patt= dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})",
+                           YYYYMMDDHH="([0-9]{10})", YYYYMMDDHHMM="([0-9]{12})")
+    # an ordered list of date keywords
+    date_keywords=date_glob_patt.keys() ; date_keywords.sort(reverse=True)
     #
     for l in urls :
         # Instantiate keywords in pattern with attributes values
@@ -345,7 +349,8 @@ def selectGenericFiles(urls, **kwargs):
         #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
-        temp2=template ; for k in lkeys : temp2=temp2.replace(k,dt[k])
+        temp2=template
+        for k in date_keywords : temp2=temp2.replace(k,date_glob_patt[k])
         # Do globbing with plain varname
         if remote_prefix : 
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))
@@ -359,7 +364,8 @@ def selectGenericFiles(urls, **kwargs):
             # Change value of facet 'variable'
             kwargs['variable']=kwargs['filenameVar']
             template=my_template.safe_substitute(**kwargs)
-            temp2=template ; for k in lkeys : temp2=temp2.replace(k,dt[k])
+            temp2=template
+            for k in date_keywords : temp2=temp2.replace(k,date_glob_patt[k])
             #
             # Do globbing with fileVarname
             if remote_prefix : # 
@@ -369,20 +375,56 @@ def selectGenericFiles(urls, **kwargs):
                 lfiles=sorted(glob.glob(temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
         #
+        # Discover values for those facets which are a joker :
+        #   1- construct a regexp with a group name for those facets
+        alt_basename=basename
+        alt_kwargs=kwargs.copy()
+        for kw in kwargs :
+            if type(kwargs[kw]) is str and "*" in kwargs[kw] :
+                alt_kwargs[kw]=kwargs[kw].replace("*",".*")
+                #alt_basename=alt_basename.replace(r"${%s}"%kw,r"(?P<%s>[\w-]*)"%kw,1)
+                alt_basename=alt_basename.replace(r"${%s}"%kw,r"(?P<%s>%s)"%(kw,alt_kwargs[kw]),1)
+        regexp=Template(alt_basename).safe_substitute(**alt_kwargs)
+        for k in date_keywords : regexp=regexp.replace(k,date_regexp_patt[k])
+        #   2- extract group values
+        jokers=dict()
+        for f in lfiles :
+            for kw in kwargs :
+                it=re.finditer(regexp,f)
+                if type(kwargs[kw]) is str and "*" in kwargs[kw] :
+                    for oc in it :
+                        facet_value=oc.group(kw)
+                        if facet_value is not None :
+                            if kw not in jokers : jokers[kw]=set()
+                            jokers[kw].add(facet_value)
+                            clogger.debug("Discover %s=%s for file=%s"%(kw,facet_value,f))
+                        else :
+                            clogger.debug("Logic issue for kw=%s and file=%s"%(kw,f))
+        #  3- Aggregate discovered facet values set, + checks
+        for facet in jokers:
+            s=jokers[facet]
+            if return_jokers is not None : return_jokers[facet]=list(s)
+            if len(s) > 1 :
+                message="Attribute %s has multiple values : %s"%(facet,s)
+                if return_jokers : clogger.info(message)
+                else: clogger.error(message)
+            else:
+                clogger.info("Attribute %s has matching value %s"%(facet,list(s)[0]))
+        
         # Construct regexp for extracting dates from filename
         regexp=None
         #print "template before searching dates : "+template
-        for key in rkeys :
+        for key in date_keywords :
             #print "searchin "+key+" in "+=Template(l)
             start=template.find(key)
             if (start>=0 ) :
                 #print "found "+key
-                regexp=template.replace(key,dr[key],1)
+                regexp=template.replace(key,date_regexp_patt[key],1)
                 hasEnd=False
                 start=regexp.find(key)
                 if (start >=0 ) :
                     hasEnd=True
-                    regexp=regexp.replace(key,dr[key],1)
+                    regexp=regexp.replace(key,date_regexp_patt[key],1)
                 break
         #print "regexp before searching dates : "+regexp
         #
