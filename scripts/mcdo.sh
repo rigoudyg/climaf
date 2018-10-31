@@ -89,8 +89,9 @@ for file in $files ; do
     # If requested, fix attribute 'coordinates' of file variable for Aladin outputs.
     [ "${CLIMAF_FIX_ALADIN_COORD:-no}" != no ] && file=$(aladin_coordfix $file)
     #
-    vfiles+=" "$file
+    vfiles+=$file" "
 done
+vfiles=${vfiles/% /} # Discard last space character becasue CDO cannot !
 
 time $CDO $ops "$vfiles" $out
 
