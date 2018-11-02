@@ -448,11 +448,11 @@ class cdataset(cobject):
     def explore(self,option='check_and_store'):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
-        attributes. Attribute period cannot use a * without being  == * 
+        attributes. 
 
         ``option`` can be :
         
-          - 'choices' for returning a dict which keys are joker attributes and entries 
+          - 'choices' for returning a dict which keys are wildcard attributes and entries 
             are values list
           - 'resolve' for returning a NEW DATASET with instanciated attributes (if uniquely)
           - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of a 
@@ -461,6 +461,10 @@ class cdataset(cobject):
             (while ensuring non-ambiguity check for wildcard attributes)
 
         This feature works only for projects which organization is of type 'generic'
+
+        Attribute 'period' cannot use a * without being  == * ; in that case, the period of all 
+        matching files will be aggregated in the answer, among all instances of all attributes  
+        with wildcards.
 
         Toy example ::
 
@@ -502,11 +506,19 @@ class cdataset(cobject):
                 'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')
                })
 
-          # Identify period covered by data, and versions
-          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", table="*", period="*" , model="*",version="*")
-          >>> d.explore('choices')
-          {'institute': ['CNRM-CERFACS'], 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': ['gn'], 'table': ['Omon'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+        Identify period covered by data, and versions ::
 
+          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", table="*", period="*" , model="*",version="*")
+          >>> clog('info')
+          >>> d.explore('choices')
+          info     : Attribute institute='*' has matching value 'CNRM-CERFACS'
+          info     : Attribute perios='*' has matching value [1850-2349]
+          info     : Attribute version='*' has multiple values : ['v0', 'v20180720', 'latest']
+          info     : Attribute grid='g*' has matching value 'gn'
+          info     : Attribute mip='*' has matching value 'CMIP'
+          info     : Attribute table='*' has matching value 'Omon'
+          info     : Attribute model='*' has multiple values : ['CNRM-ESM2-1', 'CNRM-CM6-1']
+          {'institute': 'CNRM-CERFACS', 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': 'gn', 'table': 'Omon', 'mip': 'CMIP', 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
         """
         dic=self.kvp.copy()

@@ -537,15 +537,22 @@ def selectGenericFiles(urls, return_wildcards=None,**kwargs):
     #  For wildcard facets, discover facet values + checks
     for facet in wildcards:
         s=wildcards[facet]
-        if return_wildcards is not None : return_wildcards[facet]=list(s)
-        if len(s) > 1 :
-            message="Attribute %s has multiple values : %s"%(facet,s)
-            if return_wildcards : clogger.info(message)
-            else: clogger.error(message)
-        else:
-            clogger.info("Attribute %s has matching value '%s'"%(facet,list(s)[0]))
-    if periods is not None :
-        return_wildcards['period']=merge_periods(periods)
+        if return_wildcards is not None :
+            if facet=="period" and periods is not None :
+                s=merge_periods(list(periods))
+                clogger.info("Attribute period='*' has aggregated value %s"%(s))
+                return_wildcards[facet]=s
+            else:
+                if len(s) == 1 :
+                    s=s.pop()
+                    clogger.info("Attribute %s='%s' has matching value '%s'"%(facet,kwargs[facet],s))
+                    return_wildcards[facet]=s
+                else:
+                    return_wildcards[facet]=list(s)
+                    message="Attribute %s='%s' has multiple values : %s"%(facet,kwargs[facet],list(s))
+                    if return_wildcards : clogger.info(message)
+                    else: clogger.error(message)
+                s=return_wildcards[facet]
     return rep
 
 
