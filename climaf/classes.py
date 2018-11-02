@@ -505,7 +505,7 @@ class cdataset(cobject):
           # Identify period covered by data, and versions
           >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", table="*", period="*" , model="*",version="*")
           >>> d.explore('choices')
-        {'institute': ['CNRM-CERFACS'], 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': ['gn'], 'table': ['Omon'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+          {'institute': ['CNRM-CERFACS'], 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': ['gn'], 'table': ['Omon'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
 
         """
