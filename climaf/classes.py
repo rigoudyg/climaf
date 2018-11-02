@@ -277,7 +277,7 @@ def processDatasetArgs(**kwargs) :
         #print "checking facet %s"%facet
         # Facet specific processing
         if facet=='period' :
-            if not isinstance(attval['period'],cperiod) :
+            if not isinstance(attval['period'],cperiod) and attval['period'] != "*" :
                 try :
                     attval['period']=init_period(attval['period'])
                 except :
@@ -287,7 +287,7 @@ def processDatasetArgs(**kwargs) :
             e="Project %s doesn't have facet %s"%(project,facet)
             errmsg+=" "+e
     if errmsg != "" : raise Climaf_Classes_Error(errmsg)
-    if 'period' in attval and not isinstance(attval['period'],cperiod) :
+    if 'period' in attval and not isinstance(attval['period'],cperiod) and attval['period'] !=  "*" :
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
     return attval
 
@@ -445,9 +445,11 @@ class cdataset(cobject):
         _,_,_,_,_,missing=self.alias
         return missing is None
     
-    def explore(self,option=None):
+    def explore(self,option='check_and_store'):
         """
-        Versatile datafile exploration for a dataset which possibly has jokers (*) in attributes. 
+        Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
+        attributes. Attribute period cannot use a * without being  == * 
+
         ``option`` can be :
         
           - 'choices' for returning a dict which keys are joker attributes and entries 
@@ -455,10 +457,10 @@ class cdataset(cobject):
           - 'resolve' for returning a NEW DATASET with instanciated attributes (if uniquely)
           - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of a 
             single attribute
-          - None (or missing) for just identifying and storing dataset files list (while  
-            ensuring non-ambiguity check for joker attributes)
+          - 'check_and_store' (or missing) for just identifying and storing dataset files list 
+            (while ensuring non-ambiguity check for wildcard attributes)
 
-        This features works only for projects which organization is of type 'generic'
+        This feature works only for projects which organization is of type 'generic'
 
         Toy example ::
 
@@ -474,7 +476,7 @@ class cdataset(cobject):
           ds('example|AMIPV6ALB2G|rst|1980-1981|global|monthly')
           
           >>> my_ensemble=rst.explore('ensemble')
-          error    : "Creating an ensemble does not make sense because all joker attributes have a single possible value ({'simulation': ['AMIPV6ALB2G']})"
+          error    : "Creating an ensemble does not make sense because all wildcard attributes have a single possible value ({'simulation': ['AMIPV6ALB2G']})"
 
         Real life example for options ``choices`` and ``ensemble`` ::
 
@@ -500,6 +502,11 @@ class cdataset(cobject):
                 'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')
                })
 
+          # Identify period covered by data, and versions
+          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", table="*", period="*" , model="*",version="*")
+          >>> d.explore('choices')
+        {'institute': ['CNRM-CERFACS'], 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': ['gn'], 'table': ['Omon'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+
 
         """
         dic=self.kvp.copy()
@@ -508,40 +515,40 @@ class cdataset(cobject):
             dic["variable"]=string.Template(filevar).safe_substitute(dic)
             if filenameVar : dic["filenameVar"]=filenameVar
         clogger.debug("Looking with dic=%s"%`dic`)
-        jokers=None
-        if option is not None : jokers=dict()
-        files=dataloc.selectFiles(return_jokers=jokers,**dic)
+        wildcards=None
+        if option != 'check_and_store' : wildcards=dict()
+        files=dataloc.selectFiles(return_wildcards=wildcards,**dic)
         #
-        joker_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
+        wildcard_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
         if option == 'resolve' :
-            clogger.debug("Trying to resolve on attributes %s"%joker_attributes_list)
-            for kw in jokers :
-                dic[kw]=jokers[kw][0]
-                if len(jokers[kw]) > 1 :
-                    raise Climaf_Classes_Error("Joker attribute %s is ambiguous %s"%(kw,jokers[kw]))
+            clogger.debug("Trying to resolve on attributes %s"%wildcard_attributes_list)
+            for kw in wildcards :
+                dic[kw]=wildcards[kw][0]
+                if len(wildcards[kw]) > 1 :
+                    raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,wildcards[kw]))
             return ds(**dic)
         elif option == 'choices' :
-            clogger.debug("Listing possible values for  %s"%joker_attributes_list)
-            return jokers
+            clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)
+            return wildcards
         elif option == 'ensemble' :
-            clogger.debug("Trying to create an ensemble on attributes %s"%joker_attributes_list)
+            clogger.debug("Trying to create an ensemble on attributes %s"%wildcard_attributes_list)
             ensemble_kw=None
-            for kw in jokers :
-                if len(jokers[kw]) > 1 :
+            for kw in wildcards :
+                if len(wildcards[kw]) > 1 :
                     if ensemble_kw is not None :
                         raise \
                             Climaf_Classes_Error("Cannot create an ensemble, because there are at least"+\
                                                  " two possible attributes for defining it : %s and %s"%\
                                                  (ensemble_kw,kw))
                     else: ensemble_kw=kw
-                    dic[kw]=jokers[kw]
+                    dic[kw]=wildcards[kw]
                 else:
-                    dic[kw]=jokers[kw][0]
+                    dic[kw]=wildcards[kw][0]
             if ensemble_kw is None :
-                raise Climaf_Classes_Error("Creating an ensemble does not make sense because all joker"+\
-                                           "attributes have a single possible value (%s)"%jokers)
+                raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
+                                           "attributes have a single possible value (%s)"%wildcards)
             return eds(**dic)
-        elif option == None :
+        elif option == 'check_and_store' :
             self.files=files
         else:
             raise Climaf_Classes_Error("Unknown option %s"%(option))

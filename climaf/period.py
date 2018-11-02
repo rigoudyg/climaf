@@ -97,6 +97,12 @@ class cperiod():
         if self.start==begin.start and self.end >= begin.end : 
             return cperiod(begin.end,self.end)
     #
+    def is_before(self,candidate) :
+        """ True if period SELF starts before period CANDIDATE
+        """
+        if (self.fx) :return(False)
+        return self.start <= candidate.start 
+    #
     def includes(self,included) :
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
@@ -238,6 +244,56 @@ def init_period(dates) :
         return cperiod(s,e,None)
     else :
         raise Climaf_Period_Error("Must have start ("+`s`+") before,(or equal to, end ("+`e`+")")
+
+
+
+def sort_periods_list(periods_list):
+    #
+    class SortTree() :
+        def __init__(self,el):
+            self.pivot=el
+            self.smaller=None
+            self.larger=None
+    #
+    def insert(el,tree=None):
+        """
+        """
+        if tree is None : return SortTree(el)
+        if (`tree.pivot`==`el`) : return tree # Discard identical periods
+        if el.is_before(tree.pivot) : tree.smaller=insert(el,tree.smaller)
+        else :                        tree.larger =insert(el,tree.larger )
+        return tree
+    #
+    def walk(tree):
+        if tree is None : return []
+        rep=walk(tree.smaller)
+        rep.append(tree.pivot)
+        rep.extend(walk(tree.larger))
+        return rep
+    #
+    import copy
+    clist=copy.copy(periods_list)
+    sorted_tree=SortTree(clist.pop())
+    while clist : insert(clist.pop(),sorted_tree)
+    return walk(sorted_tree)
+
+def merge_periods(remain_to_merge, already_merged=[]):
+    if already_merged==[] :
+        if len (remain_to_merge) <2 :
+            return remain_to_merge,[]
+        sorted=sort_periods_list(remain_to_merge)
+        return merge_periods(sorted[1:], [sorted[0]])
+    if len(remain_to_merge) > 0 :
+        last=already_merged[-1]
+        next_one=remain_to_merge.pop(0)
+        #print "last.end=",last.end,"next.start=",next_one.start
+        if (last.end == next_one.start) :
+            already_merged[-1]=cperiod(last.start,next_one.end)
+        else: already_merged.append(next_one)
+        return merge_periods(remain_to_merge, already_merged)
+    else:
+        return already_merged
+        
 
 
 class Climaf_Period_Error(Exception):

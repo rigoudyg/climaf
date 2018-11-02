@@ -55,9 +55,7 @@ if root:
   ## -- Define the patterns
   base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
   base_pattern+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
-  patterns=[]
-  for date_format in [ "YYYY-YYYY" ,"YYYYMM-YYYYMM" , "YYYYMMDD-YYYYMMDD" , "YYYYMMDDHHMM-YYYYMMDDHHMM" ] :
-      patterns.append(base_pattern + date_format + ".nc")
+  patterns=[base_pattern + "${PERIOD}" + ".nc"]
 
   ## -- call the dataloc CliMAF function
   dataloc(project='CMIP6', organization='generic', url=patterns)
