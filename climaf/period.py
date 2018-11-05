@@ -302,7 +302,20 @@ def merge_periods(remain_to_merge, already_merged=[]):
         return merge_periods(remain_to_merge, already_merged)
     else:
         return already_merged
-        
+
+def intersect_periods_list(lperiod1, lperiod2):
+    """
+    Given two lists of periods, returns a list of the periods representing their intersection
+
+    Algorithm : for each period in l1, compute intersection with all periods in l2, 
+    and add it in a big list; finally, merge  the big list
+    """
+    big=[]
+    for p1 in lperiod1 :
+        for p2 in lperiod2 :
+            inter=p1.intersects(p2)
+            if inter : big.append(inter)
+    return merge_periods(big)
 
 
 class Climaf_Period_Error(Exception):

@@ -10,7 +10,7 @@
 import re, string, copy, os.path
 
 import dataloc
-from period    import init_period, cperiod
+from period    import init_period, cperiod, intersect_periods_list
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
@@ -445,7 +445,7 @@ class cdataset(cobject):
         _,_,_,_,_,missing=self.alias
         return missing is None
     
-    def explore(self,option='check_and_store',sort_periods_on=None):
+    def explore(self,option='check_and_store',sort_periods_on=None,intersection=False):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
         attributes. 
@@ -466,7 +466,8 @@ class cdataset(cobject):
         matching files will be either :
 
           - aggregated among all instances of all attributes with wildcards (default)
-          - or aggregated after being sorted on attribute ``sort_periods_on``, if provided
+          - or aggregated after being sorted on attribute ``sort_periods_on``, if provided.
+            In that case, you can ask for the common period using ``intersection=True``
 
         Toy example ::
 
@@ -524,7 +525,7 @@ class cdataset(cobject):
           info     : Attribute model='*' has multiple values : ['CNRM-ESM2-1', 'CNRM-CM6-1']
           {'institute': 'CNRM-CERFACS', 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': 'gn', 'table': 'Omon', 'mip': 'CMIP', 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
-        Analyze available periods for each value of a given attribute ::
+        Analyze available periods separately for each value of a given attribute (here for each model) ::
 
           >>> rsut=ds(project="CMIP6", model='*', experiment="piControl*", realization="r1i1p1f*", table="Amon", variable="rsut", period="*")
           >>> rsut.explore('choices','model')
@@ -533,6 +534,18 @@ class cdataset(cobject):
              'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
           # Could also be written : rsut.explore(option='choices',sort_periods_on='model')
+
+        Same, but ask for the intersection of available periods (i.e. common period) :: 
+
+          >>> rsut.explore('choices','mip')
+          {'institute': 'CNRM-CERFACS', 'period': {'CMIP': [1850-2349], 'RFMIP': [1850-1879]}, 
+              'experiment': ['piClim-control', 'piControl'], 'grid': 'gr', 'realization': 'r1i1p1f2', 
+              'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+          >>> rsut.explore('choices','mip',intersection=True)
+          {'institute': 'CNRM-CERFACS', 'period': [1850-1879], 
+              'experiment': ['piClim-control', 'piControl'], 'grid': 'gr', 'realization': 'r1i1p1f2', 
+              'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+
 
         """
         dic=self.kvp.copy()
@@ -544,6 +557,13 @@ class cdataset(cobject):
         wildcards=None
         if option != 'check_and_store' : wildcards=dict()
         files=dataloc.selectFiles(return_wildcards=wildcards,sort_periods_on=sort_periods_on,**dic)
+        if sort_periods_on and intersection :
+            periods=wildcards['period']
+            if periods :
+                periods=periods.values()
+                inter=periods.pop(0) # It is a list of periods
+                for p in periods : inter=intersect_periods_list(inter,p)
+            wildcards['period']=inter
         #
         wildcard_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
         if option == 'resolve' :

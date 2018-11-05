@@ -8,7 +8,7 @@ Changes, newest first :
 
 - V1.2.6:
 
-  - a versatile datafiles exploration method is associated to datasets: see :py:meth:`~climaf.classes.cdataset.explore` 
+  - a versatile datafiles and periods exploration method is associated to datasets: see :py:meth:`~climaf.classes.cdataset.explore` 
 
 - V1.2.2:
 
