@@ -8,7 +8,7 @@ This section is still a draft :
 
 - When contributing to the **documentation** or for a **standard operator** (by providing a script), please prepare your changes according to :ref:`how_to_contribute_a_script` and :ref:`how_to_improve_doc`
 
-- When writing Python code for CliMAF core, docstrings should stick to `Google-style docstring coding standard <http://sphinx-doc.org/ext/example_google.html#example-google>`_ ; you may also consider  `other Google-style coding standards <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html>`_
+- When writing Python code for CliMAF core, docstrings should stick to `Google-style docstring coding standard <https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html>`_ ; you may also consider  `other Google-style coding standards <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html>`_
 
 - You may propose your changes to climaf@meteo.fr :
 

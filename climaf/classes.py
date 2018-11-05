@@ -445,7 +445,7 @@ class cdataset(cobject):
         _,_,_,_,_,missing=self.alias
         return missing is None
     
-    def explore(self,option='check_and_store'):
+    def explore(self,option='check_and_store',sort_periods_on=None):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
         attributes. 
@@ -463,8 +463,10 @@ class cdataset(cobject):
         This feature works only for projects which organization is of type 'generic'
 
         Attribute 'period' cannot use a * without being  == * ; in that case, the period of all 
-        matching files will be aggregated in the answer, among all instances of all attributes  
-        with wildcards.
+        matching files will be either :
+
+          - aggregated among all instances of all attributes with wildcards (default)
+          - or aggregated after being sorted on attribute ``sort_periods_on``, if provided
 
         Toy example ::
 
@@ -493,7 +495,8 @@ class cdataset(cobject):
           info     : Attribute realization has matching value r1i1p1f2
           info     : Attribute mip has multiple values : set(['CMIP', 'RFMIP'])
           info     : Attribute model has multiple values : set(['CNRM-ESM2-1', 'CNRM-CM6-1'])
-          {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+          {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 
+          'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
           # Let us further select by setting experiment=piCOntrol
           >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
@@ -508,7 +511,8 @@ class cdataset(cobject):
 
         Identify period covered by data, and versions ::
 
-          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", table="*", period="*" , model="*",version="*")
+          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", 
+          ... table="*", period="*" , model="*",version="*")
           >>> clog('info')
           >>> d.explore('choices')
           info     : Attribute institute='*' has matching value 'CNRM-CERFACS'
@@ -520,6 +524,16 @@ class cdataset(cobject):
           info     : Attribute model='*' has multiple values : ['CNRM-ESM2-1', 'CNRM-CM6-1']
           {'institute': 'CNRM-CERFACS', 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': 'gn', 'table': 'Omon', 'mip': 'CMIP', 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
+        Analyze available periods for each value of a given attribute ::
+
+          >>> rsut=ds(project="CMIP6", model='*', experiment="piControl*", realization="r1i1p1f*", table="Amon", variable="rsut", period="*")
+          >>> rsut.explore('choices','model')
+          {'institute': 'CNRM-CERFACS', 'period': {'CNRM-ESM2-1': [1850-2349], 'CNRM-CM6-1': [1850-2349]}, 
+             'experiment': 'piControl', 'grid': 'gr', 'realization': 'r1i1p1f2', 'mip': 'CMIP', 
+             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+
+          # Could also be written : rsut.explore(option='choices',sort_periods_on='model')
+
         """
         dic=self.kvp.copy()
         if self.alias : 
@@ -529,7 +543,7 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s"%`dic`)
         wildcards=None
         if option != 'check_and_store' : wildcards=dict()
-        files=dataloc.selectFiles(return_wildcards=wildcards,**dic)
+        files=dataloc.selectFiles(return_wildcards=wildcards,sort_periods_on=sort_periods_on,**dic)
         #
         wildcard_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
         if option == 'resolve' :

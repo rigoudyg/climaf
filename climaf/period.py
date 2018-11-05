@@ -280,16 +280,25 @@ def sort_periods_list(periods_list):
 def merge_periods(remain_to_merge, already_merged=[]):
     if already_merged==[] :
         if len (remain_to_merge) <2 :
-            return remain_to_merge,[]
+            return remain_to_merge
         sorted=sort_periods_list(remain_to_merge)
         return merge_periods(sorted[1:], [sorted[0]])
     if len(remain_to_merge) > 0 :
         last=already_merged[-1]
         next_one=remain_to_merge.pop(0)
         #print "last.end=",last.end,"next.start=",next_one.start
-        if (last.end == next_one.start) :
-            already_merged[-1]=cperiod(last.start,next_one.end)
-        else: already_merged.append(next_one)
+        #if (last.end == next_one.start) :
+        #    already_merged[-1]=cperiod(last.start,next_one.end)
+        if (next_one.start <= last.end) :
+            if next_one.end > last.end :
+                # the next period is not entirely included in the
+                # last merged one
+                already_merged[-1]=cperiod(last.start,next_one.end)
+        else:
+            # There is no overlap between both periods
+            already_merged.append(next_one)
+    #
+    if len(remain_to_merge) > 0  :
         return merge_periods(remain_to_merge, already_merged)
     else:
         return already_merged
