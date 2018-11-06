@@ -10,7 +10,7 @@
 import re, string, copy, os.path
 
 import dataloc
-from period    import init_period, cperiod, intersect_periods_list
+from period    import init_period, cperiod, merge_periods,intersect_periods_list
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
@@ -444,8 +444,8 @@ class cdataset(cobject):
         if (alias is None) : return True
         _,_,_,_,_,missing=self.alias
         return missing is None
-    
-    def explore(self,option='check_and_store',sort_periods_on=None,intersection=False):
+
+    def explore(self,option='check_and_store',group_periods_on=None,operation='intersection'):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
         attributes. 
@@ -462,12 +462,7 @@ class cdataset(cobject):
 
         This feature works only for projects which organization is of type 'generic'
 
-        Attribute 'period' cannot use a * without being  == * ; in that case, the period of all 
-        matching files will be either :
-
-          - aggregated among all instances of all attributes with wildcards (default)
-          - or aggregated after being sorted on attribute ``sort_periods_on``, if provided.
-            In that case, you can ask for the common period using ``intersection=True``
+        **See further below, after the first examples, what can done with wildcard on 'period'**
 
         Toy example ::
 
@@ -499,7 +494,7 @@ class cdataset(cobject):
           {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 
           'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
-          # Let us further select by setting experiment=piCOntrol
+          # Let us further select by setting experiment=piControl
           >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
           >>> mrst.explore('choices')
           {'institute': ['CNRM-CERFACS'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], 'grid': ['gr'], 'realization': ['r1i1p1f2']}
@@ -510,42 +505,61 @@ class cdataset(cobject):
                 'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')
                })
 
-        Identify period covered by data, and versions ::
+        When option='choices' and period= '*', the period of all matching files will be either :
 
-          >>> d=ds(project="CMIP6",experiment="piControl", realization='r1i1p1f2', variable="so", 
-          ... table="*", period="*" , model="*",version="*")
-          >>> clog('info')
-          >>> d.explore('choices')
-          info     : Attribute institute='*' has matching value 'CNRM-CERFACS'
-          info     : Attribute perios='*' has matching value [1850-2349]
-          info     : Attribute version='*' has multiple values : ['v0', 'v20180720', 'latest']
-          info     : Attribute grid='g*' has matching value 'gn'
-          info     : Attribute mip='*' has matching value 'CMIP'
-          info     : Attribute table='*' has matching value 'Omon'
-          info     : Attribute model='*' has multiple values : ['CNRM-ESM2-1', 'CNRM-CM6-1']
-          {'institute': 'CNRM-CERFACS', 'period': [1850-2349], 'version': ['v0', 'v20180720', 'latest'], 'grid': 'gn', 'table': 'Omon', 'mip': 'CMIP', 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+          - aggregated among all instances of all attributes with wildcards (default)
+          - or, if argument ``group_periods_on`` provides an attribute name, aggregated after
+            being sorted on that attribute and merged
 
-        Analyze available periods separately for each value of a given attribute (here for each model) ::
+        The aggregation is governed by argument ``operation``, which can be either :
 
-          >>> rsut=ds(project="CMIP6", model='*', experiment="piControl*", realization="r1i1p1f*", table="Amon", variable="rsut", period="*")
-          >>> rsut.explore('choices','model')
-          {'institute': 'CNRM-CERFACS', 'period': {'CNRM-ESM2-1': [1850-2349], 'CNRM-CM6-1': [1850-2349]}, 
-             'experiment': 'piControl', 'grid': 'gr', 'realization': 'r1i1p1f2', 'mip': 'CMIP', 
-             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+          - 'intersection' : which is the most useful case, and hence is the default
+          - 'union' : which has not much sense except to know which periods are definitely 
+            not covered by any data
+          - None : no aggregation occurs, and you get a dict of the merged periods, which 
+            keys are the value of the grouping attribute
 
-          # Could also be written : rsut.explore(option='choices',sort_periods_on='model')
+        Attribute 'period' cannot use a * without being  == * ; 
 
-        Same, but ask for the intersection of available periods (i.e. common period) :: 
 
-          >>> rsut.explore('choices','mip')
-          {'institute': 'CNRM-CERFACS', 'period': {'CMIP': [1850-2349], 'RFMIP': [1850-1879]}, 
-              'experiment': ['piClim-control', 'piControl'], 'grid': 'gr', 'realization': 'r1i1p1f2', 
-              'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
-          >>> rsut.explore('choices','mip',intersection=True)
-          {'institute': 'CNRM-CERFACS', 'period': [1850-1879], 
-              'experiment': ['piClim-control', 'piControl'], 'grid': 'gr', 'realization': 'r1i1p1f2', 
-              'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
+        Examples without grouping periods over any attribute ::
 
+          >>> # Let us use a kind of dataset which data files are temporally splitted, 
+          >>> # and allow for various models, and use a wildcard for period
+          >>> so=ds(project="CMIP6", model='CNRM*', experiment="piControl", realization="r1i1p1f2", 
+          ... table="Omon", variable="so", period="*")
+
+          >>> # What is the overall period covered by the union of all datafiles (but not necessarily by a single model!)
+          >>> so.explore('choices', operation='union')          
+          { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
+
+          >>> # What is the intersection of periods covered by all datafiles 
+          >>> so.explore('choices')
+          { 'period': [None], 'model': ['CNRM-ESM2-1', .... }
+
+          >>> # What is the list of periods covered by datafiles 
+          >>> so.explore('choices', operation=None)
+          { 'period': {None: [2250-2299, 2300-2349, 2200-2249, 1850-1899, 2100-2149, 2150-2199, 
+                              2200-2249, 2000-2049, 2250-2299, 2150-2199, 2050-2099, 2300-2349, 
+                              1950-1999, 1900-1949, 1850-1899, 2000-2049, 2100-2149, 1950-1999, 
+                              1900-1949, 2050-2099]} ....}
+
+        Examples using periods grouping over an attribute ::
+
+          >>> # What is the intersection of available periods after grouping them on the various values of 'model'
+          >>> so.explore('choices',group_periods_on='model')
+          { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ....}
+
+          >>> # Same, but expliciting the default value
+          >>> so.explore('choices',group_periods_on='model',operation='intersection')
+          { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ....}
+
+          >>> # What are the aggregated periods for each value of 'model'
+          >>> so.explore('choices',group_periods_on='model',operation=None)
+          { 'period': 
+              {'CNRM-ESM2-1': [1850-2349], 
+               'CNRM-CM6-1' : [1850-2349] }, 
+            'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ...}
 
         """
         dic=self.kvp.copy()
@@ -556,14 +570,37 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s"%`dic`)
         wildcards=None
         if option != 'check_and_store' : wildcards=dict()
-        files=dataloc.selectFiles(return_wildcards=wildcards,sort_periods_on=sort_periods_on,**dic)
-        if sort_periods_on and intersection :
-            periods=wildcards['period']
-            if periods :
+        files=dataloc.selectFiles(return_wildcards=wildcards,merge_periods_on=group_periods_on,**dic)
+        periods=wildcards.get('period',None)
+        if periods :
+            #print "periods=",periods
+            if operation=='intersection':
                 periods=periods.values()
-                inter=periods.pop(0) # It is a list of periods
-                for p in periods : inter=intersect_periods_list(inter,p)
-            wildcards['period']=inter
+                if group_periods_on : 
+                    #print "periods=",periods
+                    merged_periods=[ merge_periods(p) for p in periods ]
+                    inter=merged_periods.pop(0)
+                    for p in merged_periods : inter=intersect_periods_list(inter,p)
+                else:
+                    #print "periods=",periods
+                    periods=periods[0]
+                    inter=periods[0]
+                    for p in periods : inter=p.intersects(inter)
+                    inter=[inter]
+                wildcards['period']=inter
+            elif operation=='union' :
+                #print "periods=",periods
+                to_merge=[]
+                for plist in periods.values() : to_merge.extend(plist)
+                wildcards['period']=merge_periods(to_merge)
+            elif operation is None :
+                #print "periods=",periods
+                # Merge periods for each facet value separately
+                if group_periods_on : 
+                    for key in periods: periods[key]=merge_periods(periods[key])
+                wildcards['period']=periods
+            else:
+                raise Climaf_Classes_Error("Operation %s is not kown "%(operation))
         #
         wildcard_attributes_list=[ k for k in dic if type(dic[k]) is str and  "*" in dic[k]]
         if option == 'resolve' :
