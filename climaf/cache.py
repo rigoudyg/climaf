@@ -33,6 +33,8 @@ stamping=True
 crs2filename=dict()
 #: The dictionary associating CRS expressions to their evaluation 
 crs2eval=dict()
+#: The list of crs which file has been dropped since last synchronisation between in-memory index and file index (or at least since the beginning of the session)
+dropped_crs=[]
 
 #: A dict containing cache index entries (as listed in index file), which 
 # were up to now not interpretable, given the set of defined projects
@@ -167,6 +169,7 @@ def register(filename,crs,outfilename=None):
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
+    global dropped_crs
     if not stamping :
         clogger.debug('No stamping')
         crs2filename[crs]=filename
@@ -200,6 +203,7 @@ def register(filename,crs,outfilename=None):
                     clogger.info("move %s as %s "%(filename,outfilename))
                     clogger.info("%s registered as %s"%(crs,outfilename))
                     crs2filename[crs]=outfilename
+                    if crs in dropped_crs : dropped_crs.remove(crs)
                     return True
                 else:
                     clogger.critical("cannot move by"%cmd)
@@ -208,6 +212,7 @@ def register(filename,crs,outfilename=None):
             else:
                 clogger.info("%s registered as %s"%(crs,filename))
                 crs2filename[crs]=filename
+                if crs in dropped_crs : dropped_crs.remove(crs)
                 return True
         else : 
             clogger.critical("cannot stamp by %s"%command)
@@ -355,6 +360,7 @@ def cdrop(obj, rm=True) :
     
     """
     global crs2filename
+    global dropped_crs
 
     if (isinstance(obj,cobject) ):
         crs=`obj`
@@ -370,6 +376,7 @@ def cdrop(obj, rm=True) :
             try :
                 path_file=os.path.dirname(fil)
                 os.remove(fil)
+                dropped_crs.append(crs)
                 try:
                     os.rmdir(path_file)
                 except OSError as ex:
@@ -399,13 +406,14 @@ def csync(update=False) :
     #
     import pickle
     global cacheIndexFileName
+    global dropped_crs
 
     # Merge index on file and index in memory
     file_index=cload(True)
+    for crs in dropped_crs : file_index.pop(crs,None)
     crs2filename.update(file_index)
 
-    # check if cache index is up to date; if not
-    # enforce consistency
+    # check if cache index is up to date; if not enforce consistency
     if update :
         clogger.info("Listing crs from files present in cache")
         files_in_cache=list_cache()
@@ -417,20 +425,22 @@ def csync(update=False) :
                 clogger.info("Rebuilding cache index from file content")
                 rebuild()
             else :
-                clogger.info('Removing cache files which content is not known')
-                for fil in files_in_cache :
-                    if fil not in files_in_index :
-                        os.system("rm %"%fil)
+                clogger.warning('In no stamp mode, there is no way to seriously identify CRS from files in cache  !')
+                # clogger.warning('Removing cache files which content is not known. This is an issue in concurrent mode !')
+                # for fil in files_in_cache :
+                #     if fil not in files_in_index :
+                #         os.system("rm %"%fil)
                     #else :
                     # Should also remove empty files, as soon as
                     # file creation will be atomic enough 
-    # Save to disk
-    try: 
-        cacheIndexFile=file(os.path.expanduser(cacheIndexFileName), "w")
-        pickle.dump(crs2filename,cacheIndexFile)  
-        cacheIndexFile.close()
+    # Save index to disk
+    fn=os.path.expanduser(cacheIndexFileName)
+    try:
+        with open(fn,"w") as cacheIndexFile :
+            pickle.dump(crs2filename,cacheIndexFile)  
+        dropped_crs=[]
     except:
-        clogger.info("No cache index file yet")
+        clogger.error("Issue when writing cache index %s"%fn)
 
 def cload(alt=None) :
     global crs2filename 
