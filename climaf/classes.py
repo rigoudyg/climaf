@@ -494,7 +494,7 @@ class cdataset(cobject):
           {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 
           'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
-          # Let us further select by setting experiment=piControl
+          >>> # Let us further select by setting experiment=piControl
           >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
           >>> mrst.explore('choices')
           {'institute': ['CNRM-CERFACS'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], 'grid': ['gr'], 'realization': ['r1i1p1f2']}
@@ -533,16 +533,15 @@ class cdataset(cobject):
           >>> so.explore('choices', operation='union')          
           { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
-          >>> # What is the intersection of periods covered by all datafiles 
+          >>> # What is the intersection of periods covered by each datafile
           >>> so.explore('choices')
-          { 'period': [None], 'model': ['CNRM-ESM2-1', .... }
+          { 'period': [None], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
           >>> # What is the list of periods covered by datafiles 
           >>> so.explore('choices', operation=None)
-          { 'period': {None: [2250-2299, 2300-2349, 2200-2249, 1850-1899, 2100-2149, 2150-2199, 
-                              2200-2249, 2000-2049, 2250-2299, 2150-2199, 2050-2099, 2300-2349, 
-                              1950-1999, 1900-1949, 1850-1899, 2000-2049, 2100-2149, 1950-1999, 
-                              1900-1949, 2050-2099]} ....}
+          { 'period': {None: [1850-1899, 1900-1949, 1950-1999, 2000-2049, 2050-2099, 
+                              2100-2149, 2150-2199, 2200-2249, 2250-2299, 2300-2349]}, 
+             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}             
 
         Examples using periods grouping over an attribute ::
 
@@ -575,18 +574,12 @@ class cdataset(cobject):
         if periods :
             #print "periods=",periods
             if operation=='intersection':
-                periods=periods.values()
                 if group_periods_on : 
                     #print "periods=",periods
                     merged_periods=[ merge_periods(p) for p in periods ]
                     inter=merged_periods.pop(0)
                     for p in merged_periods : inter=intersect_periods_list(inter,p)
-                else:
-                    #print "periods=",periods
-                    periods=periods[0]
-                    inter=periods[0]
-                    for p in periods : inter=p.intersects(inter)
-                    inter=[inter]
+                else: inter=merge_periods(periods[None]) 
                 wildcards['period']=inter
             elif operation=='union' :
                 #print "periods=",periods
@@ -606,9 +599,12 @@ class cdataset(cobject):
         if option == 'resolve' :
             clogger.debug("Trying to resolve on attributes %s"%wildcard_attributes_list)
             for kw in wildcards :
-                dic[kw]=wildcards[kw][0]
-                if len(wildcards[kw]) > 1 :
-                    raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,wildcards[kw]))
+                val=wildcards[kw]
+                if type(val)==list :
+                    if len(val) > 1 :
+                        raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,val))
+                    else: val=val[0]
+                dic[kw]=val
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)

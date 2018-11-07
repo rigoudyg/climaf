@@ -9,7 +9,7 @@ import os, os.path, re, string, glob, subprocess
 from string import Template
 
 import classes
-from climaf.period import init_period
+from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
 from operator import itemgetter
@@ -243,7 +243,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         clogger.warning("no datalocation found for %s %s %s %s "%(project, model, simulation, frequency))
     for org,freq,urls in ofu :
         if return_wildcards is not None and org is not "generic" :
-            classes.Climaf_Error("Can handle multipe facet query only for organization=generic ")
+            raise classes.Climaf_Error("Can hanle multipe facet query only for organization=generic ")
         kwargs2=kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies :
@@ -569,8 +569,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         s=wildcards[facet]
         if return_wildcards is not None :
             if facet=="period" :
-                for val in periods_dict :
-                    periods_dict[val]=list(periods_dict[val])
+                for val in periods_dict : 
+                    periods_dict[val]=sort_periods_list(list(periods_dict[val]))
                 clogger.info("Attribute period='*' has values %s"%(periods_dict))
                 return_wildcards["period"]=periods_dict
             else:
