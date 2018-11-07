@@ -333,7 +333,6 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             periods.append(fperiod)
         #
         for kw in kwargs :
-            #print facets_regexp, f
             it=re.finditer(facets_regexp,f)
             for oc in it :
                 try : facet_value=oc.group(kw)
@@ -358,8 +357,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     else:
                         pass
                         #print "no Adding period for %s=%s for %s"%(kw,facet_value,f)
-            #
-    #
+        #print "end of store, periods_dict=",periods_dict, "wild=",wildcards
 
     rep=[]
     #
@@ -390,8 +388,9 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     rperiod="(?P<period>(?P<start>%s)(-(?P<end>%s))?)"%(date,date)
     #print "period=",period
     #
-    date_regexp_patt= dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})",
-                           YYYYMMDDHH="([0-9]{10})", YYYYMMDDHHMM="([0-9]{12})")
+    #date_regexp_patt= dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})",
+    #                       YYYYMMDDHH="([0-9]{10})", YYYYMMDDHHMM="([0-9]{12})")
+    date_regexp_patt= dict(YYYY=rperiod,YYYYMM=rperiod, YYYYMMDD=rperiod, YYYYMMDDHH=rperiod, YYYYMMDDHHMM=rperiod)
     date_regexp_patt.update({ "${PERIOD}" : rperiod } )
     #                       DATE="([0-9]{4,12})")
     # an ordered list of dates keywords
@@ -555,9 +554,10 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             else:
                 if not fperiod :
                     clogger.debug('not appending %s because period is None '%f)
-                else:
-                    if not period.intersects(fperiod) :
+                elif not period.intersects(fperiod) :
                         clogger.debug('not appending %s because period doesn t intersect %s'%(f,period))
+                else:
+                    clogger.debug('not appending %s for some other reason %s'%(f))
 
         # Break on first url with any matching data
         if len(rep)>0 :
@@ -569,6 +569,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         s=wildcards[facet]
         if return_wildcards is not None :
             if facet=="period" :
+                #print "s=",s," periods_dict=",periods_dict
                 for val in periods_dict : 
                     periods_dict[val]=sort_periods_list(list(periods_dict[val]))
                 clogger.info("Attribute period='*' has values %s"%(periods_dict))
@@ -584,6 +585,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     if return_wildcards : clogger.info(message)
                     else: clogger.error(message)
                 s=return_wildcards[facet]
+        else:
+            clogger.debug("return_wildcards is None")
     return rep
 
 

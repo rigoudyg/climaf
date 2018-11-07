@@ -568,26 +568,31 @@ class cdataset(cobject):
             if filenameVar : dic["filenameVar"]=filenameVar
         clogger.debug("Looking with dic=%s"%`dic`)
         wildcards=None
-        if option != 'check_and_store' : wildcards=dict()
+        #if option != 'check_and_store' :
+        wildcards=dict()
         files=dataloc.selectFiles(return_wildcards=wildcards,merge_periods_on=group_periods_on,**dic)
+        #if option != 'check_and_store' :
         periods=wildcards.get('period',None)
+        #else : periods=None
         if periods :
             #print "periods=",periods
+            if option != 'choices': 
+                if group_periods_on :
+                    raise Climaf_Classes_Error("Can use 'group_periods_on' only with option='choices'")
+                if operation!='intersection': 
+                    raise Climaf_Classes_Error("Can use operation %s only with option='choices'"%operation)
             if operation=='intersection':
-                if group_periods_on : 
-                    #print "periods=",periods
+                if group_periods_on :
                     merged_periods=[ merge_periods(p) for p in periods ]
                     inter=merged_periods.pop(0)
                     for p in merged_periods : inter=intersect_periods_list(inter,p)
                 else: inter=merge_periods(periods[None]) 
                 wildcards['period']=inter
             elif operation=='union' :
-                #print "periods=",periods
                 to_merge=[]
                 for plist in periods.values() : to_merge.extend(plist)
                 wildcards['period']=merge_periods(to_merge)
             elif operation is None :
-                #print "periods=",periods
                 # Merge periods for each facet value separately
                 if group_periods_on : 
                     for key in periods: periods[key]=merge_periods(periods[key])
@@ -602,7 +607,10 @@ class cdataset(cobject):
                 val=wildcards[kw]
                 if type(val)==list :
                     if len(val) > 1 :
-                        raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,val))
+                        if kw=='period' : 
+                            raise Climaf_Classes_Error("Periods with holes are not handled %s"%(val))
+                        else:
+                            raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,val))
                     else: val=val[0]
                 dic[kw]=val
             return ds(**dic)
@@ -613,21 +621,33 @@ class cdataset(cobject):
             clogger.debug("Trying to create an ensemble on attributes %s"%wildcard_attributes_list)
             ensemble_kw=None
             for kw in wildcards :
-                if len(wildcards[kw]) > 1 :
-                    if ensemble_kw is not None :
+                entry=wildcards[kw]
+                #print "entry=",entry, 'type=',type(entry), 'ensemble_kw=',ensemble_kw
+                if kw=='period' and type(entry) is list :
+                    if len(wildcards['period']) > 1 :
                         raise \
-                            Climaf_Classes_Error("Cannot create an ensemble, because there are at least"+\
-                                                 " two possible attributes for defining it : %s and %s"%\
-                                                 (ensemble_kw,kw))
-                    else: ensemble_kw=kw
-                    dic[kw]=wildcards[kw]
-                else:
-                    dic[kw]=wildcards[kw][0]
+                            Climaf_Classes_Error("Cannot create an ensemble with holes in period (%s)"%wildcards['period'])
+                    entry=entry[0]
+                if type(entry) is list :
+                    if len(entry) > 1 :
+                        if ensemble_kw is not None :
+                            raise \
+                                Climaf_Classes_Error("Cannot create an ensemble, because there are at least"+\
+                                   " two possible attributes for defining it : %s -> %s and %s -> %s"%\
+                                   (ensemble_kw,wildcards[ensemble_kw],kw,wildcards[kw]))
+                        else: ensemble_kw=kw
+                dic[kw]=entry
             if ensemble_kw is None :
                 raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
                                            "attributes have a single possible value (%s)"%wildcards)
+            #print "dic=",dic
             return eds(**dic)
         elif option == 'check_and_store' :
+            for kw in wildcards:
+                entry=wildcards[kw]
+                if type(entry) is list and len(entry) > 1 : 
+                    raise Climaf_Classes_Error("This dataset is ambiguous on attribute "+\
+                                               "%s='%s'; please choose among : %s"% (kw,dic[kw],entry))
             self.files=files
         else:
             raise Climaf_Classes_Error("Unknown option %s"%(option))
