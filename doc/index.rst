@@ -41,6 +41,31 @@ So, CliMAF can be described as :
 - and a visualisation engine for the corresponding results
 
 
+
+Can CliMAF make my scientific life easier?
+----------------------------------------------
+
+In the following you will find illustrations of the use of CliMAF:
+- CliMAF in a nutshell: a quick overview of what it does and how to use it
+- access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI)
+- work with ensembles
+- gathering my results in an html page
+
+You will also find notebooks to illustrate various aspects of CliMAF:
+- how to use the plot operator
+- how the cache works
+- details on the common pretreatments
+- or how to plug a script
+
+
+Examples of what CliMAF can do
+-----------------------------------
+
+Use it to do all the pretreatments on a CMIP archive and then do the plot with your own script:
+
+Building a community tool to be used routinely, producing loads of figures: The CliMAF Earth System Model Evaluation Platform (C-ESM-EP):
+
+
 Description 
 ----------------
 
