@@ -436,7 +436,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         #
         # For discovering values for those facets which are a wildcard,
         # construct a regexp with a group name for all facets (but period)
-        alt_basename=basename
+        alt_basename=basename.replace("?",".").replace("*",".*")
         alt_kwargs=kwargs.copy()
         for kw in kwargs :
             if type(kwargs[kw]) is str : # This excludes period attribute, which has a type

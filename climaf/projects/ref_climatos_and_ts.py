@@ -70,7 +70,7 @@ cdef('period'      , 'fx'           , project='ref_climatos')
 
 if (root) :
     #pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc" 
-    pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_*${clim_period}-clim.nc"
+    pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_${clim_period}-clim.nc"
     dataloc(project='ref_climatos', organization='generic', url=pattern2)
 
 
