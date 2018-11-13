@@ -35,6 +35,8 @@ if root:
   cproject('CORDEX','root','model','CORDEX_domain', 'model_version', 'frequency', 'driving_model',
          'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'], separator='%')
   dataloc(project='CORDEX', url=[pattern1])
+  cdef('experiment', '*', project='CORDEX')
+  cdef('model_version', '*', project='CORDEX')
 
   # -- CORDEX extent (historical + scenario at once)
   cproject('CORDEX_extent','root','model','CORDEX_domain', 'model_version', 'frequency', 'driving_model',
@@ -49,6 +51,8 @@ if root:
   cproject('CORDEX-Adjust','root','model','CORDEX_domain', 'bias_correction', 'frequency', 'driving_model',
          'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'], separator='%')
   dataloc(project='CORDEX-Adjust', url=pattern)
+  cdef('bias_correction'    , '*'       , project='CORDEX-Adjust')
+  cdef('experiment'    , 'rcp85'       , project='CORDEX-Adjust')
 
   for project in ['CORDEX', 'CORDEX_extent', 'CORDEX-Adjust']:
       cfreqs(project, {'daily':'day'})
@@ -56,6 +60,11 @@ if root:
       cdef('root'         , root          , project=project)
       cdef('institute'    , '*'           , project=project)
       cdef('realization'  , 'r1i1p1'      , project=project)
-      cdef('frequency'    , 'daily'       , project=project)
+      cdef('frequency'    , '*'       , project=project)
+      cdef('driving_model'    , '*'       , project=project)
+      cdef('CORDEX_domain'    , '*'       , project=project)
+      cdef('model'    , '*'       , project=project)
 
+  for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
+      calias('CORDEX-Adjust', var, var+'Adjust')
 

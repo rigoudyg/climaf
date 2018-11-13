@@ -67,6 +67,7 @@ if root:
       cdef('root'        , root          , project=project)
       #cdef('institute'   , '*'           , project=project)
       cdef('table'       , '*'           , project=project) # impossible, because of ambiguities
+      cdef('realm'      , '*'           , project=project)
       cdef('realization' , 'r1i1p1'      , project=project)
       cdef('experiment'  , 'historical'   , project=project)
       cdef('version'     , 'latest'       , project=project)
@@ -75,8 +76,8 @@ if root:
 
   ## -- Declare a CMIP5-Adjust CliMAF project: bias corrected CMIP5 simulations
   ## ------------------------------------ >
-  pattern='${root}/CMIP5-Adjust/bias-adjusted-output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${}/${gr}/${bias_correction}/${version}/${variable}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${bias_correction}_${PERIOD}.nc'
-  cproject('CMIP5-Adjust','root', 'model','experiment', 'bias_correction', 'frequency', 'table','gr', 
+  pattern='${root}/CMIP5-Adjust/bias-adjusted-output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${gr}/${bias_correction}/${version}/${variable}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${bias_correction}_${PERIOD}.nc'
+  cproject('CMIP5-Adjust','root', 'model','experiment', 'bias_correction', 'frequency', 'table','gr','realm', 
          'realization', 'experiment', 'version', ensemble=['model', 'realization'], separator='%')
   dataloc(project='CMIP5-Adjust', url=pattern)
 
@@ -86,10 +87,11 @@ if root:
   cdef('root'           , root          , project='CMIP5-Adjust')
   #cdef('institute'      , '*'           , project='CMIP5-Adjust')
   cdef('table'          , '*'           , project='CMIP5-Adjust') # impossible, because of ambiguities
+  cdef('realm'           , '*'           , project='CMIP5-Adjust') # impossible, because of ambiguities
   cdef('realization'    , 'r1i1p1'      , project='CMIP5-Adjust')
   cdef('experiment'     , 'rcp85'       , project='CMIP5-Adjust')
   cdef('version'        , 'latest'      , project='CMIP5-Adjust')
-  cdef('gr'             , 'gr1'         , project='CMIP5-Adjust')
+  cdef('gr'             , '*'         , project='CMIP5-Adjust')
   cdef('bias_correction', '*'           , project='CMIP5-Adjust')
   cdef('frequency'      , '*'           , project='CMIP5-Adjust')
 
