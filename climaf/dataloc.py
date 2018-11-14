@@ -274,6 +274,9 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         if (len(rep) == 0 ) :
             clogger.warning("no file found for %s, at these "
                             "data locations %s "%(`kwargs` , `urls`))
+            if any([ kwargs[k] == '' for k in kwargs ]) :
+                clogger.warning("Please check these empty attributes %s"%\
+                                [ k for k in kwargs if kwargs[k]=='' ])
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep.sort()

@@ -583,7 +583,8 @@ class cdataset(cobject):
                     raise Climaf_Classes_Error("Can use operation %s only with option='choices'"%operation)
             if operation=='intersection':
                 if group_periods_on :
-                    merged_periods=[ merge_periods(p) for p in periods ]
+                    #print "periods=",periods
+                    merged_periods=[ merge_periods(p) for p in periods.values() ]
                     inter=merged_periods.pop(0)
                     for p in merged_periods : inter=intersect_periods_list(inter,p)
                 else: inter=merge_periods(periods[None]) 
@@ -648,8 +649,8 @@ class cdataset(cobject):
             for kw in wildcards:
                 entry=wildcards[kw]
                 if type(entry) is list and len(entry) > 1 : 
-                    raise Climaf_Classes_Error("This dataset is ambiguous on attribute "+\
-                                               "%s='%s'; please choose among : %s"% (kw,dic[kw],entry))
+                    raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among : %s or use either 'ensure_dataset=False' (with method baseFiles or listfiles) or 'option=\'choices\' (with method explore)"%\
+                            (kw,dic[kw],entry))
             self.files=files
         else:
             raise Climaf_Classes_Error("Unknown option %s"%(option))
