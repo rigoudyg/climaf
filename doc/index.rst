@@ -9,6 +9,7 @@ Quick links : :ref:`News <news>` | :ref:`Functions <API>` |
 
 .. |logo| image:: Logo-CliMAF-compact.png
   :scale: 60%
+  :target: <http://htmlpreview.github.io/?https://github.com/jservonnat/C-ESM-EP/blob/master/Documentation/Access_to_your_own_datasets_CESMEP.html>
 
 |logo| 
 
@@ -44,6 +45,8 @@ So, CliMAF can be described as :
 
 Can CliMAF make my scientific life easier?
 ----------------------------------------------
+
+ - Test of url: `Notebook <http://htmlpreview.github.io/?https://github.com/jservonnat/C-ESM-EP/blob/master/Documentation/Access_to_your_own_datasets_CESMEP.html>`_
 
 In the following you will find illustrations of the use of CliMAF:
 - CliMAF in a nutshell: a quick overview of what it does and how to use it

@@ -54,8 +54,8 @@ if root:
 
   # -- Make the alias and default values for both projects
   for project in ['CMIP5', 'CMIP5_extent']:
-      calias(project, 'tos', offset=273.15)
-      calias(project, 'thetao', offset=273.15)
+      #calias(project, 'tos', offset=273.15)
+      #calias(project, 'thetao', offset=273.15)
       calias(project, 'sivolu', 'sivol')
       calias(project, 'sic', 'siconc')
       calias(project, 'sit', 'sithick')
@@ -94,4 +94,8 @@ if root:
   cdef('gr'             , '*'         , project='CMIP5-Adjust')
   cdef('bias_correction', '*'           , project='CMIP5-Adjust')
   cdef('frequency'      , '*'           , project='CMIP5-Adjust')
+
+
+  for project in ['CMIP5', 'CMIP5_extent', 'CMIP5-Adjust']:
+      cfreqs(project, {'daily':'day', 'monthly':'mon', 'yearly':'yr'})
 
