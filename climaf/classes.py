@@ -10,7 +10,7 @@
 import re, string, copy, os.path
 
 import dataloc
-from period    import init_period, cperiod, merge_periods,intersect_periods_list
+from period    import init_period, cperiod, merge_periods,intersect_periods_list,lastyears
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
@@ -612,8 +612,9 @@ class cdataset(cobject):
                             raise Climaf_Classes_Error("Periods with holes are not handled %s"%(val))
                         else:
                             raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,val))
-                    else: val=val[0]
-                dic[kw]=val
+                    else:
+                        val=val[0]
+                        dic[kw]=val
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)
@@ -1303,14 +1304,22 @@ def ds(*args,**kwargs) :
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
+    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this 
+    will work only if no dataset's attribute is ambiguous
+
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
     """
     if len(args) >1 :
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) :
-       return cdataset(**select_projects(**kwargs))
-       #return cdataset(**kwargs) # Front-end to cdataset
+        match=None
+        if type(kwargs['period']) is str :
+            match=re.match("(last|LAST)_(?P<duration>[0-9]*)(y|Y)$",kwargs['period'])
+        if match is None :
+            return cdataset(**select_projects(**kwargs))
+        else:
+            return resolve_last_years(copy.deepcopy(kwargs),match.group('duration'))
     crs=args[0]
     results=[]
     for cproj in cprojects : 
@@ -1900,7 +1909,19 @@ def attributeOf(cobject,attrib) :
     elif cobject is None : return ''
     else : raise Climaf_Classes_Error("Unknown class for argument "+`cobject`)
 
-        
+
+def resolve_last_years(kwargs,duration) :
+    # Returns a dataset after translation of period like 'last_50y'
+    kwargs['period']='*'
+    explorer=ds(**kwargs)
+    attributes=explorer.explore(option='choices')
+    periods=attributes['period']
+    period=periods[-1]
+    kwargs['period']=lastyears(period,int(duration))
+    explorer=ds(**kwargs)
+    return explorer.explore('resolve')
+
+    
 class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

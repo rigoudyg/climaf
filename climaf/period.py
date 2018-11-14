@@ -4,7 +4,7 @@
 
 # S.Senesi 08/2014 : created
 
-import re, datetime
+import re, datetime, copy
 from climaf.clogging import clogger, dedent
 
 class cperiod():
@@ -317,6 +317,19 @@ def intersect_periods_list(lperiod1, lperiod2):
             if inter : big.append(inter)
     return merge_periods(big)
 
+def lastyears(period,nyears):
+    """
+    Returns a period ending at PERIOD's end and which duration is at most NYEARS
+    """
+    #print "period=",period, 'type=',type(period),'nyears=',nyears
+    if type(period) is str : period=cperiod(period)
+    rep=cperiod(period.start,period.end)
+    yend=rep.end.year
+    ystart=rep.start.year
+    if ystart < yend-nyears :
+        s=rep.start
+        rep.start=datetime.datetime(year=yend-nyears,month=s.month,day=s.day,hour=s.hour,minute=s.minute)
+    return `rep`
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
