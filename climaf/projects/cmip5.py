@@ -26,7 +26,7 @@ if onCiclad :
    root="/prodigfs/project"
 if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
-   root="/cnrm/cmip"
+   root="/cnrm/cmip/cnrm/ESG/"
 
 if root:
   ## -- Declare a CMIP5 CliMAF project 
@@ -39,10 +39,10 @@ if root:
            'version', ensemble=['model','realization'],separator='%')
 
   ## -- Define the pattern for CMIP5
-  pattern1='${root}/CMIP5/output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern1='${root}/CMIP5/output*/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern1+='${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
   ## -- And the additionnal pattern for extent
-  pattern2='${root}/CMIP5/output/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern2='${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern2+='${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
 
   ## -- call the dataloc CliMAF function
@@ -70,7 +70,10 @@ if root:
       cdef('realm'      , '*'           , project=project)
       cdef('realization' , 'r1i1p1'      , project=project)
       cdef('experiment'  , 'historical'   , project=project)
-      cdef('version'     , 'latest'       , project=project)
+      if atCNRM :
+          cdef('version'     , '*'       , project=project)
+      else:
+          cdef('version'     , 'latest'       , project=project)
       cdef('frequency'   , '*'            , project=project)
 
 
