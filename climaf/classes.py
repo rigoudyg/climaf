@@ -616,6 +616,7 @@ class cdataset(cobject):
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)
+            self.files=files
             return wildcards
         elif option == 'ensemble' :
             clogger.debug("Trying to create an ensemble on attributes %s"%wildcard_attributes_list)
@@ -641,6 +642,7 @@ class cdataset(cobject):
                 raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
                                            "attributes have a single possible value (%s)"%wildcards)
             #print "dic=",dic
+            self.files=files
             return eds(**dic)
         elif option == 'check_and_store' :
             for kw in wildcards:
