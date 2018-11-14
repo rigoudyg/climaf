@@ -11,8 +11,8 @@
 # Lack of variable VAR in some file(s) is not considered an error
 # Having no data for the PERIOD is not considered an error
 
-set -x 
-operator=$1 ; shift
+set -ex 
+operator="$1" ; shift
 out=$1 ; shift
 var=$1 ; shift
 period=$1 ; shift
@@ -78,7 +78,7 @@ else
     # varname is not in filename -> assume selvar before selvar is best
     ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selvar" "$selregion" "$merge
 fi
-[ $operator ] && ops="-"${operator}" "$ops 
+[ "$operator" ] && ops="-"${operator}" "$ops 
 #
 
 # Construct files list, which may involve transformed files
