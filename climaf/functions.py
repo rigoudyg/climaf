@@ -297,6 +297,7 @@ def clim_average(dat,season):
 
         if selmonths:
             avg = ccdo(scyc,operator='timmean -seltimestep,'+selmonths)
+            #avg = ccdo(scyc,operator='timmean -selmon,'+selmonths)
         #
         #
         # -- Individual months

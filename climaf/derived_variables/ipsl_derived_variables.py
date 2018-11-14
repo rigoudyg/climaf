@@ -14,4 +14,4 @@ from climaf.api import derive, calias
 
 
 
-  calias('CMIP6', 'wfo', 'wfonocorr')
+calias('CMIP6', 'wfo', 'wfonocorr')

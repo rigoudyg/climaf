@@ -1,47 +1,101 @@
 """
-This module declares locations for searching data for projects CMIP5 for all frequencies, and where the data is
-at CNRM and on Ciclad
+This module declares locations for searching data for CMIP5 outputs produced by 
+libIGCM or Eclis for all frequencies.
 
-Attributes for CMIP5 datasets are : model, rip (called simulation), frequency, table, realm, version
+Attributes for CMIP5 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
 
-Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
+Syntax for these attributes is described in `the CMIP5 DRS document <https://goo.gl/v1drZl>`_
 
 Example for a CMIP5 dataset declaration ::
 
- >>> tas1pc=ds(project='CMIP5', model='CNRM-CM5', experiment='1pctCO2', variable='tas', frequency='monthly', period='1860-1861')
+ >>> tas1pc=ds(project='CMIP5', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon', realization='r3i1p1f2', period='1860-1861')
+
 
 
 """
 
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs,cdef
-from climaf.site_settings import atCNRM, onCiclad
-from climaf.operators import derive
+from climaf.classes import cproject, calias, cfreqs, cdef
+from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
-p=cproject("CMIP5" ,"model","experiment", ("frequency","monthly"),
-           ("table","*"),("realm","*"),("version","last"),
-           ensemble=["model","simulation"])
-cdef("simulation","r1i1p1",project="CMIP5")
 
-# Frequency alias
-cfreqs('CMIP5', {'monthly':'mon' , 'daily':'day' })
-
-urls_CMIP5=None
-
-if atCNRM :
-    # Declare the directory for CNRM-CM CMIP5 data on CNRM's Lustre file system.
-    urls_CMIP5=["/cnrm/cmip/cnrm/ESG"]
+root = None
 if onCiclad :
-    # Declare a list of root directories for CMIP5 data on IPLS's Ciclad file system
-    urls_CMIP5=["/prodigfs/project/"]
+   # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
+   root="/prodigfs/project"
+if atCNRM:
+   # Declare a list of root directories for IPSL data at TGCC
+   root="/cnrm/cmip"
 
-if urls_CMIP5 :
-    # Next command will lead to explore all directories in 'url' 
-    # for searching data for a CliMAF dataset (by function ds) except if 
-    # a more specific dataloc entry matches the arguments to 'ds'
-    dataloc(project="CMIP5", organization="CMIP5_DRS", url=urls_CMIP5)
+if root:
+  ## -- Declare a CMIP5 CliMAF project 
+  ## ------------------------------------ >
+  cproject('CMIP5', 'root', 'model', 'table', 'experiment', 'realization', 'frequency', 'realm',
+           'version', ensemble=['model','realization'],separator='%')
+  ## -- Declare a CMIP5 'extent' CliMAF project = extracts a period covering historical and a scenario
+  ## ------------------------------------ >
+  cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment', 'extent_experiment', 'realization', 'frequency', 'realm',
+           'version', ensemble=['model','realization'],separator='%')
+
+  ## -- Define the pattern for CMIP5
+  pattern1='${root}/CMIP5/output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern1+='${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
+  ## -- And the additionnal pattern for extent
+  pattern2='${root}/CMIP5/output/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern2+='${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
+
+  ## -- call the dataloc CliMAF function
+  ## -- CMIP5
+  dataloc(project='CMIP5', organization='generic', url=pattern1)
+  ## -- CMIP5_extent
+  dataloc(project='CMIP5_extent', organization='generic', url=pattern1)
+  dataloc(project='CMIP5_extent', organization='generic', url=pattern2)
+
+  # -- Make the alias and default values for both projects
+  for project in ['CMIP5', 'CMIP5_extent']:
+      #calias(project, 'tos', offset=273.15)
+      #calias(project, 'thetao', offset=273.15)
+      calias(project, 'sivolu', 'sivol')
+      calias(project, 'sic', 'siconc')
+      calias(project, 'sit', 'sithick')
+      calias(project, 'NO3', 'no3')
+      calias(project, 'PO4', 'po4')
+      calias(project, 'Si', 'si')
+      calias(project, 'O2', 'o2')
+      
+      cdef('root'        , root          , project=project)
+      #cdef('institute'   , '*'           , project=project)
+      cdef('table'       , '*'           , project=project) # impossible, because of ambiguities
+      cdef('realm'      , '*'           , project=project)
+      cdef('realization' , 'r1i1p1'      , project=project)
+      cdef('experiment'  , 'historical'   , project=project)
+      cdef('version'     , 'latest'       , project=project)
+      cdef('frequency'   , '*'            , project=project)
 
 
-calias('CMIP5', 'hflsevap', 'hfls', scale=1./2.5e6 )
-derive('CMIP5', 'pme', 'minus', 'pr' ,'hflsevap')
+  ## -- Declare a CMIP5-Adjust CliMAF project: bias corrected CMIP5 simulations
+  ## ------------------------------------ >
+  pattern='${root}/CMIP5-Adjust/bias-adjusted-output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${gr}/${bias_correction}/${version}/${variable}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${bias_correction}_${PERIOD}.nc'
+  cproject('CMIP5-Adjust','root', 'model','experiment', 'bias_correction', 'frequency', 'table','gr','realm', 
+         'realization', 'experiment', 'version', ensemble=['model', 'realization'], separator='%')
+  dataloc(project='CMIP5-Adjust', url=pattern)
+
+  for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
+      calias('CMIP5-Adjust', var, var+'Adjust')
+
+  cdef('root'           , root          , project='CMIP5-Adjust')
+  #cdef('institute'      , '*'           , project='CMIP5-Adjust')
+  cdef('table'          , '*'           , project='CMIP5-Adjust') # impossible, because of ambiguities
+  cdef('realm'           , '*'           , project='CMIP5-Adjust') # impossible, because of ambiguities
+  cdef('realization'    , 'r1i1p1'      , project='CMIP5-Adjust')
+  cdef('experiment'     , 'rcp85'       , project='CMIP5-Adjust')
+  cdef('version'        , 'latest'      , project='CMIP5-Adjust')
+  cdef('gr'             , '*'         , project='CMIP5-Adjust')
+  cdef('bias_correction', '*'           , project='CMIP5-Adjust')
+  cdef('frequency'      , '*'           , project='CMIP5-Adjust')
+
+
+  for project in ['CMIP5', 'CMIP5_extent', 'CMIP5-Adjust']:
+      cfreqs(project, {'daily':'day', 'monthly':'mon', 'yearly':'yr'})
+
