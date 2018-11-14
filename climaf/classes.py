@@ -654,23 +654,26 @@ class cdataset(cobject):
         else:
             raise Climaf_Classes_Error("Unknown option %s"%(option))
 
-    def baseFiles(self,force=False):
+    def baseFiles(self,force=False,ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
         
         Use cached value (i.e. attribute 'files') unless called with arg force=True
+        If ensure_dataset is True, allows for ambiguous datasets
         """
         if (force and self.project != 'file') or self.files is None :
-            self.explore()
+            if ensure_dataset : self.explore()
+            else: self.explore(option='choices')
         return self.files
 
-    def listfiles(self,force=False):
+    def listfiles(self,force=False,ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
         
         Use cached value unless called with arg force=True
+        If ensure_dataset is True, allows for ambiguous datasets
         """
-        return self.baseFiles(force=force)
+        return self.baseFiles(force=force,ensure_dataset=ensure_dataset)
 
     def hasRawVariable(self) :
         """ Test local data files to tell if a dataset variable is actually included 
