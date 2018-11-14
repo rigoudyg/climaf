@@ -385,7 +385,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     annee="%s{4}"%digit
     mois="(01|02|03|04|05|06|07|08|09|10|11|12)"
     jour="([0-3][0-9])"
-    heure="(01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
+    heure="(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
     minutes="[0-5][0-9]"
     date="%s(%s(%s(%s(%s)?)?)?)?"%(annee,mois,jour,heure,minutes)
     rperiod="(?P<period>(?P<start>%s)(-(?P<end>%s))?)"%(date,date)
@@ -475,7 +475,13 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             fperiod=None
             if date_regexp :
                 if "P<period>" in date_regexp :
-                    fperiod=init_period(re.sub(date_regexp,r'\g<period>',f))
+                    print "date_rexgep=",date_regexp
+                    print "f=",f
+                    print "period=",re.sub(date_regexp,r'\g<period>',f)
+                    tperiod=re.sub(date_regexp,r'\g<period>',f)
+                    if tperiod==f :
+                        raise classes.Climaf_Error("Cannot find a period in %s with regexp %s"%(f,date_regexp))
+                    fperiod=init_period(tperiod)
                 else:
                     date_regexp0=date_regexp 
                     #print "date_regexp for extracting dates : "+date_regexp0, "file="+f
