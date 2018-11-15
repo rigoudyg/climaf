@@ -107,14 +107,14 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
 
     def test_identifying_files(self):
         files=self.ds.baseFiles()
-        expected="/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
+        expected="/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
         print "actual="+files
         print "expected="+expected
         self.assertEqual(files,expected, 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
         my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
+        expected=climaf.cache.currentCache+'/eb08a/4b6ab/f3cfd/ce2df/f504f/ef602/7dbcc/13b99/3db30/063c9/96739/0.nc'
         print "actual="+my_file
         print "expected="+expected
         self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')

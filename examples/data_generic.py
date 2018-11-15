@@ -72,7 +72,7 @@ data_pattern_A=cpath+"/../examples/data/${simulation}/A/${simulation}PLYYYY.nc"
 dataloc(project="example",organization="generic",url=[data_pattern_A,data_pattern_L])
 
 # Access a dataset
-rst=ds(project="example", simulation="AMIPV6ALB2G", variable="rst", period="1980-1981")
+rst=ds(project="example", simulation="AMIPV6ALB2G", variable="rst", period="1980")
 l=rst.baseFiles()
 my_file=cfile(rst)
 

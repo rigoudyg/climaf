@@ -16,7 +16,8 @@ from climaf.api import *
 # Set some default values
 cdef("project","example")
 cdef("simulation","AMIPV6ALB2G")
-cdef("period","1980-1981")
+#cdef("period","1980-1981") # Cannto , because datafiles don't have same number of variables for these two years
+cdef("period","1980")
 
 # Define some dataset with a new, virtual, variable (also called
 # 'derived') . We call it 'crest' (which stand for Cloud Radiative

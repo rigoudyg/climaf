@@ -36,9 +36,8 @@ if atCNRM or onCiclad :
     # Define some default values for using CMIP5 data for various realizations
     cdef("project","CMIP5"); cdef("frequency","monthly") ;  
     cdef("model","CNRM-CM5") ; cdef("variable","tas"); 
-    
     # Create an ensemble of datasets , more easily, with 'eds'; labels are automatic
-    ens=eds(experiment="historical", period="1860", simulation=["r1i1p1","r2i1p1"])
+    ens=eds(experiment="historical", period="1860", simulation=["r1i1p1","r2i1p1"],table="Amon")
 else:
     ens=e2
     
@@ -56,7 +55,7 @@ cshow(page)
 
 if atCNRM or onCiclad :
     # Add a member to an ensemble
-    member=ds(experiment="historical", period="1860", simulation="r3i1p1")
+    member=ds(experiment="historical", period="1860", simulation="r3i1p1",table="Amon")
     ens["r3i1p1"]=member
 
 # Compute ensemble mean thanks to CDO

@@ -21,7 +21,7 @@ else :
     else :
         print("I do not know how to find CMIP5 data on this machine")
         exit(0)
-tos=ds(experiment="historical", variable="tos", period="186001")
+tos=ds(experiment="historical", variable="tos", period="186001", table="Omon")
 
 # Display the basic filenames involved in the dataset (all filenames 
 # in one single string). CliMAF will search them at the data location 
@@ -47,7 +47,7 @@ tos_box=llbox(tos,latmin=40, lonmin=-30, lonmax=5, latmax=66)
 ncview(tos_box)
 
 # Compute a time average on 10 years 
-tos=ds( experiment="historical", variable="tos", period="1860-1869")
+tos=ds( experiment="historical", variable="tos", period="1860-1869", table="Omon")
 tosavg=time_average(tos)
 ncview(tosavg)
 

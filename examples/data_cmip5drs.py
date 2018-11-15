@@ -23,7 +23,7 @@ from climaf.api import *
 cdef("frequency","monthly") ;  cdef("project","CMIP5")
 
 # Define your dataset (a number of facets take default values)
-tas1pc=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1861")
+tas1pc=ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="tas", period="1860-1861", table="Amon")
 
 # Display the basic filenames involved in the dataset (all filenames 
 # in one single string). CliMAF will search them at the data location 
