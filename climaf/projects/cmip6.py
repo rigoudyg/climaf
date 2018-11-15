@@ -44,10 +44,7 @@ if root:
   cdef('mip'          , '*'           , project='CMIP6')
   #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
   cdef('grid'         , 'g*'          , project='CMIP6')
-  if atCNRM:
-      cdef('realization'  , 'r1i1p1f2'    , project='CMIP6')
-  else:
-      cdef('realization'  , 'r1i1p1f1'    , project='CMIP6')
+  cdef('realization'  , 'r1i1p1f*'    , project='CMIP6')
   cdef('experiment'  , 'historical'   , project='CMIP6')
   cdef('version'     , 'latest'       , project='CMIP6')
 
