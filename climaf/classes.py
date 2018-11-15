@@ -1314,7 +1314,7 @@ def ds(*args,**kwargs) :
     #clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if (len(args)==0) :
         match=None
-        if type(kwargs['period']) is str :
+        if 'period' in kwargs and type(kwargs['period']) is str :
             match=re.match("(last|LAST)_(?P<duration>[0-9]*)(y|Y)$",kwargs['period'])
         if match is None :
             return cdataset(**select_projects(**kwargs))

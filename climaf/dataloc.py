@@ -381,6 +381,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     date_glob_patt  = dict(YYYY=4*digit,YYYYMM=6*digit,YYYYMMDD=8*digit, YYYYMMDDHH=10*digit,
                            YYYYMMDDHHMM=12*digit)
     date_glob_patt.update( { "${PERIOD}" : "*" } )
+    # an ordered list of dates keywords
+    date_keywords=date_glob_patt.keys() ; date_keywords.sort(reverse=True)
     #
     annee="%s{4}"%digit
     mois="(01|02|03|04|05|06|07|08|09|10|11|12)"
@@ -388,16 +390,19 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     heure="(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
     minutes="[0-5][0-9]"
     date="%s(%s(%s(%s(%s)?)?)?)?"%(annee,mois,jour,heure,minutes)
-    rperiod="(?P<period>(?P<start>%s)(-(?P<end>%s))?)"%(date,date)
+    rperiod="(?P<period>(?P<start>%s)([_-](?P<end>%s))?)"%(date,date)
     #print "period=",period
     #
     #date_regexp_patt= dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})",
     #                       YYYYMMDDHH="([0-9]{10})", YYYYMMDDHHMM="([0-9]{12})")
-    date_regexp_patt= dict(YYYY=rperiod,YYYYMM=rperiod, YYYYMMDD=rperiod, YYYYMMDDHH=rperiod, YYYYMMDDHHMM=rperiod)
+    date_regexp_patt= { "YYYY[-_]YYYY":rperiod,"YYYYMM[-_]YYYYMM":rperiod," YYYYMMDD[-_]YYYYMMDD":rperiod,
+                           "YYYYMMDDHH[-_]YYYYMMDDHH":rperiod," YYYYMMDDHHMM[-_]YYYYMMDDHHMM":rperiod,
+                           "YYYY":rperiod,"YYYYMM":rperiod,"YYYYMMDD":rperiod,"YYYYMMDDHH":rperiod,"YYYYMMDDHHMM":rperiod }
     date_regexp_patt.update({ "${PERIOD}" : rperiod } )
     #                       DATE="([0-9]{4,12})")
     # an ordered list of dates keywords
-    date_keywords=date_glob_patt.keys() ; date_keywords.sort(reverse=True)
+    date_regexp_keywords=date_regexp_patt.keys() ; date_regexp_keywords.sort(reverse=True)
+    #print "dkw=",date_regexp_keywords
     #
     #
     for l in urls :
@@ -446,24 +451,28 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                 alt_kwargs[kw]=kwargs[kw].replace("?",".").replace("*",".*")
                 alt_basename=alt_basename.replace(r"${%s}"%kw,r"(?P<%s>%s)"%(kw,alt_kwargs[kw]),1)
         facets_regexp=Template(alt_basename).safe_substitute(**alt_kwargs)
-        for k in date_keywords : facets_regexp=facets_regexp.replace(k,date_regexp_patt[k])
+        for k in date_regexp_keywords :
+            facets_regexp=facets_regexp.replace(k,date_regexp_patt[k],1)
+            facets_regexp=facets_regexp.replace(k,".*",1)
         wildcards=dict()
         
         # Construct regexp for extracting dates from filename
         date_regexp=None
         template_toreg=template.replace("*",".*").replace("?",r".")
         #print "template before searching dates : "+template
-        for key in date_keywords :
-            #print "searchin "+key+" in "+=Template(l)
-            start=template.find(key)
+        for key in date_regexp_keywords :
+            #print "searchin "+key+" in "+template
+            start=re.search(key,template)
             if (start>=0 ) :
-                #print "found "+key
-                date_regexp=template_toreg.replace(key,date_regexp_patt[key],1)
+                date_regexp=re.sub(key,date_regexp_patt[key],template_toreg,1)
+                #print "found ",key," dateregexp ->",date_regexp
                 hasEnd=False
-                start=date_regexp.find(key)
+                start=re.search(key,date_regexp)
+                #start=date_regexp.find(key)
                 if (start >=0 ) :
                     hasEnd=True
-                    date_regexp=date_regexp.replace(key,date_regexp_patt[key],1)
+                    date_regexp=re.sub(key,date_regexp_patt[key],date_regexp,1)
+                    #date_regexp=date_regexp.replace(key,date_regexp_patt[key],1)
                 break
         #print "date_regexp before searching dates : "+date_regexp
         #
@@ -475,16 +484,16 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             fperiod=None
             if date_regexp :
                 if "P<period>" in date_regexp :
-                    print "date_rexgep=",date_regexp
-                    print "f=",f
-                    print "period=",re.sub(date_regexp,r'\g<period>',f)
+                    #print "date_rexgep=",date_regexp
+                    #print "f=",f
+                    #print "period=",re.sub(date_regexp,r'\g<period>',f)
                     tperiod=re.sub(date_regexp,r'\g<period>',f)
                     if tperiod==f :
                         raise classes.Climaf_Error("Cannot find a period in %s with regexp %s"%(f,date_regexp))
                     fperiod=init_period(tperiod)
                 else:
                     date_regexp0=date_regexp 
-                    #print "date_regexp for extracting dates : "+date_regexp0, "file="+f
+                    print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start=re.sub(date_regexp0,r'\1',f)
                     if start==f: raise classes.Climaf_Error("Start period not found") #? 
                     if hasEnd :
