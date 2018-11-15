@@ -18,7 +18,7 @@ var=$1 ; shift
 period=$1 ; shift
 region=$1 ; shift
 alias=$1 ; shift
-units=$1 ; shift
+units="$1" ; shift
 vm=$1 ; shift
 
 tmp=$(mktemp -d -t climaf_mcdo_XXXXXX) # Will use TMPDIR if set, else /tmp
@@ -47,7 +47,7 @@ if [ "$region" ] ; then
     selregion="-sellonlatbox,$lonmin,$lonmax,$latmin,$latmax"
 fi
 
-[ "$units" ] && setunits="-setattribute,"${var}"@units="${units} 
+[ "$units" ] && setunits=-setattribute,${var}@units=${units// /*}
 
 if [ "$alias" ] ; then 
     IFS=", " read var filevar scale offset <<< $alias 
