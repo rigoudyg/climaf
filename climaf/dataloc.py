@@ -453,25 +453,26 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         facets_regexp=Template(alt_basename).safe_substitute(**alt_kwargs)
         for k in date_regexp_keywords :
             facets_regexp=facets_regexp.replace(k,date_regexp_patt[k],1)
-            facets_regexp=facets_regexp.replace(k,".*",1)
+            facets_regexp=facets_regexp.replace(k,".*")
         wildcards=dict()
-        
+        #print "facets_regexp=",facets_regexp
+        #
         # Construct regexp for extracting dates from filename
         date_regexp=None
         template_toreg=template.replace("*",".*").replace("?",r".")
-        #print "template before searching dates : "+template
+        #print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords :
             #print "searchin "+key+" in "+template
-            start=re.search(key,template)
+            start=template_toreg.find(key)
             if (start>=0 ) :
-                date_regexp=re.sub(key,date_regexp_patt[key],template_toreg,1)
+                date_regexp=template_toreg.replace(key,date_regexp_patt[key],1)
                 #print "found ",key," dateregexp ->",date_regexp
                 hasEnd=False
-                start=re.search(key,date_regexp)
+                start=date_regexp.find(key)
                 #start=date_regexp.find(key)
                 if (start >=0 ) :
                     hasEnd=True
-                    date_regexp=re.sub(key,date_regexp_patt[key],date_regexp,1)
+                    date_regexp=date_regexp.replace(key,date_regexp_patt[key],1)
                     #date_regexp=date_regexp.replace(key,date_regexp_patt[key],1)
                 break
         #print "date_regexp before searching dates : "+date_regexp
@@ -493,7 +494,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     fperiod=init_period(tperiod)
                 else:
                     date_regexp0=date_regexp 
-                    print "date_regexp for extracting dates : "+date_regexp0, "file="+f
+                    #print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start=re.sub(date_regexp0,r'\1',f)
                     if start==f: raise classes.Climaf_Error("Start period not found") #? 
                     if hasEnd :
@@ -533,6 +534,10 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             #
             # If file period matches requested period, check similarly for variable
             #
+            #print "fperiod=",fperiod
+            #print "periods=",periods
+            #print "inter=",period.intersects(fperiod)
+            #print "date_regexp=",date_regexp
             if (fperiod and ( periods is not None or period.intersects(fperiod) )) \
                or not date_regexp :
                 #
