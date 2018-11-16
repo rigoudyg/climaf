@@ -70,10 +70,7 @@ if root:
       cdef('realm'      , '*'           , project=project)
       cdef('realization' , 'r1i1p1'      , project=project)
       cdef('experiment'  , 'historical'   , project=project)
-      if atCNRM :
-          cdef('version'     , '*'       , project=project)
-      else:
-          cdef('version'     , 'latest'       , project=project)
+      cdef('version'     , '*'       , project=project)
       cdef('frequency'   , '*'            , project=project)
 
 

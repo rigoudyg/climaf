@@ -615,6 +615,8 @@ class cdataset(cobject):
                     else:
                         val=val[0]
                         dic[kw]=val
+                else:
+                    dic[kw]=val
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)
