@@ -4,7 +4,7 @@ libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP5 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
 
-Syntax for these attributes is described in `the CMIP5 DRS document  <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
+Syntax for these attributes is described in `the CMIP5 DRS document <https://goo.gl/v1drZl>`_
 
 Example for a CMIP5 dataset declaration ::
 
@@ -26,7 +26,7 @@ if onCiclad :
    root="/prodigfs/project"
 if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
-   root="/cnrm/cmip/cnrm/ESG/"
+   root="/cnrm/cmip"
 
 if root:
   ## -- Declare a CMIP5 CliMAF project 
@@ -39,10 +39,10 @@ if root:
            'version', ensemble=['model','realization'],separator='%')
 
   ## -- Define the pattern for CMIP5
-  pattern1='${root}/CMIP5/output*/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern1='${root}/CMIP5/output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern1+='${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
   ## -- And the additionnal pattern for extent
-  pattern2='${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern2='${root}/CMIP5/output/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern2+='${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
 
   ## -- call the dataloc CliMAF function
@@ -56,22 +56,23 @@ if root:
   for project in ['CMIP5', 'CMIP5_extent']:
       #calias(project, 'tos', offset=273.15)
       #calias(project, 'thetao', offset=273.15)
-      calias(project, 'sivolu', 'sivol')
-      calias(project, 'sic', 'siconc')
-      calias(project, 'sit', 'sithick')
+      #calias(project, 'sivolu', 'sivol')
+      #calias(project, 'sic', 'siconc')
+      #calias(project, 'sit', 'sithick')
       calias(project, 'NO3', 'no3')
       calias(project, 'PO4', 'po4')
       calias(project, 'Si', 'si')
       calias(project, 'O2', 'o2')
       
-      cdef('root'        , root          , project=project)
-      #cdef('institute'   , '*'           , project=project)
-      cdef('table'       , '*'           , project=project) # impossible, because of ambiguities
+      cdef('root'        , root         , project=project)
+      #cdef('institute'   , '*'          , project=project)
+      cdef('table'       , '*'          , project=project) # impossible, because of ambiguities
       cdef('realm'      , '*'           , project=project)
-      cdef('realization' , 'r1i1p1'      , project=project)
-      cdef('experiment'  , 'historical'   , project=project)
+      cdef('realization' , 'r1i1p1'     , project=project)
+      cdef('experiment'  , 'historical' , project=project)
       cdef('version'     , '*'       , project=project)
-      cdef('frequency'   , '*'            , project=project)
+      cdef('frequency'   , '*'          , project=project)
+  cdef('extent_experiment'  , 'rcp85'   , project='CMIP5_extent')
 
 
   ## -- Declare a CMIP5-Adjust CliMAF project: bias corrected CMIP5 simulations

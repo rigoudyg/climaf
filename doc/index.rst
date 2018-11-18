@@ -7,15 +7,14 @@
 Quick links : :ref:`News <news>` | :ref:`Functions <API>` |
 :ref:`standard_operators` | :ref:`howto` | :ref:`examples` |  :ref:`contents`
 
-.. |logo| image:: Logo-CliMAF-compact.png
-  :scale: 60%
-  :target: <http://htmlpreview.github.io/?https://github.com/jservonnat/C-ESM-EP/blob/master/Documentation/Access_to_your_own_datasets_CESMEP.html>
+.. |logo| image:: CliMAF_front_image.png
+     :scale: 100%
 
 |logo| 
 
+
 CliMAF - a Climate Model Assessment Framework
 ========================================================
-
 
 CliMAF is an `Open Source software
 <http://en.wikipedia.org/wiki/Open-source_software>`_, distributed
@@ -23,54 +22,58 @@ with a GPL-compatible licence. See :doc:`the licence notice
 <license>`. 
 It is available at  `CliMAF GitHub repository <https://github.com/senesis/climaf>`_
 
-The aim of CliMAF is to allow for an actual, **easy, collaborative development of climate model outputs assessment suites by climate scientists with varied IT background**, and to ultimately share such suites for the benefit of the Climate Science. 
+The goal of CliMAF is to ease the common steps that separate you from your scientific diagnostic (in climate science):
+CliMAF was designed to answer those specifications of CliMAF:
+  - We have **several data organizations (path/filename syntax, variable names, units... CMIP5 and CMIP6 at CLIMERI among others)** to deal with and **we don’t want to rewrite all of them**
+  - We want to **share diagnostics**: one common library with a vocabulary **that follows standards (inspired by the CMIP standards)**
+  - We don’t want to exclude existing scripts: **possibility to plug any script** that can be run with a command line, **your own** post-processing and analysis **scripts and programs** as well as other tools sets such as `NCO <http://nco.sourceforge.net/>`_ and `CDO <https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html>`_  operators
+  - We want to **ease all those classic/basic treatments we do everyday**: selection of a period, variable, geographical region, working on an ensemble
+  - We don’t want to **recompute what has already been computed once**
+  - We want to use this library to build a **custom set of diagnostics** as well as a **big evaluation package** like the `CliMAF Earth System Model Evaluation Platform <https://github.com/jservonnat/C-ESM-EP/wiki>`_
 
-
-So, CliMAF can be described as :
-
-- an aid for handling access to common climate
-  simulations and re-analysis datafiles, and to personnal data
-  files, in a uniform way
-- a wrapper which provides you with uniform, handy, combination and caching
-  features around :
-
-  - **your own** post-processing and analysis **scripts and programs**
-  - other tools sets such as `NCO <http://nco.sourceforge.net/>`_ and `CDO <https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html>`_  operators
-
-- a way to share advanced climate diagnostic modules 
-- an actual repository for such modules
-- and a visualisation engine for the corresponding results
+.. image:: CliMAF_structure.png
+     :scale: 80%
 
 
 
 Can CliMAF make my scientific life easier?
 ----------------------------------------------
 
- - Test of url: `Notebook <http://htmlpreview.github.io/?https://github.com/jservonnat/C-ESM-EP/blob/master/Documentation/Access_to_your_own_datasets_CESMEP.html>`_
+You want to know what CliMAF is about? Here are some notebooks to illustrate interesting things to do with it:
+ - :download:`CliMAF in a nutshell <../examples/CliMAF_in_a_nutshell.html>` : a quick overview of what CliMAF is about: data access, the cache, quick pretreatments and plots
+ - :download:`Adding access to my own datasets <../examples/Adding_access_to_my_own_data.html>` : see how you can access your own data in CliMAF, taking advantage of the period/variable/geographical region selection provided by ds() (and many other advantages) ; see also how to access an isolated file (like a grid or mask file)
+ - :download:`How the cache works and how to manage its content <../examples/Managing_your_cache_in_CliMAF.html>`
+ - :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>` : some illustrations of the main features of the CliMAF plot operator (:doc:`scripts/plot`) to find out quickly how you can do some of the maps we like to do in climate science 
+ - :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`
+ - or :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`
 
-In the following you will find illustrations of the use of CliMAF:
-- CliMAF in a nutshell: a quick overview of what it does and how to use it
-- access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI)
-- work with ensembles
-- gathering my results in an html page
+The links point to the html versions of the notebooks.
 
-You will also find notebooks to illustrate various aspects of CliMAF:
-- how to use the plot operator
-- how the cache works
-- details on the common pretreatments
-- or how to plug a script
+You can get the original notebooks (.ipynb) in :ref:`examples`. 
 
-
-Examples of what CliMAF can do
------------------------------------
-
-Use it to do all the pretreatments on a CMIP archive and then do the plot with your own script:
-
-Building a community tool to be used routinely, producing loads of figures: The CliMAF Earth System Model Evaluation Platform (C-ESM-EP):
+Have a look at `this documentation <https://post2web.github.io/posts/reuse-jupyter-notebooks/>`_  to see how to reuse a notebook from a python script (and avoid the conversion from the notebook to python script).
 
 
-Description 
-----------------
+CMIP6/CMIP5 CLIMERI - Convergence training session November 19 2018
+--------------------------------------------------------------------
+These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>`_ (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
+Morning presentation:
+ - :download:`a quick illustration of CMIP data access on Ciclad - CLIMERI <../examples/CLIMERI_Quick_demo_CMIP_data_access_20181119.html>`
+
+Afternoon practicals:
+ - 1/ :download:`Access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI) <../examples/Basis_of_CliMAF_data_access_at_CLIMERI.html>`
+ - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`
+ - 3/ Open session on available functionalities in the notebooks (general sujects above: `Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`_, `the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`_, or `gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`_)
+
+FAQ (Frequently Asked Questions)
+--------------------------------------------------------------------
+TBD, with your feedbacks.
+
+We need you for this! please send your questions at: climaf@meteo.fr
+
+
+Another way to describe CliMAF
+--------------------------------
 
 CliMAF is basically a Python-scriptable way to process NetCDF `CF compliant <http://cfconventions.org/>`_ climate model outputs which allows:
 

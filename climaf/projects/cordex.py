@@ -45,6 +45,7 @@ if root:
   dataloc(project='CORDEX_extent', url=[pattern2])
   cdef('extent_experiment', 'rcp85', project='CORDEX_extent')
   cdef('experiment', 'historical', project='CORDEX_extent')
+  cdef('model_version', '*'      , project='CORDEX_extent')
 
   # -- CORDEX Adjust
   pattern='${root}/CORDEX-Adjust/bias-adjusted-output/${CORDEX_domain}/${institute}/${driving_model}/${experiment}/${realization}/${model}/${bias_correction}/${frequency}/${variable}/${version}/${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${bias_correction}_${frequency}_${PERIOD}.nc'
