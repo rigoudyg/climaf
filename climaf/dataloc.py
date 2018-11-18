@@ -401,7 +401,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     date_regexp_patt.update({ "${PERIOD}" : rperiod } )
     #                       DATE="([0-9]{4,12})")
     # an ordered list of dates keywords
-    date_regexp_keywords=date_regexp_patt.keys() ; date_regexp_keywords.sort(reverse=True)
+    date_regexp_keywords=date_regexp_patt.keys() ;
+    date_regexp_keywords.sort(reverse=True)
     #print "dkw=",date_regexp_keywords
     #
     #
@@ -421,7 +422,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         # Do globbing with plain varname
         if remote_prefix : 
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))
-            clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
+            clogger.debug("Remote globbing %d files for varname on %s : "%\
+                          (len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
@@ -437,7 +439,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             # Do globbing with fileVarname
             if remote_prefix : # 
                 lfiles=sorted(glob_remote_data(remote_prefix, temp2))
-                clogger.debug("Remote globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
+                clogger.debug("Remote globbing %d files for filenamevar on %s: "%\
+                              (len(lfiles),remote_prefix+temp2))
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
