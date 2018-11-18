@@ -1,0 +1,218 @@
+body {
+background-color: white;
+font-family:"Trebuchet MS",Verdana,Geneva,Arial,Helvetica,sans-serif;
+margin:30px 70px 70px 0px;
+}
+
+#menu ul {
+font-family:verdana, sans-serif;
+padding:10;
+margin-top : 5px;
+margin-bottom : 5px;
+list-style-type:none;
+text-align:center;
+}
+
+#menu li {
+font-size:100%;
+float:right;
+margin:auto;
+padding:10;
+background-color:AntiqueWhite;
+}
+#menu li a {
+display:block;
+width:80px;
+color:brown;
+text-decoration:none;
+padding:2px;
+}
+
+#menu {
+height:80%;
+width:80%;
+}
+
+.bloc1 {
+background-color: white;
+height: 100%;
+width: 15%;
+float: left;
+}
+.bloc2 {
+background-color: white;
+height: 100%;
+width: 87%;
+float: left;
+margin-left: -40px;
+}
+
+h1 {
+font-family:verdana, sans-serif;
+font-size:300%;
+color:black;
+background-color:transparent;
+text-align:center;
+}
+
+h2 {
+font-family:verdana, sans-serif;
+font-size:140%;
+color:black;
+background-color:honeydew;
+text-align:left;
+}
+h2.centre {text-align: center}
+
+h3 {
+font-family:verdana, sans-serif;
+font-size:110%;
+color:black;
+background-color:transparent;
+text-align:left;
+}
+h3.centre {text-align: center}
+
+h4 {
+font-family:Helvetica, sans-serif;
+font-size:140%;
+color:#e1e7f2;
+background-color:#06275b;
+text-align:left;
+}
+h4.centre {text-align: center}
+
+h5 {
+font-family:verdana, sans-serif;
+font-size:90%;
+color:SteelBlue;
+background-color:transparent;
+text-align:left;
+}
+h5.centre {text-align: center}
+
+h6 {
+font-family:verdana, sans-serif;
+font-size:90%;
+color:DarkGoldenrod;
+background-color:transparent;
+text-align:left;
+}
+h6.centre {text-align: center}
+
+h7 {
+font-family:verdana, sans-serif;
+font-size:90%;
+color:deeppink;
+background-color:transparent;
+text-align:left;   
+}
+h7.centre {text-align: center}
+
+
+p {
+font-family:verdana, sans-serif;
+font-size:80%;
+color:black;
+background-color:transparent;
+text-align:left;
+margin-left:0px;
+margin-right:0px;
+}
+p.centre {text-align: center}
+p.centre {font-size: 100%}
+
+li {
+font-family:verdana, sans-serif;
+font-size:130%;
+color:black;
+background-color:transparent;
+text-align:left;
+margin-left:10px;
+margin-right:10px;
+}
+
+br {
+font-family:verdana, sans-serif;
+font-size:100%;
+color:blue;
+background-color:transparent;
+text-align:left;
+margin-left:10px;
+margin-right:10px;
+}
+
+a:link {
+font-family:verdana, sans-serif;
+font-size:90%;
+color:green;
+background-color:transparent;
+text-decoration:underline;
+}
+
+a:visited {
+font-family:verdana, sans-serif;
+font-size:90%;
+color:#8b008b;
+background-color:transparent;
+text-decoration:underline;
+}
+
+a:hover {
+font-family:verdana, sans-serif;
+font-size:100%;
+color:black;
+background-color:transparent;
+text-decoration:underline;
+}
+
+table {
+border-color:transparent;
+border-style:solid;
+border-width:1px;
+}
+
+td {
+font-family:verdana, sans-serif;
+font-size:80%;
+color:black;
+text-align:left;
+background-color:transparent;
+border-color:transparent;
+border-style:solid;
+border-width:1px;
+}
+
+th {
+font-size:90%;
+}
+
+a.info {
+position:relative;
+z-index:24;
+color:#000;
+text-decoration:underline;
+}              
+
+a.info span{
+display: none;
+}
+
+a.info:hover{
+z-index:25;
+background-color:#FFF
+}
+
+a.info:hover span{
+display:block;
+position:absolute;
+white-space: nowrap;
+bottom:2em;left:4em;
+border:1px solid #000; 
+background-color:#FFF;
+color:#000;
+text-align:justify;
+font-weight:none;
+padding:5px;
+overflow:auto;
+}

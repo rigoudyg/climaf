@@ -86,6 +86,7 @@ from plot.plot_params import plot_params, hovm_params
 from plot.varlongname import varlongname
 from derived_variables import *
 from functions import *
+from easyCMIP_functions import *
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
 cpath=os.path.abspath(climaf.__path__[0]) 

@@ -347,17 +347,17 @@ def summary(dat):
             obj=dat[m]
             if isinstance(obj,climaf.classes.cdataset) :
                 print m
-                files=dat[m].baseFiles()
+                files=dat[m].baseFiles(ensure_dataset=False)
                 if files :
                     for f in str.split(files,' '): print f
             else : 
                 print(m+" : "+ `obj`)
             print '--'
     elif isinstance(dat,classes.cdataset):
-	if not dat.baseFiles():
+	if not dat.baseFiles(ensure_dataset=False):
 	    print '-- No file found for:'
     	else:
-            for f in str.split(dat.baseFiles(),' '): print f
+            for f in str.split(dat.baseFiles(ensure_dataset=False),' '): print f
     	return dat.kvp
     else :
         print "Cannot handle "+`dat`
