@@ -56,14 +56,14 @@ Have a look at `this documentation <https://post2web.github.io/posts/reuse-jupyt
 
 CMIP6/CMIP5 CLIMERI - Convergence training session November 19 2018
 --------------------------------------------------------------------
-These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>`_ (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
+These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>` (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
 Morning presentation:
  - :download:`a quick illustration of CMIP data access on Ciclad - CLIMERI <../examples/CLIMERI_Quick_demo_CMIP_data_access_20181119.html>`
 
 Afternoon practicals:
- - 1/ :download:`Access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI) <../examples/Basis_of_CliMAF_data_access_at_CLIMERI.html>`_
- - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`_
- - 3/ Open session on available functionalities in the notebooks (general sujects above: :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`_, :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`_, or :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`_)
+ - 1/ :download:`Access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI) <../examples/Basis_of_CliMAF_data_access_at_CLIMERI.html>`
+ - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`
+ - 3/ Open session on available functionalities in the notebooks (general sujects above: :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`, :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`, or :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`)
 
 FAQ (Frequently Asked Questions)
 --------------------------------------------------------------------
