@@ -56,7 +56,7 @@ Have a look at `this documentation <https://post2web.github.io/posts/reuse-jupyt
 
 CMIP6/CMIP5 CLIMERI - Convergence training session November 19 2018
 --------------------------------------------------------------------
-These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>`_ (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
+These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>` (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
 Morning presentation:
  - :download:`a quick illustration of CMIP data access on Ciclad - CLIMERI <../examples/CLIMERI_Quick_demo_CMIP_data_access_20181119.html>`
 
