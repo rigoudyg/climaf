@@ -12,6 +12,7 @@ from climaf.api import derive, calias
 
 
 
+derive('*','dtr','minus','tasmax','tasmin')
 
 
 calias('CMIP6', 'wfo', 'wfonocorr')

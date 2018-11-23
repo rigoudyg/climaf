@@ -65,6 +65,10 @@ Afternoon practicals:
  - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`
  - 3/ Open session on available functionalities in the notebooks (general sujects above: :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`, :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`, or :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`)
 
+Also find here :download:`the last notebook we've done together during the last hour of the practicals: working with a CMIP5 and a CMIP6 ensemble, calculating an ensemble mean and the difference between those and observations, and eventually make some multiplots <../examples/Playing_with_ensembles_from_scratch_last_hour_of_training_session_20181119.html>`.
+Bonus: thanks to the questions of the participants, you will find in this notebook how to easily plot the members of an ensemble to track down a potential corrupted member.
+
+
 FAQ (Frequently Asked Questions)
 --------------------------------------------------------------------
 TBD, with your feedbacks.

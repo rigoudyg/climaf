@@ -26,7 +26,8 @@ if atTGCC:
    root="/ccc/work/cont003/cmip6/cmip6"
 if onCiclad :
    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-   root="/ccc/work/cont003/cmip6/cmip6"
+   root="/bdd"
+   #root="/ccc/work/cont003/cmip6/cmip6"
 if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
    root="/cnrm/cmip"
