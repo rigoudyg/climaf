@@ -51,8 +51,8 @@ if root:
 
   ## -- Define the patterns
   base_pattern="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
-  base_pattern+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_"
-  patterns=[base_pattern + "${PERIOD}" + ".nc"]
+  base_pattern+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}"
+  patterns=[base_pattern + "_${PERIOD}" + ".nc", base_pattern + ".nc"]
 
   ## -- call the dataloc CliMAF function
   dataloc(project='CMIP6', organization='generic', url=patterns)
