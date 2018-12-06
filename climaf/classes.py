@@ -398,6 +398,23 @@ class cdataset(cobject):
         rep="ds('%s')"%crs_template.safe_substitute(dic)
         return rep
 
+    def errata(self):
+        if self.project=="CMIP6" :
+            service="https://errata.es-doc.org/1/resolve/simple-pid?datasets="
+            browser="firefox"
+            try :
+                res=self.explore('resolve')
+            except:
+                raise Climaf_Classes_Error("Cannot proceed with errata: Cannot resolve ambiguities on %s"%`self`)
+            # CMIP6.CMIP.CNRM-CERFACS.CNRM-ESM2-1.1pctCO2.r1i1p1f2.Emon.expfe.gn.v20181018
+            ref="%s.%s.%s.%s.%s.%s.%s.%s.%s.v%s"%("CMIP6",res.kvp['mip'],
+                    res.kvp['institute'],res.kvp['model'],res.kvp['experiment'],res.kvp['realization'],
+                    res.kvp['table'],res.kvp['variable'],res.kvp['grid'],res.kvp['version'])
+            clogger.warning("Querying errata service %s using %s"%(service,browser))
+            os.system("%s %s%s &"%(browser,service,ref))
+            # voir le fichier api_errata_Atef.py pour faire mieux
+        else: clogger.warning("No errata service is yet defined for project %s"%self.project)
+
     def isLocal(self) :
         #return self.baseFiles().find(":")<0
         model=getattr(self,"model","*")
