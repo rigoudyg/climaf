@@ -20,7 +20,7 @@ if os.path.exists('/cnrm'):
     # Frequency alias
     cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
     #
-    pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_YYYYMM-YYYYMM.nc"
+    pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_${PERIOD}.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
 
 

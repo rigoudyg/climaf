@@ -46,14 +46,14 @@ if atCNRM :
 
     # User simulations
     pathG="${root}/${group}/${simulation}/"
-    pathI=pathG+"O/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_icemod.nc" # var:T
-    pathO=pathG+"O/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" # var:T
+    pathI=pathG+"O/${simulation}_1${frequency}_${PERIOD}_icemod.nc" # var:T
+    pathO=pathG+"O/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" # var:T
     dataloc(project="emn36", organization="generic", url=[pathI,pathO])
     
     # Shared simulations 
     pathg="/cnrm/cmip/cnrm/simulations/${group}/"
-    pathgI=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_icemod.nc" 
-    pathgO=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" 
+    pathgI=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_icemod.nc" 
+    pathgO=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" 
     dataloc(project="emn36", organization="generic", url=[pathgI,pathgO])
 
     # Define default values

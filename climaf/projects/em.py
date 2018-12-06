@@ -65,8 +65,8 @@ if atCNRM :
     pathA=pathg+"${realm}/${simulation}PLYYYY.nc" #GSAG
     pathL=pathg+"${realm}/${simulation}SFXYYYY.nc"
     pathI=pathg+"${realm}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8
-    pathO=pathg+"${realm}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" # var:T_table2.2
-    pathO2=pathg+"${realm}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_scalar_table2.2.nc" # PICTLWS2, PRE6CPLCr2alb
+    pathO=pathg+"${realm}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" # var:T_table2.2
+    pathO2=pathg+"${realm}/${simulation}_1${frequency}_${PERIOD}_scalar_table2.2.nc" # PICTLWS2, PRE6CPLCr2alb
     
     dataloc(project="em", organization="generic", url=[pathA,pathL,pathI,pathO,pathO2])
     
@@ -74,8 +74,8 @@ if atCNRM :
     pathg="/cnrm/cmip/cnrm/simulations/${group}/"
     pathgA=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
     pathgL=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
-    pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8
-    pathgO=pathg+"${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_YYYYMMDD_YYYYMMDD_grid_${variable}.nc" 
+    pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_${PERIOD}.nc" #HISTNATr8
+    pathgO=pathg+"${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" 
     
     dataloc(project="em", organization="generic", url=[pathgA,pathgL,pathgI,pathgO])
     

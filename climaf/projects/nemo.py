@@ -153,7 +153,7 @@ if root:
    cfreqs('NEMO', {'monthly':'1M' , 'daily':'1D' , 'seasonal':'SE', 'annual_cycle':'SE', 'yearly':'1Y'})
    
    urls_NEMO=[
-      "${root}/${model}/${config}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_YYYYMMDD_YYYYMMDD_${frequency}_${variable}.nc",
+      "${root}/${model}/${config}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_${PERIOD}_${frequency}_${variable}.nc",
       "${root}/${model}/${config}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc"
    ]
    

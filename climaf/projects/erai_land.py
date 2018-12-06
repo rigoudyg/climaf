@@ -28,7 +28,7 @@ if atCNRM:
     cproject('erai-land','grid')  # no grid writes as '_' , otherwise as e.g. 'T127'
 
     root="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/erai-land/erai_???_mm_${variable}"
-    suffix="YYYY-YYYY.nc"
+    suffix="${PERIOD}.nc"
     #
     url_erai_land1=root+"${grid}"+suffix   #for original grid
     url_erai_land2=root+".${grid}."+suffix #for other grids write e.g. as : grid='T127'

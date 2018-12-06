@@ -48,16 +48,16 @@ if root:
   cdef('root'        , root           , project='IGCM_CMIP6')
 
   # -- Specify the pattern
-  pattern1="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_*${frequency}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc"
-  pattern2="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc"
-  #pattern3="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${MIP_prefix}${frequency}${MIP_suffix}${qualifier}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc"
-  #pattern4="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${miptable}_${model}_${experiment}_${realization}_${grid}_YYYYMM-YYYYMM.nc"
+  pattern1="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_*${frequency}_${model}_${experiment}_${realization}_${grid}_${PERIOD}.nc"
+  pattern2="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}_${PERIOD}.nc"
+  #pattern3="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${MIP_prefix}${frequency}${MIP_suffix}${qualifier}_${model}_${experiment}_${realization}_${grid}_${PERIOD}.nc"
+  #pattern4="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${miptable}_${model}_${experiment}_${realization}_${grid}_${PERIOD}.nc"
   # -- Si on precise seulement la MIP table, on n'a pas la frequence ;
   #    on pourrait rajouter une analyse de la table, si elle existe, pour rajouter la frequence?
   #    
 
-  #pattern1="${root}/*/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_YYYYMM-YYYYMM.nc"
-  #pattern2="${root}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_YYYYMM-YYYYMM.nc"
+  #pattern1="${root}/*/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${PERIOD}.nc"
+  #pattern2="${root}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${PERIOD}.nc"
   # -- call the dataloc CliMAF function
   dataloc(project='IGCM_CMIP6', organization='generic', url=[pattern2])
 

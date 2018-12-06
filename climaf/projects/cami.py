@@ -19,7 +19,7 @@ CAMIOBS_root="/cnrm/est/COMMON/cami/V1.8/climlinks/"
 
 # Pattern for matching CAMI obs data files and their directory. 
 # We choose to use facet 'model' to carry the observation source
-CAMIOBS_pattern="${product}/${variable}_1m_YYYYMM_YYYYMM_${simulation}.nc"
+CAMIOBS_pattern="${product}/${variable}_1m_${PERIOD}_${simulation}.nc"
 
 # Declare the CAMIOBS pattern to be associated with a project we name OBS_CAMI
 dataloc(project="CAMIOBS", organization="generic", 

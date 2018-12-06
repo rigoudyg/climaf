@@ -24,10 +24,10 @@ if atCNRM:
     cproject('erai',('grid','_'), ('frequency','monthly'))  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127' 
 
     root="/cnrm/amacs/DATA/OBS/netcdf/${frequency}"
-    patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}YYYY-YYYY.nc"   #for original grid
-    patmonth2=root+"_mean/erai/erai_???_mm_${variable}.${grid}.YYYY-YYYY.nc" #for other grids e.g. : grid ='T42' or 'T127'
-    patday1=root+"/erai/ei_${variable}${grid}YYYY-YYYY.nc"   #for original grid
-    patday2=root+"/erai/ei_${variable}_${grid}_YYYY-YYYY.nc" #for other grids e.g.: grid ='T42' or 'T127'
+    patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}${PERIOD}.nc"   #for original grid
+    patmonth2=root+"_mean/erai/erai_???_mm_${variable}.${grid}.${PERIOD}.nc" #for other grids e.g. : grid ='T42' or 'T127'
+    patday1=root+"/erai/ei_${variable}${grid}${PERIOD}.nc"   #for original grid
+    patday2=root+"/erai/ei_${variable}_${grid}_${PERIOD}.nc" #for other grids e.g.: grid ='T42' or 'T127'
     dataloc(project='erai', organization='generic', url=[patmonth1,patmonth2,patday1,patday2])
 
 

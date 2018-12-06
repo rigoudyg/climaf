@@ -29,6 +29,6 @@ if onCiclad :
     #
     dataloc(project="OCMIP5", organization="generic",
             url=['/prodigfs/project/OCMIP5/OUTPUT/*/${model}/${simulation}/${frequency}/'
-                 '${variable}/${variable}_*_${model}_${simulation}_YYYY-YYYY.nc'])
+                 '${variable}/${variable}_*_${model}_${simulation}_${PERIOD}.nc'])
     #
     cfreqs('OCMIP5',{'monthly':'mon' })
