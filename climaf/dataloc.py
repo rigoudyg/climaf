@@ -411,6 +411,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         if re.findall(".*:.*",l) :
             remote_prefix=':'.join(l.split(":")[0:-1])+':'
         basename=l.split(":")[-1] # This discard the remote_prefix if any
+        basename=basename.replace("//","/")
         my_template=Template(basename)
         template=my_template.safe_substitute(**kwargs)
         #print "template after attributes replace : "+template
@@ -496,7 +497,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     date_regexp0=date_regexp 
                     #print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start=re.sub(date_regexp0,r'\1',f)
-                    if start==f: raise classes.Climaf_Error("Start period not found") #? 
+                    if start==f:
+                        raise Climaf_Data_Error("Start period not found in %s using regexp %s"%(f,regexp0)) #? 
                     if hasEnd :
                         end=re.sub(date_regexp0,r'\2',f)
                         fperiod=init_period("%s-%s"%(start,end))
