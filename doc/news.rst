@@ -12,15 +12,21 @@ Changes, newest first :
     model+realization); :py:func:`~climaf.function.eds` has new
     argument 'first' for driving which attribute appears first in member labels
 
-  - period='first_10y' (and variants) are allowed
+  - period='first_10y' and variants are allowed.
 
-  - when declaring a project, pattern for dates in filenames is now
-    ${PERIOD} (see :py:class:`~climaf.dataloc.dataloc`)
+  - when declaring a project, allowed pattern for dates in filenames 
+    is now ${PERIOD} (see :py:class:`~climaf.dataloc.dataloc`); but anyway,
+    upward compatibility is ensured.
 
   - cache results can be protected against deletion by normal calls to 
     :py:func:`~climaf.cache.craz` and :py:func:`~climaf.cache.cdrop` ;
     see :py:func:`~climaf.cache.cprotect`; erase functions have new
     argument 'force' to overcome this protection
+
+  - dataset now have a (prototype) method 'errata()', which opens a Firefox tab
+    for CMIP6 datasets, querying the ES-Doc errata service. However,
+    this service doesn't yet support value 'latest' for attribute 'version'
+  
 
 - V1.2.7:
 
