@@ -621,7 +621,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     clogger.info("Attribute %s='%s' has matching value '%s'"%(facet,kwargs[facet],s))
                     return_wildcards[facet]=s
                 else:
-                    return_wildcards[facet]=list(s)
+                    rep=list(s); rep.sort()
+                    return_wildcards[facet]=rep
                     message="Attribute %s='%s' has multiple values : %s"%(facet,kwargs[facet],list(s))
                     if return_wildcards : clogger.info(message)
                     else: clogger.error(message)

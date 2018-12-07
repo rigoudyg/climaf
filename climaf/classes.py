@@ -462,7 +462,7 @@ class cdataset(cobject):
         _,_,_,_,_,missing=self.alias
         return missing is None
 
-    def explore(self,option='check_and_store',group_periods_on=None,operation='intersection'):
+    def explore(self,option='check_and_store',group_periods_on=None,operation='intersection',first=None):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
         attributes. 
@@ -472,8 +472,8 @@ class cdataset(cobject):
           - 'choices' for returning a dict which keys are wildcard attributes and entries 
             are values list
           - 'resolve' for returning a NEW DATASET with instanciated attributes (if uniquely)
-          - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of a 
-            single attribute
+          - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of one
+            or more attributes (tell which one is first in labels by using arg 'first') 
           - 'check_and_store' (or missing) for just identifying and storing dataset files list 
             (while ensuring non-ambiguity check for wildcard attributes)
 
@@ -641,7 +641,7 @@ class cdataset(cobject):
             return wildcards
         elif option == 'ensemble' :
             clogger.debug("Trying to create an ensemble on attributes %s"%wildcard_attributes_list)
-            ensemble_kw=None
+            is_ensemble=False
             for kw in wildcards :
                 entry=wildcards[kw]
                 #print "entry=",entry, 'type=',type(entry), 'ensemble_kw=',ensemble_kw
@@ -651,20 +651,14 @@ class cdataset(cobject):
                             Climaf_Classes_Error("Cannot create an ensemble with holes in period (%s)"%wildcards['period'])
                     entry=entry[0]
                 if type(entry) is list :
-                    if len(entry) > 1 :
-                        if ensemble_kw is not None :
-                            raise \
-                                Climaf_Classes_Error("Cannot create an ensemble, because there are at least"+\
-                                   " two possible attributes for defining it : %s -> %s and %s -> %s"%\
-                                   (ensemble_kw,wildcards[ensemble_kw],kw,wildcards[kw]))
-                        else: ensemble_kw=kw
+                    is_ensemble= (len(entry) > 1)
                 dic[kw]=entry
-            if ensemble_kw is None :
+            if is_ensemble is False :
                 raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
                                            "attributes have a single possible value (%s)"%wildcards)
             #print "dic=",dic
             self.files=files
-            return eds(**dic)
+            return eds(first=first,**dic)
         elif option == 'check_and_store' :
             for kw in wildcards:
                 entry=wildcards[kw]
@@ -1063,11 +1057,11 @@ class cens(cobject,dict):
         
 
 
-def eds(**kwargs):
+def eds(first=None,**kwargs):
     """
     Create a dataset ensemble using the same calling sequence as
-    :py:func:`~climaf.classes.cdataset`, except that one of the facets
-    is a list, which defines the ensemble members; this facet must be among
+    :py:func:`~climaf.classes.cdataset`, except that some facets
+    are lists, which defines the ensemble members; these facets must be among
     the facets authorized for ensemble in the (single) project involved
 
     Example::
@@ -1076,12 +1070,15 @@ def eds(**kwargs):
     >>> cdef("variable","tas"); cdef("period","1860")
     >>> ens=eds(experiment="historical", simulation=["r1i1p1","r2i1p1"])
 
+    Argument 'first' is used when multiple attributes are of list type, and tells which 
+    of these attributes appears first in member labels
+
     """
     attval=processDatasetArgs(**kwargs)
     # Check that any facet/attribute of type 'list' (for defining an
     # ensemble) is OK for the project, and that there is at most one
     nlist=0
-    listattr=None
+    listattr=[]
     for attr in attval :
         clogger.debug("Looking at attr %s for ensemble"%attr)
         if isinstance(attval[attr], list) and attr != "domain":
@@ -1089,17 +1086,52 @@ def eds(**kwargs):
                 raise Climaf_Classes_Error("Attribute %s cannot be used for ensemble"%attr)
             clogger.debug("Attr %s is used for an ensemble"%attr)
             nlist+=1
-            listattr=attr
-    if nlist != 1 :
-        raise Climaf_Classes_Error("Must ask for an ensemble on exactly one attribute")
-    #
+            listattr.append(attr)
+    if len(listattr) < 1 :
+        raise Climaf_Classes_Error("For building an esemble, must have at least one attribute which is a list")
     # Create an ensemble of datasets if applicable
     d=dict()
-    for member in attval[listattr] :
-        attval2=attval.copy()
-        attval2[listattr]=member
-        d[member]=cdataset(**attval2)
-    return cens(d,order=attval[listattr])
+    if len(listattr) == 1 :
+        # Simple case : only one attribute has multiple values (-> members)
+        attr=listattr[0]
+        for member in attval[attr] :
+            attval2=attval.copy()
+            attval2[attr]=member
+            d[member]=cdataset(**attval2)
+        return cens(d,order=attval[attr])
+    else :
+        # Must construct the cartesian product of all list-type attributes
+        listattr2=[ l for l in listattr ]
+        if first is not None :
+            listattr2.remove(first)
+            att=first
+        else:
+            # Use the first attributes declared as ensemble-prone for the project
+            for a in  cprojects[attval["project"]].attributes_for_ensemble :
+                print "Checkin listattribute",a, "against",listattr2
+                if a in listattr2 :
+                    listattr2.remove(a)
+                    att=a
+                    break
+        comb=[ [(att,val)] for val in attval[att]] 
+        while len(listattr2) > 0 :
+            att=listattr2.pop(0) ; newcomb=[]
+            for c in comb :
+                for v in attval[att] :
+                    l=[ e for e in c]
+                    l.append((att,v))
+                    newcomb.append(l)
+            comb=newcomb
+        orderl=[]
+        for c in comb :
+            attval2=attval.copy() ; label=""
+            for att,val in c :
+                attval2[att]=val
+                label+=val+"_"
+            label=label[:-1]
+            orderl.append(label)
+            d[label]=cdataset(**attval2)
+        return cens(d,order=orderl)
 
 def fds(filename, simulation=None, variable=None, period=None, model=None) :
     """
@@ -1324,7 +1356,7 @@ def ds(*args,**kwargs) :
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this 
-    will work only if no dataset's attribute is ambiguous
+    will work only if no dataset's attribute is ambiguous. 'first_50y' also works, similarly
 
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
     """
