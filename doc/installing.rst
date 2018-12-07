@@ -10,37 +10,51 @@ Using CliMAF at CNRM, on Ciclad or Climserv: fast track
 - If working on IPSL's Ciclad, Climserv, at CNRM or on MF's Beaufix HPC machine, you do not need to install CliMAF; just 
   do as indicated below (as e.g. in section :ref:`running_inter`), replacing ``<some_installation_dir>`` by :
 
-  - ``/cnrm/est/COMMON/climaf/current`` at CNRM
+  - ``/cnrm/est/COMMON/climaf/climaf_x.y.z`` at CNRM
 
-  - ``~senesi/climaf`` on Beaufix
+  - ``~senesi/climaf_installs/climaf_x.y.`` on Beaufix
 
+
+    
 - On the IPSL - ESPRI Mesocenter (Ciclad and Climserv):
+      
   - do not forget to submit an interactive session if you want to run your code interactively:
-     * qsub -IVX -q std -l mem=9g -l vmem=9g (don't need the X if you don't want interactive display, and add ``-l nodes=1:ppn=10`` for parallel prrocessing on 10 procs)
+     * qsub -IVX -q std -l mem=9g -l vmem=9g (don't need the X if you
+       don't want interactive display, and add ``-l nodes=1:ppn=10``
+       for parallel processing on 10 procs)
+     
   - do::
-     module load climaf
+    
+      module load climaf
+
     to set your environment:
       - point to a CliMAF install ($CLIMAF environment variable)
       - set your CliMAF cache ($CLIMAF_CACHE environment variable)
       - use a miniconda install and activate a suitable environment
       - load cdo, ncl, nco, and netcdf4 modules
+
     See 'Configuring CliMAF' below to customize your environment (use another CliMAF install, another cache...)
 
   - use CliMAF in an interactive IPython session (launch IPython and import CliMAF at once)::
-     climaf
+
+      climaf
 
   - if you want to use Jupyter notebooks, use::
-     climaf-notebook
+
+      climaf-notebook
 
     and follow the instructions
 
   - get the CliMAF demo notebooks::
+    
      cp -r /ciclad-home/jservon/TP_CliMAF ~
      cd TP_CliMAF
      climaf-notebook
 
   - eventually, use::
+    
      from climaf.api import *
+
     at the beginning of your python script or notebook to import CliMAF
 
 

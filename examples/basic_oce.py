@@ -17,11 +17,12 @@ cdef("frequency","monthly")
 # Choose a model and define your dataset 
 if onCiclad : cdef ("model","IPSL-CM5A-LR")
 else :
-    if atCNRM : cdef ("model","CNRM-CM5")
+    if atCNRM : cdef ("model","CNRM-CM5",project="CMIP5")
     else :
         print("I do not know how to find CMIP5 data on this machine")
         exit(0)
-tos=ds(experiment="historical", variable="tos", period="186001", table="Omon")
+
+tos=ds(experiment="historical", variable="tos", period="186001", table="Omon",model="CNRM-CM5")
 
 # Display the basic filenames involved in the dataset (all filenames 
 # in one single string). CliMAF will search them at the data location 

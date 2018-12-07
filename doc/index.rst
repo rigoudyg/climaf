@@ -24,12 +24,29 @@ It is available at  `CliMAF GitHub repository <https://github.com/senesis/climaf
 
 The goal of CliMAF is to ease the common steps that separate you from your scientific diagnostic (in climate science):
 CliMAF was designed to answer those specifications of CliMAF:
-  - We have **several data organizations (path/filename syntax, variable names, units... CMIP5 and CMIP6 at CLIMERI among others)** to deal with and **we don’t want to rewrite all of them**
-  - We want to **share diagnostics**: one common library with a vocabulary **that follows standards (inspired by the CMIP standards)**
-  - We don’t want to exclude existing scripts: **possibility to plug any script** that can be run with a command line, **your own** post-processing and analysis **scripts and programs** as well as other tools sets such as `NCO <http://nco.sourceforge.net/>`_ and `CDO <https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html>`_  operators
+
+  - We have **several data organizations (path/filename syntax,
+    variable names, units... CMIP5 and CMIP6 at CLIMERI among
+    others)** to deal with and **we don’t want to rewrite all of
+    them**
+  
+  - We want to **share diagnostics**: one common library with a
+    vocabulary **that follows standards (inspired by the CMIP
+    standards)**
+  
+  - We don’t want to exclude existing scripts: **possibility to plug
+    any script** that can be run with a command line, **your own**
+    post-processing and analysis **scripts and programs** as well as
+    other tools sets such as `NCO <http://nco.sourceforge.net/>`_ and
+    `CDO <https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html>`_
+    operators
+  
   - We want to **ease all those classic/basic treatments we do everyday**: selection of a period, variable, geographical region, working on an ensemble
+  
   - We don’t want to **recompute what has already been computed once**
+  
   - We want to use this library to build a **custom set of diagnostics** as well as a **big evaluation package** like the `CliMAF Earth System Model Evaluation Platform <https://github.com/jservonnat/C-ESM-EP/wiki>`_
+  
 
 .. image:: CliMAF_structure.png
      :scale: 80%
@@ -58,12 +75,16 @@ CMIP6/CMIP5 CLIMERI - Convergence training session November 19 2018
 --------------------------------------------------------------------
 These are the notebooks used for the `training session of November 19 (2018) on 'CMIP6 analysis at CLIMERI' <http://convergence-ipsl.prod.lamp.cnrs.fr/data-analysis/>` (follow the link to see how to set up your environment to work with CliMAF at CLIMERI).
 Morning presentation:
+
  - :download:`a quick illustration of CMIP data access on Ciclad - CLIMERI <../examples/CLIMERI_Quick_demo_CMIP_data_access_20181119.html>`
 
 Afternoon practicals:
- - 1/ :download:`Access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI) <../examples/Basis_of_CliMAF_data_access_at_CLIMERI.html>`
- - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`
- - 3/ Open session on available functionalities in the notebooks (general sujects above: :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`, :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`, or :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`)
+   
+  - 1/ :download:`Access CMIP data, observations/reanalyses, and explore the archives (on Ciclad - CLIMERI) <../examples/Basis_of_CliMAF_data_access_at_CLIMERI.html>`
+  
+  - 2/ :download:`work with ensembles (CMIP, CORDEX, or any other ensembles specified manually) <../examples/Working_with_CliMAF_ensembles.html>`
+  
+  - 3/ Open session on available functionalities in the notebooks (general sujects above: :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>`, :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`, or :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`)
 
 Also find here :download:`the last notebook we've done together during the last hour of the practicals: working with a CMIP5 and a CMIP6 ensemble, calculating an ensemble mean and the difference between those and observations, and eventually make some multiplots <../examples/Playing_with_ensembles_from_scratch_last_hour_of_training_session_20181119.html>`.
 Bonus: thanks to the questions of the participants, you will find in this notebook how to easily plot the members of an ensemble to track down a potential corrupted member.

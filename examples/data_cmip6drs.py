@@ -16,7 +16,7 @@ from climaf.api import *
 
 # Define default value for some dataset facets
 cdef("project","CMIP6")
-cdef("model","CNRM-CM6-1")
+cdef("model","CNRM-CM6-1",project="CMIP6")
 
 # Define your dataset (a number of facets take default values)
 tas1pc=ds(experiment="1pctCO2", realization='r1i1p1f2', variable="tas", table="Amon", period="1862-1863",  )

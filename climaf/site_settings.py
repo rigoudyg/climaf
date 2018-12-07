@@ -25,7 +25,7 @@ if os.path.exists ('/ccc') and not os.path.exists ('/data')  :
     atIPSL   = True
 if os.path.exists ('/cnrm') :
     atCNRM   = True
-if 'ciclad' in HostName  or 'loholt' or 'ipsl.polytechnique.fr' in HostName  :
+if 'ciclad' in HostName  or 'loholt' in HostName or 'ipsl.polytechnique.fr' in HostName  :
     onCiclad = True
     atIPSL   = True
 if 'ada' in HostName        :
