@@ -10,7 +10,7 @@
 import re, string, copy, os.path
 
 import dataloc
-from period    import init_period, cperiod, merge_periods,intersect_periods_list,lastyears
+from period    import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
 from clogging  import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal   import Decimal
@@ -1334,11 +1334,12 @@ def ds(*args,**kwargs) :
     if (len(args)==0) :
         match=None
         if 'period' in kwargs and type(kwargs['period']) is str :
-            match=re.match("(last|LAST)_(?P<duration>[0-9]*)(y|Y)$",kwargs['period'])
-        if match is None :
-            return cdataset(**select_projects(**kwargs))
-        else:
-            return resolve_last_years(copy.deepcopy(kwargs),match.group('duration'))
+            match=re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)(y|Y)$",kwargs['period'])
+            if match is not None :
+                return resolve_first_or_last_years(copy.deepcopy(kwargs),match.group('duration'),
+                                                   option=match.group('option').lower())
+        return cdataset(**select_projects(**kwargs))
+
     crs=args[0]
     results=[]
     for cproj in cprojects : 
@@ -1929,14 +1930,15 @@ def attributeOf(cobject,attrib) :
     else : raise Climaf_Classes_Error("Unknown class for argument "+`cobject`)
 
 
-def resolve_last_years(kwargs,duration) :
+def resolve_first_or_last_years(kwargs,duration,option="last") :
     # Returns a dataset after translation of period like 'last_50y'
     kwargs['period']='*'
     explorer=ds(**kwargs)
     attributes=explorer.explore(option='choices')
     periods=attributes['period']
     period=periods[-1]
-    kwargs['period']=lastyears(period,int(duration))
+    if option=='last'  : kwargs['period']=lastyears(period,int(duration))
+    if option=='first' : kwargs['period']=firstyears(period,int(duration))
     explorer=ds(**kwargs)
     return explorer.explore('resolve')
 

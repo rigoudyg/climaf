@@ -331,6 +331,21 @@ def lastyears(period,nyears):
         rep.start=datetime.datetime(year=yend-nyears,month=s.month,day=s.day,hour=s.hour,minute=s.minute)
     return `rep`
 
+def firstyears(period,nyears):
+    """
+    Returns a period beginning at PERIOD's begin and which duration is at most NYEARS
+    """
+    if type(period) is str : period=cperiod(period)
+    rep=cperiod(period.start,period.end)
+    yend=rep.end.year
+    ystart=rep.start.year
+    if yend > ystart+nyears :
+        s=rep.end
+        rep.end=datetime.datetime(year=ystart+nyears,month=s.month,day=s.day,hour=s.hour,minute=s.minute)
+    #print "period=",period, 'type=',type(period),'nyears=',nyears
+    #print rep
+    return `rep`
+
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
