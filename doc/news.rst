@@ -27,7 +27,8 @@ Changes, newest first :
     for CMIP6 datasets, querying the ES-Doc errata service. However,
     this service doesn't yet support value 'latest' for attribute 'version'
   
-
+  - fix issue with filenames which includes a plus (+) sign 
+    
 - V1.2.7:
 
   - period='last_50y' (and variants, e.g. LAST_3Y) are allowed

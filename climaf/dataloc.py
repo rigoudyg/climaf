@@ -154,7 +154,7 @@ class dataloc():
                 u=u.replace(pat+"-"+pat,"${PERIOD}")
                 u=u.replace(pat+"_"+pat,"${PERIOD}")
                 u=u.replace(pat,"${PERIOD}")
-                alt2.append(u)
+            alt2.append(u)
         #
         self.urls=alt2
         # Register new dataloc only if not already registered
@@ -421,6 +421,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
+            clogger.debug("Before regexp filtering : Globbing %d files for varname on %s : "%(len(lfiles),temp2))
             # Must filter with regexp, because * with glob is too inclusive
             alt=[]
             for f in lfiles :
@@ -472,7 +473,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         #
         # Construct regexp for extracting dates from filename
         date_regexp=None
-        template_toreg=template.replace("*",".*").replace("?",r".")
+        template_toreg=template.replace("*",".*").replace("?",r".").replace("+","\+")
         #print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords :
             #print "searchin "+key+" in "+template
