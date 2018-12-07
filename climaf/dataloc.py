@@ -121,8 +121,8 @@ class dataloc():
          - and declaring a project to access remote data (on multiple servers)::
 
             >>> cproject('MY_REMOTE_DATA', ('frequency', 'monthly'), separator='|')
-            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFXYYYY.nc',
-            ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_YYYYMM_YYYYMM_${model}.nc']),
+            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFX${PERIOD}.nc',
+            ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_${PERIOD}_${model}.nc']),
             >>> calias('MY_REMOTE_DATA','tas','tas',filenameVar='2T')
             >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')        
 
@@ -147,7 +147,15 @@ class dataloc():
             #if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
             if u[0] != '$' and ':' not in u: alt.append(os.path.abspath(u))             
             else : alt.append(u)
-        self.urls=alt
+        # Change all datedeb-datend patterns to ${PERIOD} for upward compatibility
+        alt2=[]
+        for u in alt :
+            for pat in [ "YYYYMMDDHHMM", "YYYYMMDDHH", "YYYYMMDD", "YYYYMM", "YYYY" ] :
+                u=u.replace(pat"-"pat,"${PERIOD}")
+                u=u.replace(pat"_"pat,"${PERIOD}")
+                alt2.append(u)
+        #
+        self.urls=alt2
         # Register new dataloc only if not already registered
         if not (any([ l == self for l in locs])) : locs.append(self)
     def __eq__(self, other):
@@ -307,7 +315,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
    
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*YYYY*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*${PERIOD}*.nc)']
     /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
@@ -316,12 +324,10 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     - ${variable} : use it if the files are split by variable and 
       filenames do include the variable name, as this speed up the search
 
-    - ${PERIOD} or YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHH, , YYYYMMDDMM : use it 
-      for indicating the start date of the period covered by each file, if this 
-      is applicable in the file naming; 
-      If not using ${PERIOD}, use YYYYxx a second time for end date, 
-      if applicable (otherwise the assumption is that the whole year -resp. 
-      month or day- is included in the file
+    - ${PERIOD} : use it for indicating the period covered by each file, if this 
+      is applicable in the file naming; this period can appear in filenames as 
+      YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHHMM, either once only, or twice with 
+      separator ='-' or '_'
 
     - wildcards '?' and '*' for matching respectively one and any number of characters
 
