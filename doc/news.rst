@@ -6,6 +6,22 @@ Whats' new
 
 Changes, newest first :
 
+- V1.2.9:
+
+  - ensembles can be built on multiple attributes (e.g
+    model+realization); :py:func:`~climaf.function.eds` has new
+    argument 'first' for driving which attribute appears first in member labels
+
+  - period='first_10y' (and variants) are allowed
+
+  - when declaring a project, pattern for dates in filenames is now
+    ${PERIOD} (see :py:class:`~climaf.dataloc.dataloc`)
+
+  - cache results can be protected against deletion by normal calls to 
+    :py:func:`~climaf.cache.craz` and :py:func:`~climaf.cache.cdrop` ;
+    see :py:func:`~climaf.cache.cprotect`; erase functions have new
+    argument 'force' to overcome this protection
+
 - V1.2.7:
 
   - period='last_50y' (and variants, e.g. LAST_3Y) are allowed

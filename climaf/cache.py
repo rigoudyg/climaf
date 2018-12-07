@@ -339,15 +339,17 @@ def complement(crsb, crse, crs) :
         register(filet,crs)
         return filet
 
-def cdrop(obj, rm=True) :
+def cdrop(obj, rm=True, force=False) :
     """
     Deletes the cached file for a CliMAF object, if it exists
 
     Args:
      obj (cobject or string) : object to delete, or its string representation (CRS)
 
-     rm (bool) : for advanced use only; should we actually delete (rm) the file, or just forget it in CliMAF cache index
+     force (bool) : should we delete the object even if it is 'protected'
     
+     rm (bool) : for advanced use only; should we actually delete (rm) the file, or just forget it in CliMAF cache index
+
     Returns:
      None if object does not exists, False if failing to delete, True if OK
 
@@ -370,12 +372,17 @@ def cdrop(obj, rm=True) :
         clogger.error("%s is not a CliMAF object"%`obj`)
         return
     if crs in crs2filename :
-        clogger.info("discarding cached value for "+crs)
-        fil=crs2filename.pop(crs)
+        clogger.info("Discarding cached value for %s (expect if protected)"%crs)
+        fil=crs2filename[crs]
         if rm :
             try :
+                if force : os.system("chmod +w "+fil)
+                if not os.access(fil,os.W_OK) :
+                    clogger.info("Object %s is protected"%crs)
+                    return
                 path_file=os.path.dirname(fil)
                 os.remove(fil)
+                crs2filename.pop(crs)
                 dropped_crs.append(crs)
                 try:
                     os.rmdir(path_file)
@@ -390,6 +397,34 @@ def cdrop(obj, rm=True) :
         clogger.info("%s is not cached"%crs)
         return None
 
+def cprotect(obj, stop=False) :
+    """
+    Protects the cache file for a given object (or stops protection with arg 'stop=True'). 
+
+    In order to erase it, argument 'force=True' must then be used with function  
+    :py:func:`~climaf.cache.craz` or :py:func:`~climaf.cache.cdrop` 
+
+    """
+    if (isinstance(obj,cobject) ):
+        crs=`obj`
+        if (isinstance(obj, cdataset) ) : crs="select("+crs+")"
+    elif type(obj) is str : crs=obj
+    else :
+        clogger.error("%s is not a CliMAF object"%`obj`)
+        return 
+    if crs in crs2filename :
+        if stop is False :
+            clogger.info("Protecting cached value for "+crs)
+            os.system("chmod -w "+crs2filename[crs])
+        else:
+            clogger.info("Stopping protection on cached value for "+crs)
+            os.system("chmod +w "+crs2filename[crs])
+        return 
+    else :
+        clogger.info("%s is not (yet) cached; use cfile() to cache it"%crs)
+    
+    
+    
 def csync(update=False) :
     """
     Merges current in-memory cache index and current on-file cache index 
@@ -508,17 +543,20 @@ def cload_for_project(project):
         except:
             clogger.error("CRS expression %s is not valid for project %s"%(crs,project))
          
-def craz(hideError=False) :
+def craz(force=False, hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index
 
     Args:
+      force (bool): should we erase also all 'protected' files
+
       hideError (bool): if True, will not warn for non existing cache
 
     """
     global crs2filename
     cc=os.path.expanduser(currentCache)
     if (os.path.exists(currentCache) or hideError is False) :
+        if force : os.system("chmod -R +w  "+cc)
         os.system("rm -fR "+cc+"/*")
         os.system("ls  "+cc)
     #for f in crs2filename : os.remove(crs2filename[f])

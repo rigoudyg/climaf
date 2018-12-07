@@ -113,5 +113,10 @@ cdrop : erase a result's file
 
 .. autofunction:: climaf.cache.cdrop
 
+cprotect : protect a result's file against cdrop and craz
+---------------------------------------------------------
+
+.. autofunction:: climaf.cache.cprotect
+
 
 

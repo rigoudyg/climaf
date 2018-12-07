@@ -40,4 +40,10 @@ cdrop : erase a result's file
 .. autofunction:: climaf.cache.cdrop
    :noindex:
 
+cprotect : protect a result's file against cdrop and craz
+---------------------------------------------------------
+
+.. autofunction:: climaf.cache.cprotect
+   :noindex:
+
 

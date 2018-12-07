@@ -48,6 +48,8 @@ Main functions are :
 
  - ``cdrop``    : delete the cached file for an object
 
+ - ``cprotect`` : protect the cached file for an object from deletion 
+
  - ``craz``     : reset cache
 
  - ``csync``    : save cache index to disk
@@ -79,7 +81,7 @@ from cmacro    import macro,cmacros
 from driver    import ceval, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
 from dataloc   import dataloc 
 from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
-from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc
+from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc, cprotect
 from clogging  import clogger, clog, clog_file, logdir
 from site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 from plot.plot_params import plot_params, hovm_params

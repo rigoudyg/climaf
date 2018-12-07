@@ -1103,7 +1103,7 @@ def CFlongname(varname) :
     return("TBD_should_improve_function_climaf.driver.CFlongname") 
 
 
-def efile(obj, filename, forced=False) :
+def efile(obj, filename, force=False) :
     """
     Create a single file for an ensemble of CliMAF objects (launch computation if needed).
     
@@ -1118,18 +1118,18 @@ def efile(obj, filename, forced=False) :
          label (e.g. : tas_CNRM-CM, tas_IPSL-CM... ) (more formally : 
          'var(obj.order[n])'_'obj.ens[order[n]]')
 
-        forced (logical, optional) : if True, CliMAF will override the file
+        force (logical, optional) : if True, CliMAF will override the file
          'filename' if it already exists 
                 
     """
     if isinstance(obj,classes.cens) :
 
         if os.path.isfile(filename):
-            if forced:
+            if force:
                 os.system("rm -rf %s" %filename)
                 clogger.warning("File '%s' already existed and has been overriden" %filename)
             else:
-                raise Climaf_Driver_Error("File '%s' already exists: use 'forced=True' to override it" %filename)
+                raise Climaf_Driver_Error("File '%s' already exists: use 'force=True' to override it" %filename)
                 
         for lab in obj.order:
             memb=obj[lab]
