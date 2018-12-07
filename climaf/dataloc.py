@@ -431,6 +431,11 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
+            # Must filter with regexp, because * with glob is too inclusive
+            alt=[]
+            for f in lfiles :
+                if re.match(date_regexp_patt[k],f) : alt.append(f)
+            lfiles=alt
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
         # If unsuccessful using varname, try with filenameVar
@@ -447,6 +452,11 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                 clogger.debug("Remote globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
+                # Must filter with regexp, because * with glob is too inclusive
+                alt=[]
+                for f in lfiles :
+                    if re.match(date_regexp_patt[k],f) : alt.append(f)
+                lfiles=alt
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
         #
         # For discovering values for those facets which are a wildcard,
