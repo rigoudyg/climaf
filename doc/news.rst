@@ -48,14 +48,7 @@ Changes, newest first :
 
 - V1.2.6:
 
-  - a versatile datafiles and periods exploration method is associated
-    to datasets: see :py:meth:`~climaf.classes.cdataset.explore`
-  
-  - datafile patterns can use keyword ${PERIOD} for matching the dates
-    in filenames
-
-  - Script mcdo.sh (a CliMAF basic for accessing datafiles) was
-    re-designed. No adverse side effects should occur ...(?)
+  - a versatile datafiles and periods exploration method is associated to datasets: see :py:meth:`~climaf.classes.cdataset.explore` 
 
 - V1.2.2:
 
@@ -103,6 +96,7 @@ Changes, newest first :
 
   - Bug fix on ds() for the access to daily datasets with the CMIP5 project
 
+======= end
 
 - 2017/05/02:
 

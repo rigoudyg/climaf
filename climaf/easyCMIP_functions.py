@@ -270,23 +270,55 @@ def merge_climaf_ensembles(ens_list=[]):
     else:
         print 'Provide a list of ensembles to merge together'
         
-#
-# -- Definition of a new project called CMIP5_extent: can work on two CMIP5 experiments at once
-patterns = ['/prodigfs/project/CMIP5/output/*/${model}/${base_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/${variable}_${table}_${model}_${base_experiment}_${realization}_YYYYMM-YYYYMM.nc',
-            '/prodigfs/project/CMIP5/output/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/${variable}_${table}_${model}_${extent_experiment}_${realization}_YYYYMM-YYYYMM.nc']
 
-cproject('CMIP5_extent','model','frequency','realm','table','realization','version','base_experiment',
-         'extent_experiment', ensemble=['model','realization'], separator='%')
-
-dataloc(project='CMIP5_extent', organization='generic', url=patterns)
-
-cdef('version','latest', project='CMIP5_extent')
-cdef('frequency','monthly', project='CMIP5_extent')
-cdef('realization','r1i1p1', project='CMIP5_extent')
-cdef('base_experiment','historical', project='CMIP5_extent')
-cdef('extent_experiment','rcp85', project='CMIP5_extent')
-cdef('realm','*', project='CMIP5_extent')
-
-cfreqs('CMIP5_extent',{'monthly':'mon'})
+def check_time_consistency_CMIP(dat, return_available_period=False):
+    ''' Check if the period found by CliMAF actually covers the request period
+        If yes, returns True.
+        If not, returns False.
+        If not, and return_available_period=True, returns the period actually available in your request.
+    '''
+    #
+    # -- First, get the period available among the listed files
+    startyears = []
+    endyears = []
+    for tmpf in str.split(dat.baseFiles(),' '):
+        dum = str.split(tmpf,'_')
+        tmpf_period = str.replace(dum[-1],'.nc','')
+        startdate = str.split(tmpf_period,'-')[0]
+        enddate = str.split(tmpf_period,'-')[1]
+        startyears.append(int(startdate[0:4]))
+        endyears.append(int(enddate[0:4]))
+    first_available_year = sorted(startyears)[0]
+    last_available_year = sorted(endyears)[-1]
+    #
+    # -- Then, get the start year and end year of the request
+    req_period = str.replace(str(dat.period),'_','-')
+    #
+    start_req_date = str.split(req_period,'-')[0]
+    end_req_date = str.split(req_period,'-')[1]
+    #
+    start_req_year = int(start_req_date[0:4])
+    end_req_year = int(end_req_date[0:4])
+    #
+    # -- Eventually, check if the requested period is covered by the listed files
+    #    -> If yes, return True
+    #    -> If not, return False
+    if start_req_year>=first_available_year and end_req_year<=last_available_year:
+        check=True
+        if return_available_period:
+            return req_period
+    else:
+        check=False
+        if return_available_period:
+            if start_req_year<=first_available_year:
+                available_period = str(first_available_year)
+            else:
+                available_period = str(start_req_year)
+            if end_req_year>=last_available_year:
+                available_period += '-'+str(last_available_year)
+            else:
+                available_period += '-'+str(end_req_year)
+            return available_period
+    return check
 
 

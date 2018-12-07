@@ -21,6 +21,9 @@ if onCiclad :
     
     # -- Make a 
     cdef('frequency', 'daily', project='E-OBS')
+    cdef('grid', '*deg_*', project='E-OBS')
+    cdef('period', '*', project='E-OBS')
+    cdef('variable', '*', project='E-OBS')
     cfreqs('E-OBS',{'daily':'day'})
     
     calias('E-OBS', 'tasmin', 'tn')

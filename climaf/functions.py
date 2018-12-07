@@ -347,17 +347,17 @@ def summary(dat):
             obj=dat[m]
             if isinstance(obj,climaf.classes.cdataset) :
                 print m
-                files=dat[m].baseFiles()
+                files=dat[m].baseFiles(ensure_dataset=False)
                 if files :
                     for f in str.split(files,' '): print f
             else : 
                 print(m+" : "+ `obj`)
             print '--'
     elif isinstance(dat,classes.cdataset):
-	if not dat.baseFiles():
+	if not dat.baseFiles(ensure_dataset=False):
 	    print '-- No file found for:'
     	else:
-            for f in str.split(dat.baseFiles(),' '): print f
+            for f in str.split(dat.baseFiles(ensure_dataset=False),' '): print f
     	return dat.kvp
     else :
         print "Cannot handle "+`dat`
@@ -644,5 +644,30 @@ def ts_plot(ts, **kwargs):
 
     return ensemble_ts_plot(ens_ts, **w_kwargs)
 
+
+def iplot_members(ens, nplot=12, N=1, **pp):
+    '''
+    Display multiplot from individual members of a CliMAF ensemble
+       - nplots = number of plots per multiplot
+       - N = (integer) the number of the series of plots:
+           N = 1 to display the first set of nplots
+           N = 2 to display the second set of nplots...
+    '''
+    members = ens.keys()
+    new_ens = ens.copy()
+    start = ((N-1)*(nplot))
+    end   = nplot*N
+    if start > len(members):
+        return 'The list of members is shorter than what you asked; specify smaller N or nplot'
+    if end > len(members):
+        end = -1
+    members_selection = members[start:end]
+    for mem in ens:
+        if mem not in members_selection: new_ens.pop(mem)
+    new_ens.set_order(members_selection)
+    #
+    mp = cpage(plot(new_ens, **pp))
+    
+    return iplot(mp)
 
 

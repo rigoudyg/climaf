@@ -26,7 +26,8 @@ if atTGCC:
    root="/ccc/work/cont003/cmip6/cmip6"
 if onCiclad :
    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-   root="/ccc/work/cont003/cmip6/cmip6"
+   root="/bdd"
+   #root="/ccc/work/cont003/cmip6/cmip6"
 if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
    root="/cnrm/cmip"
@@ -41,12 +42,14 @@ if root:
   ## -- Set default values
   cdef('root'         , root          , project='CMIP6')
   cdef('institute'    , '*'           , project='CMIP6')
+  cdef('model'        , '*'           , project='CMIP6')
   cdef('mip'          , '*'           , project='CMIP6')
   #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
   cdef('grid'         , 'g*'          , project='CMIP6')
   cdef('realization'  , 'r1i1p1f*'    , project='CMIP6')
   cdef('experiment'  , 'historical'   , project='CMIP6')
   cdef('version'     , 'latest'       , project='CMIP6')
+  cdef('table'        , '*'           , project='CMIP6')
 
 
   ## -- Define the patterns
