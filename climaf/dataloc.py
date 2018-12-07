@@ -418,7 +418,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         # Do globbing with plain varname
         if remote_prefix : 
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))
-            clogger.debug("Remote globbing %d files for varname on %s : "%(len(lfiles),remote_prefix+temp2))
+            clogger.debug("Remote globbing %d files for varname on %s : "%\
+                          (len(lfiles),remote_prefix+temp2))
         else: # local data
             lfiles=sorted(glob.glob(temp2))
             clogger.debug("Before regexp filtering : Globbing %d files for varname on %s : "%(len(lfiles),temp2))
@@ -443,7 +444,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             # Do globbing with fileVarname
             if remote_prefix : # 
                 lfiles=sorted(glob_remote_data(remote_prefix, temp2))
-                clogger.debug("Remote globbing %d files for filenamevar on %s: "%(len(lfiles),remote_prefix+temp2))
+                clogger.debug("Remote globbing %d files for filenamevar on %s: "%\
+                              (len(lfiles),remote_prefix+temp2))
             else: # local data
                 lfiles=sorted(glob.glob(temp2))
                 # Must filter with regexp, because * with glob is too inclusive

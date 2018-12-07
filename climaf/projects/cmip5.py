@@ -4,7 +4,7 @@ libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP5 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
 
-Syntax for these attributes is described in `the CMIP5 DRS document <https://goo.gl/v1drZl>`_
+Syntax for these attributes is described in `the CMIP5 DRS document  <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
 
 Example for a CMIP5 dataset declaration ::
 
@@ -46,7 +46,7 @@ if root:
 
   pattern1+='${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
   ## -- And the additionnal pattern for extent
-  pattern2='${root}/CMIP5/output/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
+  pattern2='${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern2+='${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
 
   ## -- call the dataloc CliMAF function
