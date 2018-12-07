@@ -151,8 +151,9 @@ class dataloc():
         alt2=[]
         for u in alt :
             for pat in [ "YYYYMMDDHHMM", "YYYYMMDDHH", "YYYYMMDD", "YYYYMM", "YYYY" ] :
-                u=u.replace(pat"-"pat,"${PERIOD}")
-                u=u.replace(pat"_"pat,"${PERIOD}")
+                u=u.replace(pat+"-"+pat,"${PERIOD}")
+                u=u.replace(pat+"_"+pat,"${PERIOD}")
+                u=u.replace(pat,"${PERIOD}")
                 alt2.append(u)
         #
         self.urls=alt2
@@ -384,9 +385,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     # dicts of date patterns, for globbing and for regexp
     #
     digit="[0-9]"
-    date_glob_patt  = dict(YYYY=4*digit,YYYYMM=6*digit,YYYYMMDD=8*digit, YYYYMMDDHH=10*digit,
-                           YYYYMMDDHHMM=12*digit)
-    date_glob_patt.update( { "${PERIOD}" : "*" } )
+    date_glob_patt={ "${PERIOD}" : "*" } 
     # an ordered list of dates keywords
     date_keywords=date_glob_patt.keys() ; date_keywords.sort(reverse=True)
     #
@@ -397,18 +396,9 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     minutes="[0-5][0-9]"
     date="%s(%s(%s(%s(%s)?)?)?)?"%(annee,mois,jour,heure,minutes)
     rperiod="(?P<period>(?P<start>%s)([_-](?P<end>%s))?)"%(date,date)
-    #print "period=",period
-    #
-    #date_regexp_patt= dict(YYYY="([0-9]{4})",YYYYMM="([0-9]{6})", YYYYMMDD="([0-9]{8})",
-    #                       YYYYMMDDHH="([0-9]{10})", YYYYMMDDHHMM="([0-9]{12})")
-    date_regexp_patt= { "YYYY[-_]YYYY":rperiod,"YYYYMM[-_]YYYYMM":rperiod," YYYYMMDD[-_]YYYYMMDD":rperiod,
-                           "YYYYMMDDHH[-_]YYYYMMDDHH":rperiod," YYYYMMDDHHMM[-_]YYYYMMDDHHMM":rperiod,
-                           "YYYY":rperiod,"YYYYMM":rperiod,"YYYYMMDD":rperiod,"YYYYMMDDHH":rperiod,"YYYYMMDDHHMM":rperiod }
-    date_regexp_patt.update({ "${PERIOD}" : rperiod } )
-    #                       DATE="([0-9]{4,12})")
-    # an ordered list of dates keywords
+    date_regexp_patt={ "${PERIOD}" : rperiod } 
+    # an ordered list of dates regexp keywords
     date_regexp_keywords=date_regexp_patt.keys() ; date_regexp_keywords.sort(reverse=True)
-    #print "dkw=",date_regexp_keywords
     #
     #
     for l in urls :
@@ -434,7 +424,10 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             # Must filter with regexp, because * with glob is too inclusive
             alt=[]
             for f in lfiles :
-                if re.match(date_regexp_patt[k],f) : alt.append(f)
+                for k in date_keywords :
+                    if re.search(date_regexp_patt[k],f) :
+                        alt.append(f)
+                        continue
             lfiles=alt
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
@@ -455,7 +448,10 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                 # Must filter with regexp, because * with glob is too inclusive
                 alt=[]
                 for f in lfiles :
-                    if re.match(date_regexp_patt[k],f) : alt.append(f)
+                    for k in date_keywords :
+                        if re.search(date_regexp_patt[k],f) :
+                            alt.append(f)
+                            continue
                 lfiles=alt
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
         #
