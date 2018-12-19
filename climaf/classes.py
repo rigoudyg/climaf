@@ -636,7 +636,7 @@ class cdataset(cobject):
                     dic[kw]=val
             return ds(**dic)
         elif option == 'choices' :
-            clogger.debug("Listing possible values for  %s"%wildcard_attributes_list)
+            clogger.debug("Listing possible values for these wildcard attributes %s"%wildcard_attributes_list)
             self.files=files
             return wildcards
         elif option == 'ensemble' :
@@ -962,7 +962,12 @@ class cens(cobject,dict):
         #
         dict.update(self,dic)
         #
-        keylist=self.keys() ; keylist.sort()
+        keylist=self.keys() ;
+        try :
+            from natsort import natsorted
+            keylist=natsorted(keylist)
+        except :
+            keylist.sort()
         if order : self.set_order(order,keylist)
         elif sortfunc : self.order=sortfunc(keylist)
         else : self.order=keylist
