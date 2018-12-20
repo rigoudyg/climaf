@@ -201,7 +201,9 @@ class cscript():
            format string, used to derive the variable name from first
            input variable name as in e.g. :
            ``output2_var='std_dev(%s)'`` for the output labelled
-           output2 (i.e. declared as '${out_output2}')
+           output2 (i.e. declared as '${out_output2}') or ``_var='std_dev(%s)'`` 
+           for the default (main) output
+
 
            - in the example above, we just apply the convention used by CDO,
              which expects that you provide an output filename as last
