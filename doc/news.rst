@@ -6,6 +6,15 @@ Whats' new
 
 Changes, newest first :
 
+- V1.2.10:
+
+  - Ensembles are sorted on their label using module natsort (when it is available) 
+
+  - Init variable site_settings.atCerfacs based on existence of /scratch/globc
+
+  - Fix for data files without a date in filename, which were sometimes disregarded
+
+  
 - V1.2.9:
 
   - ensembles can be built on multiple attributes (e.g

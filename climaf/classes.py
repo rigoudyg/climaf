@@ -1093,7 +1093,7 @@ def eds(first=None,**kwargs):
             nlist+=1
             listattr.append(attr)
     if len(listattr) < 1 :
-        raise Climaf_Classes_Error("For building an esemble, must have at least one attribute which is a list")
+        raise Climaf_Classes_Error("For building an ensemble, must have at least one attribute which is a list")
     # Create an ensemble of datasets if applicable
     d=dict()
     if len(listattr) == 1 :

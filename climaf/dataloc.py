@@ -430,9 +430,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     if re.search(date_regexp_patt[k],f) :
                         alt.append(f)
                         continue
-                # But must also consider the case where there is no date pattern in fiel pattern
-                if not any([ k in l for k in date_regexp_patt ]) :
-                    alt.append(f)
+                # But must also consider the case where there is no date pattern in file pattern
+                if not any([ k in l for k in date_regexp_patt ]) : alt.append(f)
             lfiles=alt
             clogger.debug("Globbing %d files for varname on %s : "%(len(lfiles),temp2))
         #
@@ -458,6 +457,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                         if re.search(date_regexp_patt[k],f) :
                             alt.append(f)
                             continue
+                    # But must also consider the case where there is no date pattern in file pattern
+                    if not any([ k in l for k in date_regexp_patt ]) : alt.append(f)
                 lfiles=alt
                 clogger.debug("Globbing %d files for filenamevar on %s: "%(len(lfiles),temp2))
         #
