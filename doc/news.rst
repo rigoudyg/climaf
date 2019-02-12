@@ -6,6 +6,11 @@ Whats' new
 
 Changes, newest first :
 
+- dev:
+
+  - add an example for declaring :download:`a script which has multiple output
+    files <../examples/myscript_has_two_outputs.py>` 
+
 - V1.2.10:
 
   - Ensembles are sorted on their label using module natsort (when it is available) 
