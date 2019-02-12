@@ -8,6 +8,10 @@ Changes, newest first :
 
 - dev:
 
+  - fix a bug and clean code in init_period()
+
+  - improve doc (typos, english)
+
   - add an example for declaring :download:`a script which has multiple output
     files <../examples/myscript_has_two_outputs.py>` 
 

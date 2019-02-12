@@ -17,11 +17,11 @@ class cperiod():
     """
     def __init__(self,start,end=None,pattern=None) :
         self.fx=False
-        if start == 'fx' :
+        if type(start)==type('') and start == 'fx' :
             self.fx=True
             self.pattern='fx'
-        elif not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) : 
-            raise Climaf_Period_Error("issue with start or end")
+        elif not isinstance(start,datetime.datetime) or not isinstance(end,datetime.datetime) :
+            raise Climaf_Period_Error("issue with start or end, types=%s, %s"%(type(start),type(end)))
         else :
             self.start=start ; self.end=end ;
             if pattern is None :
@@ -174,72 +174,39 @@ def init_period(dates) :
     except :
         raise Climaf_Period_Error("period start string %s is not a date (%s %s %s %s %s)"%(start,syear,smonth,sday,shour,sminute))
     #
+    #
     end=re.sub(r'.*[-_]([0-9]{1,12})$',r'\1',dates)
     end=(4-len(end))*"0"+end
     #clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
-    done=False
-    if (end==dates) :
-        # No string found for end of period
-        if (len(start)<=4 ) : eyear=syear+1 ; emonth=1 ; eday=1 ; ehour=0 
-        elif (len(start)==6 ) :
-            eyear=syear ; emonth=smonth+1 ;
-            if (emonth > 12) :
-                emonth=1
-                eyear=eyear+1
-            eday=1 ; ehour=0 
-        elif (len(start)==8 ) :
-            eyear=syear ; emonth=smonth ; eday=sday ; ehour=0 
-            if (sday > 27) :
-                # Must use datetime for handling month length
-                e=s+datetime.timedelta(1)
-                done=True
-            else : eday=sday+1
-        elif (len(start)==10 ) :
-            eyear=syear ; emonth=smonth ; eday=sday ; ehour=shour+1
-            if (ehour > 23) :
-                ehour=0
-                eday=eday+1
-        eminute = 0
+    if (end==dates) : end=start
     else:
         #clogger.debug("len(end)=%d"%len(end))
         if len(start) != len(end) :
             raise Climaf_Period_Error("Must have same numer of digits for start and end dates (%s and %s)"%(start,end))
-        if (len(end)<12)  :
-            eminute = 0
-        else :
-            eminute=int(end[10:12])
-        if (len(end)==4 ) : eyear=int(end[0:4])+1 ; emonth=1 ; eday=1 ; ehour=0 
-        elif (len(end)==6 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6])+1 ; eday=1 ; ehour=0
-            if (emonth > 12) :
-                emonth=1
-                eyear=eyear+1
-        elif (len(end)==8 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=0 
-            if (eday > 27) :
-                try :
-                    #print "trying %d %d %d %d %d"%(eyear,emonth,eday,ehour,eminute)
-                    e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
-                except:
-                    raise Climaf_Period_Error("period end string %s is not a date"%end)
-                e=e+datetime.timedelta(1)
-                done=True
-            else:
-                eday=eday+1
-        elif (len(end)==10 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10])+1 
-            if (ehour > 23) :
-                ehour=0
-                eday=eday+1
-        elif (len(end)==12 ) :
-            eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10]) ; eminute=int(end[10:12])
     #
-    if not done :
-        try :
-            #print "try:%d %02d %02d %02d %02d"%(eyear,emonth,eday,ehour,eminute)
-            e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
-        except:
-            raise Climaf_Period_Error("period end string %s is not a date"%end)
+    emonth=1 ; eday=1 ;  ehour=0 ; eminute=0
+    add_day=0 ; add_hour=0 ; add_minute=0
+    if (len(end)==4 ) :
+        eyear=int(end[0:4])+1; 
+    elif (len(end)==6 ) :
+        eyear=int(end[0:4]) ; emonth=int(end[4:6])+1 ; 
+        if (emonth > 12) :
+            emonth=1
+            eyear=eyear+1
+    elif (len(end)==8 ) :
+        add_day=1
+        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  
+    elif (len(end)==10 ) :
+        add_hour=1
+        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10]) 
+    elif (len(end)==12 ) :
+        add_minute=1
+        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ;
+        ehour=int(end[8:10]) ; eminute=int(end[10:12])
+    #
+    e=datetime.datetime(year=eyear,month=emonth,day=eday,hour=ehour,minute=eminute)
+    e=e+datetime.timedelta(days=add_day, hours=add_hour, minutes=add_minute )
+
     if s < e :
         return cperiod(s,e,None)
     else :

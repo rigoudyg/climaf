@@ -278,10 +278,7 @@ def processDatasetArgs(**kwargs) :
         # Facet specific processing
         if facet=='period' :
             if not isinstance(attval['period'],cperiod) and attval['period'] != "*" :
-                try :
-                    attval['period']=init_period(attval['period'])
-                except :
-                    raise Climaf_Classes_Error("Cannot interpret period for %s"%`attval['period']`)
+                attval['period']=init_period(attval['period'])
         # Check for typing or user's logic errors
         if not facet in cprojects[project].facets :
             e="Project %s doesn't have facet %s"%(project,facet)
