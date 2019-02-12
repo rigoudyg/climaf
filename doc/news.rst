@@ -67,7 +67,7 @@ Changes, newest first :
 - V1.2.2:
 
   - Introduce doc for project CMIP6 : :py:mod:`~climaf.projects.cmip6`
-    and example :download:`data_cmip6drs.py <../examples/data_cmip6drs.py>`        
+    and example :download:`data_cmip6drs.py <../examples/data_cmip6drs.py>` 
 
 
 - V1.2:

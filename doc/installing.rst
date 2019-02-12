@@ -51,7 +51,7 @@ Using CliMAF at CNRM, on Ciclad or Climserv: fast track
      cd TP_CliMAF
      climaf-notebook
 
-  - eventually, use::
+  - lastly, use::
     
      from climaf.api import *
 

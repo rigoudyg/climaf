@@ -1,9 +1,9 @@
 .. _requirements:
 
-Requirements and ackowledgements
+Requirements and acknowledgements
 ---------------------------------
 
-This is a natural place for acknowledging the unvaluable contribution
+This is a natural place for acknowledging the invaluable contribution
 by the tools/packages listed below, with a special thanks to CDO
 2015: Climate Data Operators. Available at: http://www.mpimet.mpg.de/cdo
 
@@ -20,7 +20,7 @@ Optional
 
 - `ncview <http://meteora.ucsd.edu:80/~pierce/ncview_home_page.html>`_
 
-If wanting to build or modify CliMAF documentation :
+Special requirement for building or modifying CliMAF documentation :
 
 - Sphinx : 
 
