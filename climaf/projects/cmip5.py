@@ -44,7 +44,12 @@ if root:
   else:
      pattern1='${root}/CMIP5/output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
 
+  # a pattern for fixed fields
+  patternf=pattern1+'${variable}_${table}_${model}_${experiment}_${realization}.nc'
+
+  # The pattern for fields with a period
   pattern1+='${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
+
   ## -- And the additionnal pattern for extent
   pattern2='${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/${version}/${variable}/'
   pattern2+='${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
@@ -52,6 +57,7 @@ if root:
   ## -- call the dataloc CliMAF function
   ## -- CMIP5
   dataloc(project='CMIP5', organization='generic', url=pattern1)
+  dataloc(project='CMIP5', organization='generic', url=patternf)
   ## -- CMIP5_extent
   dataloc(project='CMIP5_extent', organization='generic', url=pattern1)
   dataloc(project='CMIP5_extent', organization='generic', url=pattern2)

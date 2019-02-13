@@ -8,6 +8,8 @@ Changes, newest first :
 
 - dev:
 
+  - fix : for project CMIP5, add a pattern matching fixed fields
+
   - fix a bug and clean code in init_period()
 
   - improve doc (typos, english)
