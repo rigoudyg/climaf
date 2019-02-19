@@ -630,7 +630,24 @@ class cdataset(cobject):
                         val=val[0]
                         dic[kw]=val
                 else:
-                    dic[kw]=val
+                    if kw == 'variable' : # Should take care of aliasing to fileVar
+                        matching_vars=set()
+                        paliases=aliases.get(self.project,[])
+                        for variable in paliases :
+                            if val==paliases[variable][0] :
+                                matching_vars.add(variable)
+                        if len(matching_vars)== 0 :
+                            # No filename variable in aliases matches actual filename
+                            dic[kw]=val
+                        elif len(matching_vars)==1 :
+                            # One variable has a filename variable whih matches the retrieved filename
+                            dic[kw]=matching_vars.pop()
+                        else : 
+                            raise Climaf_Classes_Error("Filename variable %s is matched by multiple variables %s"%\
+                                                       (val,`matching_vars`))
+                    else :
+                        dic[kw]=val
+                        
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for these wildcard attributes %s"%wildcard_attributes_list)
