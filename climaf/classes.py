@@ -578,6 +578,7 @@ class cdataset(cobject):
         dic=self.kvp.copy()
         if self.alias : 
             filevar,_,_,_,filenameVar,_=self.alias
+            req_var = dic["variable"]
             dic["variable"]=string.Template(filevar).safe_substitute(dic)
             if filenameVar : dic["filenameVar"]=filenameVar
         clogger.debug("Looking with dic=%s"%`dic`)
@@ -585,6 +586,8 @@ class cdataset(cobject):
         #if option != 'check_and_store' :
         wildcards=dict()
         files=dataloc.selectFiles(return_wildcards=wildcards,merge_periods_on=group_periods_on,**dic)
+        # -- Use the requested variable instead of the aliased
+        if self.alias : dic["variable"]=req_var
         #if option != 'check_and_store' :
         periods=wildcards.get('period',None)
         #else : periods=None
@@ -647,7 +650,7 @@ class cdataset(cobject):
                                                        (val,`matching_vars`))
                     else :
                         dic[kw]=val
-                        
+            #                        
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for these wildcard attributes %s"%wildcard_attributes_list)
@@ -668,9 +671,9 @@ class cdataset(cobject):
                     is_ensemble= (len(entry) > 1)
                 dic[kw]=entry
             if is_ensemble is False :
-                raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
-                                           "attributes have a single possible value (%s)"%wildcards)
-            #print "dic=",dic
+                #raise Climaf_Classes_Error("Creating an ensemble does not make sense because all wildcard "+\
+                #                           "attributes have a single possible value (%s)"%wildcards)
+                clogger.warning("Creating an ensemble with a single member")
             self.files=files
             return eds(first=first,**dic)
         elif option == 'check_and_store' :
@@ -688,7 +691,7 @@ class cdataset(cobject):
         for the dataset
         
         Use cached value (i.e. attribute 'files') unless called with arg force=True
-        If ensure_dataset is True, allows for ambiguous datasets
+        If ensure_dataset is True, forbid ambiguous datasets
         """
         if (force and self.project != 'file') or self.files is None :
             if ensure_dataset : self.explore()
@@ -700,7 +703,7 @@ class cdataset(cobject):
         for the dataset
         
         Use cached value unless called with arg force=True
-        If ensure_dataset is True, allows for ambiguous datasets
+        If ensure_dataset is True, forbid ambiguous datasets
         """
         return self.baseFiles(force=force,ensure_dataset=ensure_dataset)
 
@@ -990,12 +993,14 @@ class cens(cobject,dict):
         self.register()
 
     def set_order(self,order,ordered_keylist=None):
-        ordered_list=[ o  for o in order ] ; ordered_list.sort()
+        ordered_list=[ o  for o in order ] ;
+        ordered_list.sort()
         if ordered_keylist is None:
-            ordered_keylist=self.keys() ; ordered_keylist.sort()
+            ordered_keylist=[ o for o in self ]
+            ordered_keylist.sort()
         if ordered_list != ordered_keylist :
             raise Climaf_Classes_Error(
-                "Order list does not match dict keys list : %s   and %s"%
+                "Labels list (as described by order list) does not match ensemble labels list : %s   and %s"%
                 (`ordered_list`,`ordered_keylist`))
         self.order=order
 
@@ -1986,10 +1991,16 @@ def resolve_first_or_last_years(kwargs,duration,option="last") :
     kwargs['period']='*'
     explorer=ds(**kwargs)
     attributes=explorer.explore(option='choices')
-    periods=attributes['period']
-    period=periods[-1]
-    if option=='last'  : kwargs['period']=lastyears(period,int(duration))
-    if option=='first' : kwargs['period']=firstyears(period,int(duration))
+    if 'period' in attributes :
+        periods=attributes['period']
+        if option=='last'  :
+            period=periods[-1]
+            kwargs['period']=lastyears(period,int(duration))
+        if option=='first' :
+            period=periods[0]
+            kwargs['period']=firstyears(period,int(duration))
+    else:
+        kwargs['period']='*'
     explorer=ds(**kwargs)
     return explorer.explore('resolve')
 

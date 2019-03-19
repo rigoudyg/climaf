@@ -1,3 +1,5 @@
+# -*- coding: iso-8859-15 -*-
+
 """ CliMAF datasets location handling and data access module
 
 Handles a database of attributes for describing organization and location of datasets
@@ -150,7 +152,7 @@ class dataloc():
         # Change all datedeb-datend patterns to ${PERIOD} for upward compatibility
         alt2=[]
         for u in alt :
-            for pat in [ "YYYYMMDDHHMM", "YYYYMMDDHH", "YYYYMMDD", "YYYYMM", "YYYY" ] :
+            for pat in [ "YYYYMMDDHHMM", "YYYYMMDDHH", "YYYYMMDD", "YYYYMM", "YYYY", "${period}" ] :
                 u=u.replace(pat+"-"+pat,"${PERIOD}")
                 u=u.replace(pat+"_"+pat,"${PERIOD}")
                 u=u.replace(pat,"${PERIOD}")
@@ -252,7 +254,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         clogger.warning("no datalocation found for %s %s %s %s "%(project, model, simulation, frequency))
     for org,freq,urls in ofu :
         if return_wildcards is not None and org is not "generic" :
-            raise classes.Climaf_Error("Can hanle multipe facet query only for organization=generic ")
+            raise classes.Climaf_Error("Can handle multipe facet query only for organization=generic ")
         kwargs2=kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies :
@@ -302,8 +304,8 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     Allow to describe a ``generic`` file organization : the list of files returned 
     by this function is composed of files which :
 
-    - match the patterns in ``url`` once these patterns are instantiated by 
-      the values in kwargs, and 
+     - match the patterns in ``url`` once these patterns are instantiated by 
+       the values in kwargs, and 
 
      - contain the ``variable`` provided in kwargs
 
@@ -333,10 +335,59 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     - wildcards '?' and '*' for matching respectively one and any number of characters
 
 
+    Résumé en francais : 
+
+    - On construit une expression régulière pour matcher les périodes
+
+    - On boucle sur les patterns de la liste url :
+
+      - Instancier le pattern par les valeurs des facettes fournies, et par  ".*" pour $PERIOD
+
+      - on fait glob.glob
+
+      - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous 
+        réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi 
+        avec filenameVar; d'où une liste de fichiers lfiles
+  
+      - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit 
+        une expression régulière (avec groupes) qui capture les valeurs de facettes 
+        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore 
+        nécessaire ???)
+
+        - Boucle sur les fichiers de lfiles:
+
+          - si le pattern n'indique pas qu'on peut extraire la date, 
+
+    	     - si la frequence indique un champ fixe, on retient le fichier;
+
+	     - sinon , on le retient aussi sans filtrer sur la période
+
+          - si oui,
+
+	     - on extrait la periode
+
+	     - si elle convient (divers cas ...)
+
+	       - si on a pu filtrer sur la variable, 
+	         ou que variable="*" ou variable multiple,
+	         ou que le fichier contient la bonne variable, eventuellement après renommage
+  	         on retient le fichier
+
+        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
+
+        - Dès qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
+
+    - A la fin , on formatte le dictionnaire de valeurs de facettes qui est rendu
+
     """
     def store_wildcard_facet_values(f,facets_regexp, kwargs, wildcards, merge_periods_on=None, 
                                     fperiod=None,periods=None,periods_dict=None):
-        """"
+        """
+        Using a (groups-capable) regexp FACETS_REGEXP for finding facet values, analyze
+        string F for finding the value of each keyword (facet name) in KWARGS, and stores
+        it in dict WILDCARDS, which keys are facet names and values are set of encountered 
+        values
+        Regarding periods, ... (TBD)
         """
         if fperiod is not None and periods is not None :
             clogger.debug('Adding period %s'%fperiod)
@@ -376,18 +427,21 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     #
     period=kwargs['period'] ;
     if period == "*" :
-        periods=[] # List of all periods
+        periods=[] # Init an empty list of all periods
     elif type(period) is str : period=init_period(period)
     #
     variable=kwargs['variable']
     altvar=kwargs.get('filenameVar',variable)
     #
-    # dicts of date patterns, for globbing and for regexp
+    # a patterns for dates for globbing 
+    # (we store it in a dict only for an for historcial reason)
     #
     digit="[0-9]"
     date_glob_patt={ "${PERIOD}" : "*" } 
-    # an ordered list of dates keywords
-    date_keywords=date_glob_patt.keys() ; date_keywords.sort(reverse=True)
+    date_keywords=[ "${PERIOD}" ]
+    #
+    # a pattern for dates for regexp
+    # (we store it in a dict only for an for historcial reason)
     #
     annee="%s{4}"%digit
     mois="(01|02|03|04|05|06|07|08|09|10|11|12)"
@@ -398,23 +452,25 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     rperiod="(?P<period>(?P<start>%s)([_-](?P<end>%s))?)"%(date,date)
     date_regexp_patt={ "${PERIOD}" : rperiod } 
     # an ordered list of dates regexp keywords
-    date_regexp_keywords=date_regexp_patt.keys() ; date_regexp_keywords.sort(reverse=True)
+    date_regexp_keywords=[ "${PERIOD}" ]
     #
     #
     for l in urls :
-        # Instantiate keywords in pattern with attributes values
+        # First discard protocol prefix in url element
         remote_prefix="" ;
         if re.findall(".*:.*",l) :
             remote_prefix=':'.join(l.split(":")[0:-1])+':'
         basename=l.split(":")[-1] # This discard the remote_prefix if any
         basename=basename.replace("//","/")
+        #
+        # Instantiate keywords in pattern with attributes values provided in kwargs
         my_template=Template(basename)
         template=my_template.safe_substitute(**kwargs)
-        #print "template after attributes replace : "+template
         #
         # Construct a pattern for globbing dates
         temp2=template
         for k in date_keywords : temp2=temp2.replace(k,date_glob_patt[k])
+        #
         # Do globbing with plain varname
         if remote_prefix : 
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))

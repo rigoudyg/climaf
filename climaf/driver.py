@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 """ 
 CliMAF driver
 
@@ -78,9 +79,10 @@ def capply_script (script_name, *operands, **parameters):
     for op in opscopy  :
         if isinstance(op,classes.cens ):
             raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
-    # 
-    #print "op(0)="+`operands[0]`
-    #print "script=%s , script.flags.commuteWithEnsemble="%script_name+`script.flags.commuteWithEnsemble`
+    #
+    # If first operand is an ensemble, and the script is not ensemble-capable,
+    # result is the ensemble of applying the script ot each member of first operand
+    # Otherwise, just call maketree
     if (isinstance(operands[0],classes.cens) and script.flags.commuteWithEnsemble) :
         # Must iterate on members
         reps=[]
@@ -97,6 +99,10 @@ def capply_script (script_name, *operands, **parameters):
         return(maketree(script_name, script, *operands, **parameters))
             
 def maketree(script_name, script, *operands, **parameters):
+    # maketree takes care of
+    #  - creating a ctree object representing the application of the scripts to its operands
+    #  - computing the variable name for all outputs, using dict script.outputs
+    #  - for each secondary outputs, creating an attribute of the ctree named as this output
     rep=classes.ctree(script_name, script, *operands, **parameters)
     # TBD Analyze script inputs cardinality vs actual arguments
     # Create one child for each output
@@ -104,6 +110,7 @@ def maketree(script_name, script, *operands, **parameters):
         #defaultPeriod=operands[0].period
     for outname in script.outputs :
         if outname is None  or outname=='' :
+            # This is the main output
             if "%s" in script.outputs[''] :
                 rep.variable=script.outputs['']%defaultVariable
             else:
@@ -111,6 +118,7 @@ def maketree(script_name, script, *operands, **parameters):
             template=Template(rep.variable)
             rep.variable=template.substitute(parameters)
         else :
+            # This is a secondary output
             son=classes.scriptChild(rep,outname)
             if "%s" in script.outputs[outname] :
                 son.variable=script.outputs[outname]%defaultVariable
@@ -166,12 +174,14 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             #   if the user can select the data and aggregate time, and requested format is
             #     'file' return the filenames
             #   else : read the data, create a cache file for that, and recurse
-            # Go to derived variable evaluation if appicable
-            #if ds.variable in operators.derived_variables and not ds.hasRawVariable() :
+            #
+            # First go to derived variable evaluation if applicable
             if operators.is_derived_variable(ds.variable,ds.project) :
                 if ds.variable in derived_list :
                     raise Climaf_Driver_Error("Loop detected while evaluating"
                          "derived variable "+ ds.variable + " " + `derived_list`)
+                # Create the object representing applying the operation needed to derive the var
+                # and return it 
                 derived=derive_variable(ds)
                 clogger.debug("evaluating derived variable %s as %s"%\
                                   (ds.variable,`derived`))
@@ -186,6 +196,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 cdedent()
                 return(derived_value)
             elif noselect(userflags, ds, format) :
+                # The caller is assumed to be able to select the needed sub-period or variable
+                # and to select the variable 
                 clogger.debug("Delivering file set or sets is OK for the target use")
                 cdedent()
                 rep=ds.baseFiles()
@@ -195,35 +207,26 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else:
                 clogger.debug("Must subset and/or aggregate and/or select "+
                               "var from data files and/or get data, or provide object result")
-                ## extract=cread(ds)
-                ## clogger.debug(" Done with subsetting and caching data files")
-                ## cstore(extract) # extract should include the dataset def
-                ## return ceval(extract,userflags,format)
                 if format == 'file' or format == "MaskedArray" :
                     if ds.hasOneMember() :
                         clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                         extract=capply('select',ds)
                     else :
-                        clogger.debug("On multi-member datafiles , fetching/selection/aggregation is done using select_member - TBD")
+                        clogger.debug("On multi-member datafiles , fetching/selection/aggregation "+
+                                      "is done using select_member - TBD")
                         extract=capply('select_member',ds)
                     if extract is None :
                         raise Climaf_Driver_Error("Cannot access dataset" + `ds`)
                     rep=ceval(extract,userflags=userflags,format=format)
-                #elif format="MaskedArray" :
-                #    if ds.hasOneMember() :
-                #        clogger.debug("Selection + aggregation for MA output using cread for %s"%ds)
-                #        rep=cread(ds.baseFiles(),classes.varOf(ds),period="%s"%ds.period)
-                #    else:
-                #        raise Climaf_Driver_Error("Cannot yet read multi-member dataset in MA format" + `ds`)
                 else :
                     raise Climaf_Driver_Error("Untractable output format %s"%format)
                 userflags.unset_selectors()
                 cdedent()
                 return rep
         else :
-            # else (non-local and non-cached dataset)
+            # Non-local and non-cached dataset
             #   if the user can access the dataset by one of the dataset-specific protocols
-            #   then assume it can also select on time and provide it with the address
+            #   then assume it can also select on time; -> just provide it with the address
             #   else : fetch the relevant selection of the data, and store it in cache
             clogger.debug("Dataset is remote " )
             if (userflags.canOpendap and format == 'file' ) :
@@ -231,13 +234,15 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 cdedent()
                 return(ds.adressOf())
             else :
-                if noselect(userflags, ds, format) :    
+                if noselect(userflags, ds, format) :
+                    # ce cas-ci n'a jamais été activé !
                     clogger.debug("Delivering file set or sets is OK for the target use")
                     cdedent()
                     rep=ds.baseFiles()
                     if not rep : raise Climaf_Driver_Error("No file found for %s"%`ds`)
                     return(rep) 
                 else:
+                    # This matches reaching data using e.g. ftp
                     clogger.debug("Must remote read and cache " )
                     rep=ceval(capply('remote_select',ds),userflags=userflags,format=format)
                     ds.files=rep
@@ -334,12 +339,12 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             file=cfilePage(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if ( format == 'file' ) : return (file)
-            else : return cread(file)
+            else : return cread(file) # !! Does it make sense ?
         elif isinstance(cobject,classes.cpage_pdf) :
             file=cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if ( format == 'file' ) : return (file)
-            else : return cread(file)
+            else : return cread(file) # !! Does it make sense ?
         elif isinstance(cobject,classes.cens) :
             d=dict()
             for member in cobject.order :
@@ -1082,7 +1087,7 @@ def calias(project,variable,fileVariable=None,**kwargs):
     
     Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``;
-    It allows to use a list of variable, given as a string where
+    It allows to use a list of variables, given as a string where
     the name of variables are separated by commas
     """
     if not "," in variable: # mono-variable

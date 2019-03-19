@@ -1,5 +1,7 @@
+import numpy as np
 from climaf.api import *
 from climaf.operators import *
+from climaf.driver import cvalue
 from climaf import classes
 from clogging  import clogger
 
@@ -7,11 +9,7 @@ def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).
     """
-    ma = cMA(dat)
-    if len(ma.shape)==1: return cMA(dat)[0]
-    if len(ma.shape)==2: return cMA(dat)[0][0]
-    if len(ma.shape)==3: return cMA(dat)[0][0][0]
-    if len(ma.shape)==4: return cMA(dat)[0][0][0][0]
+    return(cvalue(dat))
 
 
 def apply_scale_offset(dat,scale,offset):
@@ -35,7 +33,7 @@ def apply_scale_offset(dat,scale,offset):
 
 def fmul(dat1,dat2):
     """
-    Multiplication of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    Multiplication of two CliMAF objects, or multiplication of the CliMAF object given as first argument
     and a constant as second argument (string, float or integer)
 
     Shortcut to ccdo(dat1,dat2,operator='mul') and ccdo(dat,operator='mulc,'+c)
@@ -185,8 +183,6 @@ def vertical_average(dat,zmin,zmax):
     return tmp
 
 
-import numpy as np
-
 def implot(field,**kwargs):
     # -- Fonctions de plot interactives : a importer dans l'API
     from IPython.display import Image
@@ -282,7 +278,9 @@ def clim_average(dat,season):
         #
         # -- Classic atmospheric seasons
         selmonths=selmonth=None
-        if str(season).upper()=='DJF': selmonths ='1,2,12'
+        if str(season).upper()=='DJF':
+            selmonths ='1,2,12'
+            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper()=='MAM': selmonths ='3,4,5'
         if str(season).upper()=='JJA': selmonths ='6,7,8'
         if str(season).upper()=='SON': selmonths ='9,10,11'
@@ -320,7 +318,7 @@ def clim_average(dat,season):
         if str(season).lower() in ['max','annual max','annual_max']:
             avg = ccdo(scyc,operator='timmax')
         #
-        # -- Annual Maximum
+        # -- Annual Minimum
         if str(season).lower() in ['min','annual min','annual_min']:
             avg = ccdo(scyc,operator='timmin')
     #

@@ -6,16 +6,33 @@ Whats' new
 
 Changes, newest first :
 
-- dev:
+- V1.2.11:
 
-  - fix : for project CMIP5, add a pattern matching fixed fields
-
-  - fix a bug and clean code in init_period()
-
-  - improve doc (typos, english)
+  - **This is the last release which is truly handled on the 'senesis/climaf' Github
+    account repository; next releases will be handled on the 'rigoudyg/climaf'
+    account**; anyway Github will redirect your ``git clone`` commands to
+    the new location
 
   - add an example for declaring :download:`a script which has multiple output
     files <../examples/myscript_has_two_outputs.py>` 
+
+  - dataset's method :py:meth:`~climaf.classes.cdataset.explore` is improved :
+  
+    - option ``resolve`` handle variable aliasing correctly 
+
+    - option ``resolve`` will instantiate periods ``like last_YYY`` and ``first_YYY``
+
+    - option ``ensemble`` allow for single-member ensembles
+
+  - function :py:meth:`~climaf.classes.dataloc.dataloc` can use keyword ``${period}`` in filename patterns
+  
+  - fixes :
+
+    - for project CMIP5, add a pattern matching fixed fields
+
+    - fix a bug and clean code in :py:func:`~climaf.period.init_period`
+
+    - improve doc (typos, english), and testing/test_1.py
 
 - V1.2.10:
 
@@ -64,7 +81,7 @@ Changes, newest first :
   - the cache index, when synchronized, will know about dropped
     objects
 
-  - add module esayCMIP, yet un-documented
+  - add module easyCMIP, yet un-documented
 
 - V1.2.6:
 

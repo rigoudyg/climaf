@@ -103,7 +103,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
         urls_CMIP5=["/prodigfs/project"]
         dataloc(organization="CMIP5_DRS", url=urls_CMIP5)
         cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
-        self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
+        self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861",version="latest")
 
     def test_identifying_files(self):
         files=self.ds.baseFiles()

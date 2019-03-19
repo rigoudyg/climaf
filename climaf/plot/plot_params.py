@@ -36,7 +36,7 @@ def plot_params(variable,context, custom_plot_params=None) :
     Then, it updates with sets of parameters
     that are specific to the centers (for instance CNRM or IPSL).
 
-    Eventually, it can take a custom dictionary as an argument; it
+    Finally, it can take a custom dictionary as an argument; it
     will use it to update the dictionary (i.e. override matching entries).
     Such a dictionnary would be build such as the example 
     at :download:`../climaf/plot/atmos_plot_params.py` 
@@ -58,8 +58,8 @@ def plot_params(variable,context, custom_plot_params=None) :
     >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...)) # the annual mean climatology of a reference dataset for variable var
     
     >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
-    >>> niceplot_params=**plot_params(var,'full_field')
-    >>> climato_plot = plot(climato_dat, nice_plot_params) 
+    >>> niceplot_params=plot_params(var,'full_field')
+    >>> climato_plot = plot(climato_dat, **nice_plot_params) 
     >>> bias_plot = plot(bias, **plot_params(var,'bias'))
     
     >>> my_custom_params = {'pr':{'bias':{'colors':'-10 -5 -2 -0.5 -0.2 -0.1 0 0.1 0.2 0.5 1 2 5 10'}}}
