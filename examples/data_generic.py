@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 __doc__="""
 Example for CliMAF access to data organized in various ways, using the 
 data organization called 'generic' :
@@ -24,35 +27,35 @@ from climaf.api import *
 if atCNRM :
     # NOTE : THE PROJECT AND DATALOC DECLARATION BELOW ARE ACTUALLY BUILT-IN AND NOT NECESSARY
     # They show here as an example of CliMAF felxibility
-    
+
     # First declare project 'CAMIOBS' - Default project attribute 'simulation' will be used to identify a data source
     # Some data sources have a "." in their name, hence must use another separator for this project
     cproject("CAMIOBS",separator="_")
-    
+
     # Root directory for obs data organized 'a la CAMI' on CNRM's Lustre file system.
     CAMIOBS_root="/cnrm/est/COMMON/cami/V1.8/climlinks/"
-    
-    # Pattern for matching CAMI obs data files and their directory. 
+
+    # Pattern for matching CAMI obs data files and their directory.
     # We choose to use facet 'model' to carry the observation source
     CAMIOBS_pattern="${simulation}/${variable}_1m_YYYYMM_YYYYMM_${simulation}.nc"
-    
+
     # Declare the CAMIOBS pattern to be associated with a project we name OBS_CAMI
-    dataloc(project="CAMIOBS", organization="generic", 
+    dataloc(project="CAMIOBS", organization="generic",
             url=[CAMIOBS_root+CAMIOBS_pattern])
-    
-    # From here, you can define your dataset using these files. 
+
+    # From here, you can define your dataset using these files.
     # You need only to define the facets useful w.r.t. the patterns
     # i.e. here : model and variable
     pr_gpcp=ds(project="CAMIOBS", simulation="GPCP2.5d", variable="pr", period="1979-1980")
-    
-    # Display the basic filenames involved in the dataset 
+
+    # Display the basic filenames involved in the dataset
     pr_gpcp.baseFiles()
-    
-    # Let CliMAF generate a file with the exact dataset in its disk cache 
+
+    # Let CliMAF generate a file with the exact dataset in its disk cache
     # i.e. : select period and/or variables, aggregate files...
     my_file=cfile(pr_gpcp)
     print my_file
-    
+
     # Check file size and content
     import os
     os.system("ls -al "+my_file)
@@ -82,18 +85,18 @@ my_file=cfile(rst)
 #---------------------------------------------------------------
 
 if onCiclad :
-    
+
     # These definitions are now built-in :
     #cproject("OCMIP5","model","frequency")
     #cfreqs('OCMIP5',{'monthly':'mon' })
-    
+
     #dataloc(project="OCMIP5_Ciclad", organization="generic",
     #        url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${simulation}/${frequency}/'
     #             '${variable}/${variable}_*_${model}_${simulation}_YYYY-YYYY.nc'])
-    
-    cdef("model","IPSL-CM4") 
+
+    cdef("model","IPSL-CM4")
     cdef("frequency","monthly")
-    
+
     cactl=ds(project="OCMIP5", simulation="CTL", variable="CACO3", period="1860-1861")
     print cactl.baseFiles()
 
@@ -106,7 +109,7 @@ if onCiclad :
 #---------------------------------------------------------------
 
 if atCNRM :
-    
+
     cproject("OBS4MIPS","frequency")
 
     pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/"+\
@@ -125,7 +128,7 @@ if (my_file is None) : exit(1)
 # Managing fiexed fields : use specific dataloc and frequency='fx
 ###################################################################
 
-# If you want to access fixed fields, you must describe them as attached to a given 'model', 
+# If you want to access fixed fields, you must describe them as attached to a given 'model',
 # and using frequency 'fx' , and write it as indicated below
 
 # define a pattern for accessing fixed fields (here we use a set of fixed fields from CMIP5,
@@ -153,7 +156,7 @@ dataloc(model="CNRM-CM5",simulation="LGM", frequency="fx",organization="generic"
 sftlf_lgm=ds(model="CNRM-CM5", variable="sftlf", frequency="fx", simulation="LGM")
 if atCNRM: print sftlf_lgm.baseFiles()
 
-# Note : access to fx fields for projects or experiments related to an 
+# Note : access to fx fields for projects or experiments related to an
 # organization=CMIP5_DRS is built-in: no additionnal dataloc() call; and version
 # used is the last one; just use frequency='fx' as for other datasets
 

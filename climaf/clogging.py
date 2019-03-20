@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import logging
 
 logdir="."
@@ -33,15 +36,15 @@ def clog(level=None) :
     Note : at CliMAF startup, the level is set to the value of envrionment variable $CLIMAF_LOG_LEVEL
 
     """
-    if (level) : clogger.setLevel(transl(level)) 
+    if (level) : clogger.setLevel(transl(level))
     exist_stream_handler=False
     for h in clogger.handlers :
         if type(h) is logging.StreamHandler :
             #print "il existe deja un StreamHandler => on change le niveau d informations et on formatte le msg ", h
-            #clogger.setLevel(arg) 
+            #clogger.setLevel(arg)
             h.setFormatter(formatter)
-            exist_stream_handler=True    
-            
+            exist_stream_handler=True
+
     if not exist_stream_handler :
         #print "ajout d un StreamHandler"
         console = logging.StreamHandler()
@@ -66,17 +69,17 @@ def clog_file(level=None) :
             #print "il existe deja un FileHandler => on change le niveau d informations", h
             if level : h.setLevel(transl(level))
             h.setFormatter(formatter)
-            exist_file_handler=True    
-            
+            exist_file_handler=True
+
     if exist_file_handler==False:
         #print "ajout d un FileHandler"
-        fh = logging.FileHandler(logdir+"/"+'climaf.log',mode='w') 
+        fh = logging.FileHandler(logdir+"/"+'climaf.log',mode='w')
         if level : fh.setLevel(transl(level))
         fh.setFormatter(formatter)
         clogger.addHandler(fh)
 
 def indent():
-    """ 
+    """
     Forces log messages to be indented by one more TAB
     """
     global formatter
@@ -86,7 +89,7 @@ def indent():
     clog_file()
 
 def dedent(n=1):
-    """ 
+    """
     Forces log messages to be de-indented by one or more TAB
     """
     global formatter

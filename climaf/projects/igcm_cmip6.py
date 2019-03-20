@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IPSL CMIP6 outputs produced by libIGCM for all frequencies,
 on Ciclad.
@@ -54,7 +56,7 @@ if root:
   #pattern4="${root}/${login}/IGCM_OUT/${IPSL_MODEL}/${status}/${experiment}/${simulation}/CMIP6/${realm}/${variable}_${miptable}_${model}_${experiment}_${realization}_${grid}_${PERIOD}.nc"
   # -- Si on precise seulement la MIP table, on n'a pas la frequence ;
   #    on pourrait rajouter une analyse de la table, si elle existe, pour rajouter la frequence?
-  #    
+  #
 
   #pattern1="${root}/*/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${PERIOD}.nc"
   #pattern2="${root}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${PERIOD}.nc"

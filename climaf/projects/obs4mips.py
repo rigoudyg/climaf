@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for
 all frequencies; see file:///cnrm/amacs/DATA/Obs4MIPs/doc/

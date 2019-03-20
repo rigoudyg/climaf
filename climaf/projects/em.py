@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """This module declares project em, base on data organization 'generic'
 
 EM (Experiment Manager) is a tool used at CNRM for moving simulation post-processed data
@@ -8,14 +10,14 @@ Simulation names (or 'EXPIDs') are assumed to be unique in the
 namespace defined by the user's configuration file, which may include
 shared simulation
 
-Specific facets are : 
+Specific facets are :
   - root : root directory for private data files as declared to EM
   - group : group of the simualtion (as declared to ECLIS)
   - frequency : for now, only monthly is managed; it is the default
-  - realm : to speed up data search, and to resolve ambiguities. Usable values 
-    are 'A, Atmos, O, Ocean, I, SeaIce, L, Land. Unfortunately, for now, 
-    you have to know whether you data is on a private dir (use e.g. 'A') or a 
-    shared one (use e.g. Atmos). Default is '*' (costly). 
+  - realm : to speed up data search, and to resolve ambiguities. Usable values
+    are 'A, Atmos, O, Ocean, I, SeaIce, L, Land. Unfortunately, for now,
+    you have to know whether you data is on a private dir (use e.g. 'A') or a
+    shared one (use e.g. Atmos). Default is '*' (costly).
 
 Examples for defining an EM dataset::
 
@@ -49,7 +51,7 @@ if atCNRM :
 
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs,cdef
-    
+
 
     # In project 'em', there is a ROOT location, data is organized in
     # REALMS, and we handle data FREQUENCY
@@ -67,31 +69,31 @@ if atCNRM :
     pathI=pathg+"${realm}/${variable}_O1_YYYY-YYYY.nc" #HISTNATr8
     pathO=pathg+"${realm}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" # var:T_table2.2
     pathO2=pathg+"${realm}/${simulation}_1${frequency}_${PERIOD}_scalar_table2.2.nc" # PICTLWS2, PRE6CPLCr2alb
-    
+
     dataloc(project="em", organization="generic", url=[pathA,pathL,pathI,pathO,pathO2])
-    
+
     # Shared simulations - example : group=SC
     pathg="/cnrm/cmip/cnrm/simulations/${group}/"
     pathgA=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc" #C1P60
     pathgL=pathg+"${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc" #C1P60
     pathgI=pathg+"${realm}/Origin/Monthly/${simulation}/${variable}_O1_${PERIOD}.nc" #HISTNATr8
-    pathgO=pathg+"${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" 
-    
+    pathgO=pathg+"${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc"
+
     dataloc(project="em", organization="generic", url=[pathgA,pathgL,pathgI,pathgO])
-    
+
 
     # Define default values
     ############################################
 
     # You do not need to use a GROUPs experiment
-    cdef("group","",project="em") ;  
+    cdef("group","",project="em") ;
 
-    # Files hierarchy and file naming conventions for ocean data requires 
+    # Files hierarchy and file naming conventions for ocean data requires
     # to tell freq="m" when defining a monthly ocean dataset. Otherwise, it defaults to 'mon'
     cdef("frequency","mon",project="em") ;
 
     # Realm is used only for sometimes disambiguating a variable among realms
-    cdef("realm","*",project="em") ;  # A/L/I/O or , for shared simulation : Atmos/Land/Seaice/Ocean 
+    cdef("realm","*",project="em") ;  # A/L/I/O or , for shared simulation : Atmos/Land/Seaice/Ocean
 
 
     # More details about data organization
@@ -107,7 +109,7 @@ if atCNRM :
     #calias("em", 'friver' ,filenameVar='S*')
     #calias("em", 'e-p' ,filenameVar='S*')
     #calias("em", 'flake' ,filenameVar='S*')
-    
+
     calias("em", 'to'  ,offset=273.15,filenameVar='T_table2.2')
     calias("em", 'tos' ,offset=273.15, filenameVar='T_table2.2')
     calias("em", 'tossq' ,filenameVar='T_table2.2')
@@ -120,7 +122,7 @@ if atCNRM :
     calias("em", 'so' ,filenameVar='T_table2.2')
     calias("em", 'sos' ,filenameVar='T_table2.2')
     calias("em", 'thetao' ,filenameVar='T_table2.2')
-    
+
     calias("em", 'emps' ,filenameVar='T_table2.5')
     calias("em", 'evt' ,filenameVar='T_table2.5')
     calias("em", 'evs' ,filenameVar='T_table2.5')
@@ -160,7 +162,7 @@ if atCNRM :
 
 
     # .... to be continued
-    
+
     # A fix for seaice missing values
     calias('em',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice', 'mpalb', 'snomlet',
                   'tmelt', 'bmelt', 'snc','sic1','sic2', 'sic3', 'sic4', 'ssi', 'ageice'],

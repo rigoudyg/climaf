@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Basic test for accessing data in CMIP5_DRS hierarchy. With unittest
 
@@ -23,7 +25,7 @@ class A_basic(unittest.TestCase):
         print pdg
         expected="ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')"
         print expected
-        self.assertEqual(pdg,expected, 
+        self.assertEqual(pdg,expected,
                          'Issue printing a very basic dataset')
 
     def test_2_declaring_and_applying_a_script(self):
@@ -48,7 +50,7 @@ class A_basic(unittest.TestCase):
     def test_4_plotting(self):
         mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
         std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        plot1d=climaf.driver.capply("plot",std,title="tas standard deviation") 
+        plot1d=climaf.driver.capply("plot",std,title="tas standard deviation")
         # Have the plot displayed (this will also actually launch the script,
         cshow(plot1d)
 	os.system("sleep 3s")

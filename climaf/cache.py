@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS expression.
@@ -11,7 +13,7 @@ import sys, os, os.path, re, time, glob
 import pickle
 import uuid
 import hashlib
-from operator import itemgetter  
+from operator import itemgetter
 
 from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
@@ -31,23 +33,23 @@ directoryNameLength=5
 stamping=True
 #: The index associating filenames to CRS expressions
 crs2filename=dict()
-#: The dictionary associating CRS expressions to their evaluation 
+#: The dictionary associating CRS expressions to their evaluation
 crs2eval=dict()
 #: The list of crs which file has been dropped since last synchronisation between in-memory index and file index (or at least since the beginning of the session)
 dropped_crs=[]
 
-#: A dict containing cache index entries (as listed in index file), which 
+#: A dict containing cache index entries (as listed in index file), which
 # were up to now not interpretable, given the set of defined projects
 crs_not_yet_evaluable=dict()
 
 def setNewUniqueCache(path,raz=True) :
-    """ Define PATH as the sole cache to use from now. And clear it 
+    """ Define PATH as the sole cache to use from now. And clear it
 
     """
     global currentCache
     global cachedirs
     global cacheIndexFileName
-    
+
     cachedirs=[ path ] # The list of cache directories
     cacheIndexFileName = cachedirs[0]+"/index"  # The place to write the index
     currentCache=cachedirs[0]
@@ -58,15 +60,15 @@ def generateUniqueFileName(expression, operator=None, format="nc"):
         return generateUniqueFileName_safe(expression, operator=operator, format=format)
     else :
         return generateUniqueFileName_unsafe(expression, format=format)
-    
+
 def generateUniqueFileName_unsafe(expression, format="nc"):
     """
     Generate a filename path from string EXPRESSION and FILEFORMAT,
     almost unique for the expression and the cache directory
 
-    This uses hashlib.sha224, which are truncated to fileNameLength. 
+    This uses hashlib.sha224, which are truncated to fileNameLength.
 
-    Generated names drive a structure where each directory name 
+    Generated names drive a structure where each directory name
     has dirNameLength characters
     """
     #
@@ -83,12 +85,12 @@ def generateUniqueFileName_unsafe(expression, format="nc"):
 
 def generateUniqueFileName_safe(expression, operator=None, format="nc"):
     """ Generate a filename path from string EXPRESSION and FILEFORMAT, unique for the
-    expression and the set of cache directories currently listed in cache.cachedirs 
+    expression and the set of cache directories currently listed in cache.cachedirs
     OPERATOR may be a function that provides a prefix, using EXPRESSION
 
-    This uses hashlib.sha224, which are truncated to 3 (or more) characters. 
+    This uses hashlib.sha224, which are truncated to 3 (or more) characters.
     More characters are used if a shorter name is already in use for another
-    expression in one of the known cache directories 
+    expression in one of the known cache directories
 
     Generated names drive a structure where each directory name 1 or 2
     characters and file names have no more characters
@@ -104,7 +106,7 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
     number=fileNameLength
     guess=full[0 : number - 1 ]
     existing=searchFile(prefix+stringToPath(guess, directoryNameLength )+"."+format)
-    if existing : 
+    if existing :
         readCRS=getCRS(existing)
         # Update index if needed
         if readCRS not in crs2filename :
@@ -134,18 +136,18 @@ def stringToPath(name, length) :
     l=len(name)
     rep=""
     i=0
-    while (i + length < l) : 
+    while (i + length < l) :
         rep = rep+name[i:i+length]+"/"
         i   += length
     rep += name[i:l]
     return rep
 
 def searchFile(path):
-    """ Search for first occurrence of PATH as a path in all 
+    """ Search for first occurrence of PATH as a path in all
     directories listed in CACHEDIRS
     """
     for cdir in cachedirs :
-        candidate=os.path.expanduser(cdir+"/"+path)        
+        candidate=os.path.expanduser(cdir+"/"+path)
         if os.path.lexists(candidate):
             # If this is a broken link, delete it ~ silently and return None
             if not os.path.exists(candidate):
@@ -155,7 +157,7 @@ def searchFile(path):
             return candidate
 
 def register(filename,crs,outfilename=None):
-    """ 
+    """
     Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
     metadata 'CLiMAF' with CliMAF version and ref URL
 
@@ -173,7 +175,7 @@ def register(filename,crs,outfilename=None):
     if not stamping :
         clogger.debug('No stamping')
         crs2filename[crs]=filename
-        return True 
+        return True
     waited=0
     while waited < 50 and not os.path.exists(filename) :
         time.sleep(0.1)
@@ -181,7 +183,7 @@ def register(filename,crs,outfilename=None):
     #time.sleep(0.5)
     if os.path.exists(filename) :
         #while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
-        if re.findall(".nc$",filename) : 
+        if re.findall(".nc$",filename) :
             command="ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)\" %s"%\
                 (crs,version,filename)
         if re.findall(".png$",filename) :
@@ -196,7 +198,7 @@ def register(filename,crs,outfilename=None):
             command='exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s (http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s'%\
                 (version,crs,filename)
         clogger.debug("trying stamping by %s"%command)
-        if ( os.system(command) == 0 ) :     
+        if ( os.system(command) == 0 ) :
             if outfilename:
                 cmd = 'mv -f %s %s '%(filename,outfilename)
                 if ( os.system(cmd) == 0 ):
@@ -214,18 +216,18 @@ def register(filename,crs,outfilename=None):
                 crs2filename[crs]=filename
                 if crs in dropped_crs : dropped_crs.remove(crs)
                 return True
-        else : 
+        else :
             clogger.critical("cannot stamp by %s"%command)
             exit()
             return None
     else :
         clogger.error("file %s does not exist (for crs %s)"%(filename,crs))
 
-    
+
 def getCRS(filename) :
     """ Returns the CRS expression found in FILENAME's meta-data"""
     import subprocess
-    if re.findall(".nc$",filename) : 
+    if re.findall(".nc$",filename) :
         form='ncdump -h %s | grep -E "CRS_def *=" | '+\
             'sed -r -e "s/.*:CRS_def *= *\\\"(.*)\\\" *;$/\\1/" '
     elif re.findall(".png$",filename) :
@@ -240,7 +242,7 @@ def getCRS(filename) :
     command=form%filename
     try:
         rep=subprocess.check_output(command, shell=True).replace('\n','')
-        if (rep == "" ) and ('Empty.png' not in filename) : 
+        if (rep == "" ) and ('Empty.png' not in filename) :
             clogger.error("file %s is not well formed (no CRS)"%filename)
         if re.findall(".nc$",filename) : rep=rep.replace(r"\'",r"'")
     except:
@@ -254,12 +256,12 @@ def rename(filename,crs) :
     newfile=generateUniqueFileName(crs, format="nc")
     if newfile :
         l=[ c for c in crs2filename if crs2filename[c] == filename ]
-        for c in l : crs2filename.pop(c) 
+        for c in l : crs2filename.pop(c)
         os.rename(filename,newfile)
         register(newfile,crs)
         return(newfile)
-    
-def hasMatchingObject(cobject,ds_func) : 
+
+def hasMatchingObject(cobject,ds_func) :
     """
     If the cache holds a file which represents an object with the
     same nodes as COBJECT and which leaves/datasets, when paired with
@@ -273,14 +275,14 @@ def hasMatchingObject(cobject,ds_func) :
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
-        return not operators.scripts[operator].flags.commuteWithTimeConcatenation 
+        return not operators.scripts[operator].flags.commuteWithTimeConcatenation
     #
     global crs2eval
     key_to_rm=list()
     for crs in crs2filename :
         co=crs2eval.get(crs,None)
         if co is None:
-            try: 
+            try:
                 co=eval(crs, sys.modules['__main__'].__dict__)
                 if co: crs2eval[crs]=co
             except:
@@ -319,7 +321,7 @@ def hasExactObject(cobject) :
         else :
             clogger.debug("Dropping cobject.crs from cache index, because file si missing")
             crs2filename.pop(cobject.crs)
-    
+
 def complement(crsb, crse, crs) :
     """ Extends time period of file object of CRSB (B for 'begin')
     with file object of CRSE (E for 'end') for creating file object of
@@ -347,7 +349,7 @@ def cdrop(obj, rm=True, force=False) :
      obj (cobject or string) : object to delete, or its string representation (CRS)
 
      force (bool) : should we delete the object even if it is 'protected'
-    
+
      rm (bool) : for advanced use only; should we actually delete (rm) the file, or just forget it in CliMAF cache index
 
     Returns:
@@ -359,7 +361,7 @@ def cdrop(obj, rm=True, force=False) :
     >>> f=cfile(dg)
     >>> os.system('ls -al '+f)
     >>> cdrop(dg)
-    
+
     """
     global crs2filename
     global dropped_crs
@@ -388,7 +390,7 @@ def cdrop(obj, rm=True, force=False) :
                     os.rmdir(path_file)
                 except OSError as ex:
                     clogger.warning(ex)
-                
+
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache"%crs)
@@ -399,10 +401,10 @@ def cdrop(obj, rm=True, force=False) :
 
 def cprotect(obj, stop=False) :
     """
-    Protects the cache file for a given object (or stops protection with arg 'stop=True'). 
+    Protects the cache file for a given object (or stops protection with arg 'stop=True').
 
-    In order to erase it, argument 'force=True' must then be used with function  
-    :py:func:`~climaf.cache.craz` or :py:func:`~climaf.cache.cdrop` 
+    In order to erase it, argument 'force=True' must then be used with function
+    :py:func:`~climaf.cache.craz` or :py:func:`~climaf.cache.cdrop`
 
     """
     if (isinstance(obj,cobject) ):
@@ -411,7 +413,7 @@ def cprotect(obj, stop=False) :
     elif type(obj) is str : crs=obj
     else :
         clogger.error("%s is not a CliMAF object"%`obj`)
-        return 
+        return
     if crs in crs2filename :
         if stop is False :
             clogger.info("Protecting cached value for "+crs)
@@ -419,23 +421,23 @@ def cprotect(obj, stop=False) :
         else:
             clogger.info("Stopping protection on cached value for "+crs)
             os.system("chmod +w "+crs2filename[crs])
-        return 
+        return
     else :
         clogger.info("%s is not (yet) cached; use cfile() to cache it"%crs)
-    
-    
-    
+
+
+
 def csync(update=False) :
     """
-    Merges current in-memory cache index and current on-file cache index 
+    Merges current in-memory cache index and current on-file cache index
     for updating both
 
     If arg `update` is True, additionnaly ensures consistency between files
     set and index content, either :
 
     - if cache.stamping is true, by reading CRS in all files
-    - else, by removing files which are not in the index; this may erase 
-      result files which have been computed by another running 
+    - else, by removing files which are not in the index; this may erase
+      result files which have been computed by another running
       instance of CliMAF
     """
     #
@@ -467,21 +469,21 @@ def csync(update=False) :
                 #         os.system("rm %"%fil)
                     #else :
                     # Should also remove empty files, as soon as
-                    # file creation will be atomic enough 
+                    # file creation will be atomic enough
     # Save index to disk
     fn=os.path.expanduser(cacheIndexFileName)
     try:
         with open(fn,"w") as cacheIndexFile :
-            pickle.dump(crs2filename,cacheIndexFile)  
+            pickle.dump(crs2filename,cacheIndexFile)
         dropped_crs=[]
     except:
         clogger.error("Issue when writing cache index %s"%fn)
 
 def cload(alt=None) :
-    global crs2filename 
+    global crs2filename
     global crs_not_yet_evaluable
     rep=dict()
- 
+
     if len(crs2filename) != 0 and not alt:
         Climaf_Cache_Error(
             "attempt to reset file index - would lead to inconsistency !")
@@ -499,7 +501,7 @@ def cload(alt=None) :
     must_check_index_entries=False
     if (must_check_index_entries) :
         # We may have some crs inherited from past sessions and for which
-        # some operator may have become non-standard, or some projects are yet 
+        # some operator may have become non-standard, or some projects are yet
         # undeclared
         crs_not_yet_evaluable=dict()
         allow_error_on_ds()
@@ -517,7 +519,7 @@ def cload(alt=None) :
                 # Analyze projects of inconsistent cache objects
                 projects= crs_not_yet_evaluable.keys()
                 if projects :
-                    clogger.info( 
+                    clogger.info(
                         "The cache has %d objects for non-declared projects %s.\n"
                         "For using it, consider including relevant project(s) "
                         "declaration(s) in ~/.climaf and restarting CliMAF.\n"
@@ -527,7 +529,7 @@ def cload(alt=None) :
         allow_error_on_ds(False)
     if alt :
         return rep
-        
+
 
 def cload_for_project(project):
     """
@@ -542,7 +544,7 @@ def cload_for_project(project):
             d.pop(crs)
         except:
             clogger.error("CRS expression %s is not valid for project %s"%(crs,project))
-         
+
 def craz(force=False, hideError=False) :
     """
     Clear CliMAF cache : erase existing files content, reset in-memory index
@@ -567,7 +569,7 @@ def cdump(use_macro=True):
     """
     List the in-memory content of CliMAF cache index. Interpret it
     using macros except if arg use_macro is False
-    
+
     """
     for crs in crs2filename :
         if not use_macro :
@@ -581,7 +583,7 @@ def cdump(use_macro=True):
 def list_cache():
     """
     Return the list of files in cache directories, using `find`
-    
+
     """
     files_in_cache=[]
     find_return=""
@@ -603,9 +605,9 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     Please consider the cost and benefit of first updating CliMAF cache index (by scanning
     files on disk) using :py:func:`csync()`
-    
+
     Args:
-     size (string, optional): n[ckMG]     
+     size (string, optional): n[ckMG]
       Search files using more than n units of disk space, rounding up.
       The following suffixes can be used:
 
@@ -619,32 +621,32 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
       Any fractional part is ignored, so to match age='+1', a file has
       to have been changed at least two days ago.
       Numeric arguments can be specified as:
-      
+
         - `+n`   for greater than n
         - `-n`   for less than n,
         - `n`    for exactly n.
 
-     access (int, optional): n 
+     access (int, optional): n
       Search files which were last accessed more than n*24 hours ago. Any
       fractional part is ignored, so to match access='1', a file has to
       have been accessed at least two days ago.
 
      pattern (string, optional): Scan through crs and filenames looking for
-      the first location where the regular expression pattern produces a match. 
+      the first location where the regular expression pattern produces a match.
 
      not_pattern (string, optional): Scan through crs and filenames looking
       for the location where the regular expression not_pattern does not
-      produce a match. 
-        
+      produce a match.
+
      usage (bool, optional): Estimate found files space usage, for each
       found file and total size. If count is True, estimate only found
       files total space usage.
 
      count (bool, optional): Return the number of found files. If CRS is True,
       also return crs of found files.
-        
+
      remove (bool, optional): Remove the found files. This argument is exclusive.
-        
+
      CRS (bool, optional): if True, print also CRS expression. Useful only
       if count is True.
 
@@ -657,7 +659,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
       was last changed more than 15 days ago and containing the pattern
       '1980-1981' either in crs or filename. For found files, we want to
       estimate only found files total space usage::
-     
+
       >>> clist(size='3M', age='+15', pattern= '1980-1981', usage=True, count=True)
 
     """
@@ -669,19 +671,19 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     command=""
     opt_find=""
     if size :
-        if re.search('[kMG]', size) is None :  
-            opt_find+="-size +%sc "%size  
+        if re.search('[kMG]', size) is None :
+            opt_find+="-size +%sc "%size
         else:
             opt_find+="-size +%s "%size
     if age :
         opt_find+="-ctime %s "%age
     if access !=0 :
         opt_find+="-atime +%s"%str(int(access))
-                
+
     var_find=False
     if size or age or access != 0 :
         var_find=True
-        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" %(rep, opt_find) 
+        command="find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" %(rep, opt_find)
         clogger.debug("Find command is :"+command)
 
         #construction of the new dictionary after research on size/age/access
@@ -699,11 +701,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             for crs in crs2filename:
                 if crs2filename[crs]==filen:
                     new_dict[crs]=filen
-                    
+
         if len(new_dict) != 0 :
             if new_dict != crs2filename :
                 clogger.debug("Dictionary after find for size/age/access: "+`new_dict`)
-            else : 
+            else :
                 clogger.debug("Size/age/access criteria do not lead to any filtering")
         else :
             clogger.debug("No file meet the size/age/access criteria")
@@ -726,17 +728,17 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 list_crs_to_rm.append(crs)
         for crs in list_crs_to_rm :
             del new_dict[crs]
-    
+
         if find_pattern :
             clogger.debug("Dictionary after search for pattern: "+`new_dict`)
         elif len_new_dict!=0 :
             clogger.debug("No string found for pattern => no result")
-       
+
     #update size new dictionary
     len_new_dict=len(new_dict)
-    
-    #research on not_pattern  
-    find_not_pattern=False  
+
+    #research on not_pattern
+    find_not_pattern=False
     if not_pattern:
         list_crs_to_rm=[]
         for crs in new_dict :
@@ -748,18 +750,18 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 list_crs_to_rm.append(crs)
         for crs in list_crs_to_rm :
             del new_dict[crs]
-        
+
         if find_not_pattern :
             clogger.debug("Dictionary after search for not_pattern: "+`new_dict`)
         elif  len_new_dict!=0 :
             clogger.debug("All strings contain not_pattern => no result")
-            
+
     #update size new dictionary
     len_new_dict=len(new_dict)
 
     #request on new dictionary through usage, count and remove
     work_dic=new_dict if (var_find or pattern is not "" or not_pattern is not "") else crs2filename
-    
+
     if usage is True and len_new_dict != 0 :
         #construction of a dictionary containing crs and disk-usage associated
         dic_usage=dict()
@@ -767,26 +769,26 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         for crs in work_dic :
             tmp+=work_dic[crs]+" "
         res=os.popen("du -sc %s"%tmp).read()
-        
+
         regex=re.compile('([0-9]+)\t')
         list_size=re.findall(regex,res)
         regex2=re.compile('([0-9]+\t)')
         str_path=regex2.sub('',res)
         list_fig=str_path.split('\n')
         list_fig.pop(-1)
-    
-        for fig,size in zip(list_fig,list_size): 
+
+        for fig,size in zip(list_fig,list_size):
             if fig!="total":
                 for crs in work_dic:
                     if fig==work_dic[crs]:
-                        dic_usage[crs]=size 
+                        dic_usage[crs]=size
             else:
                 dic_usage[fig]=size
 
         #sort of usage dictionary and units conversion
         du_list_sort=dic_usage.items()
         du_list_sort.sort(key=itemgetter(1),reverse=False)
-        
+
         unit=["K","M","G","T"]
         for n,pair in enumerate(du_list_sort):
             i=0
@@ -795,38 +797,38 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 flt/=1024.
                 i+=1
             du_list_sort[n]=(du_list_sort[n][0],"%6.1f%s"%(flt,unit[i]))
-            
+
         if count is True : # Display total volume of found files
             for fig, size in du_list_sort:
-                if fig=="total":              
-                    print "%7s : %s" %(size,fig)  
-            
+                if fig=="total":
+                    print "%7s : %s" %(size,fig)
+
         else: #retrieve disk-usage of each found file and total volume
             for fig,size in du_list_sort:
                 print "%7s : %s" %(size,fig)
-        
+
     elif count is True and len_new_dict != 0 :
         print "Number of files found:", len(work_dic)
         if CRS is True:
             for crs in work_dic : print crs
-        
+
     elif remove is True and len_new_dict != 0 :
         print "Removed files:"
         list_tmp_crs=[]
-        list_tmp_crs=new_dict.keys() if (var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys() 
+        list_tmp_crs=new_dict.keys() if (var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
         return(map(crewrite,list_tmp_crs))
-                
+
     else: #usage, count and remove are False
         if var_find or pattern is not "" or not_pattern is not "" :
-            if len(new_dict) != 0 : 
+            if len(new_dict) != 0 :
                 if new_dict != crs2filename :
                     print "Filtered objects :"
                 else :
                     print "Filtered objects = cache content"
                 return (map(crewrite,new_dict.keys()))
-            #else : print "No matching file "    
+            #else : print "No matching file "
         else:
             print "Content of CliMAF cache"
             return (map(crewrite,crs2filename.keys()))
@@ -837,7 +839,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         dic_special=dict()
         if var_find is True or pattern is not "" or not_pattern is not "" :
             dic_special=new_dict.copy()
-        else: 
+        else:
             dic_special=crs2filename.copy()
         print "List of marked figures as 'special'", dic_special.values()
         return(dic_special) #TBD: declarer comme var globale et enlever son effacement dans creset
@@ -847,7 +849,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 def cls(**kwargs):
     """
     List CliMAF cache objects. Synonym to clist(). See :py:func:`~climaf.cache.clist`
-   
+
     """
     return clist(**kwargs)
 
@@ -859,7 +861,7 @@ def crm(**kwargs):
     Example to remove files using more than 3M of disk space, which status
     was last changed more than 15 days ago and containing the pattern
     '1980-1981' either in crs or filename::
-     
+
      >>> crm(size='3M', age='+15', pattern='1980-1981')
 
     """
@@ -877,11 +879,11 @@ def cdu(**kwargs):
     was last changed more than 15 days ago and containing the pattern '1980-1981'
     either in crs or filename. For found files, we want to
     estimate only found files total space usage::
-     
+
       >>> cdu(size='3M', age='+15', pattern= '1980-1981', count=True)
-    
+
     """
-    kwargs['usage']=True 
+    kwargs['usage']=True
     kwargs['remove']=False
     return clist(**kwargs)
 
@@ -895,19 +897,19 @@ def cwc(**kwargs):
     than 3M of disk space, which status was last changed more than 15
     days ago and containing the pattern '1980-1981' either in crs or
     filename::
-     
+
      >>> cwc(size='3M', age='+15', pattern= '1980-1981', CRS=True)
 
     """
     kwargs['count']=True
     kwargs['remove']=False
-    kwargs['usage']=False 
+    kwargs['usage']=False
     return clist(**kwargs)
 
 def rebuild():
     """
     Rebuild the in-memory content of CliMAF cache index
-    
+
     """
     global crs2filename
 
@@ -924,7 +926,7 @@ def rebuild():
             os.system('rm -f '+files)
             clogger.warning("File %s is removed"%files)
     return(crs2filename)
-    
+
 
 class Climaf_Cache_Error(Exception):
     def __init__(self, valeur):

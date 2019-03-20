@@ -1,5 +1,6 @@
-# -*- coding: iso-8859-1 -*-
-""" 
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver
  This is a first protoype, where the interpreter is Python itself
 
@@ -33,11 +34,11 @@ class cproject():
         Declare a project and its facets/attributes in CliMAF (see below)
 
         Args:
-          name (string) : project name; 
+          name (string) : project name;
            do not use the chosen separator in it (see below)
-          args (strings) : attribute names; 
-           they are free; do not use the chosen separator in it (see below); **CliMAF 
-           anyway will add attributes : 
+          args (strings) : attribute names;
+           they are free; do not use the chosen separator in it (see below); **CliMAF
+           anyway will add attributes :
            project, simulation, variable, period, and domain**
           kwargs (dict) :
            can only be used with keywords :
@@ -54,17 +55,17 @@ class cproject():
 
         A 'cproject' is the definition of a set of attributes, or
         facets, which values will completely define a 'dataset' as
-        managed by CliMAF. Its name is one of the possible keys 
+        managed by CliMAF. Its name is one of the possible keys
         for describing data locations (see
         :py:class:`~climaf.dataloc.dataloc`)
 
-        For instance, cproject CMIP5, after its Data Reference Syntax, 
-        has attributes : 
+        For instance, cproject CMIP5, after its Data Reference Syntax,
+        has attributes :
         model, simulation (used for rip), experiment, variable, frequency, realm, table, version
 
 
         **A number of projects are built-in**. See :py:mod:`~climaf.projects`
-        
+
         A dataset in a cproject declared as ::
 
         >>> cproject('MINE','myfreq','myfacet',sep='_')
@@ -94,7 +95,7 @@ class cproject():
         names in datafiles, or variables that should undergo re-scaling; see
         :py:func:`~climaf.classes.calias`
 
-        A project can be declared as having non-standard frequency names (this is 
+        A project can be declared as having non-standard frequency names (this is
         used when accessing datafiles); see :py:func:`~climaf.classes.cfreqs`)
 
         """
@@ -121,7 +122,7 @@ class cproject():
         cprojects[name]=self
         self.crs=""
         # Build the pattern for the datasets CRS for this cproject
-        for f in self.facets : 
+        for f in self.facets :
             self.crs += "${%s}%s"%(f,self.separator)
         self.crs=self.crs[:-1]
         # Create an attribute hodling the list of facets which are allowed
@@ -133,7 +134,7 @@ class cproject():
     def __repr__(self):
         return self.crs
     def crs2ds(self,crs) :
-        """ 
+        """
         Try to interpret string ``crs`` as the CRS of a dataset for
         the cproject. Return the dataset if OK
         """
@@ -163,7 +164,7 @@ def cdef(attribute,value=None, project=None):
     >>> cdef('project','OCMPI5')
     >>> cdef('frequency','monthly',project='OCMPI5')
     """
-    
+
     if project not in cprojects :
         raise Climaf_Classes_Error("project '%s' has not yet been declared"%project)
     if attribute == 'project' : project=None
@@ -177,7 +178,7 @@ def cdef(attribute,value=None, project=None):
         return rep
     else :
         cprojects[project].facet_defaults[attribute]=value
-            
+
 
 cproject(None)
 cdef("domain","global")
@@ -188,7 +189,7 @@ cobjects=dict()
 
 class cobject():
     def __init__(self):
-        # crs is the string expression defining the object 
+        # crs is the string expression defining the object
         # in the CLIMAF Reference Syntax
         self.crs="void"
     def __str__(self):
@@ -256,14 +257,14 @@ def processDatasetArgs(**kwargs) :
             attval['simulation']=kwargs['member']
             clogger.info('Attribute "member" in project CMIP5 has been translated to "simulation"')
         # Special processing for CMIP5 fixed fields : handling redundancy in facets
-        if ( attval['table']=='fx' or attval['period']=='fx' or 
+        if ( attval['table']=='fx' or attval['period']=='fx' or
              attval['simulation']=='r0i0p0' or attval['frequency']=='fx') :
-            attval['table']='fx' ; attval['period']='fx' 
+            attval['table']='fx' ; attval['period']='fx'
             attval['simulation']='r0i0p0' ; attval['frequency']='fx'
     # Special processing for CMIP6  : facet 'simulation' is forbidden (must use 'realization')
     if (attval['project'] == 'CMIP6')  and 'simulation' in kwargs and kwargs['simulation'] is not '':
         raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'. This if for kwargs=%s"%`kwargs`)
-    
+
     errmsg=""
     for facet in cprojects[project].facets :
         if attval[facet] is None :
@@ -294,13 +295,13 @@ class cdataset(cobject):
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self,**kwargs) :
         """
-        Create a CLIMAF dataset. 
-        
-        A CLIMAF dataset is a description of what the data (rather than 
+        Create a CLIMAF dataset.
+
+        A CLIMAF dataset is a description of what the data (rather than
         the data itself or a file).  It is basically a set of pairs
         attribute-value. The list of attributes actually used to
         describe a dataset is defined by the project it refers
-        to. 
+        to.
 
         To display the attributes you may use for a given project, type e.g.:
 
@@ -314,23 +315,23 @@ class cdataset(cobject):
         :py:func:`~climaf.classes.cdef` (which also applies if
         providing a None value for an attribute)
 
-        Some attributes have a special format or processing : 
-        
+        Some attributes have a special format or processing :
+
         - period : see :py:func:`~climaf.period.init_period`
 
         - domain : allowed values are either 'global' or a list for
           latlon corners ordered as in : [ latmin, latmax, lonmin,
           lonmax ]
-            
+
         - variable :  name of the geophysical variable ; this should be :
 
            - either a variable actually included in the datafiles,
 
            - or a 'derived' variable (see  :py:func:`~climaf.operators.derive` ),
-             
+
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
-        - in project CMIP5 , for triplets (frequency, simulation, period, table )  : 
+        - in project CMIP5 , for triplets (frequency, simulation, period, table )  :
           if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
           'fx' (resp. 'r0i0p0') too.
 
@@ -341,12 +342,12 @@ class cdataset(cobject):
 
         You may use wildcard ('*') in attribute values, and use  :py:meth:`~climaf.classes.cdataset.explore`
         for having CliMAF doing something sensible matching such attributes with available data
-        
+
         """
         #
         attval=processDatasetArgs(**kwargs)
         #
-        # TBD : Next lines for backward compatibility, but should re-engineer 
+        # TBD : Next lines for backward compatibility, but should re-engineer
         self.project   = attval["project"]
         self.simulation= attval['simulation']
         self.variable  = attval['variable']
@@ -375,7 +376,7 @@ class cdataset(cobject):
                 raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs=self.buildcrs()
-        # 
+        #
         self.files=None
         self.local_copies_of_remote_files=None
         self.register()
@@ -386,7 +387,7 @@ class cdataset(cobject):
         self.kvp['period']=period
         self.crs=self.buildcrs()
         self.register()
-        
+
     def buildcrs(self,period=None,crsrewrite=None):
         crs_template=string.Template(cprojects[self.project].crs)
         dic=self.kvp.copy()
@@ -417,10 +418,10 @@ class cdataset(cobject):
         model=getattr(self,"model","*")
         return(dataloc.isLocal(project=self.project, model=model, \
                                simulation=self.simulation, frequency=self.frequency))
-        
+
     def isCached(self) :
         """ TBD : analyze if a remote dataset is locally cached
-        
+
         """
         #clogger.error("TBD - remote datasets are not yet cached")
         rep=False
@@ -430,30 +431,30 @@ class cdataset(cobject):
         locs=dataloc.getlocs(project=self.project, model=self.model, simulation=self.simulation, \
                              frequency=self.frequency)
         return(all([org for org,freq,url in locs]))
-    
+
     def periodIsFine(self):
         clogger.debug("always returns False, yet - TBD")
-        return(False) 
-        
+        return(False)
+
     def domainIsFine(self):
         clogger.debug("a bit too simple yet (domain=='global')- TBD")
-        return(self.domain == 'global') 
-        
+        return(self.domain == 'global')
+
     def periodHasOneFile(self) :
         return(len(self.baseFiles().split(" ")) < 2)
         #clogger.debug("always returns False, yet - TBD")
-        #return(False) 
+        #return(False)
 
     def hasOneMember(self) :
         clogger.debug("always returns True, yet - TBD")
-        return(True) 
+        return(True)
 
     def hasExactVariable(self):
         # Assume that group variable do not need aliasing
         if ("," in self.variable) : return True
         clogger.debug("always returns False, yet - TBD")
-        return(False) 
-    
+        return(False)
+
     def missingIsOK(self):
         if (alias is None) : return True
         _,_,_,_,_,missing=self.alias
@@ -461,17 +462,17 @@ class cdataset(cobject):
 
     def explore(self,option='check_and_store',group_periods_on=None,operation='intersection',first=None):
         """
-        Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in  
-        attributes. 
+        Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in
+        attributes.
 
         ``option`` can be :
-        
-          - 'choices' for returning a dict which keys are wildcard attributes and entries 
+
+          - 'choices' for returning a dict which keys are wildcard attributes and entries
             are values list
           - 'resolve' for returning a NEW DATASET with instanciated attributes (if uniquely)
           - 'ensemble' for returning AN ENSEMBLE based on multiple possible values of one
-            or more attributes (tell which one is first in labels by using arg 'first') 
-          - 'check_and_store' (or missing) for just identifying and storing dataset files list 
+            or more attributes (tell which one is first in labels by using arg 'first')
+          - 'check_and_store' (or missing) for just identifying and storing dataset files list
             (while ensuring non-ambiguity check for wildcard attributes)
 
         This feature works only for projects which organization is of type 'generic'
@@ -483,14 +484,14 @@ class cdataset(cobject):
           >>> rst=ds(project="example", simulation="*", variable="rst", period="1980-1981")
           >>> rst
           ds('example|*|rst|1980-1981|global|monthly')
-          
+
           >>> rst.explore('choices')
           {'simulation': ['AMIPV6ALB2G']}
-          
+
           >>> instanciated_dataset=rst.explore('resolve')
           >>> instanciated_dataset
           ds('example|AMIPV6ALB2G|rst|1980-1981|global|monthly')
-          
+
           >>> my_ensemble=rst.explore('ensemble')
           error    : "Creating an ensemble does not make sense because all wildcard attributes have a single possible value ({'simulation': ['AMIPV6ALB2G']})"
 
@@ -505,7 +506,7 @@ class cdataset(cobject):
           info     : Attribute realization has matching value r1i1p1f2
           info     : Attribute mip has multiple values : set(['CMIP', 'RFMIP'])
           info     : Attribute model has multiple values : set(['CNRM-ESM2-1', 'CNRM-CM6-1'])
-          {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'], 
+          {'institute': ['CNRM-CERFACS'], 'experiment': ['piClim-control', 'piControl'], 'grid': ['gr'],
           'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
           >>> # Let us further select by setting experiment=piControl
@@ -528,34 +529,34 @@ class cdataset(cobject):
         The aggregation is governed by argument ``operation``, which can be either :
 
           - 'intersection' : which is the most useful case, and hence is the default
-          - 'union' : which has not much sense except to know which periods are definitely 
+          - 'union' : which has not much sense except to know which periods are definitely
             not covered by any data
-          - None : no aggregation occurs, and you get a dict of the merged periods, which 
+          - None : no aggregation occurs, and you get a dict of the merged periods, which
             keys are the value of the grouping attribute
 
-        Attribute 'period' cannot use a * without being  == * ; 
+        Attribute 'period' cannot use a * without being  == * ;
 
 
         Examples without grouping periods over any attribute ::
 
-          >>> # Let us use a kind of dataset which data files are temporally splitted, 
+          >>> # Let us use a kind of dataset which data files are temporally splitted,
           >>> # and allow for various models, and use a wildcard for period
-          >>> so=ds(project="CMIP6", model='CNRM*', experiment="piControl", realization="r1i1p1f2", 
+          >>> so=ds(project="CMIP6", model='CNRM*', experiment="piControl", realization="r1i1p1f2",
           ... table="Omon", variable="so", period="*")
 
           >>> # What is the overall period covered by the union of all datafiles (but not necessarily by a single model!)
-          >>> so.explore('choices', operation='union')          
+          >>> so.explore('choices', operation='union')
           { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
           >>> # What is the intersection of periods covered by each datafile
           >>> so.explore('choices')
           { 'period': [None], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
-          >>> # What is the list of periods covered by datafiles 
+          >>> # What is the list of periods covered by datafiles
           >>> so.explore('choices', operation=None)
-          { 'period': {None: [1850-1899, 1900-1949, 1950-1999, 2000-2049, 2050-2099, 
-                              2100-2149, 2150-2199, 2200-2249, 2250-2299, 2300-2349]}, 
-             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}             
+          { 'period': {None: [1850-1899, 1900-1949, 1950-1999, 2000-2049, 2050-2099,
+                              2100-2149, 2150-2199, 2200-2249, 2250-2299, 2300-2349]},
+             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
         Examples using periods grouping over an attribute ::
 
@@ -569,14 +570,14 @@ class cdataset(cobject):
 
           >>> # What are the aggregated periods for each value of 'model'
           >>> so.explore('choices',group_periods_on='model',operation=None)
-          { 'period': 
-              {'CNRM-ESM2-1': [1850-2349], 
-               'CNRM-CM6-1' : [1850-2349] }, 
+          { 'period':
+              {'CNRM-ESM2-1': [1850-2349],
+               'CNRM-CM6-1' : [1850-2349] },
             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ...}
 
         """
         dic=self.kvp.copy()
-        if self.alias : 
+        if self.alias :
             filevar,_,_,_,filenameVar,_=self.alias
             req_var = dic["variable"]
             dic["variable"]=string.Template(filevar).safe_substitute(dic)
@@ -593,10 +594,10 @@ class cdataset(cobject):
         #else : periods=None
         if periods :
             #print "periods=",periods
-            if option != 'choices': 
+            if option != 'choices':
                 if group_periods_on :
                     raise Climaf_Classes_Error("Can use 'group_periods_on' only with option='choices'")
-                if operation!='intersection': 
+                if operation!='intersection':
                     raise Climaf_Classes_Error("Can use operation %s only with option='choices'"%operation)
             if operation=='intersection':
                 if group_periods_on :
@@ -604,7 +605,7 @@ class cdataset(cobject):
                     merged_periods=[ merge_periods(p) for p in periods.values() ]
                     inter=merged_periods.pop(0)
                     for p in merged_periods : inter=intersect_periods_list(inter,p)
-                else: inter=merge_periods(periods[None]) 
+                else: inter=merge_periods(periods[None])
                 wildcards['period']=inter
             elif operation=='union' :
                 to_merge=[]
@@ -612,7 +613,7 @@ class cdataset(cobject):
                 wildcards['period']=merge_periods(to_merge)
             elif operation is None :
                 # Merge periods for each facet value separately
-                if group_periods_on : 
+                if group_periods_on :
                     for key in periods: periods[key]=merge_periods(periods[key])
                 wildcards['period']=periods
             else:
@@ -625,7 +626,7 @@ class cdataset(cobject):
                 val=wildcards[kw]
                 if type(val)==list :
                     if len(val) > 1 :
-                        if kw=='period' : 
+                        if kw=='period' :
                             raise Climaf_Classes_Error("Periods with holes are not handled %s"%(val))
                         else:
                             raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s"%(kw,val))
@@ -645,12 +646,12 @@ class cdataset(cobject):
                         elif len(matching_vars)==1 :
                             # One variable has a filename variable whih matches the retrieved filename
                             dic[kw]=matching_vars.pop()
-                        else : 
+                        else :
                             raise Climaf_Classes_Error("Filename variable %s is matched by multiple variables %s"%\
                                                        (val,`matching_vars`))
                     else :
                         dic[kw]=val
-            #                        
+            #
             return ds(**dic)
         elif option == 'choices' :
             clogger.debug("Listing possible values for these wildcard attributes %s"%wildcard_attributes_list)
@@ -679,7 +680,7 @@ class cdataset(cobject):
         elif option == 'check_and_store' :
             for kw in wildcards:
                 entry=wildcards[kw]
-                if type(entry) is list and len(entry) > 1 : 
+                if type(entry) is list and len(entry) > 1 :
                     raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among : %s or use either 'ensure_dataset=False' (with method baseFiles or listfiles) or 'option=\'choices\' (with method explore)"%\
                             (kw,dic[kw],entry))
             self.files=files
@@ -689,7 +690,7 @@ class cdataset(cobject):
     def baseFiles(self,force=False,ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
-        
+
         Use cached value (i.e. attribute 'files') unless called with arg force=True
         If ensure_dataset is True, forbid ambiguous datasets
         """
@@ -701,14 +702,14 @@ class cdataset(cobject):
     def listfiles(self,force=False,ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
         for the dataset
-        
+
         Use cached value unless called with arg force=True
         If ensure_dataset is True, forbid ambiguous datasets
         """
         return self.baseFiles(force=force,ensure_dataset=ensure_dataset)
 
     def hasRawVariable(self) :
-        """ Test local data files to tell if a dataset variable is actually included 
+        """ Test local data files to tell if a dataset variable is actually included
         in files (rather than being a derived, virtual variable)
 
         For the time being, returns False, which leads to always consider that variables
@@ -723,40 +724,40 @@ class cdataset(cobject):
         - check if first data time interval is consistent with dataset frequency
         - check if file data have a gap
         - check if period covered by data files actually includes the whole of dataset period
-          
+
         Returns: True if period of data files included dataset period, False otherwise.
-        
+
         Examples:
-    
-        >>> # Dataset with monthly frequency  
+
+        >>> # Dataset with monthly frequency
         >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas',period='1980-1981')
         >>> res1=tas.check()
         >>>
-        >>> # Ensemble with monthly frequency  
+        >>> # Ensemble with monthly frequency
         >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
         >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
         >>> ens=cens({'1980':j0, '1981':j1})
         >>> res2=ens.check()
-    
-        >>> # Define a new project for 'em' data with 3 hours frequency in particular     
+
+        >>> # Define a new project for 'em' data with 3 hours frequency in particular
         >>> cproject('em_3h','root','group','realm','frequency',separator='|')
-        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc' 
+        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc'
         >>> dataloc(project='em_3h', organization='generic', url=path)
-    
-        >>> # Dataset with 3h frequency for 'tas' variable (instant) 
+
+        >>> # Dataset with 3h frequency for 'tas' variable (instant)
         >>> tas_3h=ds(project='em_3h',variable='tas',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
         >>> res3=tas_3h.check()
-     
-        >>> # Dataset with 3h frequency for 'pr' variable (time mean) 
+
+        >>> # Dataset with 3h frequency for 'pr' variable (time mean)
         >>> pr_3h=ds(project='em_3h',variable='pr',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
-        >>> res4=pr_3h.check()   
-        
+        >>> res4=pr_3h.check()
+
         """
         from anynetcdf import ncf
         from datetime import datetime, timedelta
         from netCDF4 import num2date
         import numpy as np
-        
+
         # Returns the list of files which include the data for the dataset
         # or for each member of the ensemble
         if isinstance(self,cdataset):
@@ -767,7 +768,7 @@ class cdataset(cobject):
             if not files:
                 clogger.error('No file found for: %s'%self)
                 if not ( self.isLocal() or self.isCached() ):
-                    clogger.warning('For remote data, you have to do at first "cfile(%s)"'%self)                
+                    clogger.warning('For remote data, you have to do at first "cfile(%s)"'%self)
                 return(False)
         else :
             clogger.error("Cannot handle %s" %self)
@@ -776,8 +777,8 @@ class cdataset(cobject):
         if files:
             filedate=[]
             clogger.debug("List of selected files: %s"%files)
-            
-            var=str.split(varOf(self),',')[0] 
+
+            var=str.split(varOf(self),',')[0]
             # Concatenate all data files
             for filename in str.split(files,' '):
                 fileobj=ncf(filename)
@@ -786,13 +787,13 @@ class cdataset(cobject):
                     var=aliases[self.project][var][0]
                 #
                 dimname=''
-                for dim in fileobj.variables[var].dimensions:  
+                for dim in fileobj.variables[var].dimensions:
                     if 'time' in dim: dimname=dim
                 if not dimname: clogger.error('No time dimension for variable %s'%var)
-                time_obj=fileobj.variables[dimname]  
+                time_obj=fileobj.variables[dimname]
                 filedate=np.concatenate((filedate,num2date(time_obj.getValue(),\
                                         units=time_obj.units,calendar=time_obj.calendar)))
-            
+
             clogger.debug('Time data of selected files: %s'%filedate)
 
             # Check if first data time interval is consistent with dataset frequency
@@ -808,7 +809,7 @@ class cdataset(cobject):
                     (filedate_delta > 366.*24.*3600. or filedate_delta < 365.*24.*3600.) ) \
                or ( self.frequency == 'decadal' and \
                     (filedate_delta > 3653.*24.*3600. or filedate_delta < 3651.*24.*3600.) ):
-        
+
                 clogger.warning('First data time interval (= %.1f days) is not consistent with dataset frequency (i.e. %s)'\
                                 %(filedate_delta/(24.*3600.),self.frequency))
 
@@ -844,7 +845,7 @@ class cdataset(cobject):
                                           %((filedate[i+1]-filedate[i]).total_seconds()/3600.,filedate_delta/3600.))
             #
             # Compute period covered by data files
-            if self.frequency == 'monthly' or not self.frequency:  
+            if self.frequency == 'monthly' or not self.frequency:
                 filedate[0]=filedate[0].replace(day=01)
                 if filedate[-1].month > 11 :
                     filedate[-1]=filedate[-1].replace(year=filedate[-1].year+1)
@@ -858,11 +859,11 @@ class cdataset(cobject):
                 filedate[0]=filedate[0].replace(hour=00)
                 filedate[-1]=filedate[-1].replace(hour=00)
                 filedate[-1]=filedate[-1] + timedelta(days=1)
-              
+
             elif self.frequency == '6h'or self.frequency == '3h' or self.frequency == '1h' \
                       or self.frequency == '3Hourly' or self.frequency == '6Hourly':
-           
-                if 'cell_methods' in fileobj.variables[var].__dict__ : # time mean 
+
+                if 'cell_methods' in fileobj.variables[var].__dict__ : # time mean
 
                     regex=re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
                     cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
@@ -875,7 +876,7 @@ class cdataset(cobject):
                     filedate[0] = filedate[0] - timedelta( minutes=(freq/2.)*60 + \
                                     ((filedate[0].hour*60 + filedate[0].minute)-(freq/2.)*60)%(freq*60) )
                     filedate[-1] = filedate[-1] - timedelta( minutes=(freq/2.)*60 + \
-                                    ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 ) 
+                                    ((filedate[-1].hour*60 + filedate[-1].minute)-(freq/2.)*60)%(freq*60) - freq*60 )
 
                 else: # assume it is instant data
                     freq=filedate_delta/3600.
@@ -888,9 +889,9 @@ class cdataset(cobject):
                 filedate[-1]=filedate[-1].replace(month=01)
                 filedate[-1]=filedate[-1].replace(day=01)
                 filedate[-1]=filedate[-1] + timedelta(years=1)
-   
+
             elif self.frequency == 'fx' or self.frequency == 'annual_cycle':
-                clogger.error('Check time consistency with a frequency equal to %s has no sense' %self.frequency)      
+                clogger.error('Check time consistency with a frequency equal to %s has no sense' %self.frequency)
 
             else:
                 clogger.error('Dataset frequency is non-standard: frequency = %s. ' %self.frequency +\
@@ -944,10 +945,10 @@ class cens(cobject,dict):
         The dict keys must be label strings, which describe what is
         basically different among members. They are usually used by
         plot scripts to provide a caption allowing to identify each
-        dataset/object e.g using various colors. 
+        dataset/object e.g using various colors.
 
         Examples (see also :download:`../examples/ensemble.py`) :
-        
+
         >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
         >>> cdef('variable','tas');cdef('frequency','monthly')
         >>> #
@@ -956,7 +957,7 @@ class cens(cobject,dict):
         >>> #
         >>> myens=cens({'1980':ds1980 , '1981':ds1981 })
         >>> ncview(myens)  # will launch ncview once per member
-        >>> 
+        >>>
         >>> myens=cens({'1980':ds1980 , '1981':ds1981 }, order=['1981','1980'])
         >>> myens.set_order(['1981','1980'])
         >>>
@@ -1005,7 +1006,7 @@ class cens(cobject,dict):
         self.order=order
 
     def __setitem__(self,k,v):
-        if ( not isinstance(k,str)) : 
+        if ( not isinstance(k,str)) :
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not isinstance(v,cobject) :
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
@@ -1016,7 +1017,7 @@ class cens(cobject,dict):
                 self.order=self.sortfunc(self.keys())
         self.crs=self.buildcrs()
         self.register()
-        
+
     def items(self):
         return [ (l,self[l]) for l in self.order ]
 
@@ -1035,7 +1036,7 @@ class cens(cobject,dict):
     def clear(self):
         dict.clear(self)
         self.order=[]
-        
+
     def update(self,it) :
         dict.update(self,it)
         if isinstance(it,dict) :
@@ -1043,7 +1044,7 @@ class cens(cobject,dict):
         else:
             for el,val in it: self.order.append(el)
         if self.sortfunc : self.order=self.sortfunc(self.keys())
-        
+
     def buildcrs(self,crsrewrite=None,period=None) :
         rep="cens({"
         for m in self.order :
@@ -1059,26 +1060,26 @@ class cens(cobject,dict):
         - check if first data time interval is consistent with dataset frequency
         - check if file data have a gap
         - check if period covered by data files actually includes the whole of dataset period
-        
+
         Returns: True if period of data files included dataset period, False otherwise.
-        
+
         Example:
-    
-        >>> # Ensemble with monthly frequency  
+
+        >>> # Ensemble with monthly frequency
         >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
         >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
         >>> ens=cens({'1980':j0, '1981':j1})
         >>> res=ens.check()
-        
+
         """
-        
+
         # Call 'check' method of 'cdataset' for each member of the ensemble
         rep=True
         for memb in self:
             #clogger.info('Member: %s'%memb)
             rep=self[memb].check() and rep
         return rep
-        
+
 
 
 def eds(first=None,**kwargs):
@@ -1094,7 +1095,7 @@ def eds(first=None,**kwargs):
     >>> cdef("variable","tas"); cdef("period","1860")
     >>> ens=eds(experiment="historical", simulation=["r1i1p1","r2i1p1"])
 
-    Argument 'first' is used when multiple attributes are of list type, and tells which 
+    Argument 'first' is used when multiple attributes are of list type, and tells which
     of these attributes appears first in member labels
 
     """
@@ -1137,7 +1138,7 @@ def eds(first=None,**kwargs):
                     listattr2.remove(a)
                     att=a
                     break
-        comb=[ [(att,val)] for val in attval[att]] 
+        comb=[ [(att,val)] for val in attval[att]]
         while len(listattr2) > 0 :
             att=listattr2.pop(0) ; newcomb=[]
             for c in comb :
@@ -1173,17 +1174,17 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
 
     The following restriction apply to such datasets :
 
-    - functions :py:func:`~climaf.classes.calias` and 
-      :py:func:`~climaf.operators.derive` cannot be used for project 
+    - functions :py:func:`~climaf.classes.calias` and
+      :py:func:`~climaf.operators.derive` cannot be used for project
       'file'
-    
+
     Results are unforeseen if all variables do not have the same time axis
-    
+
     Examples : See :download:`data_file.py <../examples/data_file.py>`
-    
+
     """
     filename=os.path.expanduser(filename)
-    if not os.path.exists(filename): 
+    if not os.path.exists(filename):
         raise Climaf_Classes_Error("File %s does no exist"%filename)
     #
     if model is None : model=model_id(filename)
@@ -1191,7 +1192,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
     #
     if variable is None :
         lvars=varsOfFile(filename)
-        if len(lvars)==0 : 
+        if len(lvars)==0 :
             raise Climaf_Classes_Error("No variable in file %s"%filename)
         variable=lvars.pop()
         for v in lvars : variable+=","+v
@@ -1213,7 +1214,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None) :
             raise Climaf_Classes_Error("Max period from file %s is %s"\
                                            %(filename,`fperiod`))
     #
-    d=ds(project='file', model=model, simulation=simulation, 
+    d=ds(project='file', model=model, simulation=simulation,
          variable=variable, period=period, path=filename)
     d.files=filename
     return d
@@ -1297,16 +1298,16 @@ class scriptChild(cobject):
 def compare_trees(tree1,tree2,func,filter_on_operator=None) :
     """
     Recursively compares TREE1 and TREE2.
-    
-    For the nodes : compares operator and parameters; ensures 
-    that FILTER_ON_OPERATOR(operator) is not true 
-    
+
+    For the nodes : compares operator and parameters; ensures
+    that FILTER_ON_OPERATOR(operator) is not true
+
     For the leaves (datasets) : ensure that string representations of
     applying function FUNC to the pair of datasets returns the same
     value for all datasets pairs in the (parallel) trees
-    
+
     Returns that common value : func(leave1,leave2)) or None
-    
+
     FUNC cannot return None as a valid value
     """
     if isinstance(tree1,cdataset) and isinstance(tree2,cdataset):
@@ -1316,8 +1317,8 @@ def compare_trees(tree1,tree2,func,filter_on_operator=None) :
             if filter_on_operator :
                 if filter_on_operator(tree1.operator): return None
             if tree1.parameters == tree2.parameters :
-                return(reduce(lambda a,b : a if `a`==`b` else None, 
-                   [ compare_trees(op1,op2,func,filter_on_operator) 
+                return(reduce(lambda a,b : a if `a`==`b` else None,
+                   [ compare_trees(op1,op2,func,filter_on_operator)
                      for op1,op2 in zip(tree1.operands, tree2.operands) ]))
     elif isinstance(tree1,scriptChild) and isinstance(tree2,scriptChild):
         if tree1.varname==tree2.varname :
@@ -1373,13 +1374,13 @@ def ds(*args,**kwargs) :
 
      >>> ds('CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last')
 
-    Also a shortcut for :py:meth:`~climaf.classes.cdataset`, 
+    Also a shortcut for :py:meth:`~climaf.classes.cdataset`,
     when used with with only keywords arguments. Example ::
 
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
-    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this 
+    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this
     will work only if no dataset's attribute is ambiguous. 'first_50y' also works, similarly
 
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
@@ -1398,8 +1399,8 @@ def ds(*args,**kwargs) :
 
     crs=args[0]
     results=[]
-    for cproj in cprojects : 
-        try : dataset = cprojects[cproj].crs2ds(crs) 
+    for cproj in cprojects :
+        try : dataset = cprojects[cproj].crs2ds(crs)
         except Climaf_Classes_Error: dataset=None
         if (dataset) : results.append(dataset)
     if len(results) > 1 :
@@ -1410,23 +1411,23 @@ def ds(*args,**kwargs) :
         e="CRS expression %s is not valid for any project in %s"%(crs,`cprojects.keys()`)
         if allow_errors_on_ds_call : clogger.debug(e)
         else : raise Climaf_Classes_Error(e)
-    else : 
+    else :
         rep=results[0]
         if rep.project=='file' : rep.files=rep.kvp["path"]
         return rep
 
 def cfreqs(project,dic) :
-    """ 
+    """
     Allow to declare a dictionary specific to ``project`` for matching
     ``normalized`` frequency values to project-specific frequency values
 
-    Normalized frequency values are : 
+    Normalized frequency values are :
       decadal, yearly, monthly, daily, 6h, 3h, fx and annual_cycle
 
     When defining a dataset, any reference to a non-standard
     frequency will be left unchanged both in the datset's CRS and
     when trying to access corresponding datafiles
-    
+
     Examples::
 
     >>> cfreqs('CMIP5',{'monthly':'mon' , 'daily':'day' })
@@ -1475,7 +1476,7 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     and missing args must be the same for all variables in that case
 
     Example ::
-    
+
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
@@ -1484,12 +1485,12 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
     NB: A wrapper with same name of this function is defined in
     :py:func:`climaf.driver.calias` and it is the one which is
     exported by module climaf.api. It allows to use a list of
-    variable.  
-    
+    variable.
+
     """
     if not fileVariable : fileVariable = variable
     if not filenameVar  : filenameVar  = None
-    if project not in cprojects : 
+    if project not in cprojects :
         raise Climaf_Classes_Error("project %s is not known"%project)
     if project not in aliases : aliases[project]=dict()
     if type(variable)     is not list : variable    = [variable]
@@ -1500,7 +1501,7 @@ def calias(project,variable,fileVariable=None,scale=1.,offset=0.,units=None,miss
         aliases[project][v]=(fv,scale,offset,u,fnv,missing)
 
 def varIsAliased(project,variable) :
-    """ 
+    """
     Return a n-uplet (fileVariable, scale, offset, filevarName,
     missing) defining how to compute a 'variable' which is not in
     files, for the 'project'
@@ -1515,27 +1516,27 @@ def cmissing(project,missing,*kwargs) :
     Such a declaration must follow all ``calias`` declarations for the
     same project
     """
-    pass # TBD 
+    pass # TBD
 
 
 
 class cpage(cobject):
-    def __init__(self, fig_lines=None, widths=None, heights=None, 
+    def __init__(self, fig_lines=None, widths=None, heights=None,
                  fig_trim=True, page_trim=True, format="png",
                  orientation=None,
                  page_width=1000., page_height=1500.,title="", x=0, y=26, ybox=50, pt=24,
-                 font="Times-New-Roman", gravity="North", background="white"): 
+                 font="Times-New-Roman", gravity="North", background="white"):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
-        
+
         Args:
-        
+
           fig_lines (a list of lists of figure objects or an ensemble of figure objects):
-           each sublist of 'fig_lines' represents a line of figures   
-          widths (list, optional): the list of figure widths, i.e. the width of each 
+           each sublist of 'fig_lines' represents a line of figures
+          widths (list, optional): the list of figure widths, i.e. the width of each
            column. By default, if fig_lines is:
-           
+
              - a list of lists: spacing is even
              - an ensemble: one column is used
           heights (list, optional): the list of figure heights, i.e. the
@@ -1545,20 +1546,20 @@ class cpage(cobject):
            either True (default) or False
           page_trim (logical, optional): to turn on/off triming for the page. It
            removes all the surrounding extra space of the page, either True
-           (default) or False 
+           (default) or False
           format (str, optional) : graphic output format, either 'png' (default)
            or 'pdf'(not recommended)
           page_width (float, optional) : width resolution of resultant image;
-           CLiMAF default: 1000. 
+           CLiMAF default: 1000.
           page_height (float, optional) : height resolution of resultant image;
-           CLiMAF default: 1500. 
-          orientation (str,optional): if set, it supersedes page_width and 
+           CLiMAF default: 1500.
+          orientation (str,optional): if set, it supersedes page_width and
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
           title (str, optional) : append a label below or above (depending optional
            argument 'gravity') figures in the page.
 
         If title is activated:
-        
+
             - x, y (int, optional): annotate the page with text.
               x is the offset towards the right from the upper left corner
               of the page, while y is the offset upward or the bottom
@@ -1602,7 +1603,7 @@ class cpage(cobject):
         if orientation is not None :
             if orientation=='portrait' :
                 page_width=1000.; page_height=1500.
-            else : 
+            else :
                 if orientation=='landscape' :
                     page_width=1500.; page_height=1000.
                 else :
@@ -1650,7 +1651,7 @@ class cpage(cobject):
                         "each line in fig_lines must have same dimension as "
                         "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
-        else: # case of an ensemble (cens) 
+        else: # case of an ensemble (cens)
             if not widths and not heights :
                 self.scatter_on_page([ fig_lines[label] for label in fig_lines.order])
             else:
@@ -1661,20 +1662,20 @@ class cpage(cobject):
                     heights=[]
                     for memb in figs: heights.append(round(1./len(figs),2))
                 self.heights=heights
-                    
+
                 self.fig_lines=[]
                 for l in heights :
                     line=[]
                     for c in widths :
                         if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
                         else : line.append(None)
-                            
+
                     self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
 
     def scatter_on_page(self,figs) :
-        """ Try to optimize nb of columns and lines, based on figs 
+        """ Try to optimize nb of columns and lines, based on figs
         list length
         """
         n=len(figs)
@@ -1687,8 +1688,8 @@ class cpage(cobject):
         if n >=16 and n<=20     : nx,ny=4,5
         if n >=21  : raise Climaf_Classes_Error("Too many figures in page")
         lines=[]
-        for i in range(len(figs)) : 
-            if ( i %nx == 0) : 
+        for i in range(len(figs)) :
+            if ( i %nx == 0) :
                 line=[] ; lines.append(line)
             line.append(figs[i])
         j=len(line)
@@ -1704,13 +1705,13 @@ class cpage(cobject):
             for f in line :
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
-            rep+=" ],"; 
+            rep+=" ],";
 
         if self.title is "" :
             rep+=( "],"+`self.widths`+","+`self.heights`+", fig_trim='%s', page_trim='%s', format='"+self.format+\
                    "', page_width=%d, page_height=%d)" )\
                    %(self.fig_trim,self.page_trim,self.page_width,self.page_height)
-            
+
         else:
             rep+=( "],"+`self.widths`+","+`self.heights`+\
                    ", fig_trim='%s', page_trim='%s', format='"+self.format+\
@@ -1718,10 +1719,10 @@ class cpage(cobject):
                    "', x=%d, y=%d, ybox=%d, pt=%d, font='"+self.font+\
                    "', gravity='"+self.gravity+"', background='"+self.background+"')" )\
                    %(self.fig_trim,self.page_trim,self.page_width,self.page_height,self.x,self.y,self.ybox,self.pt)
-            
+
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
-        
+
         return rep
 
 
@@ -1734,43 +1735,43 @@ class cpage_pdf(cobject):
         """
         Builds a CliMAF cpage_pdf object, which represents an array of figures (output:
         'pdf' figure). Figures are automatically centered in the page using 'pdfjam' tool; see
-        http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam   
+        http://www2.warwick.ac.uk/fac/sci/statistics/staff/academic-research/firth/software/pdfjam
 
         Args:
           fig_lines (a list of lists of figure objects or an ensemble of figure objects):
-           each sublist of 'fig_lines' represents a line of figures   
-          widths (list, optional): the list of figure widths, i.e. the width of each 
+           each sublist of 'fig_lines' represents a line of figures
+          widths (list, optional): the list of figure widths, i.e. the width of each
            column. By default, if fig_lines is:
 
              - a list of lists: spacing is even
              - an ensemble: one column is used
           heights (list, optional): the list of figure heights, i.e. the
-           height of each line. By default spacing is even        
+           height of each line. By default spacing is even
           page_width (float, optional): width resolution of resultant image;
-           CLiMAF default: 1000. 
+           CLiMAF default: 1000.
           page_height (float, optional): height resolution of resultant image;
-           CLiMAF default: 1500. 
-          orientation (str,optional): if set, it supersedes page_width and 
+           CLiMAF default: 1500.
+          orientation (str,optional): if set, it supersedes page_width and
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
           scale (float, optional): to scale all input pages; default:1.
           openright (logical, optional): this option puts an empty figure before the
-           first figure; default: False. For more details, see: 
+           first figure; default: False. For more details, see:
            http://ftp.oleane.net/pub/CTAN/macros/latex/contrib/pdfpages/pdfpages.pdf
           title (str, optional): append a label in the page.
 
         If title is activated, it is by default horizontally centered:
-        
-            - x (int, optional): title horizontal shift (in cm). 
-            - y (int, optional): vertical shift from the top of the page (in cm); 
-              only positive (down) values have an effect, default=2 cm 
+
+            - x (int, optional): title horizontal shift (in cm).
+            - y (int, optional): vertical shift from the top of the page (in cm);
+              only positive (down) values have an effect, default=2 cm
             - titlebox (logical, optional): set it to True to frame the text in a box,
               frame color is 'black'
             - pt (str, optional): title font size; CLiMAF default: 'Huge'
               (corresponding to 24 pt). You can set or not a backslash before this
-              argument. 
+              argument.
             - font (str, optional): font
               abbreviation among available LaTex fonts; default: '\\\\\\\\familydefault'.
-            - background (str, optional): frame fill background color; among LaTex 
+            - background (str, optional): frame fill background color; among LaTex
               'fcolorbox' colors; default: 'white'.
 
         Left and right margins are set to 2cm.
@@ -1778,14 +1779,14 @@ class cpage_pdf(cobject):
         Example:
 
          Using no default value, to create a PDF page with 2 columns and 3 lines::
-         
+
           >>> tas_ds=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
           >>> tas_avg=time_average(tas_ds)
           >>> fig=plot(tas_avg,title='title',format='pdf')
           >>> crop_fig=cpdfcrop(fig)
           >>> my_pdfpage=cpage_pdf([[crop_fig,crop_fig],[crop_fig, crop_fig],[crop_fig,crop_fig]],
-          ... widths=[0.2,0.8], heights=[0.33,0.33,0.33], page_width=800., page_height=1200., 
-          ... scale=0.95, openright=True, title='Page title', x=-5, y=10, titlebox=True, 
+          ... widths=[0.2,0.8], heights=[0.33,0.33,0.33], page_width=800., page_height=1200.,
+          ... scale=0.95, openright=True, title='Page title', x=-5, y=10, titlebox=True,
           ... pt='huge', font='ptm', background='yellow') # Font name is 'Times'
         """
         if fig_lines is None :
@@ -1793,7 +1794,7 @@ class cpage_pdf(cobject):
         if orientation is not None :
             if orientation=='portrait' :
                 page_width=1000.; page_height=1500.
-            else : 
+            else :
                 if orientation=='landscape' :
                     page_width=1500.; page_height=1000.
                 else :
@@ -1840,7 +1841,7 @@ class cpage_pdf(cobject):
                         "each line in fig_lines must have same dimension as "
                         "widths; pb for sublist "+`line`)
             self.fig_lines=fig_lines
-        else: # case of an ensemble (cens) 
+        else: # case of an ensemble (cens)
             figs=[fig for fig in fig_lines.order]
 
             if not widths: widths=[1.]
@@ -1849,18 +1850,18 @@ class cpage_pdf(cobject):
                 heights=[]
                 for memb in figs: heights.append(round(1./len(figs),2))
             self.heights=heights
-            
+
             self.fig_lines=[]
             for l in heights :
                 line=[]
                 for c in widths :
                     if len(figs) > 0 : line.append(fig_lines[figs.pop(0)])
                     else : line.append(None)
-                              
+
                 self.fig_lines.append(line)
         #
         self.crs=self.buildcrs()
-               
+
     def buildcrs(self,crsrewrite=None,period=None):
         rep="cpage_pdf(["
         for line in self.fig_lines :
@@ -1868,13 +1869,13 @@ class cpage_pdf(cobject):
             for f in line :
                 if f : rep+=f.buildcrs(crsrewrite=crsrewrite)+","
                 else : rep+=`None`+","
-            rep+=" ],"; 
+            rep+=" ],";
 
         if self.title is "" :
             rep+=( "],"+`self.widths`+","+`self.heights`+\
                    "', page_width=%d, page_height=%d, scale=%.2f, openright='%s')" )\
                    %(self.page_width,self.page_height,self.scale,self.openright)
-            
+
         else:
             rep+=( "],"+`self.widths`+","+`self.heights`+\
                    "', page_width=%d, page_height=%d, scale=%.2f, openright='%s', title='"\
@@ -1884,36 +1885,36 @@ class cpage_pdf(cobject):
 
         rep=rep.replace(",]","]")
         rep=rep.replace(", ]","]")
-        
+
         return rep
-            
+
 
 def guess_projects(crs) :
     """
-    Return the list of projects involved in the datasets involved in a 
-    CRS expression. 
+    Return the list of projects involved in the datasets involved in a
+    CRS expression.
     """
     def guess_project(crs) :
         """
-        Guess which is the project name for a dataset's crs, with minimum 
+        Guess which is the project name for a dataset's crs, with minimum
         assumption on the separator used in the project
         """
-        separators=[r'.',r'_',r'£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
-                    r";",r":",r"!",r'§',r'/',r'.',r'ø',r'+',r'°']
+        separators=[r'.',r'_',r'Â£',r'$',r'@',r'_',r'|',r'&',r"-",r"=",r"^",
+                    r";",r":",r"!",r'Â§',r'/',r'.',r'Ã¸',r'+',r'Â°']
         counts=dict()
         for sep in separators : counts[sep]=crs.count(sep)
         # Assume that the highest count gives the right separator
         max=0
-        for key in counts : 
-            if counts[key] >= max : 
+        for key in counts :
+            if counts[key] >= max :
                 max=counts[key]
                 sep=key
         return(crs[1:crs.find(sep)])
     return map(guess_project,re.findall(r"ds\(([^)]*)",crs))
-    
+
 def browse_tree(cobj,func,results):
-    """ Browse a CliMAF object's tree, accumulating in 'results' the 
-    values returned by 'func' on each tree node or leave (if they are 
+    """ Browse a CliMAF object's tree, accumulating in 'results' the
+    values returned by 'func' on each tree node or leave (if they are
     not None)
     """
     if isinstance(cobj,cdataset) or isinstance(cobj,cdummy) :
@@ -1928,7 +1929,7 @@ def browse_tree(cobj,func,results):
     elif isinstance(cobj,cpage) :
         for line in cobj.fig_lines :
             map(lambda x : browse_tree(x,func,partial), line)
-    elif cobj is None : return 
+    elif cobj is None : return
     else :
         clogger.error("Cannot yet handle object :%s", `cobj`)
         return
@@ -1938,13 +1939,13 @@ def domainOf(cobject) :
     """ Returns a domain for a CliMAF object : if object is a dataset, returns
     its domain, otherwise returns domain of first operand
     """
-    if isinstance(cobject,cdataset) : 
+    if isinstance(cobject,cdataset) :
 	if type(cobject.domain) is list :
             rep=""
             for coord in cobject.domain[0:-1] : rep=r"%s%d,"%(rep,coord)
             rep="%s%d"%(rep,cobject.domain[-1])
             return(rep)
-	else : 
+	else :
 	    if cobject.domain == "global" : return ""
 	    else : return(cobject.domain)
     elif isinstance(cobject,ctree) :
@@ -1958,7 +1959,7 @@ def domainOf(cobject) :
         return domainOf(cobject.values()[0])
     elif cobject is None : return "none"
     else : clogger.error("Unkown class for argument "+`cobject`)
-             
+
 def varOf(cobject) : return attributeOf(cobject,"variable")
 def modelOf(cobject) : return attributeOf(cobject,"model")
 def simulationOf(cobject) : return attributeOf(cobject,"simulation")
@@ -1970,12 +1971,12 @@ def attributeOf(cobject,attrib) :
     """ Returns the attribute for a CliMAF object : if object is a dataset, returns
     its attribute property, otherwise returns attribute of first operand
     """
-    if isinstance(cobject,cdataset) : 
-        val=getattr(cobject,attrib,None) 
+    if isinstance(cobject,cdataset) :
+        val=getattr(cobject,attrib,None)
         if val is not None : return val
         else : return(cobject.kvp.get(attrib))
     elif isinstance(cobject,cens) : return attributeOf(cobject.values()[0],attrib)
-    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib) 
+    elif getattr(cobject,attrib,None) : return getattr(cobject,attrib)
     elif isinstance(cobject,ctree) :
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
         return attributeOf(cobject.operands[0],attrib)
@@ -2004,7 +2005,7 @@ def resolve_first_or_last_years(kwargs,duration,option="last") :
     explorer=ds(**kwargs)
     return explorer.explore('resolve')
 
-    
+
 class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
@@ -2023,7 +2024,7 @@ class Climaf_Error(Exception):
 
 
 def test():
-#    clogger.basicConfig(level=clogger.DEBUG) 
+#    clogger.basicConfig(level=clogger.DEBUG)
 #    clogger.basicConfig(format='"%(asctime)s [%(funcName)s: %(filename)s,%(lineno)d] %(message)s : %(levelname)s', level=clogger.DEBUG)
     cdef("project","CMIP5")
     #cdef("project","PR6")
@@ -2046,7 +2047,7 @@ def test():
 
 def t2() :
     p=period("1984-1984")
-    
+
 
 if __name__ == "__main__":
     test()

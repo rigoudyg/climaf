@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Retrieve input remote files in local (located at 'remote_cachedir')
 # if necessary;
 # and launch script 'mcdo.sh' with input local files
@@ -11,12 +14,12 @@ import netrc
 from dateutil import tz
 from Tkinter import *
 
-# Climaf 
+# Climaf
 from climaf import __path__ as cpath, remote_cachedir
 from climaf.clogging import clogger, dedent as cdedent
 from climaf.dataloc import remote_to_local_filename
 
-scriptpath=cpath[0]+"/../scripts/" 
+scriptpath=cpath[0]+"/../scripts/"
 
 operator=sys.argv[1]
 out=sys.argv[2]
@@ -44,7 +47,7 @@ for i in files:
         if not host_user.has_key((i.split(":")[k],'')): host_user[(i.split(":")[k],'')]=[]
         host_user[(i.split(":")[k],'')].append(i.split(":")[-1])
 
-            
+
 # 'dynamic_host' is an host with incremental files.
 dynamic_host=['hendrix', 'beaufix']
 
@@ -83,35 +86,35 @@ def input_user_pass(host):
     """
     Mafenetre = Tk()
     Mafenetre.title('Enter login and password for host %s:'%host)
-    
+
     Login= StringVar()
     Motdepasse= StringVar()
-    
+
     Label(Mafenetre,text="Enter login and pass:", fg='red', bg='white').pack(padx=5,pady=5)
-    
+
     Frame1 = Frame(Mafenetre,borderwidth=2,relief=GROOVE)
     Frame1.pack(side=TOP,padx=10,pady=10)
-    
+
     Frame11 = Frame(Frame1,borderwidth=2,relief=GROOVE, bg ='white')
     Frame11.pack(side=LEFT,padx=15,pady=15)
     Label(Frame11,text="Enter login:", fg="navy").pack(side=TOP,padx=10,pady=10)
     Label(Frame11,text="Enter pass:", fg="navy").pack(side=BOTTOM,padx=10,pady=10)
-    
+
     Frame12 = Frame(Frame1,borderwidth=2,relief=GROOVE)
     Frame12.pack(side=RIGHT,padx=15,pady=15)
     Champ1 = Entry(Frame12, textvariable= Login, bg ='bisque', fg='maroon')
     Champ2 = Entry(Frame12, textvariable= Motdepasse, show='*', bg ='bisque', fg='maroon')
     Champ1.focus_set()
-    Champ2.focus_set()    
+    Champ2.focus_set()
     Champ1.pack(side = TOP,padx = 5, pady = 5)
     Champ2.pack(side = BOTTOM,padx = 5, pady = 5)
-    
+
     Frame3 = Frame(Mafenetre,borderwidth=2,relief=GROOVE)
     Frame3.pack(side = BOTTOM,padx=15,pady=15)
     Button(Frame3, text ='Valider', fg='navy', command = Mafenetre.destroy ).pack(side=BOTTOM,padx = 5, pady = 5)
-   
+
     Mafenetre.mainloop()
-         
+
     return(Login.get(), Motdepasse.get())
 
 
@@ -126,12 +129,12 @@ for host,username in host_user2:
 #    password;
 #  - if 'host' is not present in $HOME/.netrc file, we prompt the user for entering 'user' and 'password'.
 
-    if username:        
+    if username:
         if host in secrets.hosts:
             login, account, password = secrets.authenticators( host )
             if login != username: password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
         else:
-            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))            
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
         connect=ftp.FTP(host,username,password)
     else:
         if host in secrets.hosts:
@@ -144,16 +147,16 @@ for host,username in host_user2:
     etat = connect.getwelcome()
     print 'Connect to host: %s'%host
     print etat
-    
+
     for ffile in host_user2[host,username]:
-        if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) or host in dynamic_host:            
+        if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) or host in dynamic_host:
             filename=os.path.basename(ffile)
             dir=os.path.dirname(ffile)
             if not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+dir):
                 os.makedirs(os.path.expanduser(remote_cachedir)+'/'+host+dir)
             connect.cwd(dir)
             if host in dynamic_host and \
-               os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile): 
+               os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile):
                 filetransfer=False
                 resp=connect.sendcmd("MDTM %s" %filename)
                 if resp[0] == '2':
@@ -177,8 +180,8 @@ for host,username in host_user2:
                  not os.path.exists(os.path.expanduser(remote_cachedir)+'/'+host+ffile) :
                 print 'File %s transfered \n'%ffile
                 connect.retrbinary('RETR '+filename, open(os.path.expanduser(remote_cachedir)+'/'+host+ffile, 'wb').write)
-                #if host in dynamic_host and filetransfer: os.utime(os.path.expanduser(remote_cachedir)+'/'+host+ffile, (timestamp, timestamp)) 
-           
+                #if host in dynamic_host and filetransfer: os.utime(os.path.expanduser(remote_cachedir)+'/'+host+ffile, (timestamp, timestamp))
+
         else:
             print 'File found in cache: %s is at %s \n'%(ffile,os.path.expanduser(remote_cachedir)+'/'+host+ffile)
 

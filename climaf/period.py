@@ -1,4 +1,6 @@
-"""  Basic types and syntax for managing time periods in CLIMAF 
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""  Basic types and syntax for managing time periods in CLIMAF
 
 """
 
@@ -55,11 +57,11 @@ class cperiod():
                     self.start.year,self.start.month,self.start.day,self.start.hour,
                     self.end.year,self.end.month,self.end.day,self.end.hour))
         elif (self.start.day != 1 or self.end.day != 1 ):
-            if (self.end.day != 1 ): 
+            if (self.end.day != 1 ):
                 d=self.end.day -1
                 m=self.end.month
                 y=self.end.year
-            else : 
+            else :
                 end=self.end - datetime.timedelta(1)
                 y=end.year ; m=end.month; d=end.day
             if (self.start.year,self.start.month,self.start.day)== (y,m,d) :
@@ -69,10 +71,10 @@ class cperiod():
                     self.start.year,self.start.month,self.start.day,
                     y,m,d))
         elif (self.start.month != 1 or self.end.month != 1 ):
-            if (self.end.month != 1 ): 
+            if (self.end.month != 1 ):
                 m=self.end.month -1
                 y=self.end.year
-            else : 
+            else :
                 m=12
                 y=self.end.year-1
             if self.start.year==y and self.start.month==m :
@@ -80,7 +82,7 @@ class cperiod():
             else:
                 return("%04d%02d-%04d%02d"%(self.start.year,self.start.month,y, m))
         else :
-            if self.start.year != self.end.year-1 : 
+            if self.start.year != self.end.year-1 :
                 return("%04d-%04d"%(self.start.year, self.end.year-1))
             else:
                 return("%04d"%(self.start.year))
@@ -88,20 +90,20 @@ class cperiod():
     def hasFullYear(self,year):
         if (self.fx) :
             raise Climaf_Period_Error("Meaningless for period 'fx'")
-        return( int(year) >= self.start.year and int(year) < self.end.year) 
+        return( int(year) >= self.start.year and int(year) < self.end.year)
     #
     def start_with(self,begin) :
-        """ If period BEGIN actually begins period SELF, returns the 
+        """ If period BEGIN actually begins period SELF, returns the
         complement of BEGIN in SELF; otherwise returns None """
         if (self.fx) :return(False)
-        if self.start==begin.start and self.end >= begin.end : 
+        if self.start==begin.start and self.end >= begin.end :
             return cperiod(begin.end,self.end)
     #
     def is_before(self,candidate) :
         """ True if period SELF starts before period CANDIDATE
         """
         if (self.fx) :return(False)
-        return self.start <= candidate.start 
+        return self.start <= candidate.start
     #
     def includes(self,included) :
         """ if period self does include period 'included', returns a pair of
@@ -112,7 +114,7 @@ class cperiod():
             return cperiod(self.start,included.start), cperiod(included.end,self.end)
     #
     def intersects(self,other) :
-        """ 
+        """
         Returns the intersection of period self and period 'other' if any
         """
         if (self.fx) :
@@ -135,11 +137,11 @@ def init_period(dates) :
     Returns:
       the corresponding CliMAF 'period' object
 
-    When using only YYYY, can omit some Ys (for zeros). 
+    When using only YYYY, can omit some Ys (for zeros).
     Cannot handle year 0000
 
     Examples :
-    
+
     -  a one-year long period : '1980', or '1980-1980'
     -  a decade : '1980-1989'
     -  first millenium : 1-1000  # Must have leading zeroes if you want to quote a month
@@ -152,19 +154,19 @@ def init_period(dates) :
     CliMAF internally handles date-time values with a 1 minute accurracy; it can provide date
     information to external scripts in two forms; see keywords 'period' and 'period_iso' in
     :py:func:`~climaf.operators.cscript`
-      
+
     """
-    
+
     #clogger.debug("analyzing  %s"%dates)
     if not type(dates) is str :
         raise Climaf_Period_Error("arg is not a string : "+`dates`)
     if (dates == 'fx' ) : return cperiod('fx')
-    
+
     start=re.sub(r'^([0-9]{1,12}).*',r'\1',dates)
     # Pad with leading 0 to reach a length of 4 characters
     start=(4-len(start))*"0"+start
     # TBD : check that start actually matches a date
-    syear  =int(start[0:4])  
+    syear  =int(start[0:4])
     smonth =int(start[4:6])  if len(start) > 5  else 1
     sday   =int(start[6:8])  if len(start) > 7  else 1
     shour  =int(start[8:10]) if len(start) > 9  else 0
@@ -187,18 +189,18 @@ def init_period(dates) :
     emonth=1 ; eday=1 ;  ehour=0 ; eminute=0
     add_day=0 ; add_hour=0 ; add_minute=0
     if (len(end)==4 ) :
-        eyear=int(end[0:4])+1; 
+        eyear=int(end[0:4])+1;
     elif (len(end)==6 ) :
-        eyear=int(end[0:4]) ; emonth=int(end[4:6])+1 ; 
+        eyear=int(end[0:4]) ; emonth=int(end[4:6])+1 ;
         if (emonth > 12) :
             emonth=1
             eyear=eyear+1
     elif (len(end)==8 ) :
         add_day=1
-        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  
+        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])
     elif (len(end)==10 ) :
         add_hour=1
-        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10]) 
+        eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ; ehour=int(end[8:10])
     elif (len(end)==12 ) :
         add_minute=1
         eyear=int(end[0:4]) ; emonth=int(end[4:6]) ; eday=int(end[6:8])  ;
@@ -274,7 +276,7 @@ def intersect_periods_list(lperiod1, lperiod2):
     """
     Given two lists of periods, returns a list of the periods representing their intersection
 
-    Algorithm : for each period in l1, compute intersection with all periods in l2, 
+    Algorithm : for each period in l1, compute intersection with all periods in l2,
     and add it in a big list; finally, merge  the big list
     """
     big=[]

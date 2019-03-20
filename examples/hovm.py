@@ -1,6 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Example for plotting a Hovmoller diagram using NCL
 # Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/hovm.html
-# This example includes all plot types 
+# This example includes all plot types
 
 from climaf.api import *
 craz()
@@ -54,7 +57,7 @@ tas=ds(project='example', simulation="AMIPV6ALB2G", variable="tas", frequency='m
 # Mean on latitude axis => you must not set points because rank=3 and a mean on latitude is done
 #
 diag8=hovm(tas, title='2m_Temperature', mean_axis='Lat',fmt="%C",
-           **hovm_params('NINO4')) # => diag (x,t). If you use xpoint/ypoint/zpoint, selected points are not considered. 
+           **hovm_params('NINO4')) # => diag (x,t). If you use xpoint/ypoint/zpoint, selected points are not considered.
 
 #
 # Mean on longitude axis => you must not set points because rank=3 and a mean on longitude is done
@@ -70,7 +73,7 @@ diag11=hovm(tas, title='2m_Temperature', mean_axis='Point', ypoint=2, fmt="%C", 
 
 
 ## Compute 'ta' zonal mean => 3D field: ta_zonmean(time, plev, lat)
-ta_zonmean=ccdo(ta, operator='zonmean') 
+ta_zonmean=ccdo(ta, operator='zonmean')
 
 #
 # Mean on latitude axis => you must not set points because rank=3 and a mean on latitude is done
@@ -86,7 +89,7 @@ diag14=hovm(ta_zonmean, title='Zonal mean', mean_axis='Point', zpoint=1000., fmt
 
 
 ## Compute 'ta' meridional mean => 3D field: ta_mermean(time, plev, lon)
-ta_mermean=ccdo(ta, operator='mermean') 
+ta_mermean=ccdo(ta, operator='mermean')
 
 #
 # Mean on longitude axis => you must not set points because rank=3 and a mean on longitude is done

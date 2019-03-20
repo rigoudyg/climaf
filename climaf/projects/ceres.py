@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 This module declares CERES data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
@@ -18,7 +20,7 @@ from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('ceres') 
+    cproject('ceres')
     url_ceres="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/ceres/${variable}_CERES-EBAF.nc"
     dataloc(project='ceres', organization='generic', url=[url_ceres])
 
@@ -27,6 +29,6 @@ if atCNRM:
 
     #calias("ceres",''    ,'rluscs'  ,filenameVar='rluscs') pas de variable correspondante...?
     #rluscs:="Surface Longwave Flux Up, Monthly Means, Clear-Sky conditions"
-	
+
 
 

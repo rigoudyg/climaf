@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Using macros in CliMAF  - S.Senesi - 04/2015
 
 # The basic idea is that, once you are happy with a suite of
@@ -23,7 +26,7 @@ macro("eu_zonal_mean",ta_ezm)
 fig_ezm=plot(ta_ezm)
 macro("eu_cross_section",fig_ezm)
 
-# You can of course use a macro on other dataset(s), 
+# You can of course use a macro on other dataset(s),
 pr=ds(project='example',simulation="AMIPV6ALB2G", variable="pr",
               frequency='monthly', period="198001")
 pr_ezm=eu_zonal_mean(pr)
@@ -47,15 +50,15 @@ cmacros.pop("my_macro")
 #   - automatically reading macros at start of CliMAF sessions
 climaf.cmacro.write("~/.climaf.macros")
 
-# Look at the external representation of the macros. 
+# Look at the external representation of the macros.
 print "\nContent of ~/.climaf.macros :"
 import os ; os.system("cat ~/.climaf.macros")
 
-# Using that example, you can also write macros to and load macros from 
-# any file, using the macro syntax (here, we use the default location) 
+# Using that example, you can also write macros to and load macros from
+# any file, using the macro syntax (here, we use the default location)
 climaf.cmacro.read("~/.climaf.macros")
 
-# Trigger the computation of some results, in order to populate the cache 
+# Trigger the computation of some results, in order to populate the cache
 cfile(fig_ezm)
 
 # The cache is displayed using macros

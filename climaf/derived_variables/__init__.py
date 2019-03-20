@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Some projects like atmosphere_derived_variables, others don't
 #__all__=[ "atmosphere_derived_variables", "ocean_derived_variables" ]

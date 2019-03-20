@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 def varlongname(variable):
    """
    Returns the long name of variable
@@ -187,15 +190,15 @@ def varlongname(variable):
         longvarname  = 'MLD (SigmaT 0.03)'
    if variable=='wfo':
         longvarname  = 'E-P Budget'
-   if variable=='tauu':        
+   if variable=='tauu':
         longvarname  = 'Zonal Wind Stress'
-   if variable=='tauv':        
+   if variable=='tauv':
         longvarname  = 'Meridional Wind Stress'
-   if variable=='hfls':        
+   if variable=='hfls':
         longvarname  = 'Latent Heat Flux'
-   if variable=='hfss':        
+   if variable=='hfss':
         longvarname  = 'Sensible Heat Flux'
-   if variable=='sic':        
+   if variable=='sic':
         longvarname  = 'Sea Ice Concentration'
    if variable=='sit':
         longvarname  = 'Sea Ice Thickness'

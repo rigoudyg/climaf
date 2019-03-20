@@ -1,7 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Example for CliMAF access to data organized according to CNRM-CM's 'em' scheme
 
-See also  :download:`climaf/projects/em.py <../climaf/projects/em.py>`    
+See also  :download:`climaf/projects/em.py <../climaf/projects/em.py>`
 
 """
 
@@ -13,8 +15,8 @@ if not atCNRM : exit(0)
 
 cdef("project","em")
 
-# What is my EM root directory (EM_NETCDF_DIR) 
-cdef("root","/cnrm/est/USERS/senesi/NO_SAVE/expes",project="em") ;  
+# What is my EM root directory (EM_NETCDF_DIR)
+cdef("root","/cnrm/est/USERS/senesi/NO_SAVE/expes",project="em") ;
 
 # Define some datasets based on private experiments
 
@@ -41,12 +43,12 @@ Sic=ds(simulation="CHIST2", variable="sic" , period="1975", group="SC")
 
 
 # Display the basic filenames involved in the dataset (all filenames in one single string)
-# CliMAF will search them at the data location which is the most specific among all declared data locations 
+# CliMAF will search them at the data location which is the most specific among all declared data locations
 files=tas.baseFiles()
 print files
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (this
-# select period and/or variables, aggregate files...) 
+# select period and/or variables, aggregate files...)
 my_file=cfile(tas)
 print my_file
 
@@ -74,4 +76,4 @@ ncview(tos_on_tas_grid)
 
 # Next line for automated tests
 if (cfile(tos_on_tas_grid) is None) : exit(1)
-    
+

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares project example and its data location for the standard CliMAF distro
 
@@ -16,7 +18,7 @@ from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
 
 from climaf import __path__ as cpath
-cpath=os.path.abspath(cpath[0]) 
+cpath=os.path.abspath(cpath[0])
 
 cproject("example" , ("frequency","monthly") ,separator='|')
 cfreqs('example',{'monthly':'mon' })

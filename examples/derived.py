@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """ CliMAF - example for derived variables
 
 A derived variable is a new geophysical variable defined by explaining

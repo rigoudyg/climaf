@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Examples for vertical interpolation
 # 1/ interpolating a 3D field on model levels on standard pressure levels using ml2pl
 # 2/ computing a model-reference difference using diff_zonmean (based on zonmean_interpolation)

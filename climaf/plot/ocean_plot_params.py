@@ -1,5 +1,6 @@
-# -*- coding: iso-8859-1 -*-
-# Created : S.Sénési - nov 2015
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# Created : S.SÃ©nÃ©si - nov 2015
 
 dict_plot_params = {
         'wfo' : {

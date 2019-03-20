@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import derive, calias
 
 # Content was sent to various places : prokect IGCM_OUT, atmposphere_derived_variables, ocean_derived_variables

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 This module declares ERA Interim data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
@@ -21,7 +23,7 @@ from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('erai',('grid','_'), ('frequency','monthly'))  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127' 
+    cproject('erai',('grid','_'), ('frequency','monthly'))  # no grid writes as '_' , otherwise as e.g. 'T42' or 'T127'
 
     root="/cnrm/amacs/DATA/OBS/netcdf/${frequency}"
     patmonth1=root+"_mean/erai/erai_???_mm_${variable}${grid}${PERIOD}.nc"   #for original grid
@@ -70,7 +72,7 @@ if atCNRM:
     calias("erai",'rlscs'  ,'strc',filenameVar='STRC')
     calias("erai",'pr','tp',filenameVar='TP')
     #snm est en kg.m-2.s-1 et smlt en "m of water equivalent" , supposement par mois
-    calias("erai",'snm', 'smlt', scale=1000./(86400.*30.3),units="kg m-2 s-1", filenameVar='SMLT') 
+    calias("erai",'snm', 'smlt', scale=1000./(86400.*30.3),units="kg m-2 s-1", filenameVar='SMLT')
 
     # Some additional daily fields
     calias("erai",'v850'   ,'v850',filenameVar='V850')
@@ -80,7 +82,7 @@ if atCNRM:
     # For sfcWind, need to define a derived variable, from 10U and 10V
     #calias("erai",'sfcWind','fg10',filenameVar='10FG') #sfcWind:="Near-Surface Wind Speed" et fg10:="10 metre wind gust"
     calias("erai",'hus'    ,'q',filenameVar='Q60')
-    #calias("erai",'z500'   ,'z', scale=1./9.81, units="m", filenameVar='Z500') 
-    calias("erai",'z500'   ,'z'   , filenameVar='Z500') 
-    
+    #calias("erai",'z500'   ,'z', scale=1./9.81, units="m", filenameVar='Z500')
+    calias("erai",'z500'   ,'z'   , filenameVar='Z500')
+
     # To do : either read specific files for hurs and huss or provide a CliMAF operator

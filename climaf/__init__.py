@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Climaf is documented at ReadTheDocs : http://climaf.readthedocs.org/
 
@@ -35,7 +37,7 @@ already_inited=False
 onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 
-if not already_inited  and not onrtd : 
+if not already_inited  and not onrtd :
     import sys
     from climaf.driver import logdir
     #
@@ -55,7 +57,7 @@ if not already_inited  and not onrtd :
     clogging.clog(os.getenv("CLIMAF_LOG_LEVEL","warning"))
     clogging.clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL","info"))
     tim("loggings")
-    #    
+    #
     # Decide for cache location
     if site_settings.onCiclad :
         default_cache="/data/"+os.getenv("USER")+"/climaf_cache"

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 Example for CliMAF access to various obs/reanalyses data as managed on
@@ -25,7 +27,7 @@ cdef("frequency",'monthly')
 pr_mmday=ds(variable="precip", period="197901")
 #cshow(plot(pr_mmday,title='gpcp 1979-1980'))
 
-# CliMAF provides 'pr' in SI units 
+# CliMAF provides 'pr' in SI units
 pr_gpcp=ds(variable="pr",  period="1979-1980")
 
 pr_gpcp_avg=time_average(pr_gpcp)
@@ -42,7 +44,7 @@ cdef("frequency",'monthly')
 pr_gpcc_mmday=ds(variable="GPCC", period="197901")
 #cshow(plot(pr_gpcc_mmday,title='gpcp 1979-1980'))
 
-# CliMAF provide 'pr' in SI units 
+# CliMAF provide 'pr' in SI units
 pr_gpcc=ds(variable="pr",  period="1979-1980")
 
 pr_gpcc_avg=time_average(pr_gpcc)
@@ -87,4 +89,4 @@ rlut_cycle=ccdo(rlut,operator='ymonavg')
 # Average annual cycle on a latlon box
 cycle=space_average(llbox(rlut_cycle,latmin=-20,latmax=30,lonmin=-30,lonmax=50))
 cshow(curves(cycle,title='rlut on box'))
-                    
+

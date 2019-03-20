@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 __doc__="""
 Example for decalring to CliMAF a script which has tywo outputs 
 
@@ -7,7 +10,7 @@ We use a data sample distributed with CliMAF
 
 # S.Senesi - nov 2018
 
-# Load Climaf functions 
+# Load Climaf functions
 from climaf.api import *
 
 # Access example data (which are pre-defined in CliMAF)
@@ -22,7 +25,7 @@ rst=ds(project="example", simulation="AMIPV6ALB2G", variable="rst", period="1980
    # cp $entree $sortie
    # cp $entree $autre_sortie
 
-# Declare this script :  
+# Declare this script :
 cscript('myscript', cpath+'/../examples/my_2_outputs_script.sh ${in} ${out} ${out_secondary}')
 
 # EXPLANATIONS :

@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import subprocess, sys
 import glob
 import argparse
@@ -40,18 +43,18 @@ for file in vfiles:
 
     if args.upper_verbosity:
         ex = subprocess.Popen(["python",file])
-    else: 
+    else:
         ex = subprocess.Popen(["/usr/bin/python",file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if ex.wait()==0 : #code retour
         if args.verbosity:
-            print "Success" 
+            print "Success"
     else:
         if args.verbosity:
             print ex.stdout.read()
             print ex.stderr.read()
-        print "Failure" 
+        print "Failure"
         sys.exit(1)
-         
+
 if not args.verbosity:
     print "Success"

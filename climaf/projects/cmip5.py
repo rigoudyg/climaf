@@ -1,5 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-This module declares locations for searching data for CMIP5 outputs produced by 
+This module declares locations for searching data for CMIP5 outputs produced by
 libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP5 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
@@ -29,7 +31,7 @@ if atCNRM:
    root="/cnrm/cmip/cnrm/ESG"
 
 if root:
-  ## -- Declare a CMIP5 CliMAF project 
+  ## -- Declare a CMIP5 CliMAF project
   ## ------------------------------------ >
   cproject('CMIP5', 'root', 'model', 'table', 'experiment', 'realization', 'frequency', 'realm',
            'version', ensemble=['model','realization'],separator='%')
@@ -73,7 +75,7 @@ if root:
       calias(project, 'PO4', 'po4')
       calias(project, 'Si', 'si')
       calias(project, 'O2', 'o2')
-      
+
       cdef('root'        , root         , project=project)
       #cdef('institute'   , '*'          , project=project)
       cdef('table'       , '*'          , project=project) # impossible, because of ambiguities
@@ -88,7 +90,7 @@ if root:
   ## -- Declare a CMIP5-Adjust CliMAF project: bias corrected CMIP5 simulations
   ## ------------------------------------ >
   pattern='${root}/CMIP5-Adjust/bias-adjusted-output/*/${model}/${experiment}/${frequency}/${realm}/${table}/${realization}/${gr}/${bias_correction}/${version}/${variable}/${variable}_${table}_${model}_${experiment}_${realization}_${gr}_${bias_correction}_${PERIOD}.nc'
-  cproject('CMIP5-Adjust','root', 'model','experiment', 'bias_correction', 'frequency', 'table','gr','realm', 
+  cproject('CMIP5-Adjust','root', 'model','experiment', 'bias_correction', 'frequency', 'table','gr','realm',
          'realization', 'experiment', 'version', ensemble=['model', 'realization'], separator='%')
   dataloc(project='CMIP5-Adjust', url=pattern)
 

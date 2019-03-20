@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Examples for some cdftools operators (muti-variable datasets):
 #
 # - cdfheatc (computes the heat content in the specified area)
@@ -15,7 +18,7 @@ if 'ccdfmean' not in cscripts :
     print("CDFtools not available")
     exit(0)
 
-# Declare "data_CNRM" project for Nemo raw outputs 
+# Declare "data_CNRM" project for Nemo raw outputs
 #
 cproject('data_CNRM')
 
@@ -23,10 +26,10 @@ cproject('data_CNRM')
 #root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
 root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
-url_nemo_standard=root1+suffix  
+url_nemo_standard=root1+suffix
 #
 dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard])
-# 
+#
 # Declare how variables are scattered/groupes among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
@@ -37,7 +40,7 @@ calias("data_CNRM","so,thetao",filenameVar="grid_T_table2.2")
 calias("data_CNRM","thetao,omlmax",filenameVar="grid_T_table2.2")
 calias("data_CNRM","so,thetao,omlmax",filenameVar="grid_T_table2.2")
 
-# Define defaults facets for datasets 
+# Define defaults facets for datasets
 cdef("project","data_CNRM")
 cdef("frequency","monthly")
 cdef("simulation","PRE6CPLCr2alb")
@@ -53,17 +56,17 @@ fixed_fields(['ccdfheatc','ccdfmxlheatc'],
              ('mesh_zgr.nc',tpath+'ORCA1_mesh_zgr.nc'))
 
 #-----------
-# cdfheatc   
+# cdfheatc
 #-----------
 #
 # CDFtools usage :
 # cdfheatc  T-file ...
-#     ... [imin imax jmin jmax kmin kmax] [-full] 
+#     ... [imin imax jmin jmax kmin kmax] [-full]
 #
 # CliMAF usage (ccdfheatc) :
 #
 
-# Define multi-variable dataset with salinity and temperature 
+# Define multi-variable dataset with salinity and temperature
 dT1=ds(simulation="PRE6CPLCr2alb", variable="so,thetao", period="199807", realm="O")
 
 # Compute the heat content in the specified area
@@ -88,7 +91,7 @@ cshow(plot_my_cdfheatc)
 # CliMAF usage (ccdfmxlheatc) :
 #
 
-# Define multi-variable dataset with mld 
+# Define multi-variable dataset with mld
 dT2=ds(simulation="PRE6CPLCr2alb", variable="thetao,omlmax", period="199807", realm="O")
 
 # Compute the heat content in the mixed layer
@@ -96,7 +99,7 @@ my_cdfmxlheatc=ccdfmxlheatc(dT2)
 cfile(my_cdfmxlheatc)
 
 #----------------
-#  cdfsections 
+#  cdfsections
 #----------------
 #
 # CDFtools usage :
@@ -107,11 +110,11 @@ cfile(my_cdfmxlheatc)
 #
 
 # Define datasets with salinity,  temperature, mld, sea water x and y velocity (uo/vo)
-dT3=ds(simulation="PRE6CPLCr2alb", variable="so,thetao,omlmax", period="199807", realm="O")      
-duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")      
+dT3=ds(simulation="PRE6CPLCr2alb", variable="so,thetao,omlmax", period="199807", realm="O")
+duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
-# Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang 
+# Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang
 # along a section made of Nsec linear segments
 my_cdfsections=ccdfsections(duo,dvo,dT3,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
 cfile(my_cdfsections)

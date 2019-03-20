@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import derive, calias
 
 # -- Potential Temperature and salinity @ 200m, 1000m and 2000m in depth

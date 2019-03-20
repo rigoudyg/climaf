@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import *
 
 # -- easyCMIP_functions contains an ensemble of functionalities for
@@ -13,7 +16,7 @@ def ensemble_one_keyword(req_dict):
        - simulation='*'
        - member='*'
     It returns a CliMAF ensemble with all the datasets matching the request.
-    
+
     Example:
     >>> req_dict = dict(project='CMIP5',
                         model='*',
@@ -24,7 +27,7 @@ def ensemble_one_keyword(req_dict):
                         )
     >>> my_ens = ensemble_one_keyword(req_dict)
     >>> summary(my_ens)
-    
+
     '''
     # -- Check the wildcards
     #keys = []
@@ -63,7 +66,7 @@ def ensemble_request(req_dict):
        - model, simulation, member to '*' or a list
        - variable, period to a list (not to '*')
     It returns a CliMAF ensemble with all the datasets matching the request.
-    
+
     Example:
     >>> req_dict = dict(project='CMIP5',
                         model='*',
@@ -74,9 +77,9 @@ def ensemble_request(req_dict):
                         )
     >>> my_ens = ensemble_request(req_dict)
     >>> summary(my_ens)
-    
+
     '''
-    
+
     keys = []
     for elt in req_dict:
         if req_dict[elt]=='*' or isinstance(req_dict[elt],list):
@@ -121,12 +124,12 @@ def ensemble_request(req_dict):
         if 'simulation' in wreq_dict:
             wreq_dict.pop('simulation')
         if 'member' in wreq_dict:
-            wreq_dict.pop('member')           
+            wreq_dict.pop('member')
         available_models = ensemble_one_keyword(wreq_dict).order
     else:
         available_models = [req_dict['model']]
     #
-    
+
     total_ens = None
     total_ens_names = []
     #
@@ -151,7 +154,7 @@ def ensemble_request(req_dict):
             sub_ens = tmp_sub_ens
         #
         multi_periods_variables_sub_ens_dict = dict()
-        multi_periods_variables_sub_ens_names = []                
+        multi_periods_variables_sub_ens_names = []
         #
         # On fait maintenant une boucle sur tous les membres si on a demande plusieurs
         # periodes, variables
@@ -192,7 +195,7 @@ def save_req_file(ens_obj, filename = 'test.txt', separator = ' '):
     save_req_file is used to save the list of netcdf files associated with a CliMAF ensemble
     in a txt or json file, tagged with their names from the ensemble.
     It takes as arguments: a CliMAF ensemble, a filename (optional), and a separator (only for txt)
-    
+
     Examples:
     >>> my_ens = ensemble_request(req_dict) # -- see help(ensemble_request)
     >>> save_req_file(my_ens, filename='my_pretreated_files.txt')
@@ -201,10 +204,10 @@ def save_req_file(ens_obj, filename = 'test.txt', separator = ' '):
 
     '''
     if '.txt' in filename:
-        file = open(filename,"w") 
+        file = open(filename,"w")
         for elt in ens_obj.order:
             print elt+separator+cfile(ens_obj[elt])
-            file.write(elt+separator+cfile(ens_obj[elt])+' \n') 
+            file.write(elt+separator+cfile(ens_obj[elt])+' \n')
         file.close()
     if '.json' in filename:
         import json
@@ -213,12 +216,12 @@ def save_req_file(ens_obj, filename = 'test.txt', separator = ' '):
             print elt+separator+cfile(ens_obj[elt])
             json_dict.update({elt:cfile(ens_obj[elt])})
         with open(filename, 'w') as outfile:
-            json.dump(json_dict, outfile, indent = 4) 
+            json.dump(json_dict, outfile, indent = 4)
 
 def add_str_to_list_elements(my_list, my_str):
     '''
     This function adds a string (second argument) to all the elements of a list (first argument)
-    
+
     Example:
     >>> my_list = ['model1','model2']
     >>> add_str_to_list_elements(my_list, '_tas')
@@ -233,7 +236,7 @@ def add_prefix_suffix_to_ens_req(ens_obj, prefix='', suffix=''):
     the names of the members of a CliMAF ensemble. It is very useful to rename
     the members of an ensemble.
     It returns the renamed ensemble.
-    
+
     Example:
     >>> my_ens = ensemble_request(req_dict) # -- see help(ensemble_request)
     >>> renamed_ens = add_prefix_suffix_to_ens_req(my_ens, prefix='tas_', suffix='_myperiod')
@@ -245,7 +248,7 @@ def add_prefix_suffix_to_ens_req(ens_obj, prefix='', suffix=''):
         new_ens_dict.update( {prefix+elt+suffix: ens_obj[elt]} )
     new_ens = cens(new_ens_dict, order=new_names)
     new_ens.set_order(new_names)
-    
+
     return new_ens
 
 
@@ -253,7 +256,7 @@ def merge_climaf_ensembles(ens_list=[]):
     '''
     Simply merges a list ens_list of CliMAF ensembles, keeping the order of the members
     in the order of the list.
-    
+
     Example:
     >>> my_hist_ens = ensemble_request(hist_dict) # -- see help(ensemble_request)
     >>> my_rcp85_ens = ensemble_request(rcp85_dict) # -- see help(ensemble_request)
@@ -269,7 +272,7 @@ def merge_climaf_ensembles(ens_list=[]):
         return merged_ens
     else:
         print 'Provide a list of ensembles to merge together'
-        
+
 
 def check_time_consistency_CMIP(dat, return_available_period=False):
     ''' Check if the period found by CliMAF actually covers the request period

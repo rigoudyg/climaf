@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 #import sys; sys.path.append("/home/stephane/Bureau/climaf")
 from climaf.api import *
 craz()
@@ -22,12 +25,12 @@ cshow(zplot)
 zplotl=plot(ta_zonal_mean,title='title', y="index")
 cshow(zplotl)
 
-# Compute meridional mean and plot it 
+# Compute meridional mean and plot it
 ta_merid_mean=ccdo(january_ta,operator="mermean")
 mplot=plot(ta_merid_mean,title="Meridional mean")
 cshow(mplot)
 
-# Profile of global mean 
+# Profile of global mean
 ta_profile=ccdo(ta_merid_mean,operator="zonmean")
 gplot=plot(ta_profile, title="TA profile, log", y="log")
 cshow(gplot)
@@ -44,6 +47,6 @@ cshow(profplot)
 
 
 # Newt line is used for systematic test suite
-fig=cfile(profplot) 
+fig=cfile(profplot)
 if (fig  is None) : exit(1)
 

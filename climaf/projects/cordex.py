@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CORDEX, CORDEX_extent and CORDEX-Adjust outputs on Ciclad-CLIMERI
 
@@ -26,11 +28,11 @@ if onCiclad :
 #   root="/cnrm/cmip"
 
 if root:
-  ## -- Declare the various CORDEX CliMAF project 
+  ## -- Declare the various CORDEX CliMAF project
   ## --------------------------------------------- >
   pattern1='${root}/CORDEX/output/${CORDEX_domain}/${institute}/${driving_model}/${experiment}/${realization}/${model}/${model_version}/${frequency}/${variable}/${version}/${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_${frequency}_${PERIOD}.nc'
   pattern2='${root}/CORDEX/output/${CORDEX_domain}/${institute}/${driving_model}/${extent_experiment}/${realization}/${model}/${model_version}/${frequency}/${variable}/${version}/${variable}_${CORDEX_domain}_${driving_model}_${extent_experiment}_${realization}_${model}_${model_version}_${frequency}_${PERIOD}.nc'
-  
+
   # -- CORDEX
   cproject('CORDEX','root','model','CORDEX_domain', 'model_version', 'frequency', 'driving_model',
          'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'], separator='%')

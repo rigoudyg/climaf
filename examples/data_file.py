@@ -1,10 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Example for declaring a dataset from a datafile, quite simply, using function fds()
 """
 
 # S.Senesi - sept 2015
 
-# Load Climaf functions 
+# Load Climaf functions
 from climaf.api import *
 
 # Let us use a CMIP5-compliant datafile which is included in CliMAF distro
@@ -31,6 +33,6 @@ print 'model='      , all.model
 # If you know what you want from the data file
 my_rst=fds(multifile,variable='rst',period='198004')
 
-# You may whish that CliMAF handles the model name, and a sensible simulation name 
+# You may whish that CliMAF handles the model name, and a sensible simulation name
 my_rst=fds(multifile,simulation='my_simu',model='CNRM-CM', variable='rst',period='198004')
 cshow(plot(my_rst, title='Multivar file example'))

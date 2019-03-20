@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import cdms2
 import cdutil
 #from pcmdi_metrics.pcmdi.pmp_parser import *

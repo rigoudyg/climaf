@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import re
 
 from climaf.clogging import clogger, dedent
@@ -22,12 +25,12 @@ def varOfFile(filename) :
     if len(lvars)==1 : return lvars[0]
 
 def varsOfFile(filename) :
-    """ 
+    """
     returns the list of non-dimensions variable in NetCDF file FILENAME
     """
     from anynetcdf import ncf
     lvars=[]
-    fileobj=ncf(filename, 'r') 
+    fileobj=ncf(filename, 'r')
     vars=fileobj.variables
     if isinstance(vars,dict ) : vars=vars.keys()
     for filevar in vars :
@@ -46,7 +49,7 @@ def varsOfFile(filename) :
 
 
 def fileHasVar(filename,varname):
-    """ 
+    """
     returns True if FILENAME has variable VARNAME
     """
     from anynetcdf import ncf
@@ -101,17 +104,17 @@ def dimsOfFile(filename):
 
 
 def model_id(filename):
-    """ 
+    """
 
     """
     from anynetcdf import ncf
     rep='no_model'
     clogger.debug("opening "+filename)
-    f=ncf(filename, 'r') 
+    f=ncf(filename, 'r')
     if 'model_id' in dir(f) : rep=f.model_id
     f.close()
     return(rep)
-    
+
 def timeLimits(filename) :
     #
     try :
@@ -121,14 +124,14 @@ def timeLimits(filename) :
     #
     from anynetcdf import ncf
     rep=None
-    f=ncf(filename) 
+    f=ncf(filename)
     if 'time_bnds' in f.variables :
         tim=f.variables['time_bnds']
         if 'units' in dir(tim) :
-            start=tim[0,0] ; end=tim[-1,1] 
+            start=tim[0,0] ; end=tim[-1,1]
             ct=netcdftime.utime(tim.units, calendar=tim.calendar)
             return cperiod(ct.num2date(start),ct.num2date(end))
     f.close()
     return rep
     #raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
-        
+

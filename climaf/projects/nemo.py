@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IGCM outputs produced by libIGCM for all frequencies,
 on Ciclad and at TGCC.
@@ -64,7 +66,7 @@ Example 1:
 	       period='1850-1900',
 	       variable='tas'
 	       )
-               
+
 Note that the following request returns the same files (but takes more time):
  >>> dat1 = ds(project='NEMO',
                model='IPSLCM6',
@@ -131,7 +133,7 @@ if onSpip:
 if root:
 
    p=cproject("NEMO", "root", "login", "model", "config", "status", "experiment", "simulation", "DIR", "OUT", "ave_length", "frequency", "period", "clim_period", "clim_period_length", ensemble=["model","simulation","clim_period"], separator="%")
-   
+
    cdef('root'               , root       ,  project='NEMO')
    cdef('clim_period'        , '????_????',  project='NEMO')
    cdef('clim_period_length' , '*'        ,  project='NEMO') # --> Takes the following values: '*', '' (to access only to SE), '_50Y', '_100Y'
@@ -147,32 +149,32 @@ if root:
    cdef('DIR'                , '*'        ,  project='NEMO') # --> ATM, OCE, SRF...
    cdef('login'              , '*'        ,  project='NEMO')
    cdef('period'             , 'fx'       ,  project='NEMO')
-   
-   
+
+
    # Frequency alias
    cfreqs('NEMO', {'monthly':'1M' , 'daily':'1D' , 'seasonal':'SE', 'annual_cycle':'SE', 'yearly':'1Y'})
-   
+
    urls_NEMO=[
       "${root}/${model}/${config}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_${PERIOD}_${frequency}_${variable}.nc",
       "${root}/${model}/${config}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc"
    ]
-   
-   
+
+
    # Next command will lead to explore all directories in 'urls_NEMO'
-   # for searching data for a CliMAF dataset (by function ds) except if 
+   # for searching data for a CliMAF dataset (by function ds) except if
    # a more specific dataloc entry matches the arguments to 'ds'
    dataloc(project="NEMO", organization="generic", url=urls_NEMO)
-   
-   
+
+
    # -- Note:
    # -- In the project NEMO, we have defined aliases for both the CMIP variable names (aliased to the old igcm names when necessary)
    # -- and the old IGCM names to take advantage of the mechanisms behind calias (scale, offset, filenameVar)
-   
-   
-   
+
+
+
    # ---------------------------------------- #
    # -- Aliases to the CMIP variable names -- #
-   
+
    # OCE
    calias("NEMO", 'tos'                 , offset=273.15 , filenameVar='grid_T')
    calias("NEMO", 'sos'                                 , filenameVar='grid_T')
@@ -183,11 +185,11 @@ if root:
    calias("NEMO", 'mlddt02' ,'mld_dt02'                 , filenameVar='grid_T')
    calias("NEMO", 'hc300'               ,   scale=1.E-9 , filenameVar='grid_T')
    calias("NEMO", 'wfo'                                 , filenameVar='grid_T')
-   
+
    # ICE
-   calias("NEMO", 'sic'   ,    'siconc',   scale=100 , filenameVar="icemod") 
-   calias("NEMO", 'sit'   ,    'sithic'              , filenameVar="icemod") 
-   
+   calias("NEMO", 'sic'   ,    'siconc',   scale=100 , filenameVar="icemod")
+   calias("NEMO", 'sit'   ,    'sithic'              , filenameVar="icemod")
+
    # ATM general variables
    calias("NEMO", 'pr'      ,'precip'  ,filenameVar='histmth')
    calias("NEMO", 'prw'                ,filenameVar='histmth')
@@ -197,7 +199,7 @@ if root:
    calias("NEMO", 'uas'     ,'u10m'    ,filenameVar='histmth')
    calias("NEMO", 'vas'     ,'v10m'    ,filenameVar='histmth')
    calias("NEMO", 'sfcWind' ,'wind10m' ,filenameVar='histmth')
-   
+
    # -> Turbulent fluxes
    calias("NEMO", 'hfls'   ,'solahdoo' , scale=-1 , filenameVar='grid_T')
    calias("NEMO", 'hfss'   ,'sosehdoo' , scale=-1 , filenameVar='grid_T')
@@ -209,7 +211,7 @@ if root:
    calias('NEMO', 'PO4', filenameVar='ptrc_T')
    calias('NEMO', 'Si', filenameVar='ptrc_T')
    calias('NEMO', 'O2', filenameVar='ptrc_T')
-  
+
 
    # ---------------------------------------------------------------------------------------------- #
    # --> Aliases to the zonal average (computed on the x axis of the ORCA grid)                  -- #
@@ -229,10 +231,10 @@ if root:
    calias('NEMO', 'zomsfatl', filenameVar='diaptr')
    calias('NEMO', 'zomsfind', filenameVar='diaptr')
 
- 
+
    # ---------------------------------------------------------------------------------------------- #
    # --> Aliases to the old NEMO names (to take advantage of offset, scale and filenameVar)  -- #
-   
+
    # OCE
    calias("NEMO", 'sosstsst'            , offset=273.15 , filenameVar='grid_T')
    calias("NEMO", 'sosaline'                            , filenameVar='grid_T')
@@ -242,12 +244,12 @@ if root:
    calias("NEMO", 'somx3010'                            , filenameVar='grid_T')
    calias("NEMO", 'sohtc300'            ,   scale=1.E-9 , filenameVar='grid_T')
    calias("NEMO", 'mld_dt02'                            , filenameVar='grid_T')
-   
+
    # ICE
    calias("NEMO", 'siconc' ,  scale=100 , filenameVar="icemod")
    calias("NEMO", 'sithic'              , filenameVar="icemod")
    calias("NEMO", 'sivolu'              , filenameVar="icemod")
-   
+
    # ATM general variables
    calias("NEMO", 'precip'  ,filenameVar='histmth')
    calias("NEMO", 'prw'     ,filenameVar='histmth')
@@ -257,29 +259,29 @@ if root:
    calias("NEMO", 'u10m'    ,filenameVar='histmth')
    calias("NEMO", 'v10m'    ,filenameVar='histmth')
    calias("NEMO", 'wind10m' ,filenameVar='histmth')
-   
+
    # -> Clouds
    calias("NEMO", 'cldt'           , scale=100, filenameVar='histmth')
-   
+
    # -> Radiative down at TOA
    calias("NEMO", 'SWdnTOA'     ,filenameVar='histmth')
-   
+
    # -> Radiative down at TOA
    calias("NEMO", 'topl'        ,filenameVar='histmth')
    calias("NEMO", 'SWupTOA'     ,filenameVar='histmth')
    calias("NEMO", 'topl0'       ,filenameVar='histmth')
    calias("NEMO", 'SWupTOAclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative up at Surface
    calias("NEMO", 'LWupSFC'  ,filenameVar='histmth')
    calias("NEMO", 'SWupSFC'  ,filenameVar='histmth')
    calias("NEMO", 'SWupSFCclr'  ,filenameVar='histmth')
    calias("NEMO", 'LWupSFCclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative down at Surface
    calias("NEMO", 'LWdnSFC'  ,filenameVar='histmth')
    calias("NEMO", 'SWdnSFC'  ,filenameVar='histmth')
    calias("NEMO", 'LWdnSFCclr'  ,filenameVar='histmth')
    calias("NEMO", 'SWdnSFCclr'  ,filenameVar='histmth')
-   
-   
+
+

@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 from climaf.api import *
 from climaf.operators import *
@@ -16,14 +19,14 @@ def apply_scale_offset(dat,scale,offset):
     """Returns a CliMAF object after applying a scale and offset
     ! Shortcut to: ccdo(ccdo(dat,operator='mulc,'+str(float(scale))),operator='addc,'+str(float(offset)))
 
-    **Note** : this function should be used parcimonioulsy because the model in CliMAF 
+    **Note** : this function should be used parcimonioulsy because the model in CliMAF
     for dealing with scaling and offset is rather :
 
       - to automatically scale and offset the data to S.I. units at
         input/reading stage; this si done by declaring scaling for
         each relevant variable in a project using function
         :py:func:`~climaf.classes.calias`; it also allows to set the units
-      - if the S.I. units are not suitable for a plot, to use plot 
+      - if the S.I. units are not suitable for a plot, to use plot
         operators arguments 'scale' and 'offset' to change the values
 
     """
@@ -49,7 +52,7 @@ def fmul(dat1,dat2):
     if isinstance(dat2,(str,float,int)):
        c = str(float(dat2))
        return ccdo(dat1,operator='mulc,'+c)
-    else: 
+    else:
        return ccdo2(dat1,dat2,operator='mul')
 
 def fdiv(dat1,dat2):
@@ -213,14 +216,14 @@ def diff_regridn (data1, data2, cdogrid='n90', option='remapbil'):
     """
     Regrids dat1 and dat2 on a chosen cdogrid (default is n90) and returns the difference between dat1 and dat2
     The user can specify the cdo regridding method with the argument option (as in regridn(); default is option='remapbil').
-  
+
       >>> dat1= ....   # some dataset, with whatever variable
       >>> dat2= ....   # some dataset, with the same variable as dat1
       >>> diff_dat1_dat2 = diff_regridn(dat1,dat2) # -> uses cdogrid='n90' and option='remapbil'
       >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90') # -> Returns the difference on 2 deg grid
       >>> diff_dat1_dat2 = diff_regridn(dat1,dat2,cdogrid='r180x90', option='remapdis') # -> Returns the difference on 2 deg grid regridded with the remapdis CDO method
- 
-    """    
+
+    """
     return minus(regridn(data1,cdogrid=cdogrid,option=option),regridn(data2,cdogrid=cdogrid,option=option))
 
 
@@ -247,18 +250,18 @@ def annual_cycle(dat):
 
 def clim_average(dat,season):
     """
-    Computes climatological averages on the annual cycle of a dataset, on the months 
+    Computes climatological averages on the annual cycle of a dataset, on the months
     specified with 'season', either:
 
     - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
-    - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology 
+    - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
-    - individual monthly climatologies (e.g. season = 'january', 'jan', '1' or 1 to get 
+    - individual monthly climatologies (e.g. season = 'january', 'jan', '1' or 1 to get
       the climatological January)
     - annual maximum or minimum (typically makes sense with the mixed layer depth)
 
     Note that you can use upper case or lower case characters to specify the months or seasons.
-    
+
     clim_average computes the annual cycle for you.
 
       >>> dat= ....   # some dataset, with whatever variable
@@ -328,7 +331,7 @@ def clim_average(dat,season):
 def summary(dat):
     """
     Summary provides the informations on a CliMAF dataset or ensemble of datsets
-    It displays the path and filenames, and the dictionary of pairs keyword-values 
+    It displays the path and filenames, and the dictionary of pairs keyword-values
     associated with the dataset.
 
       >>> dat= ds(....)   # some dataset, with whatever variable
@@ -348,7 +351,7 @@ def summary(dat):
                 files=dat[m].baseFiles(ensure_dataset=False)
                 if files :
                     for f in str.split(files,' '): print f
-            else : 
+            else :
                 print(m+" : "+ `obj`)
             print '--'
     elif isinstance(dat,classes.cdataset):
@@ -370,7 +373,7 @@ def projects():
         print 'Facets =>',cprojects[key]
 
 #
-def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True): 
+def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_grid='r1x90',horizontal_regridding=True):
     """
     Interpolates a lon/lat/pres field dat1 via two possible ways:
     - either by providing a target lon/lat/pres field dat2 => dat1 is regridded both horizontally and vertically on dat2
@@ -381,26 +384,26 @@ def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
     vertical_levels='100000,85000,50000,20000'
     Before the computations, the function checks the unit of the vertical axis;
     it is converted to Pa if necessary directly in the netcdf file(s) corresponding to dat1(2).
-    
+
        >>> dat = ds(project='CMIP5',model='IPSL-CM5A-LR',variable='ua',period='1980-1985',
                     experiment='historical',table='Amon')
        >>> ref = ds(project='ref_pcmdi',variable='ua',product='ERAINT')
-   
+
        >>> zonmean_dat = zonmean(time_average(dat))
        >>> zonmean_ref = zonmean(time_average(ref))
-   
+
        >>> dat_interpolated_on_ref = lonlatvert_interpolation(zonmean_dat,zonmean_ref)
        >>> dat_interpolated_on_list_of_levels = lonlatvert_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
 
     """
-    
+
     from climaf.anynetcdf import ncf
     from climaf import cachedir
-     
+
     file1 = cfile(dat1)
     clogger.debug('file1 = %s' %file1)
     ncfile1 = ncf(file1)
-    
+
     # -- First, we check the unit of the vertical dimension of file1
     levname1=None
     for varname in ncfile1.variables:
@@ -420,7 +423,7 @@ def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
         file2 = cfile(dat2)
         clogger.debug('file2 = %s' %file2)
         ncfile2 = ncf(file2)
-        
+
         levname2=None
         for varname in ncfile2.variables:
             if varname.lower() in ['level','levels','lev','levs','depth','deptht','olevel'] or 'plev' in varname.lower():
@@ -436,7 +439,7 @@ def lonlatvert_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_
            try:
               levValues2 = ncfile2.variables[levname2].data
            except:
-              levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])] 
+              levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])]
         if levunits2.lower() in ['hpa','millibar','mbar','hectopascal']:
             # -- Multiplier par 100
             cscript('convert_plev_hPa_to_Pa','ncap2 -As "'+levname2+'='+levname2+'*100" ${in} '+cachedir+'/convert_to_Pa_tmp.nc ; ncatted -O -a units,'+levname2+',o,c,Pa '+cachedir+'/convert_to_Pa_tmp.nc ; mv '+cachedir+'/convert_to_Pa_tmp.nc ${out}')
@@ -499,7 +502,7 @@ def zonmean_interpolation(dat1,dat2=None,vertical_levels=None,cdo_horizontal_gri
        >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
 
     """
-    
+
     return lonlatvert_interpolation(dat1,dat2,vertical_levels,cdo_horizontal_grid='r1x90',horizontal_regridding=horizontal_regridding)
 
 
@@ -570,7 +573,7 @@ def convert_list_to_string(dum,separator1=',', separator2='|'):
 
 
 def ts_plot(ts, **kwargs):
-    """ 
+    """
     A python-user-friendly interface for the climaf operator :doc:`scripts/ensemble_ts_plot`.
 
     It takes the same arguments, but you can pass python lists
@@ -583,7 +586,7 @@ def ts_plot(ts, **kwargs):
             - a CliMAF ensemble
 
     It is also able to take 'title' and 'title_fontsize 'as argument (will use the right_string resource for this)
-    
+
     See the documentation of :doc:`scripts/ensemble_ts_plot` for the details on all possible options.
 
     Examples:
@@ -602,7 +605,7 @@ def ts_plot(ts, **kwargs):
 
 
     """
-    # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot 
+    # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot
     if not isinstance(ts, climaf.classes.cens):
        # -- Case 1: it's a single CliMAF dataset
        if not isinstance(ts, list):
@@ -626,7 +629,7 @@ def ts_plot(ts, **kwargs):
                  elts_dict.update({ts_name:ts_elt})
           ens_ts = cens(elts_dict, order=elts_order)
           ens_ts.set_order(elts_order)
-          
+
     else:
        ens_ts = ts.copy()
     # -- Convert lists to string
@@ -665,7 +668,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
     new_ens.set_order(members_selection)
     #
     mp = cpage(plot(new_ens, **pp))
-    
+
     return iplot(mp)
 
 

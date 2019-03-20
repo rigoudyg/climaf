@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import *
 
 # Define a dataset, using a built-in pre-defined datafile location

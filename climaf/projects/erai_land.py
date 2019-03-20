@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 This module declares ERA Interim land data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
@@ -37,10 +39,10 @@ if atCNRM:
 
 
     # Defining alias and derived variables for ERAI-land, together with filenames
-    ############################################################################## 
+    ##############################################################################
 
-    #asn:="Snow albedo" sans dimension 
-    #calias("erai-land",''    ,'asn'  ,filenameVar='ASN') 
+    #asn:="Snow albedo" sans dimension
+    #calias("erai-land",''    ,'asn'  ,filenameVar='ASN')
 
     #calias("erai-land",'snw'    ,'rsn'  , scale= 'snd',filenameVar='RSN') ?
     #rsn=Snow density "kg m**-3"ds .nc

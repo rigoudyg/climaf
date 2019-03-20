@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Standard site settings for working with CliMAF.
 
@@ -42,4 +44,4 @@ if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.
 if os.path.exists('/data8/datamg/') or os.path.exists('/scratch/globc') :
     atCerfacs=True
 
-    
+

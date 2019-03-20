@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import *
-from climaf.html import * 
+from climaf.html import *
 from climaf import cachedir
 
 # This example does work only on Ciclad
@@ -8,23 +11,23 @@ if not onCiclad: exit(0)
 desc="\n\nProto d'atlas oceanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"
 from optparse import OptionParser
 parser = OptionParser(desc) ; parser.set_usage("%%prog [-h]\n%s" % desc)
-parser.add_option("-s", "--simulation", 
+parser.add_option("-s", "--simulation",
                   help="simulation to process ",
                   action="store",default="historical")
-parser.add_option("-i", "--index", 
+parser.add_option("-i", "--index",
                   help="html index filename",
                   action="store",default="index_oce.html")
-parser.add_option("-d", "--directory", 
+parser.add_option("-d", "--directory",
                   help="destination directory ", action="store")
-parser.add_option("-a", "--alt_dir_name", 
+parser.add_option("-a", "--alt_dir_name",
                   help="disguise links to another dir ", action="store")
-parser.add_option("-u", "--root_url", 
+parser.add_option("-u", "--root_url",
                   help="Root url for option -a",
                   default="https://vesg.ipsl.upmc.fr", action="store")
-parser.add_option("-p", "--period", 
+parser.add_option("-p", "--period",
                   help="period after CliMAF syntax, as e.g. 1980-1987",
                   action="store",default="1980")
-parser.add_option("-v", "--variables", 
+parser.add_option("-v", "--variables",
                   help="variables list(comma separated)",
                   action="store",default="thetao,so")
 #
@@ -40,8 +43,8 @@ dataloc(project="ref_pcmdi",organization="generic",
         url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
 calias('ref_pcmdi','moc','stream_function_mar',filenameVar='moc')
 
-model=dict(project='CMIP5',model='CNRM-CM5', frequency="mon", 
-           realm="ocean", table="Omon", version="latest", 
+model=dict(project='CMIP5',model='CNRM-CM5', frequency="mon",
+           realm="ocean", table="Omon", version="latest",
            period=opts.period, experiment=opts.simulation,simulation="r1i1p1")
 levitus=dict(project="ref_pcmdi", product='NODC-Levitus',clim_period='*')
 
@@ -53,8 +56,8 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     create a figure for profile for the variable in both sources
 
     dataset specifications are dictionnaries
-    
-    specifics : 
+
+    specifics :
      - space averaging uses cdftools for model variable, on grid T
      - obs data are supposed to be an annual cycle
 
@@ -68,11 +71,11 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     """
     modvar=ds(variable=variable,**model)
     obsvar=ds(variable=variable,**obs)
-    
-    #- Compute temporal means 
+
+    #- Compute temporal means
     tmean_modvar=ccdo(modvar,operator='timavg -yearmonmean')
-    tmean_obsvar=ccdo(obsvar,operator='yearmonmean') 
-    
+    tmean_obsvar=ccdo(obsvar,operator='yearmonmean')
+
     #- Compute model profile using CdfTools (this requires some pre-processing)
     fixed_fields('ccdfmean_profile',
              ('mask.nc',    masks+'/ORCA1_mesh_mask.nc'),
@@ -84,9 +87,9 @@ def model_vs_obs_profile_oce(variable,model,obs,masks='/data/esanchez/Atlas/oce/
     vertprof_obsvar=ccdo(tmean_obsvar,operator='mermean -zonmean')
 
     #- Plot vertical profile of model & obs data
-    myplot=plot( vertprof_obsvar, vertprof_modvar, title='MOD&OBS - '+variable, 
+    myplot=plot( vertprof_obsvar, vertprof_modvar, title='MOD&OBS - '+variable,
                  y="index",aux_options="xyLineColor='red'",invXY=False)
-    
+
     return(myplot)
 
 
@@ -96,7 +99,7 @@ def plot_basin_moc(model, variable="msftmyz", basin=1):
     moc_model_mean=time_average(moc_model)
     # extraire le bassin de rang 'basin' (def: Atlantique=1)
     moc_model_mean_atl=slice(moc_model_mean, dim='x', min=basin, max=basin)
-    # masquer les valeurs 
+    # masquer les valeurs
     moc_model_mean_atl_mask=mask(moc_model_mean_atl,miss=0.0)
     # Plot
     plot_moc_slice=plot(moc_model_mean_atl_mask, title="MOC", y="lin",
@@ -105,8 +108,8 @@ def plot_basin_moc(model, variable="msftmyz", basin=1):
 
 
 # Profil de MOC, vs Obs RAPID
-def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1): 
-    """ 
+def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1):
+    """
     Model is a dict defining the model dataset (except variable)
     """
     # Comparer les profil de MOC modele/RAPID a la latitude 26
@@ -123,7 +126,7 @@ def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1):
     moc_obs=ds(project="ref_pcmdi",variable='moc')
     moc_obs_mean=time_average(moc_obs)
     #
-    plot_profile_obs=plot(moc_model_26,moc_obs_mean, title='RAPID', 
+    plot_profile_obs=plot(moc_model_26,moc_obs_mean, title='RAPID',
                           y="lin", units="Sv", aux_options="xyLineColor='red'")
     return plot_profile_obs
 
@@ -131,8 +134,8 @@ def moc_profile_vs_obs_rapid(model,variable="msftmyz",basin=1):
 # Init html index
 #########################################################################
 #if opts.directory : atlas_dir=os.path.expanduser(opts.directory)
- 
-index= header("Nemo CliMAF Atlas for "+opts.simulation+ " and period "+opts.period) 
+
+index= header("Nemo CliMAF Atlas for "+opts.simulation+ " and period "+opts.period)
 index += section("ocean", level=4)
 
 # A table with one line per variable, showing its global average profile
@@ -161,7 +164,7 @@ index+=line({"moc_profile":cfile(moc_profile), "moc_atl":cfile(moc_atl)},
 
 
 index += trailer()
-import os 
+import os
 out=opts.index
 if opts.alt_dir_name :
     outfile=cachedir+"/"+out

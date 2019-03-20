@@ -1,5 +1,7 @@
-"""This module declares project emn36 , base on data organization 'generic', for 
-handling Nemo36 data such as organized by EM 
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""This module declares project emn36 , base on data organization 'generic', for
+handling Nemo36 data such as organized by EM
 
 EM (Experiment Manager) is a tool used at CNRM for moving simulation post-processed data
 from the HPSS to the local filesystem, and to organize it in a file hierarchy governed by a few
@@ -9,10 +11,10 @@ Simulation names (or 'EXPIDs') are assumed to be unique in the
 namespace defined by the user's configuration file, which may include
 shared simulation
 
-Specific facets are : 
+Specific facets are :
   - root : root directory for private data files as declared to EM
   - group : group of the simualtion (as declared to ECLIS)
-  - frequency 
+  - frequency
 
 Examples for defining an EM dataset::
 
@@ -32,7 +34,7 @@ if atCNRM :
 
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs,cdef
-    
+
     # example : /cnrm/ioga/Users/voldoire/NO_SAVE/PRE6/CPLTEA623O45
 
     # In project 'emn36', there is a ROOT location, data is organized in
@@ -49,18 +51,18 @@ if atCNRM :
     pathI=pathG+"O/${simulation}_1${frequency}_${PERIOD}_icemod.nc" # var:T
     pathO=pathG+"O/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" # var:T
     dataloc(project="emn36", organization="generic", url=[pathI,pathO])
-    
-    # Shared simulations 
+
+    # Shared simulations
     pathg="/cnrm/cmip/cnrm/simulations/${group}/"
-    pathgI=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_icemod.nc" 
-    pathgO=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc" 
+    pathgI=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_icemod.nc"
+    pathgO=pathg+"O/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc"
     dataloc(project="emn36", organization="generic", url=[pathgI,pathgO])
 
     # Define default values
     ############################################
 
     # You do not need to use a GROUPs experiment
-    cdef("group","",project="emn36") ;  
+    cdef("group","",project="emn36") ;
 
     cdef("frequency","monthly",project="emn36") ;
     cfreqs("emn36",{"daily":"d", "monthly":"m"})
@@ -78,7 +80,7 @@ if atCNRM :
     calias("emn36", 'so'  ,filenameVar='S')
     calias("emn36", 'sos' ,filenameVar='S')
     calias("emn36", 'wfo' ,filenameVar='S')
-    
+
     calias("emn36", 'thetao',filenameVar='T')
     calias("emn36", 'tos'   ,filenameVar='T')
     calias("emn36", 'tossq' ,filenameVar='T')
@@ -86,7 +88,7 @@ if atCNRM :
     calias("emn36", 'zossq' ,filenameVar='T')
     calias("emn36", 'nshfls',filenameVar='T')
     calias("emn36", 'rsntds',filenameVar='T')
-    
+
     calias("emn36", 'uo' ,filenameVar='U')
     calias("emn36", 'uos' ,filenameVar='U')
     calias("emn36", 'tauuo' ,filenameVar='U')
@@ -108,10 +110,10 @@ if atCNRM :
     # sivelv
     # sivolu
     # snvolu
-    
+
 
     # .... to be continued
-    
+
     # A fix for seaice missing values
     #calias('emn36',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice', 'mpalb', 'snomlet',
     #              'tmelt', 'bmelt', 'snc','sic1','sic2', 'sic3', 'sic4', 'ssi', 'ageice'],

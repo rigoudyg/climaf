@@ -1,5 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-This module declares locations for searching data for CMIP6 outputs produced by 
+This module declares locations for searching data for CMIP6 outputs produced by
 libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP6 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
@@ -33,7 +35,7 @@ if atCNRM:
    root="/cnrm/cmip"
 
 if root:
-  ## -- Declare a 'CMIP6 CliMAF project 
+  ## -- Declare a 'CMIP6 CliMAF project
   ## ------------------------------------ >
   cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
            'grid', 'version', ensemble=['model','realization'],separator='%')

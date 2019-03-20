@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 CliMAF macros module :
 
@@ -93,10 +95,10 @@ def macro(name,cobj,lobjects=[]):
         rep=scriptChild(macro(None,cobj.father),cobj.varname)
     elif isinstance(cobj,cpage) :
         rep=cpage([ map(macro, [ None for fig in line ], line) for line in cobj.fig_lines ], cobj.widths, cobj.heights)
-    elif isinstance(cobj,cens) :      
+    elif isinstance(cobj,cens) :
         d=dict()
         for k,v in zip(cobj.keys(),map(macro,[ None for o in cobj.values()],cobj.values())) : d[k]=v
-        rep=cens(d)                
+        rep=cens(d)
     elif cobj is None : return None
     else :
         clogger.error("Cannot yet handle object :%s", `cobj`)
@@ -106,7 +108,7 @@ def macro(name,cobj,lobjects=[]):
         doc="A CliMAF macro, which text is "+`rep`
         defs='def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n'\
               % (name,doc,name)
-        exec defs in globals() 
+        exec defs in globals()
         exec "from climaf.cmacro import %s"%name in sys.modules['__main__'].__dict__
         clogger.debug("Macro %s has been declared"%name)
 
@@ -115,12 +117,12 @@ def macro(name,cobj,lobjects=[]):
 
 def crewrite(crs,alsoAtTop=True):
     """
-    Return the crs expression with sub-trees replaced by macro equivalent 
+    Return the crs expression with sub-trees replaced by macro equivalent
     when applicable
 
     Search order is : from CRS tree root try all macros, then do the
-    same for first subtree, and recursively in depth, and then go 
-    to second subtreesecond 
+    same for first subtree, and recursively in depth, and then go
+    to second subtreesecond
     """
     # Next line used for interpreting macros's CRS
     exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
@@ -187,8 +189,8 @@ def cmatch(macro,cobj) :
                         argsub+=cmatch(mfig,fig)
         return argsub
     else : return []
-    
-    
+
+
 def read(filename):
     """
     Read macro dictionary from filename, and add it to cmacros[]

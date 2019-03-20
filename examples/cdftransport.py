@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import *
 
 if not atCNRM: exit(0)
@@ -14,7 +17,7 @@ cproject('data_CNRM')
 #root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
 root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
-url_nemo_standard=root1+suffix  
+url_nemo_standard=root1+suffix
 
 # For VT files from Monitoring
 #root2="/cnrm/ioga/Users/chevallier/chevalli/Monitoring/Results/NO_SAVE/PRE6/SORTIE/PRE6/${simulation}/MONITOR/VT/"
@@ -22,7 +25,7 @@ root2="/cnrm/est/COMMON/climaf/test_data/${simulation}/VT/"
 url_nemo_monitoring=root2+suffix
 #
 dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard,url_nemo_monitoring])
-# 
+#
 # Declare how variables are scattered/grouped among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
@@ -33,13 +36,13 @@ calias("data_CNRM","so,thetao",filenameVar="grid_T_table2.2")
 products="vomevt,vomevs,vozout,vozous"
 calias("data_CNRM",products,filenameVar="VT")
 
-# Define defaults facets for datasets 
+# Define defaults facets for datasets
 cdef("project","data_CNRM")
 cdef("frequency","monthly")
 cdef("simulation","PRE6CPLCr2alb")
 cdef("period","199808-199809")
 
-# Define datasets 
+# Define datasets
 duo=ds(variable="uo")
 dvo=ds(variable="vo")
 dx=ds(variable=products)
@@ -60,7 +63,7 @@ cfile(trsp) #main output is mass transport
 cfile(trsp.htrp)
 cfile(trsp.strp)
 
-# Compute products another way, and transport 
+# Compute products another way, and transport
 dso=ds(variable="so")
 dtho=ds(variable="thetao")
 dx2=ccdfvT(dtho,dso,duo,dvo)

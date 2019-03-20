@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Examples for some cdftools operators :
 #
 # - cdfmean =>
@@ -24,8 +27,8 @@
 #           V.T, V.S, U.T and U.S used in heat and salt transport computation)
 #
 # - cdfzonalmean =>
-#    * ccdfzonalmean : compute the global zonal mean of the given variable 
-#    * ccdfzonalmean_bas : compute the zonal mean of the given variable in a specified sub-basin 
+#    * ccdfzonalmean : compute the global zonal mean of the given variable
+#    * ccdfzonalmean_bas : compute the zonal mean of the given variable in a specified sub-basin
 #
 
 #export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
@@ -36,7 +39,7 @@ if 'ccdfmean' not in cscripts :
     print("CDFtools not available")
     exit(0)
 
-# Declare "data_CNRM" project for Nemo raw outputs 
+# Declare "data_CNRM" project for Nemo raw outputs
 #
 cproject('data_CNRM')
 
@@ -44,17 +47,17 @@ cproject('data_CNRM')
 #root1="/cnrm/est/USERS/senesi/NO_SAVE/expes/PRE6/${simulation}/O/"
 root1="/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
 suffix="${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
-url_nemo_standard=root1+suffix  
+url_nemo_standard=root1+suffix
 #
 dataloc(project='data_CNRM', organization='generic', url=[url_nemo_standard])
-# 
+#
 # Declare how variables are scattered/groupes among files
 # (and with mixed variable names conventions - CNRM and  MONITORING)
 calias("data_CNRM","uo",filenameVar="grid_U_table2.3")
 calias("data_CNRM","vo,vmo",filenameVar="grid_V_table2.3")
 calias("data_CNRM","so,thetao,omlmax",filenameVar="grid_T_table2.2")
 
-# Define defaults facets for datasets 
+# Define defaults facets for datasets
 cdef("project","data_CNRM")
 cdef("frequency","monthly")
 
@@ -80,7 +83,7 @@ fixed_fields(['ccdfzonalmean_bas'],
 #
 # CDFtools usage :
 # cdfmean  IN-file IN-var T|U|V|F|W [imin imax jmin jmax kmin kmax]
-#        ... [-full] [-var] [-zeromean] 
+#        ... [-full] [-var] [-zeromean]
 #
 # CliMAF usage (ccdfmean, ccdfmean_profile, ccdfmean_profile_box, ccdfvar, ccdfvar_profile) :
 #
@@ -131,17 +134,17 @@ my_plot4=curves(my_cdfvar_prof2_level0,labels="uo",title="Level 0 (gdept=5.02159
 cshow(my_plot4)
 
 #-----------
-# cdfheatc   
+# cdfheatc
 #-----------
 #
 # CDFtools usage :
 # cdfheatc  T-file ...
-#     ... [imin imax jmin jmax kmin kmax] [-full] 
+#     ... [imin imax jmin jmax kmin kmax] [-full]
 #
 # CliMAF usage (ccdfheatc) :
 #
 
-# Define datasets with salinity and temperature 
+# Define datasets with salinity and temperature
 dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
 dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
 
@@ -167,7 +170,7 @@ cshow(my_plot5)
 # CliMAF usage (ccdfmxlheatc) :
 #
 
-# Define dataset with mld 
+# Define dataset with mld
 dmldx=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")
 
 # Compute the heat content in the mixed layer
@@ -175,19 +178,19 @@ my_cdfmxlheatc=ccdfmxlheatcm(dtho,dmldx)
 cfile(my_cdfmxlheatc)
 
 #-----------
-# cdfsaltc   
+# cdfsaltc
 #-----------
 #
 # CDFtools usage :
 # cdfsaltc  T-file ...
-#     ... [imin imax jmin jmax kmin kmax] [-full] 
+#     ... [imin imax jmin jmax kmin kmax] [-full]
 #
 # CliMAF usage (ccdfsaltc) :
 #
 
 #export CLIMAF_FIX_NEMO_TIME='on'
 
-# Define dataset with salinity 
+# Define dataset with salinity
 dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="1998", realm="O")
 
 # Compute the salt content in the specified area
@@ -225,7 +228,7 @@ cfile(my_cdfstd_moy)
 cfile(my_cdfstd_moy.moy)
 
 #----------------
-#  cdfsections 
+#  cdfsections
 #----------------
 #
 # CDFtools usage :
@@ -236,13 +239,13 @@ cfile(my_cdfstd_moy.moy)
 #
 
 # Define datasets with salinity,  temperature, mld, sea water x and y velocity (uo/vo)
-dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")      
-dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") 
-dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O") 
-duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")      
+dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
+dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
+dmld=ds(simulation="PRE6CPLCr2alb", variable="omlmax", period="199807", realm="O")
+duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
-# Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang 
+# Compute temperature, salinity, sig0, sig1, sig2, sig4, Uorth, Utang
 # along a section made of Nsec linear segments
 my_cdfsections=ccdfsectionsm(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=125.0,Nsec=1,lat1=50.0,lon1=127.0,lat2=50.5,lon2=157.5,n1=20)
 cfile(my_cdfsections)
@@ -258,7 +261,7 @@ my_cdfsections2=ccdfsectionsm(dso,dtho,dmld,duo,dvo,larf=48.0,lorf=305.0,Nsec=2,
 cfile(my_cdfsections2)
 
 #----------------
-#  cdfvT 
+#  cdfvT
 #----------------
 #
 # CDFtools usage :
@@ -271,12 +274,12 @@ cfile(my_cdfsections2)
 # salinity ("so" in .nc <=> "vosaline" for cdftools),
 # zonal velocity component ("uo" in .nc <=> "vozocrtx" for cdftools),
 # meridional velocity component ("vo" in .nc <=> "vomecrty" for cdftools)
-dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")      
-dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O") 
-duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")      
+dso=ds(simulation="PRE6CPLCr2alb", variable="so", period="199807", realm="O")
+dtho=ds(simulation="PRE6CPLCr2alb", variable="thetao", period="199807", realm="O")
+duo=ds(simulation="PRE6CPLCr2alb", variable="uo", period="199807", realm="O")
 dvo=ds(simulation="PRE6CPLCr2alb", variable="vo", period="199807", realm="O")
 
-# Compute the time average values for second order products 
+# Compute the time average values for second order products
 # V.T, V.S, U.T and U.S used in heat and salt transport computation
 my_cdfvT=ccdfvT(dtho,dso,duo,dvo)
 cfile(my_cdfvT)

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CMIP3 outputs on e.g. Ciclad
 
@@ -28,28 +30,28 @@ if atCNRM:
    pass
 
 if root:
-   ## -- Declare a CMIP3 CliMAF project 
+   ## -- Declare a CMIP3 CliMAF project
    ## ------------------------------------ >
-   cproject('CMIP3', 'root', 'model', 'realm', 'experiment', 'realization', 'frequency', 
+   cproject('CMIP3', 'root', 'model', 'realm', 'experiment', 'realization', 'frequency',
             ensemble=['model','realization'],separator='%')
-   
+
    ## -- Define the pattern for CMIP3 data
    pattern1='${root}/${experiment}/${realm}/${frequency}/${variable}/${model}/${realization}/'
    pattern1+='${variable}_*.nc'
-   
+
    ## -- call the dataloc CliMAF function
    dataloc(project='CMIP3', organization='generic', url=pattern1)
-   
+
    # -- Make the alias and default values for both projects
    for project in ['CMIP3']:
       #calias(project, 'tos', offset=273.15)
-      
+
       cdef('root'        , root         , project=project)
       cdef('realm'       , '*'           , project=project)
       cdef('realization' , '*'     , project=project)
       cdef('experiment'  , 'sresa1b' , project=project)
       cdef('frequency'   , 'mo'          , project=project)
       cdef('period'      , '*'           , project=project)
-      
+
       cfreqs(project, {'monthly':'mo', })
-      
+

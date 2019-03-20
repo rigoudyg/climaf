@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IGCM outputs produced by libIGCM for all frequencies,
 on Ciclad and at TGCC.
@@ -64,7 +66,7 @@ Example 1:
 	       period='1850-1900',
 	       variable='tas'
 	       )
-               
+
 Note that the following request returns the same files (but takes more time):
  >>> dat1 = ds(project='IGCM_OUT',
                model='IPSLCM6',
@@ -133,7 +135,7 @@ if onSpip:
 if root:
 
    p=cproject("IGCM_OUT", "root", "login", "model", "status", "experiment", "simulation", "DIR", "OUT", "ave_length", "frequency", "period", "clim_period", "clim_period_length", ensemble=["model","simulation","clim_period"], separator="%")
-   
+
    cdef('root'               , root       ,  project='IGCM_OUT')
    if login: cdef('login' , login, project='IGCM_OUT')
    cdef('clim_period'        , '????_????',  project='IGCM_OUT')
@@ -149,14 +151,14 @@ if root:
    cdef('DIR'                , '*'        ,  project='IGCM_OUT') # --> ATM, OCE, SRF...
    cdef('login'              , '*'        ,  project='IGCM_OUT')
    cdef('period'             , 'fx'       ,  project='IGCM_OUT')
-   #cdef('file_syntax'        , '${simulation}_${start_year}MMDD_${end_year}MMDD_${frequency}_${variable}.nc', project='IGCM_OUT')   
+   #cdef('file_syntax'        , '${simulation}_${start_year}MMDD_${end_year}MMDD_${frequency}_${variable}.nc', project='IGCM_OUT')
    #cdef('file_separator'        , '_', project='IGCM_OUT')
    #cdef('period_separator'        , '_', project='IGCM_OUT')
 
    # Frequency alias
    cfreqs('IGCM_OUT', {'monthly':'1M' , 'daily':'1D' , 'seasonal':'SE', 'annual_cycle':'SE', 'yearly':'1Y'})
 
-   if onCiclad:   
+   if onCiclad:
      urls_IGCM_OUT=[
         "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/${simulation}_${PERIOD}_${frequency}_${variable}.nc",
         "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
@@ -167,23 +169,23 @@ if root:
         "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
      ]
 
-   
-   
+
+
    # Next command will lead to explore all directories in 'urls_IGCM_OUT'
-   # for searching data for a CliMAF dataset (by function ds) except if 
+   # for searching data for a CliMAF dataset (by function ds) except if
    # a more specific dataloc entry matches the arguments to 'ds'
    dataloc(project="IGCM_OUT", organization="generic", url=urls_IGCM_OUT)
-   
-   
+
+
    # -- Note:
    # -- In the project IGCM_OUT, we have defined aliases for both the CMIP variable names (aliased to the old igcm names when necessary)
    # -- and the old IGCM names to take advantage of the mechanisms behind calias (scale, offset, filenameVar)
-   
-   
-   
+
+
+
    # ---------------------------------------- #
    # -- Aliases to the CMIP variable names -- #
-   
+
    # OCE
    calias("IGCM_OUT", 'tos'                 , offset=273.15 , filenameVar='grid_T')
    calias("IGCM_OUT", 'sos'                                 , filenameVar='grid_T')
@@ -194,10 +196,10 @@ if root:
    calias("IGCM_OUT", 'mlddt02' ,'mld_dt02'                 , filenameVar='grid_T')
    calias("IGCM_OUT", 'hc300'               ,   scale=1.E-9 , filenameVar='grid_T')
    calias("IGCM_OUT", 'wfo'                                 , filenameVar='grid_T')
-   
+
    # ICE
-   calias("IGCM_OUT", 'sic'   ,    'siconc',   scale=100 , filenameVar="icemod") 
-   calias("IGCM_OUT", 'sit'   ,    'sithic'              , filenameVar="icemod") 
+   calias("IGCM_OUT", 'sic'   ,    'siconc',   scale=100 , filenameVar="icemod")
+   calias("IGCM_OUT", 'sit'   ,    'sithic'              , filenameVar="icemod")
    calias("IGCM_OUT", 'sivolu'                       , filenameVar="icemod")
 
    # ATM general variables
@@ -210,7 +212,7 @@ if root:
    calias("IGCM_OUT", 'vas'     ,'v10m'    ,filenameVar='histmth')
    calias("IGCM_OUT", 'sfcWind' ,'wind10m' ,filenameVar='histmth')
    calias("IGCM_OUT", 'hurs'    ,'rh2m'    ,filenameVar='histmth')
-   
+
    # 3D Variables
    calias("IGCM_OUT", 'ta'  , filenameVar='histmthNMC')
    calias("IGCM_OUT", 'ua'  , filenameVar='histmthNMC')
@@ -218,40 +220,40 @@ if root:
    calias("IGCM_OUT", 'zg'  , filenameVar='histmthNMC')
    calias("IGCM_OUT", 'hus' , filenameVar='histmthNMC')
    calias("IGCM_OUT", 'hur' , filenameVar='histmthNMC')
-   
+
    # -> Turbulent fluxes
    calias("IGCM_OUT", 'hfls'   ,'flat' , scale=-1 , filenameVar='histmth')
    calias("IGCM_OUT", 'hfss'   ,'sens' , scale=-1 , filenameVar='histmth')
    calias("IGCM_OUT", 'tauu'   ,'taux'            , filenameVar='histmth')
    calias("IGCM_OUT", 'tauv'   ,'tauy'            , filenameVar='histmth')
-   
+
    # -> Clouds
    calias("IGCM_OUT", 'clt'   ,'cldt'  , scale=100, filenameVar='histmth')
    calias("IGCM_OUT", 'cldl'           , scale=100, filenameVar='histmth')
    calias("IGCM_OUT", 'cldm'           , scale=100, filenameVar='histmth')
    calias("IGCM_OUT", 'cldh'           , scale=100, filenameVar='histmth')
-   
+
    # -> Radiative up at TOA
    calias("IGCM_OUT", 'rlut'   ,'topl'        ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsut'   ,'SWupTOA'     ,filenameVar='histmth')
    calias("IGCM_OUT", 'rlutcs' ,'topl0'       ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsutcs' ,'SWupTOAclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative down at TOA
    calias("IGCM_OUT", 'rsdt'   ,'SWdnTOA'     ,filenameVar='histmth')
-   
+
    # -> Radiative up at Surface
    calias("IGCM_OUT", 'rlus'   ,'LWupSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsus'   ,'SWupSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsuscs' ,'SWupSFCclr'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rluscs' ,'LWupSFCclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative down at Surface
    calias("IGCM_OUT", 'rlds'   ,'LWdnSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsds'   ,'SWdnSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rldscs' ,'LWdnSFCclr'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'rsdscs' ,'SWdnSFCclr'  ,filenameVar='histmth')
-   
+
    # -- Land surface - ORCHIDEE
    #calias("IGCM_OUT", 'gpp'   , scale=1000  ,filenameVar='sechiba_history')
    # --> !!! This will not stay in the param file !!! --------------------
@@ -324,10 +326,10 @@ if root:
    calias('IGCM_OUT', 'zomsfatl', filenameVar='diaptr')
    calias('IGCM_OUT', 'zomsfind', filenameVar='diaptr')
 
-   
+
    # ---------------------------------------------------------------------------------------------- #
    # --> Aliases to the old IGCM_OUT names (to take advantage of offset, scale and filenameVar)  -- #
-   
+
    # OCE
    calias("IGCM_OUT", 'sosstsst'            , offset=273.15 , filenameVar='grid_T')
    calias("IGCM_OUT", 'sosaline'                            , filenameVar='grid_T')
@@ -347,12 +349,12 @@ if root:
    calias('IGCM_OUT', 'PO4', filenameVar='ptrc_T')
    calias('IGCM_OUT', 'Si', filenameVar='ptrc_T')
    calias('IGCM_OUT', 'O2', filenameVar='ptrc_T')
-   
+
    # ICE
    calias("IGCM_OUT", 'siconc' ,  scale=100 , filenameVar="icemod")
    calias("IGCM_OUT", 'sithic'              , filenameVar="icemod")
    calias("IGCM_OUT", 'sivolu'              , filenameVar="icemod")
-   
+
    # ATM general variables
    calias("IGCM_OUT", 'precip'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'prw'     ,filenameVar='histmth')
@@ -362,40 +364,40 @@ if root:
    calias("IGCM_OUT", 'u10m'    ,filenameVar='histmth')
    calias("IGCM_OUT", 'v10m'    ,filenameVar='histmth')
    calias("IGCM_OUT", 'wind10m' ,filenameVar='histmth')
-   
+
    # -> Turbulent fluxes
    calias("IGCM_OUT", 'flat' , scale=-1 , filenameVar='histmth')
    calias("IGCM_OUT", 'sens' , scale=-1 , filenameVar='histmth')
    calias("IGCM_OUT", 'taux'            , filenameVar='histmth')
    calias("IGCM_OUT", 'tauy'            , filenameVar='histmth')
-   
+
    # -> Clouds
    calias("IGCM_OUT", 'cldt'           , scale=100, filenameVar='histmth')
-   
+
    # -> Radiative down at TOA
    calias("IGCM_OUT", 'SWdnTOA'     ,filenameVar='histmth')
-   
+
    # -> Radiative down at TOA
    calias("IGCM_OUT", 'topl'        ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWupTOA'     ,filenameVar='histmth')
    calias("IGCM_OUT", 'topl0'       ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWupTOAclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative up at Surface
    calias("IGCM_OUT", 'LWupSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWupSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWupSFCclr'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'LWupSFCclr'  ,filenameVar='histmth')
-   
+
    # -> Radiative down at Surface
    calias("IGCM_OUT", 'LWdnSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWdnSFC'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'LWdnSFCclr'  ,filenameVar='histmth')
    calias("IGCM_OUT", 'SWdnSFCclr'  ,filenameVar='histmth')
-   
-   
+
+
    # -- P - E
    calias('IGCM_OUT', 'hflsevap', 'hfls', scale=-1./2.5e6, filenameVar='histmth')
    #derive('IGCM_OUT', 'pme', 'minus', 'pr' ,'hflsevap')
-   
-   
+
+

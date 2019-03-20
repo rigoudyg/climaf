@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # How to export CliMAF results as NetCDF files or Numpy Masked Arrays
 #####################################################################
 
@@ -11,20 +14,20 @@ cdef("frequency","monthly")
 # Define some dataset you want to study ( a number of facets take default values )
 dg=ds(simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
 
-# Compute its space_average using a CliMAF standard operator based on a script based on CDO 
+# Compute its space_average using a CliMAF standard operator based on a script based on CDO
 sa=space_average(dg)
 
 # Computing and exporting a CliMAF object as a NetCDF file
 #----------------------------------------------------------
-# Just requiring the filename if CliMAF cache 
+# Just requiring the filename if CliMAF cache
 saFile=cfile(sa)
 # Requiring a copy the result as some other place
 saFile=cfile(sa,"~/tmp/space_average.nc")
 
-# Requiring a symbolic link to CliMAF cache result 
+# Requiring a symbolic link to CliMAF cache result
 saFile=cfile(sa,"~/tmp/space_average_link.nc",ln=True)
 
-# Requiring a hard link to CliMAF cache result 
+# Requiring a hard link to CliMAF cache result
 saFile=cfile(sa,"~/tmp/space_average_hard.nc",hard=True)
 
 # Looking at the result

@@ -1,4 +1,5 @@
-# -*- coding: iso-8859-15 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 """ CliMAF datasets location handling and data access module
 
@@ -15,16 +16,16 @@ from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from clogging import clogger,dedent
 from operator import itemgetter
-import ftplib as ftp  
-import getpass 
-import netrc  
+import ftplib as ftp
+import getpass
+import netrc
 from functools import partial
 
 
 locs=[]
 
 class dataloc():
-    def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*", 
+    def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*",
                  realm="*", table="*", frequency="*"):
         """
         Create an entry in the data locations dictionary for an ensemble of datasets.
@@ -38,27 +39,27 @@ class dataloc():
           url (list of strings): list of URLS for the data root directories, local or remote
 
         Each entry in the dictionary allows to store :
-        
+
          - a list of path or URLS (local or remote), which are root paths for
            finding some sets of datafiles which share a file organization scheme.
 
            - For remote data:
-           
+
              url is supposed to be in the format 'protocol:user@host:path', but
              'protocol' and 'user' are optional. So, url can also be 'user@host:path'
-             or 'protocol:host:path' or 'host:path'. ftp is default protocol (and 
+             or 'protocol:host:path' or 'host:path'. ftp is default protocol (and
              the only one which is yet managed, AMOF).
 
              If 'user' is given:
-           
+
              - if 'host' is in $HOME/.netrc file, CliMAF check if corresponding
                'login == 'user'. If it is, CliMAF get associated
                password; otherwise it will prompt the user for entering password;
-             - if 'host' is not present in $HOME/.netrc file, CliMAF will prompt 
+             - if 'host' is not present in $HOME/.netrc file, CliMAF will prompt
                the user for entering password.
 
              If 'user' is not given:
-           
+
              - if 'host' is in $HOME/.netrc file, CliMAF get corresponding 'login'
                as 'user' and also get associated password;
              - if 'host' is not present in $HOME/.netrc file, CliMAF prompt the
@@ -88,23 +89,23 @@ class dataloc():
 
            - CMIP5_DRS : any datafile organized after the CMIP5 data reference syntax, such as on IPSL's Ciclad and CNRM's Lustre
            - EM : CNRM-CM post-processed outputs as organized using EM (please use a list of anyone string for arg urls)
-           - generic : a data organization described by the user, using patterns such as described for 
+           - generic : a data organization described by the user, using patterns such as described for
              :py:func:`~climaf.dataloc.selectGenericFiles`. This is the default
 
-           Please ask the CliMAF dev team for implementing further organizations. 
-           It is quite quick for data which are on the filesystem. Organizations 
+           Please ask the CliMAF dev team for implementing further organizations.
+           It is quite quick for data which are on the filesystem. Organizations
            considered for future implementations are :
 
            - NetCDF model outputs as available during an ECLIS or ligIGCM simulation
            - ESGF
-           
-         - the set of attribute values which simulation's data are 
+
+         - the set of attribute values which simulation's data are
            stored at that URLS and with that organization
-           
+
            For remote files, filename pattern must include ${varname}, which is instanciated
            by variable name or filenameVar (given via :py:func:`~climaf.classes.calias()`),
            for the sake of efficiency. Please complain if this is inadequate
-           
+
 
         For the sake of brievity, each attribute can have the '*'
         wildcard value; when using the dictionary, the most specific
@@ -113,11 +114,11 @@ class dataloc():
         Example :
 
          - Declaring that all IPSLCM-Z-HR data for project PRE_CMIP6 are stored under a single root path and folllows organization named CMIP6_DRS::
-            
+
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', organization='CMIP6_DRS', url=['/prodigfs/esg/'])
-            
+
          - and declaring an exception for one simulation (here, both location and organization are supposed to be different)::
-            
+
             >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
 
          - and declaring a project to access remote data (on multiple servers)::
@@ -126,11 +127,11 @@ class dataloc():
             >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFX${PERIOD}.nc',
             ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_${PERIOD}_${model}.nc']),
             >>> calias('MY_REMOTE_DATA','tas','tas',filenameVar='2T')
-            >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')        
+            >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each organization scheme
 
-                
+
         """
         self.project=project
         self.model=model
@@ -147,7 +148,7 @@ class dataloc():
         alt=[]
         for u in self.urls :
             #if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
-            if u[0] != '$' and ':' not in u: alt.append(os.path.abspath(u))             
+            if u[0] != '$' and ':' not in u: alt.append(os.path.abspath(u))
             else : alt.append(u)
         # Change all datedeb-datend patterns to ${PERIOD} for upward compatibility
         alt2=[]
@@ -167,7 +168,7 @@ class dataloc():
         else:
             return False
     def __ne__(self, other):
-        return not self.__eq__(other)        
+        return not self.__eq__(other)
     def __str__(self):
         return self.model+self.project+self.simulation+self.frequency+self.organization+`self.urls`
     def pr(self):
@@ -175,11 +176,11 @@ class dataloc():
               " for simulation "+self.simulation+" and freq "+self.frequency +\
               " locations are : " + `self.urls` + " and org is :" + self.organization
 
- 
+
 def getlocs(project="*",model="*",simulation="*",frequency="*"):
-    """ Returns the list of org,freq,url triples which may match the 
-    list of given attributes values (allowing for wildcards '*') and which have 
-    the lowest number of wildcards (*) in attributes 
+    """ Returns the list of org,freq,url triples which may match the
+    list of given attributes values (allowing for wildcards '*') and which have
+    the lowest number of wildcards (*) in attributes
 
     """
     rep=[]
@@ -210,7 +211,7 @@ def getlocs(project="*",model="*",simulation="*",frequency="*"):
 
 def isLocal(project, model, simulation, frequency) :
     if project == 'file' : return True
-    ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency) 
+    ofu=getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
     if (len(ofu) == 0 ) : return False
     rep=True
     for org,freq,llocs in ofu :
@@ -223,15 +224,15 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
 
-    Method : 
-    
-    - use datalocations indexed by :py:func:`~climaf.dataloc.dataloc` to 
-      identify data organization and data store urls for these (facet,value) 
+    Method :
+
+    - use datalocations indexed by :py:func:`~climaf.dataloc.dataloc` to
+      identify data organization and data store urls for these (facet,value)
       pairs
 
-    - check that data organization is as known one, i.e. is one of 'generic', 
+    - check that data organization is as known one, i.e. is one of 'generic',
       CMIP5_DRS' or 'EM'
-    
+
     - derive relevant filenames search function such as as :
       py:func:`~climaf.dataloc.selectCmip5DrsFiles` from data
       organization scheme
@@ -258,8 +259,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         kwargs2=kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies :
-            normfreq=kwargs2['frequency'] 
-            if normfreq in classes.frequencies[project]: 
+            normfreq=kwargs2['frequency']
+            if normfreq in classes.frequencies[project]:
                 kwargs2['frequency']=classes.frequencies[project][normfreq]
         # JS # Convert normalized realm to project-specific realm if applicable
         if "realm" in kwargs and project in classes.realms :
@@ -301,21 +302,21 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
 
 def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwargs):
     """
-    Allow to describe a ``generic`` file organization : the list of files returned 
+    Allow to describe a ``generic`` file organization : the list of files returned
     by this function is composed of files which :
 
-     - match the patterns in ``url`` once these patterns are instantiated by 
-       the values in kwargs, and 
+     - match the patterns in ``url`` once these patterns are instantiated by
+       the values in kwargs, and
 
      - contain the ``variable`` provided in kwargs
 
      - match the `period`` provided in kwargs
-    
+
     In the pattern strings, no keyword is mandatory. However, for remote files,
     filename pattern must include ${varname}, which is instanciated by variable
-    name or ``filenameVar`` (given via :py:func:`~climaf.classes.calias()`); this is  
+    name or ``filenameVar`` (given via :py:func:`~climaf.classes.calias()`); this is
     for the sake of efficiency (please complain if inadequate)
-   
+
     Example :
 
     >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*${PERIOD}*.nc)']
@@ -323,21 +324,21 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
 
     In the pattern strings, the keywords that can be used in addition to the argument
     names (e.g. ${model}) are:
-    
-    - ${variable} : use it if the files are split by variable and 
+
+    - ${variable} : use it if the files are split by variable and
       filenames do include the variable name, as this speed up the search
 
-    - ${PERIOD} : use it for indicating the period covered by each file, if this 
-      is applicable in the file naming; this period can appear in filenames as 
-      YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHHMM, either once only, or twice with 
+    - ${PERIOD} : use it for indicating the period covered by each file, if this
+      is applicable in the file naming; this period can appear in filenames as
+      YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHHMM, either once only, or twice with
       separator ='-' or '_'
 
     - wildcards '?' and '*' for matching respectively one and any number of characters
 
 
-    Résumé en francais : 
+    RÃ©sumÃ© en francais :
 
-    - On construit une expression régulière pour matcher les périodes
+    - On construit une expression rÃ©guliÃ¨re pour matcher les pÃ©riodes
 
     - On boucle sur les patterns de la liste url :
 
@@ -345,22 +346,22 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
 
       - on fait glob.glob
 
-      - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous 
-        réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi 
-        avec filenameVar; d'où une liste de fichiers lfiles
-  
-      - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit 
-        une expression régulière (avec groupes) qui capture les valeurs de facettes 
-        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore 
-        nécessaire ???)
+      - on affine : on ne retient que les valeurs qui matchent avec la regexp de pÃ©riodes (sous
+        rÃ©serve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
+        avec filenameVar; d'oÃ¹ une liste de fichiers lfiles
+
+      - on cherche a connaitre les valeurs rencontrÃ©es pour chaque facette : on construit
+        une expression rÃ©guliÃ¨re (avec groupes) qui capture les valeurs de facettes
+        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
+        nÃ©cessaire ???)
 
         - Boucle sur les fichiers de lfiles:
 
-          - si le pattern n'indique pas qu'on peut extraire la date, 
+          - si le pattern n'indique pas qu'on peut extraire la date,
 
     	     - si la frequence indique un champ fixe, on retient le fichier;
 
-	     - sinon , on le retient aussi sans filtrer sur la période
+	     - sinon , on le retient aussi sans filtrer sur la pÃ©riode
 
           - si oui,
 
@@ -368,24 +369,24 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
 
 	     - si elle convient (divers cas ...)
 
-	       - si on a pu filtrer sur la variable, 
+	       - si on a pu filtrer sur la variable,
 	         ou que variable="*" ou variable multiple,
-	         ou que le fichier contient la bonne variable, eventuellement après renommage
+	         ou que le fichier contient la bonne variable, eventuellement aprÃ¨s renommage
   	         on retient le fichier
 
-        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
+        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrÃ©es pour les attributs
 
-        - Dès qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
+        - DÃ¨s qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
 
     - A la fin , on formatte le dictionnaire de valeurs de facettes qui est rendu
 
     """
-    def store_wildcard_facet_values(f,facets_regexp, kwargs, wildcards, merge_periods_on=None, 
+    def store_wildcard_facet_values(f,facets_regexp, kwargs, wildcards, merge_periods_on=None,
                                     fperiod=None,periods=None,periods_dict=None):
         """
         Using a (groups-capable) regexp FACETS_REGEXP for finding facet values, analyze
         string F for finding the value of each keyword (facet name) in KWARGS, and stores
-        it in dict WILDCARDS, which keys are facet names and values are set of encountered 
+        it in dict WILDCARDS, which keys are facet names and values are set of encountered
         values
         Regarding periods, ... (TBD)
         """
@@ -411,9 +412,9 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                         elif kw == merge_periods_on : key=facet_value
                         else :
                             #print "Skipping for kw=%s,sort=%s"%(kw,merge_periods_on)
-                            continue                        
+                            continue
                         if key not in periods_dict: periods_dict[key]=set()
-                        #print "adding period %s for key %s"%(fperiod,key) 
+                        #print "adding period %s for key %s"%(fperiod,key)
                         periods_dict[key].add(fperiod)
                     else:
                         pass
@@ -433,11 +434,11 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     variable=kwargs['variable']
     altvar=kwargs.get('filenameVar',variable)
     #
-    # a patterns for dates for globbing 
+    # a patterns for dates for globbing
     # (we store it in a dict only for an for historcial reason)
     #
     digit="[0-9]"
-    date_glob_patt={ "${PERIOD}" : "*" } 
+    date_glob_patt={ "${PERIOD}" : "*" }
     date_keywords=[ "${PERIOD}" ]
     #
     # a pattern for dates for regexp
@@ -450,7 +451,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
     minutes="[0-5][0-9]"
     date="%s(%s(%s(%s(%s)?)?)?)?"%(annee,mois,jour,heure,minutes)
     rperiod="(?P<period>(?P<start>%s)([_-](?P<end>%s))?)"%(date,date)
-    date_regexp_patt={ "${PERIOD}" : rperiod } 
+    date_regexp_patt={ "${PERIOD}" : rperiod }
     # an ordered list of dates regexp keywords
     date_regexp_keywords=[ "${PERIOD}" ]
     #
@@ -472,7 +473,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         for k in date_keywords : temp2=temp2.replace(k,date_glob_patt[k])
         #
         # Do globbing with plain varname
-        if remote_prefix : 
+        if remote_prefix :
             lfiles=sorted(glob_remote_data(remote_prefix, temp2))
             clogger.debug("Remote globbing %d files for varname on %s : "%\
                           (len(lfiles),remote_prefix+temp2))
@@ -500,7 +501,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             for k in date_keywords : temp2=temp2.replace(k,date_glob_patt[k])
             #
             # Do globbing with fileVarname
-            if remote_prefix : # 
+            if remote_prefix : #
                 lfiles=sorted(glob_remote_data(remote_prefix, temp2))
                 clogger.debug("Remote globbing %d files for filenamevar on %s: "%\
                               (len(lfiles),remote_prefix+temp2))
@@ -569,11 +570,11 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                         raise classes.Climaf_Error("Cannot find a period in %s with regexp %s"%(f,date_regexp))
                     fperiod=init_period(tperiod)
                 else:
-                    date_regexp0=date_regexp 
+                    date_regexp0=date_regexp
                     #print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start=re.sub(date_regexp0,r'\1',f)
                     if start==f:
-                        raise Climaf_Data_Error("Start period not found in %s using regexp %s"%(f,regexp0)) #? 
+                        raise Climaf_Data_Error("Start period not found in %s using regexp %s"%(f,regexp0)) #?
                     if hasEnd :
                         end=re.sub(date_regexp0,r'\2',f)
                         fperiod=init_period("%s-%s"%(start,end))
@@ -607,7 +608,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     store_wildcard_facet_values(f,facets_regexp, kwargs, wildcards,merge_periods_on)
                     rep.append(f)
-            
+
             #
             # If file period matches requested period, check similarly for variable
             #
@@ -618,14 +619,14 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
             if (fperiod and ( periods is not None or period.intersects(fperiod) )) \
                or not date_regexp :
                 #
-                clogger.debug('Period is OK - Considering variable filtering on %s and %s for %s'%(variable,altvar,f)) 
-                # Filter against variable 
+                clogger.debug('Period is OK - Considering variable filtering on %s and %s for %s'%(variable,altvar,f))
+                # Filter against variable
                 if (l.find("${variable}")>=0):
                     clogger.debug('appending %s based on variable in filename'%f)
                     store_wildcard_facet_values(f,facets_regexp, kwargs, wildcards,merge_periods_on,
                                                 fperiod,periods,periods_dict)
                     rep.append(remote_prefix+f)
-                    continue    
+                    continue
                 if (f not in rep):
                     # local data
                     if not remote_prefix and \
@@ -638,7 +639,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
                         rep.append(f)
                         continue
                     # remote data
-                    elif remote_prefix  : 
+                    elif remote_prefix  :
                         if variable=='*' or "," in variable or \
                             (variable != altvar and (f.find(altvar)>=0) ):
                             # Should check time period in the file if not date_regexp
@@ -670,7 +671,7 @@ def selectGenericFiles(urls, return_wildcards=None,merge_periods_on=None,**kwarg
         if return_wildcards is not None :
             if facet=="period" :
                 #print "s=",s," periods_dict=",periods_dict
-                for val in periods_dict : 
+                for val in periods_dict :
                     periods_dict[val]=sort_periods_list(list(periods_dict[val]))
                 clogger.info("Attribute period='*' has values %s"%(periods_dict))
                 return_wildcards["period"]=periods_dict
@@ -709,8 +710,8 @@ def ftpmatch(connect, url) :
     else :
         lurl = url.split("/")
         for n, elt in enumerate(lurl) :
-            if elt.find('*') >= 0 or elt.find('?') >= 0 : 
-                break 
+            if elt.find('*') >= 0 or elt.find('?') >= 0 :
+                break
 
         prefixpath = os.path.join('/',*lurl[:n]).rstrip("/")
         patt = lurl[n].replace("*",".*").replace("?",r".")
@@ -724,13 +725,13 @@ def ftpmatch(connect, url) :
             for lfile in all_files :
                 if re.match(patt,lfile) is not None :
                     lpath_match += [ os.path.join(prefixpath,lfile) ]
-        # directory stage 
+        # directory stage
         else :
             all_subdirs=[]
             cb = partial(parse_list_line, subdirs=all_subdirs)
             connect.dir(prefixpath, cb)
             for sdir in all_subdirs :
-                if re.match(patt,sdir) is not None : 
+                if re.match(patt,sdir) is not None :
                     lpath_match += ftpmatch( connect, os.path.join(prefixpath,sdir,*lurl[n+1:]))
     return lpath_match
 
@@ -738,9 +739,9 @@ def ftpmatch(connect, url) :
 def glob_remote_data(remote, pattern) :
     """
     Returns a list of path names that match pattern, for remote data
-    located atremote 
+    located atremote
     """
-    
+
     if len(remote.split(":")) == 3: k=1
     else: k=0
     k=0
@@ -759,7 +760,7 @@ def glob_remote_data(remote, pattern) :
             login, account, password = secrets.authenticators( host )
             if login != username: password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
         else:
-            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))            
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
     else:
         if host in secrets.hosts:
             username, account, password = secrets.authenticators( host )
@@ -767,7 +768,7 @@ def glob_remote_data(remote, pattern) :
             username = raw_input("Enter login for host '%s': " %host)
             password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
 
-    try : 
+    try :
         connect = ftp.FTP(host,username,password)
         listfiles = ftpmatch(connect, pattern)
         connect.quit()
@@ -796,7 +797,7 @@ def glob_remote_data(url, pattern) :
     Returns a list of path names that match pattern, for remote data
     located at url
     """
-    
+
     if len(url.split(":")) == 3: k=1
     else: k=0
 
@@ -814,7 +815,7 @@ def glob_remote_data(url, pattern) :
             login, account, password = secrets.authenticators( host )
             if login != username: password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
         else:
-            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))            
+            password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
     else:
         if host in secrets.hosts:
             username, account, password = secrets.authenticators( host )
@@ -822,7 +823,7 @@ def glob_remote_data(url, pattern) :
             username = raw_input("Enter login for host '%s': " %host)
             password = getpass.getpass("Password for host '%s' and user '%s': "%(host,username))
 
-    try : 
+    try :
         connect=ftp.FTP(host,username,password)
         listfiles=connect.nlst(pattern)
         connect.quit()
@@ -847,12 +848,12 @@ def remote_to_local_filename(url):
         hostname=url.split(":")[k].split("@")[-1]
     else:
         hostname=url.split(":")[k]
-        
+
     local_filename=os.path.expanduser(remote_cachedir)+'/'+hostname+os.path.abspath(url.split(":")[-1])
     return(local_filename)
 
 
-    
+
 def selectEmFiles(**kwargs) :
     #Pour A et L : mon, day1, day2, 6hLev, 6hPlev, 3h
     simulation=kwargs['simulation']
@@ -909,7 +910,7 @@ def periodOfEmFile(filename,realm,freq):
     if (realm == 'A' or realm == 'L' ) :
         if freq=='mon' or freq=='' :
             year=re.sub(r'^.*([0-9]{4}).nc',r'\1',filename)
-            if year.isdigit(): 
+            if year.isdigit():
                 speriod="%s01-%s12"%(year,year)
                 return init_period(speriod)
         else:
@@ -928,10 +929,10 @@ def periodOfEmFile(filename,realm,freq):
     else:
         raise classes.Climaf_Error("unexpected realm "+realm)
 
-        
 
 
-                        
+
+
 def selectExampleFiles(urls,**kwargs) :
     rep=[]
     if (kwargs['frequency'] == "monthly") :
@@ -950,13 +951,13 @@ def selectExampleFiles(urls,**kwargs) :
                                 rep.append(dir+"/"+f)
                             #else: print "No var ",variable," in file", dir+"/"+f
     return rep
-                        
+
 
 def selectCmip5DrsFiles(urls, **kwargs) :
     # example for path : CMIP5/[output1/]CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/
     #      Amon/r1i1p1/v20110701/clivi/clivi_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc
     #
-    # second path segment can be any string (allows for : output,output1, merge...), 
+    # second path segment can be any string (allows for : output,output1, merge...),
     # but if 'merge' exists, it is used alone
     # This segment ca also be empty
     #

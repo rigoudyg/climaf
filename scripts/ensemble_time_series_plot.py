@@ -1,4 +1,5 @@
-#!/bin/python
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # --------------------------------------------------------------------------------------------------
 # -- Interfacing the script with CliMAF: writing a command line taking arguments
@@ -19,7 +20,7 @@ import argparse
 # --------------------------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='Plot script for CliMAF that handles CliMAF ensemble')
 
-# -- Describe the arguments you need 
+# -- Describe the arguments you need
 # --------------------------------------------------------------------------------------------------
 # --> filenames = ${ins} in cscript
 parser.add_argument('--filenames', action='store', help='Netcdf files provided by CliMAF')
@@ -109,7 +110,7 @@ args, unknown = parser.parse_known_args()
 
 filenames = args.filenames
 outfig = args.outfig
-labels = str.replace(args.labels,'"','') # -- We remove the " from labels 
+labels = str.replace(args.labels,'"','') # -- We remove the " from labels
 #  -> the string ${labels} provided by CliMAF contains $. If we simply provide a string with $
 #     to python, the $ and strings immediately following it are removed it to the string.
 #     For instance: label_1$label_2$label_3 will be converted to _1_2_3
@@ -165,14 +166,14 @@ else:
 colors = colors + colors
 
 # -- Line width
-if args.lw: 
+if args.lw:
     lw_list = str.split(args.lw,',')
     if len(lw_list)==1:
         lw_list = lw_list * len(filenames_list)
 else:
     lw_list = [0.4] * len(filenames_list)
 
-if args.highlight_period_lw: 
+if args.highlight_period_lw:
     highlight_period_lw_list = str.split(args.highlight_period_lw,',')
     if len(highlight_period_lw_list)==1:
         highlight_period_lw_list = highlight_period_lw_list * len(filenames_list)
@@ -380,7 +381,7 @@ if draw_legend:
             handle_dict.update(dict(color=legend_colors_list[leg_ind]))
             legend_handles.append(mlines.Line2D([], [], **handle_dict))
         leg_dict.update(dict(handles=legend_handles))
-        
+
     # !!!
     print 'leg_dict = ', leg_dict
     leg = plt.legend(**leg_dict)
@@ -393,7 +394,7 @@ if draw_legend:
                 legend_lw_list = [2]*len(filenames_list) + legend_lw_list
             if len(legend_lw_list)==(len(legend_labels_list)+1):
                 legend_lw_list = [legend_lw_list[0]]*len(filenames_list) + legend_lw_list[1:len(legend_lw_list)]
-        
+
         #for legobj in leg.legendHandles:
         print 'legend_lw_list = ',legend_lw_list
         for ind in range(0, len(leg.legendHandles)):
@@ -440,7 +441,7 @@ if args.text:
                  verticalalignment=text_verticalalignment_list[text_ind],
                  horizontalalignment=text_horizontalalignment_list[text_ind]
                 )
-        
+
 # -- Control margins
 left_margin = (args.left_margin if args.left_margin else '0.1')
 right_margin = (args.right_margin if args.right_margin else '0.8')

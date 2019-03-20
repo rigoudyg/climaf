@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from climaf.api import *
 
 # Define a dataset, using a built-in pre-defined datafile location
@@ -30,7 +33,7 @@ cshow(map)
 # A more comprehensive way of configuring plots
 ###################################################
 def map_graph_attributes(var) :
-    """ 
+    """
     Return a dictionnary with graphic attributes :
     - relevant to the geophysical variable in argument
     - with adequate keys for operator 'plot'
@@ -43,7 +46,7 @@ def map_graph_attributes(var) :
         rep["min"]=-15  ; rep["max"]=25 ; rep["delta"]=2.
     #
     return rep
-    
+
 map2=plot(ta,title="Surface temperature (tas)",**map_graph_attributes(varOf(ta)))
 cshow(map2)
 

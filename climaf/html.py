@@ -1,20 +1,21 @@
-# -*- coding: iso-8859-1 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-CliMAF module ``html`` defines functions for building some html index 
+CliMAF module ``html`` defines functions for building some html index
 giving acces to figure files, through links bearing a label or through
-thumbnails. It eases iterating over lines and columns in tables. 
+thumbnails. It eases iterating over lines and columns in tables.
 
 
 **See a code example in** :download:`index_html.py <../examples/index_html.py>`
 or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |indexh|
 
-.. |indexh| image:: ../doc/html_index.png 
+.. |indexh| image:: ../doc/html_index.png
   :scale: 20%
 
 
 """
 
-import os, re, glob 
+import os, re, glob
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
 import pickle
@@ -58,7 +59,7 @@ def trailer():
     """
     return("</body>\n")
 
-def vspace(nb=1) : 
+def vspace(nb=1) :
     return nb*"<br>\n"
 
 def section(title,level=1,key="None"):
@@ -68,7 +69,7 @@ def section(title,level=1,key="None"):
     return '<h'+`level`+'><a name="'+key+'"></a>'+title+'</h4>'+'\n'
 
 def open_table(title="",columns=[],spacing=5):
-    """ 
+    """
     Returns header text for an html table. title will go as title for
     first column. columns should be a list of column titles
     """
@@ -91,7 +92,7 @@ def close_line() :
     return(' </TR>\n')
 
 def link(label,filename,thumbnail=None,hover=True) :
-    """ 
+    """
     Creates the provided label, with a link to the provided image
     filename (if not None) and possibly showing a thumbnail for the
     image (with the provided thumbnail size) and possibly displaying
@@ -99,16 +100,16 @@ def link(label,filename,thumbnail=None,hover=True) :
 
     - 'thumbnail' can be an integer or a string with width or height
       (in these cases, width=height), or a string with width and height
-      separated by character 'x' or '*'. The size is in pixels; default : 
+      separated by character 'x' or '*'. The size is in pixels; default :
       None (no thumbnail)
     - 'hover' can be a logical, or a string with width or height (in this
       case, width=height), or a string with width and height separated by
-      character 'x' or '*'. The size is in pixels; default is True, which 
+      character 'x' or '*'. The size is in pixels; default is True, which
       tanslates according to value of thumbnail :
 
       - if thumbnail is not None, hover width and height are respectively
         set as 3 times that of thumbnail width and height
-      - if thumbnail is None, size is '200*200' 
+      - if thumbnail is None, size is '200*200'
     """
     if filename :
         if thumbnail is not None :
@@ -132,7 +133,7 @@ def link(label,filename,thumbnail=None,hover=True) :
                         except:
                             raise Climaf_Html_Error("If hover is a not empty string, it must " \
                                                     "contain width and/or height, separated by 'x' or '*'")
-                            
+
                         hover_width=hover
                         hover_height=hover
                 else:
@@ -144,10 +145,10 @@ def link(label,filename,thumbnail=None,hover=True) :
                      `hover_height` + ' WIDTH='+ `hover_width` +' SRC="' +\
                      filename+'"/></span></a>'
 
-            else:              
+            else:
                 rep='<A HREF="'+filename+'"><IMG HEIGHT=' + `thumbnail_height` + \
                       ' WIDTH=' + `thumbnail_width` + ' SRC="'+filename+'"></a>'
-            
+
         else:
 
             if hover :
@@ -161,7 +162,7 @@ def link(label,filename,thumbnail=None,hover=True) :
                         except:
                             raise Climaf_Html_Error("If hover is a not empty string, it must " \
                                                     "contain width and/or height, separaed by 'x' or '*'")
-                            
+
                         hover_width=hover
                         hover_height=hover
                 else:
@@ -171,39 +172,39 @@ def link(label,filename,thumbnail=None,hover=True) :
                 rep='<A class="info" HREF="'+filename+'">' + label +'<span><IMG HEIGHT='+ \
                      `hover_height` + ' WIDTH='+ `hover_width` +' SRC="' +\
                      filename+'"/></span></a>'
-            else:            
+            else:
                 rep='<A HREF="'+filename+'">' + label + '</a>'
-      
+
     else:
         rep=label
 
     return rep
 
 def link_on_its_own_line(label,filename,thumbnail=None,hover=True) :
-    """ Does the same as :py:func:`~climaf.html.link` ,but for a link which is 
-    sole on its own line 
+    """ Does the same as :py:func:`~climaf.html.link` ,but for a link which is
+    sole on its own line
     """
     return open_line()+link(label,filename,thumbnail=thumbnail,hover=hover)+close_line()
 
 
 def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None) :
-    """ 
+    """
     Create a table cell with the provided label, which bears a link to
     the provided filename and possibly shows a thumbnail for the link
     with the provided thumbnail size (in pixels) and possibly display
     it when you mouse over it (with the provided hover size in pixels).
 
-    If 'dirname' is not None, creates  a hard link in directory dirname 
-    to file filename. This allow to generate a portable atlas in this 
-    directory. Hard links are named after pattern 
+    If 'dirname' is not None, creates  a hard link in directory dirname
+    to file filename. This allow to generate a portable atlas in this
+    directory. Hard links are named after pattern
     climaf_atlas<digit>.<extension>
-    
+
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
 
-    If 'altdir' is not None (and 'dirname is None), the HREF links 
-    images in index have the prefix of their absolute path changed from 
-    $CLIMAF_CACHE to 'altdir' (use case : when the Http server only knows 
+    If 'altdir' is not None (and 'dirname is None), the HREF links
+    images in index have the prefix of their absolute path changed from
+    $CLIMAF_CACHE to 'altdir' (use case : when the Http server only knows
     another filesystem). Example:
 
     - CLIMAF_CACHE=/prodigfs/ipslfs/dods/fabric/coding_sprint_NEMO/stephane
@@ -214,7 +215,7 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
         os.system('mkdir -p '+dirname)
         if filename:
             tmpfilename,filextension=os.path.splitext(os.path.basename(filename))
-            
+
             regex=re.compile('([a-z]+)\_([a-z]+)([0-9]+)')
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
@@ -233,7 +234,7 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             #
             if not os.path.isfile(index_atlas):
                # -- Create the dictionary
-               tt = index_dict 
+               tt = index_dict
             else:
                # -- Read the content of the index
                atlas_index_r = file(os.path.expanduser(index_atlas), "r")
@@ -245,44 +246,44 @@ def cell(label,filename=None,thumbnail=None,hover=True,dirname=None, altdir=None
             atlas_index_w = file(os.path.expanduser(index_atlas), "w")
             pickle.dump(tt,atlas_index_w)
             atlas_index_w.close()
-          
+
             return '<TD ALIGN=RIGHT>'+ \
                    link(label,"climaf_atlas"+str(nb)+filextension,thumbnail,hover)+\
                    '</TD>\n'
-        else: #lv 
+        else: #lv
             return '<TD ALIGN=RIGHT>'+ \
             link(label,filename,thumbnail,hover)+\
-            '</TD>\n'                
+            '</TD>\n'
 
     else:
         fn=filename
         if altdir and fn: #lv
             from climaf import cachedir
-            fn=filename.replace(cachedir,altdir) 
+            fn=filename.replace(cachedir,altdir)
         return '<TD ALIGN=RIGHT>'+ \
                link(label,fn,thumbnail,hover)+\
                '</TD>\n'
 
 def line(list_of_pairs,title="",thumbnail=None,hover=True, dirname=None,altdir=None):
     """
-    Create an html line with labels and links from first args 
-    list_of_pairs (and when this is not a pair, only put the label). 
+    Create an html line with labels and links from first args
+    list_of_pairs (and when this is not a pair, only put the label).
     Put a line title if provided. Replace
     labels with thumbnail figures if arg thumbnail is set to a size
     (in pixels) and display figures when you mouse over it if arg
     hover is set to True or to a size (in pixels); in that case, dic
     can also be a list of filenames. If 'dirname' is not None, creates
-    hardlinks to the filenames, in directory dirname, and named 
-    as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps'). 
+    hardlinks to the filenames, in directory dirname, and named
+    as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps').
     This allows to generate a portable atlas in dirname
     """
     labels=[]
     figures=[]
 
     for e in list_of_pairs :
-        if isinstance(e,tuple) : 
+        if isinstance(e,tuple) :
             label=e[0]; labels.append(label) ; figures.append(e[1])
-        else : 
+        else :
             label=e; labels.append(e) ; figures.append(None)
     rep=open_line()+title
     for lab,fig in zip(labels,figures):
@@ -291,17 +292,17 @@ def line(list_of_pairs,title="",thumbnail=None,hover=True, dirname=None,altdir=N
 
 def flines(func,fargs, sargs, common_args=[], \
        other_fargs=[], other_sargs=[], thumbnail=None, hover=True, dirname=None, **kwargs):
-    """ 
-    **See doc for** :py:func:`~climaf.html.fline` **first** 
+    """
+    **See doc for** :py:func:`~climaf.html.fline` **first**
 
     Creates a table by iterating calling fline over 'fargs'
     (which can be a list or a dict) with :
 
-    - 'farg' being the running element (or key) of 'fargs' 
+    - 'farg' being the running element (or key) of 'fargs'
     - 'title' being the corresponding 'fargs' value (or 'farg' if not a dict)
     - 'common_args' being forwarded to :py:func:`~climaf.html.fline`
     - 'other_args' being the merge of other_fargs[farg] and other_sargs
-    
+
     It forwards remaining keyword arguments (kwargs) to  :py:func:`~climaf.html.fline`
 
     Example : assuming that function avg returns the filename for a figure
@@ -309,14 +310,14 @@ def flines(func,fargs, sargs, common_args=[], \
     table of links for average values of two variables over two masks,
     with thumbnail of images and displaying images when you mouse over it with
     'hover' argument:
-    
+
     >>> t=table_lines(avg,['tas','tos'],['land','sea'],thumbnail=40,hover='60x80')
 
     """
     rep=""
     for farg in fargs:
         args=[farg,sargs]+common_args
-        if other_fargs : 
+        if other_fargs :
             args=args+other_fargs.get(farg,None)
         args=args+other_sargs
         if isinstance(fargs,list) :
@@ -334,15 +335,15 @@ def fline(func,farg, sargs, title=None, \
     calling a function, once per column, with at least two
     arguments. Cells have a label and possibly a link
 
-    - 'func' is a python function which computes and labels 
-      and/or figures; 
-    - 'farg' is any object, used a 1st arg for 'func'; 
-    - 'sargs' is a list or a dict, used for providing 
-      the 2nd arg to each call to 'func'. 
-    - 'title' is a line title (for first column); 
+    - 'func' is a python function which computes and labels
+      and/or figures;
+    - 'farg' is any object, used a 1st arg for 'func';
+    - 'sargs' is a list or a dict, used for providing
+      the 2nd arg to each call to 'func'.
+    - 'title' is a line title (for first column);
       if missing, 'farg' is used
     - see further below fo remaining arguments
-    
+
     So, there will be one column/cell per item in 'sargs'; each cell
     shows a label which can be an active link.  Both the label value
     and the link value can be the result of calling 'func' arg with
@@ -352,8 +353,8 @@ def fline(func,farg, sargs, title=None, \
 
     Use cases :
 
-     - a line showing just numeric values; we assume that 
-       function average(var,mask) returns such a numeric 
+     - a line showing just numeric values; we assume that
+       function average(var,mask) returns such a numeric
        value, which is a gloabl average of a variable over a mask:
 
        >>> rep=fline(average, 'tas', \
@@ -368,8 +369,8 @@ def fline(func,farg, sargs, title=None, \
      - a line showing pre-defined labels, which here are shortcuts for
        mask names, and which carry links to same figures as above : let
        function 'average' only return the figure filename, and call :
- 
-       >>> rep=fline(average, 'tas', 
+
+       >>> rep=fline(average, 'tas',
        ...  {'global':'GLB','sea':'SEA','land':'LND'}, 'tas averages')
 
     Advanced arguments :
@@ -383,10 +384,10 @@ def fline(func,farg, sargs, title=None, \
         image of that size (in pixels)
       - hover : if 'func' returns a filename, display image of that size
         (in pixels) when you mouse over it. If hover is True:
-        
+
         - hover width and height are respectively set as 3 times that of
           thumbnail width and height if thumbnail is not None
-        - hover is set to '200*200' if thumbnail is None        
+        - hover is set to '200*200' if thumbnail is None
       - dirname : if 'func' returns a filename, creates a directory (if
         doesn't exist) wich contains filename as a hard link to the
         target dirname/'climaf_atlas'([0-9]+).ext ('ext' is 'png', 'pdf'
@@ -410,14 +411,14 @@ def fline(func,farg, sargs, title=None, \
         else :
             sargs=dict(zip(sargs,sargs))
     rep=open_line(title)
-    for key in sargs : 
+    for key in sargs :
         allargs=[farg,sargs[key]]
         allargs=allargs+common_args
         if other_args :
             allargs=allargs+other_args.get(key,None)
         #print 'allargs=',allargs
         funcrep=func(*allargs,**kwargs)
-        if isinstance(funcrep,tuple): 
+        if isinstance(funcrep,tuple):
             #print "tuple case",lab,rfig
             lab,rfig=funcrep
         else :
@@ -435,7 +436,7 @@ def fline(func,farg, sargs, title=None, \
 
 
 def cinstantiate(objin,filout=None,should_exec=True) :
-    """ Read file or string 'objin', extract parts of text surrounded by '£',
+    """ Read file or string 'objin', extract parts of text surrounded by 'Â£',
     evaluate them as Python assignments or expressions, replaces
     expressions with the result of evaluation, and :
      - either returns the whole, modified, file content
@@ -472,8 +473,8 @@ def cinstantiate(objin,filout=None,should_exec=True) :
     else:
         print("Input is not a file nor a string"+`flux`)
         return(None)
-    #re.sub(r"£([^£]*)£",repl,"aa£pp=6£bb£`pp`£cc\ndd£`pp`£")
-    rep=re.sub(u"£([^£]*)£",exec_and_discard_test,flux)
+    #re.sub(r"Â£([^Â£]*)Â£",repl,"aaÂ£pp=6Â£bbÂ£`pp`Â£cc\nddÂ£`pp`Â£")
+    rep=re.sub(u"Â£([^Â£]*)Â£",exec_and_discard_test,flux)
     rep=re.sub(u"&([^&]*)&",replace_text_with_evaluation,rep)
     if filout :
         with open(filout,'w') as ficout :

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 This module declares GPCC data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
@@ -34,6 +36,6 @@ if atCNRM:
     calias("gpcc",'pr'       ,'GPCC' ,scale=1./86400. ,missing=1.e+20, units="kg m-2 s-1")
 
     #calias("gpcc",'GPCC'    ,'GPCC' ,                                   ,units="mm/day")
-    #NSTA:="Number of stations available for a specific analysis grid in a specific month" 
-    #calias("gpcc",'site'    ,'NSTA'   ) 
+    #NSTA:="Number of stations available for a specific analysis grid in a specific month"
+    #calias("gpcc",'site'    ,'NSTA'   )
 
