@@ -9,25 +9,24 @@ import os
 from climaf import cachedir
 import shutil
 
-StringFontHeight=0.019
+StringFontHeight = 0.019
 
-#main_cesmep_path
+# main_cesmep_path
 
-hover=False
+hover = False
 
 # -- Set a blank space
 # -----------------------------------------------------------------------------------
-blank_cell=os.path.dirname(__file__)+'/Empty.png'
+blank_cell = os.path.dirname(__file__) + '/Empty.png'
 
+# -- Add the variable and get the dataset
+wdat = dat.copy()
+wdat.update(dict(variable=variable))
+# -- Apply the frequency and time manager (IGCM_OUT)
+frequency_manager_for_diag(wdat, diag='SE')
+get_period_manager(wdat)
+print wdat
 
-    # -- Add the variable and get the dataset
-    wdat = dat.copy()
-    wdat.update(dict(variable=variable))
-    # -- Apply the frequency and time manager (IGCM_OUT)
-    frequency_manager_for_diag(wdat, diag='SE')
-    get_period_manager(wdat)
-    print wdat
-    
 
 # -- Function to produce a section of 2D maps (both atmosphere and ocean variables)
 # -----------------------------------------------------------------------------------
@@ -41,9 +40,9 @@ def section_WaterBudget(models, main_cesmep_path, safe_mode=True):
     #
     # -- Start the line with the title
     if not line_title:
-       wline_title = varlongname(variable)+' ('+variable+') ; season = '+season
+        wline_title = varlongname(variable) + ' (' + variable + ') ; season = ' + season
     else:
-       wline_title = line_title
+        wline_title = line_title
     index += start_line(wline_title)
     #
     # -- Loop on the models and compute the difference against the reference
@@ -54,7 +53,7 @@ def section_WaterBudget(models, main_cesmep_path, safe_mode=True):
         # --   - LMDz
         # --   - NEMO
         # --   - ORCHIDEE
-        index+=cell("", model_diff, thumbnail=thumbN_size, hover=hover, **alternative_dir)
+        index += cell("", model_diff, thumbnail=thumbN_size, hover=hover, **alternative_dir)
         #
     # -- Close the line
     close_line()
@@ -62,5 +61,3 @@ def section_WaterBudget(models, main_cesmep_path, safe_mode=True):
     #
     # -- Close the table of the section
     return index
-
-

@@ -9,13 +9,11 @@ from climaf.api import derive, calias
 # -- LMDZ
 
 # -- GPP total ready for comparison with obs
-#calias("IGCM_OUT", 'cfracgpp', 'gpp' ,filenameVar='stomate_ipcc_history')
-#derive("IGCM_OUT", 'gpptot', 'divide', 'cfracgpp','Contfrac')
+# calias("IGCM_OUT", 'cfracgpp', 'gpp' ,filenameVar='stomate_ipcc_history')
+# derive("IGCM_OUT", 'gpptot', 'divide', 'cfracgpp','Contfrac')
 # -> alias for the obs
 
 
-
-derive('*','dtr','minus','tasmax','tasmin')
-
+derive('*', 'dtr', 'minus', 'tasmax', 'tasmin')
 
 calias('CMIP6', 'wfo', 'wfonocorr')

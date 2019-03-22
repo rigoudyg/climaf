@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Programm Interface for scripting in Python with CliMAF for easy climate model output processing.
+CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Programm Interface for scripting in
+Python with CliMAF for easy climate model output processing.
 
 It also imports a few functions from other modules, and declares a number of 'CliMAF standard operators'
 
@@ -67,7 +68,8 @@ Main functions are :
 # Created : S.Senesi - 2014
 
 
-import os, os.path
+import os
+import os.path
 #
 import climaf
 
@@ -78,13 +80,14 @@ from projects import *
 # All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
 #####################################################################################################################
 #
-from classes   import cdef,cdataset,ds,cproject,cprojects,aliases,cpage,cfreqs,cens,eds,fds,cpage_pdf,varOf,crealms
-from cmacro    import macro,cmacros
-from driver    import ceval, cfile, cshow, cMA, cvalue, cimport, cexport,calias, efile
-from dataloc   import dataloc
-from operators import cscript, scripts as cscripts,operators, fixed_fields, derive
-from cache     import craz, csync, cdump, cdrop,  clist, cls, crm, cdu, cwc, cprotect
-from clogging  import clogger, clog, clog_file, logdir
+from classes import cdef, cdataset, ds, cproject, cprojects, aliases, cpage, cfreqs, cens, eds, fds, cpage_pdf, varOf, \
+    crealms
+from cmacro import macro, cmacros
+from driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
+from dataloc import dataloc
+from operators import cscript, scripts as cscripts, operators, fixed_fields, derive
+from cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect
+from clogging import clogger, clog, clog_file, logdir
 from site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 from plot.plot_params import plot_params, hovm_params
 from plot.varlongname import varlongname
@@ -92,11 +95,13 @@ from derived_variables import *
 from functions import *
 from easyCMIP_functions import *
 
-#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not meaningful for your own CliMAF install
-cpath=os.path.abspath(climaf.__path__[0])
+#: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not
+# meaningful for your own CliMAF install
+cpath = os.path.abspath(climaf.__path__[0])
+
 
 def cerr():
     """ Display file 'last.out' (stdout and stderr of last operator call)
 
     """
-    os.system('cat '+logdir+'/last.out')
+    os.system('cat ' + logdir + '/last.out')

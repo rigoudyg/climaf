@@ -9,27 +9,29 @@
 # 'cmacro()'; the macros can be saved and edited, and they simplify
 # the display of CliMAF cache content
 
+import os
+
 from climaf.api import *
 
 # First use and combine CliMAF operators to get some interesting
 # result using some dataset(s)
-january_ta=ds(project='example',simulation="AMIPV6ALB2G", variable="ta",
-              frequency='monthly', period="198001")
-ta_europe=llbox(january_ta,latmin=40,latmax=60,lonmin=-15,lonmax=25)
-ta_ezm=ccdo(ta_europe,operator="zonmean")
+january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta",
+                frequency='monthly', period="198001")
+ta_europe = llbox(january_ta, latmin=40, latmax=60, lonmin=-15, lonmax=25)
+ta_ezm = ccdo(ta_europe, operator="zonmean")
 
 # Using this result as an example, define a macro named "eu_zonal_mean",
 # which arguments will be the datasets involved in this result
-macro("eu_zonal_mean",ta_ezm)
+macro("eu_zonal_mean", ta_ezm)
 
 # Also design a figure and define the corresponding macro
-fig_ezm=plot(ta_ezm)
-macro("eu_cross_section",fig_ezm)
+fig_ezm = plot(ta_ezm)
+macro("eu_cross_section", fig_ezm)
 
 # You can of course use a macro on other dataset(s),
-pr=ds(project='example',simulation="AMIPV6ALB2G", variable="pr",
-              frequency='monthly', period="198001")
-pr_ezm=eu_zonal_mean(pr)
+pr = ds(project='example', simulation="AMIPV6ALB2G", variable="pr",
+        frequency='monthly', period="198001")
+pr_ezm = eu_zonal_mean(pr)
 
 # You can also define a macro 'from scratch', using ARG for dataset arguments/parameters
 macro("my_macro", "ccdo(ARG,operator='timavg')")
@@ -52,7 +54,8 @@ climaf.cmacro.write("~/.climaf.macros")
 
 # Look at the external representation of the macros.
 print "\nContent of ~/.climaf.macros :"
-import os ; os.system("cat ~/.climaf.macros")
+
+os.system("cat ~/.climaf.macros")
 
 # Using that example, you can also write macros to and load macros from
 # any file, using the macro syntax (here, we use the default location)
@@ -64,7 +67,3 @@ cfile(fig_ezm)
 # The cache is displayed using macros
 print "\nCache content (using macros) :"
 cdump()
-
-
-
-

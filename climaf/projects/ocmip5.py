@@ -24,8 +24,8 @@ from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
 from climaf.site_settings import onCiclad
 
-if onCiclad :
-    cproject("OCMIP5","model","simulation",("frequency","monthly"),ensemble=["model"])
+if onCiclad:
+    cproject("OCMIP5", "model", "simulation", ("frequency", "monthly"), ensemble=["model"])
     #
     # Declare which facets can be used for defining an ensemble
     #
@@ -33,4 +33,4 @@ if onCiclad :
             url=['/prodigfs/project/OCMIP5/OUTPUT/*/${model}/${simulation}/${frequency}/'
                  '${variable}/${variable}_*_${model}_${simulation}_${PERIOD}.nc'])
     #
-    cfreqs('OCMIP5',{'monthly':'mon' })
+    cfreqs('OCMIP5', {'monthly': 'mon'})

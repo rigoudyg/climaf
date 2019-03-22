@@ -18,11 +18,9 @@ if os.path.exists('/cnrm'):
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
 
-    cproject("OBS4MIPS","experiment",("frequency","monthly"))
+    cproject("OBS4MIPS", "experiment", ("frequency", "monthly"))
     # Frequency alias
-    cfreqs('OBS4MIPS', {'monthly':'monthly_mean' })
+    cfreqs('OBS4MIPS', {'monthly': 'monthly_mean'})
     #
-    pattern="/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_${PERIOD}.nc"
+    pattern = "/cnrm/amacs/DATA/Obs4MIPs/netcdf/${frequency}/${variable}_${simulation}_*_${PERIOD}.nc"
     dataloc(project="OBS4MIPS", organization="generic", url=[pattern])
-
-

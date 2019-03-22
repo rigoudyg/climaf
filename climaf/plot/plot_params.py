@@ -11,20 +11,23 @@ import ocean_plot_params
 # --> for land
 import land_plot_params
 
-centerspecs=False
+centerspecs = False
 # --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)
 if atCNRM:
-   import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
-   import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
-   import land_plot_params_CNRM as land_plot_params_centerspecs
-   centerspecs=True
-if atIPSL:
-   import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
-   import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
-   import land_plot_params_IPSL as land_plot_params_centerspecs
-   centerspecs=True
+    import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
+    import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
+    import land_plot_params_CNRM as land_plot_params_centerspecs
 
-def plot_params(variable,context, custom_plot_params=None) :
+    centerspecs = True
+if atIPSL:
+    import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
+    import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
+    import land_plot_params_IPSL as land_plot_params_centerspecs
+
+    centerspecs = True
+
+
+def plot_params(variable, context, custom_plot_params=None):
     """Returns a dictionary of default plotting parameters (isolines,
     color palettes...) by variable and context, i.e. the full field
     (full_field), bias (bias), or model-model difference
@@ -56,8 +59,10 @@ def plot_params(variable,context, custom_plot_params=None) :
     Call example ::
 
     >>> var = 'pr'
-    >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))       # here, the annual mean climatology of a CMIP5 dataset for variable var
-    >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...)) # the annual mean climatology of a reference dataset for variable var
+    >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))
+    # here, the annual mean climatology of a CMIP5 dataset for variable var
+    >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...))
+    # the annual mean climatology of a reference dataset for variable var
 
     >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
     >>> niceplot_params=plot_params(var,'full_field')
@@ -75,8 +80,8 @@ def plot_params(variable,context, custom_plot_params=None) :
     """
 
     defaults = {
-        'contours' : 1 ,
-        'color'    :'temp_19lev',
+        'contours': 1,
+        'color': 'temp_19lev',
     }
 
     per_variable = {}
@@ -84,38 +89,39 @@ def plot_params(variable,context, custom_plot_params=None) :
     per_variable.update(atmos_plot_params.dict_plot_params)
     per_variable.update(ocean_plot_params.dict_plot_params)
     per_variable.update(land_plot_params.dict_plot_params)
-    if centerspecs :
-       # --> Then, add the plot params specific to the centers
-       per_variable.update(atmos_plot_params_centerspecs.dict_plot_params)
-       per_variable.update(ocean_plot_params_centerspecs.dict_plot_params)
-       per_variable.update(land_plot_params_centerspecs.dict_plot_params)
+    if centerspecs:
+        # --> Then, add the plot params specific to the centers
+        per_variable.update(atmos_plot_params_centerspecs.dict_plot_params)
+        per_variable.update(ocean_plot_params_centerspecs.dict_plot_params)
+        per_variable.update(land_plot_params_centerspecs.dict_plot_params)
     # --> If needed, adding a custom dictionnary of plot params
     if custom_plot_params:
-       per_variable.update(custom_plot_params)
+        per_variable.update(custom_plot_params)
     #
-    rep=defaults.copy()
+    rep = defaults.copy()
     # -- If the variable name is in the list of variables:
-    if variable in per_variable :
-        var_entry=per_variable[variable]
-        for cont in [ 'default', context ] :
-            if cont in var_entry : rep.update(var_entry[cont])
+    if variable in per_variable:
+        var_entry = per_variable[variable]
+        for cont in ['default', context]:
+            if cont in var_entry:
+                rep.update(var_entry[cont])
     else:
-       print 'Message from plot_params: '+variable+' is not in the list of defined plot parameters'
-       # -- if not, we try to split
-       tmp_variable = str.split(variable,'_')[0]
-       if tmp_variable in per_variable :
-          print 'We will use the plot parameters of '+tmp_variable
-          var_entry=per_variable[tmp_variable]
-          for cont in [ 'default', context ] :
-              if cont in var_entry : rep.update(var_entry[cont])
-       else:
-          print 'Message from plot_params: '+variable+' is not in the list of defined plot parameters'
-          print 'We will use the default plot parameters.'
+        print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
+        # -- if not, we try to split
+        tmp_variable = str.split(variable, '_')[0]
+        if tmp_variable in per_variable:
+            print 'We will use the plot parameters of ' + tmp_variable
+            var_entry = per_variable[tmp_variable]
+            for cont in ['default', context]:
+                if cont in var_entry:
+                    rep.update(var_entry[cont])
+        else:
+            print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
+            print 'We will use the default plot parameters.'
     return rep
 
 
-
-def hovm_params(SSTbox_name) :
+def hovm_params(SSTbox_name):
     """Returns a dictionary with domain definition of SST/climate
     specified box for plotting Hovmoller diagrams
 
@@ -139,14 +145,15 @@ def hovm_params(SSTbox_name) :
     """
 
     SST_boxes = {
-       'NINO3-4' :  {'latS': ' -5.', 'latN': '5.' , 'lonW': '-170.', 'lonE': '-120.'},
-       'NINO1-2' :  {'latS': '-10.', 'latN': '0.' , 'lonW': '-90.' , 'lonE': '-80.' },
-       'NINO3'   :  {'latS': '-5.' , 'latN': '5.' , 'lonW': '-150.', 'lonE': '-90.' },
-       'NINO4'   :  {'latS': '-5.' , 'latN': '5.' , 'lonW': '-160.', 'lonE': '-150.'},
-       'GRL'     :  {'latS': '40.' , 'latN': '60.', 'lonW': '-60.' , 'lonE': '-30.' },
-       'NATL'    :  {'latS': '20.' , 'latN': '85.', 'lonW': '-90.' , 'lonE': '30.'  },
-       'SAT'     :  {'latS': '6.'  , 'latN': '18.', 'lonW': '-30.' , 'lonE': '10.'  },
-       'TPA'     :  {'latS': '20.' , 'latN': '85.', 'lonW': '-90.' , 'lonE': '30.'  },
-       }
+        'NINO3-4': {'latS': ' -5.', 'latN': '5.', 'lonW': '-170.', 'lonE': '-120.'},
+        'NINO1-2': {'latS': '-10.', 'latN': '0.', 'lonW': '-90.', 'lonE': '-80.'},
+        'NINO3': {'latS': '-5.', 'latN': '5.', 'lonW': '-150.', 'lonE': '-90.'},
+        'NINO4': {'latS': '-5.', 'latN': '5.', 'lonW': '-160.', 'lonE': '-150.'},
+        'GRL': {'latS': '40.', 'latN': '60.', 'lonW': '-60.', 'lonE': '-30.'},
+        'NATL': {'latS': '20.', 'latN': '85.', 'lonW': '-90.', 'lonE': '30.'},
+        'SAT': {'latS': '6.', 'latN': '18.', 'lonW': '-30.', 'lonE': '10.'},
+        'TPA': {'latS': '20.', 'latN': '85.', 'lonW': '-90.', 'lonE': '30.'},
+    }
 
-    if SSTbox_name in SST_boxes : return (SST_boxes[SSTbox_name])
+    if SSTbox_name in SST_boxes:
+        return (SST_boxes[SSTbox_name])

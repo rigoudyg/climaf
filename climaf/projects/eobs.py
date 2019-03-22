@@ -13,12 +13,12 @@ The specific attributes are:
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC, atIDRIS,atCerfacs,atCNRM
+from climaf.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
-if onCiclad :
+if onCiclad:
     # -- Create E-OBS CliMAF project
     EOBS_pattern = '/bdd/E-OBS/Grid_${grid}/${variable}_${grid}_${PERIOD}_v15.0.nc4'
-    cproject('E-OBS','grid', 'frequency', separator='%')
+    cproject('E-OBS', 'grid', 'frequency', separator='%')
     dataloc(project='E-OBS', organization='generic', url=EOBS_pattern)
 
     # -- Make a
@@ -26,10 +26,7 @@ if onCiclad :
     cdef('grid', '*deg_*', project='E-OBS')
     cdef('period', '*', project='E-OBS')
     cdef('variable', '*', project='E-OBS')
-    cfreqs('E-OBS',{'daily':'day'})
+    cfreqs('E-OBS', {'daily': 'day'})
 
     calias('E-OBS', 'tasmin', 'tn')
     calias('E-OBS', 'tasmax', 'tx')
-
-
-
