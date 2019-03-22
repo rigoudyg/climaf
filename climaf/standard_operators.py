@@ -166,7 +166,7 @@ def load_standard_operators():
     #
     # cepscrop : crop 'eps' file using epstopdf, pdfcrop and pdftops
     #
-    if (os.system("type exiv2 >/dev/null 2>&1") == 0):
+    if os.system("type exiv2 >/dev/null 2>&1") == 0:
         cscript('cepscrop',
                 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
                                                                     'pdftops -eps tmpfile-crop.pdf ${out}; '
@@ -275,7 +275,7 @@ def load_standard_operators():
             _var='curltau')
 
     #
-    if (os.system("type cdfmean >/dev/null 2>&1") == 0):
+    if os.system("type cdfmean >/dev/null 2>&1") == 0:
         load_cdftools_operators()
     else:
         clogger.warning("Binary cdftools not found. Some operators won't work")

@@ -232,7 +232,7 @@ class cdummy(cobject):
         pass
 
     def buildcrs(self, period=None, crsrewrite=None):
-        return ('ARG')
+        return 'ARG'
 
 
 def processDatasetArgs(**kwargs):
@@ -275,7 +275,7 @@ def processDatasetArgs(**kwargs):
                         "it is the declared separator for project '%s'. "
                         "See help(cproject) for changing it, if needed" % (sep, facet, val, project))
             # print "initalizing facet %s with value"%(facet,val)
-    if (attval['project'] == 'CMIP5'):
+    if attval['project'] == 'CMIP5':
         # Allow for a synonym for 'simulation' in CMIP5 : 'member'
         if 'member' in kwargs and kwargs['member'] not in [None, '']:
             attval['simulation'] = kwargs['member']
@@ -387,7 +387,7 @@ class cdataset(cobject):
         self.model = attval.get('model', "*")
         self.frequency = attval.get('frequency', "*")
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
-        if (self.frequency == 'seasonal' or self.frequency == 'annual_cycle'):
+        if self.frequency == 'seasonal' or self.frequency == 'annual_cycle':
             self.period.fx = True
         freqs_dic = frequencies.get(self.project, None)
         # print freqs_dic
@@ -399,9 +399,9 @@ class cdataset(cobject):
         self.kvp = attval
         self.alias = varIsAliased(self.project, self.variable)
         #
-        if ("," in self.variable and self.alias):
+        if "," in self.variable and self.alias:
             filevar, scale, offset, units, filenameVar, missing = self.alias
-            if (filevar != self.variable or scale != 1. or offset != 0 or missing):
+            if filevar != self.variable or scale != 1. or offset != 0 or missing:
                 raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs = self.buildcrs()
@@ -464,34 +464,34 @@ class cdataset(cobject):
     def oneVarPerFile(self):
         locs = dataloc.getlocs(project=self.project, model=self.model, simulation=self.simulation,
                                frequency=self.frequency)
-        return (all([org for org, freq, url in locs]))
+        return all([org for org, freq, url in locs])
 
     def periodIsFine(self):
         clogger.debug("always returns False, yet - TBD")
-        return (False)
+        return False
 
     def domainIsFine(self):
         clogger.debug("a bit too simple yet (domain=='global')- TBD")
-        return (self.domain == 'global')
+        return self.domain == 'global'
 
     def periodHasOneFile(self):
-        return (len(self.baseFiles().split(" ")) < 2)
+        return len(self.baseFiles().split(" ")) < 2
         # clogger.debug("always returns False, yet - TBD")
         # return(False)
 
     def hasOneMember(self):
         clogger.debug("always returns True, yet - TBD")
-        return (True)
+        return True
 
     def hasExactVariable(self):
         # Assume that group variable do not need aliasing
-        if ("," in self.variable):
+        if "," in self.variable:
             return True
         clogger.debug("always returns False, yet - TBD")
-        return (False)
+        return False
 
     def missingIsOK(self):
-        if (alias is None):
+        if alias is None:
             return True
         _, _, _, _, _, missing = self.alias
         return missing is None
@@ -660,7 +660,7 @@ class cdataset(cobject):
                         periods[key] = merge_periods(periods[key])
                 wildcards['period'] = periods
             else:
-                raise Climaf_Classes_Error("Operation %s is not kown " % (operation))
+                raise Climaf_Classes_Error("Operation %s is not kown " % operation)
         #
         wildcard_attributes_list = [k for k in dic if type(dic[k]) is str and "*" in dic[k]]
         if option == 'resolve':
@@ -670,7 +670,7 @@ class cdataset(cobject):
                 if type(val) == list:
                     if len(val) > 1:
                         if kw == 'period':
-                            raise Climaf_Classes_Error("Periods with holes are not handled %s" % (val))
+                            raise Climaf_Classes_Error("Periods with holes are not handled %s" % val)
                         else:
                             raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s" % (kw, val))
                     else:
@@ -731,7 +731,7 @@ class cdataset(cobject):
                                                (kw, dic[kw], entry))
             self.files = files
         else:
-            raise Climaf_Classes_Error("Unknown option %s" % (option))
+            raise Climaf_Classes_Error("Unknown option %s" % option)
 
     def baseFiles(self, force=False, ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
@@ -764,7 +764,7 @@ class cdataset(cobject):
         declared as 'derived' actually are derived """
         clogger.debug("TBD: actually test variables in files, rather than assuming that variable %s is virtual for "
                       "dataset %s" % (self.variable, self.crs))
-        return (False)
+        return False
 
     def check(self):
         """
@@ -817,7 +817,7 @@ class cdataset(cobject):
                 clogger.error('No file found for: %s' % self)
                 if not (self.isLocal() or self.isCached()):
                     clogger.warning('For remote data, you have to do at first "cfile(%s)"' % self)
-                return (False)
+                return False
         else:
             clogger.error("Cannot handle %s" % self)
             return
@@ -963,11 +963,11 @@ class cdataset(cobject):
             if file_period.includes(self.period):
                 clogger.info("Time data in datafiles (i.e. %s) includes time data of " % file_period +
                              "dataset (i.e. %s) => dataset are consistent." % self.period)
-                return (True)
+                return True
             else:
                 clogger.info("Time data in datafiles (i.e. %s) don't include time data of " % file_period +
                              "dataset (i.e. %s) => dataset are not consistent." % self.period)
-                return (False)
+                return False
 
 
 class cens(cobject, dict):
@@ -1006,7 +1006,7 @@ class cens(cobject, dict):
 
         Examples (see also :download:`../examples/ensemble.py`) :
 
-        >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G");
+        >>> cdef('project','example'); cdef('simulation',"AMIPV6ALB2G")
         >>> cdef('variable','tas');cdef('frequency','monthly')
         >>> #
         >>> ds1980=ds(period="1980")
@@ -1066,7 +1066,7 @@ class cens(cobject, dict):
         self.order = order
 
     def __setitem__(self, k, v):
-        if (not isinstance(k, str)):
+        if not isinstance(k, str):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not isinstance(v, cobject):
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
@@ -1085,7 +1085,7 @@ class cens(cobject, dict):
         e = cens(self,
                  order=[m for m in self.order],
                  sortfunc=self.sortfunc)
-        return (e)
+        return e
 
     def pop(self, key, default=None):
         if key in self:
@@ -1274,7 +1274,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     fperiod = timeLimits(filename)
     if period is None:
         if fperiod is None:
-            raise Climaf_Classes_Error("Must provide a period for file %s " % (filename))
+            raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
     else:
@@ -1363,7 +1363,7 @@ class scriptChild(cobject):
 
     def buildcrs(self, period=None, crsrewrite=None):
         tmp = self.father.buildcrs(period=period)
-        if (crsrewrite):
+        if crsrewrite:
             tmp = crsrewrite(tmp)
         return tmp + "." + self.varname
 
@@ -1466,7 +1466,7 @@ def ds(*args, **kwargs):
     if len(args) > 1:
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
-    if (len(args) == 0):
+    if len(args) == 0:
         match = None
         if 'period' in kwargs and type(kwargs['period']) is str:
             match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)(y|Y)$", kwargs['period'])
@@ -1482,7 +1482,7 @@ def ds(*args, **kwargs):
             dataset = cprojects[cproj].crs2ds(crs)
         except Climaf_Classes_Error:
             dataset = None
-        if (dataset):
+        if dataset:
             results.append(dataset)
     if len(results) > 1:
         e = "CRS expression %s is ambiguous among projects %s" % (crs, repr(cprojects.keys()))
@@ -1716,7 +1716,7 @@ class cpage(cobject):
         self.font = font
         self.gravity = gravity
         self.background = background
-        if (self.ybox < (self.y + self.pt)):
+        if self.ybox < (self.y + self.pt):
             raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
         if not isinstance(fig_lines, list) and not isinstance(fig_lines, cens):
             raise Climaf_Classes_Error(
@@ -1782,25 +1782,25 @@ class cpage(cobject):
         list length
         """
         n = len(figs)
-        if n == 1 or n == 2 or n == 3:
+        if n in range(1, 4):
             nx, ny = 1, n
-        if n == 4:
+        elif n == 4:
             nx, ny = 2, 2
-        if n == 5 or n == 6:
+        elif n in range(5, 7):
             nx, ny = 2, 3
-        if n == 7 or n == 8:
+        elif n in range(7, 9):
             nx, ny = 2, 4
-        if n >= 9 and n <= 12:
+        elif n in range(9,13):
             nx, ny = 3, 4
-        if n >= 13 and n <= 15:
+        elif n in range(13, 16):
             nx, ny = 3, 5
-        if n >= 16 and n <= 20:
+        elif n in range(16, 21):
             nx, ny = 4, 5
-        if n >= 21:
+        elif n >= 21:
             raise Climaf_Classes_Error("Too many figures in page")
         lines = []
         for i in range(len(figs)):
-            if (i % nx == 0):
+            if i % nx == 0:
                 line = []
                 lines.append(line)
             line.append(figs[i])
@@ -2037,7 +2037,7 @@ def guess_projects(crs):
             if counts[key] >= max:
                 max = counts[key]
                 sep = key
-        return (crs[1:crs.find(sep)])
+        return crs[1:crs.find(sep)]
 
     return map(guess_project, re.findall(r"ds\(([^)]*)", crs))
 
@@ -2079,12 +2079,12 @@ def domainOf(cobject):
             for coord in cobject.domain[0:-1]:
                 rep = r"%s%d," % (rep, coord)
             rep = "%s%d" % (rep, cobject.domain[-1])
-            return (rep)
+            return rep
         else:
             if cobject.domain == "global":
                 return ""
             else:
-                return (cobject.domain)
+                return cobject.domain
     elif isinstance(cobject, ctree):
         clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
         return domainOf(cobject.operands[0])
@@ -2127,7 +2127,7 @@ def attributeOf(cobject, attrib):
         if val is not None:
             return val
         else:
-            return (cobject.kvp.get(attrib))
+            return cobject.kvp.get(attrib)
     elif isinstance(cobject, cens):
         return attributeOf(cobject.values()[0], attrib)
     elif getattr(cobject, attrib, None):

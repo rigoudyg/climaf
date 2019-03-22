@@ -9,7 +9,7 @@ from climaf.api import *
 
 
 def ensemble_one_keyword(req_dict):
-    '''
+    """
     ensemble_one_keyword takes a dictionary containing the same arguments
     as ds() or eds(), but it is possible to set EITHER:
        - model='*'
@@ -27,8 +27,7 @@ def ensemble_one_keyword(req_dict):
                         )
     >>> my_ens = ensemble_one_keyword(req_dict)
     >>> summary(my_ens)
-
-    '''
+    """
     # -- Check the wildcards
     # keys = []
     key = None
@@ -62,7 +61,7 @@ def ensemble_one_keyword(req_dict):
 
 
 def ensemble_request(req_dict):
-    '''
+    """
     ensemble_request takes a dictionary containing the same arguments
     as ds() or eds(), but it is possible to set:
        - model, simulation, member to '*' or a list
@@ -80,7 +79,7 @@ def ensemble_request(req_dict):
     >>> my_ens = ensemble_request(req_dict)
     >>> summary(my_ens)
 
-    '''
+    """
 
     keys = []
     for elt in req_dict:
@@ -196,7 +195,7 @@ def ensemble_request(req_dict):
 
 
 def save_req_file(ens_obj, filename='test.txt', separator=' '):
-    '''
+    """
     save_req_file is used to save the list of netcdf files associated with a CliMAF ensemble
     in a txt or json file, tagged with their names from the ensemble.
     It takes as arguments: a CliMAF ensemble, a filename (optional), and a separator (only for txt)
@@ -207,7 +206,7 @@ def save_req_file(ens_obj, filename='test.txt', separator=' '):
     >>> save_req_file(my_ens, filename='my_pretreated_files_bis.txt', separator=';')
     >>> save_req_file(my_ens, filename='my_pretreated_files.json')
 
-    '''
+    """
     if '.txt' in filename:
         file = open(filename, "w")
         for elt in ens_obj.order:
@@ -225,13 +224,13 @@ def save_req_file(ens_obj, filename='test.txt', separator=' '):
 
 
 def add_str_to_list_elements(my_list, my_str):
-    '''
+    """
     This function adds a string (second argument) to all the elements of a list (first argument)
 
     Example:
     >>> my_list = ['model1','model2']
     >>> add_str_to_list_elements(my_list, '_tas')
-    '''
+    """
     new_list = []
     for elt in my_list:
         new_list.append(elt + my_str)
@@ -239,7 +238,7 @@ def add_str_to_list_elements(my_list, my_str):
 
 
 def add_prefix_suffix_to_ens_req(ens_obj, prefix='', suffix=''):
-    '''
+    """
     add_prefix_suffix_to_ens_req adds a prefix and/or a suffix string to
     the names of the members of a CliMAF ensemble. It is very useful to rename
     the members of an ensemble.
@@ -248,7 +247,7 @@ def add_prefix_suffix_to_ens_req(ens_obj, prefix='', suffix=''):
     Example:
     >>> my_ens = ensemble_request(req_dict) # -- see help(ensemble_request)
     >>> renamed_ens = add_prefix_suffix_to_ens_req(my_ens, prefix='tas_', suffix='_myperiod')
-    '''
+    """
     new_ens_dict = dict()
     new_names = []
     for elt in ens_obj.order:
@@ -261,7 +260,7 @@ def add_prefix_suffix_to_ens_req(ens_obj, prefix='', suffix=''):
 
 
 def merge_climaf_ensembles(ens_list=[]):
-    '''
+    """
     Simply merges a list ens_list of CliMAF ensembles, keeping the order of the members
     in the order of the list.
 
@@ -269,7 +268,7 @@ def merge_climaf_ensembles(ens_list=[]):
     >>> my_hist_ens = ensemble_request(hist_dict) # -- see help(ensemble_request)
     >>> my_rcp85_ens = ensemble_request(rcp85_dict) # -- see help(ensemble_request)
     >>> my_merged_ens = merge_climaf_ensembles(ens_list=[my_hist_ens,my_rcp85_ens])
-    '''
+    """
     if ens_list:
         merged_ens = ens_list[0].copy()
         merged_names = ens_list[0].order
@@ -283,11 +282,11 @@ def merge_climaf_ensembles(ens_list=[]):
 
 
 def check_time_consistency_CMIP(dat, return_available_period=False):
-    ''' Check if the period found by CliMAF actually covers the request period
+    """ Check if the period found by CliMAF actually covers the request period
         If yes, returns True.
         If not, returns False.
         If not, and return_available_period=True, returns the period actually available in your request.
-    '''
+    """
     #
     # -- First, get the period available among the listed files
     startyears = []

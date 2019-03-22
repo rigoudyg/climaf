@@ -73,7 +73,7 @@ cdef('period', 'fx', project='ref_climatos')
 cdef('table', '*', project='ref_climatos')
 cdef('obs_type', '*', project='ref_climatos')
 
-if (root):
+if root:
     # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc"
     # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_${clim_period}-clim.nc"
     pattern2 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
@@ -101,7 +101,7 @@ calias('ref_climatos', 'O2', scale=44.64)
 calias(project='ref_climatos', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 calias(project='ref_ts', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 
-if (root):
+if root:
     # pattern1=root+"ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
     pattern1 = root + "ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
     dataloc(project='ref_ts', organization='generic', url=[pattern1])

@@ -45,5 +45,5 @@ saMA.shape
 saMA.data
 
 # next line is only for systematic tests purpose
-if (saFile is None):
+if saFile is None:
     exit(1)

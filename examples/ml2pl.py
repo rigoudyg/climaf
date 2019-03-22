@@ -33,5 +33,5 @@ if onCiclad:
                      title='Zonal Mean Difference', contours='-20 -10 -5 -1 1 5 10 15 20 30 40',
                      min=-20, max=20, delta=2)
 
-    if (cfile(test_plot) is None):
+    if cfile(test_plot) is None:
         exit(1)

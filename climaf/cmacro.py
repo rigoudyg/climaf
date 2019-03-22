@@ -136,7 +136,7 @@ def crewrite(crs, alsoAtTop=True):
         co = eval(crs, sys.modules['__main__'].__dict__)
     except:
         clogger.debug("Issue when rewriting %s" % crs)
-        return (crs)
+        return crs
     allow_error_on_ds(False)
     if isinstance(co, ctree) or isinstance(co, scriptChild) or isinstance(co, cpage):
         if alsoAtTop:
@@ -153,9 +153,9 @@ def crewrite(crs, alsoAtTop=True):
                     return rep
         # No macro matches at top level, or top level not wished.
         # Let us dig a bit
-        return (co.buildcrs(crsrewrite=crewrite))
+        return co.buildcrs(crsrewrite=crewrite)
     else:
-        return (crs)
+        return crs
 
 
 def cmatch(macro, cobj):
@@ -179,10 +179,10 @@ def cmatch(macro, cobj):
                 argsub.append(op)
             else:
                 argsub += cmatch(mop, op)
-        return (argsub)
+        return argsub
     elif isinstance(cobj, scriptChild) and isinstance(macro, scriptChild) and \
             macro.varname == cobj.varname:
-        return (cmatch(macro.father, cobj.father, argslist))
+        return cmatch(macro.father, cobj.father, argslist)
     elif isinstance(cobj, cpage) and isinstance(macro, cpage):
         argsub = []
         if cobj.heights == macro.heights and \
@@ -208,7 +208,7 @@ def read(filename):
     macros_texts = None
     try:
         macrofile = file(os.path.expanduser(filename), "r")
-        clogger.debug("Macrofile %s read" % (macrofile))
+        clogger.debug("Macrofile %s read" % macrofile)
         macros_texts = json.load(macrofile)
         clogger.debug("After reading file %s, macros=%s" % (macrofile, repr(macros_texts)))
         macrofile.close()
@@ -274,7 +274,7 @@ def instantiate(mac, operands, toplevel=True):
         rep = cdataset
     if toplevel and len(operands) != 0:
         raise Climaf_Macro_Error('too many operands; left operands are : ' + repr(operands))
-    return (rep)
+    return rep
 
 
 class Climaf_Macro_Error(Exception):

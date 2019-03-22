@@ -19,7 +19,7 @@ import copy
 
 
 def period_for_diag_manager(DAT_DICT, diag=''):
-    ''' In a python dictionary dat_dict defining a CliMAF dataset, '''
+    """ In a python dictionary dat_dict defining a CliMAF dataset, """
     ''' this function updates:                                     '''
     '''   - period with dat_dict[diag+'_period']                   '''
     '''   - ts_period with dat_dict[diag+'_ts_period']             '''
@@ -52,7 +52,7 @@ def period_for_diag_manager(DAT_DICT, diag=''):
 
 
 def base_variable_of_derived_variable(tested_variable, project='*'):
-    ''' Returns one of the variables used to compute a derived variable '''
+    """ Returns one of the variables used to compute a derived variable """
     project_derived_variables = copy.deepcopy(derived_variables['*'])
     if project in derived_variables:
         project_derived_variables.update(derived_variables[project])

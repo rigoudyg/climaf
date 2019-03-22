@@ -25,5 +25,5 @@ dg_nino28 = ds(simulation="AMIPV6ALB2G", variable="tas",
                period="1980-1981", domain=box["nino28"])
 f = cfile(dg_nino28)
 
-if (f is None):
+if f is None:
     exit(1)

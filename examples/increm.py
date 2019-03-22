@@ -42,5 +42,5 @@ f = cfile(dsf)
 print "cache index after evaluation for [1981-1981]. A file was added for the subperiod, because explicitly asked for"
 cdump()
 
-if (f is None):
+if f is None:
     exit(1)

@@ -73,5 +73,5 @@ ncview(space_averaged_cycle)
 anncycle_4deg = regridn(anncycle, cdogrid="r90x45")
 ncview(anncycle_4deg)
 
-if (cfile(anncycle) is None):
+if cfile(anncycle) is None:
     exit(1)

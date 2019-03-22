@@ -8,9 +8,8 @@ from __future__ import print_function
 
 import time
 import os
-import os.path
 
-# Created : S.Senesi - 2014
+# Created : S.Sénési - 2014
 
 __all__ = ["site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
@@ -35,7 +34,7 @@ def tim(string=None):
 
 
 xdg_bin = False
-if (os.system("type xdg-open >/dev/null 2>&1") == 0):
+if os.system("type xdg-open >/dev/null 2>&1") == 0:
     xdg_bin = True
 
 already_inited = False
@@ -86,13 +85,13 @@ if not already_inited and not onrtd:
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     tim("execs_projects")
-    exec ("from climaf.classes   import ds, eds, cens, fds") in sys.modules['__main__'].__dict__
+    exec "from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__
     tim("execs_classes")
-    exec ("from climaf.operators import cscript") in sys.modules['__main__'].__dict__
+    exec "from climaf.operators import cscript" in sys.modules['__main__'].__dict__
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
-    exec ("from climaf.projects  import *") in sys.modules['__main__'].__dict__
+    exec "from climaf.projects  import *" in sys.modules['__main__'].__dict__
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")

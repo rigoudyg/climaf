@@ -48,7 +48,7 @@ class cperiod():
         """ Return isoformat(start)-isoformat(end), (with inclusive end, and 1 minute accuracy)
         e.g. : 1980-01-01T00:00:00,1980-12-31T23:59:00
         """
-        if (self.fx):
+        if self.fx:
             raise Climaf_Period_Error("There is no ISO representation for period 'fx'")
         endproxy = self.end - datetime.timedelta(0, 60)  # substract 1 minute
         return "%s,%s" % (self.start.isoformat(), endproxy.isoformat())
@@ -57,17 +57,17 @@ class cperiod():
     def pr(self):
         if self.fx:
             return 'fx'
-        if (self.start.minute != 0 or self.start.minute != 0):
+        if self.start.minute != 0 or self.start.minute != 0:
             return ("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d" % (self.start.year, self.start.month, self.start.day,
                                                                    self.start.hour, self.start.minute, self.end.year,
                                                                    self.end.month, self.end.day, self.end.hour,
                                                                    self.end.minute))
-        elif (self.start.hour != 0 or self.end.hour != 0):
+        elif self.start.hour != 0 or self.end.hour != 0:
             return ("%04d%02d%02d%02d-%04d%02d%02d%02d" % (self.start.year, self.start.month, self.start.day,
                                                            self.start.hour, self.end.year, self.end.month, self.end.day,
                                                            self.end.hour))
-        elif (self.start.day != 1 or self.end.day != 1):
-            if (self.end.day != 1):
+        elif self.start.day != 1 or self.end.day != 1:
+            if self.end.day != 1:
                 d = self.end.day - 1
                 m = self.end.month
                 y = self.end.year
@@ -77,38 +77,38 @@ class cperiod():
                 m = end.month
                 d = end.day
             if (self.start.year, self.start.month, self.start.day) == (y, m, d):
-                return ("%04d%02d%02d" % (y, m, d))
+                return "%04d%02d%02d" % (y, m, d)
             else:
-                return ("%04d%02d%02d-%04d%02d%02d" % (self.start.year, self.start.month, self.start.day, y, m, d))
-        elif (self.start.month != 1 or self.end.month != 1):
-            if (self.end.month != 1):
+                return "%04d%02d%02d-%04d%02d%02d" % (self.start.year, self.start.month, self.start.day, y, m, d)
+        elif self.start.month != 1 or self.end.month != 1:
+            if self.end.month != 1:
                 m = self.end.month - 1
                 y = self.end.year
             else:
                 m = 12
                 y = self.end.year - 1
             if self.start.year == y and self.start.month == m:
-                return ("%04d%02d" % (self.start.year, self.start.month))
+                return "%04d%02d" % (self.start.year, self.start.month)
             else:
-                return ("%04d%02d-%04d%02d" % (self.start.year, self.start.month, y, m))
+                return "%04d%02d-%04d%02d" % (self.start.year, self.start.month, y, m)
         else:
             if self.start.year != self.end.year - 1:
-                return ("%04d-%04d" % (self.start.year, self.end.year - 1))
+                return "%04d-%04d" % (self.start.year, self.end.year - 1)
             else:
-                return ("%04d" % (self.start.year))
+                return "%04d" % self.start.year
 
     #
     def hasFullYear(self, year):
-        if (self.fx):
+        if self.fx:
             raise Climaf_Period_Error("Meaningless for period 'fx'")
-        return (int(year) >= self.start.year and int(year) < self.end.year)
+        return int(year) in range(self.start.year, self.end.year + 1)
 
     #
     def start_with(self, begin):
         """ If period BEGIN actually begins period SELF, returns the
         complement of BEGIN in SELF; otherwise returns None """
-        if (self.fx):
-            return (False)
+        if self.fx:
+            return False
         if self.start == begin.start and self.end >= begin.end:
             return cperiod(begin.end, self.end)
 
@@ -116,16 +116,16 @@ class cperiod():
     def is_before(self, candidate):
         """ True if period SELF starts before period CANDIDATE
         """
-        if (self.fx):
-            return (False)
+        if self.fx:
+            return False
         return self.start <= candidate.start
 
     #
     def includes(self, included):
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
-        if (self.fx):
-            return (False)
+        if self.fx:
+            return False
         # raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end:
             return cperiod(self.start, included.start), cperiod(included.end, self.end)
@@ -135,16 +135,16 @@ class cperiod():
         """
         Returns the intersection of period self and period 'other' if any
         """
-        if (self.fx):
+        if self.fx:
             raise Climaf_Period_Error("Meaningless for period 'fx'")
         if other:
             start = self.start
-            if (other.start > start):
+            if other.start > start:
                 start = other.start
             end = self.end
-            if (other.end < end):
+            if other.end < end:
                 end = other.end
-            if (start < end):
+            if start < end:
                 return cperiod(start, end)
 
 
@@ -182,7 +182,7 @@ def init_period(dates):
     # clogger.debug("analyzing  %s"%dates)
     if not type(dates) is str:
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
-    if (dates == 'fx'):
+    if dates == 'fx':
         return cperiod('fx')
 
     start = re.sub(r'^([0-9]{1,12}).*', r'\1', dates)
@@ -204,7 +204,7 @@ def init_period(dates):
     end = re.sub(r'.*[-_]([0-9]{1,12})$', r'\1', dates)
     end = (4 - len(end)) * "0" + end
     # clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
-    if (end == dates):
+    if end == dates:
         end = start
     else:
         # clogger.debug("len(end)=%d"%len(end))
@@ -219,26 +219,26 @@ def init_period(dates):
     add_day = 0
     add_hour = 0
     add_minute = 0
-    if (len(end) == 4):
+    if len(end) == 4:
         eyear = int(end[0:4]) + 1
-    elif (len(end) == 6):
+    elif len(end) == 6:
         eyear = int(end[0:4])
         emonth = int(end[4:6]) + 1
-        if (emonth > 12):
+        if emonth > 12:
             emonth = 1
             eyear = eyear + 1
-    elif (len(end) == 8):
+    elif len(end) == 8:
         add_day = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
         eday = int(end[6:8])
-    elif (len(end) == 10):
+    elif len(end) == 10:
         add_hour = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
         eday = int(end[6:8])
         ehour = int(end[8:10])
-    elif (len(end) == 12):
+    elif len(end) == 12:
         add_minute = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
@@ -269,7 +269,7 @@ def sort_periods_list(periods_list):
         """
         if tree is None:
             return SortTree(el)
-        if (repr(tree.pivot) == repr(el)):
+        if repr(tree.pivot) == repr(el):
             return tree  # Discard identical periods
         if el.is_before(tree.pivot):
             tree.smaller = insert(el, tree.smaller)
@@ -307,7 +307,7 @@ def merge_periods(remain_to_merge, already_merged=[]):
         # print "last.end=",last.end,"next.start=",next_one.start
         # if (last.end == next_one.start) :
         #    already_merged[-1]=cperiod(last.start,next_one.end)
-        if (next_one.start <= last.end):
+        if next_one.start <= last.end:
             if next_one.end > last.end:
                 # the next period is not entirely included in the
                 # last merged one

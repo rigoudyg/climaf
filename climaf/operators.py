@@ -263,7 +263,7 @@ class cscript():
             r"\${(?P<keyw>(?P<mult>mm)?in(?P<serie>s)?(_(?P<n>([\d]+)))?)}",
             command)
         for oc in it:
-            if (oc.group("n") is not None):
+            if oc.group("n") is not None:
                 rank = int(oc.group("n"))
             else:
                 rank = 0
@@ -316,7 +316,7 @@ class cscript():
         for occ in it:
             outname = occ.group("outname")
             if outname is not None:
-                if (outname in outvarnames):
+                if outname in outvarnames:
                     self.outputs[outname] = outvarnames[outname]
                 else:
                     self.outputs[outname] = "%s"  # outname
@@ -385,7 +385,7 @@ class cscript():
             if e != old:
                 ls.append(e)
             old = e
-        return (len(ls))
+        return len(ls)
 
 
 def fixed_fields(operator, *paths):
@@ -510,7 +510,7 @@ def is_derived_variable(variable, project):
     rep = (project in derived_variables and variable in derived_variables[project] or
            "*" in derived_variables and variable in derived_variables["*"])
     clogger.debug("Checking if variable %s is derived for project %s : %s" % (variable, project, rep))
-    return (rep)
+    return rep
 
 
 def derived_variable(variable, project):
@@ -523,7 +523,7 @@ def derived_variable(variable, project):
     else:
         rep = None
     clogger.debug("Derived variable %s for project %s is %s" % (variable, project, rep))
-    return (rep)
+    return rep
 
 
 class Climaf_Operator_Error(Exception):

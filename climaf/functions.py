@@ -13,7 +13,7 @@ def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).
     """
-    return (cvalue(dat))
+    return cvalue(dat)
 
 
 def apply_scale_offset(dat, scale, offset):
@@ -370,7 +370,7 @@ def summary(dat):
       >>> summary(dat) #
     """
     if isinstance(dat, classes.cens):
-        if (len(dat.keys()) > 0):
+        if len(dat.keys()) > 0:
             kvp = getattr(dat[dat.keys()[0]], 'kvp', None)
             if kvp:
                 print 'Keys - values:'
@@ -689,16 +689,16 @@ def ts_plot(ts, **kwargs):
 
 
 def iplot_members(ens, nplot=12, N=1, **pp):
-    '''
+    """
     Display multiplot from individual members of a CliMAF ensemble
        - nplots = number of plots per multiplot
        - N = (integer) the number of the series of plots:
            N = 1 to display the first set of nplots
            N = 2 to display the second set of nplots...
-    '''
+    """
     members = ens.keys()
     new_ens = ens.copy()
-    start = ((N - 1) * (nplot))
+    start = (N - 1) * nplot
     end = nplot * N
     if start > len(members):
         return 'The list of members is shorter than what you asked; specify smaller N or nplot'

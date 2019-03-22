@@ -270,7 +270,7 @@ def ENSO_linreg_tauuA_on_SSTANino3(tauu_dat_dict, tos_dat_dict, do_cfile=True, s
 
 
 def find_common_period(period1, period2):
-    '''Returns the period covered both by period1 and period2'''
+    """Returns the period covered both by period1 and period2"""
     if str(period1) == 'fx' or str(period2) == 'fx':
         print '--'
         print 'Warning in find_common_period => cant work on fx period'

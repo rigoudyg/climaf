@@ -73,5 +73,5 @@ tos_on_tas_grid = regrid(tos, tas, option="remapbil")
 ncview(tos_on_tas_grid)
 
 # Next line for automated tests
-if (cfile(tos_on_tas_grid) is None):
+if cfile(tos_on_tas_grid) is None:
     exit(1)

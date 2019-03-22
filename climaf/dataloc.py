@@ -150,7 +150,7 @@ class dataloc():
         self.organization = organization
         if organization not in ['EM', 'CMIP5_DRS', 'generic']:
             raise classes.Climaf_Error("Cannot process organization " + organization)
-        if (isinstance(url, list)):
+        if isinstance(url, list):
             self.urls = url
         else:
             if re.findall("^esgf://.*", url):
@@ -206,17 +206,17 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     for loc in locs:
         stars = 0
         # loc.pr()
-        if (loc.project == "*" or project == loc.project):
-            if (loc.project == "*" or project == "*"):
+        if loc.project == "*" or project == loc.project:
+            if loc.project == "*" or project == "*":
                 stars += 1
-            if (loc.model == "*" or model == loc.model):
-                if (loc.model == "*" or model == "*"):
+            if loc.model == "*" or model == loc.model:
+                if loc.model == "*" or model == "*":
                     stars += 1
-                if (loc.simulation == "*" or simulation == loc.simulation):
-                    if (loc.simulation == "*" or simulation == "*"):
+                if loc.simulation == "*" or simulation == loc.simulation:
+                    if loc.simulation == "*" or simulation == "*":
                         stars += 1
-                    if (loc.frequency == "*" or frequency == loc.frequency):
-                        if (loc.frequency == "*" or frequency == "*"):
+                    if loc.frequency == "*" or frequency == loc.frequency:
+                        if loc.frequency == "*" or frequency == "*":
                             stars += 1
                         rep.append((loc.organization, loc.frequency, loc.urls, stars))
                         # print("appended")
@@ -225,20 +225,20 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     filtered = []
     mini = 100
     for org, freq, url, stars in rep:
-        if (stars < mini):
+        if stars < mini:
             mini = stars
     for org, freq, url, stars in rep:
-        if (stars == mini):
+        if stars == mini:
             filtered.append((org, freq, url))
     # Should we further filter ?
-    return (filtered)
+    return filtered
 
 
 def isLocal(project, model, simulation, frequency):
     if project == 'file':
         return True
     ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
-    if (len(ofu) == 0):
+    if len(ofu) == 0:
         return False
     rep = True
     for org, freq, llocs in ofu:
@@ -284,7 +284,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
 
     ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
     clogger.debug("locs=" + repr(ofu))
-    if (len(ofu) == 0):
+    if len(ofu) == 0:
         clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
     for org, freq, urls in ofu:
         if return_wildcards is not None and org is not "generic":
@@ -302,21 +302,21 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
                 kwargs2['realm'] = classes.realms[project][normrealm]
         #
         # Call organization-specific routine
-        if (org == "EM"):
+        if org == "EM":
             rep.extend(selectEmFiles(**kwargs2))
-        elif (org == "CMIP5_DRS"):
+        elif org == "CMIP5_DRS":
             rep.extend(selectCmip5DrsFiles(urls, **kwargs2))
-        elif (org == "generic"):
+        elif org == "generic":
             rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
                                           merge_periods_on=merge_periods_on, **kwargs2))
         else:
             raise classes.Climaf_Error("Cannot process organization " + org +
                                        " for simulation " + simulation + " and model " + model +
                                        " of project " + project)
-    if (not ofu):
+    if not ofu:
         return None
     else:
-        if (len(rep) == 0):
+        if len(rep) == 0:
             clogger.warning("no file found for %s, at these "
                             "data locations %s " % (repr(kwargs), repr(urls)))
             if any([kwargs[k] == '' for k in kwargs]):
@@ -330,7 +330,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
             rep.remove(last)
         last = f
     # Assemble filenames in one single string
-    return (string.join(rep))
+    return string.join(rep)
 
 
 def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwargs):
@@ -584,13 +584,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         for key in date_regexp_keywords:
             # print "searchin "+key+" in "+template
             start = template_toreg.find(key)
-            if (start >= 0):
+            if start >= 0:
                 date_regexp = template_toreg.replace(key, date_regexp_patt[key], 1)
                 # print "found ",key," dateregexp ->",date_regexp
                 hasEnd = False
                 start = date_regexp.find(key)
                 # start=date_regexp.find(key)
-                if (start >= 0):
+                if start >= 0:
                     hasEnd = True
                     date_regexp = date_regexp.replace(key, date_regexp_patt[key], 1)
                     # date_regexp=date_regexp.replace(key,date_regexp_patt[key],1)
@@ -666,13 +666,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 clogger.debug(
                     'Period is OK - Considering variable filtering on %s and %s for %s' % (variable, altvar, f))
                 # Filter against variable
-                if (l.find("${variable}") >= 0):
+                if l.find("${variable}") >= 0:
                     clogger.debug('appending %s based on variable in filename' % f)
                     store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
                                                 fperiod, periods, periods_dict)
                     rep.append(remote_prefix + f)
                     continue
-                if (f not in rep):
+                if f not in rep:
                     # local data
                     if not remote_prefix and \
                             (variable == '*' or "," in variable or fileHasVar(f, variable) or
@@ -703,7 +703,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 elif not period.intersects(fperiod):
                     clogger.debug('not appending %s because period doesn t intersect %s' % (f, period))
                 else:
-                    clogger.debug('not appending %s for some other reason %s' % (f))
+                    clogger.debug('not appending %s for some other reason %s' % f)
 
         # Break on first url with any matching data
         if len(rep) > 0:
@@ -718,7 +718,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 # print "s=",s," periods_dict=",periods_dict
                 for val in periods_dict:
                     periods_dict[val] = sort_periods_list(list(periods_dict[val]))
-                clogger.info("Attribute period='*' has values %s" % (periods_dict))
+                clogger.info("Attribute period='*' has values %s" % periods_dict)
                 return_wildcards["period"] = periods_dict
             else:
                 if len(s) == 1:
@@ -824,7 +824,7 @@ def glob_remote_data(remote, pattern):
         connect = ftp.FTP(host, username, password)
         listfiles = ftpmatch(connect, pattern)
         connect.quit()
-        return (listfiles)
+        return listfiles
     except ftp.all_errors as err_ftp:
         print err_ftp
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
@@ -884,7 +884,7 @@ def glob_remote_data(url, pattern):
         connect = ftp.FTP(host, username, password)
         listfiles = connect.nlst(pattern)
         connect.quit()
-        return (listfiles)
+        return listfiles
     except ftp.all_errors as err_ftp:
         print err_ftp
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
@@ -909,7 +909,7 @@ def remote_to_local_filename(url):
         hostname = url.split(":")[k]
 
     local_filename = os.path.expanduser(remote_cachedir) + '/' + hostname + os.path.abspath(url.split(":")[-1])
-    return (local_filename)
+    return local_filename
 
 
 def selectEmFiles(**kwargs):
@@ -970,7 +970,7 @@ def periodOfEmFile(filename, realm, freq):
     Return the period covered by a file handled by EM, based on filename
     rules for EM. returns None if file frequency does not fit freq
     """
-    if (realm == 'A' or realm == 'L'):
+    if realm == 'A' or realm == 'L':
         if freq == 'mon' or freq == '':
             year = re.sub(r'^.*([0-9]{4}).nc', r'\1', filename)
             if year.isdigit():
@@ -978,7 +978,7 @@ def periodOfEmFile(filename, realm, freq):
                 return init_period(speriod)
         else:
             raise classes.Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
-    elif (realm == 'O' or realm == 'I'):
+    elif realm == 'O' or realm == 'I':
         if freq == 'monthly' or freq == 'mon' or freq == '':
             altfreq = 'm'
         elif freq[0:2] == 'da':
@@ -989,7 +989,7 @@ def periodOfEmFile(filename, realm, freq):
         beg = re.sub(patt, r'\1', filename)
         end = re.sub(patt, r'\2', filename)
         # clogger.debug("beg=%s,end=%s,fn=%s"%(beg,end,filename))
-        if (end == filename or beg == filename):
+        if end == filename or beg == filename:
             return None
         return init_period("%s-%s" % (beg, end))
     else:
@@ -998,7 +998,7 @@ def periodOfEmFile(filename, realm, freq):
 
 def selectExampleFiles(urls, **kwargs):
     rep = []
-    if (kwargs['frequency'] == "monthly"):
+    if kwargs['frequency'] == "monthly":
         for l in urls:
             for realm in ["A", "L"]:
                 # dir=l+"/"+realm+"/Origin/Monthly/"+simulation
@@ -1061,10 +1061,10 @@ def selectCmip5DrsFiles(urls, **kwargs):
             lversions.sort()
             # print "lversions="+`lversions`+ "while version="+version
             cversion = version  # initial guess of the version to use
-            if (version == "last"):
-                if (len(lversions) == 1):
+            if version == "last":
+                if len(lversions) == 1:
                     cversion = lversions[0]
-                elif (len(lversions) > 1):
+                elif len(lversions) > 1:
                     if "last" in lversions:
                         cversion = "last"
                     else:
@@ -1084,7 +1084,7 @@ def selectCmip5DrsFiles(urls, **kwargs):
                     elif freqd == 'yr':
                         regex = r'^.*([0-9]{4}-[0-9]{4}).nc$'
                     fileperiod = init_period(re.sub(regex, r'\1', f))
-                    if (fileperiod and period.intersects(fileperiod)):
+                    if fileperiod and period.intersects(fileperiod):
                         rep.append(f)
                 else:
                     clogger.debug("adding fixed field " + f)

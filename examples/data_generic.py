@@ -119,7 +119,7 @@ if atCNRM:
     my_file = cfile(pr_obs)
     print my_file
 
-if (my_file is None):
+if my_file is None:
     exit(1)
 
 # Managing fiexed fields : use specific dataloc and frequency='fx

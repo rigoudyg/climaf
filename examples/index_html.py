@@ -54,7 +54,7 @@ def my_slice(var, season):
     else:
         dat_season = zonal_mean
     toplot = time_average(dat_season)
-    return (cfile(plot(toplot, title=var + " " + exp + " " + period + " " + season)))
+    return cfile(plot(toplot, title=var + " " + exp + " " + period + " " + season))
 
 
 # Define a first table : only two lines, for two variables, with seasons as columns

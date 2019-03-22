@@ -21,7 +21,7 @@ def varOfFile(filename):
     lvars = varsOfFile(filename)
     if len(lvars) > 1:
         clogger.debug("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
-        return (None)
+        return None
     if len(lvars) == 1:
         return lvars[0]
 
@@ -48,7 +48,7 @@ def varsOfFile(filename):
                 not re.findall("_bnds$", filevar)):
             lvars.append(filevar)
     fileobj.close()
-    return (lvars)
+    return lvars
 
 
 def fileHasVar(filename, varname):
@@ -67,7 +67,7 @@ def fileHasVar(filename, varname):
             rep = True
             break
     fileobj.close()
-    return (rep)
+    return rep
 
 
 def fileHasDim(filename, dimname):
@@ -90,7 +90,7 @@ def fileHasDim(filename, dimname):
             rep = True
             break
     fileobj.close()
-    return (rep)
+    return rep
 
 
 def dimsOfFile(filename):
@@ -105,7 +105,7 @@ def dimsOfFile(filename):
     if isinstance(dims, dict):
         dims = dims.keys()
     fileobj.close()
-    return (dims)
+    return dims
 
 
 def model_id(filename):
@@ -119,7 +119,7 @@ def model_id(filename):
     if 'model_id' in dir(f):
         rep = f.model_id
     f.close()
-    return (rep)
+    return rep
 
 
 def timeLimits(filename):

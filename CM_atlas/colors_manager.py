@@ -68,21 +68,22 @@ cesmep_python_colors = cesmep_python_colors + mpcolors
 
 
 def colors_manager(dataset_list, default_colors, colors_list=[], method='start_with_colors_list'):
-    '''colors_manager returns a list of colors that combines default '''
-    '''colors specified for the C-ESM-EP and user specified colors.  '''
-    '''                                                              '''
-    ''' It is typically used in the context of the C-ESM-EP:         '''
-    '''    - the user provides a list of datasets, like models       '''
-    '''      as first argument                                       '''
-    '''    - the second argument is the default palette to be used.  '''
-    '''      By default we use python colors (cesmep_python_colors)  '''
-    '''      but we can use R colors (cesmep_R_colors) or any user   '''
-    '''      specified list of colors.                               '''
-    '''    - it is also possible to provide a list of colors to      '''
-    '''      to start with (only used for the //coordinates plots)   '''
-    ''' colors_manager automatically handles duplicate color names   '''
-    ''' and gives priority to the user specified colors.             '''
-    '''                                                              '''
+    """
+    colors_manager returns a list of colors that combines default
+    colors specified for the C-ESM-EP and user specified colors.
+
+    It is typically used in the context of the C-ESM-EP:
+        - the user provides a list of datasets, like models
+          as first argument
+        - the second argument is the default palette to be used.
+          By default we use python colors (cesmep_python_colors)
+          but we can use R colors (cesmep_R_colors) or any user
+          specified list of colors.
+        - it is also possible to provide a list of colors to
+          to start with (only used for the //coordinates plots)
+    colors_manager automatically handles duplicate color names
+    and gives priority to the user specified colors.
+    """
     hashcolor = []
     for dumcolor in default_colors:
         hashcolor.append(str(matplotlib.colors.cnames[dumcolor]))

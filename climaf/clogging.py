@@ -42,7 +42,7 @@ def clog(level=None):
     Note : at CliMAF startup, the level is set to the value of envrionment variable $CLIMAF_LOG_LEVEL
 
     """
-    if (level):
+    if level:
         clogger.setLevel(transl(level))
     exist_stream_handler = False
     for h in clogger.handlers:

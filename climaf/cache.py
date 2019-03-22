@@ -60,7 +60,7 @@ def setNewUniqueCache(path, raz=True):
     cachedirs = [path]  # The list of cache directories
     cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
     currentCache = cachedirs[0]
-    if (raz):
+    if raz:
         craz(hideError=True)
 
 
@@ -93,7 +93,7 @@ def generateUniqueFileName_unsafe(expression, format="nc"):
     if not os.path.exists(dirn):
         os.makedirs(dirn)
     clogger.debug("returning %s" % rep)
-    return (rep)
+    return rep
 
 
 def generateUniqueFileName_safe(expression, operator=None, format="nc"):
@@ -127,10 +127,10 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         if readCRS not in crs2filename:
             clogger.warning("existing data %s in file %s was not yet registered in cache index" % (readCRS, existing))
             crs2filename[readCRS] = existing
-    while ((existing is not None) and (readCRS != expression)):
+    while (existing is not None) and (readCRS != expression):
         clogger.debug("must skip %s which CRS is %s" % (existing, getCRS(existing)))
         number += 2
-        if (number >= len(full)):
+        if number >= len(full):
             clogger.critical("Critical issue in cache : " + len(full) + " digits is not enough for " + expression)
             exit
         guess = full[0: number - 1]
@@ -144,7 +144,7 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
     if not os.path.exists(dirn):
         os.makedirs(dirn)
     clogger.debug("returning %s" % rep)
-    return (rep)
+    return rep
 
 
 def stringToPath(name, length):
@@ -152,7 +152,7 @@ def stringToPath(name, length):
     l = len(name)
     rep = ""
     i = 0
-    while (i + length < l):
+    while i + length < l:
         rep = rep + name[i:i + length] + "/"
         i += length
     rep += name[i:l]
@@ -219,10 +219,10 @@ def register(filename, crs, outfilename=None):
                       '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
                       (version, crs, filename)
         clogger.debug("trying stamping by %s" % command)
-        if (os.system(command) == 0):
+        if os.system(command) == 0:
             if outfilename:
                 cmd = 'mv -f %s %s ' % (filename, outfilename)
-                if (os.system(cmd) == 0):
+                if os.system(cmd) == 0:
                     clogger.info("move %s as %s " % (filename, outfilename))
                     clogger.info("%s registered as %s" % (crs, outfilename))
                     crs2filename[crs] = outfilename
@@ -285,7 +285,7 @@ def rename(filename, crs):
             crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs)
-        return (newfile)
+        return newfile
 
 
 def hasMatchingObject(cobject, ds_func):
@@ -369,7 +369,7 @@ def complement(crsb, crse, crs):
     filee = crs2filename[crse]
     filet = generateUniqueFileName(crs)
     command = "ncrcat -O %s %s %s" % (fileb, filee, filet)
-    if (os.system(command) != 0):
+    if os.system(command) != 0:
         clogger.error("Issue when merging %s and %s in %s (using command:%s)" % (crsb, crse, crs, command))
         return None
     else:
@@ -404,9 +404,9 @@ def cdrop(obj, rm=True, force=False):
     global crs2filename
     global dropped_crs
 
-    if (isinstance(obj, cobject)):
+    if isinstance(obj, cobject):
         crs = repr(obj)
-        if (isinstance(obj, cdataset)):
+        if isinstance(obj, cdataset):
             crs = "select(" + crs + ")"
     elif type(obj) is str:
         crs = obj
@@ -449,9 +449,9 @@ def cprotect(obj, stop=False):
     :py:func:`~climaf.cache.craz` or :py:func:`~climaf.cache.cdrop`
 
     """
-    if (isinstance(obj, cobject)):
+    if isinstance(obj, cobject):
         crs = repr(obj)
-        if (isinstance(obj, cdataset)):
+        if isinstance(obj, cdataset):
             crs = "select(" + crs + ")"
     elif type(obj) is str:
         crs = obj
@@ -545,7 +545,7 @@ def cload(alt=None):
         # clogger.debug("no index file yet")
     #
     must_check_index_entries = False
-    if (must_check_index_entries):
+    if must_check_index_entries:
         # We may have some crs inherited from past sessions and for which
         # some operator may have become non-standard, or some projects are yet
         # undeclared
@@ -605,7 +605,7 @@ def craz(force=False, hideError=False):
     """
     global crs2filename
     cc = os.path.expanduser(currentCache)
-    if (os.path.exists(currentCache) or hideError is False):
+    if os.path.exists(currentCache) or hideError is False:
         if force:
             os.system("chmod -R +w  " + cc)
         os.system("rm -fR " + cc + "/*")
@@ -644,7 +644,7 @@ def list_cache():
             "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep).read()
     files_in_cache = find_return.split('\n')
     files_in_cache.pop(-1)
-    return (files_in_cache)
+    return files_in_cache
 
 
 def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, count=False,
@@ -875,7 +875,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
-        return (map(crewrite, list_tmp_crs))
+        return map(crewrite, list_tmp_crs)
 
     else:  # usage, count and remove are False
         if var_find or pattern is not "" or not_pattern is not "":
@@ -884,11 +884,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     print "Filtered objects :"
                 else:
                     print "Filtered objects = cache content"
-                return (map(crewrite, new_dict.keys()))
+                return map(crewrite, new_dict.keys())
             # else : print "No matching file "
         else:
             print "Content of CliMAF cache"
-            return (map(crewrite, crs2filename.keys()))
+            return map(crewrite, crs2filename.keys())
 
     # TBD
     if special is True:
@@ -899,7 +899,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         else:
             dic_special = crs2filename.copy()
         print "List of marked figures as 'special'", dic_special.values()
-        return (dic_special)  # TBD: declarer comme var globale et enlever son effacement dans creset
+        return dic_special  # TBD: declarer comme var globale et enlever son effacement dans creset
 
     new_dict.clear()
 
@@ -987,7 +987,7 @@ def rebuild():
         else:
             os.system('rm -f ' + files)
             clogger.warning("File %s is removed" % files)
-    return (crs2filename)
+    return crs2filename
 
 
 class Climaf_Cache_Error(Exception):

@@ -60,7 +60,7 @@ def header(title, style_file=None):
 def trailer():
     """ Returns the text for closing an html document
     """
-    return ("</body>\n")
+    return "</body>\n"
 
 
 def vspace(nb=1):
@@ -90,15 +90,15 @@ def open_table(title="", columns=[], spacing=5):
 def close_table():
     """ Returns text for closing an html table
     """
-    return ("</TABLE>\n")
+    return "</TABLE>\n"
 
 
 def open_line(title=""):
-    return (' <TR>\n <TH ALIGN=LEFT> <li>' + title + '</li> </TH> \n')
+    return ' <TR>\n <TH ALIGN=LEFT> <li>' + title + '</li> </TH> \n'
 
 
 def close_line():
-    return (' </TR>\n')
+    return ' </TR>\n'
 
 
 def link(label, filename, thumbnail=None, hover=True):
@@ -343,7 +343,7 @@ def flines(func, fargs, sargs, common_args=[],
         else:
             title = fargs.get(farg, repr(farg))
         rep += fline(func, *args, title=title, thumbnail=thumbnail, hover=hover, dirname=dirname, **kwargs)
-    return (rep)
+    return rep
 
 
 def fline(func, farg, sargs, title=None,
@@ -454,7 +454,7 @@ def fline(func, farg, sargs, title=None,
                 # print "lab case",lab,rfig
         rep += cell(lab, rfig, thumbnail, hover, dirname)
     rep += close_line()
-    return (rep)
+    return rep
 
 
 # cinstantiate("index.html","inst.html")
@@ -501,7 +501,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         flux = objin[:]
     else:
         print("Input is not a file nor a string" + repr(flux))
-        return (None)
+        return None
     # re.sub(r"Â£([^Â£]*)Â£",repl,"aaÂ£pp=6Â£bbÂ£`pp`Â£cc\nddÂ£`pp`Â£")
     rep = re.sub(u"Â£([^Â£]*)Â£", exec_and_discard_test, flux)
     rep = re.sub(u"&([^&]*)&", replace_text_with_evaluation, rep)

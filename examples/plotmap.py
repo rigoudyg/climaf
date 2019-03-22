@@ -57,5 +57,5 @@ def map_graph_attributes(var):
 map2 = plot(ta, title="Surface temperature (tas)", **map_graph_attributes(varOf(ta)))
 cshow(map2)
 
-if (cfile(map2) is None):
+if cfile(map2) is None:
     exit(1)

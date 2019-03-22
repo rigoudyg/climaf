@@ -97,7 +97,7 @@ def model_vs_obs_profile_oce(variable, model, obs, masks='/data/esanchez/Atlas/o
     myplot = plot(vertprof_obsvar, vertprof_modvar, title='MOD&OBS - ' + variable,
                   y="index", aux_options="xyLineColor='red'", invXY=False)
 
-    return (myplot)
+    return myplot
 
 
 def plot_basin_moc(model, variable="msftmyz", basin=1):
@@ -111,7 +111,7 @@ def plot_basin_moc(model, variable="msftmyz", basin=1):
     # Plot
     plot_moc_slice = plot(moc_model_mean_atl_mask, title="MOC", y="lin",
                           min=-10., max=30., delta=1., scale=1e-3, units="Sv", options="trXMinF=-30.")
-    return (plot_moc_slice)
+    return plot_moc_slice
 
 
 # Profil de MOC, vs Obs RAPID

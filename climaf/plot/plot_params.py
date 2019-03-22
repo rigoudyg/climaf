@@ -156,4 +156,4 @@ def hovm_params(SSTbox_name):
     }
 
     if SSTbox_name in SST_boxes:
-        return (SST_boxes[SSTbox_name])
+        return SST_boxes[SSTbox_name]

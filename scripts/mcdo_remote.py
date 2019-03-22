@@ -126,7 +126,7 @@ def input_user_pass(host):
 
     Mafenetre.mainloop()
 
-    return (Login.get(), Motdepasse.get())
+    return Login.get(), Motdepasse.get()
 
 
 for host, username in host_user2:
