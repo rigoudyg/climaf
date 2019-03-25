@@ -7,6 +7,8 @@ CNRM's Lustre, using the pre-defined 'projects' : gpcp, gpcc, erai, erai-land, c
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # S.Senesi - may 2015
 
 from __future__ import print_function

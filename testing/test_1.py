@@ -8,7 +8,7 @@ Call it as : python -m unittest -b -v -f test_1
 S.Senesi - dec 2014
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import unittest
 import os.path

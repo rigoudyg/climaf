@@ -9,7 +9,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 """
 # Created : S.Sénési - 2014
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import sys
 import six
@@ -24,10 +24,10 @@ import hashlib
 from operator import itemgetter
 
 from climaf import version
-from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
-from cmacro import crewrite
+from .classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
+from .cmacro import crewrite
 from env.clogging import clogger, dedent
-import operators
+from . import operators
 
 currentCache = None
 cachedirs = None

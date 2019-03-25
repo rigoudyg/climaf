@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # -- Import the dictionnaries of plot params:
-from __future__ import print_function
+
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.site_settings import *
 
 # --> Import the default CliMAF sets of plot params
 # --> for atmosphere
-import atmos_plot_params
+from . import atmos_plot_params
 # --> for ocean
-import ocean_plot_params
+from . import ocean_plot_params
 # --> for land
-import land_plot_params
+from . import land_plot_params
 
 centerspecs = False
 # --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)

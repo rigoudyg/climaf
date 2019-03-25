@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # PART 1: How to build a an array of figures using cpage()
 from climaf.api import *
 

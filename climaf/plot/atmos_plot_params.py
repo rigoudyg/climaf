@@ -3,6 +3,8 @@
 # Created : S.Sénési - nov 2015
 # Adapter : J.Servonnat - april 2016
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 dict_plot_params = {
     'pr': {
         'default': {'scale': 86400., 'color': 'precip_11lev', 'contours': 1},

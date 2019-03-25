@@ -17,6 +17,8 @@ setup (by ``import site_settings`` and ``import standard_projects``)
 
 # S.Senesi - feb 2015
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
 
 from climaf.api import *

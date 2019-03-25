@@ -6,6 +6,8 @@ from __future__ import print_function
 # How to export CliMAF results as NetCDF files or Numpy Masked Arrays
 #####################################################################
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # Load Climaf functions and site settings
 from climaf.api import *
 

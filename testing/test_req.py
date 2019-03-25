@@ -8,7 +8,7 @@ Run it as : python -m unittest -v test_req
 S.Senesi - jan 2015
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import unittest
 import os

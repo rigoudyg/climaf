@@ -11,6 +11,8 @@ Example ::
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cdef
 

@@ -11,6 +11,8 @@ Example for a dataset declaration ::
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.classes import cproject
 
 cproject("file", "model", "path", separator="|")

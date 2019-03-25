@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # Computig and plotting an annual cycle
 
 # Load Climaf functions

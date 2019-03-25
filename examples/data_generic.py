@@ -24,6 +24,10 @@ data organization called 'generic' :
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+import os
+
 from climaf.api import *
 
 if atCNRM:
@@ -59,8 +63,6 @@ if atCNRM:
     print(my_file)
 
     # Check file size and content
-    import os
-
     os.system("ls -al " + my_file)
     # os.system("ncdump -h "+my_file)
 

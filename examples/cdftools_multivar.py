@@ -11,6 +11,8 @@
 #                 along a section made of Nsec linear segments)
 
 # export CLIMAF_FIX_NEMO_TIME='on'  # can be useful at CNRM
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 if not atCNRM:

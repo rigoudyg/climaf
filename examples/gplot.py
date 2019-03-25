@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # Example for general-purpose plot using NCL
 # Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 

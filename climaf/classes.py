@@ -8,7 +8,7 @@
 """
 # Created : S.Sénési - 2014
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import re
 import string

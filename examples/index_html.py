@@ -6,6 +6,9 @@ and stored in CliMAF's cache, including :
   - some paragraph titles formatting
   - a small table giving access to figure files through html links
 """
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
 import os.path
 

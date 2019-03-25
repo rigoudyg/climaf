@@ -5,6 +5,8 @@
 #  1- to a named grid,
 #  2- to the grid of another dataset
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # 0 - define a dataset
