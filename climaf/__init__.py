@@ -54,10 +54,10 @@ if not already_inited and not onrtd:
     #
     import env.clogging as clogging
     import env.site_settings as site_settings
-    import cache
-    import standard_operators
-    import cmacro
-    import operators
+    from . import cache
+    from . import standard_operators
+    from . import cmacro
+    from . import operators
     import subprocess
     import commands
 
@@ -160,24 +160,24 @@ if not already_inited and not onrtd:
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     tim("execs_projects")
-    exec "from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__
+    exec("from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__)
     tim("execs_classes")
-    exec "from climaf.operators import cscript" in sys.modules['__main__'].__dict__
+    exec("from climaf.operators import cscript" in sys.modules['__main__'].__dict__)
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
-    exec "from climaf.projects  import *" in sys.modules['__main__'].__dict__
+    exec("from climaf.projects  import *" in sys.modules['__main__'].__dict__)
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")
     if os.path.isfile(conf_file):
-        execfile(conf_file, sys.modules['__main__'].__dict__)
+        exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
     # Init and load macros
     macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
-    print("Available macros read from %s are : %s" % (macroFilename, repr(cmacro.cmacros.keys())),
+    print("Available macros read from %s are : %s" % (macroFilename, repr(list(cmacro.cmacros))),
           file=sys.stderr)
     tim("macros")
     #

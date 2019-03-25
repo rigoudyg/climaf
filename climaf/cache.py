@@ -82,7 +82,7 @@ def generateUniqueFileName(expression, format="nc", option="new"):
     if format is None:
         return ""
     prefix = ""
-    vhash = hashlib.sha224(expression).hexdigest()
+    vhash = hashlib.sha224(expression.encode("utf-8")).hexdigest()
     rep = hash_to_path(vhash, format, option="new")
     # Create the relevant directory, so that user scripts don't have to care
     dirn = os.path.dirname(rep)
@@ -513,7 +513,7 @@ def csync(update=False):
         clogger.info("Listing crs from files present in cache")
         files_in_cache = list_cache()
         files_in_cache.sort()
-        files_in_index = crs2filename.values()
+        files_in_index = list(crs2filename.values())
         files_in_index.sort()
         if files_in_index != files_in_cache:
             if stamping:
@@ -550,7 +550,7 @@ def cload(alt=None):
         Climaf_Cache_Error(
             "attempt to reset file index - would lead to inconsistency !")
     try:
-        cacheIndexFile = file(os.path.expanduser(cacheIndexFileName), "r")
+        cacheIndexFile = open(os.path.expanduser(cacheIndexFileName), "r")
         if alt:
             rep = pickle.load(cacheIndexFile)
         else:
@@ -584,7 +584,7 @@ def cload(alt=None):
                 crs_not_yet_evaluable[p][crs] = crs2filename[crs]
                 crs2filename.pop(crs)
                 # Analyze projects of inconsistent cache objects
-                projects = crs_not_yet_evaluable.keys()
+                projects = list(crs_not_yet_evaluable)
                 if projects:
                     clogger.info(
                         "The cache has %d objects for non-declared projects %s.\n"
@@ -871,7 +871,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                 dic_usage[fig] = size
 
         # sort of usage dictionary and units conversion
-        du_list_sort = dic_usage.items()
+        du_list_sort = list(dic_usage.items())
         du_list_sort.sort(key=itemgetter(1), reverse=False)
 
         unit = ["K", "M", "G", "T"]
@@ -901,11 +901,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     elif remove is True and len_new_dict != 0:
         print("Removed files:")
         list_tmp_crs = []
-        list_tmp_crs = new_dict.keys() if (
-                var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
+        list_tmp_crs = list(new_dict) if (var_find or pattern is not "" or not_pattern is not "")\
+            else list(crs2filename)
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
-        return map(crewrite, list_tmp_crs)
+        return list(map(crewrite, list_tmp_crs))
 
     else:  # usage, count and remove are False
         if var_find or pattern is not "" or not_pattern is not "":
@@ -914,11 +914,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     print("Filtered objects :")
                 else:
                     print("Filtered objects = cache content")
-                return map(crewrite, new_dict.keys())
+                return list(map(crewrite, new_dict))
             # else : print "No matching file "
         else:
             print("Content of CliMAF cache")
-            return map(crewrite, crs2filename.keys())
+            return list(map(crewrite, crs2filename))
 
     # TBD
     if special is True:
@@ -928,7 +928,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             dic_special = new_dict.copy()
         else:
             dic_special = crs2filename.copy()
-        print("List of marked figures as 'special'", dic_special.values())
+        print("List of marked figures as 'special'", list(dic_special.values()))
         return dic_special  # TBD: declarer comme var globale et enlever son effacement dans creset
 
     new_dict.clear()

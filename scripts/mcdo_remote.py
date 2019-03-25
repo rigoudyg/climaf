@@ -19,6 +19,7 @@ import ftplib as ftp
 import getpass
 import netrc
 from dateutil import tz
+# TODO: Tkinter is not a module in Python3, it should be replaced by tkinter (after future module import)
 from Tkinter import *
 import argparse
 from collections import defaultdict

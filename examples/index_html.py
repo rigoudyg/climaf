@@ -8,6 +8,11 @@ and stored in CliMAF's cache, including :
 """
 
 from __future__ import print_function, division, unicode_literals, absolute_import
+# TODO: replace list(seasons.values()) by a more efficient syntax
+# see: https://python-future.org/compatible_idioms.html#dict-keys-values-items-as-a-list
+# from future.utils import listvalues
+# from future.utils import itervalues
+# from six import itervalues
 
 import os
 import os.path
@@ -91,11 +96,11 @@ index += vspace(3)
 # dict with similar keys and which values are line titles)
 
 seasons = {'Year': 'ANN', 'Winter': 'DJF'}
-index += open_table(title='variable/season', columns=seasons.keys(), spacing=5)
+index += open_table(title='variable/season', columns=list(seasons), spacing=5)
 lvars = {
     "rst": "short wave at top ",
     "ta": " upper air temp"}
-index += flines(my_slice, lvars, seasons.values(), thumbnail=60)
+index += flines(my_slice, lvars, list(seasons.values()), thumbnail=60)
 # (Argument thumbnail allows to control the size of the small image displayed
 # instead of a labelled link)
 index += close_table()

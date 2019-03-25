@@ -61,7 +61,7 @@ def ensemble_intersection(ensembles):
                 ens_dict[mem] = tmpens[mem]
             ens_list.append(cens(ens_dict, order=sorted(members)))
         return ens_list
-            
+
     else:
         raise classes.Climaf_Error("Your CliMAF ensembles have no member in common among all them; "
                                    "check them manually with .order")
@@ -98,10 +98,6 @@ def fmul(dat1, dat2):
         return ccdo(dat1, operator='mulc,' + c)
     else:
         return ccdo2(dat1, dat2, operator='mul')
-
-
-
-
 
 
 def fdiv(dat1, dat2):
@@ -553,8 +549,8 @@ def summary(dat):
       >>> summary(dat) #
     """
     if isinstance(dat, classes.cens):
-        if len(dat.keys()) > 0:
-            kvp = getattr(dat[dat.keys()[0]], 'kvp', None)
+        if len(list(dat)) > 0:
+            kvp = getattr(dat[list(dat)[0]], 'kvp', None)
             if kvp:
                 print('Keys - values:')
                 print(kvp)
@@ -595,7 +591,7 @@ def projects():
     Lists available projects and their associated facets.
     """
     print('-- Available projects:')
-    for key in cprojects.keys():
+    for key in list(cprojects):
         print('-- Project:', key)
         print('Facets =>', cprojects[key])
 
@@ -632,7 +628,7 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
     file1 = cfile(dat1)
     clogger.debug('file1 = %s' % file1)
     ncfile1 = ncf(file1)
-     
+
     # -- First, we check the unit of the vertical dimension of file1
     levname1 = None
     for varname in ncfile1.variables:
@@ -855,7 +851,7 @@ def ts_plot(ts, **kwargs):
             elts_dict = dict()
             for ts_elt in ts:
                 if isinstance(ts_elt, dict):
-                    elts_order.append(ts_elt.keys()[0])
+                    elts_order.append(list(ts_elt)[0])
                     elts_dict.update(ts_elt)
                 else:
                     ts_name = ts.crs
@@ -888,7 +884,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
            N = 1 to display the first set of nplots
            N = 2 to display the second set of nplots...
     """
-    members = ens.keys()
+    members = list(ens)
     new_ens = ens.copy()
     start = (N - 1) * nplot
     end = nplot * N

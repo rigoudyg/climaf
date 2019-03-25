@@ -29,6 +29,7 @@ import pickle
 import shutil
 from collections import OrderedDict
 from env.clogging import clogger, dedent
+from functools import reduce
 
 
 def header(title, style_file=None):
@@ -149,7 +150,7 @@ def link(label, filename, thumbnail=None, hover=True):
                 thumbnail_height = int(thumbnail_height)
 
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, str):
                     hover_regex_match = regex.match(hover)
                     if hover_regex_match:
                         hover_width = hover_regex_match.groupdict()["width"]
@@ -184,7 +185,7 @@ def link(label, filename, thumbnail=None, hover=True):
         else:
 
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, str):
                     hover_regex_match = regex.match(hover)
                     if hover_regex_match:
                         hover_width = hover_regex_match.groupdict()["width"]
@@ -279,7 +280,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 # -- Read the content of the index
                 print('index_atlas in html.py = ', index_atlas)
                 try:
-                    atlas_index_r = file(os.path.expanduser(index_atlas), "r")
+                    atlas_index_r = open(os.path.expanduser(index_atlas), "rb")
                     tt = pickle.load(atlas_index_r)
                     atlas_index_r.close()
                 except:
@@ -287,7 +288,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 # -- Append the file
                 tt.update(index_dict)
             # -- Save the file
-            atlas_index_w = file(os.path.expanduser(index_atlas), "w")
+            atlas_index_w = open(os.path.expanduser(index_atlas), "wb")
             pickle.dump(tt, atlas_index_w)
             atlas_index_w.close()
 
@@ -459,10 +460,10 @@ def fline(func, farg, sargs, title=None,
     if not isinstance(sargs, dict):
         imposed_labels = False
         if not isinstance(sargs, list):
-            print("Issue with second args : not a dict nor a list (got `sargs`) ")
+            print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:
-            sargs = OrderedDict(zip(sargs, sargs))
+            sargs = OrderedDict(list(zip(sargs, sargs)))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
@@ -504,7 +505,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         if should_exec:
             # print "Executing %s"%expression
             # try :
-            exec expression in globals()
+            exec(expression, globals())
             # except :
             #    print "Issue executing %s"%expression
         return ""

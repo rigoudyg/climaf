@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 __doc__ = """
 Example for CliMAF access to data organized in various ways, using the 
@@ -24,7 +24,6 @@ data organization called 'generic' :
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
-from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 

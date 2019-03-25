@@ -17,15 +17,15 @@ from . import land_plot_params
 centerspecs = False
 # --> Import the sets of plot parameters that are specific to the centers (CNRM or IPSL)
 if atCNRM:
-    import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
-    import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
-    import land_plot_params_CNRM as land_plot_params_centerspecs
+    from . import atmos_plot_params_CNRM as atmos_plot_params_centerspecs
+    from . import ocean_plot_params_CNRM as ocean_plot_params_centerspecs
+    from . import land_plot_params_CNRM as land_plot_params_centerspecs
 
     centerspecs = True
 if atIPSL:
-    import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
-    import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
-    import land_plot_params_IPSL as land_plot_params_centerspecs
+    from . import atmos_plot_params_IPSL as atmos_plot_params_centerspecs
+    from . import ocean_plot_params_IPSL as ocean_plot_params_centerspecs
+    from . import land_plot_params_IPSL as land_plot_params_centerspecs
 
     centerspecs = True
 

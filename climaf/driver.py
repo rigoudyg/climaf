@@ -23,12 +23,14 @@ from string import Template
 import tempfile
 from datetime import datetime
 
+from functools import reduce
+
 # Climaf modules
 import climaf
-import classes
-import cache
-import operators
-import cmacro
+from . import classes
+from . import cache
+from . import operators
+from . import cmacro
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod, merge_periods
@@ -49,7 +51,7 @@ def capply(climaf_operator, *operands, **parameters):
     res = None
     if operands is None or operands[0] is None and not classes.allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
-    opds = map(str, operands)
+    opds = list(map(str, operands))
     if climaf_operator in operators.scripts:
         # clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res = capply_script(climaf_operator, *operands, **parameters)
@@ -111,7 +113,7 @@ def capply_script(script_name, *operands, **parameters):
             params = parameters.copy()
             params["member_label"] = label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
-        return classes.cens(dict(zip(order, reps)), order)
+        return classes.cens(dict(list(zip(order, reps))), order)
     else:
         return maketree(script_name, script, *operands, **parameters)
 
@@ -119,7 +121,7 @@ def capply_script(script_name, *operands, **parameters):
 def maketree(script_name, script, *operands, **parameters):
     # maketree takes care of
     #  - creating a ctree object representing the application of the scripts to its operands
-    #  - checking that the time period of result makes sense 
+    #  - checking that the time period of result makes sense
     #  - computing the variable name for all outputs, using dict script.outputs
     #  - for each secondary outputs, creating an attribute of the ctree named as this output
     add_dict = dict()
@@ -651,7 +653,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
     try:
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
-    except subprocess.CalledProcessError, inst:
+    except subprocess.CalledProcessError as inst:
         logfile.close()
         raise Climaf_Driver_Error("Something went wrong when computing %s. See file ./last.out for details" %
                                   scriptCall.crs)
@@ -720,7 +722,7 @@ def timePeriod(cobject):
         return timePeriod(cobject.father)
     elif isinstance(cobject, classes.cens):
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
-        return timePeriod(cobject.values()[0])
+        return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
 
@@ -769,7 +771,7 @@ def cread(datafile, varname=None, period=None):
             raise Climaf_Driver_Error("")
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
-        from anynetcdf import ncf
+        from .anynetcdf import ncf
         fileobj = ncf(datafile)
         # import netCDF4
         # fileobj=netCDF4.Dataset(datafile)
@@ -1202,8 +1204,8 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     page_size = "{%dpx,%dpx}" % (cobj.page_width, cobj.page_height)
     fig_nb = "%dx%d" % (len(cobj.fig_lines[0]), len(cobj.fig_lines))
     fig_delta = "%d %d" % (xmargin, ymargin)
-    preamb = "\pagestyle{empty} \usepackage{hyperref} \usepackage{graphicx} \usepackage{geometry} " \
-             "\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
+    preamb = "\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} " \
+             "\\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
 
     args = ["pdfjam", "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta, "--nup",
             fig_nb]  # "%s"%preamb

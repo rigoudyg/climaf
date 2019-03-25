@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 __doc__ = """
 Example for CliMAF access to data organized according to CMIP5 DRS such as :
@@ -16,8 +16,6 @@ setup (by ``import site_settings`` and ``import standard_projects``)
 """
 
 # S.Senesi - feb 2015
-
-from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 

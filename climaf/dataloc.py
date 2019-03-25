@@ -19,7 +19,7 @@ import glob
 import subprocess
 from string import Template
 
-import classes
+from . import classes
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger, dedent
@@ -159,7 +159,7 @@ class dataloc():
             if re.findall("^esgf://.*", url):
                 self.organization = "ESGF"
             self.urls = [url]
-        self.urls = map(os.path.expanduser, self.urls)
+        self.urls = list(map(os.path.expanduser, self.urls))
         alt = []
         for u in self.urls:
             # if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
@@ -328,7 +328,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep = sorted(list(set([f.strip() for f in rep])))
     # Assemble filenames in one single string
-    return string.join(rep)
+    return ' '.join(rep)
 
 
 def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwargs):
@@ -845,7 +845,7 @@ def glob_remote_data(remote, pattern):
         if host in secrets.hosts:
             username, account, password = secrets.authenticators(host)
         else:
-            username = raw_input("Enter login for host '%s': " % host)
+            username = eval(input("Enter login for host '%s': " % host))
             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
 
     try:
@@ -905,7 +905,7 @@ def glob_remote_data(url, pattern):
         if host in secrets.hosts:
             username, account, password = secrets.authenticators(host)
         else:
-            username = raw_input("Enter login for host '%s': " % host)
+            username = eval(input("Enter login for host '%s': " % host))
             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
 
     try:

@@ -15,7 +15,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys
 import os
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
+from .classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 from env.clogging import clogger, dedent
 
 #: Dictionary of macros
@@ -94,14 +94,14 @@ def macro(name, cobj, lobjects=[]):
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
                     *cobj.operands, **cobj.parameters)
-        rep.operands = map(macro, [None for o in rep.operands], rep.operands)
+        rep.operands = list(map(macro, [None for o in rep.operands], rep.operands))
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
-        rep = cpage([map(macro, [None for fig in line], line) for line in cobj.fig_lines], cobj.widths, cobj.heights)
+        rep = cpage([list(map(macro, [None for fig in line], line)) for line in cobj.fig_lines], cobj.widths, cobj.heights)
     elif isinstance(cobj, cens):
         d = dict()
-        for k, v in zip(cobj.keys(), map(macro, [None for o in cobj.values()], cobj.values())):
+        for k, v in zip(list(cobj), map(macro, [None for o in cobj.values()], cobj.values())):
             d[k] = v
         rep = cens(d)
     elif cobj is None:
@@ -114,8 +114,8 @@ def macro(name, cobj, lobjects=[]):
         doc = "A CliMAF macro, which text is " + repr(rep)
         defs = 'def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n' \
                % (name, doc, name)
-        exec defs in globals()
-        exec "from climaf.cmacro import %s" % name in sys.modules['__main__'].__dict__
+        exec(defs, globals())
+        exec("from climaf.cmacro import %s" % name, sys.modules['__main__'].__dict__)
         clogger.debug("Macro %s has been declared" % name)
 
     return rep
@@ -209,7 +209,7 @@ def read(filename):
     global cmacros
     macros_texts = None
     try:
-        macrofile = file(os.path.expanduser(filename), "r")
+        macrofile = open(os.path.expanduser(filename), "r")
         clogger.debug("Macrofile %s read" % macrofile)
         macros_texts = json.load(macrofile)
         clogger.debug("After reading file %s, macros=%s" % (macrofile, repr(macros_texts)))
@@ -233,7 +233,7 @@ def write(filename):
         os.remove(filen)
     except:
         pass
-    macrofile = file(filen, "w")
+    macrofile = open(filen, "w")
     dcrs = cmacros.copy()
     for m in dcrs:
         dcrs[m] = dcrs[m].buildcrs()

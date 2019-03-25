@@ -14,7 +14,7 @@ import os
 import re
 import sys
 import subprocess
-import driver
+from . import driver
 from env.clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
@@ -179,8 +179,8 @@ class cscript():
               not tasked with selecting the variable, and that CliMAF must
               feed CDO with a datafile where it has already performed the
               selection
-        
-            - if the script MUST receive the name of the variable in all 
+
+            - if the script MUST receive the name of the variable in all
               circumstances, use keyword **Var**
 
          - **period, period_<digit>** : when a script can select a time
@@ -580,7 +580,7 @@ class Climaf_Operator_Error(Exception):
 if __name__ == "__main__":
     def ceval(script_name, *args, **dic):
         print(script_name, " has been called with args=", args, " and dic=", dic)
-        print("Command would be:",)
+        print("Command would be:", end=" ")
 
 
     cscript('test_script', 'echo $*')
