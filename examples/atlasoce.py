@@ -49,7 +49,7 @@ calias("CMIP5", "msftmyz", scale=1.e-3)
 
 # Obs de MOC RAPID (Il a fallu bricoler les données d'origine pour la dimension time au début et unlim)
 dataloc(project="ref_pcmdi", organization="generic",
-        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
+        url=['/home/esanchez/data_climaf/${variable}_vertical_unlim.nc',])
 calias('ref_pcmdi', 'moc', 'stream_function_mar', filenameVar='moc')
 
 model = dict(project='CMIP5', model='CNRM-CM5', frequency="mon",

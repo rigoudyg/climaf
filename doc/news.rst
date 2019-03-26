@@ -210,13 +210,13 @@ Changes, newest first:
 
 - V1.2.10:
 
-  - Ensembles are sorted on their label using module natsort (when it is available) 
+  - Ensembles are sorted on their label using module natsort (when it is available)
 
   - Init variable site_settings.atCerfacs based on existence of /scratch/globc
 
   - Fix for data files without a date in filename, which were sometimes disregarded
 
-  
+
 - V1.2.9:
 
   - ensembles can be built on multiple attributes (e.g model+realization); :py:func:`~climaf.function.eds` has new
@@ -268,7 +268,7 @@ Changes, newest first:
     - ``ensemble_ts_plot`` (:doc:`scripts/ensemble_ts_plot`), with python-user-friendly shortcut ``ts_plot``
       (:py:func:`~climaf.functions.ts_plot` ): an alternative to ``curves`` (:doc:`scripts/curves`) for time series,
       with more possibilities for customization
-    
+
     - ``cLinearRegression`` (:doc:`scripts/cLinearRegression`): computes linear regressions between two lon/lat/time
       datasets (same size) or between a time series and a lon/lat/time
 
@@ -286,7 +286,7 @@ Changes, newest first:
 
   - Added :py:func:`~climaf.functions.cscalar`: this function returns a float in python when applied on a CliMAF
     object that is supposed to have one single value. It uses cMA to import a masked array and returns only the float.
-    
+
   - Allow to choose log directory (for files climaf.log and last.out), using environment variable CLIMAF_LOG_DIR
 
   - Bug fix on ds() for the access to daily datasets with the CMIP5 project
@@ -298,14 +298,14 @@ Changes, newest first:
     maximum of all fields (instead of first member of ensemble) 
   
 - 2017/04/18:
-  
+
   - **Transparent ftp access to remote data is now possible**.
     See toward the end of entry :py:class:`~climaf.dataloc.dataloc` to know how to describe a project for remote data.
     A local directory holds a copy of remote data. This directory is set using environment variable
     'CLIMAF_REMOTE_CACHE' (defaults to $CLIMAF_CACHE/remote_data), see :ref:`installing`
 
 - 2017/02/21:
-      
+
   - Fixes a bug about a rarely used case (operator secondary outputs)
 
 - 2017/01/25:
@@ -324,7 +324,7 @@ Changes, newest first:
     You must reset your cache for getting the improvement. You may use 'rm -fR $CLIMAF_CACHE' or function
     :py:func:`~climaf.cache.craz`
 
-  - **Fix issue occurring in parallel runs** (especially for PDF outputs): 
+  - **Fix issue occurring in parallel runs** (especially for PDF outputs):
 
     - the scripts output files now have temporary unique names until they are fully tagged with their CRS and moved to
       the cache
@@ -377,12 +377,12 @@ Changes, newest first:
     - ``time``, ``date`` and ``level`` extractions apply on all fields now from 2D to 4D, instead of only 3D and 4D
     - log messages, when a time or level extraction is made, are also performed
     - Bug fixes when using ``mpCenterLonF`` argument
- 
+
 
 - 2016/05/04 - Version 1.0.1:
 
   - html package:
-    
+
     - **Change interface for function** :py:func:`~climaf.html.line`: now use a list of pairs (label,figure_filename)
       as first arg
     - add function :py:func:`~climaf.html.link_on_its_own_line`
@@ -402,7 +402,7 @@ Changes, newest first:
 
       - ``ml2pl`` to interpolate a 3D variable on a model levels to pressure levels; works only if binary ml2pl is in
         your PATH
-         
+
          - :doc:`scripts/ml2pl` and :download:`an example using ml2pl <../examples/ml2pl.py>`
 
       - ``ccdo2`` and ``ccdo_ens`` coming in addition to the very useful ``ccdo`` swiss knife; ``ccdo2`` takes two
@@ -411,10 +411,10 @@ Changes, newest first:
         numerous files
 
          - :doc:`scripts/ccdo2`
-      
+
          - :doc:`scripts/ccdo_ens`
 
-      - ``regridll`` for regridding to a lat-lon box (see :doc:`scripts/regridll`) 
+      - ``regridll`` for regridding to a lat-lon box (see :doc:`scripts/regridll`)
 
   - A whole new set of functions, that are mainly 'science oriented' shortcuts for specific use of CliMAF operators:
 
@@ -422,46 +422,46 @@ Changes, newest first:
         objects of same size, or between a CliMAF object and a constant (provided as string, float or integer)
          
          - :py:func:`~climaf.functions.fadd`
-         
+
          - :py:func:`~climaf.functions.fsub`
 
          - :py:func:`~climaf.functions.fmul`
-         
+
          - :py:func:`~climaf.functions.fdiv`
 
       - ``apply_scale_offset`` to apply a scale and offset to a CliMAF object
-         
+
          - :py:func:`~climaf.functions.apply_scale_offset`
 
       - ``diff_regrid`` and ``diff_regridn`` -> returns the difference between two CliMAF datasets after regridding
-         
+
          ( based on :doc:`scripts/regrid` and :doc:`scripts/regridn` )
-         
+
          - :py:func:`~climaf.functions.diff_regrid`
-         
+
          - :py:func:`~climaf.functions.diff_regridn`
 
       - ``clim_average`` provides a simple way to compute climatological averages (annual mean, seasonal averages,
         one-month climatology...)
-         
+
          - :py:func:`~climaf.functions.clim_average`
 
       - ``annual_cycle`` returns the 12-month climatological annual cycle of a CliMAF object
-         
+
          - :py:func:`~climaf.functions.annual_cycle`
 
       - ``zonmean``, ``diff_zonmean`` and ``zonmean_interpolation`` to work on zonal mean fields
-         
+
          - :py:func:`~climaf.functions.zonmean`
-         
+
          - :py:func:`~climaf.functions.diff_zonmean`
-         
+
          - :py:func:`~climaf.functions.zonmean_interpolation`,
 
   - Two functions to display a plot in an IPython Notebook: ``iplot`` and ``implot``
-      
+
       - :py:func:`~climaf.functions.iplot`
-      
+
       - :py:func:`~climaf.functions.implot`
 
   - Functions for an interactive use of ds() and projects:
@@ -562,7 +562,7 @@ Changes, newest first:
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`):
 
    - new arguments:
-     
+
      - ``shade_below`` and ``shade_above`` to shade contour regions for auxiliary field;
      - ``options``, ``aux_options`` and ``shading_options`` for setting NCL graphic resources directly
    - color filling is smoothed to contours
@@ -610,7 +610,7 @@ Changes, newest first:
 
    - Two examples :download:`gplot <../examples/gplot.py>` and
      :download:`cdftools_multivar <../examples/cdftools_multivar.py>` were added to the script which tests all examples
-     :download:`test_examples <../testing/test_examples.sh>` 
+     :download:`test_examples <../testing/test_examples.sh>`
    - cpdfcrop, which is used by operators 'cpdfcrop' and 'cepscrop' tools, is embarked in CliMAF distribution:
      ``<your_climaf_installation_dir>/bin/pdfcrop``
    - Python 2.7 is required and tested in :download:`test_install <../testing/test_install.sh>`
@@ -638,7 +638,7 @@ Changes, newest first:
 .. _news_0.12:
 
 - 2015/11/27 - Version 0.12:
-  
+
  - Changes for standard operator ``plot`` (see :doc:`scripts/plot`):
 
    - new arguments:
@@ -682,7 +682,7 @@ Changes, newest first:
 
  - New function :py:func:`~climaf.driver.efile()` allows to apply :py:func:`~climaf.driver.cfile()` to an ensemble
    object. It writes a single file with variable names suffixed by member label.
- 
+
  - The **general purpose plot operator** (for plotting 1D and 2D datasets: maps, cross-sections and profiles), named
    ``plot``, was significantly enriched. It now allows for plotting an additional scalar field displayed as contours
    and for plotting an optional vector field, for setting the reference longitude, the contours levels for main or
@@ -696,7 +696,7 @@ Changes, newest first:
 
  - Interface to Drakkar CDFTools: a number of operators now come in two versions: one accepting multi-variable inputs,
    and one accepting only mono-variable inputs (with an 'm' suffix)
-   
+
  - Multi-variable datasets are managed. This is handy for cases where variables are grouped in a file. See an example
    in: :download:`cdftransport.py <../examples/cdftransport.py>`, where variable 'products' is assigned
 
@@ -744,7 +744,7 @@ Changes, newest first:
     if you want a consistent documentation. A facet named 'experiment' was added to project CMIP5 (for hosting the
     'CMIP5-controlled-vocabulary' experiment name, as e.g. 'historical').
   - **default values for facets** are now handled on a per-project basis. See :py:func:`~climaf.classes.cdef()` and
-    :py:class:`~climaf.classes.cdataset()`. 
+    :py:class:`~climaf.classes.cdataset()`.
   - Binary ``climaf`` can be used as a **back end** in your scripts, feeding it with a string argument. See
     :ref:`backend`
 
@@ -758,9 +758,9 @@ Changes, newest first:
 
   - Package climaf.html allows to **easily create an html index**, which includes tables of links (or thumbnails) to
     image files; iterating on e.g. seasons and variables is handled by CliMAF. See:
-    
+
     - a screen dump for such an index: |indx|
-    - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>` 
+    - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>`
     - the package documentation: :py:mod:`climaf.html`
   - Function :py:func:`~climaf.driver.cfile` can create **hard links**: the same datafile (actually: the samer inode)
     will exists with two filenames (one in CliMAF cache, one which is yours), while disk usage is counted only for one
@@ -866,7 +866,7 @@ Changes, newest first:
   - Access to fixed fields is now possible, and fixed fields may be specific to a given simulation. See examples in
     :download:`data_generic.py <../examples/data_generic.py>` and
     :download:`data_cmip5drs.py <../examples/data_cmip5drs.py>`
-    
+
  - Operators:
 
   - Explanation is available on how to know how a given operator is declared to CliMAF, i.e. what is the calling

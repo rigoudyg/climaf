@@ -258,6 +258,9 @@ class cobject():
         # del(cobjects[self.crs])
         # clogger.debug("Object deleted ; crs = %s"%(self.crs))
 
+    def buildcrs(self):
+        raise NotImplementedError
+
 
 class cdummy(cobject):
     def __init__(self):

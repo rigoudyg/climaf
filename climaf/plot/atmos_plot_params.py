@@ -85,16 +85,6 @@ dict_plot_params = {
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
-    'crest': {
-        'full_field': {'colors': '-120 -110 -100 -90 -80 -70 -60 -50 -40 -30 -20 -10'},
-        'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
-        'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
-    },
-    'crett': {
-        'full_field': {'colors': '-60 -50 -40 -30 -20 -10 0 10 20 30 40 50 60'},
-        'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
-        'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
-    },
     'hfns': {
         'full_field': {'colors': '-200 -150 -100 -50 0 50 100 150 200 -75 -25 25 75'},
         'bias': {'colors': '-80 -60 -40 -20 -10 10 20 40 60 80', 'color': 'BlueWhiteOrangeRed'},
@@ -261,13 +251,24 @@ dict_plot_params = {
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
+    # TODO: Delete useless duplicated keys in dictionnary
     'crest': {
         'full_field': {'colors': '-100 -90 -80 -70 -60 -50 -40 -30 -20 -10 0 10 20 30 40 50 60 70 80 90 100'},
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
+    'crest': {
+        'full_field': {'colors': '-120 -110 -100 -90 -80 -70 -60 -50 -40 -30 -20 -10'},
+        'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
+        'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
+    },
     'crelt': {
         'full_field': {'colors': '-100 -90 -80 -70 -60 -50 -40 -30 -20 -10 0 10 20 30 40 50 60 70 80 90 100'},
+        'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
+        'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
+    },
+    'crelt': {
+        'full_field': {'colors': '0 5 10 15 20 25 30 35 40 45 50 55 60 65 70', 'color': 'WhiteBlueGreenYellowRed'},
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
@@ -276,13 +277,13 @@ dict_plot_params = {
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
-    'rts': {
-        'full_field': {'colors': '-20 0 20 40 60 80 100 120 140 160 180 200', 'color': 'WhiteBlueGreenYellowRed'},
+    'crett': {
+        'full_field': {'colors': '-60 -50 -40 -30 -20 -10 0 10 20 30 40 50 60'},
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
-    'crelt': {
-        'full_field': {'colors': '0 5 10 15 20 25 30 35 40 45 50 55 60 65 70', 'color': 'WhiteBlueGreenYellowRed'},
+    'rts': {
+        'full_field': {'colors': '-20 0 20 40 60 80 100 120 140 160 180 200', 'color': 'WhiteBlueGreenYellowRed'},
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
