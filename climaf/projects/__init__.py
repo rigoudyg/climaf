@@ -15,7 +15,7 @@ Please note that, for some combinations of observation 'projects' and
 variables (i.e. 'snm' in erai, 'pr' in gpcp and cruts3), CliMAF provides a
 flux variable, while the original data provides a monthly
 accumulation. In that case, the conversion to rates assumes a fixed
-month lenght of 30.3 days (for ensuring mnimal bias at year scale)
+month length of 30.3 days (for ensuring minimal bias at year scale)
 
 For listing the declared projects and their specifics, if you are under
 the Python prompt, type e.g. ::

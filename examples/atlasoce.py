@@ -13,7 +13,7 @@ from climaf import cachedir
 if not onCiclad:
     exit(0)
 
-desc = "\n\nProto d'atlas oceanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"
+desc = "\n\nProto d'atlas océanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"
 
 parser = OptionParser(desc)
 parser.set_usage("%%prog [-h]\n%s" % desc)
@@ -41,10 +41,10 @@ parser.add_option("-v", "--variables",
 
 # Some settings about data used (model and obs)
 #######################################################
-# Scaling de la MOC modele pour homogeneite avec obs RAPID
+# Scaling de la MOC modèle pour homogénéité avec obs RAPID
 calias("CMIP5", "msftmyz", scale=1.e-3)
 
-# Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
+# Obs de MOC RAPID (Il a fallu bricoler les données d'origine pour la dimension time au début et unlim)
 dataloc(project="ref_pcmdi", organization="generic",
         url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
 calias('ref_pcmdi', 'moc', 'stream_function_mar', filenameVar='moc')
@@ -62,7 +62,7 @@ def model_vs_obs_profile_oce(variable, model, obs, masks='/data/esanchez/Atlas/o
     Given two dataset specifications, and an oceanic variable name,
     create a figure for profile for the variable in both sources
 
-    dataset specifications are dictionnaries
+    dataset specifications are dictionaries
 
     specifics :
      - space averaging uses cdftools for model variable, on grid T
@@ -119,7 +119,7 @@ def moc_profile_vs_obs_rapid(model, variable="msftmyz", basin=1):
     """
     Model is a dict defining the model dataset (except variable)
     """
-    # Comparer les profil de MOC modele/RAPID a la latitude 26
+    # Comparer les profils de MOC modèle/RAPID a la latitude 26
     mod = model.copy()
     mod.update({'variable': variable})
     moc_model = ds(**mod)

@@ -6,7 +6,7 @@
 
 
 """
-# Created : S.Senesi - 2014
+# Created : S.Sénési - 2014
 
 import re
 import string
@@ -601,7 +601,7 @@ class cdataset(cobject):
           >>> so.explore('choices',group_periods_on='model')
           { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ....}
 
-          >>> # Same, but expliciting the default value
+          >>> # Same, but explicit the default value
           >>> so.explore('choices',group_periods_on='model',operation='intersection')
           { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ....}
 

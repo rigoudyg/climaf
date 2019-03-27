@@ -7,7 +7,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 
 
 """
-# Created : S.Senesi - 2014
+# Created : S.Sénési - 2014
 
 import sys
 import os
@@ -475,7 +475,7 @@ def csync(update=False):
     Merges current in-memory cache index and current on-file cache index
     for updating both
 
-    If arg `update` is True, additionnaly ensures consistency between files
+    If arg `update` is True, additionally ensures consistency between files
     set and index content, either :
 
     - if cache.stamping is true, by reading CRS in all files

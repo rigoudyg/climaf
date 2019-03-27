@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Programm Interface for scripting in
+CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Program Interface for scripting in
 Python with CliMAF for easy climate model output processing.
 
 It also imports a few functions from other modules, and declares a number of 'CliMAF standard operators'
