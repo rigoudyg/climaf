@@ -57,7 +57,7 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root = "/data8/datamg/Ciclad/ReferenceDatasets/"
+    root="/scratch/globc/coquart/ReferenceDatasets_CESMEP/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
