@@ -21,6 +21,7 @@ import glob
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
 import pickle
+from collections import OrderedDict
 
 
 def header(title, style_file=None):
@@ -431,7 +432,7 @@ def fline(func, farg, sargs, title=None,
                   "not a dict nor a list (got `sargs`) "
             return
         else:
-            sargs = dict(zip(sargs, sargs))
+            sargs = OrderedDict(zip(sargs, sargs))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
