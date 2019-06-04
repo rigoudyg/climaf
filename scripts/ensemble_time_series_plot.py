@@ -19,7 +19,8 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from netCDF4 import Dataset, netcdftime
+from netCDF4 import Dataset
+import netcdftime
 import datetime
 import numpy as np
 
@@ -262,6 +263,7 @@ for pathfilename in filenames_list:
         cdftime = netcdftime.utime(t_unit)  #
         # , calendar=u"gregorian")
         # -- Garde-fou calendar
+        print("LC bug search : before isinstance")
         if not isinstance(cdftime.num2date(time_test)[0], datetime.datetime):
             cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
         datevar.append(cdftime.num2date(time_test))

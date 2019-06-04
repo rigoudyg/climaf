@@ -103,7 +103,8 @@ result.coordinates = 'lon lat'
 result.longname = 'Linear regression slope'
 # result.units = 'Y('+ydat.id+'['+ydat.units+'])/X('+xdat.id+'['+xdat.units+'])'
 result.units = 'Y/X'
-cdms2.setNetcdf4Flag(1)
+# atCerfacs
+#cdms2.setNetcdf4Flag(1)
 
 out = cdms2.open(outfile, 'w')
 # if type(xlon)!=cdms2.coord.TransientAxis2D and type(xlat)!=cdms2.coord.TransientAxis2D:
