@@ -19,10 +19,15 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from netCDF4 import Dataset
-import netcdftime
 import datetime
 import numpy as np
+from netCDF4 import Dataset
+
+from climaf.site_settings import atCerfacs
+if atCerfacs:
+    import netcdftime
+else:
+    from netCDF4 import netcdftime
 
 # -- Initialize the parser
 # --------------------------------------------------------------------------------------------------

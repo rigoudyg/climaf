@@ -6,6 +6,8 @@ import cdutil
 # from pcmdi_metrics.pcmdi.pmp_parser import *
 import genutil
 
+from climaf.site_settings import atCerfacs
+
 # import argparse
 # parser = argparse.ArgumentParser(description='Linear Regression between X and Y')
 # parser = PMPParser()
@@ -104,7 +106,8 @@ result.longname = 'Linear regression slope'
 # result.units = 'Y('+ydat.id+'['+ydat.units+'])/X('+xdat.id+'['+xdat.units+'])'
 result.units = 'Y/X'
 # atCerfacs
-#cdms2.setNetcdf4Flag(1)
+if not atCerfacs:
+    cdms2.setNetcdf4Flag(1)
 
 out = cdms2.open(outfile, 'w')
 # if type(xlon)!=cdms2.coord.TransientAxis2D and type(xlat)!=cdms2.coord.TransientAxis2D:
