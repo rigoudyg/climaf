@@ -25,7 +25,7 @@ from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 root = None
 if onCiclad:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-    root = "/prodigfs/project"
+    root = "/bdd"
 if atCNRM:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/cnrm/cmip/cnrm/ESG"
@@ -102,7 +102,7 @@ if root:
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CMIP5-Adjust', var, var + 'Adjust')
 
-    cdef('root', root, project='CMIP5-Adjust')
+    cdef('root', '/prodigfs/project' , project='CMIP5-Adjust')
     # cdef('institute'      , '*'           , project='CMIP5-Adjust')
     cdef('table', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
     cdef('realm', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities

@@ -502,7 +502,7 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
         #
         # --> We can now interpolate dat1 on dat2 verticaly and horizontally
         if horizontal_regridding:
-            regridded_dat1 = ccdo(regrid(dat1, dat2, option='remapbil'), operator='intlevel' + levels)
+            regridded_dat1 = ccdo(regrid(dat1, dat2, option='remapdis'), operator='intlevel' + levels)
         else:
             regridded_dat1 = ccdo(dat1, operator='intlevel' + levels)
     else:

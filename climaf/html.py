@@ -20,7 +20,10 @@ import re
 import glob
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
+from climaf import cachedir
+from climaf.driver import cfile
 import pickle
+import shutil
 from collections import OrderedDict
 
 
@@ -527,6 +530,43 @@ def compareCompanion():
         ' <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js">'
         '</script>\n <script type="text/javascript" '
         'src="https://cdn.rawgit.com/PBrockmann/compareCompanion/master/compareCompanion.js"></script> \n')
+
+
+def start_line(title):
+    tmpindex = open_table()
+    tmpindex += open_line(title) + close_line() + close_table()
+    tmpindex += open_table()
+    tmpindex += open_line()
+    return tmpindex
+
+
+# Need to create cachedir if it does not exist yet
+if not os.path.isdir(cachedir): os.makedirs(cachedir)
+shutil.copy(cpath[0]+'/plot/Empty.png',cachedir)
+blank_cell=cachedir+'/Empty.png'
+
+def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
+    if not do_cfile:
+       return myplot
+       #
+    else:
+       # -- We try to 'cfile' the plot
+       if not safe_mode:
+          print '-- plot function is not in safe mode --'
+          return cfile(myplot)
+       else:
+          try:
+             plot_filename = cfile(myplot)
+             print '--> Successfully plotted ',myplot
+             return plot_filename
+          except:
+             # -- In case it didn't work, we try to see if it comes from the availability of the data
+             print '!! Plotting failed ',myplot
+             print "set clog('debug') and safe_mode=False to identify where the plotting failed"
+             return blank_cell
+
+
+
 
 
 class Climaf_Html_Error(Exception):
