@@ -522,7 +522,9 @@ def csync(update=False):
             pickle.dump(crs2filename, cacheIndexFile)
         dropped_crs = []
     except:
-        clogger.error("Issue when writing cache index %s" % fn)
+        if update:
+            if os.path.isfile(fn) and len(files_in_cache>0):
+                clogger.error("Issue when writing cache index %s" % fn)
 
 
 def cload(alt=None):

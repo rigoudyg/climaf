@@ -15,6 +15,7 @@ by the tools/packages listed below, with a special thanks to CDO
 - `Ncl 6.3.0 <http://www.ncl.ucar.edu/>`_  (Ncl >= 6.1.2 may work, nevertheless)
 - Data files must be `CF compliant <http://cfconventions.org/>`_
 - `exiv2 <https://github.com/Exiv2/exiv2/>`_ (Image metadata manipulation tool); exiv2 is a program to read and write Exif, IPTC, XMP metadata and image comments.
+- `epstopdf` (to make multiplot in pdf format with cpage_pdf)
 
 Optional 
 

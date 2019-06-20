@@ -21,6 +21,7 @@ import shutil
 import copy
 from string import Template
 import tempfile
+from datetime import datetime
 
 # Climaf modules
 import climaf
@@ -854,7 +855,15 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
 
     """
     clogger.debug("cfile called on " + str(object))
+    start_time = datetime.now()
+    clogger.debug("Starting cfile at: "+start_time.strftime("%Y-%m-%d %H:%M:%S"))
+    #
+    # -- Evaluate the CliMAF object
     result = ceval(object, format='file', deep=deep)
+    #
+    end_time = datetime.now()
+    duration = end_time - start_time
+    clogger.debug("cfile completed at: "+end_time.strftime("%Y-%m-%d %H:%M:%S")+" : total duration = "+str(duration.total_seconds())+' seconds')
     if target is None:
         return result
     else:
