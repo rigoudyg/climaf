@@ -27,7 +27,10 @@ from climaf.site_settings import atCerfacs
 if atCerfacs:
     import netcdftime
 else:
-    from netCDF4 import netcdftime
+    try:
+        from netCDF4 import netcdftime
+    except:
+        import netcdftime
 
 # -- Initialize the parser
 # --------------------------------------------------------------------------------------------------
