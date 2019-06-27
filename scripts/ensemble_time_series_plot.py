@@ -17,6 +17,7 @@
 # --------------------------------------------------------------------------------------------------
 import argparse
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import datetime
@@ -186,7 +187,6 @@ if args.highlight_period:
 # --------------------------------------------------------------------------------------------------
 # -- Plotting (here it's just a dummy plot to produce a result; otherwise CliMAF returns an error
 # --------------------------------------------------------------------------------------------------
-matplotlib.use('Agg')
 
 # -- Colors
 if args.colors:

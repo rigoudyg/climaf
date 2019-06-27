@@ -73,19 +73,19 @@ seldate=$seldatebase
 # construct CDO operators chain, optimizing operations list and order
 if [[ $ffile == *${filevar}_* ]] ; then 
     # varname is in filename -> assume seldate before selvar is best
-    ops=$setmiss" "$setunits" "$selalias" "$selvar" "$seldate" "$selregion" "$merge
+    ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selregion" "$selvar" "$merge
 else
     # varname is not in filename -> assume selvar before selvar is best
-    ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selvar" "$selregion" "$merge
+    ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selregion" "$selvar" "$merge
 fi
-[ "$operator" ] && ops="-"${operator}" "$ops 
+[ "$operator" ] && ops="-"${operator}" "$ops
 #
 
 # Construct files list, which may involve transformed files
 vfiles=""
 for file in $files ; do
     # If requested, fix time_counter for Nemo outputs. Feature not yet tested !!
-    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file) 
+    [ "${CLIMAF_FIX_NEMO_TIME:-no}" != no ] && file=$(nemo_timefix $file)
     # If requested, fix attribute 'coordinates' of file variable for Aladin outputs.
     [ "${CLIMAF_FIX_ALADIN_COORD:-no}" != no ] && file=$(aladin_coordfix $file)
     #
