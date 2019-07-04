@@ -93,6 +93,8 @@ Configuring CliMAF
 
 - CliMAF do interpret some environment variables :
 
+ - CLIMAF : path to CliMAF install 
+
  - CLIMAF_CACHE : a directory used for storing intermediate results,
    and those final results which are not explicitly copied elsewhere;
    defaults to ~/tmp/climaf_cache. 
@@ -132,8 +134,7 @@ Configuring CliMAF
 
   - If running on Ciclad, you must setup your environment by::
 
-    $ module load python
-    $ module load ncl/6.3.0
+    $ module load climaf
 
   - On some systems, if CDO fails at allocating memory, you may have
     to put e.g. in your ~/.bash_profile::
