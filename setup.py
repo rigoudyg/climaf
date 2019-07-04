@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from setuptools import find_packages
@@ -19,7 +20,7 @@ classifiers = [
     'Operating System :: POSIX',
     'Programming Language :: Python',
     'Topic :: Scientific/Engineering :: Atmospheric Science',
-    #'License :: CeCILL-C Free Software License Agreement (CECILL-C)'
+    # 'License :: CeCILL-C Free Software License Agreement (CECILL-C)'
 ]
 
 setup(name='climaf',
@@ -66,4 +67,4 @@ setup(name='climaf',
           'scripts/time_average_basics.sh',
           'scripts/wcdo.sh',
       ],
-)
+      )

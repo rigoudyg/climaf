@@ -1,9 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
-This module declares two 'projects' : 
+This module declares two 'projects' :
 
-  - 'ref_climatos', for the climatological annual cycles and 
-  - 'ref_ts', for the 'time series' (one variable evolving with time) 
+  - 'ref_climatos', for the climatological annual cycles and
+  - 'ref_ts', for the 'time series' (one variable evolving with time)
     of a set of reference products as managed by J. Servonnat at IPSL.
 
 This archive is available on Ciclad (IPSL), Curie (TGCC) and Ada (IDRIS), and /cnrm and at Cerfacs
@@ -11,7 +13,7 @@ This archive is available on Ciclad (IPSL), Curie (TGCC) and Ada (IDRIS), and /c
 The specific attributes are:
 
   - **product** (default:'*'): name of the observation or reanalysis product (example: ERAI, GPCP...)
-  - for climatologies only : **clim_period** : a character string; there is no mechanism of 
+  - for climatologies only : **clim_period** : a character string; there is no mechanism of
     period selection (like with 'period')
 
 Default values of the attributes for climatologies (**ref_climato**) :
@@ -21,7 +23,7 @@ Default values of the attributes for climatologies (**ref_climato**) :
 - period : 'fx'
 - frequency : annual_cycle'
 
-It is possible to pass a list of products to 'product' to define an ensemble of 
+It is possible to pass a list of products to 'product' to define an ensemble of
 climatologies with eds() as in:
 
  >>> dat_ens = eds(project='ref_climatos', product=['ERAI','NCEP'],...)
@@ -44,61 +46,68 @@ Example of a 'ref_ts' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC, atIDRIS,atCerfacs,atCNRM
+from climaf.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
-root=None
+root = None
 
 if onCiclad:
-    root="/data/jservon/Evaluation/ReferenceDatasets/"
+    root = "/data/jservon/Evaluation/ReferenceDatasets/"
 if atTGCC:
-    root="/ccc/work/cont003/igcmg/igcmg/IGCM/ReferenceDatasets/"
+    root = "/ccc/work/cont003/igcmg/igcmg/IGCM/ReferenceDatasets/"
 if atIDRIS:
-    root="/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
+    root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root="/data8/datamg/Ciclad/ReferenceDatasets/"
+    root="/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
 if atCNRM:
-    root="/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
-    
-cproject('ref_climatos', ('frequency','annual_cycle'), 'product', 'clim_period', 'table', 'obs_type', ensemble=['product'],separator='%')
-cfreqs('ref_climatos', {'monthly':'mo' , 'daily':'day' , 'seasonal':'mo', 'annual_cycle':'mo','yearly':'yr'})
+    root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
-cdef('variable'    , '*'            , project='ref_climatos')
-cdef('product'     , '*'            , project='ref_climatos')
-cdef('clim_period' , '*'            , project='ref_climatos')
-cdef('simulation'  , 'refproduct'   , project='ref_climatos')
-cdef('period'      , 'fx'           , project='ref_climatos')
-cdef('table'       , '*'           , project='ref_climatos')
-cdef('obs_type'       , '*'           , project='ref_climatos')
+cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'clim_period_begin', 'clim_period_end', 'table', 'obs_type',
+         ensemble=['product'], separator='%')
+cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
 
+cdef('variable', '*', project='ref_climatos')
+cdef('product', '*', project='ref_climatos')
+cdef('clim_period', '*', project='ref_climatos')
+cdef('clim_period_begin', '*', project='ref_climatos')
+cdef('clim_period_end', '*', project='ref_climatos')
+cdef('simulation', 'refproduct', project='ref_climatos')
+cdef('period', 'fx', project='ref_climatos')
+cdef('table', '*', project='ref_climatos')
+cdef('obs_type', '*', project='ref_climatos')
 
-if (root) :
-    #pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc" 
-    #pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_${clim_period}-clim.nc"
-    pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_${table}_${product}_${obs_type}_${clim_period}-clim.nc"
-    dataloc(project='ref_climatos', organization='generic', url=pattern2)
-
+if root:
+    # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc"
+    # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_${clim_period}-clim.nc"
+    pattern2 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
+                      "${variable}_${table}_${product}_${obs_type}_${clim_period}-clim.nc"
+    pattern3 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
+                      "${variable}_${table}_${product}_${clim_period}-clim.nc"
+    pattern4 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
+                      "${variable}_${table}_${product}_${clim_period_begin}_{clim_period_end}-clim.nc"
+    dataloc(project='ref_climatos', organization='generic', url=[pattern2, pattern3, pattern4])
 
 ##########################################################################################
 
 
-cproject('ref_ts', ('frequency','monthly'), ('product','*'), ('period','1900-2050'), 'obs_type', 'table', ensemble=['product'])
-cfreqs('ref_ts', {'monthly':'mo' , 'daily':'day' })
+cproject('ref_ts', ('frequency', 'monthly'), ('product', '*'), ('period', '1900-2050'), 'obs_type', 'table',
+         ensemble=['product'])
+cfreqs('ref_ts', {'monthly': 'mo', 'daily': 'day'})
 
-cdef('variable'    , '*'            , project='ref_ts')
-cdef('product'     , '*'            , project='ref_ts')
-cdef('simulation'  , 'refproduct'   , project='ref_ts')
-cdef('period'      , '1980-2005'    , project='ref_ts')
-cdef('obs_type'    , '*'            , project='ref_ts')
-cdef('table'    , '*'            , project='ref_ts')
+cdef('variable', '*', project='ref_ts')
+cdef('product', '*', project='ref_ts')
+cdef('simulation', 'refproduct', project='ref_ts')
+cdef('period', '1980-2005', project='ref_ts')
+cdef('obs_type', '*', project='ref_ts')
+cdef('table', '*', project='ref_ts')
 
 calias('ref_climatos', 'O2', scale=44.64)
 # Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
-#dataloc(project="ref_climatos",organization="generic",
+# dataloc(project="ref_climatos",organization="generic",
 #        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
-calias(project='ref_climatos',variable='moc',fileVariable='stream_function_mar',filenameVar='moc')
-calias(project='ref_ts',variable='moc',fileVariable='stream_function_mar',filenameVar='moc')
+calias(project='ref_climatos', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
+calias(project='ref_ts', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 
-if (root) :
-    #pattern1=root+"ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
-    pattern1=root+"ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
+if root:
+    # pattern1=root+"ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
+    pattern1 = root + "ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
     dataloc(project='ref_ts', organization='generic', url=[pattern1])

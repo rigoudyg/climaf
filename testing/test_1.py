@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Basic test for accessing data in CMIP5_DRS hierarchy. With unittest
 
@@ -6,56 +8,57 @@ Call it as : python -m unittest -b -v -f test_1
 S.Senesi - dec 2014
 """
 
-import unittest, os.path
+import unittest
+import os.path
 from climaf.api import *
 
 
 class A_basic(unittest.TestCase):
-    def setUp(self) :
+    def setUp(self):
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_basic"))
-        #dataloc(project="example", simulation="AMIPV6ALB2G", organization="example", url=[cpath+"/../examples/data/AMIPV6ALB2G"])
-        cdef("frequency","monthly")
-        self.dg=ds(project="example", simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
-        self.dir=dict()
+        # dataloc(project="example", simulation="AMIPV6ALB2G", organization="example",
+        #        url=[cpath+"/../examples/data/AMIPV6ALB2G"])
+        cdef("frequency", "monthly")
+        self.dg = ds(project="example", simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
+        self.dir = dict()
 
     def test_1_print_dataset(self):
-        pdg=`self.dg`
+        pdg = repr(self.dg)
         print pdg
-        expected="ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')"
+        expected = "ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')"
         print expected
-        self.assertEqual(pdg,expected, 
+        self.assertEqual(pdg, expected,
                          'Issue printing a very basic dataset')
 
     def test_2_declaring_and_applying_a_script(self):
-        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
-        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        sd=`std`
-        actual=sd
-        print "actual=",sd
-        expected="mean_and_std(ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')).sdev"
-        print "expected=",expected
-        self.assertEqual(sd,expected,' Issue building a compound expression (apply script)')
+        mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
+        std = mean.sdev  # Secondary output 'std' is a 'property' of main output
+        sd = repr(std)
+        actual = sd
+        print "actual=", sd
+        expected = "mean_and_std(ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')).sdev"
+        print "expected=", expected
+        self.assertEqual(sd, expected, ' Issue building a compound expression (apply script)')
 
     def test_3_evaluating_a_script(self):
-        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
-        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        fil=cfile(std)
-        expected=climaf.cache.currentCache+'/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
-        print "actual=",fil
-        print "expected=",expected
-        self.assertEqual(fil,expected,"Issue evaluating script application as a file")
+        mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
+        std = mean.sdev  # Secondary output 'std' is a 'property' of main output
+        fil = cfile(std)
+        expected = climaf.cache.currentCache + '/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
+        print "actual=", fil
+        print "expected=", expected
+        self.assertEqual(fil, expected, "Issue evaluating script application as a file")
 
     def test_4_plotting(self):
-        mean=climaf.driver.capply("mean_and_std",self.dg) # Main output is the return value of applying the script
-        std=mean.sdev         # Secondary output 'std' is a 'property' of main output
-        plot1d=climaf.driver.capply("plot",std,title="tas standard deviation") 
+        mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
+        std = mean.sdev  # Secondary output 'std' is a 'property' of main output
+        plot1d = climaf.driver.capply("plot", std, title="tas standard deviation")
         # Have the plot displayed (this will also actually launch the script,
         cshow(plot1d)
-	os.system("sleep 3s")
+        os.system("sleep 3s")
 
     def tearDown(self):
         climaf.cache.craz(hideError=True)
-
 
 
 def skipUnless_CNRM_Lustre():
@@ -63,31 +66,37 @@ def skipUnless_CNRM_Lustre():
         return lambda func: func
     return unittest.skip("because CNRM's Lustre not available")
 
+
 @skipUnless_CNRM_Lustre()
-#@unittest.skip("Not tested here")
+# @unittest.skip("Not tested here")
 class B_CMIP5_DRS_CNRM(unittest.TestCase):
-    def setUp(self) :
+    def setUp(self):
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
         # Declare the directory for CMIP5 data on CNRM's Lustre file system.
-        url_CMIP5_CNRM=["/cnrm/cmip/cnrm/ESG"]
+        url_CMIP5_CNRM = ["/cnrm/cmip/cnrm/ESG"]
         dataloc(project="CMIP5", organization="CMIP5_DRS", url=url_CMIP5_CNRM)
-        cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
-        self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861")
+        cdef("frequency", "monthly")
+        cdef("model", "CNRM-CM5")
+        cdef("project", "CMIP5")
+        self.ds = ds(experiment="1pctCO2", variable="tas", period="1860-1861")
 
     def test_identifying_files(self):
-        files=self.ds.baseFiles()
-        self.assertEqual(files,"/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc", 'Issue accessing 1cptCO2 data files')
+        files = self.ds.baseFiles()
+        self.assertEqual(files,
+                         "/cnrm/cmip/cnrm/ESG/CMIP5/output1/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/"
+                         "v20110701/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc",
+                         'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
-        print `ds`
-        my_file=cfile(self.ds); print "myfile = "+my_file
-        expected=climaf.cache.currentCache+'/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
-        print "expected = "+expected
-        self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
+        print repr(ds)
+        my_file = cfile(self.ds)
+        print "myfile = " + my_file
+        expected = climaf.cache.currentCache + '/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
+        print "expected = " + expected
+        self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 
     def tearDown(self):
         climaf.cache.craz(hideError=True)
-
 
 
 def skipUnless_Ciclad():
@@ -95,73 +104,77 @@ def skipUnless_Ciclad():
         return lambda func: func
     return unittest.skip("because not on Ciclad")
 
+
 @skipUnless_Ciclad()
 class B_CMIP5_DRS_Ciclad(unittest.TestCase):
-    def setUp(self) :
+    def setUp(self):
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
         # Declare a list of root directories for CMIP5 data on CNRM's Lustre file system.
-        urls_CMIP5=["/prodigfs/project"]
+        urls_CMIP5 = ["/prodigfs/project"]
         dataloc(organization="CMIP5_DRS", url=urls_CMIP5)
-        cdef("frequency","monthly") ; cdef("model","CNRM-CM5") ; cdef("project","CMIP5")
-        self.ds=ds(experiment="1pctCO2", variable="tas", period="1860-1861",version="latest")
+        cdef("frequency", "monthly")
+        cdef("model", "CNRM-CM5")
+        cdef("project", "CMIP5")
+        self.ds = ds(experiment="1pctCO2", variable="tas", period="1860-1861", version="latest")
 
     def test_identifying_files(self):
-        files=self.ds.baseFiles()
-        expected="/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
-        print "actual="+files
-        print "expected="+expected
-        self.assertEqual(files,expected, 'Issue accessing 1cptCO2 data files')
+        files = self.ds.baseFiles()
+        expected = "/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/latest/tas/" \
+                   "tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
+        print "actual=" + files
+        print "expected=" + expected
+        self.assertEqual(files, expected, 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
-        my_file=cfile(self.ds)
-        expected=climaf.cache.currentCache+'/eb08a/4b6ab/f3cfd/ce2df/f504f/ef602/7dbcc/13b99/3db30/063c9/96739/0.nc'
-        print "actual="+my_file
-        print "expected="+expected
-        self.assertEqual(my_file,expected,'Issue extracting 1pctCO2 data files')
+        my_file = cfile(self.ds)
+        expected = climaf.cache.currentCache + '/eb08a/4b6ab/f3cfd/ce2df/f504f/ef602/7dbcc/13b99/3db30/063c9/96739/0.nc'
+        print "actual=" + my_file
+        print "expected=" + expected
+        self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 
     def tearDown(self):
         climaf.cache.craz(hideError=True)
 
 
-
-
-#@unittest.skip("Not tested here")
+# @unittest.skip("Not tested here")
 @skipUnless_Ciclad()
 class C_OCMIP5_CIclad(unittest.TestCase):
-    def setUp(self) :
+    def setUp(self):
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_drs_ocmip5_ciclad"))
         dataloc(project="OCMIP5", organization="generic",
                 url=['/prodigfs/OCMIP5/OUTPUT/*/${model}/${simulation}/'
                      '${frequency}/${variable}/${variable}_*_${model}_'
                      '${simulation}_YYYY-YYYY.nc'])
-        cdef("frequency","mon") ; cdef("project","OCMIP5")
-        cactl=ds(simulation="CTL", model="IPSL-CM4", variable="CACO3", period="1860-1861")
-        mfile=cfile(cactl)
-        self.file=mfile
+        cdef("frequency", "mon")
+        cdef("project", "OCMIP5")
+        cactl = ds(simulation="CTL", model="IPSL-CM4", variable="CACO3", period="1860-1861")
+        mfile = cfile(cactl)
+        self.file = mfile
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
-        expected=climaf.cache.currentCache+'/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
+        expected = climaf.cache.currentCache + '/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
         print self.file
         print expected
-        self.assertEqual(self.file,expected,'Issue')
+        self.assertEqual(self.file, expected, 'Issue')
 
     def tearDown(self):
         climaf.cache.craz(hideError=True)
 
-## def suite():
-##     suite = unittest.TestSuite()
-##     suite.addTest(WidgetTestCase('test_default_size'))
-##     suite.addTest(WidgetTestCase('test_resize'))
-##     return suite
 
-## def suite():
-##     tests = ['test_identifying_files', 'test_selecting_files']
-##     return unittest.TestSuite(map(WidgetTestCase, tests))
+# def suite():
+#     suite = unittest.TestSuite()
+#     suite.addTest(WidgetTestCase('test_default_size'))
+#     suite.addTest(WidgetTestCase('test_resize'))
+#     return suite
+
+# def suite():
+#     tests = ['test_identifying_files', 'test_selecting_files']
+#     return unittest.TestSuite(map(WidgetTestCase, tests))
 
 suite1 = unittest.TestLoader().loadTestsFromTestCase(A_basic)
 suite2 = unittest.TestLoader().loadTestsFromTestCase(B_CMIP5_DRS_CNRM)
 suite3 = unittest.TestLoader().loadTestsFromTestCase(C_OCMIP5_CIclad)
-alltests = unittest.TestSuite([suite1, suite2,suite3])
+alltests = unittest.TestSuite([suite1, suite2, suite3])
 
 if __name__ == '__main__':
     print "Testing some CliMAF basic operations"

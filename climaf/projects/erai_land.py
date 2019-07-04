@@ -1,6 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
-This module declares ERA Interim land data organization and specifics, as managed by Sophie T. at CNRM; see file:///cnrm/amacs/DATA/OBS/netcdf/
+This module declares ERA Interim land data organization and specifics, as managed by Sophie T. at CNRM;
+see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 **Also declares how to derive CMIP5 variables from the original ERAI-land variables set**
 
@@ -25,26 +28,23 @@ from climaf.classes import cproject, calias
 from climaf.site_settings import atCNRM
 
 if atCNRM:
-    cproject('erai-land','grid')  # no grid writes as '_' , otherwise as e.g. 'T127'
+    cproject('erai-land', 'grid')  # no grid writes as '_' , otherwise as e.g. 'T127'
 
-    root="/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/erai-land/erai_???_mm_${variable}"
-    suffix="${PERIOD}.nc"
+    root = "/cnrm/amacs/DATA/OBS/netcdf/monthly_mean/erai-land/erai_???_mm_${variable}"
+    suffix = "${PERIOD}.nc"
     #
-    url_erai_land1=root+"${grid}"+suffix   #for original grid
-    url_erai_land2=root+".${grid}."+suffix #for other grids write e.g. as : grid='T127'
+    url_erai_land1 = root + "${grid}" + suffix  # for original grid
+    url_erai_land2 = root + ".${grid}." + suffix  # for other grids write e.g. as : grid='T127'
     #
-    dataloc(project='erai-land', organization='generic', url=[url_erai_land1,url_erai_land2])
-
+    dataloc(project='erai-land', organization='generic', url=[url_erai_land1, url_erai_land2])
 
     # Defining alias and derived variables for ERAI-land, together with filenames
-    ############################################################################## 
+    ##############################################################################
 
-    #asn:="Snow albedo" sans dimension 
-    #calias("erai-land",''    ,'asn'  ,filenameVar='ASN') 
+    # asn:="Snow albedo" sans dimension
+    # calias("erai-land",''    ,'asn'  ,filenameVar='ASN')
 
-    #calias("erai-land",'snw'    ,'rsn'  , scale= 'snd',filenameVar='RSN') ?
-    #rsn=Snow density "kg m**-3"ds .nc
+    # calias("erai-land",'snw'    ,'rsn'  , scale= 'snd',filenameVar='RSN') ?
+    # rsn=Snow density "kg m**-3"ds .nc
 
-    calias("erai-land",'snd' ,'sd'  ,filenameVar='SD')
-
-
+    calias("erai-land", 'snd', 'sd', filenameVar='SD')

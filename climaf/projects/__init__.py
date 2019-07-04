@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 
 Package projects declares a number of 'projects', and the data location
@@ -13,7 +15,7 @@ Please note that, for some combinations of observation 'projects' and
 variables (i.e. 'snm' in erai, 'pr' in gpcp and cruts3), CliMAF provides a
 flux variable, while the original data provides a monthly
 accumulation. In that case, the conversion to rates assumes a fixed
-month lenght of 30.3 days (for ensuring mnimal bias at year scale)
+month length of 30.3 days (for ensuring minimal bias at year scale)
 
 For listing the declared projects and their specifics, if you are under
 the Python prompt, type e.g. ::
@@ -31,8 +33,12 @@ and interpret a result such as::
            'das': ('d2m', 1.0, 0.0, None, '2D', None),
   ....
 
-by : in project 'erai', standard variable 'clt' is read from data variable 'tcc' with scaling=1, offest=0, and no change in units name; while 'TCC' is the variable name used in computing datafilename; and there is no special missing value in addition to the one duly declared in the datafile
+by : in project 'erai', standard variable 'clt' is read from data variable 'tcc' with scaling=1, offest=0, and no change
+in units name; while 'TCC' is the variable name used in computing datafilename; and there is no special missing value in
+addition to the one duly declared in the datafile
 
 """
 
-__all__=[ "example", "cami", "cmip3", "cmip5", "ocmip5" , "obs4mips" , "em" , "erai", "erai_land", "gpcc", "gpcp", "ceres", "cruts3", "file", "ref_climatos_and_ts", "igcm_out", "emn36", "nemo", "igcm_cmip6", "cmip6","eobs", "cordex"]
+__all__ = ["example", "cami", "cmip3", "cmip5", "ocmip5", "obs4mips", "em", "erai", "erai_land", "gpcc", "gpcp",
+           "ceres", "cruts3", "file", "ref_climatos_and_ts", "igcm_out", "emn36", "nemo", "igcm_cmip6", "cmip6", "eobs",
+           "cordex", "primavera"]

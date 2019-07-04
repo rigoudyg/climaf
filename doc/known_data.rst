@@ -36,16 +36,6 @@ igcm_out
 
 .. automodule:: climaf.projects.igcm_out
 
-igcm_out_old
------------------------------------------------------------
-
-.. automodule:: climaf.projects.igcm_out_old
-
-igcm_out_cmip
------------------------------------------------------------
-
-.. automodule:: climaf.projects.igcm_out_cmip
-
 em 
 -----------------------------------------------------------
 

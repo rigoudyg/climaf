@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
-This module declares a dummy project named 'file' which allows to describe dataset very simply from datafile using fucntion :py:func:`~climaf.classes.fds()`
+This module declares a dummy project named 'file' which allows to describe dataset very simply from datafile using
+function :py:func:`~climaf.classes.fds()`
 
 Example for a dataset declaration ::
 
@@ -10,5 +13,4 @@ Example for a dataset declaration ::
 
 from climaf.classes import cproject
 
-cproject("file" ,"model","path",separator="|")
-
+cproject("file", "model", "path", separator="|")
