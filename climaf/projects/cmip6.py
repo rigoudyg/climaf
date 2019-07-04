@@ -35,12 +35,12 @@ if atCNRM:
 if root:
   ## -- Declare a 'CMIP6 CliMAF project 
   ## ------------------------------------ >
-  cproject('CMIP6', 'root', 'model', 'mip', 'table', 'experiment', 'realization',
+  cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
            'grid', 'version', ensemble=['model','realization'], separator='%')
 
   ## -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
   ## ------------------------------------ >
-  cproject('CMIP6_extent', 'root', 'model', 'mip', 'table', 'experiment', 'extent_experiment', 'realization',
+  cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment', 'realization',
            'grid', 'version', ensemble=['model','realization'], separator='%')
 
 
@@ -49,7 +49,7 @@ if root:
       ## -- Set the aliases for the frequency
       ## -- Set default values
       cdef('root'         , root          , project=project)
-      #cdef('institute'    , '*'           , project=project)
+      cdef('institute'    , '*'           , project=project)
       cdef('model'        , '*'           , project=project)
       cdef('mip'          , '*'           , project=project)
       #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
@@ -74,11 +74,11 @@ if root:
 
   # -------------
   ## -- Define the patterns
-  base_pattern1="${root}/CMIP6/${mip}/*/${model}/${experiment}/${realization}/${table}/"
+  base_pattern1="${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
   base_pattern1+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}"
   patterns1=[base_pattern1 + "_${PERIOD}" + ".nc", base_pattern1 + ".nc"]
 
-  base_pattern2="${root}/CMIP6/${mip}/*/${model}/${extent_experiment}/${realization}/${table}/"
+  base_pattern2="${root}/CMIP6/${mip}/${institute}/${model}/${extent_experiment}/${realization}/${table}/"
   base_pattern2+="${variable}/${grid}/${version}/${variable}_${table}_${model}_${extent_experiment}_${realization}_${grid}"
   patterns2=[base_pattern2 + "_${PERIOD}" + ".nc"]
 
