@@ -39,4 +39,4 @@ if atCNRM:
     # Original data is mm/day
     calias("gpcp", 'precip', 'precip', filenameVar='pr')
     # Compute in SI
-    calias("gpcp", 'pr', 'pr', scale=1. / 86400., units="kg m-2 s-1", filenameVar='pr')
+    calias("gpcp", 'pr', 'precip', scale=1. / 86400., units="kg m-2 s-1", filenameVar='pr')

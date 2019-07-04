@@ -15,6 +15,24 @@
 # --------------------------------------------------------------------------------------------------
 import argparse
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+import datetime
+import numpy as np
+from netCDF4 import Dataset
+
+from climaf.site_settings import atCerfacs
+if atCerfacs:
+    import netcdftime
+else:
+    try:
+        from netCDF4 import netcdftime
+    except:
+        import netcdftime
+
+
 # -- Initialize the parser
 # --------------------------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='Plot script for CliMAF that handles CliMAF ensemble')
@@ -143,13 +161,6 @@ if args.highlight_period:
 # --------------------------------------------------------------------------------------------------
 # -- Plotting (here it's just a dummy plot to produce a result; otherwise CliMAF returns an error
 # --------------------------------------------------------------------------------------------------
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
-from netCDF4 import Dataset, netcdftime
-import datetime
-import numpy as np
 
 
 # -- Colors

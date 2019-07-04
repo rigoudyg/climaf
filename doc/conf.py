@@ -26,10 +26,11 @@ sys.path.insert(0, os.path.abspath('..'))
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # If your documentation needs a minimal Sphinx version, state it here.
-if on_rtd:
-    needs_sphinx = '1.6.9'  # this one is needed by RTD
-else:
-    needs_sphinx = '1.4.9'  # this one available at CNRM
+needs_sphinx = "1.8.4"
+# if on_rtd:
+#     needs_sphinx = '1.6.9'  # this one is needed by RTD
+# else:
+#     needs_sphinx = '1.4.9'  # this one available at CNRM
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
