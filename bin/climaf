@@ -10,10 +10,10 @@ cdir=$(cd $(dirname $0)/..; pwd)
 
 export PYTHONPATH=$cdir:$PYTHONPATH 
 
-# if [ ! "cesmep_env"="$CONDA_DEFAULT_ENV" ]
-# then
-#   source activate cesmep_env
-# fi
+if [ ! "cesmep_env"="$CONDA_DEFAULT_ENV" ]
+then
+  source activate cesmep_env
+fi
 
 if [ "$*" ] ; then 
     if [ -f "$1" ] ; then 
@@ -27,12 +27,6 @@ if [ "$*" ] ; then
     fi
 else
     # Interactive session (or read stdin)
-    if [ ! -d /cnrm ] ; then
-	# Can use ipython
-	ipython -i -c 'from climaf.api import *'
-    else
-	# ipython at CNRM for now implies Python3, which is notcompatible with CliMAF
-	python -i -c 'from climaf.api import *'
-    fi
+    ipython -i -c 'from climaf.api import *'
 fi
 

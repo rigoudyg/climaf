@@ -259,6 +259,17 @@ def annual_cycle(dat):
     """
     return ccdo(dat, operator="ymonavg")
 
+def annual_cycle_fast(dat):
+    """
+    Computes the annual cycle as the 12 climatological months of dat
+    (wrapper of ccdo with operator ymonavg)
+
+      >>> dat= ....   # some dataset, with whatever variable
+      >>> annual_cycle_dat = annual_cycle(dat)
+
+    """
+    return ccdo_fast(dat, operator="ymonavg")
+
 
 def clim_average(dat, season):
     """
@@ -358,6 +369,107 @@ def clim_average(dat, season):
             avg = ccdo(scyc, operator='timmin')
     #
     return avg
+
+
+def clim_average_fast(dat, season):
+    """
+    Computes climatological averages on the annual cycle of a dataset, on the months
+    specified with 'season', either:
+
+    - the annual mean climatology (season => 'ann','annual','climato','clim','climatology','annual_average','anm')
+    - seasonal climatologies (e.g. season = 'DJF' or 'djf' to compute the seasonal climatology
+      over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
+    - individual monthly climatologies (e.g. season = 'january', 'jan', '1' or 1 to get
+      the climatological January)
+    - annual maximum or minimum (typically makes sense with the mixed layer depth)
+
+    Note that you can use upper case or lower case characters to specify the months or seasons.
+
+    clim_average computes the annual cycle for you.
+
+      >>> dat= ....   # some dataset, with whatever variable
+      >>> climds_JFM = clim_average(dat,'JFM')         # The climatology of dat over January-February-March
+      >>> climds_ANM = clim_average(dat,'annual_mean') # The annual mean climatology
+      >>> climds_September = clim_average(dat,'September') # The annual mean climatology of September
+      >>> climds_September = clim_average(dat,9) # Same as previous example, with a float
+
+    """
+    #
+    if str(season).lower() in ['ann', 'annual', 'climato', 'clim', 'climatology', 'annual_average', 'anm',
+                               'annual_mean']:
+        avg = time_average_fast(dat)
+    else:
+        #
+        # -- Compute the annual cycle
+        scyc = annual_cycle_fast(dat)
+        #
+        # -- Classic atmospheric seasons
+        selmonths = selmonth = None
+        if str(season).upper() == 'DJF':
+            selmonths = '1,2,12'
+            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+        if str(season).upper() == 'MAM':
+            selmonths = '3,4,5'
+        if str(season).upper() == 'JJA':
+            selmonths = '6,7,8'
+        if str(season).upper() == 'SON':
+            selmonths = '9,10,11'
+        # -- Classic oceanic seasons
+        if str(season).upper() == 'JFM':
+            selmonths = '1,2,3'
+        if str(season).upper() == 'JAS':
+            selmonths = '7,8,9'
+        if str(season).upper() == 'JJAS':
+            selmonths = '6,7,8,9'
+        # -- Biogeochemistry season
+        if str(season).upper() == 'NDJ':
+            selmonths = '11,12,1'
+        if str(season).upper() == 'AMJ':
+            selmonths = '4,5,6'
+
+        if selmonths:
+            avg = ccdo_fast(scyc, operator='timmean -seltimestep,' + selmonths)
+            # avg = ccdo(scyc,operator='timmean -selmon,'+selmonths)
+        #
+        #
+        # -- Individual months
+        if str(season).lower() in ['january', 'jan', '1']:
+            selmonth = '1'
+        if str(season).lower() in ['february', 'feb', '2']:
+            selmonth = '2'
+        if str(season).lower() in ['march', 'mar', '3']:
+            selmonth = '3'
+        if str(season).lower() in ['april', 'apr', '4']:
+            selmonth = '4'
+        if str(season).lower() in ['may', '5']:
+            selmonth = '5'
+        if str(season).lower() in ['june', 'jun', '6']:
+            selmonth = '6'
+        if str(season).lower() in ['july', 'jul', '7']:
+            selmonth = '7'
+        if str(season).lower() in ['august', 'aug', '8']:
+            selmonth = '8'
+        if str(season).lower() in ['september', 'sep', '9']:
+            selmonth = '9'
+        if str(season).lower() in ['october', 'oct', '10']:
+            selmonth = '10'
+        if str(season).lower() in ['november', 'nov', '11']:
+            selmonth = '11'
+        if str(season).lower() in ['december', 'dec', '12']:
+            selmonth = '12'
+        if selmonth:
+            avg = ccdo_fast(scyc, operator='selmon,' + selmonth)
+        #
+        # -- Annual Maximum
+        if str(season).lower() in ['max', 'annual max', 'annual_max']:
+            avg = ccdo_fast(scyc, operator='timmax')
+        #
+        # -- Annual Minimum
+        if str(season).lower() in ['min', 'annual min', 'annual_min']:
+            avg = ccdo_fast(scyc, operator='timmin')
+    #
+    return avg
+
 
 
 def summary(dat):

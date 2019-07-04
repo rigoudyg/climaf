@@ -59,6 +59,7 @@ if not already_inited and not onrtd:
     import cmacro
     import operators
     import subprocess
+    import commands
     
     def my_which(soft):
         p = subprocess.Popen(["which",soft], stdout=subprocess.PIPE)
@@ -71,22 +72,24 @@ if not already_inited and not onrtd:
     print("CliMAF install => "+os.environ['CLIMAF'])
     print("python => "+my_which('python'))
     print("---")
-    print("Required softwares to run CliMAF:")
+    print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
-       print("ncl => "+my_which('ncl'))
+       print("ncl "+commands.getoutput(my_which('ncl')+' -V')+" => "+my_which('ncl'))
     except:
        print("Warning: ncl not found -> can't use CliMAF plotting scripts")
     try:
-       print("cdo => "+my_which('cdo'))
+       tmp = str.split(commands.getstatusoutput(my_which('cdo')+' -V')[1],' ')
+       print("cdo "+tmp[tmp.index('version')+1]+" => "+my_which('cdo'))
     except:
        print("Error: cdo not found -> CDO is mandatory to run CliMAF")
        my_which('cdo')
     try:
-       print("nco (ncks) => "+my_which('ncks'))
+       tmp = str.split(commands.getstatusoutput(my_which('ncks')+' --version')[1], ' ')
+       print("nco (ncks) "+tmp[tmp.index('version')+1]+" => "+my_which('ncks'))
     except:
        print("Warning: nco not found -> can't use nco from CliMAF")
     try:
-       print("ncdump => "+my_which('ncdump'))
+       print("ncdump "+commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')[-1].split('\n')[-1].split()[3]+" => "+my_which('ncdump'))
     except:
        print("Warning: ncdump not found -> can't use ncdump from CliMAF")
     print("---")

@@ -40,6 +40,8 @@ def load_standard_operators():
                          '"${missing}" ${ins}')
     #
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
+    cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
+
     #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
@@ -59,16 +61,29 @@ def load_standard_operators():
             scriptpath + 'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
                          '"${missing}" ${ins}',
             commuteWithTimeConcatenation=True)
+    cscript('space_average_fast',
+            scriptpath + 'mcdo.sh fldmean "${out}" "" "" "" "" "" '
+                         '"" ${ins}',
+            commuteWithTimeConcatenation=True)
     #
     cscript('time_average',
             scriptpath + 'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
                          '"${missing}" ${ins}',
+            commuteWithSpaceConcatenation=True)
+    cscript('time_average_fast',
+            scriptpath + 'mcdo.sh timmean  "${out}" "" "" "" "" "" '
+                         '"" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox',
             scriptpath + 'mcdo.sh ""  "${out}" "${var}" "${period_iso}" "${latmin},${latmax},${lonmin},${lonmax}" '
                          '"${alias}" "${units}" "${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    cscript('llbox_fast',
+            scriptpath + 'mcdo.sh ""  "${out}" "" "" "${latmin},${latmax},${lonmin},${lonmax}" '
+                         '"" "" "" ${ins}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+
     #
     cscript('regrid',
             scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${option}',
