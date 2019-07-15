@@ -307,7 +307,7 @@ def processDatasetArgs(**kwargs):
         # Facet specific processing
         if facet == 'period':
             if attval["period"] == "fx":
-                pass
+                attval["period"] = cperiod(attval["period"])
             elif not isinstance(attval['period'], cperiod) and attval['period'] != "*":
                 attval['period'] = init_period(attval['period'])
         # Check for typing or user's logic errors
@@ -316,7 +316,7 @@ def processDatasetArgs(**kwargs):
             errmsg += " " + e
     if errmsg != "":
         raise Climaf_Classes_Error(errmsg)
-    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*", "fx"]:
+    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*",]:
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
     return attval
 
@@ -389,7 +389,7 @@ class cdataset(cobject):
         self.model = attval.get('model', "*")
         self.frequency = attval.get('frequency', "*")
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
-        if self.frequency in ['seasonal', 'annual_cycle'] and self.period != "fx":
+        if self.frequency in ['seasonal', 'annual_cycle']:
             self.period.fx = True
         freqs_dic = frequencies.get(self.project, None)
         # print freqs_dic

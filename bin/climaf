@@ -27,6 +27,12 @@ if [ "$*" ] ; then
     fi
 else
     # Interactive session (or read stdin)
-    ipython -i -c 'from climaf.api import *'
+    if [ ! -d /cnrm ] ; then
+	# Can use ipython
+	ipython -i -c 'from climaf.api import *'
+    else
+	# ipython at CNRM for now implies Python3, which is notcompatible with CliMAF
+	python -i -c 'from climaf.api import *'
+    fi
 fi
 

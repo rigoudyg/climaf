@@ -69,7 +69,7 @@ if not already_inited and not onrtd:
 
     tim("imports")
     print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => "+os.environ['CLIMAF'])
+    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
     print("python => "+my_which('python'))
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")

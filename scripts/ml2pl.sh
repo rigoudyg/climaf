@@ -33,7 +33,7 @@
 ##set -x
 
 # Absolute path to Fortran executable:
-#executable=/data/guez/Compil_prod/Ml2pl/ml2pl
+#executable=/data/guez/build/Ml2pl/ml2pl
 #executable=$CLIMAF/scripts/ml2pl
 executable=$(dirname *0)/ml2pl
 
