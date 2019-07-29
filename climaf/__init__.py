@@ -58,13 +58,15 @@ if not already_inited and not onrtd:
     from . import standard_operators
     from . import cmacro
     from . import operators
+    from future import standard_library
+    standard_library.install_aliases()
     import subprocess
     import commands
 
 
     def my_which(soft):
         p = subprocess.Popen(["which", soft], stdout=subprocess.PIPE)
-        return str.replace(p.stdout.readlines()[0], '\n', '')
+        return str.replace(p.stdout.readlines()[0].decode(encoding="utf-8"), '\n', '')
 
 
     def bash_command_to_str(cmd):
@@ -160,13 +162,13 @@ if not already_inited and not onrtd:
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     tim("execs_projects")
-    exec("from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__)
+    exec("from climaf.classes   import ds, eds, cens, fds", sys.modules['__main__'].__dict__)
     tim("execs_classes")
-    exec("from climaf.operators import cscript" in sys.modules['__main__'].__dict__)
+    exec("from climaf.operators import cscript", sys.modules['__main__'].__dict__)
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
-    exec("from climaf.projects  import *" in sys.modules['__main__'].__dict__)
+    exec("from climaf.projects  import *", sys.modules['__main__'].__dict__)
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")

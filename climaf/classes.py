@@ -1399,9 +1399,8 @@ class ctree(cobject):
                 rep += opcrs + ","
         #
         clefs = self.parameters.keys()
-        clefs.sort()
-        for par in clefs:
-            if par != 'member_label':  # and self.parameters[par] is not None:
+        for par in sorted(list(clefs)):
+            if par != 'member_label':
                 rep += par + "=" + repr(self.parameters[par]) + ","
         rep += ")"
         rep = rep.replace(",)", ")")
