@@ -24,7 +24,7 @@ import hashlib
 from operator import itemgetter
 
 from climaf import version
-from .classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
+from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
 from .cmacro import crewrite
 from env.clogging import clogger, dedent
 from . import operators

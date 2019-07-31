@@ -14,20 +14,20 @@ import os
 import six
 import os.path
 import re
-import string
 import glob
 import subprocess
 from string import Template
-
-from . import classes
-from climaf.period import init_period, sort_periods_list
-from climaf.netcdfbasics import fileHasVar
-from env.clogging import clogger, dedent
-from operator import itemgetter
 import ftplib as ftp
 import getpass
 import netrc
 from functools import partial
+
+from climaf.environment import get_variable
+from climaf.utils import Climaf_Error
+from climaf.period import init_period, sort_periods_list
+from climaf.netcdfbasics import fileHasVar
+from env.clogging import clogger
+
 
 locs = []
 
@@ -152,7 +152,7 @@ class dataloc():
         self.frequency = frequency
         self.organization = organization
         if organization not in ['EM', 'CMIP5_DRS', 'generic']:
-            raise classes.Climaf_Error("Cannot process organization " + organization)
+            raise Climaf_Error("Cannot process organization " + organization)
         if isinstance(url, list):
             self.urls = url
         else:
@@ -291,18 +291,20 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
     for org, freq, urls in ofu:
         if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
-            raise classes.Climaf_Error("Can handle multiple facet query only for organization=generic ")
+            raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
-        if "frequency" in kwargs and project in classes.frequencies:
+        frequencies = get_variable("frequencies")
+        if "frequency" in kwargs and project in frequencies:
             normfreq = kwargs2['frequency']
-            if normfreq in classes.frequencies[project]:
-                kwargs2['frequency'] = classes.frequencies[project][normfreq]
+            if normfreq in frequencies[project]:
+                kwargs2['frequency'] = frequencies[project][normfreq]
         # JS # Convert normalized realm to project-specific realm if applicable
-        if "realm" in kwargs and project in classes.realms:
+        realms = get_variable("realms")
+        if "realm" in kwargs and project in realms:
             normrealm = kwargs2['realm']
-            if normrealm in classes.realms[project]:
-                kwargs2['realm'] = classes.realms[project][normrealm]
+            if normrealm in realms[project]:
+                kwargs2['realm'] = realms[project][normrealm]
         #
         # Call organization-specific routine
         if org == "EM":
@@ -313,9 +315,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
             rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
                                           merge_periods_on=merge_periods_on, **kwargs2))
         else:
-            raise classes.Climaf_Error("Cannot process organization " + org +
-                                       " for simulation " + simulation + " and model " + model +
-                                       " of project " + project)
+            raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
+                               model + " of project " + project)
     if not ofu:
         return None
     else:
@@ -638,7 +639,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     # print "period=",re.sub(date_regexp,r'\g<period>',f)
                     tperiod = re.sub(date_regexp, r'\g<period>', f)
                     if tperiod == f:
-                        raise classes.Climaf_Error("Cannot find a period in %s with regexp %s" % (f, date_regexp))
+                        raise Climaf_Error("Cannot find a period in %s with regexp %s" % (f, date_regexp))
                     fperiod = init_period(tperiod)
                 else:
                     date_regexp0 = date_regexp
@@ -673,9 +674,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                                 clogger.debug("adding fixed field :" + remote_prefix + f)
                                 rep.append(remote_prefix + f)
                         else:
-                            raise classes.Climaf_Error(
-                                "For remote files, filename pattern (%s) should include ${varname} " +
-                                "(which is instanciated by variable name or filenameVar)" % f)
+                            raise Climaf_Error("For remote files, filename pattern (%s) should include ${varname} " +
+                                               "(which is instanciated by variable name or filenameVar)" % f)
                 else:
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     # if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
@@ -724,7 +724,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         else:
                             mess = "For remote files, filename pattern (%s) should include" % (remote_prefix + f)
                             mess += " ${varname} (which is instanciated by variable name or filenameVar)"
-                            raise classes.Climaf_Error(mess)
+                            raise Climaf_Error(mess)
             else:
                 if not fperiod:
                     clogger.debug('not appending %s because period is None ' % f)
@@ -855,7 +855,7 @@ def glob_remote_data(remote, pattern):
         return listfiles
     except ftp.all_errors as err_ftp:
         print(err_ftp)
-        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
+        raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
 
 
 def remote_to_local_filename(url):
@@ -915,7 +915,7 @@ def glob_remote_data(url, pattern):
         return listfiles
     except ftp.all_errors as err_ftp:
         print(err_ftp)
-        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
+        raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
 
 
 def remote_to_local_filename(url):
@@ -1005,14 +1005,14 @@ def periodOfEmFile(filename, realm, freq):
                 speriod = "%s01-%s12" % (year, year)
                 return init_period(speriod)
         else:
-            raise classes.Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
+            raise Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
     elif realm == 'O' or realm == 'I':
         if freq == 'monthly' or freq == 'mon' or freq == '':
             altfreq = 'm'
         elif freq[0:2] == 'da':
             altfreq = 'd'
         else:
-            raise classes.Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
+            raise Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt = r'^.*_1' + altfreq + r'_([0-9]{8})_*([0-9]{8}).*nc'
         beg = re.sub(patt, r'\1', filename)
         end = re.sub(patt, r'\2', filename)
@@ -1021,7 +1021,7 @@ def periodOfEmFile(filename, realm, freq):
             return None
         return init_period("%s-%s" % (beg, end))
     else:
-        raise classes.Climaf_Error("unexpected realm " + realm)
+        raise Climaf_Error("unexpected realm " + realm)
 
 
 def selectExampleFiles(urls, **kwargs):

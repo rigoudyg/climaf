@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, division, unicode_literals, absolute_import
+from __future__ import print_function, division, absolute_import  # , unicode_literals
 
 # Some projects like atmosphere_derived_variables, others don't
 # __all__= [ "atmosphere_derived_variables", "ocean_derived_variables" ]

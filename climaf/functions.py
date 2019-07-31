@@ -3,12 +3,12 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import numpy as np
 from climaf.api import *
 from climaf.operators import *
-from climaf.driver import cvalue
+from climaf.driver import cvalue, cfile
 from climaf import classes
 from env.clogging import clogger
+from climaf.environment import get_variable
 
 
 def cscalar(dat):
@@ -590,6 +590,7 @@ def projects():
     """
     Lists available projects and their associated facets.
     """
+    cprojects = get_variable("cprojects")
     print('-- Available projects:')
     for key in list(cprojects):
         print('-- Project:', key)

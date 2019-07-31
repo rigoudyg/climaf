@@ -58,16 +58,15 @@ if not already_inited and not onrtd:
     from . import standard_operators
     from . import cmacro
     from . import operators
-    from future import standard_library
-    standard_library.install_aliases()
     import subprocess
     import commands
 
 
     def my_which(soft):
-        p = subprocess.Popen(["which", soft], stdout=subprocess.PIPE)
-        return str.replace(p.stdout.readlines()[0].decode(encoding="utf-8"), '\n', '')
-
+        p = subprocess.Popen(["which",soft], stdout=subprocess.PIPE)
+        rep = p.stdout.readlines()[0].decode("utf-8")
+        rep = rep.replace("\n", "")
+        return rep
 
     def bash_command_to_str(cmd):
         return str.replace(subprocess.Popen(str.split(cmd, ' '), stdout=subprocess.PIPE).stdout.readlines()[0], '\n',
@@ -168,7 +167,8 @@ if not already_inited and not onrtd:
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
-    exec("from climaf.projects  import *", sys.modules['__main__'].__dict__)
+    from . import projects
+    exec("from climaf.projects  import %s" % ",".join(projects.__all__), sys.modules['__main__'].__dict__)
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")

@@ -14,8 +14,8 @@ import os
 import re
 import sys
 import subprocess
-from . import driver
-from env.clogging import clogger, dedent
+
+from env.clogging import clogger
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
@@ -387,9 +387,8 @@ class cscript():
                 docfilename = os.path.dirname(__file__) + "/../doc/scripts/" + name + ".rst"
                 # print "docfilen= "+docfilename
                 try:
-                    docfile = open(docfilename)
-                    doc = docfile.read()
-                    docfile.close()
+                    with open(docfilename) as docfile:
+                        doc = docfile.read().decode(encoding="utf-8")
                 except:
                     pass
                 #

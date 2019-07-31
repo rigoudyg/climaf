@@ -4,6 +4,7 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import logging
+import six
 
 logdir = "."
 
@@ -113,7 +114,7 @@ def dedent(n=1):
 
 
 def transl(level):
-    if type(level) is str:
+    if isinstance(level, six.string_types):
         if level.lower() == 'debug':
             return logging.DEBUG
         elif level.lower() == 'critical':

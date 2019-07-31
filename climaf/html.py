@@ -20,16 +20,16 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 import re
-import glob
-from climaf import __path__ as cpath
-from climaf.cache import getCRS
-from climaf import cachedir
-from climaf.driver import cfile
 import pickle
 import shutil
 from collections import OrderedDict
 from env.clogging import clogger, dedent
 from functools import reduce
+
+from climaf import __path__ as cpath
+from climaf.cache import getCRS
+from climaf import cachedir
+from climaf.driver import cfile
 
 
 def header(title, style_file=None):

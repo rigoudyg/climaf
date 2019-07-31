@@ -10,9 +10,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import re
 import datetime
-import copy
-from env.clogging import clogger, dedent
 import six
+
+from env.clogging import clogger, dedent
 
 
 class cperiod():

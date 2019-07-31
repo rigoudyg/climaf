@@ -39,7 +39,7 @@ addition to the one duly declared in the datafile
 
 """
 
-from __future__ import print_function, division, unicode_literals, absolute_import
+from __future__ import print_function, division, absolute_import  # ,unicode_literals
 
 __all__ = ["example", "cami", "cmip3", "cmip5", "ocmip5", "obs4mips", "em", "erai", "erai_land", "gpcc", "gpcp",
            "ceres", "cruts3", "file", "ref_climatos_and_ts", "igcm_out", "emn36", "nemo", "igcm_cmip6", "cmip6", "eobs",
