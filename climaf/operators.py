@@ -15,6 +15,7 @@ import re
 import sys
 import subprocess
 
+from climaf.utils import Climaf_Operator_Error
 from env.clogging import clogger
 
 # Next definition can be splitted in a set managed by an administrator, and
@@ -563,16 +564,6 @@ def derived_variable(variable, project):
         rep = None
     clogger.debug("Derived variable %s for project %s is %s" % (variable, project, rep))
     return rep
-
-
-class Climaf_Operator_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        # clogging.dedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)
 
 
 if __name__ == "__main__":
