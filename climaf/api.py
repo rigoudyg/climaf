@@ -86,7 +86,7 @@ from climaf.environment import cprojects, aliases
 from .cmacro import macro, cmacros
 from .driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from .dataloc import dataloc
-from .operators import cscript, scripts as cscripts, operators, fixed_fields, derive
+from .operators import cscript, fixed_fields, derive
 from .cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect
 from env.clogging import clogger, clog, clog_file, logdir
 from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
@@ -95,6 +95,17 @@ from .plot.varlongname import varlongname
 from .derived_variables import *
 from .functions import *
 from .easyCMIP_functions import *
+
+
+@property
+def cscripts():
+    return get_variable("scripts")
+
+
+@property
+def operators():
+    return get_variable("operators")
+
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not
 # meaningful for your own CliMAF install

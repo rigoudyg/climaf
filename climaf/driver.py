@@ -22,20 +22,21 @@ import copy
 from string import Template
 import tempfile
 from datetime import datetime
-
 from functools import reduce
+
 
 # Climaf modules
 import climaf
 from . import classes
 from . import cache
 from . import operators
-from . import cmacro
+from climaf.cmacro import cmacros, instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod, merge_periods
 from climaf import xdg_bin
 from climaf.classes import allow_errors_on_ds_call
+from climaf.environment import get_variable
 
 logdir = "."
 
@@ -53,23 +54,24 @@ def capply(climaf_operator, *operands, **parameters):
     :param parameters: parameters to be passed to the climaf operator (not available for macros)
     :return: a list of CliMAF objects (stored if auto-store is on)
     """
+    scripts = get_variable("scripts")
     res = None
     if operands is None or operands[0] is None and not classes.allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
     opds = list(map(str, operands))
-    if climaf_operator in operators.scripts:
+    if climaf_operator in scripts:
         # clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res = capply_script(climaf_operator, *operands, **parameters)
         # Evaluate object right now if there is no output to manage
-        op = operators.scripts[climaf_operator]
-        if op.outputFormat in operators.none_formats:
+        op = scripts[climaf_operator]
+        if op.outputFormat in get_variable("none_formats"):
             ceval(res, userflags=copy.copy(op.flags))
-    elif climaf_operator in cmacro.cmacros:
+    elif climaf_operator in cmacros:
         if len(parameters) > 0:
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
         clogger.debug("applying macro %s to" % climaf_operator + repr(opds))
-        res = cmacro.instantiate(cmacro.cmacros[climaf_operator], *operands)
-    elif climaf_operator in operators.operators:
+        res = instantiate(cmacros[climaf_operator], *operands)
+    elif climaf_operator in get_variable("operators"):
         clogger.debug("applying operator %s to" % climaf_operator + repr(opds) + repr(parameters))
         res = capply_operator(climaf_operator, *operands, **parameters)
     else:
@@ -95,11 +97,10 @@ def capply_script(script_name, *operands, **parameters):
     :param parameters: parameters to be passed to the script
     :return: an object that represents the application of the script
     """
-
-    if script_name not in operators.scripts:
-        raise Climaf_Driver_Error("Script %s is not know. Consider declaring it "
-                                  "with function 'cscript' %s" % script_name)
-    script = operators.scripts[script_name]
+    scripts = get_variable("scripts")
+    if script_name not in scripts:
+        raise Climaf_Driver_Error("Script %s is not know. Consider declaring it with function 'cscript'", script_name)
+    script = scripts[script_name]
     # if len(operands) != script.inputs_number() :
     #     raise Climaf_Driver_Error("Operator %s is "
     #                               "declared with %d input streams, while you provided %d. Get doc with 'help(%s)'"%(
@@ -370,7 +371,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     # the cache doesn't have a similar tree, let us recursively eval subtrees
     ##########################################################################
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
-    if cobject.operator in operators.scripts:
+    if cobject.operator in get_variable("scripts"):
         clogger.debug("Script %s found" % cobject.operator)
         file = ceval_script(cobject, deep,
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
@@ -379,11 +380,13 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
             return file
         else:
             return cread(file, classes.varOf(cobject))
-    elif cobject.operator in operators.operators:
+    elif cobject.operator in get_variable("operators"):
         clogger.debug("Operator %s found" % cobject.operator)
+        # TODO: Implement ceval_operator
         obj = ceval_operator(cobject, deep)
         cdedent()
         if format == 'file':
+            # TODO: Implement cstore
             rep = cstore(obj)
             return rep
         else:
@@ -617,7 +620,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     """
     if format not in ["MaskedArray", "file", "txt"]:
         raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join(
-            [repr(x) for x in operators.graphic_formats]))
+            [repr(x) for x in get_variable("graphic_formats")]))
     #
     if userflags is None:
         userflags = operators.scriptFlags()
@@ -662,7 +665,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
 
     Returns a CLiMAF cache data filename
     """
-    script = operators.scripts[scriptCall.operator]
+    script = get_variable("scripts")[scriptCall.operator]
     template = Template(script.command)
     # Evaluate input data
     invalues = []
@@ -773,14 +776,15 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    if script.outputFormat not in operators.none_formats:
+    graphic_formats = get_variable("graphic_formats")
+    if script.outputFormat not in get_variable("none_formats"):
         if script.outputFormat == "graph":
             if 'format' in scriptCall.parameters:
-                if scriptCall.parameters['format'] in operators.graphic_formats:
+                if scriptCall.parameters['format'] in graphic_formats:
                     output_fmt = scriptCall.parameters['format']
                 else:
                     raise Climaf_Driver_Error('Allowed graphic formats yet are : %s' % ', '.join(
-                        [repr(x) for x in operators.graphic_formats]))
+                        [repr(x) for x in graphic_formats]))
             else:  # default graphic format
                 output_fmt = "png"
         else:
@@ -907,7 +911,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         with open(logdir + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
-    if script.outputFormat in operators.none_formats:
+    if script.outputFormat in get_variable("none_formats"):
         return None
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output

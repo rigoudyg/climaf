@@ -27,7 +27,7 @@ from climaf.utils import Climaf_Cache_Error
 from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
 from .cmacro import crewrite
 from env.clogging import clogger
-from . import operators
+from climaf.environment import get_variable
 
 currentCache = None
 cachedirs = None
@@ -301,7 +301,7 @@ def hasMatchingObject(cobject, ds_func):
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
-        return not operators.scripts[operator].flags.commuteWithTimeConcatenation
+        return not get_variable("scripts")[operator].flags.commuteWithTimeConcatenation
 
     #
     global crs2eval

@@ -52,8 +52,9 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
+    from . import environment
     import env.clogging as clogging
-    import env.site_settings as site_settings
+    import env.site_settings import site_settings
     from . import cache
     from . import standard_operators
     from . import cmacro
@@ -193,6 +194,8 @@ if not already_inited and not onrtd:
     if cache.stamping:
         # Check if exiv2 is installed
         #
-        if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in operators.graphic_formats:
-            operators.graphic_formats.remove('eps')
+        graphic_formats = environment.get_variable("graphic_formats")
+        if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in graphic_formats:
+            graphic_formats.remove('eps')
             print("exiv2 is not installed so you can not use 'eps' output format")
+            environment.change_variable("graphic_formats", graphic_formats)

@@ -25,6 +25,25 @@ frequencies = dict()
 #: Dictionary of realms names dictionaries
 realms = dict()
 
+#: Dictionary of scripts names dictionaries
+scripts = dict()
+
+#: Dictionary of operators names dictionaries
+operators = dict()
+
+#: Dictionary of derived variables names dictionaries
+derived_variables = dict()
+
+#: List of known formats
+known_formats = ['nc', 'graph', 'txt']
+
+#: List of graphic formats
+graphic_formats = ['png', 'pdf', 'eps']
+
+#: List of none formats
+none_formats = [None, 'txt']
+
+
 # Tools to deal with variables
 def get_variable(variable):
     if variable in globals():
