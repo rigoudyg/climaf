@@ -14,6 +14,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import sys
 import os
+import types
+import six
 
 from .classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 from env.clogging import clogger, dedent
@@ -74,7 +76,7 @@ def macro(name, cobj, lobjects=[]):
 
     See also much more explanations in the example at :download:`macro.py <../examples/macro.py>`
     """
-    if isinstance(cobj, str):
+    if isinstance(cobj, six.string_types):
         s = cobj
         # Next line used for interpreting macros's CRS
         exec ("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
@@ -118,6 +120,19 @@ def macro(name, cobj, lobjects=[]):
         exec("from climaf.cmacro import %s" % name, sys.modules['__main__'].__dict__)
         clogger.debug("Macro %s has been declared" % name)
 
+    return rep
+
+
+def define_new_macro(name, doc):
+    # Define the new macro code
+    codestring = compile('def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"], args)\n'
+                         % (name, doc, name), name, "exec")
+    code = types.CodeType(codestring.co_argcount, codestring.co_kwonlyargcount, codestring.co_nlocals,
+                          codestring.co_stacksize, codestring.co_flags, codestring, codestring.co_consts,
+                          codestring.co_names, codestring.co_varnames, codestring.co_filename, codestring.co_name,
+                          codestring.co_firstlineno, codestring.co_lnotab, codestring.co_freevars,
+                          codestring.co_cellvars)
+    rep = types.FunctionType(code=code, globals=globals(), name=name)
     return rep
 
 

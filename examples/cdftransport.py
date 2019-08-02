@@ -7,7 +7,7 @@ from climaf.api import *
 
 if not atCNRM:
     exit(0)
-if 'ccdfmean' not in cscripts:
+if 'ccdfmean' not in get_variable("scripts"):
     print("CDFtools not available")
     exit(0)
 

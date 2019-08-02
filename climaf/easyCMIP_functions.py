@@ -48,8 +48,8 @@ def ensemble_one_keyword(req_dict):
         index_kw = 6
     if key in ['simulation', 'member']:
         index_kw = 11
-    for pathfilename in str.split(req.baseFiles(), ' '):
-        value = str.split(pathfilename, '/')[index_kw]
+    for pathfilename in req.baseFiles().split():
+        value = pathfilename.split('/')[index_kw]
         if value not in members:
             members.append(value)
     #
@@ -293,21 +293,21 @@ def check_time_consistency_CMIP(dat, return_available_period=False):
     # -- First, get the period available among the listed files
     startyears = []
     endyears = []
-    for tmpf in str.split(dat.baseFiles(), ' '):
-        dum = str.split(tmpf, '_')
-        tmpf_period = str.replace(dum[-1], '.nc', '')
-        startdate = str.split(tmpf_period, '-')[0]
-        enddate = str.split(tmpf_period, '-')[1]
+    for tmpf in dat.baseFiles().split():
+        dum = tmpf.split('_')
+        tmpf_period = dum[-1].replace('.nc', '')
+        startdate = tmpf_period.split('-')[0]
+        enddate = tmpf_period.split('-')[1]
         startyears.append(int(startdate[0:4]))
         endyears.append(int(enddate[0:4]))
     first_available_year = sorted(startyears)[0]
     last_available_year = sorted(endyears)[-1]
     #
     # -- Then, get the start year and end year of the request
-    req_period = str.replace(str(dat.period), '_', '-')
+    req_period = str(dat.period).replace('_', '-')
     #
-    start_req_date = str.split(req_period, '-')[0]
-    end_req_date = str.split(req_period, '-')[1]
+    start_req_date = req_period.split('-')[0]
+    end_req_date = req_period.split('-')[1]
     #
     start_req_year = int(start_req_date[0:4])
     end_req_year = int(end_req_date[0:4])

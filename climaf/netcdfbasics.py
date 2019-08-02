@@ -136,8 +136,11 @@ def timeLimits(filename):
     #
     try:
         import netcdftime
-    except:
-        raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
+    except ImportError:
+        try:
+            from NetCDF4 import netcdftime
+        except ImportError:
+            raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
     #
     from .anynetcdf import ncf
     rep = None

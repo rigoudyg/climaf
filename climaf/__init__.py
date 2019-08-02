@@ -42,7 +42,8 @@ onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not already_inited and not onrtd:
     import sys
-    from climaf.driver import logdir
+    from . import environment
+    logdir = environment.get_variable("logdir")
 
     #
     already_inited = True
@@ -64,14 +65,16 @@ if not already_inited and not onrtd:
 
 
     def my_which(soft):
-        p = subprocess.Popen(["which",soft], stdout=subprocess.PIPE)
-        rep = p.stdout.readlines()[0].decode("utf-8")
-        rep = rep.replace("\n", "")
+        p = subprocess.Popen(["which", soft], stdout=subprocess.PIPE)
+        rep = p.stdout.readlines()
+        rep = rep[0]
+        rep = rep.decode("utf-8")
+        if "\n" in rep:
+            rep = rep.replace("\n", "")
         return rep
 
     def bash_command_to_str(cmd):
-        return str.replace(subprocess.Popen(str.split(cmd, ' '), stdout=subprocess.PIPE).stdout.readlines()[0], '\n',
-                           '')
+        return str.replace(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).stdout.readlines()[0], '\n', '')
 
 
     tim("imports")

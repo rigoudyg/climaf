@@ -533,7 +533,7 @@ def csync(update=False):
     fn = os.path.expanduser(cacheIndexFileName)
     try:
         with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile)
+            pickle.dump(crs2filename, cacheIndexFile, protocol=2) # Used for python 2 compatibility
         dropped_crs = []
     except:
         if update:

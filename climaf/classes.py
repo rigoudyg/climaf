@@ -15,6 +15,7 @@ import string
 import copy
 import os.path
 from functools import reduce, partial
+import six
 from decimal import Decimal
 
 from climaf.environment import get_variable, change_variable
@@ -301,7 +302,7 @@ def processDatasetArgs(**kwargs):
             else:
                 listval = [val]
             for lval in listval:
-                if isinstance(lval, str) and lval.find(sep) >= 0:
+                if isinstance(lval, six.string_types) and lval.find(sep) >= 0:
                     raise Climaf_Classes_Error(
                         "You cannot use character '%s' when setting '%s=%s' because "
                         "it is the declared separator for project '%s'. "
@@ -446,7 +447,7 @@ class cdataset(cobject):
         self.register()
 
     def setperiod(self, period):
-        if isinstance(period, str):
+        if isinstance(period, six.string_types):
             period = init_period(period)
         self.erase()
         self.period = period
@@ -460,7 +461,7 @@ class cdataset(cobject):
         dic = self.kvp.copy()
         if period is not None:
             dic['period'] = period
-        if type(dic['domain']) is list:
+        if isinstance(dic['domain'], list):
             dic['domain'] = repr(dic['domain'])
         rep = "ds('%s')" % crs_template.safe_substitute(dic)
         return rep
@@ -714,12 +715,12 @@ class cdataset(cobject):
             else:
                 raise Climaf_Classes_Error("Operation %s is not kown " % operation)
         #
-        wildcard_attributes_list = [k for k in dic if type(dic[k]) is str and "*" in dic[k]]
+        wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
         if option == 'resolve':
             clogger.debug("Trying to resolve on attributes %s" % wildcard_attributes_list)
             for kw in wildcards:
                 val = wildcards[kw]
-                if type(val) == list:
+                if isinstance(val, list):
                     if len(val) > 1:
                         if kw == 'period':
                             raise Climaf_Classes_Error("Periods with holes are not handled %s" % val)
@@ -759,13 +760,13 @@ class cdataset(cobject):
             for kw in wildcards:
                 entry = wildcards[kw]
                 # print "entry=",entry, 'type=',type(entry), 'ensemble_kw=',ensemble_kw
-                if kw == 'period' and type(entry) is list:
+                if kw == 'period' and isinstance(entry, list):
                     if len(wildcards['period']) > 1:
                         raise \
                             Climaf_Classes_Error(
                                 "Cannot create an ensemble with holes in period (%s)" % wildcards['period'])
                     entry = entry[0]
-                if type(entry) is list:
+                if isinstance(entry, list):
                     is_ensemble = (len(entry) > 1)
                 dic[kw] = entry
             if is_ensemble is False:
@@ -777,7 +778,7 @@ class cdataset(cobject):
         elif option == 'check_and_store':
             for kw in wildcards:
                 entry = wildcards[kw]
-                if type(entry) is list and len(entry) > 1:
+                if isinstance(entry, list) and len(entry) > 1:
                     raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among :"
                                                " %s or use either 'ensure_dataset=False' (with method baseFiles or "
                                                "listfiles) or 'option=\'choices\' (with method explore)" %
@@ -879,9 +880,9 @@ class cdataset(cobject):
             filedate = []
             clogger.debug("List of selected files: %s" % files)
 
-            var = str.split(varOf(self), ',')[0]
+            var = varOf(self).split(',')[0]
             # Concatenate all data files
-            for filename in str.split(files, ' '):
+            for filename in files.split():
                 fileobj = ncf(filename)
                 #
                 aliases = get_variable("aliases")
@@ -1083,7 +1084,7 @@ class cens(cobject, dict):
         :py:func:`~climaf.cache.efile`
 
         """
-        if not all(map(lambda x: isinstance(x, str), list(dic))):
+        if not all(map(lambda x: isinstance(x, six.string_types), list(dic))):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not all(map(lambda x: isinstance(x, cobject), list(dic.values()))):
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
@@ -1120,7 +1121,7 @@ class cens(cobject, dict):
         self.order = order
 
     def __setitem__(self, k, v):
-        if not isinstance(k, str):
+        if not isinstance(k, six.string_types):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not isinstance(v, cobject):
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
@@ -1407,7 +1408,7 @@ class ctree(cobject):
     def setperiod(self, period):
         """ modifies the period for all datasets of a tree"""
         self.erase()
-        if isinstance(period, str):
+        if isinstance(period, six.string_types):
             period = init_period(period)
         for op in self.operands:
             op.setperiod(period)
@@ -1557,7 +1558,7 @@ def ds(*args, **kwargs):
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
         match = None
-        if 'period' in kwargs and type(kwargs['period']) is str:
+        if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
             match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)(y|Y)$", kwargs['period'])
             if match is not None:
                 return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
@@ -1687,13 +1688,13 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
     aliases = get_variable("aliases")
     if project not in aliases:
         aliases[project] = dict()
-    if type(variable) is not list:
+    if not isinstance(variable, list):
         variable = [variable]
-    if type(filenameVar) is not list:
+    if not isinstance(filenameVar, list):
         filenameVar = [filenameVar]
-    if type(fileVariable) is not list:
+    if not isinstance(fileVariable, list):
         fileVariable = [fileVariable]
-    if type(units) is not list:
+    if not isinstance(units, list):
         units = [units]
     if conditions is not None:
         for kw in conditions:
@@ -2194,7 +2195,7 @@ def domainOf(cobject):
     its domain, otherwise returns domain of first operand
     """
     if isinstance(cobject, cdataset):
-        if type(cobject.domain) is list:
+        if isinstance(cobject.domain, list):
             rep = ""
             for coord in cobject.domain[0:-1]:
                 rep = r"%s%d," % (rep, coord)

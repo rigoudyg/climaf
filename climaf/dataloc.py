@@ -484,7 +484,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     period = kwargs['period']
     if period == "*":
         periods = []  # Init an empty list of all periods
-    elif type(period) is str:
+    elif isinstance(period, six.string_types):
         period = init_period(period)
     #
     variable = kwargs['variable']
@@ -594,7 +594,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
             else:
                 return thestring
         for kw in kwargs:
-            if type(kwargs[kw]) is str:  # This excludes period attribute, which has a type
+            if isinstance(kwargs[kw], six.string_types):  # This excludes period attribute, which has a type
                 alt_kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
                 alt_basename = rreplace(alt_basename, r"${%s}" % kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]))
         facets_regexp = Template(alt_basename).safe_substitute(**alt_kwargs)

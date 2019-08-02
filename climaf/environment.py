@@ -43,6 +43,9 @@ graphic_formats = ['png', 'pdf', 'eps']
 #: List of none formats
 none_formats = [None, 'txt']
 
+#: Log directory
+logdir = "."
+
 
 # Tools to deal with variables
 def get_variable(variable):

@@ -86,7 +86,8 @@ from climaf.environment import cprojects, aliases
 from .cmacro import macro, cmacros
 from .driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from .dataloc import dataloc
-from .operators import cscript, fixed_fields, derive
+from .operators import cscript, fixed_fields
+from climaf.operators_derive import derive
 from .cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect
 from env.clogging import clogger, clog, clog_file, logdir
 from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
