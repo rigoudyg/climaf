@@ -15,7 +15,7 @@ import six
 from env.clogging import clogger, dedent
 
 
-class cperiod():
+class cperiod(object):
     """
     A class for handling a pair of datetime objects defining a period.
 
@@ -285,7 +285,7 @@ def init_period(dates):
 
 def sort_periods_list(periods_list):
     #
-    class SortTree():
+    class SortTree(object):
         def __init__(self, el):
             self.pivot = el
             self.smaller = None

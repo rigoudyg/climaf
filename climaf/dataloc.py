@@ -33,7 +33,7 @@ from climaf.classes import cvalid
 locs = []
 
 
-class dataloc():
+class dataloc(object):
     def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*",
                  realm="*", table="*", frequency="*"):
         """

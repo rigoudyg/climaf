@@ -18,6 +18,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys
 import os
 
+from climaf import version
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -72,8 +74,6 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 # built documents.
 #
 # The short X.Y version.
-from climaf import version
-
 # version = '0.10'
 # The full version, including alpha/beta/rc tags.
 release = version

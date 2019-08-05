@@ -79,7 +79,7 @@ def macro(name, cobj, lobjects=[]):
     if isinstance(cobj, six.string_types):
         s = cobj
         # Next line used for interpreting macros's CRS
-        exec ("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
+        exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
         try:
             cobj = eval(cobj, sys.modules['__main__'].__dict__)
         except:
@@ -100,7 +100,8 @@ def macro(name, cobj, lobjects=[]):
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
-        rep = cpage([list(map(macro, [None for fig in line], line)) for line in cobj.fig_lines], cobj.widths, cobj.heights)
+        rep = cpage([list(map(macro, [None for fig in line], line)) for line in cobj.fig_lines],
+                    cobj.widths, cobj.heights)
     elif isinstance(cobj, cens):
         d = dict()
         for k, v in zip(list(cobj), map(macro, [None for o in cobj.values()], cobj.values())):
@@ -146,7 +147,7 @@ def crewrite(crs, alsoAtTop=True):
     to second subtreesecond
     """
     # Next line used for interpreting macros's CRS
-    exec ("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
+    exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
     allow_error_on_ds()
     try:

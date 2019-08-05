@@ -26,7 +26,7 @@ from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
 
-class cproject():
+class cproject(object):
     def __init__(self, name, *args, **kwargs):
         """
         Declare a project and its facets/attributes in CliMAF (see below)
@@ -229,7 +229,7 @@ cdef("domain", "global")
 cobjects = dict()
 
 
-class cobject():
+class cobject(object):
     def __init__(self):
         # crs is the string expression defining the object
         # in the CLIMAF Reference Syntax

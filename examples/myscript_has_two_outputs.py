@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 from __future__ import print_function
 
@@ -13,7 +15,6 @@ We use a data sample distributed with CliMAF
 # S.Senesi - nov 2018
 
 # Load Climaf functions
-from __future__ import print_function, division, unicode_literals, absolute_import
 
 from climaf.api import *
 

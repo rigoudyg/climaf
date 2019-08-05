@@ -533,7 +533,7 @@ def csync(update=False):
     fn = os.path.expanduser(cacheIndexFileName)
     try:
         with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile, protocol=2) # Used for python 2 compatibility
+            pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
         dropped_crs = []
     except:
         if update:
@@ -576,7 +576,7 @@ def cload(alt=None):
                 # print "evaluating crs="+crs
                 eval(crs, sys.modules['__main__'].__dict__)
             except:
-                print ("Inconsistent cache object is skipped : %s" % crs)
+                print("Inconsistent cache object is skipped : %s" % crs)
                 # clogger.debug("Inconsistent cache object is skipped : %s"%crs)
                 p = guess_projects(crs)
                 if p not in crs_not_yet_evaluable:
