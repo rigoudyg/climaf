@@ -27,6 +27,7 @@ from climaf.utils import Climaf_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
+from climaf.classes import cvalid
 
 
 locs = []
@@ -379,13 +380,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         - on fait glob.glob
 
         - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
-            réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
-            avec filenameVar; d'où une liste de fichiers lfiles
+          réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
+          avec filenameVar; d'où une liste de fichiers lfiles
 
-    - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
-        une expression régulière (avec groupes) qui capture les valeurs de facettes
-        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
-        nécessaire ???)
+        - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
+          une expression régulière (avec groupes) qui capture les valeurs de facettes
+          (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
+          nécessaire ???)
 
         - Boucle sur les fichiers de lfiles:
 
@@ -399,14 +400,14 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
                 - on extrait la periode
 
-            - si elle convient (divers cas ...)
+                - si elle convient (divers cas ...)
 
-            - si on a pu filtrer sur la variable,
-                ou que variable="*" ou variable multiple,
-                ou que le fichier contient la bonne variable, eventuellement après renommage
-                on retient le fichier
+                - si on a pu filtrer sur la variable,
+                    ou que variable="*" ou variable multiple,
+                    ou que le fichier contient la bonne variable, eventuellement après renommage
+                    on retient le fichier
 
-        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
+            - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
 
         - Dès qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
 
@@ -437,7 +438,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     facet_value = oc.group(kw)
                 except:
                     continue
-                valid_values = classes.cvalid(kw, None, project)
+                valid_values = cvalid(kw, None, project)
                 if isinstance(valid_values, list) and (facet_value not in valid_values):
                     clogger.debug("Facet value %s for %s is not allowed" % (facet_value, kw))
                     return False
@@ -608,7 +609,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         #
         # Construct regexp for extracting dates from filename
         date_regexp = None
-        template_toreg = template.replace("*", ".*").replace("?", r".").replace(r"+", r"\+")
+        template_toreg = template.replace(r"*", r".*").replace(r"?", r".").replace(r"+", r"\+")
         # print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords:
             # print "searchin "+key+" in "+template

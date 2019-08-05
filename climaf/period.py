@@ -177,7 +177,7 @@ def init_period(dates):
     Init a CliMAF 'period' object
 
     Args:
-      dates (str): must match YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]] , or
+      dates (str): must match r'YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]]' , or
         be 'fx' for fixed fields
 
     Returns:

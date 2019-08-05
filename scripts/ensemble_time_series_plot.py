@@ -298,7 +298,7 @@ for pathfilename in filenames_list:
                     datevar.append(cdatetime(year, month, day))
             else:
                 datevar.append(elt)
-                # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
+        # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
         # , calendar=u"gregorian")
         # -- Garde-fou calendar
         # if not isinstance(cdftime.num2date(nctime)[0], cdatetime):

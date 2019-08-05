@@ -287,7 +287,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt.update(index_dict)
             # -- Save the file
             with open(os.path.expanduser(index_atlas), "wb") as atlas_index_w:
-                pickle.dump(tt, atlas_index_w, protocol=2) # Used for python 2 compatibility
+                pickle.dump(tt, atlas_index_w, protocol=2)  # Used for python 2 compatibility
 
             return '<TD ALIGN=RIGHT>' + \
                    link(label, "climaf_atlas" + str(nb) + filextension, thumbnail, hover) + \

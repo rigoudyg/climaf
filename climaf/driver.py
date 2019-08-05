@@ -589,7 +589,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
 
 
 def ceval_for_string(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
-                       recurse_list=list()):
+                     recurse_list=list()):
     """
     Evaluate a CliMAF object of kind string.
     TODO: Implement this function
