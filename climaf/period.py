@@ -219,20 +219,20 @@ def init_period(dates):
     add_day = 0
     add_hour = 0
     add_minute = 0
-    if len(end) == 4:
+    if len(end) in [4, 5]:
         eyear = int(end[0:4]) + 1
-    elif len(end) == 6:
+    elif len(end) in [6, 7]:
         eyear = int(end[0:4])
         emonth = int(end[4:6]) + 1
         if emonth > 12:
             emonth = 1
             eyear = eyear + 1
-    elif len(end) == 8:
+    elif len(end) in [8, 9]:
         add_day = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
         eday = int(end[6:8])
-    elif len(end) == 10:
+    elif len(end) in [10, 11]:
         add_hour = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
@@ -287,7 +287,6 @@ def sort_periods_list(periods_list):
         return rep
 
     #
-    import copy
     clist = copy.copy(periods_list)
     sorted_tree = SortTree(clist.pop())
     while clist:
