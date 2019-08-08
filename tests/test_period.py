@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_periods_list, merge_periods, \
     intersect_periods_list, lastyears, firstyears
 
+from climaf.cache import setNewUniqueCache
+
 
 class CreatePeriodDefinedTests(unittest.TestCase):
 
@@ -376,4 +378,5 @@ if __name__ == '__main__':
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
+    setNewUniqueCache(tmp_directory)
     unittest.main()

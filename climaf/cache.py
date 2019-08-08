@@ -131,8 +131,8 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         clogger.debug("must skip %s which CRS is %s" % (existing, getCRS(existing)))
         number += 2
         if number >= len(full):
-            clogger.critical("Critical issue in cache : " + len(full) + " digits is not enough for " + expression)
-            exit
+            clogger.critical("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
+            raise Climaf_Cache_Error("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
         guess = full[0: number - 1]
         existing = searchFile(prefix + stringToPath(guess, directoryNameLength) + "." + format)
         if existing:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Test the period module.
+Test the netcdfbasics module.
 """
 
 import os
@@ -11,6 +11,7 @@ import unittest
 from climaf.netcdfbasics import varOfFile, varsOfFile, fileHasVar, fileHasDim, dimsOfFile, \
     model_id, timeLimits
 from climaf.period import init_period
+from climaf.cache import setNewUniqueCache
 from climaf import __path__ as rootpath
 
 
@@ -94,4 +95,5 @@ if __name__ == '__main__':
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
+    setNewUniqueCache(tmp_directory)
     unittest.main()
