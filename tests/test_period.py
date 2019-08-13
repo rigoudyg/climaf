@@ -173,10 +173,10 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertFalse(self.my_period.includes(self.my_period_3))
 
     def test_intersects(self):
-        self.assertEqual(repr(self.my_period_6.intersects(self.my_period_3)), repr(self.my_period_3))
-        self.assertEqual(repr(self.my_period.intersects(self.my_period_5)), repr(self.my_period_5))
-        self.assertEqual(repr(self.my_period_6.intersects(self.my_period)), repr(self.my_period))
-        self.assertEqual(repr(self.my_period_2.intersects(self.my_period)), repr(self.my_period_5))
+        self.assertEqual(self.my_period_6.intersects(self.my_period_3), self.my_period_3)
+        self.assertEqual(self.my_period.intersects(self.my_period_5), self.my_period_5)
+        self.assertEqual(self.my_period_6.intersects(self.my_period), self.my_period)
+        self.assertEqual(self.my_period_2.intersects(self.my_period), self.my_period_5)
 
 
 class InitPeriodTests(unittest.TestCase):

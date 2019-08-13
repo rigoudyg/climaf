@@ -37,6 +37,22 @@ class cperiod():
                 self.pattern = pattern
 
     #
+    def __eq__(self, other):
+        test = True
+        if self.fx != other.fx:
+            test = False
+        if self.pattern != other.pattern:
+            test = False
+        start_self = getattr(self, "start", None)
+        start_other = getattr(other, "start", None)
+        if start_self != start_other:
+            test = False
+        stop_self = getattr(self, "stop", None)
+        stop_other = getattr(other, "stop", None)
+        if stop_self != stop_other:
+            test = False
+        return test
+    #
     def __repr__(self):
         return self.pr()
         # return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
