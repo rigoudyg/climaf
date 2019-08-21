@@ -15,10 +15,16 @@ rm -rf $PWD/htmlcov
 if [[ "$report_ensemble" == "1" ]]; then
     for module in $run_modules; do
         coverage run --parallel-mode --source=climaf,scripts "test_${module}.py"
+        if [[ $? -neq 0 ]] ; then
+            exit 1
+        fi
     done
 else
     for module in $run_modules; do
         coverage run --parallel-mode --source="climaf.${module}" "test_${module}.py"
+        if [[ $? -neq 0 ]] ; then
+            exit 1
+        fi
     done
 fi
 
