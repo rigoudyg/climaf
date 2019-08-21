@@ -720,8 +720,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     """
 
     # cache directories
-    rep = os.path.expanduser(
-        cachedirs[0])  # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
+    # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
+    rep = os.path.expanduser(cachedirs[0])
 
     # command for research on size/age/access
     command = ""

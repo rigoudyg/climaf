@@ -9,6 +9,8 @@ import os
 import unittest
 from datetime import datetime, timedelta
 
+from tests.tools_for_tests import remove_dir_and_content
+
 from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_periods_list, merge_periods, \
     intersect_periods_list, lastyears, firstyears
 
@@ -137,6 +139,11 @@ class CreatePeriodGenericTests(unittest.TestCase):
 
     def test_end(self):
         self.assertEqual(self.my_period.end, self.my_date_2)
+
+    def test_eq(self):
+        self.assertTrue(self.my_period == self.my_period_1)
+        self.assertFalse(cperiod("fx") == self.my_period)
+        self.assertTrue(self.my_period_3 != self.my_period_4)
 
     @unittest.expectedFailure
     def test_repr(self):
@@ -375,8 +382,10 @@ class FirstYearsTest(unittest.TestCase):
 if __name__ == '__main__':
     # Jump into the test directory
     tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_period"])
+    remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
     unittest.main()
+    remove_dir_and_content(tmp_directory)

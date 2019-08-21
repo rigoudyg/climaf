@@ -459,8 +459,6 @@ def fline(func, farg, sargs, title=None,
         rep += cell(lab, rfig, thumbnail, hover, dirname)
     rep += close_line()
     return rep
-
-
 # cinstantiate("index.html","inst.html")
 
 
@@ -516,8 +514,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         return rep
 
 
-# TODO : a function which copy all images referenced by the index, and modifies
-# the index accordingly (for 'saving' the image package)
+# TODO : a function which copy all images referenced by the index, and modifies the index accordingly (for 'saving' the image package)
 def compareCompanion():
     """ Includes the compareCompanion Javascript functionality
         developed by Patrick Brockmann (patrick.brockmann@lsce.ipsl.fr)
@@ -538,7 +535,6 @@ def start_line(title):
     tmpindex += open_table()
     tmpindex += open_line()
     return tmpindex
-
 
 
 def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
@@ -567,9 +563,6 @@ def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
              print '!! Plotting failed ',myplot
              print "set clog('debug') and safe_mode=False to identify where the plotting failed"
              return blank_cell
-
-
-
 
 
 class Climaf_Html_Error(Exception):

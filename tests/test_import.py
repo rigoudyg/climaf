@@ -9,6 +9,8 @@ import os
 import unittest
 import importlib
 
+from tests.tools_for_tests import remove_dir_and_content
+
 
 testmodules = [
     "climaf",
@@ -41,7 +43,9 @@ class ImportTests(unittest.TestCase):
 if __name__ == '__main__':
     # Jump into the test directory
     tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_import"])
+    remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
+    remove_dir_and_content(tmp_directory)
