@@ -61,15 +61,14 @@ if atCerfacs:
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
-cproject('ref_era5cerfacs', ('frequency', 'monthly'), ('product', '*'), ('period', '1979-2018'), 'obs_type', 'table',
-         ensemble=['product'])
+cproject('ref_era5cerfacs', ('frequency', 'monthly'), 'product', ('period', '1979-2018'), 'obs_type', 'table',
+         separator='%')
 cfreqs('ref_era5cerfacs', {'monthly': 'mon', 'daily': 'day'})
 
 cdef('variable', '*', project='ref_era5cerfacs')
-cdef('product', '*', project='ref_era5cerfacs')
-cdef('simulation', 'refproduct', project='ref_era5cerfacs')
+cdef('product', 'ERA5', project='ref_era5cerfacs')
 cdef('period', '1979-2018', project='ref_era5cerfacs')
-cdef('obs_type', '*', project='ref_era5cerfacs')
+cdef('obs_type', 'reanalysis', project='ref_era5cerfacs')
 cdef('table', '*', project='ref_era5cerfacs')
 
 # Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
@@ -78,5 +77,7 @@ cdef('table', '*', project='ref_era5cerfacs')
 calias(project='ref_era5cerfacs', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 
 if root:
-    pattern1 = root + "${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
+    pattern1 = root + "${variable}_${table}_${obs_type}_${product}_${PERIOD}.nc"
     dataloc(project='ref_era5cerfacs', organization='generic', url=[pattern1])
+
+#calias("ref_era5cerfacs","tas",offset=273.15)
