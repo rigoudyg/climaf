@@ -11,6 +11,8 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
+from climaf.driver import cfile
+from climaf.classes import ds
 from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub, iplot, getLevs, vertical_average, \
     implot, diff_regrid, diff_regridn, tableau, annual_cycle, annual_cycle_fast, clim_average, clim_average_fast, \
     summary, projects, lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
@@ -21,7 +23,6 @@ class CscalarTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not implemented")
     def test_cscalar(self):
-        # TODO: Implement the test
         pass
 
 

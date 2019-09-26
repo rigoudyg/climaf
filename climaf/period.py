@@ -38,18 +38,18 @@ class cperiod():
 
     #
     def __eq__(self, other):
-        test = True
-        if self.fx != other.fx:
+        test = not other == "*" and isinstance(other, cperiod)
+        if test and self.fx != other.fx:
             test = False
-        if self.pattern != other.pattern:
+        if test and self.pattern != other.pattern:
             test = False
         start_self = getattr(self, "start", None)
         start_other = getattr(other, "start", None)
-        if start_self != start_other:
+        if test and start_self != start_other:
             test = False
         stop_self = getattr(self, "stop", None)
         stop_other = getattr(other, "stop", None)
-        if stop_self != stop_other:
+        if test and stop_self != stop_other:
             test = False
         return test
     #

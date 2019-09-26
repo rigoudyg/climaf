@@ -286,10 +286,6 @@ class ClistTests(unittest.TestCase):
                     du_list_sort[n] = (du_list_sort[n][0], "%6.1f%s" % (flt, unit[i]))
 
 
-
-
-
-
 class ClsTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "The test is not written")

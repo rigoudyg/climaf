@@ -316,7 +316,7 @@ def processDatasetArgs(**kwargs):
             errmsg += " " + e
     if errmsg != "":
         raise Climaf_Classes_Error(errmsg)
-    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*",]:
+    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*", ]:
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
     return attval
 
