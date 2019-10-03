@@ -1,0 +1,245 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+Rewrite of mcdo.sh
+"""
+
+
+import argparse
+import tempfile
+import re
+import os
+import subprocess
+import time
+import glob
+import shutil
+
+from climaf.site_settings import onCiclad
+from climaf.anynetcdf import ncf
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input_files", action="append")
+    parser.add_argument("--operator", help="Operator to be applied")
+    parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
+                        help="If True, the operator is applied after merge time. If false, it is applied before.")
+    parser.add_argument("--output_file", help="Name of the output file")
+    parser.add_argument("--var", help="Variable to be considered")
+    parser.add_argument("--period", help="Period to be considered")
+    parser.add_argument("--region", type=list,
+                        help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
+    parser.add_argument("--alias", help="Alias to be used")
+    parser.add_argument("--units", help="Units of the variable")
+    parser.add_argument("--vm", help="")
+
+    args = parser.parse_args()
+    return dict(input_files=args.input_files, operator=args.operator, output_file=args.output_file,
+                variable=args.variable, period=args.period, region=args.region, alias=args.alias, units=args.units,
+                vm=args.vm,  apply_operator_after_merge=args.apply_operator_after_merge)
+
+
+# Define several auxiliary functions
+clim_timefix_pattern = re.compile(r'IGCM_OUT.*_SE_.*(?P<value>\d{4})_\d{4}_1M.*nc')
+nemo_fix_pattern_mon = re.compile(r'.*1m.*grid_T_table2\.2\.nc')
+nemo_fix_pattern_day = re.compile(r'.*1d.*grid_T_table2\.2\.nc')
+nemo_fix_pattern = re.compile(r'.*1[m|d].*grid_T_table2\.2\.nc')
+aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
+nemo_coordinates_pattern = re.compile(r'coord.*t_ave_01month|t_ave_00086400')
+
+
+def clim_timefix(file_to_treat):
+    # Check if the time axis for a data file should be fixed, based solely on its name,
+    # and hence echoes the relevant CDO syntax (to be inserted in a CDO pipe) for fixing it
+    # Case for IPSL Seasonal cycle files, such as
+    # ... IGCM_OUT/IPSLCM6/DEVT/piControl/O1T04V04/ICE/Analyse/SE/O1T04V04_SE_1850_1859_1M_icemod.nc
+    clim_timefix_match = clim_timefix_pattern.match(file_to_treat)
+    if clim_timefix_match:
+        return "-settaxis,{}-01-16:12:00:00,1mon".format(clim_timefix_match.groupdict()["value"])
+    else:
+        return None
+
+
+def nemo_timefix(file_to_treat, tmp_dir):
+    # Rename alternate time_counter variables to 'time_counter' for some kind
+    # of Nemo outputs  (Nemo 3.2 had a bug when using IOIPSL ...)
+    # Echoes the name of a file with renamed variable (be it a modified file or a copy)
+    # Creates an alternate file in $tmp if no write permission and renaming is actually useful
+    nemo_fix_match = nemo_fix_pattern.match(file_to_treat)
+    if nemo_fix_match:
+        rep = subprocess.check_output(["ncdump", "-h", file_to_treat])
+        rep = rep.split("\n")
+        if any([nemo_coordinates_pattern.match(line) for line in rep]):
+            if nemo_fix_pattern_mon.match(file_to_treat):
+                var2rename = "t_ave_01month"
+                vars2d = ["pbo", "sos", "tos", "tossq", "zos", "zoss", "zossq", "zosto"]
+                vars3d = ["rhopoto", "so", "thetao", "thkcello", "rhopoto"]
+            elif nemo_fix_pattern_day.match(file_to_treat):
+                var2rename = "t_ave_00086400"
+                vars2d = ["tos", "tossq"]
+                vars3d = list()
+            out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
+            if os.path.isfile(out):
+                os.remove(out)
+            if subprocess.check_output(["ncdump", "-k", file_to_treat]) == "classic":
+                temp = file_to_treat
+            else:
+                temp = out
+                subprocess.check_output(["ncks", "-3", file_to_treat, temp])
+            subprocess.check_output(["ncrename", "-d", ".{},time_counter".format(var2rename),
+                                     "-v {},time_counter".format(var2rename), temp, out])
+            for lvar in vars2d:
+                subprocess.check_output(["ncatted", "-a", "coordinates,{},m,c,nav_lat nav_lon".format(lvar), out])
+            for lvar in vars3d:
+                subprocess.check_output(["ncatted", "-a", "coordinates,{},m,c,depth nav_lat nav_lon".format(lvar), out])
+
+    else:
+        return file_to_treat
+
+
+def aladin_coordfix(file_to_treat, tmp_dir, filevar):
+    # Rename attribute 'coordinates' of file variable $filevar to 'latitude longitude'
+    # for some kind of ALADIN outputs which have 'lat lon' (or 'lon lat') for attribute 'coordinates'
+    # of file variable (particularly for outputs created with post-treatment tool called 'postald')
+    # Echoes the name of a file with renamed variable attribute (be it a modified file or a copy)
+    # Creates an alternate file in $tmp if no write permission and renaming is actually useful
+    if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not(re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
+                                                              not(re.compile(r".*MED-11.*.nc").match(file_to_treat))):
+        rep = subprocess.check_output(["ncdump", "-h", file_to_treat])
+        rep = rep.split("\n")
+        if any([aladin_coordinates_pattern.match(line) for line in rep]):
+            out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
+            if os.path.isfile(out):
+                os.remove(out)
+            subprocess.check_output(["ncks", "-3", file_to_treat, out])
+            subprocess.check_output(["ncatted", "-a coordinates,{},o,c,'latitude longitude'".format(filevar), out])
+            if os.access(file_to_treat, os.W_OK):
+                os.remove(file_to_treat)
+                shutil.move(out, file_to_treat)
+                return file_to_treat
+            else:
+                return out
+    else:
+        return file_to_treat
+
+
+def call_subprocess(command):
+    print "Time at launch", time.time()
+    subprocess.run(command)
+    print "Time at end", time.time()
+
+
+def remove_dir_and_content(path_to_treat):
+    if os.path.exists(path_to_treat):
+        if os.path.isdir(path_to_treat):
+            contents = glob.glob(os.path.sep.join([path_to_treat, "*"]))
+            for content in contents:
+                remove_dir_and_content(content)
+        else:
+            os.remove(path_to_treat)
+
+
+def main(input_files, output_file, variable=None, alias=None, region=None, units=None, vm=None, period=None,
+         operator=None,  apply_operator_after_merge=None):
+    # Create a temporary directory
+    tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
+    os.chdir(tmp)
+
+    # Initialize cdo commands
+    cdo_commands_before_merge = list()
+    cdo_commands_after_merge = list()
+
+    # Find out which command must be used for cdo
+    # For the time being, at most sites, must use NetCDF3 file format chained CDO
+    # operations because NetCDF4 is not threadsafe there
+    if onCiclad:
+        init_cdo_command = "cdo -O"
+    else:
+        init_cdo_command = "cdo -O -f nc"
+
+    # If needed, select the variable first or compute it if it is an alias
+    if alias is not None:
+        if variable is None:
+            raise Exception("Units can be used only if variable is specified")
+        else:
+            var, filevar, scale, offset = alias.split(", ")
+            if var != variable:
+                raise Exception("Incoherence between variable and aliased variable:", variable, var)
+            else:
+                cdo_commands_before_merge.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
+                cdo_commands_before_merge.append("-selname,{}".format(var))
+    elif variable is not None:
+        var = variable
+        file_var = var
+        cdo_commands_before_merge.append("-selname,{}".format(var))
+
+    # Then, if needed, select the domain
+    if region is not None:
+        latmin, latmax, lonmin, lonmax = region.split(",")
+        cdo_commands_before_merge.append("-sellonlatbox,{},{},{},{}".format(lonmin, lonmax, latmin, latmax))
+
+    # Then, if needed, change the units
+    if units is not None:
+        if variable is None:
+            raise Exception("Units can be used only if variable is specified")
+        else:
+            cdo_commands_before_merge.append("-setattribute,{}@units={}".format(variable, units.replace(" ", "*")))
+
+    # Then, if needed, deal with missing values
+    if vm is not None:
+        cdo_commands_before_merge.append("-setctomiss,{}".format(vm))
+
+    # Then, deal with merge time
+    if len(input_files) > 1:
+        cdo_commands_after_merge.append("-mergetime")
+
+    # Then deal with date selection
+    if period is not None:
+        seldate = "-seldate,{}".format(period)
+        clim_time_fix =  clim_timefix(input_files[0])
+        if clim_time_fix is not None:
+            seldate = " ".join([seldate, clim_time_fix])
+        cdo_commands_after_merge.append(seldate)
+
+    # Then, if needed, deal with the operator
+    if operator is not None:
+        if apply_operator_after_merge:
+            cdo_commands_after_merge.append("-{}".format(operator))
+        else:
+            cdo_commands_before_merge.append("-{}".format(operator))
+
+    files_to_treat_before_merging = list()
+    for a_file in input_files:
+        if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
+            files_to_treat_before_merging.append(nemo_timefix(a_file))
+        if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
+            files_to_treat_before_merging.append(aladin_coordfix(a_file), tmp, filevar)
+        files_to_treat_before_merging.append(a_file)
+
+    files_to_treat_after_merging = list()
+    for a_file in files_to_treat_before_merging:
+        tmp_file_name = a_file.split(os.path.sep)[-1]
+        tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+        while os.path.exists(tmp_file_path):
+            tmp_file_name = "_".join(["tmp", tmp_file_name])
+            tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+        if not os.path.isfile(tmp_file_name):
+            cdo_command = " ".join([init_cdo_command, ] + reversed(cdo_commands_before_merge) + [a_file, tmp_file_name])
+            call_subprocess(cdo_command)
+            if not os.path.isfile(tmp_file_path):
+                raise Exception("Could not create the file ")
+            files_to_treat_after_merging.append(tmp_file_path)
+        else:
+            raise Exception("Should not pass here...")
+
+    cdo_command = " ".join([init_cdo_command, ] + reversed(cdo_commands_after_merge) + files_to_treat_after_merging +
+                           [output_file, ])
+    call_subprocess(cdo_command)
+
+    remove_dir_and_content(tmp)
+
+
+if __name__ == "__main__":
+    kwargs = parse_args()
+    main(**kwargs)

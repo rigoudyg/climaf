@@ -18,6 +18,9 @@ import getpass
 import netrc
 from dateutil import tz
 from Tkinter import *
+import argparse
+from collections import defaultdict
+import mcdo
 
 # Climaf
 from climaf import __path__ as cpath, remote_cachedir
@@ -26,34 +29,46 @@ from climaf.dataloc import remote_to_local_filename
 
 scriptpath = cpath[0] + "/../scripts/"
 
-operator = sys.argv[1]
-out = sys.argv[2]
-var = sys.argv[3]
-period = sys.argv[4]
-region = sys.argv[5]
-alias = sys.argv[6]
-units = sys.argv[7]
-vm = sys.argv[8]
-files = sys.argv[9:]
+parser = argparse.ArgumentParser()
+parser.add_argument("input_files", action="append")
+parser.add_argument("--operator", help="Operator to be applied")
+parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
+                    help="If True, the operator is applied after merge time. If false, it is applied before.")
+parser.add_argument("--output_file", help="Name of the output file")
+parser.add_argument("--var", help="Variable to be considered")
+parser.add_argument("--period", help="Period to be considered")
+parser.add_argument("--region", type=list,
+                    help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
+parser.add_argument("--alias", help="Alias to be used")
+parser.add_argument("--units", help="Units of the variable")
+parser.add_argument("--vm", help="")
+
+args = parser.parse_args()
+
+operator = args.operator
+out = args.output_file
+var = args.var
+period = args.period
+region = args.region
+alias = args.alias
+units = args.units
+vm = args.vm
+files = args.input_file
 
 # Dictionary of input files for each pair (host,user)
-host_user = dict()
+host_user = defaultdict(list)
 
 for i in files:
-    if len(i.split(":")) == 3:
+    infos = i.split(":")
+    if len(infos) == 3:
         k = 1
     else:
         k = 0
-    host_key = i.split(":")[k].split("@")[-1]
-    user_key = i.split(":")[k].split("@")[0]
-    if re.findall("@", i.split(":")[k]):
-        if (host_key, user_key) not in host_user:
-            host_user[(host_key, user_key)] = []
-        host_user[(host_key, user_key)].append(i.split(":")[-1])
+    if '@' in infos[k]:
+        user_key, host_key = infos[k].split("@")
+        host_user[(host_key, user_key)].append(infos[-1])
     else:
-        if (i.split(":")[k], '') not in host_user:
-            host_user[(i.split(":")[k], '')] = []
-        host_user[(i.split(":")[k], '')].append(i.split(":")[-1])
+        host_user[(infos[k], '')].append(infos[-1])
 
 # 'dynamic_host' is an host with incremental files.
 dynamic_host = ['hendrix', 'beaufix']
@@ -66,18 +81,14 @@ dynamic_host = ['hendrix', 'beaufix']
 # Dictionary for each pair (host,user) of:
 # - input files not found in cache for 'not-dynamic' host, so to retrieve;
 # - and all input files for 'dynamic' host
-host_user2 = dict()
+host_user2 = defaultdict(list)
 
 for host, username in host_user:
     if host not in dynamic_host:
         for ffile in host_user[host, username]:
             if not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile):
-                if (host, username) not in host_user2:
-                    host_user2[(host, username)] = []
                 host_user2[(host, username)].append(ffile)
     else:
-        if (host, username) not in host_user2:
-            host_user2[(host, username)] = []
         host_user2[(host, username)] = host_user[(host, username)]
 
 if not os.path.exists(os.path.expanduser(remote_cachedir)):
@@ -205,12 +216,8 @@ for host, username in host_user2:
 
     connect.quit()
 
-loc_files = []
-for i in files:
-    loc_files.append(remote_to_local_filename(i))
 
-args = [scriptpath + "mcdo.sh", "%s" % operator, "%s" % out, "%s" % var, "%s" % period, "%s" % region, "%s" % alias,
-        "%s" % units, "%s" % vm, "%s" % ' '.join(loc_files)]
+loc_files = [remote_to_local_filename(url) for url in files]
 
 
 class Climaf_Script_Error(Exception):
@@ -224,6 +231,8 @@ class Climaf_Script_Error(Exception):
 
 
 try:
+    mcdo.main(operator=operator, output_file=out, variable=var, period=period, region=region, alias=alias, units=units,
+              vm=vm, input_files=loc_files)
     comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print "Remote files %s were saved as local files as %s" % (files, loc_files)
 except:
