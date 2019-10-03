@@ -91,7 +91,7 @@ for file in $files ; do
     #
     vfiles+=$file" "
 done
-vfiles=${vfiles/% /} # Discard last space character becasue CDO cannot !
+vfiles=${vfiles/% /} # Discard last space character because CDO cannot !
 
 time $CDO $ops "$vfiles" $out
 
