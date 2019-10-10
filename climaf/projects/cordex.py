@@ -84,3 +84,30 @@ if root:
 
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CORDEX-Adjust', var, var + 'Adjust')
+
+    # BCCORDEX
+    project='BCCORDEX'
+    #
+    #/bdd/BCCORDEX/prAdjust/EOBS/prAdjust_EUR-11_MPI-M-MPI-ESM-LR_rcp85_r1i1p1_MPI-CSC-REMO2009_v1-LSCE-IPSL-CDFt-EOBS10-1971-2005_day_20910101-20951231.nc
+    pattern = '/bdd/BCCORDEX/${variable}/${correction_reference}/${variable}_${CORDEX_domain}_${GCM}_${experiment}_${realization}_${RCM}_${bias_correction}_${frequency}_${period}.nc'
+    cproject('BCCORDEX', 'GCM', 'RCM', 'CORDEX_domain', 'bias_correction', 'correction_reference',
+             'frequency', 
+             'realization', 'experiment', ensemble=['GCM', 'RCM', 'realization'],
+             separator='%')
+    dataloc(project='BCCORDEX', url=pattern)
+    cdef('bias_correction', '*', project='BCCORDEX')
+    cdef('correction_reference', '*', project='BCCORDEX')
+    cdef('experiment', 'rcp85', project='BCCORDEX')
+    #
+    cfreqs(project, {'daily': 'day'})
+    #    cdef('version', 'latest', project=project)
+    project='BCCORDEX'
+    cdef('realization', 'r1i1p1', project=project)
+    cdef('frequency', '*', project=project)
+    cdef('GCM', '*', project=project)
+    cdef('CORDEX_domain', '*', project=project)
+    cdef('RCM', '*', project=project)
+    # -- Overwrite root only for CORDEX-Adjust
+    for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
+        calias('BCCORDEX', var, var + 'Adjust')
+
