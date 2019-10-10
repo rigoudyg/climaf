@@ -61,8 +61,9 @@ if atCerfacs:
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
-cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'clim_period_begin', 'clim_period_end', 'table', 'obs_type',
+cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type', 'clim_period_begin', 'clim_period_end', 
          ensemble=['product'], separator='%')
+
 cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
 
 cdef('variable', '*', project='ref_climatos')
@@ -76,21 +77,21 @@ cdef('table', '*', project='ref_climatos')
 cdef('obs_type', '*', project='ref_climatos')
 
 if root:
-    # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*mon_${product}_*${clim_period}-clim.nc"
-    # pattern2=root+"climatos/*/${frequency}/${variable}/${product}/ac/${variable}_*${frequency}*_${product}_${clim_period}-clim.nc"
     pattern2 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
                       "${variable}_${table}_${product}_${obs_type}_${clim_period}-clim.nc"
-    pattern3 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
-                      "${variable}_${table}_${product}_${clim_period}-clim.nc"
+    #pattern3 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
+    #                  "${variable}_${table}_${product}_${clim_period}-clim.nc"
     pattern4 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
                       "${variable}_${table}_${product}_${clim_period_begin}_{clim_period_end}-clim.nc"
-    dataloc(project='ref_climatos', organization='generic', url=[pattern2, pattern3, pattern4])
+    dataloc(project='ref_climatos', organization='generic', url=pattern2)
+    #dataloc(project='ref_climatos', organization='generic', url=pattern3)
+    dataloc(project='ref_climatos', organization='generic', url=pattern4)
 
 ##########################################################################################
 
 
 cproject('ref_ts', ('frequency', 'monthly'), ('product', '*'), ('period', '1900-2050'), 'obs_type', 'table',
-         ensemble=['product'])
+         ensemble=['product'], separator='%')
 cfreqs('ref_ts', {'monthly': 'mo', 'daily': 'day'})
 
 cdef('variable', '*', project='ref_ts')
