@@ -35,9 +35,12 @@ def load_standard_operators():
                                      '"${alias}" "${units}" "${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
+    #cscript('ccdo',
+    #        scriptpath + 'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
+    #                     '"${missing}" ${ins}')
     cscript('ccdo',
-            scriptpath + 'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}')
+            scriptpath + 'mcdo.sh "${operator}" "${out}" "" "" "" "" "" '
+                         '"" ${ins}')
     #
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
@@ -57,33 +60,44 @@ def load_standard_operators():
     cscript('divide', 'cdo div ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
-    cscript('space_average',
-            scriptpath + 'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}',
-            commuteWithTimeConcatenation=True)
+    #cscript('space_average',
+    #        scriptpath + 'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
+    #                     '"${missing}" ${ins}',
+    #        commuteWithTimeConcatenation=True)
     cscript('space_average_fast',
             scriptpath + 'mcdo.sh fldmean "${out}" "" "" "" "" "" '
                          '"" ${ins}',
             commuteWithTimeConcatenation=True)
+    cscript('space_average',
+            scriptpath + 'mcdo.sh fldmean "${out}" "" "" "" "" "" '
+                         '"" ${ins}',
+            commuteWithTimeConcatenation=True)
     #
+    #cscript('time_average',
+    #        scriptpath + 'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
+    #                     '"${missing}" ${ins}',
+    #        commuteWithSpaceConcatenation=True)
+    #cscript('time_average_fast',
+    #        scriptpath + 'mcdo.sh timmean  "${out}" "" "" "" "" "" '
+    #                     '"" ${ins}',
+    #        commuteWithSpaceConcatenation=True)
     cscript('time_average',
-            scriptpath + 'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}',
-            commuteWithSpaceConcatenation=True)
-    cscript('time_average_fast',
             scriptpath + 'mcdo.sh timmean  "${out}" "" "" "" "" "" '
                          '"" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
+    #cscript('llbox',
+    #        scriptpath + 'mcdo.sh ""  "${out}" "${var}" "${period_iso}" "${latmin},${latmax},${lonmin},${lonmax}" '
+    #                     '"${alias}" "${units}" "${missing}" ${ins}',
+    #        commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #cscript('llbox_fast',
+    #        scriptpath + 'mcdo.sh ""  "${out}" "" "" "${latmin},${latmax},${lonmin},${lonmax}" '
+    #                     '"" "" "" ${ins}',
+    #        commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     cscript('llbox',
-            scriptpath + 'mcdo.sh ""  "${out}" "${var}" "${period_iso}" "${latmin},${latmax},${lonmin},${lonmax}" '
-                         '"${alias}" "${units}" "${missing}" ${ins}',
-            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-    cscript('llbox_fast',
             scriptpath + 'mcdo.sh ""  "${out}" "" "" "${latmin},${latmax},${lonmin},${lonmax}" '
                          '"" "" "" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-
     #
     cscript('regrid',
             scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${option}',
@@ -273,6 +287,8 @@ def load_standard_operators():
             'python ' + scriptpath + 'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
                                      '--yvariable ${var_2} --outfile ${out}',
             _var='slope')
+    # RMSE XYT
+    cscript('rmse_xyt','cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
     #
     # ml2pl (only on Ciclad)
     if onCiclad:
