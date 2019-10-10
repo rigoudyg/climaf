@@ -19,10 +19,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import datetime
 import numpy as np
-from netCDF4 import Dataset, num2date
-
+from netCDF4 import Dataset
 from climaf.site_settings import atCerfacs
 if atCerfacs:
     import netcdftime
@@ -31,7 +29,7 @@ else:
         from netCDF4 import netcdftime
     except:
         import netcdftime
-
+import datetime
 
 # -- Initialize the parser
 # --------------------------------------------------------------------------------------------------
@@ -221,6 +219,7 @@ if args.horizontal_lines_values:
 
 
 # -- Loop on the netcdf files
+from netCDF4 import Dataset,netcdftime,num2date
 
 handles_for_legend = []
 dataset_number = 0
@@ -248,6 +247,8 @@ for pathfilename in filenames_list:
       tvalue = num2date(nctime,units = t_unit,calendar = t_cal)
       datevar = []
       for elt in tvalue:
+          print 'elt = ',elt
+          print 'dir(datetime) = ',dir(datetime)
           if not isinstance(elt, datetime.datetime):
              if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or isinstance(elt, netcdftime._netcdftime.Datetime360Day):
                 strdate = str.split(elt.strftime(),' ')[0]
