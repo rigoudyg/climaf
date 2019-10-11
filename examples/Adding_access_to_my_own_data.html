@@ -11907,10 +11907,50 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 <div class="prompt"></div>
 
 
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;LC debug :&#39;, False)
+CliMAF install =&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_1.2.12
+python =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/python
+---
+Required softwares to run CliMAF =&gt; you are using the following versions/installations:
+ncl 6.3.0 =&gt; /opt/ncl-6.3.0/bin/ncl
+cdo 1.9.6 =&gt; /opt/nco/1.9/bin/cdo
+nco (ncks) 4.5.2 =&gt; /opt/nco-4.5.2/bin/ncks
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Climaf version = 1.2.8
-Cache directory set to : /prodigfs/ipslfs/dods/jservon/climafcache_test (use $CLIMAF_CACHE if set) 
-Cache directory for remote data set to : /prodigfs/ipslfs/dods/jservon/climafcache_test/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
+<pre>CliMAF version = 1.2.12
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ncdump 4.4.1.1 =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump
+---
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
+Cache directory for remote data set to : /data/jservon/climafcache/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
 Available macros read from ~/.climaf.macros are : []
 </pre>
 </div>
@@ -12114,7 +12154,7 @@ stl1.1981.asmei.GLOBAL_075.nc
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;climaf.dataloc.dataloc instance at 0x7f9e3a38b098&gt;</pre>
+<pre>&lt;climaf.dataloc.dataloc instance at 0x2b9925f8aea8&gt;</pre>
 </div>
 
 </div>
@@ -12133,7 +12173,7 @@ stl1.1981.asmei.GLOBAL_075.nc
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Test if it works with ds()</span>
@@ -12168,7 +12208,7 @@ stl1.1981.asmei.GLOBAL_075.nc
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[8]:</div>
+<div class="prompt output_prompt">Out[7]:</div>
 
 
 
@@ -12352,7 +12392,7 @@ stdout and stderr of script call :
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1">### Let&#39;s say that now you would like to access your data with standard variable and frequency names, and specify a default value</span>
@@ -12388,7 +12428,7 @@ stdout and stderr of script call :
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># We can now access the same files using the aliases</span>
@@ -12422,7 +12462,7 @@ stdout and stderr of script call :
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[12]:</div>
+<div class="prompt output_prompt">Out[9]:</div>
 
 
 
@@ -12469,7 +12509,7 @@ stdout and stderr of script call :
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1">## -- Declare a CMIP5 &#39;extent&#39; CliMAF project = extracts a period covering historical and a scenario</span>
@@ -12517,7 +12557,7 @@ stdout and stderr of script call :
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;CMIP5_extent&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;1990-2010&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tas&#39;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="s1">&#39;Amon&#39;</span><span class="p">)</span>
@@ -12549,33 +12589,48 @@ ACCESS1-3
 /prodigfs/project/CMIP5/output/CSIRO-BOM/ACCESS1-3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_ACCESS1-3_historical_r1i1p1_185001-200512.nc
 /prodigfs/project/CMIP5/output/CSIRO-BOM/ACCESS1-3/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_ACCESS1-3_rcp85_r1i1p1_200601-210012.nc
 --
+BNU-ESM
+/prodigfs/project/CMIP5/output/BNU/BNU-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_BNU-ESM_rcp85_r1i1p1_200601-210012.nc
+--
+CCSM4
+/prodigfs/project/CMIP5/output/NCAR/CCSM4/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CCSM4_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/NCAR/CCSM4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CCSM4_rcp85_r1i1p1_200601-210012.nc
+--
+CESM1-BGC
+/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-BGC_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-BGC_rcp85_r1i1p1_200601-210012.nc
+--
+CESM1-CAM5
+/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-CAM5_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-CAM5_rcp85_r1i1p1_200601-210012.nc
+--
 CESM1-CAM5-1-FV2
 /prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5-1-FV2/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-CAM5-1-FV2_rcp85_r1i1p1_200601-209912.nc
 --
-IPSL-CM5B-LR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5B-LR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5B-LR_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5B-LR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5B-LR_rcp85_r1i1p1_200601-210012.nc
+CMCC-CESM
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_199001-199412.nc
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_199501-199912.nc
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_200001-200412.nc
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_200501-200512.nc
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_rcp85_r1i1p1_200601-201512.nc
 --
-FIO-ESM
-/prodigfs/project/CMIP5/output/FIO/FIO-ESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FIO-ESM_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/FIO/FIO-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FIO-ESM_rcp85_r1i1p1_200601-210012.nc
+CMCC-CM
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CM_rcp85_r1i1p1_200601-201012.nc
 --
 CMCC-CMS
 /prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CMS_historical_r1i1p1_199001-199912.nc
 /prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CMS_historical_r1i1p1_200001-200512.nc
 /prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CMS_rcp85_r1i1p1_200601-200912.nc
 /prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CMS_rcp85_r1i1p1_201001-201912.nc
+/prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CMS_rcp85_r1i1p1_201001-201912.nc
 --
-SP-CCSM4
-/prodigfs/project/CMIP5/output/DOE-COLA-CMMAP-GMU/SP-CCSM4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_SP-CCSM4_rcp85_r1i1p1_200601-210012.nc
+CNRM-CM5
+/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_historical_r1i1p1_195001-200512.nc
+/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_rcp85_r1i1p1_200601-205512.nc
 --
-MIROC-ESM
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM_rcp85_r1i1p1_200601-210012.nc
---
-HadGEM2-ES
-/prodigfs/project/CMIP5/output/MOHC/HadGEM2-ES/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc
-/prodigfs/project/CMIP5/output/MOHC/HadGEM2-ES/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-ES_rcp85_r1i1p1_200512-203011.nc
+CSIRO-Mk3-6-0
+/prodigfs/project/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CSIRO-Mk3-6-0_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CSIRO-Mk3-6-0_rcp85_r1i1p1_200601-210012.nc
 --
 CanESM2
 /prodigfs/project/CMIP5/output/CCCma/CanESM2/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CanESM2_historical_r1i1p1_185001-200512.nc
@@ -12585,70 +12640,9 @@ FGOALS-s2
 /prodigfs/project/CMIP5/output/LASG-IAP/FGOALS-s2/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FGOALS-s2_historical_r1i1p1_185001-200512.nc
 /prodigfs/project/CMIP5/output/LASG-IAP/FGOALS-s2/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FGOALS-s2_rcp85_r1i1p1_200601-210012.nc
 --
-MPI-ESM-MR
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-MR_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-MR_rcp85_r1i1p1_200601-210012.nc
---
-CSIRO-Mk3-6-0
-/prodigfs/project/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CSIRO-Mk3-6-0_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CSIRO-Mk3-6-0_rcp85_r1i1p1_200601-210012.nc
---
-CESM1-BGC
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-BGC_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-BGC_rcp85_r1i1p1_200601-210012.nc
---
-HadGEM2-AO
-/prodigfs/project/CMIP5/output/NIMR-KMA/HadGEM2-AO/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-AO_historical_r1i1p1_186001-200512.nc
-/prodigfs/project/CMIP5/output/NIMR-KMA/HadGEM2-AO/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-AO_rcp85_r1i1p1_200601-210012.nc
---
-inmcm4
-/prodigfs/project/CMIP5/output/INM/inmcm4/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_inmcm4_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/INM/inmcm4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_inmcm4_rcp85_r1i1p1_200601-210012.nc
---
-GISS-E2-R-CC
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_historical_r1i1p1_197601-200012.nc
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_historical_r1i1p1_200101-201012.nc
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_rcp85_r1i1p1_200601-202512.nc
---
-BNU-ESM
-/prodigfs/project/CMIP5/output/BNU/BNU-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_BNU-ESM_rcp85_r1i1p1_200601-210012.nc
---
-CCSM4
-/prodigfs/project/CMIP5/output/NCAR/CCSM4/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CCSM4_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/NCAR/CCSM4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CCSM4_rcp85_r1i1p1_200601-210012.nc
---
-GFDL-ESM2G
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_198601-199012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_199101-199512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_199601-200012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_200101-200512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_rcp85_r1i1p1_200601-201012.nc
---
-CMCC-CM
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CM_rcp85_r1i1p1_200601-201012.nc
---
-MRI-CGCM3
-/prodigfs/project/CMIP5/output/MRI/MRI-CGCM3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-CGCM3_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/MRI/MRI-CGCM3/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-CGCM3_rcp85_r1i1p1_200601-210012.nc
---
-GFDL-ESM2M
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_198601-199012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_199101-199512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_199601-200012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_200101-200512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_rcp85_r1i1p1_200601-201012.nc
---
-NorESM1-M
-/prodigfs/project/CMIP5/output/NCC/NorESM1-M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-M_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/NCC/NorESM1-M/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-M_rcp85_r1i1p1_200601-210012.nc
---
-IPSL-CM5A-MR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-MR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5A-MR_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-MR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5A-MR_rcp85_r1i1p1_200601-210012.nc
---
-IPSL-CM5A-LR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-LR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5A-LR_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-LR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_IPSL-CM5A-LR_rcp85_r1i1p1_200601-230012.nc
+FIO-ESM
+/prodigfs/project/CMIP5/output/FIO/FIO-ESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FIO-ESM_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/FIO/FIO-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_FIO-ESM_rcp85_r1i1p1_200601-210012.nc
 --
 GFDL-CM3
 /prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-CM3_historical_r1i1p1_199001-199412.nc
@@ -12657,65 +12651,100 @@ GFDL-CM3
 /prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-CM3_historical_r1i1p1_200501-200512.nc
 /prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-CM3_rcp85_r1i1p1_200601-201012.nc
 --
-CNRM-CM5
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_historical_r1i1p1_195001-200512.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CNRM-CM5_rcp85_r1i1p1_200601-205512.nc
+GFDL-ESM2G
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_198601-199012.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_199101-199512.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_199601-200012.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_historical_r1i1p1_200101-200512.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2G_rcp85_r1i1p1_200601-201012.nc
+--
+GFDL-ESM2M
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_198601-199012.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_199101-199512.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_199601-200012.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_historical_r1i1p1_200101-200512.nc
+/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GFDL-ESM2M_rcp85_r1i1p1_200601-201012.nc
 --
 GISS-E2-H
 /prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H_historical_r1i1p1_195101-200512.nc
 /prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H_rcp85_r1i1p1_200601-205012.nc
 --
-MIROC-ESM-CHEM
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM-CHEM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM-CHEM_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM-CHEM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM-CHEM_rcp85_r1i1p1_200601-210012.nc
---
-MRI-ESM1
-/prodigfs/project/CMIP5/output/MRI/MRI-ESM1/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-ESM1_historical_r1i1p1_185101-200512.nc
-/prodigfs/project/CMIP5/output/MRI/MRI-ESM1/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-ESM1_rcp85_r1i1p1_200601-210012.nc
---
-NorESM1-ME
-/prodigfs/project/CMIP5/output/NCC/NorESM1-ME/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-ME_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/NCC/NorESM1-ME/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-ME_rcp85_r1i1p1_200601-204412.nc
---
-MIROC5
-/prodigfs/project/CMIP5/output/MIROC/MIROC5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC5_historical_r1i1p1_185001-201212.nc
-/prodigfs/project/CMIP5/output/MIROC/MIROC5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC5_rcp85_r1i1p1_200601-210012.nc
+GISS-E2-H-CC
+/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H-CC_historical_r1i1p1_195101-201012.nc
+/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H-CC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H-CC_rcp85_r1i1p1_200601-205012.nc
 --
 GISS-E2-R
 /prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R_historical_r1i1p1_197601-200012.nc
 /prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R_historical_r1i1p1_200101-200512.nc
 /prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R_rcp85_r1i1p1_200601-202512.nc
 --
+GISS-E2-R-CC
+/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_historical_r1i1p1_197601-200012.nc
+/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_historical_r1i1p1_200101-201012.nc
+/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-R-CC_rcp85_r1i1p1_200601-202512.nc
+--
+HadGEM2-AO
+/prodigfs/project/CMIP5/output/NIMR-KMA/HadGEM2-AO/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-AO_historical_r1i1p1_186001-200512.nc
+/prodigfs/project/CMIP5/output/NIMR-KMA/HadGEM2-AO/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-AO_rcp85_r1i1p1_200601-210012.nc
+--
 HadGEM2-CC
 /prodigfs/project/CMIP5/output/MOHC/HadGEM2-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-CC_historical_r1i1p1_198412-200511.nc
 /prodigfs/project/CMIP5/output/MOHC/HadGEM2-CC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-CC_rcp85_r1i1p1_200512-203011.nc
 --
-GISS-E2-H-CC
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H-CC/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H-CC_historical_r1i1p1_195101-201012.nc
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H-CC/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_GISS-E2-H-CC_rcp85_r1i1p1_200601-205012.nc
+HadGEM2-ES
+/prodigfs/project/CMIP5/output/MOHC/HadGEM2-ES/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc
+/prodigfs/project/CMIP5/output/MOHC/HadGEM2-ES/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_HadGEM2-ES_rcp85_r1i1p1_200512-203011.nc
 --
-CMCC-CESM
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_199001-199412.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_199501-199912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_200001-200412.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_historical_r1i1p1_200501-200512.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CMCC-CESM_rcp85_r1i1p1_200601-201512.nc
+MIROC-ESM
+/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM_rcp85_r1i1p1_200601-210012.nc
 --
-bcc-csm1-1-m
-/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1-m/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1-m_historical_r1i1p1_185001-201212.nc
-/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1-m/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1-m_rcp85_r1i1p1_200601-209912.nc
+MIROC-ESM-CHEM
+/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM-CHEM/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM-CHEM_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM-CHEM/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC-ESM-CHEM_rcp85_r1i1p1_200601-210012.nc
+--
+MIROC5
+/prodigfs/project/CMIP5/output/MIROC/MIROC5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC5_historical_r1i1p1_185001-201212.nc
+/prodigfs/project/CMIP5/output/MIROC/MIROC5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MIROC5_rcp85_r1i1p1_200601-210012.nc
 --
 MPI-ESM-LR
 /prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-LR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-LR_historical_r1i1p1_185001-200512.nc
 /prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-LR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-LR_rcp85_r1i1p1_200601-210012.nc
 --
+MPI-ESM-MR
+/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-MR_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MPI-ESM-MR_rcp85_r1i1p1_200601-210012.nc
+--
+MRI-CGCM3
+/prodigfs/project/CMIP5/output/MRI/MRI-CGCM3/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-CGCM3_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/MRI/MRI-CGCM3/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-CGCM3_rcp85_r1i1p1_200601-210012.nc
+--
+MRI-ESM1
+/prodigfs/project/CMIP5/output/MRI/MRI-ESM1/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-ESM1_historical_r1i1p1_185101-200512.nc
+/prodigfs/project/CMIP5/output/MRI/MRI-ESM1/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_MRI-ESM1_rcp85_r1i1p1_200601-210012.nc
+--
+NorESM1-M
+/prodigfs/project/CMIP5/output/NCC/NorESM1-M/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-M_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/NCC/NorESM1-M/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-M_rcp85_r1i1p1_200601-210012.nc
+--
+NorESM1-ME
+/prodigfs/project/CMIP5/output/NCC/NorESM1-ME/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-ME_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/NCC/NorESM1-ME/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_NorESM1-ME_rcp85_r1i1p1_200601-204412.nc
+--
+SP-CCSM4
+/prodigfs/project/CMIP5/output/DOE-COLA-CMMAP-GMU/SP-CCSM4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_SP-CCSM4_rcp85_r1i1p1_200601-210012.nc
+--
 bcc-csm1-1
 /prodigfs/project/CMIP5/output/BCC/bcc-csm1-1/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1_historical_r1i1p1_185001-201212.nc
 /prodigfs/project/CMIP5/output/BCC/bcc-csm1-1/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1_rcp85_r1i1p1_200601-209912.nc
 --
-CESM1-CAM5
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-CAM5_historical_r1i1p1_185001-200512.nc
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_CESM1-CAM5_rcp85_r1i1p1_200601-210012.nc
+bcc-csm1-1-m
+/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1-m/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1-m_historical_r1i1p1_185001-201212.nc
+/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1-m/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_bcc-csm1-1-m_rcp85_r1i1p1_200601-209912.nc
+--
+inmcm4
+/prodigfs/project/CMIP5/output/INM/inmcm4/historical/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_inmcm4_historical_r1i1p1_185001-200512.nc
+/prodigfs/project/CMIP5/output/INM/inmcm4/rcp85/mon/atmos/Amon/r1i1p1/latest/tas/tas_Amon_inmcm4_rcp85_r1i1p1_200601-210012.nc
 --
 </pre>
 </div>

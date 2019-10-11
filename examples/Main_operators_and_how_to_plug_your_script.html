@@ -11901,8 +11901,28 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 <div class="prompt"></div>
 
 
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;LC debug :&#39;, False)
+CliMAF install =&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_1.2.12
+python =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/python
+---
+Required softwares to run CliMAF =&gt; you are using the following versions/installations:
+ncl 6.3.0 =&gt; /opt/ncl-6.3.0/bin/ncl
+cdo 1.9.6 =&gt; /opt/nco/1.9/bin/cdo
+nco (ncks) 4.5.2 =&gt; /opt/nco-4.5.2/bin/ncks
+ncdump 4.4.1.1 =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump
+---
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Climaf version = 1.2.8
+<pre>CliMAF version = 1.2.12
 Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
 Cache directory for remote data set to : /data/jservon/climafcache/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
 Available macros read from ~/.climaf.macros are : []
@@ -11964,7 +11984,7 @@ Available macros read from ~/.climaf.macros are : []
                <span class="n">period</span><span class="o">=</span><span class="s1">&#39;1980-2000&#39;</span><span class="p">,</span>
                <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                <span class="n">simulation</span><span class="o">=</span><span class="s1">&#39;r1i1p1&#39;</span><span class="p">,</span>
-               <span class="n">version</span><span class="o">=</span><span class="s1">&#39;*&#39;</span>
+               <span class="n">version</span><span class="o">=</span><span class="s1">&#39;latest&#39;</span>
                <span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 <span class="c1"># -- summary() gives the list of files found by ds() and the pairs &#39;facets&#39;:&#39;values&#39; associated with the request</span>
@@ -11985,9 +12005,9 @@ Available macros read from ~/.climaf.macros are : []
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
@@ -12008,11 +12028,11 @@ Available macros read from ~/.climaf.macros are : []
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;*&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;r1i1p1&#39;,
  &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;*&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12055,13 +12075,13 @@ Available macros read from ~/.climaf.macros are : []
 <pre>Help on function clim_average in module climaf.functions:
 
 clim_average(dat, season)
-    Computes climatological averages on the annual cycle of a dataset, on the months 
+    Computes climatological averages on the annual cycle of a dataset, on the months
     specified with &#39;season&#39;, either:
     
     - the annual mean climatology (season =&gt; &#39;ann&#39;,&#39;annual&#39;,&#39;climato&#39;,&#39;clim&#39;,&#39;climatology&#39;,&#39;annual_average&#39;,&#39;anm&#39;)
-    - seasonal climatologies (e.g. season = &#39;DJF&#39; or &#39;djf&#39; to compute the seasonal climatology 
+    - seasonal climatologies (e.g. season = &#39;DJF&#39; or &#39;djf&#39; to compute the seasonal climatology
       over December-January-February; available seasons: DJF, MAM, JJA, SON, JFM, JAS, JJAS
-    - individual monthly climatologies (e.g. season = &#39;january&#39;, &#39;jan&#39;, &#39;1&#39; or 1 to get 
+    - individual monthly climatologies (e.g. season = &#39;january&#39;, &#39;jan&#39;, &#39;1&#39; or 1 to get
       the climatological January)
     - annual maximum or minimum (typically makes sense with the mixed layer depth)
     
@@ -12124,10 +12144,10 @@ clim_average(dat, season)
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;resolve&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">,</span> <span class="n">clim_period</span><span class="o">=</span><span class="s1">&#39;195501-201212&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;resolve&#39;</span><span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
 </pre></div>
 
@@ -12152,13 +12172,15 @@ clim_average(dat, season)
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[8]:</div>
+<div class="prompt output_prompt">Out[5]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>{&#39;clim_period&#39;: &#39;195501-201212&#39;,
+ &#39;clim_period_begin&#39;: &#39;*&#39;,
+ &#39;clim_period_end&#39;: &#39;*&#39;,
  &#39;domain&#39;: &#39;global&#39;,
  &#39;frequency&#39;: &#39;annual_cycle&#39;,
  &#39;obs_type&#39;: &#39;observations&#39;,

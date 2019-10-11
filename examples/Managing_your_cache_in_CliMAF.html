@@ -11928,10 +11928,30 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 <div class="prompt"></div>
 
 
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;LC debug :&#39;, False)
+CliMAF install =&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_1.2.12
+python =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/python
+---
+Required softwares to run CliMAF =&gt; you are using the following versions/installations:
+ncl 6.3.0 =&gt; /opt/ncl-6.3.0/bin/ncl
+cdo 1.9.6 =&gt; /opt/nco/1.9/bin/cdo
+nco (ncks) 4.5.2 =&gt; /opt/nco-4.5.2/bin/ncks
+ncdump 4.4.1.1 =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump
+---
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Climaf version = 1.2.8
-Cache directory set to : /prodigfs/ipslfs/dods/jservon/climafcache_test (use $CLIMAF_CACHE if set) 
-Cache directory for remote data set to : /prodigfs/ipslfs/dods/jservon/climafcache_test/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
+<pre>CliMAF version = 1.2.12
+Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
+Cache directory for remote data set to : /data/jservon/climafcache/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
 Available macros read from ~/.climaf.macros are : []
 </pre>
 </div>
@@ -11988,7 +12008,7 @@ Available macros read from ~/.climaf.macros are : []
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Check which cache your are using</span>
@@ -12006,13 +12026,13 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[47]:</div>
+<div class="prompt output_prompt">Out[3]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test&#39;]</pre>
+<pre>[&#39;/data/jservon/climafcache&#39;]</pre>
 </div>
 
 </div>
@@ -12031,7 +12051,7 @@ Available macros read from ~/.climaf.macros are : []
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cachedir</span> <span class="o">=</span> <span class="n">cachedirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -12053,18 +12073,10 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>(dp0
-S&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
+S&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
 p1
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/00926/2109c/c4299/c4033/34be2/09559/f88d8/0fa7a/372f5/b39b7/95e7f/2.nc&#39;
+S&#39;/data/jservon/climafcache/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;
 p2
-sS&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
-p3
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;
-p4
-sS&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
-p5
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/8524c/b1079/b42f6/e1d50/937d0/bd25c/f76a6/796e6/98331/a9540/6a99e/d.nc&#39;
-p6
 s.</pre>
 </div>
 </div>
@@ -12083,7 +12095,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -12110,13 +12122,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[4]:</div>
+<div class="prompt output_prompt">Out[5]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[]</pre>
+<pre>[&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;]</pre>
 </div>
 
 </div>
@@ -12136,10 +12148,10 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12157,7 +12169,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -12184,7 +12196,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[7]:</div>
+<div class="prompt output_prompt">Out[10]:</div>
 
 
 
@@ -12217,7 +12229,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Let&#39;s get some data as a start</span>
@@ -12228,7 +12240,7 @@ s.</pre>
                <span class="n">period</span><span class="o">=</span><span class="s1">&#39;1980-2000&#39;</span><span class="p">,</span>
                <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                <span class="n">simulation</span><span class="o">=</span><span class="s1">&#39;r1i1p1&#39;</span><span class="p">,</span>
-               <span class="n">version</span><span class="o">=</span><span class="s1">&#39;*&#39;</span>
+               <span class="n">version</span><span class="o">=</span><span class="s1">&#39;latest&#39;</span>
                <span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
@@ -12247,16 +12259,16 @@ s.</pre>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[6]:</div>
+<div class="prompt output_prompt">Out[11]:</div>
 
 
 
@@ -12270,11 +12282,11 @@ s.</pre>
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;*&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;r1i1p1&#39;,
  &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;*&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12293,7 +12305,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dat_cmip5</span><span class="o">.</span><span class="n">crs</span>
@@ -12309,13 +12321,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[7]:</div>
+<div class="prompt output_prompt">Out[12]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#34;ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;)&#34;</pre>
+<pre>&#34;ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;)&#34;</pre>
 </div>
 
 </div>
@@ -12339,7 +12351,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cfile</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
@@ -12355,13 +12367,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[8]:</div>
+<div class="prompt output_prompt">Out[13]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/b6643/744db/7be11/778ac/604dd/7bb87/b8e3c/32344/5c5a1/6671b/e7851/9.nc&#39;</pre>
+<pre>&#39;/data/jservon/climafcache/89f3a/1535f/b106c/37247/4f837/36150/4ecdb/20086/2a547/68ba7/cd864/2.nc&#39;</pre>
 </div>
 
 </div>
@@ -12380,7 +12392,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -12407,13 +12419,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[9]:</div>
+<div class="prompt output_prompt">Out[14]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;]</pre>
+<pre>[&#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;]</pre>
 </div>
 
 </div>
@@ -12437,7 +12449,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cfile</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
@@ -12453,13 +12465,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[10]:</div>
+<div class="prompt output_prompt">Out[15]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/b6643/744db/7be11/778ac/604dd/7bb87/b8e3c/32344/5c5a1/6671b/e7851/9.nc&#39;</pre>
+<pre>&#39;/data/jservon/climafcache/89f3a/1535f/b106c/37247/4f837/36150/4ecdb/20086/2a547/68ba7/cd864/2.nc&#39;</pre>
 </div>
 
 </div>
@@ -12478,10 +12490,10 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">,</span> <span class="n">clim_period</span><span class="o">=</span><span class="s1">&#39;195501-201212&#39;</span><span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
 </pre></div>
 
@@ -12506,19 +12518,23 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[11]:</div>
+<div class="prompt output_prompt">Out[16]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;clim_period&#39;: &#39;*&#39;,
+<pre>{&#39;clim_period&#39;: &#39;195501-201212&#39;,
+ &#39;clim_period_begin&#39;: &#39;*&#39;,
+ &#39;clim_period_end&#39;: &#39;*&#39;,
  &#39;domain&#39;: &#39;global&#39;,
  &#39;frequency&#39;: &#39;annual_cycle&#39;,
+ &#39;obs_type&#39;: &#39;*&#39;,
  &#39;period&#39;: fx,
  &#39;product&#39;: &#39;WOA13-v2&#39;,
  &#39;project&#39;: &#39;ref_climatos&#39;,
  &#39;simulation&#39;: &#39;refproduct&#39;,
+ &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;}</pre>
 </div>
 
@@ -12530,7 +12546,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Compute a DJF climatology</span>
@@ -12561,13 +12577,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[12]:</div>
+<div class="prompt output_prompt">Out[18]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;</pre>
+<pre>&#39;/data/jservon/climafcache/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;</pre>
 </div>
 
 </div>
@@ -12592,7 +12608,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -12619,21 +12635,22 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[13]:</div>
+<div class="prompt output_prompt">Out[19]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;select(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;))&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -12661,7 +12678,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdrop</span><span class="p">(</span><span class="n">rgrd_dat</span><span class="p">)</span>
@@ -12678,7 +12695,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[14]:</div>
+<div class="prompt output_prompt">Out[20]:</div>
 
 
 
@@ -12703,7 +12720,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -12730,19 +12747,20 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[15]:</div>
+<div class="prompt output_prompt">Out[21]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;select(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;))&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -12770,148 +12788,10 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Removed files:
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[16]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Now-you-should-only-have-the-reference-and-its-climatology">Now you should only have the reference and its climatology<a class="anchor-link" href="#Now-you-should-only-have-the-reference-and-its-climatology">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Content of CliMAF cache
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[17]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">We can also use crm() to remove files on their age. For instance, let's remove all the results that haven't been touched for more than 20 days:<a class="anchor-link" href="#We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">(We've started with a new cache... so the demo might not be very impressive... it won't actually return anything)<a class="anchor-link" href="#(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">Or remove files on their sizes; remove all the files bigger than 2M<a class="anchor-link" href="#Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 <div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="s1">&#39;2M&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12941,7 +12821,147 @@ s.</pre>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Now-you-should-only-have-the-reference,-and-its-annual-cycle-and-DJF-climatology">Now you should only have the reference, and its annual cycle and DJF climatology<a class="anchor-link" href="#Now-you-should-only-have-the-reference,-and-its-annual-cycle-and-DJF-climatology">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[23]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;select(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;))&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">We can also use crm() to remove files on their age. For instance, let's remove all the results that haven't been touched for more than 20 days:<a class="anchor-link" href="#We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">(We've started with a new cache... so the demo might not be very impressive... it won't actually return anything)<a class="anchor-link" href="#(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">Or remove files on their sizes; remove all the files bigger than 2M<a class="anchor-link" href="#Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="s1">&#39;2M&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Removed files:
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;select(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;))&#34;,
+ &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -12960,7 +12980,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdu</span><span class="p">()</span>
@@ -12980,9 +13000,8 @@ s.</pre>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre> 260.0K : ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
-   3.0M : ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)
-   3.2M : total
+<pre>   1.0K : total
+   1.0K : ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
 </pre>
 </div>
 </div>
@@ -13001,7 +13020,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3M&#39;</span><span class="p">)</span>
@@ -13016,7 +13035,7 @@ s.</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="5.-Last-step:-remove-everything-but-a-list-of-results-you-want-to-keep!">5. Last step: remove everything but a list of results you want to keep!<a class="anchor-link" href="#5.-Last-step:-remove-everything-but-a-list-of-results-you-want-to-keep!">&#182;</a></h2>
+<h2 id="5.-cprotect:-remove-everything-but-one-result-(a-list-of-results)-you-want-to-keep!">5. cprotect: remove everything but one result (a list of results) you want to keep!<a class="anchor-link" href="#5.-cprotect:-remove-everything-but-one-result-(a-list-of-results)-you-want-to-keep!">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -13030,7 +13049,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- And execute the final object</span>
@@ -13047,13 +13066,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[34]:</div>
+<div class="prompt output_prompt">Out[28]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;</pre>
+<pre>&#39;/data/jservon/climafcache/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;</pre>
 </div>
 
 </div>
@@ -13064,7 +13083,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
@@ -13091,20 +13110,20 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[35]:</div>
+<div class="prompt output_prompt">Out[30]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -13117,22 +13136,16 @@ s.</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">We will make a list of the CRS of the results we want to keep:<a class="anchor-link" href="#We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">&#182;</a></h3><h3 id="=&gt;-djf_dat,-djf_ref,-and-myplot">=&gt; djf_dat, djf_ref, and myplot<a class="anchor-link" href="#=&gt;-djf_dat,-djf_ref,-and-myplot">&#182;</a></h3>
+<h3 id="We-would-like-to-save-only-the-final-result-=&gt;-the-plot">We would like to save only the final result =&gt; the plot<a class="anchor-link" href="#We-would-like-to-save-only-the-final-result-=&gt;-the-plot">&#182;</a></h3><h3 id="=&gt;-We-will-protect-'myplot'-in-the-cache-with-cprotect()">=&gt; We will protect 'myplot' in the cache with cprotect()<a class="anchor-link" href="#=&gt;-We-will-protect-'myplot'-in-the-cache-with-cprotect()">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_results</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_dat</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_ref</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myplot</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-
-<span class="c1">## You can also write:</span>
-<span class="c1">#keep_results = [dat_cmip5.crs, ref.crs, myplot.crs]</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cprotect</span><span class="p">(</span><span class="n">myplot</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13142,7 +13155,163 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[32]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Now-clean-everything-but-the-protected-results-in-the-cache-with-craz()">Now clean everything but the protected results in the cache with craz()<a class="anchor-link" href="#Now-clean-everything-but-the-protected-results-in-the-cache-with-craz()">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="And-check-what-we-have-in-the-cache-now:">And check what we have in the cache now:<a class="anchor-link" href="#And-check-what-we-have-in-the-cache-now:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[34]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Big-advantage:-if-we-cfile(myplot),-we-have-the-result-rightaway-without-having-to-recompute-the-intermediate-results!">Big advantage: if we cfile(myplot), we have the result rightaway without having to recompute the intermediate results!<a class="anchor-link" href="#Big-advantage:-if-we-cfile(myplot),-we-have-the-result-rightaway-without-having-to-recompute-the-intermediate-results!">&#182;</a></h3><h3 id="=&gt;-save-considerable-space-and-still-take-advantage-of-the-smart-cache-that-finds-existing-results">=&gt; save considerable space and still take advantage of the smart cache that finds existing results<a class="anchor-link" href="#=&gt;-save-considerable-space-and-still-take-advantage-of-the-smart-cache-that-finds-existing-results">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">We will make a list of the CRS of the results we want to keep:<a class="anchor-link" href="#We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">&#182;</a></h3><h3 id="=&gt;-djf_dat,-djf_ref,-and-myplot">=&gt; djf_dat, djf_ref, and myplot<a class="anchor-link" href="#=&gt;-djf_dat,-djf_ref,-and-myplot">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_dat</span><span class="p">)</span>
+<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_ref</span><span class="p">)</span>
+<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myplot</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_results</span>
@@ -13158,15 +13327,15 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[37]:</div>
+<div class="prompt output_prompt">Out[36]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;]</pre>
+<pre>[ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),
+ ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),
+ plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))]</pre>
 </div>
 
 </div>
@@ -13179,7 +13348,65 @@ s.</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="And-simply-get-the-list-of-all-the-elements-of-the-cache-with-clist,-and-remove-with-cdrop-all-the-results-that-are-not-in-the-list-keep_results">And simply get the list of all the elements of the cache with clist, and remove with cdrop all the results that are not in the list keep_results<a class="anchor-link" href="#And-simply-get-the-list-of-all-the-elements-of-the-cache-with-clist,-and-remove-with-cdrop-all-the-results-that-are-not-in-the-list-keep_results">&#182;</a></h3>
+<h3 id="Make-a-loop-on-the-elements:-do-cfile-on-the-crs,-and-cprotect;-then-craz()">Make a loop on the elements: do cfile on the crs, and cprotect; then craz()<a class="anchor-link" href="#Make-a-loop-on-the-elements:-do-cfile-on-the-crs,-and-cprotect;-then-craz()">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">keep_results</span><span class="p">:</span>
+    <span class="n">cfile</span><span class="p">(</span><span class="n">elt</span><span class="p">)</span>
+    <span class="n">cprotect</span><span class="p">(</span><span class="n">elt</span><span class="p">)</span>
+<span class="n">craz</span><span class="p">()</span>
+<span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[37]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Erase-a-protected-results:-cdrop(crs,-force=True)">Erase a protected results: cdrop(crs, force=True)<a class="anchor-link" href="#Erase-a-protected-results:-cdrop(crs,-force=True)">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13188,85 +13415,62 @@ s.</pre>
 <div class="prompt input_prompt">In&nbsp;[38]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">clean_cache_and_keep_results</span><span class="p">(</span><span class="n">keep_results</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">clist</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">elt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_results</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;Remove &#39;</span><span class="p">,</span><span class="n">elt</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="n">cdrop</span><span class="p">(</span><span class="n">elt</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;We keep &#39;</span><span class="p">,</span> <span class="n">elt</span> 
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdrop</span><span class="p">(</span><span class="n">myplot</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[38]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Erase-the-whole-cache,-even-protected-results:-craz(force=True)">Erase the whole cache, even protected results: craz(force=True)<a class="anchor-link" href="#Erase-the-whole-cache,-even-protected-results:-craz(force=True)">&#182;</a></h3>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[39]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clean_cache_and_keep_results</span><span class="p">(</span><span class="n">keep_results</span><span class="p">)</span>    
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Content of CliMAF cache
-We keep  ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
---
---
-Remove  regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)
---
---
-We keep  plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))
---
---
-Remove  minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))
---
---
-Remove  ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)
---
---
-Remove  regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)
---
---
-Remove  ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)
---
---
-We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
---
---
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -13290,15 +13494,13 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[40]:</div>
+<div class="prompt output_prompt">Out[39]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[]</pre>
 </div>
 
 </div>
