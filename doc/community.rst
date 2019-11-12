@@ -13,4 +13,4 @@ There are two mailing lists for interaction about CliMAF :
 
    subscribe climaf.users
 
-There is also an `issue tracking page <https://github.com/senesis/climaf/issues>`_ on GitHub.  
+There is also an `issue tracking page <https://github.com/rigoudyg/climaf/issues>`_ on GitHub.

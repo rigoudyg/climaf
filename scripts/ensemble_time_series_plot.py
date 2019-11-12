@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import datetime
 import numpy as np
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 
 from climaf.site_settings import atCerfacs
 if atCerfacs:
@@ -221,7 +221,6 @@ if args.horizontal_lines_values:
 
 
 # -- Loop on the netcdf files
-from netCDF4 import Dataset,netcdftime,num2date
 
 handles_for_legend = []
 dataset_number = 0

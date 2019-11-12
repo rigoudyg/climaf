@@ -6,7 +6,8 @@ What s new
 
 Changes, newest first :
 
-- V1.2.12s:
+
+- Vnext:
 
   - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
     the filename of an image to insert in the page, centered at the bottom, and
@@ -19,6 +20,22 @@ Changes, newest first :
   - fixes for operator `plot`  : it actually uses user-provided max and min for 
     scaling field s order  of magnitude; and it won't plot a small empty square at
     the bottom right corner
+
+- V1.2.12:
+
+  - the version of the tools used is now displayed when CliMAF is loaded.
+
+  - add several features to run CliMAF with C-ESM-EP at IPSL, Cerfacs and CNRM
+
+  - fixes :
+
+    - fix order in ``fline`` function
+
+    - fix ``netcdftime`` import
+
+    - fix fixed fields issue
+
+    - fix documentation and change sphinx version
 
 - V1.2.11:
 
@@ -897,5 +914,5 @@ Changes, newest first :
   - a log file is added, with own severity level, set by clog_file
   - operators with format=None are also evaluated as soon as applied - i.e. cshow no more needednon ncview(...)
 
-Note : Issues with CliMAF and future work are documented at https://github.com/senesis/climaf/issues
+Note : Issues with CliMAF and future work are documented at https://github.com/rigoudyg/climaf/issues
 

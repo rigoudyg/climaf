@@ -89,7 +89,12 @@ if not already_inited and not onrtd:
     except:
        print("Warning: nco not found -> can't use nco from CliMAF")
     try:
-       print("ncdump "+commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')[-1].split('\n')[-1].split()[3]+" => "+my_which('ncdump'))
+       if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
+          print("ncdump "+commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')[-1].split('\n')[-1].split()[3]+" => "+my_which('ncdump'))
+       else:
+          binary_info = commands.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
+          binary_info = binary_info.split("version")[-1].split("of")[0].strip()
+          print("ncdump "+binary_info+" => "+my_which('ncdump'))
     except:
        print("Warning: ncdump not found -> can't use ncdump from CliMAF")
     print("---")

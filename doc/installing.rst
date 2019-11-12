@@ -62,7 +62,7 @@ Installing CliMAF (if you are not at CNRM, on Ciclad or Climserv)
 ------------------------------------------------------------------
 
 - Installing CliMAF, if necessary, is quick, through only a few commands, using `CliMAF GitHub
-  repository <https://github.com/senesis/climaf>`_ ; this will also
+  repository <https://github.com/rigoudyg/climaf>`_ ; this will also
   copy some data allowing for testing the installation and for running a few examples
 
   - first check the listed :ref:`requirements` ;
@@ -70,7 +70,7 @@ Installing CliMAF (if you are not at CNRM, on Ciclad or Climserv)
   - execute:: 
 
      cd some_installation_dir
-     git clone https://github.com/senesis/climaf climaf
+     git clone https://github.com/rigoudyg/climaf climaf
      cd climaf
      export PYTHONPATH=$PYTHONPATH:$(pwd)
      cd testing
@@ -83,7 +83,7 @@ Installing CliMAF (if you are not at CNRM, on Ciclad or Climserv)
 
   - for getting the development version, you may rather execute::
 
-      git clone -b dev https://github.com/senesis/climaf climaf
+      git clone -b dev https://github.com/rigoudyg/climaf climaf
 
 
 .. _configuring:

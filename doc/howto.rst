@@ -129,7 +129,7 @@ variable $CLIMAF_LOG (resp. $CLIMAF_FILE_LOG)
 ..report an issue
 ------------------
 
-For the time being, you may report an issue on `the CliMAF issue page on GitHub <https://github.com/senesis/climaf/issues>`_ . Just click on the green button "New issue" (you may have to create a login on GitHub for that )
+For the time being, you may report an issue on `the CliMAF issue page on GitHub <https://github.com/rigoudyg/climaf/issues>`_ . Just click on the green button "New issue" (you may have to create a login on GitHub for that )
 
 
 .. _how_to_own_script:
