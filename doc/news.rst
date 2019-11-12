@@ -6,6 +6,14 @@ Whats' new
 
 Changes, newest first :
 
+- V1.2.12s:
+
+  - Add function :py:func:`~climaf.classes.cvalid` for declaring a
+    list of allowed values for project facets/keywords. This allows to better
+    constrain the identification of files for a dataset, as e.g. for CMIP6
+    when using wildcard such as grid="g*"
+
+
 - V1.2.11:
 
   - **This is the last release which is truly handled on the 'senesis/climaf' Github

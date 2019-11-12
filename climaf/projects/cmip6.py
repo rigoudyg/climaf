@@ -16,7 +16,7 @@ Example for a CMIP6 dataset declaration ::
 
 import os
 from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias, cfreqs, cdef
+from climaf.classes import cproject, calias, cfreqs, cdef, cvalid
 from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 
@@ -32,7 +32,8 @@ if atCNRM:
    # Declare a list of root directories for IPSL data at TGCC
    root="/cnrm/cmip"
 
-if root:
+#if root:
+if True :
   ## -- Declare a 'CMIP6 CliMAF project 
   ## ------------------------------------ >
   cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
@@ -54,6 +55,7 @@ if root:
       cdef('mip'          , '*'           , project=project)
       #cdef('table'        , '*'           , project='CMIP6') # impossible, because of ambiguities
       cdef('grid'         , 'g*'          , project=project)
+      cvalid('grid'         , [ "gr", "gn", "gr1", "gr2" ] , project=project)
       cdef('realization'  , 'r1i1p1f*'    , project=project)
       cdef('experiment'  , 'historical'   , project=project)
       cdef('version'     , 'latest'       , project=project)

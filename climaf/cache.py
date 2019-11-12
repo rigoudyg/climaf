@@ -34,7 +34,7 @@ fileNameLength = 60
 safe = False
 #: The length of subdir names when segmenting cache filenames
 directoryNameLength = 5
-#: Define whether we stamps the data files with their CRS
+#: Define whether we stamp the data files with their CRS. True means mandatory. None means : please try. False means : don't try
 stamping = True
 #: The index associating filenames to CRS expressions
 crs2filename = dict()
@@ -175,6 +175,25 @@ def searchFile(path):
 
 
 def register(filename, crs, outfilename=None):
+    def do_move(crs,filename, outfilename):
+        if outfilename is None : 
+            clogger.info("%s registered as %s" % (crs, filename))
+            crs2filename[crs] = filename
+            if crs in dropped_crs:
+                dropped_crs.remove(crs)
+            return True
+        else: 
+            cmd = 'mv -f %s %s ' % (filename, outfilename)
+            if os.system(cmd) == 0:
+                clogger.info("moved %s as %s " % (filename, outfilename))
+                clogger.info("%s registered as %s" % (crs, outfilename))
+                crs2filename[crs] = outfilename
+                if crs in dropped_crs:
+                    dropped_crs.remove(crs)
+                return True
+            else:
+                #clogger.critical("cannot move by" % cmd)
+                raise Climaf_Cache_Error("cannot move after stamping by" % cmd)
     """
     Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
     metadata 'CLiMAF' with CliMAF version and ref URL
@@ -190,10 +209,9 @@ def register(filename, crs, outfilename=None):
     # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
     global dropped_crs
-    if not stamping:
+    if stamping is False :
         clogger.debug('No stamping')
-        crs2filename[crs] = filename
-        return True
+        return do_move(crs,filename, outfilename)
     waited = 0
     while waited < 50 and not os.path.exists(filename):
         time.sleep(0.1)
@@ -219,30 +237,15 @@ def register(filename, crs, outfilename=None):
                       '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
                       (version, crs, filename)
         clogger.debug("trying stamping by %s" % command)
-        if os.system(command) == 0:
-            if outfilename:
-                cmd = 'mv -f %s %s ' % (filename, outfilename)
-                if os.system(cmd) == 0:
-                    clogger.info("move %s as %s " % (filename, outfilename))
-                    clogger.info("%s registered as %s" % (crs, outfilename))
-                    crs2filename[crs] = outfilename
-                    if crs in dropped_crs:
-                        dropped_crs.remove(crs)
-                    return True
-                else:
-                    clogger.critical("cannot move by" % cmd)
-                    exit()
-                    return None
-            else:
-                clogger.info("%s registered as %s" % (crs, filename))
-                crs2filename[crs] = filename
-                if crs in dropped_crs:
-                    dropped_crs.remove(crs)
+        command_return=os.system(command) 
+        if command_return==0 or stamping is not True :
+            return do_move(crs,filename, outfilename)
+        if command_return!=0 :
+            if stamping is True :
+                raise Climaf_Cache_Error("Cannot stamp by command below. You may set climaf.cache.stamping to Flase or None - see doc\n%s" % command)
+            elif stamping is None :
+                clogger.critical("Cannot stamp by %s" % command)
                 return True
-        else:
-            clogger.critical("cannot stamp by %s" % command)
-            exit()
-            return None
     else:
         clogger.error("file %s does not exist (for crs %s)" % (filename, crs))
 
@@ -309,6 +312,9 @@ def hasMatchingObject(cobject, ds_func):
     global crs2eval
     key_to_rm = list()
     for crs in crs2filename:
+        # First, basic, screening
+        if crs.split("(")[0] != cobject.crs.split("(")[0] :
+            return None,None
         co = crs2eval.get(crs, None)
         if co is None:
             try:
