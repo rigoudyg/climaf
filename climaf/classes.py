@@ -202,7 +202,7 @@ def cvalid(attribute, value=None, project=None):
     or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
     thos data files which match a dataset definition
 
-    Argument 'project' allows to restrict the use/query 
+    Argument 'project' allows to restrict the use/query
     to the context of the given 'project'.
 
     Example::
@@ -533,7 +533,7 @@ class cdataset(cobject):
         """
         Return True if, for all keys in dict condition, the kvp
         value for same key is among condition's value (which can be a list)
-        Example : 
+        Example :
           with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
           will return True
         """
@@ -1623,7 +1623,7 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
     (see first example erai below)
 
     Arg ``conditions`` allows to restrict the effect, based on the value
-    of some facets. It is a dictionary of applicable values or 
+    of some facets. It is a dictionary of applicable values or
     values'list, which keys are the facets  (see example CMIP6 below)
 
     Arg ``filenameVar`` allows to tell which fake variable name should be
@@ -1684,7 +1684,7 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
 def varIsAliased(project, variable):
     """
     Return a n-uplet (fileVariable, scale, offset, filevarName,
-    missing,conditions) defining how to compute a 'variable' which 
+    missing,conditions) defining how to compute a 'variable' which
     is not in files, for the 'project'
     """
     if project in aliases and variable in aliases[project]:
@@ -1739,9 +1739,9 @@ class cpage(cobject):
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
           title (str, optional) : append a label below or above (depending on optional
            argument 'gravity') figures in the page.
-          insert(str,optional) : the filename for an image to insert (centered at the 
-           bottom) 
-          insert_width(int,optional) : the width at which the inserted image will be 
+          insert(str,optional) : the filename for an image to insert (centered at the
+           bottom)
+          insert_width(int,optional) : the width at which the inserted image will be
            scaled (in pixels)
 
         If title is activated:

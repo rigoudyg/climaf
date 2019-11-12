@@ -1031,7 +1031,7 @@ def get_fig_sizes(figfile):
     fig_height = figsize.split("x").pop(1)
     return int(fig_width), int(fig_height)
 
-        
+
 def cfilePage(cobj, deep, recurse_list=None):
     """
     Builds a page with CliMAF figures, computing associated crs

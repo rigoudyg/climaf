@@ -1,7 +1,7 @@
 .. _news:
 
 ------------
-What s new
+What's new
 ------------
 
 Changes, newest first:
@@ -13,8 +13,8 @@ Changes, newest first:
     definitely moved to this CliMAF version; this is not mandatory, but will actually
     lower your inodes/files use
 
-  - operator `curves` also uses dash patterns when showing more than 10 curves 
-  
+  - operator `curves` also uses dash patterns when showing more than 10 curves
+
   - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
 
   - cache speed improvement : when computing a CliMAF object, default behaviour is to
@@ -32,15 +32,16 @@ Changes, newest first:
     the filename of an image to insert in the page, centered at the bottom, and
     `insert_width` for tuning its size
 
-  - operator `plot` can superimpose a second overlay field, as for e.g. stippling + 
-    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`. 
+  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
+    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
 
-  - for climaf operators needing multiple optional input objects, providing a void 
-    object is possible using an empty string (useful when wanting to provide another, 
+  - for climaf operators needing multiple optional input objects, providing a void
+    object is possible using an empty string (useful when wanting to provide another,
     which comes after in the argument objects list)
 
-  - fix for operator `plot`  : it actually uses user-provided max and min for 
-    scaling field s order  of magnitude
+  - fixes for operator `plot`  : it actually uses user-provided max and min for
+    scaling field s order  of magnitude; and it won't plot a small empty square at
+    the bottom right corner
 
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
@@ -58,7 +59,7 @@ Changes, newest first:
     the Climaf Reference Synatx description of the data
 
   - Remove a constraining, buggy check on ensemble members order
-   
+
   - Change log level of message about how DJF clim works
 
   - fixes:
@@ -86,12 +87,12 @@ Changes, newest first:
   - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
     the filename of an image to insert in the page, centered at the bottom, and
     `insert_width` for tuning its size
-  - operator `plot` can superimpose a second overlay field, as for e.g. stippling + 
-    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`. 
-  - for climaf operators needing multiple optional input objects, providing a void 
-    object is possible using an empty string (useful when wanting to provide another, 
+  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
+    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
+  - for climaf operators needing multiple optional input objects, providing a void
+    object is possible using an empty string (useful when wanting to provide another,
     which comes after in the argument objects list)
-  - fixes for operator `plot`  : it actually uses user-provided max and min for 
+  - fixes for operator `plot`  : it actually uses user-provided max and min for
     scaling field s order  of magnitude; and it won't plot a small empty square at
     the bottom right corner
 
@@ -113,7 +114,7 @@ Changes, newest first:
     the Climaf Reference Synatx description of the data
 
   - Remove a constraining, buggy check on ensemble members order
-   
+
   - Change log level of message about how DJF clim works
 
 - V1.2.11:

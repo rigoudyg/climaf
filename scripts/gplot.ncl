@@ -795,12 +795,12 @@ begin
   if isvar("shade2_options") then
     if (.not. ( isvar("shade2_below") .and. isvar("shade2_above")  )) then
       print("Must provide args shade2_below and shade2_above when using arg shade2_options  !")
-      status_exit(1) 
+      status_exit(1)
     end if
-    ;if (.not. isvar("shade2_file") ) then
-    ;  print("Must provide a shade2 field when using arg shade2_options !")
-    ;  status_exit(1) 
-    ;end if
+    if (.not. isvar("shade2_file") ) then
+      print("Must provide a shade2 field when using arg shade2_options !")
+      status_exit(1)
+    end if
   end if
   if isvar("shade2_file") then
     if (.not. isvar("shade2_options") ) then
@@ -814,7 +814,7 @@ begin
       useXY_dummy=False
       horizontal_dummy=False
       vprofile_dummy=False
-      lat_exist2=True  
+      lat_exist2=True
       lon_exist2=True
       proj_data_dummy=False
       shade2_field_select=""
@@ -823,8 +823,8 @@ begin
       fld_shade2=array_shade2[0]
     end if
   end if
-  
-  
+
+
   ;-----------------
   ; Main field: fld
   ;-----------------
@@ -910,7 +910,7 @@ begin
       end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
-    if ismissing(power10) then 
+    if ismissing(power10) then
       print("Field has only missing values" )
       power10=1
     end if
@@ -1295,7 +1295,7 @@ begin
       res2@cnInfoLabelString = ""
     
       res2@cnLinesOn=True
-      if ( isvar("shade_below") .or. isvar("shade_above") ) then 
+      if ( isvar("shade_below") .or. isvar("shade_above") ) then
         res2@cnLinesOn=False
       end if
 
@@ -1389,7 +1389,7 @@ begin
             end if
             if .not. useLatDim .and. ( mpCenterLonF .lt. (max(londim)-180) ) then ; for only rectilinear grids
                                 ; pivots about a user-specified longitude (rectilinear grids only)
-              fld_flip=lonPivot(fld,mpCenterLonF+180) 
+              fld_flip=lonPivot(fld,mpCenterLonF+180)
               delete(fld)
               fld=fld_flip
               delete(fld_flip)
@@ -1699,22 +1699,22 @@ begin
         plot1=gsn_csm_contour(wks,fld2,res2)
         if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
       end if
-        
-      if isvar("shade2_options") .and. isvar("shade2_file") then
+
+      if isvar("shade2_options") then
         res_shade2=True
         res_shade2@gsnFrame= False
         res_shade2@gsnDraw=False
         res_shade2@gsnMaximize = True
-       
+
         res_shade2@gsnLeftString     = ""
         res_shade2@gsnRightString    = ""
         res_shade2@gsnCenterString   = ""
-       
+
         res_shade2@cnFillOn=True
         res_shade2@cnLineLabelsOn = False
         res_shade2@cnLineLabelBackgroundColor = -1
         res_shade2@cnInfoLabelString = ""
-        
+
         res_shade2@cnLinesOn=False
         ;res_shade2@gsnContourNegLineDashPattern = 1
         ;res_shade2@gsnContourZeroLineThicknessF = 0
@@ -1725,13 +1725,13 @@ begin
         plot_shade2=gsn_csm_contour(wks,fld_shade2,res_shade2)
                                 ;
         opt_shade2=True
-        ;opt_shade2@gsnShadeFillScales=(/1.,0.66, 0.45/)
+        opt_shade2@gsnShadeFillScales=(/1.,0.66, 0.45/)
         opt_shade2@gsnShadeFillType = "pattern" ; "color" or "pattern"
-        ;opt_shade2@gsnShadeLow = 17 
+        ;opt_shade2@gsnShadeLow = 17
         res_list(shade2_options, opt_shade2)
         plot_shade2 = gsn_contour_shade(plot_shade2,str_convert(shade2_below),str_convert(shade2_above),opt_shade2)
       end if
-      
+
       ;if VECT then
       ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
       ;end if
@@ -1825,10 +1825,10 @@ begin
     overlay(plot0,plot1)   
   end if
 
-  if isvar("shade2_options") .and. isvar("shade2_file") then
-    overlay(plot0,plot_shade2)   
+  if isvar("shade2_options") then
+    overlay(plot0,plot_shade2)
   end if
-  
+
   ;if VECT then
   ;  overlay(plot0,plot2)  
   ;end if
