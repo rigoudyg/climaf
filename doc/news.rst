@@ -6,13 +6,26 @@ Whats' new
 
 Changes, newest first :
 
-- V1.2.12s:
+- Vnext:
 
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
     constrain the identification of files for a dataset, as e.g. for CMIP6
-    when using wildcard such as grid="g*"
+    when using wildcard such as grid="g*". It avoids mismatch between patterns
+    for fixed fields and pattenrs for variable fields
 
+  - Projects CMIP6 and CMIP6 are defined even on systems where there is no known
+    root location for that data; so, user can define facet 'root' later on, to match
+    their data architecture, without hacking the distributed code
+
+  - Variable climaf.cache.stamping can be set to Noen, which means :
+    put a stamp if possible, but don't botehr if impossible. Reminder
+    : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
+    the Climaf Reference Synatx description of the data
+
+  - Remove a constraining, buggy check on ensemble members order
+   
+  - Change log level of message about how DJF clim works
 
 - V1.2.11:
 
