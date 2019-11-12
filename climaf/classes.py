@@ -1647,7 +1647,7 @@ class cpage(cobject):
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white",
-                 insert="", insert_width=0):
+                 insert="",insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)

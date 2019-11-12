@@ -61,8 +61,8 @@ Additional fields (optional, and in that order; replace with empty strings if ne
 
   - a dataset for an auxiliary field which can be up to 4-dimensional
   - 2 datasets for a vector field which can be up to 4-dimensional
-  - another auxilliary scalar field which can be up to 4-dimensional (and which is refered using keyword `shade2`
-    further below)
+  - another auxilliary scalar field which can be up to 4-dimensional
+    (and which is refered using keyword `shade2` further below)
 
 Warnings: 
 
@@ -154,9 +154,11 @@ General:
       - if you use both ``date`` (or ``time``) and ``level`` arguments for 2D fields which have time and level
     dimensions, it is the time extraction will be made.
 
-  - ``options``, ``aux_options``, ``shading_options``, ``shade2_options``, ``polyline_options``: strings for setting
-    NCL graphic resources directly, for the various fields (resources are separated by "|"). These lists have higher
-    priority than the CliMAF default ones. Each field has its own options argument, e.g.:
+  - ``options``, ``aux_options``, ``shading_options``, ``shade2_options``
+    ``polyline_options`` : strings for setting NCL graphic resources
+    directly, for the various fields (resources are separated by
+    "|"). These lists have higher priority than the CliMAF default
+    ones. Each field has its own options argument, e.g. :  
 
     - ``options`` for main field and vectors, e.g. :
       'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
@@ -242,8 +244,10 @@ Vectors:
   - ``rotation``: set it to 1 if you want to rotate vectors from model grid to geographic grid (see note below about
     an angles file)
   
-  - ``vcRefLengthF``: length used, in units of Ncl s NDC (Normalized Device Coordinates), to render vectors with a
-    magnitude equal to the reference magnitude, as specified by vcRefMagnitudeF; default (ncl): <dynamic>; see
+  - ``vcRefLengthF`` : length used, in units of Ncl s NDC (Normalized
+    Device Coordinates), to render vectors with a magnitude equal to
+    the reference magnitude, as specified by vcRefMagnitudeF; default
+    (ncl): <dynamic>; see
     e.g. http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcRefLengthF 
 
   - ``vcRefMagnitudeF``: magnitude used as the reference magnitude used for the vector field plot; default (ncl): 0.0
@@ -267,6 +271,15 @@ Second auxiliary field:
 
   - ``shade2_below``, ``shade2_above``: see similar options just above. For instance, for stippling above field value
     0.9: 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"' and 'shade2_above=0.9'
+
+
+.. _aux_field2_opt_args:
+
+Second auxiliary field:
+
+  - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
+    for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
+    and 'shade2_above=0.9' 
 
 .. _required_files:
 
