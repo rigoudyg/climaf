@@ -11,7 +11,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/time_axis_labels.ncl"
 ;--------------------------------------------------------------------------------------------
 
 undef("str_convert")
-; Convert an input string into logical, integer, float or the same string
+; Convert an input string into logical, integer, float, float array or the same string
 function str_convert(str:string)
 
 local val, valf
@@ -791,6 +791,39 @@ begin
       VECT=True
     end if
   end if
+
+  if isvar("shade2_options") then
+    if (.not. ( isvar("shade2_below") .and. isvar("shade2_above")  )) then
+      print("Must provide args shade2_below and shade2_above when using arg shade2_options  !")
+      status_exit(1) 
+    end if
+    if (.not. isvar("shade2_file") ) then
+      print("Must provide a shade2 field when using arg shade2_options !")
+      status_exit(1) 
+    end if
+  end if
+  if isvar("shade2_file") then
+    if (.not. isvar("shade2_options") ) then
+      print("Must provide shade2_options when providing a shade2_file !")
+      status_exit(1)
+    else
+      print("---------------------")
+      print("   STIPPLING FIELD   ")
+      print("---------------------")
+      useLatDim2=False
+      useXY_dummy=False
+      horizontal_dummy=False
+      vprofile_dummy=False
+      lat_exist2=True  
+      lon_exist2=True
+      proj_data_dummy=False
+      shade2_field_select=""
+      array_shade2=field_reduce(shade2_file, shade2_var, "lin", useXY_dummy, horizontal_dummy, \
+          useLatDim2, vprofile_dummy, shade2_field_select, lat_exist2, lon_exist2, proj_data_dummy)
+      fld_shade2=array_shade2[0]
+    end if
+  end if
+  
   
   ;-----------------
   ; Main field: fld
@@ -1256,7 +1289,11 @@ begin
       res2@cnLineLabelBackgroundColor = -1
       res2@cnInfoLabelString = ""
     
-      res2@cnLinesOn=True 
+      res2@cnLinesOn=True
+      if ( isvar("shade_below") .or. isvar("shade_above") ) then 
+        res2@cnLinesOn=False
+      end if
+
       res2@gsnContourNegLineDashPattern = 1
       res2@gsnContourZeroLineThicknessF = 1.5  
       
@@ -1335,7 +1372,25 @@ begin
           if ( prj .eq. "NH" ) then
             res@mpMinLatF=minlat
             ;delete(res@mpMaxLatF)
-          end if 
+          end if
+        else
+          res@mpProjection=proj
+          if (isvar("mpCenterLonF")) then
+            do while ((mpCenterLonF .gt. 180) .and. (mpCenterLonF .le. 360))
+              mpCenterLonF=mpCenterLonF-360
+            end do
+            if mpCenterLonF .gt. (max(londim)-180) then
+              print("out of data range: mpCenterLonF + 180 > max(londim)")
+            end if
+            if .not. useLatDim .and. ( mpCenterLonF .lt. (max(londim)-180) ) then ; for only rectilinear grids
+                                ; pivots about a user-specified longitude (rectilinear grids only)
+              fld_flip=lonPivot(fld,mpCenterLonF+180) 
+              delete(fld)
+              fld=fld_flip
+              delete(fld_flip)
+            end if
+            res@mpCenterLonF=mpCenterLonF
+          end if
         end if
         
       else
@@ -1635,10 +1690,43 @@ begin
           plot1=gsn_csm_contour(wks,fld,res2)
         end if
       else
-        if isvar("aux_options") then res_list(aux_options, res2) end if 
+        if isvar("aux_options") then res_list(aux_options, res2) end if
         plot1=gsn_csm_contour(wks,fld2,res2)
         if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
       end if
+        
+      if isvar("shade2_options") then
+        res_shade2=True
+        res_shade2@gsnFrame= False
+        res_shade2@gsnDraw=False
+        res_shade2@gsnMaximize = True
+       
+        res_shade2@gsnLeftString     = ""
+        res_shade2@gsnRightString    = ""
+        res_shade2@gsnCenterString   = ""
+       
+        res_shade2@cnFillOn=True
+        res_shade2@cnLineLabelsOn = False
+        res_shade2@cnLineLabelBackgroundColor = -1
+        res_shade2@cnInfoLabelString = ""
+        
+        res_shade2@cnLinesOn=False
+        ;res_shade2@gsnContourNegLineDashPattern = 1
+        ;res_shade2@gsnContourZeroLineThicknessF = 0
+        res_shade2@lbLabelBarOn = False ;
+        ;res_shade2@cnFillOn=True
+        ;res_shade2@cnFillColor    = "black"   ; foreground by default
+                                ;res_shade2@cnFillScaleF        = 0.6         ; add extra density
+        plot_shade2=gsn_csm_contour(wks,fld_shade2,res_shade2)
+                                ;
+        opt_shade2=True
+        opt_shade2@gsnShadeFillScales=(/1.,0.66, 0.45/)
+        opt_shade2@gsnShadeFillType = "pattern" ; "color" or "pattern"
+        ;opt_shade2@gsnShadeLow = 17 
+        res_list(shade2_options, opt_shade2)
+        plot_shade2 = gsn_contour_shade(plot_shade2,str_convert(shade2_below),str_convert(shade2_above),opt_shade2)
+      end if
+      
       ;if VECT then
       ;  plot2=gsn_csm_vector(wks,fld3,fld4,res)
       ;end if
@@ -1732,6 +1820,10 @@ begin
     overlay(plot0,plot1)   
   end if
 
+  if isvar("shade2_options") then
+    overlay(plot0,plot_shade2)   
+  end if
+  
   ;if VECT then
   ;  overlay(plot0,plot2)  
   ;end if
