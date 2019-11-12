@@ -1644,7 +1644,8 @@ class cpage(cobject):
                  fig_trim=True, page_trim=True, format="png",
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
-                 font="Times-New-Roman", gravity="North", background="white"):
+                 font="Times-New-Roman", gravity="North", background="white",
+                 insert="",insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -1674,8 +1675,12 @@ class cpage(cobject):
            CLiMAF default: 1500.
           orientation (str,optional): if set, it supersedes page_width and
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
-          title (str, optional) : append a label below or above (depending optional
+          title (str, optional) : append a label below or above (depending on optional
            argument 'gravity') figures in the page.
+          insert(str,optional) : the filename for an image to insert (centered at the 
+           bottom) 
+          insert_width(int,optional) : the width at which the inserted image will be 
+           scaled (in pixels)
 
         If title is activated:
 
@@ -1740,6 +1745,8 @@ class cpage(cobject):
         self.font = font
         self.gravity = gravity
         self.background = background
+        self.insert = insert
+        self.insert_width = insert_width
         if self.ybox < (self.y + self.pt):
             raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
         if not isinstance(fig_lines, list) and not isinstance(fig_lines, cens):
@@ -1856,9 +1863,11 @@ class cpage(cobject):
                     ", fig_trim='%s', page_trim='%s', format='" + self.format +
                     "', page_width=%d, page_height=%d, title='" + self.title +
                     "', x=%d, y=%d, ybox=%d, pt=%d, font='" + self.font +
-                    "', gravity='" + self.gravity + "', background='" + self.background + "')") \
+                    "', gravity='" + self.gravity + "', background='" + self.background +
+                    "', insert='" + self.insert + "', insert_width=%d'" +
+                    "')") \
                    % (self.fig_trim, self.page_trim, self.page_width, self.page_height, self.x, self.y, self.ybox,
-                      self.pt)
+                      self.pt, self.insert_width)
 
         rep = rep.replace(",]", "]")
         rep = rep.replace(", ]", "]")

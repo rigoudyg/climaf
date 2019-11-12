@@ -501,7 +501,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             label, multiple, serie = script.inputs[i]
             subdict[label] = infile
             # Provide the name of the variable in input file if script allows for
-            subdict["var_%d" % i] = classes.varOf(op)
+            if isinstance(op, classes.cobject) :
+                subdict["var_%d" % i] = classes.varOf(op)
             if isinstance(op, classes.cdataset) and op.alias:
                 filevar, scale, offset, units, filenameVar, missing = op.alias
                 if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
@@ -1009,6 +1010,16 @@ def cimport(cobject, crs):
         clogger.error("argument is not a Masked Array nor a filename", cobject)
 
 
+def get_fig_sizes(figfile):
+    args_figsize = ["identify", figfile]
+    comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_figsize = comm_figsize.stdout.read()
+    figsize = output_figsize.split(" ").pop(2)
+    fig_width = figsize.split("x").pop(0)
+    fig_height = figsize.split("x").pop(1)
+    return int(fig_width),int(fig_height)
+
+        
 def cfilePage(cobj, deep, recurse_list=None):
     """
     Builds a page with CliMAF figures, computing associated crs
@@ -1035,10 +1046,14 @@ def cfilePage(cobj, deep, recurse_list=None):
     xmargin = 30.  # Horizontal shift between figures
     ymargin = 30.  # Vertical shift between figures
     #
-    if cobj.title is "":
-        usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
-    else:
-        usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin - cobj.ybox
+    usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
+    if cobj.title is not "":
+        usable_height -= cobj.ybox
+    if cobj.insert is not "" :
+        ins_base_width,ins_base_height=get_fig_sizes(cobj.insert)
+        insert_height=int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
+        usable_height -= insert_height
+    #
     usable_width = cobj.page_width - xmargin * (len(cobj.widths) - 1.) - x_left_margin - x_right_margin
     #
     # page composition
@@ -1061,12 +1076,7 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            args_figsize = ["identify", figfile]
-            comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            output_figsize = comm_figsize.stdout.read()
-            figsize = output_figsize.split(" ").pop(2)
-            fig_width = figsize.split("x").pop(0)
-            fig_height = figsize.split("x").pop(1)
+            fig_width,fig_height=get_fig_sizes(figfile)
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1093,6 +1103,11 @@ def cfilePage(cobj, deep, recurse_list=None):
             y += height_adj + ymargin
         else:
             y += height + ymargin
+
+    if cobj.insert != "":
+        args.extend([cobj.insert, "-geometry", "x%d+%d+%d"%\
+                     (insert_height,(cobj.page_width-cobj.insert_width)/2,y),
+                    "-composite"])
 
     out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
     if cobj.page_trim:
