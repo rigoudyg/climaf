@@ -158,7 +158,7 @@ General:
     ``polyline_options`` : strings for setting NCL graphic resources
     directly, for the various fields (resources are separated by
     "|"). These lists have higher priority than the CliMAF default
-    ones. Each field has its own options argument, e.g. :  
+    ones. Each field has its own options argument, e.g. :
 
     - ``options`` for main field and vectors, e.g. :
       'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
@@ -279,7 +279,7 @@ Second auxiliary field:
 
   - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
     for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
-    and 'shade2_above=0.9' 
+    and 'shade2_above=0.9'
 
 
 .. _aux_field2_opt_args:
@@ -288,7 +288,7 @@ Second auxiliary field:
 
   - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
     for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
-    and 'shade2_above=0.9' 
+    and 'shade2_above=0.9'
 
 
 .. _aux_field2_opt_args:
@@ -297,7 +297,7 @@ Second auxiliary field:
 
   - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
     for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
-    and 'shade2_above=0.9' 
+    and 'shade2_above=0.9'
 
 .. _required_files:
 
