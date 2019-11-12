@@ -306,7 +306,7 @@ Second auxiliary field:
 
   - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
     for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
-    and 'shade2_above=0.9' 
+    and 'shade2_above=0.9'
 
 .. _required_files:
 

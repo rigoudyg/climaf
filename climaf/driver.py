@@ -1033,7 +1033,7 @@ def get_fig_sizes(figfile):
     figsize = output_figsize.split(" ").pop(2)
     fig_width = figsize.split("x").pop(0)
     fig_height = figsize.split("x").pop(1)
-    return int(fig_width), int(fig_height)
+    return int(fig_width),int(fig_height)
 
 
 def cfilePage(cobj, deep, recurse_list=None):
