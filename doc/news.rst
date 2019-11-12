@@ -89,6 +89,20 @@ Changes, newest first:
 
     - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
+- V1.2.13:
+
+  - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
+    the filename of an image to insert in the page, centered at the bottom, and
+    `insert_width` for tuning its size
+  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
+    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
+  - for climaf operators needing multiple optional input objects, providing a void
+    object is possible using an empty string (useful when wanting to provide another,
+    which comes after in the argument objects list)
+  - fixes for operator `plot`  : it actually uses user-provided max and min for
+    scaling field s order  of magnitude; and it won't plot a small empty square at
+    the bottom right corner
+
 - V1.2.12:
 
   - the version of the tools used is now displayed when CliMAF is loaded.
