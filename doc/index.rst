@@ -20,7 +20,7 @@ CliMAF is an `Open Source software
 <http://en.wikipedia.org/wiki/Open-source_software>`_, distributed
 with a GPL-compatible licence. See :doc:`the licence notice
 <license>`. 
-It is available at  `CliMAF GitHub repository <https://github.com/senesis/climaf>`_
+It is available at  `CliMAF GitHub repository <https://github.com/rigoudyg/climaf>`_
 
 The goal of CliMAF is to ease the common steps that separate you from your scientific diagnostic (in climate science):
 CliMAF was designed to answer those specifications of CliMAF:
