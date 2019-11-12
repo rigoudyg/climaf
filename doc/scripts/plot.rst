@@ -60,10 +60,12 @@ number of graphic attributes
 
   - a dataset for main field which can be up to 4-dimensional
 
-Additional fields (optional):
+Additional fields (optional, and in that order; replace with empty strings if needed):
 
   - a dataset for an auxiliary field which can be up to 4-dimensional
   - 2 datasets for a vector field which can be up to 4-dimensional
+  - another auxilliary scalar field which can be up to 4-dimensional
+    (and which is refered using keyword `shade2` further below)
 
 Warnings: 
 
@@ -177,7 +179,7 @@ General:
 	for 2D fields which have time and level dimensions, it is the
 	time extraction will be made.
 
-  - ``options``, ``aux_options``, ``shading_options``,
+  - ``options``, ``aux_options``, ``shading_options``, ``shade2_options``
     ``polyline_options`` : strings for setting NCL graphic resources
     directly, for the various fields (resources are separated by
     "|"). These lists have higher priority than the CliMAF default
@@ -263,7 +265,7 @@ Main field and/or auxiliary field:
 
 .. _aux_field_opt_args:
 
-Auxiliary field:
+First auxiliary field:
 
   - ``shade_below``, ``shade_above`` : shade contour regions for 
     values lower than (resp. higher than) the threshold, using a 
@@ -288,7 +290,7 @@ Vectors:
   - ``rotation`` : set it to 1 if you want to rotate vectors from model
     grid to geographic grid (see note below about an angles file)
   
-  - ``vcRefLengthF`` : length used, in units of Ncl's NDC (Normalized
+  - ``vcRefLengthF`` : length used, in units of Ncl s NDC (Normalized
     Device Coordinates), to render vectors with a magnitude equal to
     the reference magnitude, as specified by vcRefMagnitudeF; default
     (ncl): <dynamic>; see
@@ -314,6 +316,15 @@ Vectors:
     vector arrows; see e.g.
     http://www.ncl.ucar.edu/Document/Graphics/Resources/vc.shtml#vcLineArrowColor ; 
     default (climaf): "white"
+
+
+.. _aux_field2_opt_args:
+
+Second auxiliary field:
+
+  - ``shade2_below``, ``shade2_above`` : see similar options just above. For instance,
+    for stippling above field value 0.9 : 'shade2_options="gsnShadeHigh=17|gsnShadeFill=0.025|gsnShadeFillDotSizeF=0.003"'
+    and 'shade2_above=0.9' 
 
 .. _required_files:
 
