@@ -27,7 +27,7 @@ if [ "$*" ] ; then
     fi
 else
     # Interactive session (or read stdin)
-    if [ ! -d /cnrm ] ; then
+    if [ ! -d /cnrm ] && [ "$EMACS" != t ]; then
 	# Can use ipython
 	ipython -i -c 'from climaf.api import *'
     else
