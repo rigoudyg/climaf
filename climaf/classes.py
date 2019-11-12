@@ -111,6 +111,7 @@ class cproject():
         #
         self.facets = []
         self.facet_defaults = dict()
+        self.facet_authorized_values = dict()
         forced = ['project', 'simulation', 'variable', 'period', 'domain']
         for f in forced:
             self.facets.append(f)
@@ -195,6 +196,37 @@ def cdef(attribute, value=None, project=None):
         cprojects[project].facet_defaults[attribute] = value
 
 
+def cvalid(attribute, value=None, project=None):
+    """
+    Set or get the list of valid values for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
+    thos data files which match a dataset definition
+
+    Argument 'project' allows to restrict the use/query 
+    to the context of the given 'project'.
+
+    Example::
+
+    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
+    """
+
+    if project not in cprojects:
+        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+    if attribute == 'project':
+        project = None
+    #
+    if project and attribute not in cprojects[project].facets:
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+    if value is None:
+        rep = cprojects[project].facet_authorized_values.get(attribute, None)
+        if not rep:
+            rep = cprojects[None].facet_authorized_values.get(attribute, "")
+        return rep
+    else:
+        cprojects[project].facet_authorized_values[attribute] = value
+
+
+        
 cproject(None)
 cdef("domain", "global")
 
@@ -1039,14 +1071,14 @@ class cens(cobject, dict):
         #
         dict.update(self, dic)
         #
-        keylist = self.keys()
+        keylist = [ k for k in self.keys()]
         try:
             from natsort import natsorted
             keylist = natsorted(keylist)
         except:
             keylist.sort()
         if order:
-            self.set_order(order, keylist)
+            self.set_order(order, None)
         elif sortfunc:
             self.order = sortfunc(keylist)
         else:
@@ -2130,7 +2162,8 @@ def domainOf(cobject):
     elif cobject is None:
         return "none"
     else:
-        clogger.error("Unkown class for argument " + repr(cobject))
+        if cobject != "" :
+            clogger.error("Unkown class for argument " + repr(cobject))
 
 
 def varOf(cobject): return attributeOf(cobject, "variable")
