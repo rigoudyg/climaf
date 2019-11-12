@@ -498,7 +498,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             label, multiple, serie = script.inputs[i]
             subdict[label] = infile
             # Provide the name of the variable in input file if script allows for
-            if isinstance(op, classes.cobject):
+            if isinstance(op, classes.cobject) :
                 subdict["var_%d" % i] = classes.varOf(op)
             if isinstance(op, classes.cdataset) and op.alias:
                 filevar, scale, offset, units, filenameVar, missing = op.alias
@@ -1019,9 +1019,9 @@ def get_fig_sizes(figfile):
     figsize = output_figsize.split(" ").pop(2)
     fig_width = figsize.split("x").pop(0)
     fig_height = figsize.split("x").pop(1)
-    return int(fig_width), int(fig_height)
+    return int(fig_width),int(fig_height)
 
-
+        
 def cfilePage(cobj, deep, recurse_list=None):
     """
     Builds a page with CliMAF figures, computing associated crs
@@ -1051,9 +1051,9 @@ def cfilePage(cobj, deep, recurse_list=None):
     usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
     if cobj.title is not "":
         usable_height -= cobj.ybox
-    if cobj.insert is not "":
-        ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
-        insert_height = int((float(ins_base_height) * cobj.insert_width) / float(ins_base_width))
+    if cobj.insert is not "" :
+        ins_base_width,ins_base_height=get_fig_sizes(cobj.insert)
+        insert_height=int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
         usable_height -= insert_height
     #
     usable_width = cobj.page_width - xmargin * (len(cobj.widths) - 1.) - x_left_margin - x_right_margin
@@ -1078,7 +1078,7 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            fig_width, fig_height = get_fig_sizes(figfile)
+            fig_width,fig_height=get_fig_sizes(figfile)
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1107,9 +1107,9 @@ def cfilePage(cobj, deep, recurse_list=None):
             y += height + ymargin
 
     if cobj.insert != "":
-        args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
-                     (insert_height, (cobj.page_width - cobj.insert_width) / 2, y),
-                     "-composite"])
+        args.extend([cobj.insert, "-geometry", "x%d+%d+%d"%\
+                     (insert_height,(cobj.page_width-cobj.insert_width)/2,y),
+                    "-composite"])
 
     out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
     if cobj.page_trim:
