@@ -177,11 +177,14 @@ begin
       status_exit(1)
     end if
     if (i .eq. 0) then
-      fld_min=min(fld)
-      fld_max=max(fld)
-    end if
-    if (fld_min .gt. min(fld)) then fld_min=min(fld) end if
-    if (fld_max .lt. max(fld)) then fld_max=max(fld) end if
+      fld_min=min(fld*tofloat(myscale)+tofloat(myoffset))
+      fld_max=max(fld*tofloat(myscale)+tofloat(myoffset))
+    else 
+      alt_fld_min=min(fld*tofloat(myscale_aux)+tofloat(myoffset_aux))
+      if (fld_min .gt. alt_fld_min) then fld_min=alt_fld_min end if
+      alt_fld_max=max(fld*tofloat(myscale_aux)+tofloat(myoffset_aux))
+      if (fld_max .lt. alt_fld_max) then fld_max=alt_fld_max end if
+     end if
    
     ;fld=fld*tofloat(myscale)+tofloat(myoffset)
     
