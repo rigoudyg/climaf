@@ -460,15 +460,16 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
         if isinstance(op, classes.cdataset) and op.alias:
-            filevar, scale, offset, units, filenameVar, missing = op.alias
-            if scriptCall.flags.canAlias and "," not in classes.varOf(op):
-                # if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
-                subdict["var"] = Template(filevar).safe_substitute(op.kvp)
-                subdict["alias"] = "%s,%s,%.4g,%.4g" % (classes.varOf(op), subdict["var"], scale, offset)
-            if units:
-                subdict["units"] = units
-            if scriptCall.flags.canMissing and missing:
-                subdict["missing"] = missing
+            filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
+            if op.matches_conditions(conditions) :
+                if scriptCall.flags.canAlias and "," not in classes.varOf(op):
+                    # if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
+                    subdict["var"] = Template(filevar).safe_substitute(op.kvp)
+                    subdict["alias"] = "%s,%s,%.4g,%.4g" % (classes.varOf(op), subdict["var"], scale, offset)
+                if units:
+                    subdict["units"] = units
+                if scriptCall.flags.canMissing and missing:
+                    subdict["missing"] = missing
         if isinstance(op, classes.cens):
             if not multiple:
                 raise Climaf_Driver_Error(
@@ -501,16 +502,18 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             if isinstance(op, classes.cobject) :
                 subdict["var_%d" % i] = classes.varOf(op)
             if isinstance(op, classes.cdataset) and op.alias:
-                filevar, scale, offset, units, filenameVar, missing = op.alias
-                if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
+                filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
+                if op.matches_conditions(conditions) :
+                    if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
                         "," not in classes.varOf(op):
-                    subdict["var_%d" % i] = Template(filevar).safe_substitute(op.kvp)
-                    subdict["alias_%d" % i] = "%s %s %f %f" % (classes.varOf(op), subdict["var_%d" % i], scale, offset)
-                if units:
-                    subdict["units_%d" % i] = units
-                if missing:
-                    subdict["missing_%d" % i] = missing
-                # Provide period selection if script allows for
+                        subdict["var_%d" % i] = Template(filevar).safe_substitute(op.kvp)
+                        subdict["alias_%d" % i] = "%s %s %f %f" % (classes.varOf(op),
+                                                    subdict["var_%d" % i], scale, offset)
+                    if units:
+                        subdict["units_%d" % i] = units
+                    if missing:
+                        subdict["missing_%d" % i] = missing
+            # Provide period selection if script allows for
             if op:
                 per = timePeriod(op)
                 if not per.fx and per != "":
