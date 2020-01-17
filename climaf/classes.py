@@ -1303,6 +1303,10 @@ class ctree(cobject):
             p = parameters["period"]
             if isinstance(p, cperiod):
                 parameters["period"] = repr(p)
+        if "variable" in parameters:
+            self.variable = parameters["variable"]
+        else:
+            self.variable = None
         self.parameters = parameters
         for o in operands:
             if o and not isinstance(o, cobject):
@@ -1330,10 +1334,11 @@ class ctree(cobject):
         clefs = self.parameters.keys()
         clefs.sort()
         for par in clefs:
-            if par != 'member_label':
+            if par != 'member_label':  # and self.parameters[par] is not None:
                 rep += par + "=" + repr(self.parameters[par]) + ","
         rep += ")"
         rep = rep.replace(",)", ")")
+        clogger.debug("Create crs for ctree: %s" % rep)
         return rep
 
     def setperiod(self, period):
@@ -1353,14 +1358,14 @@ class scriptChild(cobject):
         """
         self.father = cobject
         self.varname = varname
+        self.variable = varname
         self.crs = self.buildcrs()
         self.file = None
         self.register()
 
     def setperiod(self, period):
         self.erase()
-        self.crs = self.father.crs.buildcrs(period=period)
-        self.crs += "." + self.varname
+        self.crs = self.buildcrs(period=period)
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
@@ -1386,20 +1391,37 @@ def compare_trees(tree1, tree2, func, filter_on_operator=None):
     FUNC cannot return None as a valid value
     """
     if isinstance(tree1, cdataset) and isinstance(tree2, cdataset):
-        return func(tree1, tree2)
+        rep = func(tree1, tree2)
+        clogger.debug("Comparison of two datasets...")
+        clogger.debug("... %s" % str(rep))
+        return rep
     elif isinstance(tree1, ctree) and isinstance(tree2, ctree):
+        clogger.debug("Comparison of two trees...")
         if tree1.operator == tree2.operator:
             if filter_on_operator:
                 if filter_on_operator(tree1.operator):
+                    clogger.debug("Operator filtered: %s" % tree1.operator)
                     return None
             if tree1.parameters == tree2.parameters:
-                return (reduce(lambda a, b: a if repr(a) == repr(b) else None,
-                               [compare_trees(op1, op2, func, filter_on_operator)
-                                for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                clogger.debug("Parameters are coherent: %s" % tree1.parameters)
+                rep = (reduce(lambda a, b: a if repr(a) == repr(b) else None,
+                              [compare_trees(op1, op2, func, filter_on_operator)
+                               for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                clogger.debug("... %s" % str(rep))
+                return rep
+            else:
+                clogger.debug("Parameters are not coherent: %s/%s" % (tree1.parameters, tree2.parameters))
+                return None
     elif isinstance(tree1, scriptChild) and isinstance(tree2, scriptChild):
+        clogger.debug("Comparison of two scriptChild...")
         if tree1.varname == tree2.varname:
-            return compare_trees(tree1.father, tree2.father,
-                                 func, filter_on_operator)
+            clogger.debug("... varnames are coherent: %s" % tree1.varname)
+            rep = compare_trees(tree1.father, tree2.father, func, filter_on_operator)
+            clogger.debug("... %s" % str(rep))
+            return rep
+        else:
+            clogger.debug("... varnames are not coherent: %s/%s" % (tree1.varname, tree2.varname))
+            return None
 
 
 allow_errors_on_ds_call = True  # False
@@ -2133,10 +2155,20 @@ def attributeOf(cobject, attrib):
     elif isinstance(cobject, cens):
         return attributeOf(cobject.values()[0], attrib)
     elif getattr(cobject, attrib, None):
-        return getattr(cobject, attrib)
+        value = getattr(cobject, attrib)
+        clogger.debug("Find value for object... %s" % value)
+        return value
     elif isinstance(cobject, ctree):
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
-        return attributeOf(cobject.operands[0], attrib)
+        # TODO: Check which operands in the correct one
+        value = getattr(cobject, attrib, None)
+        if value is None:
+            value = attributeOf(cobject.operands[0], attrib)
+            clogger.debug("Find value for current first operand... %s" % value)
+            return value
+        else:
+            clogger.debug("Find value for current object... %s" % value)
+            return value
     elif isinstance(cobject, cdummy):
         return "dummy"
     elif isinstance(cobject, cpage) or isinstance(cobject, cpage_pdf):
