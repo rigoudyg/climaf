@@ -14,25 +14,48 @@ import subprocess
 import time
 import glob
 import shutil
+import six
 
 from climaf.site_settings import onCiclad
 from climaf.anynetcdf import ncf
+from climaf.clogging import clogger
+
+
+def correct_args_type(value):
+    if isinstance(value, six.string_types):
+        if value in ["no", "False"]:
+            value = False
+        elif value in ["yes", "True"]:
+            value = True
+        elif value in ["", "none", "None"]:
+            value = None
+        else:
+            value = value.strip()
+    return value
+
+
+def correct_list_args(value):
+    if len(value) == 0:
+        return None
+    else:
+        return value.split(",")
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_files", action="append")
-    parser.add_argument("--operator", help="Operator to be applied")
+    parser.add_argument("input_files", type=correct_args_type, action="append")
+    parser.add_argument("--operator", type=correct_args_type, help="Operator to be applied")
     parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
                         help="If True, the operator is applied after merge time. If false, it is applied before.")
-    parser.add_argument("--output_file", help="Name of the output file")
-    parser.add_argument("--var", help="Variable to be considered")
-    parser.add_argument("--period", help="Period to be considered")
-    parser.add_argument("--region", type=list,
+    parser.add_argument("--output_file", type=correct_args_type, help="Name of the output file")
+    parser.add_argument("--var", "--variable", dest="variable", type=correct_args_type,
+                        help="Variable to be considered")
+    parser.add_argument("--period", type=correct_args_type, help="Period to be considered")
+    parser.add_argument("--region", type=correct_list_args,
                         help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
-    parser.add_argument("--alias", help="Alias to be used")
-    parser.add_argument("--units", help="Units of the variable")
-    parser.add_argument("--vm", help="")
+    parser.add_argument("--alias", type=correct_args_type, help="Alias to be used")
+    parser.add_argument("--units", type=correct_args_type, help="Units of the variable")
+    parser.add_argument("--vm", type=correct_args_type, help="")
 
     args = parser.parse_args()
     return dict(input_files=args.input_files, operator=args.operator, output_file=args.output_file,
@@ -125,9 +148,10 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar):
 
 
 def call_subprocess(command):
-    print "Time at launch", time.time()
-    subprocess.run(command)
-    print "Time at end", time.time()
+    clogger.debug("Command launched %s" % command)
+    clogger.debug("Time at launch %s" % time.time())
+    clogger.debug(subprocess.check_output(command, shell=True))
+    clogger.debug("Time at end %s" % time.time())
 
 
 def remove_dir_and_content(path_to_treat):
@@ -144,6 +168,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
          operator=None,  apply_operator_after_merge=None):
     # Create a temporary directory
     tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
+    clogger.debug("Create temporary dir %s" % tmp)
     os.chdir(tmp)
 
     # Initialize cdo commands
@@ -157,15 +182,19 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         init_cdo_command = "cdo -O"
     else:
         init_cdo_command = "cdo -O -f nc"
+    clogger.debug("CDO command init: %s" % init_cdo_command)
 
     # If needed, select the variable first or compute it if it is an alias
+    clogger.debug("Alias and variable considered: %s -- %s" % (alias, variable))
     if alias is not None:
         if variable is None:
+            clogger.error("Units can be used only if variable is specified")
             raise Exception("Units can be used only if variable is specified")
         else:
             var, filevar, scale, offset = alias.split(", ")
             if var != variable:
-                raise Exception("Incoherence between variable and aliased variable:", variable, var)
+                clogger.error("Incoherence between variable and aliased variable: %s %s" % (variable, var))
+                raise Exception("Incoherence between variable and aliased variable: %s %s" % (variable, var))
             else:
                 cdo_commands_before_merge.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
                 cdo_commands_before_merge.append("-selname,{}".format(var))
@@ -175,18 +204,22 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         cdo_commands_before_merge.append("-selname,{}".format(var))
 
     # Then, if needed, select the domain
+    clogger.debug("Region considered: %s" % region)
     if region is not None:
-        latmin, latmax, lonmin, lonmax = region.split(",")
+        latmin, latmax, lonmin, lonmax = region[:]
         cdo_commands_before_merge.append("-sellonlatbox,{},{},{},{}".format(lonmin, lonmax, latmin, latmax))
 
     # Then, if needed, change the units
+    clogger.debug("Units considered: %s" % units)
     if units is not None:
         if variable is None:
+            clogger.error("Units can be used only if variable is specified")
             raise Exception("Units can be used only if variable is specified")
         else:
             cdo_commands_before_merge.append("-setattribute,{}@units={}".format(variable, units.replace(" ", "*")))
 
     # Then, if needed, deal with missing values
+    clogger.debug("Vm considered: %s" % vm)
     if vm is not None:
         cdo_commands_before_merge.append("-setctomiss,{}".format(vm))
 
@@ -195,6 +228,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         cdo_commands_after_merge.append("-mergetime")
 
     # Then deal with date selection
+    clogger.debug("Period considered: %s" % period)
     if period is not None:
         seldate = "-seldate,{}".format(period)
         clim_time_fix =  clim_timefix(input_files[0])
@@ -203,6 +237,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         cdo_commands_after_merge.append(seldate)
 
     # Then, if needed, deal with the operator
+    clogger.debug("Operator considered: %s" % operator)
     if operator is not None:
         if apply_operator_after_merge:
             cdo_commands_after_merge.append("-{}".format(operator))
@@ -225,15 +260,17 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             tmp_file_name = "_".join(["tmp", tmp_file_name])
             tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
         if not os.path.isfile(tmp_file_name):
-            cdo_command = " ".join([init_cdo_command, ] + reversed(cdo_commands_before_merge) + [a_file, tmp_file_name])
+            cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_before_merge)) + [a_file, tmp_file_name])
             call_subprocess(cdo_command)
             if not os.path.isfile(tmp_file_path):
-                raise Exception("Could not create the file ")
+                clogger.error("Could not create the file %s" % tmp_file_path)
+                raise Exception("Could not create the file %s" % tmp_file_path)
             files_to_treat_after_merging.append(tmp_file_path)
         else:
+            clogger.error("Should not pass here...")
             raise Exception("Should not pass here...")
 
-    cdo_command = " ".join([init_cdo_command, ] + reversed(cdo_commands_after_merge) + files_to_treat_after_merging +
+    cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) + files_to_treat_after_merging +
                            [output_file, ])
     call_subprocess(cdo_command)
 

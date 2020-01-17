@@ -82,7 +82,7 @@ def capply_script(script_name, *operands, **parameters):
     for para in parameters:
         if re.match(r".*\{" + para + r"\}", script.command) is None:
             if re.match(r".*\{" + para + r"_iso\}", script.command) is None:
-                if para != 'member_label':
+                if para != 'member_label' and not para.startswith("add_"):
                     raise Climaf_Driver_Error("parameter '%s' is not expected by script %s"
                                               "(which command is : %s)" % (para, script_name, script.command))
     #
@@ -117,10 +117,17 @@ def maketree(script_name, script, *operands, **parameters):
     #  - creating a ctree object representing the application of the scripts to its operands
     #  - computing the variable name for all outputs, using dict script.outputs
     #  - for each secondary outputs, creating an attribute of the ctree named as this output
+    add_dict = dict()
+    for p in [p for p in parameters if p.startswith("add_")]:
+        add_dict[p] = parameters.pop(p)
+    if "add_variable" in add_dict:
+        defaultVariable = add_dict["add_variable"]
+        parameters["add_variable"] = defaultVariable
+    else:
+        defaultVariable = classes.varOf(operands[0])
     rep = classes.ctree(script_name, script, *operands, **parameters)
     # TBD Analyze script inputs cardinality vs actual arguments
     # Create one child for each output
-    defaultVariable = classes.varOf(operands[0])
     # defaultPeriod=operands[0].period
     for outname in script.outputs:
         if outname is None or outname == '':
@@ -331,11 +338,13 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         if not deep:
             deep = None
         if isinstance(cobject, classes.ctree):
+            clogger.debug("Deal with ctree: %s" % cobject.crs)
             #
             # the cache doesn't have a similar tree, let us recursively eval subtrees
             ##########################################################################
             # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
             if cobject.operator in operators.scripts:
+                clogger.debug("Script %s found" % cobject.operator)
                 file = ceval_script(cobject, deep,
                                     recurse_list=recurse_list)  # Does return a filename, or list of filenames
                 cdedent()
@@ -344,6 +353,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 else:
                     return cread(file, classes.varOf(cobject))
             elif cobject.operator in operators.operators:
+                clogger.debug("Operator %s found" % cobject.operator)
                 obj = ceval_operator(cobject, deep)
                 cdedent()
                 if format == 'file':
@@ -354,6 +364,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else:
                 raise Climaf_Driver_Error("operator %s is not a script nor known operator", str(cobject.operator))
         elif isinstance(cobject, classes.scriptChild):
+            clogger.debug("Deal with scriptChild: %s" % cobject.crs)
             # Force evaluation of 'father' script
             if ceval_script(cobject.father, deep, recurse_list=recurse_list) is not None:
                 # Re-evaluate, which should succeed using cache
@@ -363,6 +374,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else:
                 raise Climaf_Driver_Error("generating script aborted for " + cobject.father.crs)
         elif isinstance(cobject, classes.cpage):
+            clogger.debug("Deal with cpage: %s" % cobject.crs)
             file = cfilePage(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if format == 'file':
@@ -370,6 +382,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else:
                 return cread(file)  # !! Does it make sense ?
         elif isinstance(cobject, classes.cpage_pdf):
+            clogger.debug("Deal with cpage_pdf: %s" % cobject.crs)
             file = cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
             cdedent()
             if format == 'file':
@@ -377,6 +390,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
             else:
                 return cread(file)  # !! Does it make sense ?
         elif isinstance(cobject, classes.cens):
+            clogger.debug("Deal with cens: %s" % cobject.crs)
             d = dict()
             for member in cobject.order:
                 # print ("evaluating member %s"%member)
@@ -445,6 +459,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
+        print("DEBUG", op)
+        print("DEBUG", subdict["var"])
         if isinstance(op, classes.cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing = op.alias
             if scriptCall.flags.canAlias and "," not in classes.varOf(op):
@@ -468,6 +484,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 subdict["period_iso"] = per.iso()
         if scriptCall.flags.canSelectDomain:
             subdict["domain"] = classes.domainOf(op)
+    else:
+        subdict["var"] = classes.varOf(scriptCall)
+        print("DEBUG", subdict["var"])
     i = 0
     for op in scriptCall.operands:
         if op:
@@ -676,7 +695,11 @@ def ceval_select(includer, included, userflags, format, deep, derived_list, recu
             # includer.setperiod(included.period)
         incperiod = timePeriod(included)
         clogger.debug("extract sub period %s out of %s" % (repr(incperiod), includer.crs))
+        clogger.debug("Variable considered in includer: %s" % includer.variable)
+        clogger.debug("Variable considered in included: %s" % included.variable)
         extract = capply('select', includer, period=repr(incperiod))
+        clogger.debug("Variable considered in extract: %s" % extract.variable)
+        clogger.debug("Extract crs found: %s" % extract)
         objfile = ceval(extract, userflags, 'file', deep, derived_list, recurse_list)
         if objfile:
             crs = includer.buildcrs(period=incperiod)
@@ -748,15 +771,21 @@ def derive_variable(ds):
     op, outname, inVarNames, params = operators.derived_variable(ds.variable, ds.project)
     inVars = []
     for varname in inVarNames:
-        dic = ds.kvp.copy()
+        dic = copy.deepcopy(ds.kvp)
         dic['variable'] = varname
         inVars.append(classes.cdataset(**dic))
+    params["add_variable"] = ds.variable
+    # TODO: force the output variable to be well defined
     father = capply(op, *inVars, **params)
-    if outname == "out":
+    clogger.debug("Father object is: %s" % repr(father))
+    if outname == "out" or outname == ds.variable:
         rep = father
     else:
-        rep = scriptChild(father, outname)
+        rep = classes.scriptChild(father, outname)
+    clogger.debug("DEBUG variable>>> %s" % rep.variable)
+    # TODO: check the type of the outputs
     rep.variable = ds.variable
+    clogger.debug("DEBUG variable>>> %s" % rep.variable)
     return rep
 
 

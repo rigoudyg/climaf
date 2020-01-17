@@ -500,7 +500,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
                     (not getattr(Operator, "outvarnames", None)
                      or outname not in Operator.outvarnames)):
                 raise Climaf_Operator_Error(
-                    "%s is not a named  ouput for operator %s; type help(%s)" % (outname, Operator, Operator))
+                    "%s is not a named  output for operator %s; type help(%s)" % (outname, Operator, Operator))
             s = scripts[Operator]
             if s.inputs_number() != len(invars):
                 clogger.error("number of input variables for operator %s is %d, which is inconsistent with "
@@ -510,7 +510,10 @@ def derive(project, derivedVar, Operator, *invars, **params):
             # its list in cscript.init() )
             if project not in derived_variables:
                 derived_variables[project] = dict()
-            derived_variables[project][derivedVar[outname]] = (Operator, outname, list(invars), params)
+            clogger.debug("Add derive variable %s obtained with operator %s, output variable %s, input variables %s "
+                          "and parameters %s" % (derivedVar[outname], str(Operator), derivedVar[outname],
+                                                 str(list(invars)), str(params)))
+            derived_variables[project][derivedVar[outname]] = (Operator, derivedVar[outname], list(invars), params)
     elif Operator in operators:
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else:
