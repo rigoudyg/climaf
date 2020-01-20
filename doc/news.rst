@@ -22,6 +22,10 @@ Changes, newest first:
     period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
     False to avoid it
 
+  - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
+    script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
+    definitely moved to this CliMAF version; this is not mandatory, but will actually
+    lower your inodes/files use
   - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
     to restrict its effect, based on the value of some facets, through a
     dictionary of criteria. Example, for a given model which CMIP6 data has

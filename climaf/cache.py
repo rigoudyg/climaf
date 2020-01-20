@@ -95,7 +95,8 @@ def hash_to_path(vhash,format,option):
     if option == "new":
         rep = currentCache + "/" + prefix + vhash[0:2] + "/" + vhash[2:] + "." + format
     else:
-        rep = currentCache + "/" + prefix + stringToPath(vhash[0: fileNameLength - 1], directoryNameLength) + "." + format
+        rep = currentCache + "/" + prefix + stringToPath(vhash[0: fileNameLength - 1], directoryNameLength) + "." + \
+              format
     rep = os.path.expanduser(rep)
     return rep
 
@@ -121,7 +122,7 @@ def alternate_filename(fpath):
         option = "new"
     rep = hash_to_path(vhash, format, option)
     return rep
-    
+
 
 def stringToPath(name, length):
     """ Breaks NAME to a path with LENGTH characters-long directory names , for avoiding crowded directories"""
