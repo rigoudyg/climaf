@@ -42,9 +42,9 @@ def load_standard_operators():
                          ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
                          '--vm="${missing}" ${ins}')
     #
-    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
-
+    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
+    cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
