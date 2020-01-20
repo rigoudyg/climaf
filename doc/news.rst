@@ -27,30 +27,39 @@ Changes, newest first:
 
 - Vnext:
 
+  - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
+
   - Cache speed improvement : when computing a CliMAF object, default behaviour is to
     search cache for 'including' or 'begin' objects (i.e. similar objects with different
     period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
     False to avoid it
+
   - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
     script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
     definitely moved to this CliMAF version; this is not mandatory, but will actually
     lower your inodes/files use
+
   - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
     to restrict its effect, based on the value of some facets, through a
     dictionary of criteria. Example, for a given model which CMIP6 data has
     an error for variable ``evspsbl``   on some data versions :
     >>> calias('CMIP6,'evspsbl,scale=_1,conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] })
+
   - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
     the filename of an image to insert in the page, centered at the bottom, and
     `insert_width` for tuning its size
+
   - operator `plot` can superimpose a second overlay field, as for e.g. stippling + 
     hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`. 
+
   - for climaf operators needing multiple optional input objects, providing a void 
     object is possible using an empty string (useful when wanting to provide another, 
     which comes after in the argument objects list)
+
   - fixes for operator `plot`  : it actually uses user-provided max and min for 
     scaling field s order  of magnitude; and it won't plot a small empty square at
     the bottom right corner
+
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
     constrain the identification of files for a dataset, as e.g. for CMIP6
