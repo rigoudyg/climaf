@@ -459,8 +459,6 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
-        print("DEBUG", op)
-        print("DEBUG", subdict["var"])
         if isinstance(op, classes.cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing = op.alias
             if scriptCall.flags.canAlias and "," not in classes.varOf(op):
@@ -486,7 +484,6 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict["domain"] = classes.domainOf(op)
     else:
         subdict["var"] = classes.varOf(scriptCall)
-        print("DEBUG", subdict["var"])
     i = 0
     for op in scriptCall.operands:
         if op:
