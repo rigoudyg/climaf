@@ -17,7 +17,16 @@ Changes, newest first:
 
   - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
 
-  - cache speed improvement : when computing a CliMAF object, default behaviour is to
+  - fixes:
+
+    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
+
+
+- Vnext:
+
+  - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
+
+  - Cache speed improvement : when computing a CliMAF object, default behaviour is to
     search cache for 'including' or 'begin' objects (i.e. similar objects with different
     period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
     False to avoid it
@@ -26,6 +35,7 @@ Changes, newest first:
     script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
     definitely moved to this CliMAF version; this is not mandatory, but will actually
     lower your inodes/files use
+
   - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
     to restrict its effect, based on the value of some facets, through a
     dictionary of criteria. Example, for a given model which CMIP6 data has
