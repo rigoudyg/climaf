@@ -36,6 +36,9 @@ from climaf import xdg_bin
 
 logdir = "."
 
+# When evaluating an object, default behaviour is to search cache for including or begin objects
+# but this could be expensive
+dig_hard_into_cache=True
 
 def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
@@ -43,7 +46,7 @@ def capply(climaf_operator, *operands, **parameters):
     Returns results as a list of CliMAF objects and stores them if auto-store is on
     """
     res = None
-    if operands is None or operands[0] is None and not allow_errors_on_ds_call:
+    if operands is None or operands[0] is None and not classes.allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
     opds = map(str, operands)
     if climaf_operator in operators.scripts:
@@ -295,44 +298,45 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return cread(filename, classes.varOf(cobject))
         if not isinstance(cobject, classes.cpage) and not isinstance(cobject, classes.cpage_pdf) and \
                 not isinstance(cobject, classes.cens):
-            clogger.debug("Searching cache for including object for : " + repr(cobject))
-            ########################################################################
-            it, altperiod = cache.hasIncludingObject(cobject)
-            # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
-            # it=None
-            if it:
-                clogger.info("Including object found in cache : %s" % it.crs)
-                if format == 'file':
-                    clogger.info("Selecting " + repr(cobject) + " out of it")
-                    # Just select (if necessary for the user) the portion relevant to the request
-                    rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
+            if dig_hard_into_cache :
+                clogger.debug("Searching cache for including object for : " + repr(cobject))
+                ########################################################################
+                it, altperiod = cache.hasIncludingObject(cobject)
+                # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
+                # it=None
+                if it:
+                    clogger.info("Including object found in cache : %s" % it.crs)
+                    if format == 'file':
+                        clogger.info("Selecting " + repr(cobject) + " out of it")
+                        # Just select (if necessary for the user) the portion relevant to the request
+                        rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
+                        cdedent()
+                        return rep
+                    else:
+                        clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
+                                      "including object found for : " % format + repr(cobject))
+                    #
+                clogger.debug("Searching cache for begin  object for : " + repr(cobject))
+                ########################################################################
+                it, comp_period = cache.hasBeginObject(cobject)
+                clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
+                # it=None
+                if it:
+                    clogger.info("partial result found in cache for %s : %s" % (cobject.crs, it.crs))
+                    clogger.debug("comp_period=" + repr(comp_period))
+                    begcrs = it.crs
+                    # Build complement object for end, and eval it
+                    comp = copy.deepcopy(it)
+                    comp.setperiod(comp_period)
+                    evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
+                    set_variable(evalcomp, cobject.variable, format=format)
+                    rep = cache.complement(begcrs, comp.crs, cobject.crs)
                     cdedent()
-                    return rep
-                else:
-                    clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
-                                  "including object found for : " % format + repr(cobject))
-            #
-            clogger.debug("Searching cache for begin  object for : " + repr(cobject))
-            ########################################################################
-            it, comp_period = cache.hasBeginObject(cobject)
-            clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
-            # it=None
-            if it:
-                clogger.info("partial result found in cache for %s : %s" % (cobject.crs, it.crs))
-                clogger.debug("comp_period=" + repr(comp_period))
-                begcrs = it.crs
-                # Build complement object for end, and eval it
-                comp = copy.deepcopy(it)
-                comp.setperiod(comp_period)
-                evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
-                set_variable(evalcomp, cobject.variable, format=format)
-                rep = cache.complement(begcrs, comp.crs, cobject.crs)
-                cdedent()
-                if format == 'file':
-                    return rep
-                else:
-                    return ceval(cobject)
-            #
+                    if format == 'file':
+                        return rep
+                    else:
+                        return ceval(cobject)
+                #
             clogger.info("nothing relevant found in cache for %s" % cobject.crs)
         #
         if not deep:
@@ -621,6 +625,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     tim1 = time.time()
     clogger.info("Launching command:" + template)
+    #print("Launching command:" + template)
     #
     logfile = open(logdir + '/last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
@@ -628,7 +633,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError, inst:
         logfile.close()
-        raise Climaf_Driver_Error("Something went wrong - Type 'cerr()' for details")
+        raise Climaf_Driver_Error("Something went wrong when computing "+scriptCall.crs+". See file ./last.out for details")
 
     logfile.close()
     #
@@ -1253,7 +1258,7 @@ def efile(obj, filename, force=False):
          label (e.g. : tas_CNRM-CM, tas_IPSL-CM... ) (more formally :
          'var(obj.order[n])'_'obj.ens[order[n]]')
 
-        force (logical, optional) : if True, CliMAF will override the file
+        force (logical, optional) : if True, CliMAF will overwrite the file
          'filename' if it already exists
 
     """
@@ -1262,9 +1267,9 @@ def efile(obj, filename, force=False):
         if os.path.isfile(filename):
             if force:
                 os.system("rm -rf %s" % filename)
-                clogger.warning("File '%s' already existed and has been overriden" % filename)
+                clogger.warning("File '%s' already existed and has been overwritten" % filename)
             else:
-                raise Climaf_Driver_Error("File '%s' already exists: use 'force=True' to override it" % filename)
+                raise Climaf_Driver_Error("File '%s' already exists: use 'force=True' to overwrite it" % filename)
 
         for lab in obj.order:
             memb = obj[lab]

@@ -27,6 +27,10 @@ Changes, newest first:
 
 - Vnext:
 
+  - Cache speed improvement : when computing a CliMAF object, default behaviour is to
+    search cache for 'including' or 'begin' objects (i.e. similar objects with different
+    period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
+    False to avoid it
   - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
     script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
     definitely moved to this CliMAF version; this is not mandatory, but will actually
