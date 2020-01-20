@@ -203,9 +203,12 @@ def load_standard_operators():
     #
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
     #
-    cscript('slice',
+    cscript('cslice_average',
             "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} tmp.nc ; "
             "ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
+    #
+    cscript('cslice_select',
+            "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} ${out}")
     #
     cscript("mask", "cdo setctomiss,${miss} ${in} ${out}")
     #
