@@ -18,7 +18,7 @@ import six
 
 from climaf.site_settings import onCiclad
 from climaf.anynetcdf import ncf
-from climaf.clogging import clogger
+from climaf.clogging import clogger, clog
 
 
 def correct_args_type(value):
@@ -43,7 +43,7 @@ def correct_list_args(value):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_files", type=correct_args_type, action="append")
+    parser.add_argument("input_files", nargs=argparse.REMAINDER, type=correct_args_type)
     parser.add_argument("--operator", type=correct_args_type, help="Operator to be applied")
     parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
                         help="If True, the operator is applied after merge time. If false, it is applied before.")
@@ -53,7 +53,7 @@ def parse_args():
     parser.add_argument("--period", type=correct_args_type, help="Period to be considered")
     parser.add_argument("--region", type=correct_list_args,
                         help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
-    parser.add_argument("--alias", type=correct_args_type, help="Alias to be used")
+    parser.add_argument("--alias", type=correct_list_args, help="Alias to be used")
     parser.add_argument("--units", type=correct_args_type, help="Units of the variable")
     parser.add_argument("--vm", type=correct_args_type, help="")
 
@@ -166,6 +166,7 @@ def remove_dir_and_content(path_to_treat):
 
 def main(input_files, output_file, variable=None, alias=None, region=None, units=None, vm=None, period=None,
          operator=None,  apply_operator_after_merge=None):
+    clog("debug")
     # Create a temporary directory
     tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
     clogger.debug("Create temporary dir %s" % tmp)
@@ -186,22 +187,18 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # If needed, select the variable first or compute it if it is an alias
     clogger.debug("Alias and variable considered: %s -- %s" % (alias, variable))
-    if alias is not None:
-        if variable is None:
-            clogger.error("Units can be used only if variable is specified")
-            raise Exception("Units can be used only if variable is specified")
-        else:
-            var, filevar, scale, offset = alias.split(", ")
-            if var != variable:
-                clogger.error("Incoherence between variable and aliased variable: %s %s" % (variable, var))
-                raise Exception("Incoherence between variable and aliased variable: %s %s" % (variable, var))
-            else:
-                cdo_commands_before_merge.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
-                cdo_commands_before_merge.append("-selname,{}".format(var))
-    elif variable is not None:
+    if variable is not None:
         var = variable
         file_var = var
         cdo_commands_before_merge.append("-selname,{}".format(var))
+    if alias is not None:
+        var, filevar, scale, offset = alias[:]
+        if variable is not None and filevar != variable:
+            clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
+            raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
+        else:
+            cdo_commands_before_merge.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
+            cdo_commands_before_merge.append("-selname,{}".format(var))
 
     # Then, if needed, select the domain
     clogger.debug("Region considered: %s" % region)
@@ -252,27 +249,37 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             files_to_treat_before_merging.append(aladin_coordfix(a_file), tmp, filevar)
         files_to_treat_before_merging.append(a_file)
 
-    files_to_treat_after_merging = list()
-    for a_file in files_to_treat_before_merging:
-        tmp_file_name = a_file.split(os.path.sep)[-1]
-        tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-        while os.path.exists(tmp_file_path):
-            tmp_file_name = "_".join(["tmp", tmp_file_name])
+    if len(files_to_treat_before_merging) > 1:
+        files_to_treat_after_merging = list()
+        for a_file in files_to_treat_before_merging:
+            tmp_file_name = a_file.split(os.path.sep)[-1]
             tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-        if not os.path.isfile(tmp_file_name):
-            cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_before_merge)) + [a_file, tmp_file_name])
-            call_subprocess(cdo_command)
-            if not os.path.isfile(tmp_file_path):
-                clogger.error("Could not create the file %s" % tmp_file_path)
-                raise Exception("Could not create the file %s" % tmp_file_path)
-            files_to_treat_after_merging.append(tmp_file_path)
-        else:
-            clogger.error("Should not pass here...")
-            raise Exception("Should not pass here...")
+            while os.path.exists(tmp_file_path):
+                tmp_file_name = "_".join(["tmp", tmp_file_name])
+                tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+            if not os.path.isfile(tmp_file_name):
+                cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_before_merge)) +
+                                       [a_file, tmp_file_name])
+                call_subprocess(cdo_command)
+                if not os.path.isfile(tmp_file_path):
+                    clogger.error("Could not create the file %s" % tmp_file_path)
+                    raise Exception("Could not create the file %s" % tmp_file_path)
+                files_to_treat_after_merging.append(tmp_file_path)
+            else:
+                clogger.error("Should not pass here...")
+                raise Exception("Should not pass here...")
 
-    cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) + files_to_treat_after_merging +
-                           [output_file, ])
-    call_subprocess(cdo_command)
+        cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
+                               files_to_treat_after_merging + [output_file, ])
+        call_subprocess(cdo_command)
+    elif len(files_to_treat_before_merging) == 1:
+        cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
+                               list(reversed(cdo_commands_before_merge)) + files_to_treat_before_merging +
+                               [output_file, ])
+        call_subprocess(cdo_command)
+    else:
+        raise ValueError("No input file to treat!")
+
 
     remove_dir_and_content(tmp)
 
