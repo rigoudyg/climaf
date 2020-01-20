@@ -24,7 +24,7 @@ Interpolate the object to the grid of another object, using CDO
   >>> ds= .... # some dataset, with whatever variable
   >>> grid_ds= ....# some other dataset, used here for its grid
   >>> remapbil_ds=regrid(ds,grid_ds) # Interpolation is bilinear
-  >>> remapcon2_ds=regridn(ds,grid_ds, option="remapcon2")  # Interpolation is 2nd order conservative
+  >>> remapcon2_ds=regrid(ds,grid_ds, option="remapcon2")  # Interpolation is 2nd order conservative
 
 **Side effects** : a temporary file is created in current directory,
 then erased (name : climaf_tmp_grid)
