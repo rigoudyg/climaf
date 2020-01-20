@@ -94,7 +94,7 @@ done
 vfiles=${vfiles/% /} # Discard last space character because CDO cannot !
 
 # One some occasions, there is no operation to perform, but we want a result in cache anyway
-[ -z ${ops/ /} ] && ops=copy
+[ -z "${ops// /}" ] && ops=copy
 
 time $CDO $ops "$vfiles" $out
 
