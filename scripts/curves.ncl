@@ -310,16 +310,20 @@ begin
   res@xyLineThicknessF     = 3.0      ; default is 1
   res@xyMonoDashPattern    = True     ; force all solid lines
 
-  ;---Set resources for colors 
-  colornames=new(n, string)
-  if n .le. 9 then
-    stdcolors=(/"black","red","blue","green","orange","purple","violet","grey","brown"/)
+  ;---Set resources for colors
+  ncolors=10
+  set13=(/"black","red","blue","green","orange","purple","violet","grey","brown","darkgreen","cyan3","goldenrod4","rosybrown3"/)
+  set10=(/"black","red","blue","green","orange","purple","violet","grey","brown","darkgreen"/)
+  if n .le. ncolors then
+    stdcolors=set10
   else
     stdcolors=new(n, string)
-    stdcolors(0:8)=(/"black","red","blue","green","orange","purple","violet","grey","brown"/)
-    do i=0,(n-9)-1 stdcolors(i+9)=stdcolors(i) end do
+    stdcolors(0:ncolors-1)=set10
+    do i=ncolors,n-1 stdcolors(i)=stdcolors(i-ncolors) end do
   end if
+  ;print(stdcolors)
  
+  colornames=new(n, string)
   do i=0,n-1 colornames(i)=stdcolors(i) end do
 
   if isvar("colors") then 
@@ -509,6 +513,7 @@ begin
 
         ; Create plot
         res@xyLineColor = colornames(i)
+        res@xyDashPattern = i/ncolors 
         res@xyExplicitLegendLabels = "  "+tab_labels(i)
         
         if (i .eq. 0) then 
