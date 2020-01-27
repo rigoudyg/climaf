@@ -1,4 +1,4 @@
-#!/bin/python
+#!usr/bin/env python
 
 # --------------------------------------------------------------------------------------------------
 # -- Interfacing the script with CliMAF: writing a command line taking arguments

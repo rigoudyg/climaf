@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """This module declares project emn36 , base on data organization 'generic', for
 handling Nemo36 data such as organized by EM

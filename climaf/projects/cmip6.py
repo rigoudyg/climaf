@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CMIP6 outputs produced by 
 libIGCM or Eclis for all frequencies.

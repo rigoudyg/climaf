@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Management of CliMAF standard operators
@@ -32,8 +32,8 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('remote_select',
-            'python ' + scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                                     ' --period="${period_iso}" --domain="${domain}" '
+            scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                         ' --period="${period_iso}" --domain="${domain}" '
                                      '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This module declares how to access observation datasets organized 'a la CAMI' at CNRM,
