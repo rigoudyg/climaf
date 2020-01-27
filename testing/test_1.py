@@ -43,6 +43,7 @@ class A_basic(unittest.TestCase):
     def test_3_evaluating_a_script(self):
         mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
         std = mean.sdev  # Secondary output 'std' is a 'property' of main output
+        print "std = ", std
         fil = cfile(std)
         expected = climaf.cache.currentCache + '/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
         print "actual=", fil
