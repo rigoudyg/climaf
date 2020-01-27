@@ -541,11 +541,11 @@ def start_line(title):
 
 
 
+blank_cell = cachedir + '/Empty.png'
 def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
     # Need to create cachedir if it does not exist yet
     if not os.path.isdir(cachedir):
         os.makedirs(cachedir)
-    blank_cell = cachedir + '/Empty.png'
     if not os.path.isfile(blank_cell):
         shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
 
