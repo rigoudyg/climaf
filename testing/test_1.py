@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Basic test for accessing data in CMIP5_DRS hierarchy. With unittest

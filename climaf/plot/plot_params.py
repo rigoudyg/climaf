@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # -- Import the dictionnaries of plot params:
 from climaf.site_settings import *

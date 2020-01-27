@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # How to export CliMAF results as NetCDF files or Numpy Masked Arrays

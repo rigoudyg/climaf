@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Example for CliMAF access to data organized according to CNRM-CM's 'em' scheme
