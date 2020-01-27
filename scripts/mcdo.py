@@ -22,7 +22,7 @@ from climaf.clogging import clogger, clog
 
 
 def correct_args_type(value):
-    if isinstance(value, six.string_types):
+    if value is not None and isinstance(value, six.string_types):
         value = value.strip()
         if len(value) == 0 or value in ["none", "None"]:
             value = None
@@ -30,8 +30,6 @@ def correct_args_type(value):
             value = False
         elif value in ["yes", "True"]:
             value = True
-        else:
-            value = value.strip()
     return value
 
 
