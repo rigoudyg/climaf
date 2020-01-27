@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Program Interface for scripting in
