@@ -23,12 +23,13 @@ from climaf.clogging import clogger, clog
 
 def correct_args_type(value):
     if isinstance(value, six.string_types):
+        value = value.strip()
+        if len(value) == 0 or value in ["none", "None"]:
+            value = None
         if value in ["no", "False"]:
             value = False
         elif value in ["yes", "True"]:
             value = True
-        elif value in ["", "none", "None"]:
-            value = None
         else:
             value = value.strip()
     return value
@@ -38,7 +39,7 @@ def correct_list_args(value):
     if len(value) == 0:
         return None
     else:
-        return value.split(",")
+        return [v.strip() for v in value.split(",")]
 
 
 def parse_args():
