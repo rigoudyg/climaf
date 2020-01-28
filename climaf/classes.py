@@ -1053,17 +1053,15 @@ class cens(cobject, dict):
         self.crs = self.buildcrs()
         self.register()
 
-    def set_order(self, order, ordered_keylist=None):
-        ordered_list = [o for o in order]
-        ordered_list.sort()
+    def set_order(self,order,ordered_keylist=None):
+        ordered_list=[ o  for o in order ] ; ordered_list.sort()
         if ordered_keylist is None:
-            ordered_keylist = [o for o in self]
-            ordered_keylist.sort()
-        if ordered_list != ordered_keylist:
+            ordered_keylist=self.keys() ; ordered_keylist.sort()
+        if sorted(ordered_list) != sorted(ordered_keylist) :
             raise Climaf_Classes_Error(
-                "Labels list (as described by order list) does not match ensemble labels list : %s   and %s" %
-                (repr(ordered_list), repr(ordered_keylist)))
-        self.order = order
+                "Order list does not match dict keys list : %s   and %s"%
+                (`ordered_list`,`ordered_keylist`))
+        self.order=order
 
     def __setitem__(self, k, v):
         if not isinstance(k, str):
