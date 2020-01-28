@@ -611,11 +611,17 @@ def craz(force=False, hideError=False):
     if os.path.exists(currentCache) or hideError is False:
         if force:
             os.system("chmod -R +w  " + cc)
-        os.system("rm -fR " + cc + "/*")
+            os.system("rm -fR " + cc + "/*")
+            crs2filename = dict()
+        else:
+            list_of_crs = crs2filename.keys()
+            for crs in list_of_crs:
+                if cdrop(crs):
+                   clogger.debug('Removed file: %s',generateUniqueFileName(crs))
+                else:
+                   clogger.debug('Could not remove file (either not existing or protected): %s', crs2filename[crs])
+                   clogger.debug('Associated CRS : %s', crs)
         os.system("ls  " + cc)
-    # for f in crs2filename : os.remove(crs2filename[f])
-    # if os.path.exists(cacheIndexFileName) : os.remove(cacheIndexFileName)
-    crs2filename = dict()
 
 
 def cdump(use_macro=True):
