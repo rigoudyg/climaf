@@ -64,6 +64,7 @@ def header(title, style_file=None):
     return rep + style + trailer + '\n'
 
 
+
 def trailer():
     """ Returns the text for closing an html document
     """
