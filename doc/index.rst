@@ -4,13 +4,23 @@
    contain the root `toctree` directive.
 
 
-Quick links : :ref:`News <news>` | :ref:`Functions <API>` |
+Quick links : :ref:`Subscribe to mailing list <https://climaf.readthedocs.io/en/master/community.html>` | :ref:`News <news>` | :ref:`Functions <API>` |
 :ref:`standard_operators` | :ref:`howto` | :ref:`examples` |  :ref:`contents`
 
 .. |logo| image:: CliMAF_front_image.png
      :scale: 100%
 
 |logo| 
+
+
+Discover CliMAF: essentials of the documentation to get started 
+========================================================
+
+- `What is CliMAF <https://climaf.readthedocs.io/en/master/index.html#climaf-a-climate-model-assessment-framework>`_?
+- Using CliMAF: `installation, use of existing installations (ESPRI mesocenter, CNRM, CERFACS) <https://climaf.readthedocs.io/en/master/installing.html>`_
+- Getting started with CliMAF: `enjoy the collection of demo notebooks <https://climaf.readthedocs.io/en/master/index.html#can-climaf-make-my-scientific-life-easier>`_
+- `Subscribe to CliMAF users mailing list <https://climaf.readthedocs.io/en/master/community.html>`_ to stay in the loop!
+
 
 
 CliMAF - a Climate Model Assessment Framework
@@ -46,11 +56,9 @@ CliMAF was designed to answer those specifications of CliMAF:
   - We don’t want to **recompute what has already been computed once**
   
   - We want to use this library to build a **custom set of diagnostics** as well as a **big evaluation package** like the `CliMAF Earth System Model Evaluation Platform <https://github.com/jservonnat/C-ESM-EP/wiki>`_
-  
 
 .. image:: CliMAF_structure.png
      :scale: 80%
-
 
 
 Can CliMAF make my scientific life easier?
