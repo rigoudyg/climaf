@@ -64,6 +64,7 @@ def header(title, style_file=None):
     return rep + style + trailer + '\n'
 
 
+
 def trailer():
     """ Returns the text for closing an html document
     """
@@ -560,9 +561,6 @@ def start_line(title):
     tmpindex += open_table()
     tmpindex += open_line()
     return tmpindex
-
-
-blank_cell = cachedir + '/Empty.png'
 
 
 blank_cell = cachedir + '/Empty.png'

@@ -103,6 +103,7 @@ def fadd(dat1, dat2):
     if isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='addc,' + c)
+
     else:
         return ccdo2(dat1, dat2, operator='add')
 
@@ -298,7 +299,7 @@ def clim_average(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.info('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == "DJFM":
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
@@ -400,7 +401,7 @@ def clim_average_fast(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.info('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == 'DJFM':
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
