@@ -52,7 +52,7 @@ def fmul(dat1, dat2):
       >>> c = '-1'  #a constant
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:
@@ -75,7 +75,7 @@ def fdiv(dat1, dat2):
       >>> ds1_times_c = fdiv(ds1,c) # ds1 * c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='divc,' + c)
     else:
@@ -98,9 +98,10 @@ def fadd(dat1, dat2):
       >>> ds1_plus_c = fadd(ds1,c) # ds1 + c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='addc,' + c)
+
     else:
         return ccdo2(dat1, dat2, operator='add')
 
@@ -121,7 +122,7 @@ def fsub(dat1, dat2):
       >>> ds1_minus_c = fsub(ds1,c) # ds1 - c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='subc,' + c)
     else:
@@ -259,17 +260,6 @@ def annual_cycle(dat):
     """
     return ccdo(dat, operator="ymonavg")
 
-def annual_cycle_fast(dat):
-    """
-    Computes the annual cycle as the 12 climatological months of dat
-    (wrapper of ccdo with operator ymonavg)
-
-      >>> dat= ....   # some dataset, with whatever variable
-      >>> annual_cycle_dat = annual_cycle(dat)
-
-    """
-    return ccdo_fast(dat, operator="ymonavg")
-
 
 def clim_average(dat, season):
     """
@@ -308,8 +298,6 @@ def clim_average(dat, season):
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
             clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
-        if str(season).upper() == "DJFM":
-            selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
             selmonths = '3,4,5'
         if str(season).upper() == 'JJA':
@@ -403,15 +391,13 @@ def clim_average_fast(dat, season):
     else:
         #
         # -- Compute the annual cycle
-        scyc = annual_cycle_fast(dat)
+        scyc = annual_cycle(dat)
         #
         # -- Classic atmospheric seasons
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
             clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
-        if str(season).upper() == 'DJFM':
-            selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
             selmonths = '3,4,5'
         if str(season).upper() == 'JJA':
@@ -432,7 +418,7 @@ def clim_average_fast(dat, season):
             selmonths = '4,5,6'
 
         if selmonths:
-            avg = ccdo_fast(scyc, operator='timmean -seltimestep,' + selmonths)
+            avg = ccdo(scyc, operator='timmean -seltimestep,' + selmonths)
             # avg = ccdo(scyc,operator='timmean -selmon,'+selmonths)
         #
         #
@@ -462,15 +448,15 @@ def clim_average_fast(dat, season):
         if str(season).lower() in ['december', 'dec', '12']:
             selmonth = '12'
         if selmonth:
-            avg = ccdo_fast(scyc, operator='selmon,' + selmonth)
+            avg = ccdo(scyc, operator='selmon,' + selmonth)
         #
         # -- Annual Maximum
         if str(season).lower() in ['max', 'annual max', 'annual_max']:
-            avg = ccdo_fast(scyc, operator='timmax')
+            avg = ccdo(scyc, operator='timmax')
         #
         # -- Annual Minimum
         if str(season).lower() in ['min', 'annual min', 'annual_min']:
-            avg = ccdo_fast(scyc, operator='timmin')
+            avg = ccdo(scyc, operator='timmin')
     #
     return avg
 
@@ -507,8 +493,16 @@ def summary(dat):
         if not dat.baseFiles(ensure_dataset=False):
             print '-- No file found for:'
         else:
-            for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
-                print f
+            tmpkvp = dat.explore('choices')
+            keytest = None
+            for key in tmpkvp:
+                if isinstance(tmpkvp[key],list) and len(tmpkvp[key])>1:
+                    keytest = key
+                    print 'Multiple available values for attribute "'+key+'" that is set to "*" in your ds() call: ', tmpkvp[key]
+                    print 'Specify one of them (within ds() or with cdef())'
+            if not keytest:
+                for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                    print f
         return dat.kvp
     else:
         print "Cannot handle " + repr(dat)
