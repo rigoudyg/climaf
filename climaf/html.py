@@ -42,11 +42,12 @@ def header(title, style_file=None):
     <title>[ """ + title + """ ]</title>
     """
     trailer = """
-    </head>
-    <body>
-    <h1>""" + title + """</h1>
-    <hr/> <!--- this draws a line --->
-    """
+        </head>
+        <body>
+        <h1>""" + title + """</h1>
+        <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
+        <hr/> <!--- this draws a line --->
+        """
     if style_file is not None:
         with open(style_file) as fic:
             style = \
@@ -273,9 +274,13 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                atlas_index_r = file(os.path.expanduser(index_atlas), "r")
-                tt = pickle.load(atlas_index_r)
-                atlas_index_r.close()
+                print 'index_atlas in html.py = ',index_atlas
+                try:
+                   atlas_index_r = file(os.path.expanduser(index_atlas), "r")
+                   tt = pickle.load(atlas_index_r)
+                   atlas_index_r.close()
+                except:
+                   tt = index_dict
                 # -- Append the file
                 tt.update(index_dict)
             # -- Save the file
@@ -557,12 +562,12 @@ def start_line(title):
     return tmpindex
 
 
-
 blank_cell = cachedir + '/Empty.png'
 def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
     # Need to create cachedir if it does not exist yet
     if not os.path.isdir(cachedir):
         os.makedirs(cachedir)
+    blank_cell = cachedir + '/Empty.png'
     if not os.path.isfile(blank_cell):
         shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
 

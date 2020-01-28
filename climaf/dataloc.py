@@ -531,7 +531,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 # But must also consider the case where there is no date pattern in file pattern
                 if not any([k in l for k in date_regexp_patt]):
                     alt.append(f)
-            lfiles = alt
+            lfiles = list(set(alt)) # JS: set(alt) to avoid double files
             clogger.debug("Globbing %d files for varname on %s : " % (len(lfiles), temp2))
         #
         # If unsuccessful using varname, try with filenameVar
