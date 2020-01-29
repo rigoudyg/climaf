@@ -131,8 +131,16 @@ General:
   - ``proj`` : use it to request a stereopolar projection, as e.g. :
     "NH","SH60"... default: cylindrical equidistant (or native grid,
     see further below and example :ref:`Climaf call example
-    <native_grid2>`).  
-    
+    <native_grid2>`).
+    The values allowed for the parameter ``proj`` are:
+
+    - "NH"/"SH" for northern/southern hemisphere polar stereographic
+      (can be followed by the limiting latitude of the map
+      (e.g. "NH40" for a limiting latitude of 40 degrees)
+    - projection defined in NCL such as "CylindricalEquidistant", "Robinson", "Mollweidethe"....
+      The allowed values are listed here:
+      http://www.ncl.ucar.edu/Document/Graphics/Resources/mp.shtml#mpProjection
+
     If you want to turn off the data re-projection when model is
     already on a known native grid (currently Lambert only):   
 
@@ -435,16 +443,16 @@ tested, see :download:`gplot.py <../../examples/gplot.py>` and
      >>> moy_tas=time_average(tas) # time average of 'tas'
      >>> # without bringing to the script the file which includes metadata for the native Lambert grid 
      >>> # => with default cylindrical equidistant projection 
-     >>> proj=plot(moy_tas,title='ALADIN',min=-12,max=28,delta=2.5,vcb=False) 
-     >>> cshow(proj)
+     >>> plot_proj=plot(moy_tas,title='ALADIN',min=-12,max=28,delta=2.5,vcb=False)
+     >>> cshow(plot_proj)
      >>> # How to get required file which includes metadata for the native Lambert grid named 'climaf_plot_grid.nc'
      >>> fixed_fields('plot', ('climaf_plot_grid.nc','/cnrm/est/COMMON/climaf/test_data/ALADIN/tas_MED-11_ECMWF-ERAINT_evaluation_r1i1p1_CNRM-ALADIN52_v1_mon_197901-201112.nc'))
      >>> # with bringing to the script this file => with default native grid (no re-projection)
-     >>> cdrop(proj) # to re-compute 'proj'
-     >>> cshow(proj)
+     >>> cdrop(plot_proj) # to re-compute 'proj'
+     >>> cshow(plot_proj)
      >>> # with a "NH" projection
-     >>> projNH=plot(moy_tas,title='ALADIN - NH40',min=-12,max=28,delta=2.5,proj="NH40") 
-     >>> cshow(projNH)
+     >>> plot_projNH=plot(moy_tas,title='ALADIN - NH40',min=-12,max=28,delta=2.5,proj="NH40")
+     >>> cshow(plot_projNH)
 
 .. _cross_sections_example:
 
