@@ -323,12 +323,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
                 clogger.warning("Please check these empty attributes %s" % [k for k in kwargs if kwargs[k] == ''])
             return None
     # Discard duplicates (assumes that sorting is harmless for later processing)
-    rep.sort()
-    last = None
-    for f in rep:
-        if f == last:
-            rep.remove(last)
-        last = f
+    rep = sorted(list(set([f.strip() for f in rep])))
     # Assemble filenames in one single string
     return string.join(rep)
 
