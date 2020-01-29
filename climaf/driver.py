@@ -607,10 +607,14 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             template_ff_target = Template(lt).substitute(subdict_ff)
             # symlink if needed
             files_exist[ll] = False
-            if os.path.isfile(ll):
+            if os.path.islink(ll):
+                if os.path.realpath(ll) != template_ff_target:
+                    os.remove(ll)
+                    os.symlink(template_ff_target, ll)
+            elif os.path.isfile(ll):
                 files_exist[ll] = True
             else:
-                os.system("ln -s " + template_ff_target + " " + ll)
+                os.symlink(template_ff_target, ll)
     #
     tim1 = time.time()
     clogger.info("Launching command:" + template)
