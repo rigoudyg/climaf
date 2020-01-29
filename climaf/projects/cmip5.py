@@ -86,7 +86,10 @@ if root:
         cdef('realm', '*', project=project)
         cdef('realization', 'r1i1p1', project=project)
         cdef('experiment', 'historical', project=project)
-        cdef('version', 'latest', project=project)
+        if atCNRM:
+            cdef('version', '*', project=project)
+        else:
+            cdef('version', 'latest', project=project)
         cdef('frequency', '*', project=project)
     cdef('extent_experiment', 'rcp85', project='CMIP5_extent')
 
@@ -102,7 +105,7 @@ if root:
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CMIP5-Adjust', var, var + 'Adjust')
 
-    cdef('root', '/bdd' , project='CMIP5-Adjust')
+    cdef('root', root , project='CMIP5-Adjust')
     # cdef('institute'      , '*'           , project='CMIP5-Adjust')
     cdef('table', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
     cdef('realm', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
