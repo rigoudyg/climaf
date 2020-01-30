@@ -64,7 +64,6 @@ def header(title, style_file=None):
     return rep + style + trailer + '\n'
 
 
-
 def trailer():
     """ Returns the text for closing an html document
     """
@@ -564,6 +563,8 @@ def start_line(title):
 
 
 blank_cell = cachedir + '/Empty.png'
+
+
 def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
     # Need to create cachedir if it does not exist yet
     if not os.path.isdir(cachedir):
