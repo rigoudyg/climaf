@@ -392,10 +392,10 @@ class cscript():
         of a script which are inputs
 
         """
-        l = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
+        args = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
         ls = []
         old = None
-        for e in l:
+        for e in args:
             if e != old:
                 ls.append(e)
             old = e

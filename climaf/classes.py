@@ -854,9 +854,9 @@ class cdataset(cobject):
                 return
 
             if ((self.frequency == 'monthly' or not self.frequency)
-                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.))\
+                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.)) \
                     or (self.frequency == 'yearly' and
-                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.))\
+                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.)) \
                     or (self.frequency == 'decadal' and
                         (filedate_delta > 3653. * 24. * 3600. or filedate_delta < 3651. * 24. * 3600.)):
 
@@ -1053,15 +1053,17 @@ class cens(cobject, dict):
         self.crs = self.buildcrs()
         self.register()
 
-    def set_order(self,order,ordered_keylist=None):
-        ordered_list=[ o  for o in order ] ; ordered_list.sort()
+    def set_order(self, order, ordered_keylist=None):
+        ordered_list = [o for o in order]
+        ordered_list.sort()
         if ordered_keylist is None:
-            ordered_keylist=self.keys() ; ordered_keylist.sort()
-        if sorted(ordered_list) != sorted(ordered_keylist) :
+            ordered_keylist = self.keys()
+            ordered_keylist.sort()
+        if sorted(ordered_list) != sorted(ordered_keylist):
             raise Climaf_Classes_Error(
-                "Order list does not match dict keys list : %s   and %s"%
-                (`ordered_list`,`ordered_keylist`))
-        self.order=order
+                "Order list does not match dict keys list : %s   and %s" %
+                (`ordered_list`, `ordered_keylist`))
+        self.order = order
 
     def __setitem__(self, k, v):
         if not isinstance(k, str):
@@ -1641,7 +1643,7 @@ class cpage(cobject):
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white",
-                 insert="",insert_width=0):
+                 insert="", insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -1817,7 +1819,7 @@ class cpage(cobject):
             nx, ny = 2, 3
         elif n in range(7, 9):
             nx, ny = 2, 4
-        elif n in range(9,13):
+        elif n in range(9, 13):
             nx, ny = 3, 4
         elif n in range(13, 16):
             nx, ny = 3, 5

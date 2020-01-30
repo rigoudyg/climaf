@@ -189,9 +189,9 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     if variable is not None:
         var = variable
         file_var = var
-        #JS#print "var in mcdo.py  = ", var
-        #JS#print "-selname,{}".format(str(var))
-        #JS#cdo_commands_before_merge.append("-selname,{}".format(var))
+        # JS#print "var in mcdo.py  = ", var
+        # JS#print "-selname,{}".format(str(var))
+        # JS#cdo_commands_before_merge.append("-selname,{}".format(var))
         cdo_commands_before_merge.append("-selname,"+var)
     if alias is not None:
         var, filevar, scale, offset = alias[:]
@@ -229,10 +229,10 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     # Then deal with date selection
     clogger.debug("Period considered: %s" % period)
     if period is not None:
-        print "type(str) = ",type(period)
-        print "period = ",period
+        print "type(str) = ", type(period)
+        print "period = ", period
         seldate = "-seldate,{}".format(period)
-        clim_time_fix =  clim_timefix(input_files[0])
+        clim_time_fix = clim_timefix(input_files[0])
         if clim_time_fix is not None:
             seldate = " ".join([seldate, clim_time_fix])
         cdo_commands_after_merge.append(seldate)
@@ -283,7 +283,6 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         call_subprocess(cdo_command)
     else:
         raise ValueError("No input file to treat!")
-
 
     remove_dir_and_content(tmp)
 

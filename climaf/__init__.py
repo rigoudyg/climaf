@@ -60,43 +60,49 @@ if not already_inited and not onrtd:
     import operators
     import subprocess
     import commands
-    
+
+
     def my_which(soft):
-        p = subprocess.Popen(["which",soft], stdout=subprocess.PIPE)
-        return str.replace(p.stdout.readlines()[0],'\n','')
+        p = subprocess.Popen(["which", soft], stdout=subprocess.PIPE)
+        return str.replace(p.stdout.readlines()[0], '\n', '')
+
+
     def bash_command_to_str(cmd):
-        return str.replace(subprocess.Popen(str.split(cmd,' '), stdout=subprocess.PIPE).stdout.readlines()[0],'\n','')
+        return str.replace(subprocess.Popen(str.split(cmd, ' '), stdout=subprocess.PIPE).stdout.readlines()[0], '\n',
+                           '')
+
 
     tim("imports")
     print("CliMAF version = " + version, file=sys.stderr)
     print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
-    print("python => "+my_which('python'))
+    print("python => " + my_which('python'))
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
-       print("ncl "+commands.getoutput(my_which('ncl')+' -V')+" => "+my_which('ncl'))
+        print("ncl " + commands.getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
     except:
-       print("Warning: ncl not found -> can't use CliMAF plotting scripts")
+        print("Warning: ncl not found -> can't use CliMAF plotting scripts")
     try:
-       tmp = str.split(commands.getstatusoutput(my_which('cdo')+' -V')[1],' ')
-       print("cdo "+tmp[tmp.index('version')+1]+" => "+my_which('cdo'))
+        tmp = str.split(commands.getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
+        print("cdo " + tmp[tmp.index('version') + 1] + " => " + my_which('cdo'))
     except:
-       print("Error: cdo not found -> CDO is mandatory to run CliMAF")
-       my_which('cdo')
+        print("Error: cdo not found -> CDO is mandatory to run CliMAF")
+        my_which('cdo')
     try:
-       tmp = str.split(commands.getstatusoutput(my_which('ncks')+' --version')[1], ' ')
-       print("nco (ncks) "+tmp[tmp.index('version')+1]+" => "+my_which('ncks'))
+        tmp = str.split(commands.getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
+        print("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + my_which('ncks'))
     except:
-       print("Warning: nco not found -> can't use nco from CliMAF")
+        print("Warning: nco not found -> can't use nco from CliMAF")
     try:
-       if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
-          print("ncdump "+commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')[-1].split('\n')[-1].split()[3]+" => "+my_which('ncdump'))
-       else:
-          binary_info = commands.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
-          binary_info = binary_info.split("version")[-1].split("of")[0].strip()
-          print("ncdump "+binary_info+" => "+my_which('ncdump'))
+        if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
+            ncdump_ret = commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
+            print("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + my_which('ncdump'))
+        else:
+            binary_info = commands.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
+            binary_info = binary_info.split("version")[-1].split("of")[0].strip()
+            print("ncdump " + binary_info + " => " + my_which('ncdump'))
     except:
-       print("Warning: ncdump not found -> can't use ncdump from CliMAF")
+        print("Warning: ncdump not found -> can't use ncdump from CliMAF")
     print("---")
 
     logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))

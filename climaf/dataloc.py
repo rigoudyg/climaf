@@ -334,7 +334,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     by this function is composed of files which :
 
      - match the patterns in ``url`` once these patterns are instantiated by
-       the values in kwargs, and
+        the values in kwargs, and
 
      - contain the ``variable`` provided in kwargs
 
@@ -354,12 +354,12 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     names (e.g. ${model}) are:
 
     - ${variable} : use it if the files are split by variable and
-      filenames do include the variable name, as this speed up the search
+        filenames do include the variable name, as this speed up the search
 
     - ${PERIOD} : use it for indicating the period covered by each file, if this
-      is applicable in the file naming; this period can appear in filenames as
-      YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHHMM, either once only, or twice with
-      separator ='-' or '_'
+        is applicable in the file naming; this period can appear in filenames as
+        YYYY, YYYYMM, YYYYMMDD, YYYYMMDDHHMM, either once only, or twice with
+        separator ='-' or '_'
 
     - wildcards '?' and '*' for matching respectively one and any number of characters
 
@@ -370,37 +370,37 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
     - On boucle sur les patterns de la liste url :
 
-      - Instancier le pattern par les valeurs des facettes fournies, et par  ".*" pour $PERIOD
+        - Instancier le pattern par les valeurs des facettes fournies, et par  ".*" pour $PERIOD
 
-      - on fait glob.glob
+        - on fait glob.glob
 
-      - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
-        réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
-        avec filenameVar; d'où une liste de fichiers lfiles
+        - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
+            réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
+            avec filenameVar; d'où une liste de fichiers lfiles
 
-      - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
+    - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
         une expression régulière (avec groupes) qui capture les valeurs de facettes
         (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
         nécessaire ???)
 
         - Boucle sur les fichiers de lfiles:
 
-          - si le pattern n'indique pas qu'on peut extraire la date,
+            - si le pattern n'indique pas qu'on peut extraire la date,
 
-    	     - si la frequence indique un champ fixe, on retient le fichier;
+                - si la frequence indique un champ fixe, on retient le fichier;
 
-	     - sinon , on le retient aussi sans filtrer sur la période
+                - sinon , on le retient aussi sans filtrer sur la période
 
-          - si oui,
+            - si oui,
 
-	     - on extrait la periode
+                - on extrait la periode
 
-	     - si elle convient (divers cas ...)
+            - si elle convient (divers cas ...)
 
-	       - si on a pu filtrer sur la variable,
-	         ou que variable="*" ou variable multiple,
-	         ou que le fichier contient la bonne variable, eventuellement après renommage
-  	         on retient le fichier
+            - si on a pu filtrer sur la variable,
+                ou que variable="*" ou variable multiple,
+                ou que le fichier contient la bonne variable, eventuellement après renommage
+                on retient le fichier
 
         - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
 
@@ -492,12 +492,12 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     date_regexp_keywords = ["${PERIOD}"]
     #
     #
-    for l in urls:
+    for url in urls:
         # First discard protocol prefix in url element
         remote_prefix = ""
-        if re.findall(".*:.*", l):
-            remote_prefix = ':'.join(l.split(":")[0:-1]) + ':'
-        basename = l.split(":")[-1]  # This discard the remote_prefix if any
+        if re.findall(".*:.*", url):
+            remote_prefix = ':'.join(url.split(":")[0:-1]) + ':'
+        basename = url.split(":")[-1]  # This discard the remote_prefix if any
         basename = basename.replace("//", "/")
         #
         # Instantiate keywords in pattern with attributes values provided in kwargs
@@ -524,9 +524,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         alt.append(f)
                         continue
                 # But must also consider the case where there is no date pattern in file pattern
-                if not any([k in l for k in date_regexp_patt]):
+                if not any([k in url for k in date_regexp_patt]):
                     alt.append(f)
-            lfiles = list(set(alt)) # JS: set(alt) to avoid double files
+            lfiles = list(set(alt))  # JS: set(alt) to avoid double files
             clogger.debug("Globbing %d files for varname on %s : " % (len(lfiles), temp2))
         #
         # If unsuccessful using varname, try with filenameVar
@@ -552,7 +552,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                             alt.append(f)
                             continue
                     # But must also consider the case where there is no date pattern in file pattern
-                    if not any([k in l for k in date_regexp_patt]):
+                    if not any([k in url for k in date_regexp_patt]):
                         alt.append(f)
                 lfiles = alt
                 clogger.debug("Globbing %d files for filenamevar on %s: " % (len(lfiles), temp2))
@@ -661,7 +661,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 clogger.debug(
                     'Period is OK - Considering variable filtering on %s and %s for %s' % (variable, altvar, f))
                 # Filter against variable
-                if l.find("${variable}") >= 0:
+                if url.find("${variable}") >= 0:
                     clogger.debug('appending %s based on variable in filename' % f)
                     store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
                                                 fperiod, periods, periods_dict)
@@ -702,7 +702,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
         # Break on first url with any matching data
         if len(rep) > 0:
-            clogger.debug('url %s does match for ' % l + repr(kwargs))
+            clogger.debug('url %s does match for ' % url + repr(kwargs))
             break
 
     #  For wildcard facets, discover facet values + checks
@@ -994,10 +994,10 @@ def periodOfEmFile(filename, realm, freq):
 def selectExampleFiles(urls, **kwargs):
     rep = []
     if kwargs['frequency'] == "monthly":
-        for l in urls:
+        for url in urls:
             for realm in ["A", "L"]:
                 # dir=l+"/"+realm+"/Origin/Monthly/"+simulation
-                dir = l + "/" + realm
+                dir = url + "/" + realm
                 clogger.debug("Looking at dir " + dir)
                 if os.path.exists(dir):
                     lfiles = os.listdir(dir)
@@ -1038,16 +1038,15 @@ def selectCmip5DrsFiles(urls, **kwargs):
     if frequency in frequency2drs:
         freqd = frequency2drs[frequency]
     # TBD : analyze ambiguity of variable among realms+tables
-    for l in urls:
+    for url in urls:
         totry = ['merge/', 'output/', 'output?/', 'main/', '']
         for p in totry:
-            pattern1 = l + "/" + project + "/" + p + "*/" + model  # one * for modelling center
+            pattern1 = url + "/" + project + "/" + p + "*/" + model  # one * for modelling center
             joker_version = "*"
-            patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation + "/" + \
-                       joker_version + "/" + variable
+            patternv = os.sep.join([pattern1, experiment, freqd, realm, table, simulation, joker_version, variable])
             if len(glob.glob(patternv)) > 0:
                 break
-        patternv = pattern1 + "/" + experiment + "/" + freqd + "/" + realm + "/" + table + "/" + simulation
+        patternv = os.sep.join([pattern1, experiment, freqd, realm, table, simulation])
         # Get version directories list
         ldirs = glob.glob(patternv)
         clogger.debug("Globbing with " + patternv + " gives:" + repr(ldirs))
@@ -1065,7 +1064,7 @@ def selectCmip5DrsFiles(urls, **kwargs):
                     else:
                         cversion = lversions[-1]  # Assume that order provided by sort() is OK
             # print "using version "+cversion+" for requested version: "+version
-            lfiles = glob.glob(repert + "/" + cversion + "/" + variable + "/*.nc")
+            lfiles = glob.glob(os.sep.join([repert, cversion, variable, "*.nc"]))
             # print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
             # print 'lfiles='+`lfiles`
             for f in lfiles:

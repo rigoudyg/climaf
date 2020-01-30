@@ -57,11 +57,12 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root="/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
+    root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
-cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type', 'clim_period_begin', 'clim_period_end', 
+cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type',
+         'clim_period_begin', 'clim_period_end',
          ensemble=['product'], separator='%')
 
 cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
@@ -79,14 +80,13 @@ cdef('obs_type', '*', project='ref_climatos')
 if root:
     pattern2 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
                       "${variable}_${table}_${product}_${obs_type}_${clim_period}-clim.nc"
-    #pattern3 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
+    # pattern3 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
     #                  "${variable}_${table}_${product}_${clim_period}-clim.nc"
     pattern4 = root + "climatos/*/${frequency}/${variable}/${product}/ac/" \
                       "${variable}_${table}_${product}_${clim_period_begin}_{clim_period_end}-clim.nc"
     dataloc(project='ref_climatos', organization='generic', url=pattern2)
-    #dataloc(project='ref_climatos', organization='generic', url=pattern3)
+    # dataloc(project='ref_climatos', organization='generic', url=pattern3)
     dataloc(project='ref_climatos', organization='generic', url=pattern4)
-
 
 calias('ref_climatos', 'O2', scale=44.64)
 # Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
