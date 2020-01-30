@@ -149,13 +149,13 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
 
 def stringToPath(name, length):
     """ Breaks NAME to a path with LENGTH characters-long directory names , for avoiding crowded directories"""
-    l = len(name)
+    len_name = len(name)
     rep = ""
     i = 0
-    while i + length < l:
+    while i + length < len_name:
         rep = rep + name[i:i + length] + "/"
         i += length
-    rep += name[i:l]
+    rep += name[i:len_name]
     return rep
 
 
@@ -524,7 +524,7 @@ def csync(update=False):
         dropped_crs = []
     except:
         if update:
-            if os.path.isfile(fn) and len(files_in_cache>0):
+            if os.path.isfile(fn) and len(files_in_cache > 0):
                 clogger.error("Issue when writing cache index %s" % fn)
 
 
@@ -617,10 +617,10 @@ def craz(force=False, hideError=False):
             list_of_crs = crs2filename.keys()
             for crs in list_of_crs:
                 if cdrop(crs):
-                   clogger.debug('Removed file: %s',generateUniqueFileName(crs))
+                    clogger.debug('Removed file: %s', generateUniqueFileName(crs))
                 else:
-                   clogger.debug('Could not remove file (either not existing or protected): %s', crs2filename[crs])
-                   clogger.debug('Associated CRS : %s', crs)
+                    clogger.debug('Could not remove file (either not existing or protected): %s', crs2filename[crs])
+                    clogger.debug('Associated CRS : %s', crs)
         os.system("ls  " + cc)
 
 
@@ -881,7 +881,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         print "Removed files:"
         list_tmp_crs = []
         list_tmp_crs = new_dict.keys() if (
-                    var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
+                var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
         return map(crewrite, list_tmp_crs)

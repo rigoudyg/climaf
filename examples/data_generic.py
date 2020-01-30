@@ -76,7 +76,7 @@ dataloc(project="example", organization="generic", url=[data_pattern_A, data_pat
 
 # Access a dataset
 rst = ds(project="example", simulation="AMIPV6ALB2G", variable="rst", period="1980")
-l = rst.baseFiles()
+list_rest = rst.baseFiles()
 my_file = cfile(rst)
 
 # ---------------------------------------------------------------

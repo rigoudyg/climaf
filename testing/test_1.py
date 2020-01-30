@@ -129,7 +129,6 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
     def test_selecting_files(self):
         my_file = cfile(self.ds)
         expected = climaf.cache.currentCache + '/0edf6/7d617/2d79f/de87c/fd02e/c68ad/5e457/6421d/6ac8f/59811/11cee/3.nc'
-        #expected = climaf.cache.currentCache + '/eb08a/4b6ab/f3cfd/ce2df/f504f/ef602/7dbcc/13b99/3db30/063c9/96739/0.nc'
         print "actual=" + my_file
         print "expected=" + expected
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')

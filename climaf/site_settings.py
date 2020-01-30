@@ -42,8 +42,8 @@ if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.
     onSpip = True
     atIPSL = True
     print 'Spip trouve'
-    VolumesDir = os.getenv ('VolumesDir')
-if os.path.exists('/data/scratch/globc') :
-    atCerfacs=True
+    VolumesDir = os.getenv('VolumesDir')
+if os.path.exists('/data/scratch/globc'):
+    atCerfacs = True
 
-print ("LC debug :",atCerfacs)
+print ("LC debug :", atCerfacs)

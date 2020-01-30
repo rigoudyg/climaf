@@ -34,7 +34,7 @@ def load_standard_operators():
     cscript('remote_select',
             scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
                          ' --period="${period_iso}" --domain="${domain}" '
-                                     '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
+                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
@@ -146,7 +146,8 @@ def load_standard_operators():
                                               'options=\'\"${options}\"\' aux_options=\'\"${aux_options}\"\' '
                                               'shade2_options=\'\"${shade2_options}\"\' shade2_var=\'\"${var_5}\"\' '
                                               'shade2_file=\'\"${in_5}\"\' '
-                                              'shade2_below=\'\"${shade2_below}\"\' shade2_above=\'\"${shade2_above}\"\' '
+                                              'shade2_below=\'\"${shade2_below}\"\' '
+                                              'shade2_above=\'\"${shade2_above}\"\' '
                                               'shading_options=\'\"${shading_options}\"\' myscale_aux=${scale_aux} '
                                               'myoffset_aux=${offset_aux} xpolyline=\'\"${xpolyline}\"\' '
                                               'ypolyline=\'\"${ypolyline}\"\' '

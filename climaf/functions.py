@@ -465,7 +465,6 @@ def clim_average_fast(dat, season):
     return avg
 
 
-
 def summary(dat):
     """
     Summary provides the informations on a CliMAF dataset or ensemble of datsets
@@ -500,9 +499,10 @@ def summary(dat):
             tmpkvp = dat.explore('choices')
             keytest = None
             for key in tmpkvp:
-                if isinstance(tmpkvp[key],list) and len(tmpkvp[key])>1:
+                if isinstance(tmpkvp[key], list) and len(tmpkvp[key]) > 1:
                     keytest = key
-                    print 'Multiple available values for attribute "'+key+'" that is set to "*" in your ds() call: ', tmpkvp[key]
+                    print 'Multiple available values for attribute "' + key + \
+                          '" that is set to "*" in your ds() call: ' + tmpkvp[key]
                     print 'Specify one of them (within ds() or with cdef())'
             if not keytest:
                 for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):

@@ -18,9 +18,8 @@ Example for a CMIP6 dataset declaration ::
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 
-
 # Declare CMIP6CERFACS project
-cproject('CMIP6CERFACS', 'model', 'simulation', 'institute', 'mip','table', 'realization', 'grid', separator='%')
+cproject('CMIP6CERFACS', 'model', 'simulation', 'institute', 'mip', 'table', 'realization', 'grid', separator='%')
 # --> systematic arguments = simulation, frequency, variable
 # -- Set the aliases for the frequency
 # cfreqs('PRIMAVERA-cerfacs', {'monthly':'mon', 'yearly':'yr', 'daily':'day'})
