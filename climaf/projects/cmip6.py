@@ -91,9 +91,3 @@ if True:
     # -- CMIP6_extent
     dataloc(project='CMIP6_extent', organization='generic', url=patterns1)
     dataloc(project='CMIP6_extent', organization='generic', url=patterns2)
-
-
-
-
-
-

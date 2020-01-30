@@ -1063,7 +1063,7 @@ def cfilePage(cobj, deep, recurse_list=None):
         usable_height -= cobj.ybox
     if cobj.insert is not "":
         ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
-        insert_height = int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
+        insert_height = int((float(ins_base_height) * cobj.insert_width) / float(ins_base_width))
         usable_height -= insert_height
     #
     usable_width = cobj.page_width - xmargin * (len(cobj.widths) - 1.) - x_left_margin - x_right_margin
@@ -1118,7 +1118,7 @@ def cfilePage(cobj, deep, recurse_list=None):
 
     if cobj.insert != "":
         args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
-                     (insert_height, (cobj.page_width-cobj.insert_width) / 2, y), "-composite"])
+                     (insert_height, (cobj.page_width - cobj.insert_width) / 2, y), "-composite"])
 
     out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
     if cobj.page_trim:

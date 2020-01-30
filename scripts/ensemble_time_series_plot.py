@@ -296,23 +296,23 @@ for pathfilename in filenames_list:
     if len(y.shape) > 1:
         print("input data is not 1D")
     handles_for_legend.append(
-        # plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
+        #plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
         #     label=labels_list[filenames_list.index(pathfilename)])[0]
-        plt.plot(x, y, lw=lw_list[dataset_number], color=colors[dataset_number],
-                 label=labels_list[dataset_number])[0]
+        plt.plot(x,y,lw=lw_list[dataset_number], color=colors[dataset_number],
+             label=labels_list[dataset_number])[0]
     )
-    # datevar = []
+    #datevar = []
     # cdftime = netcdftime.utime(t_unit)
-    # cdftime = netcdftime.utime(t_unit, calendar=t_cal)
-    # datevar.append(num2date(nctime, units=t_unit, calendar=t_cal))
-    # datevar.append(num2date(nctime, units=cdftime, calendar=t_cal))
-    # datevar.append(cdftime.num2date(nctime))
-    # datevar.append(cdftime.dates.num2date(nctime))
+    #cdftime = netcdftime.utime(t_unit, calendar=t_cal)
+    ## datevar.append(num2date(nctime, units=t_unit, calendar=t_cal))
+    ## datevar.append(num2date(nctime, units=cdftime, calendar=t_cal))
+    #datevar.append(cdftime.num2date(nctime))
+    ##datevar.append(cdftime.dates.num2date(nctime))
     #
-    # x = np.array(datevar)[0,:]
-    # datevaro = datevar[0][:]
-    # x = list(datevaro)
-    # y = test_dat[:,0,0]
+    #x = np.array(datevar)[0,:]
+    #datevaro = datevar[0][:]
+    #x = list(datevaro)
+    #y = test_dat[:,0,0]
 
     print('dataset_numb :', dataset_number)
     print('lw_list :', int(lw_list[dataset_number]))
@@ -328,20 +328,20 @@ for pathfilename in filenames_list:
     print('Y :', int(y[0]))
     print('Y :', type(int(y[0])))
 
-    # handles_for_legend.append(
+    #handles_for_legend.append(
     #    #plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
     #    #     label=labels_list[filenames_list.index(pathfilename)])[0]
     #    #plt.plot(x,y,lw=int(lw_list[dataset_number]), color=colors[dataset_number],
     #    #     label=labels_list[dataset_number])[0]
     #    plt.plot(x,y,lw=lw_list[dataset_number], color=colors[dataset_number],
     #         label=labels_list[dataset_number])[0]
-    # )
+    #)
 
     #
     # -- Highlight the period used to compute the climatology
     if args.highlight_period:
-        # highlight_period = highlight_period_list[filenames_list.index(pathfilename)]
-        highlight_period = highlight_period_list[dataset_number]  # filenames_list.index(pathfilename)]
+        #highlight_period = highlight_period_list[filenames_list.index(pathfilename)]
+        highlight_period = highlight_period_list[dataset_number]#filenames_list.index(pathfilename)]
         sep = ('_' if '_' in highlight_period else '-')
         dum = str.split(highlight_period, sep)
         startyear = int(dum[0])
