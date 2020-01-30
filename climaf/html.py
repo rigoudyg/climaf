@@ -14,6 +14,7 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 
 
 """
+from __future__ import print_function
 
 import os
 import re
@@ -274,7 +275,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                print 'index_atlas in html.py = ', index_atlas
+                print('index_atlas in html.py = ', index_atlas)
                 try:
                     atlas_index_r = file(os.path.expanduser(index_atlas), "r")
                     tt = pickle.load(atlas_index_r)
@@ -456,8 +457,7 @@ def fline(func, farg, sargs, title=None,
     if not isinstance(sargs, dict):
         imposed_labels = False
         if not isinstance(sargs, list):
-            print "Issue with second args :" + \
-                  "not a dict nor a list (got `sargs`) "
+            print("Issue with second args : not a dict nor a list (got `sargs`) ")
             return
         else:
             sargs = OrderedDict(zip(sargs, sargs))
@@ -579,17 +579,17 @@ def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
     else:
         # -- We try to 'cfile' the plot
         if not safe_mode:
-            print '-- plot function is not in safe mode --'
+            print('-- plot function is not in safe mode --')
             return cfile(myplot)
         else:
             try:
                 plot_filename = cfile(myplot)
-                print '--> Successfully plotted ', myplot
+                print('--> Successfully plotted ', myplot)
                 return plot_filename
             except:
                 # -- In case it didn't work, we try to see if it comes from the availability of the data
-                print '!! Plotting failed ', myplot
-                print "set clog('debug') and safe_mode=False to identify where the plotting failed"
+                print('!! Plotting failed ', myplot)
+                print("set clog('debug') and safe_mode=False to identify where the plotting failed")
                 return blank_cell
 
 

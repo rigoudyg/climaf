@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import cdms2
 import cdutil
 # from pcmdi_metrics.pcmdi.pmp_parser import *
@@ -113,9 +115,9 @@ out = cdms2.open(outfile, 'w')
 # if type(xlon)!=cdms2.coord.TransientAxis2D and type(xlat)!=cdms2.coord.TransientAxis2D:
 # if len(xlon)==2 and len(xlat)==2:
 if len(xlon) == 1 and len(xlat) == 1:
-    print 'Using coordinates of ylon and ylat'
-    print 'ylon = ', ylon
-    print 'ylat = ', ylat
+    print('Using coordinates of ylon and ylat')
+    print('ylon = ', ylon)
+    print('ylat = ', ylat)
     if type(ylon) == cdms2.coord.TransientAxis2D:
         out.write(ylon)
         out.write(ylat)
@@ -125,9 +127,9 @@ if len(xlon) == 1 and len(xlat) == 1:
 
 # if type(ylon)!=cdms2.coord.TransientAxis2D and type(ylat)!=cdms2.coord.TransientAxis2D:
 if len(ylon) == 1 and len(ylat) == 1:
-    print 'Using coordinates of xlon and xlat'
-    print 'xlon = ', xlon
-    print 'xlat = ', xlat
+    print('Using coordinates of xlon and xlat')
+    print('xlon = ', xlon)
+    print('xlat = ', xlat)
     if type(xlon) == cdms2.coord.TransientAxis2D:
         out.write(xlon)
         out.write(xlat)

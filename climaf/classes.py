@@ -8,6 +8,8 @@
 """
 # Created : S.Sénési - 2014
 
+from __future__ import print_function
+
 import re
 import string
 import copy
@@ -1062,7 +1064,7 @@ class cens(cobject, dict):
         if sorted(ordered_list) != sorted(ordered_keylist):
             raise Climaf_Classes_Error(
                 "Order list does not match dict keys list : %s   and %s" %
-                (`ordered_list`, `ordered_keylist`))
+                (repr(ordered_list), repr(ordered_keylist)))
         self.order = order
 
     def __setitem__(self, k, v):
@@ -1196,7 +1198,7 @@ def eds(first=None, **kwargs):
         else:
             # Use the first attributes declared as ensemble-prone for the project
             for a in cprojects[attval["project"]].attributes_for_ensemble:
-                print "Checkin listattribute", a, "against", listattr2
+                print("Checkin listattribute", a, "against", listattr2)
                 if a in listattr2:
                     listattr2.remove(a)
                     att = a

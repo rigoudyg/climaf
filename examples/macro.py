@@ -9,6 +9,8 @@
 # 'cmacro()'; the macros can be saved and edited, and they simplify
 # the display of CliMAF cache content
 
+from __future__ import print_function
+
 import os
 
 from climaf.api import *
@@ -53,7 +55,7 @@ cmacros.pop("my_macro")
 climaf.cmacro.write("~/.climaf.macros")
 
 # Look at the external representation of the macros.
-print "\nContent of ~/.climaf.macros :"
+print("\nContent of ~/.climaf.macros :")
 
 os.system("cat ~/.climaf.macros")
 
@@ -65,5 +67,5 @@ climaf.cmacro.read("~/.climaf.macros")
 cfile(fig_ezm)
 
 # The cache is displayed using macros
-print "\nCache content (using macros) :"
+print("\nCache content (using macros) :")
 cdump()

@@ -117,6 +117,8 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 
 """
 
+from __future__ import print_function
+
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -132,7 +134,7 @@ if onCiclad:
 if onSpip:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/Users/marti/Volumes/CURIE/ccc/store/cont003/dsm"
-    print 'igcm_out : declaration root sur Spip : ', root
+    print('igcm_out : declaration root sur Spip : ', root)
 
 if root:
     p = cproject("NEMO", "root", "login", "model", "config", "status", "experiment", "simulation", "DIR", "OUT",

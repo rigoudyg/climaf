@@ -6,6 +6,8 @@ Rewrite of mcdo.sh
 """
 
 
+from __future__ import print_function
+
 import argparse
 import tempfile
 import re
@@ -229,8 +231,8 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     # Then deal with date selection
     clogger.debug("Period considered: %s" % period)
     if period is not None:
-        print "type(str) = ", type(period)
-        print "period = ", period
+        print("type(str) = ", type(period))
+        print("period = ", period)
         seldate = "-seldate,{}".format(period)
         clim_time_fix = clim_timefix(input_files[0])
         if clim_time_fix is not None:

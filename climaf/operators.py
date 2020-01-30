@@ -8,6 +8,8 @@ CliMAF handling of external scripts and binaries , and of internal operators (Py
 
 # Created : S.Senesi - 2014
 
+from __future__ import print_function
+
 import os
 import re
 import sys
@@ -555,8 +557,8 @@ class Climaf_Operator_Error(Exception):
 
 if __name__ == "__main__":
     def ceval(script_name, *args, **dic):
-        print script_name, " has been called with args=", args, " and dic=", dic
-        print "Command would be:",
+        print(script_name, " has been called with args=", args, " and dic=", dic)
+        print("Command would be:",)
 
 
     cscript('test_script', 'echo $*')

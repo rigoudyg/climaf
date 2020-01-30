@@ -9,6 +9,8 @@ See also  :download:`climaf/projects/em.py <../climaf/projects/em.py>`
 
 # S.Senesi - april 2015
 
+from __future__ import print_function
+
 import os
 
 from climaf.api import *
@@ -47,12 +49,12 @@ Sic = ds(simulation="CHIST2", variable="sic", period="1975", group="SC")
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations
 files = tas.baseFiles()
-print files
+print(files)
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (this
 # select period and/or variables, aggregate files...)
 my_file = cfile(tas)
-print my_file
+print(my_file)
 
 # Check file size and content
 os.system("ls -al " + my_file)

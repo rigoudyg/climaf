@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import numpy as np
 from climaf.api import *
 from climaf.operators import *
@@ -477,48 +479,48 @@ def summary(dat):
         if len(dat.keys()) > 0:
             kvp = getattr(dat[dat.keys()[0]], 'kvp', None)
             if kvp:
-                print 'Keys - values:'
-                print kvp
-            print '-- Ensemble members:'
+                print('Keys - values:')
+                print(kvp)
+            print('-- Ensemble members:')
         for m in dat.order:
             obj = dat[m]
             if isinstance(obj, climaf.classes.cdataset):
-                print m
+                print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
                     for f in str.split(files, ' '):
-                        print f
+                        print(f)
             else:
                 print(m + " : " + repr(obj))
-            print '--'
+            print('--')
     elif isinstance(dat, classes.cdataset):
         if not dat.baseFiles(ensure_dataset=False):
-            print '-- No file found for:'
+            print('-- No file found for:')
         else:
             tmpkvp = dat.explore('choices')
             keytest = None
             for key in tmpkvp:
                 if isinstance(tmpkvp[key], list) and len(tmpkvp[key]) > 1:
                     keytest = key
-                    print 'Multiple available values for attribute "' + key + \
-                          '" that is set to "*" in your ds() call: ' + tmpkvp[key]
-                    print 'Specify one of them (within ds() or with cdef())'
+                    print('Multiple available values for attribute "' + key + '" that is set to "*" in your ds() call: '
+                          + tmpkvp[key])
+                    print('Specify one of them (within ds() or with cdef())')
             if not keytest:
                 for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
-                    print f
+                    print(f)
         return dat.kvp
     else:
-        print "Cannot handle " + repr(dat)
+        print("Cannot handle " + repr(dat))
 
 
 def projects():
     """
     Lists available projects and their associated facets.
     """
-    print '-- Available projects:'
+    print('-- Available projects:')
     for key in cprojects.keys():
-        print '-- Project:', key
-        print 'Facets =>', cprojects[key]
+        print('-- Project:', key)
+        print('Facets =>', cprojects[key])
 
 
 #
