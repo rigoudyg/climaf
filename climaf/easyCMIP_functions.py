@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 from climaf.api import *
 
 
@@ -93,7 +95,7 @@ def ensemble_request(req_dict):
     if 'period' in keys:
         periods = req_dict['period']
         if periods == '*':
-            print "Sorry, but period='*' is not allowed. Provide either one period or a list of periods."
+            print("Sorry, but period='*' is not allowed. Provide either one period or a list of periods.")
             return ""
         wreq_dict.update(dict(period=req_dict['period'][0]))
     else:
@@ -102,9 +104,9 @@ def ensemble_request(req_dict):
         variables = req_dict['variable']
         wreq_dict.update(dict(variable=req_dict['variable'][0]))
         if variables == '*':
-            print "Sorry, but variable='*' is not allowed. Provide either one variable or a list of variables."
-            print "If you want to check the available variables for your request, do it on only one "
-            print "model, simulation and period using summary( ds(**req_dict) ) or ds(**req_dict).baseFiles()"
+            print("Sorry, but variable='*' is not allowed. Provide either one variable or a list of variables.")
+            print("If you want to check the available variables for your request, do it on only one ")
+            print("model, simulation and period using summary( ds(**req_dict) ) or ds(**req_dict).baseFiles()")
             return ""
     else:
         variables = [req_dict['variable']]
@@ -210,14 +212,14 @@ def save_req_file(ens_obj, filename='test.txt', separator=' '):
     if '.txt' in filename:
         file = open(filename, "w")
         for elt in ens_obj.order:
-            print elt + separator + cfile(ens_obj[elt])
+            print(elt + separator + cfile(ens_obj[elt]))
             file.write(elt + separator + cfile(ens_obj[elt]) + ' \n')
         file.close()
     if '.json' in filename:
         import json
         json_dict = dict()
         for elt in ens_obj.order:
-            print elt + separator + cfile(ens_obj[elt])
+            print(elt + separator + cfile(ens_obj[elt]))
             json_dict.update({elt: cfile(ens_obj[elt])})
         with open(filename, 'w') as outfile:
             json.dump(json_dict, outfile, indent=4)
@@ -278,7 +280,7 @@ def merge_climaf_ensembles(ens_list=[]):
         merged_ens.set_order(merged_names)
         return merged_ens
     else:
-        print 'Provide a list of ensembles to merge together'
+        print('Provide a list of ensembles to merge together')
 
 
 def check_time_consistency_CMIP(dat, return_available_period=False):

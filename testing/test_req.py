@@ -8,6 +8,8 @@ Run it as : python -m unittest -v test_req
 S.Senesi - jan 2015
 """
 
+from __future__ import print_function
+
 import unittest
 import os
 
@@ -59,5 +61,5 @@ class A_externals(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    print "Testing CliMAF pre-requisites"
+    print("Testing CliMAF pre-requisites")
     unittest.main()

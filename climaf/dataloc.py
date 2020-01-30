@@ -8,6 +8,8 @@ Handles a database of attributes for describing organization and location of dat
 
 # Created : S.Senesi - 2014
 
+from __future__ import print_function
+
 import os
 import os.path
 import re
@@ -191,9 +193,9 @@ class dataloc():
         return self.model + self.project + self.simulation + self.frequency + self.organization + repr(self.urls)
 
     def pr(self):
-        print "For model " + self.model + " of project " + self.project + \
-              " for simulation " + self.simulation + " and freq " + self.frequency + \
-              " locations are : " + repr(self.urls) + " and org is :" + self.organization
+        print("For model " + self.model + " of project " + self.project +
+              " for simulation " + self.simulation + " and freq " + self.frequency +
+              " locations are : " + repr(self.urls) + " and org is :" + self.organization)
 
 
 def getlocs(project="*", model="*", simulation="*", frequency="*"):
@@ -821,7 +823,7 @@ def glob_remote_data(remote, pattern):
         connect.quit()
         return listfiles
     except ftp.all_errors as err_ftp:
-        print err_ftp
+        print(err_ftp)
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
 
 
@@ -881,7 +883,7 @@ def glob_remote_data(url, pattern):
         connect.quit()
         return listfiles
     except ftp.all_errors as err_ftp:
-        print err_ftp
+        print(err_ftp)
         raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
 
 

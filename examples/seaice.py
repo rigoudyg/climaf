@@ -6,12 +6,14 @@ Example of CliMAF session with SeaIce data (here organized 'a la EM')
 """
 # S.Senesi - may 2015
 
+from __future__ import print_function
+
 from climaf.api import *
 
 import os
 
 if not atCNRM or (os.getenv("USER") != "senesi" and os.getenv("USER") != "salas"):
-    print "This example does work only at CNRM for some users"
+    print("This example does work only at CNRM for some users")
     exit(0)
 
 # Next declaration is actually built-in
@@ -30,12 +32,12 @@ sic = ds(simulation="NG89", variable="sic", period="198310", realm="I")
 # Display the basic filenames involved in the dataset (all filenames in one single string)
 # CliMAF will search them at the data location which is the most specific among all declared data locations
 files = sic.baseFiles()
-print files
+print(files)
 
 # Let CliMAF generate a file with the exact dataset in its disk cache (this
 # select period and/or variables, aggregate files...)
 my_file = cfile(sic)
-print my_file
+print(my_file)
 
 # Check file size and content
 os.system("ls -al " + my_file)
@@ -61,6 +63,6 @@ cshow(fig2)
 
 # Access daily data
 sicd = ds(simulation="NG89", variable="sic", period="198303-198304", realm="I", frequency='daily')
-print sicd.baseFiles()
+print(sicd.baseFiles())
 
 exit(0)

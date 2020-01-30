@@ -9,6 +9,8 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 """
 # Created : S.Sénési - 2014
 
+from __future__ import print_function
+
 import sys
 import os
 import os.path
@@ -634,10 +636,10 @@ def cdump(use_macro=True):
         if not use_macro:
             # No interpretation by macros
             # print "%s : %s"%(crs2filename[crs][-30:],crs)
-            print "%s : %s" % (crs2filename[crs], crs)
+            print("%s : %s" % (crs2filename[crs], crs))
         else:
             # Must update for new macros
-            print "%s : %s" % (crs2filename[crs], crewrite(crs))
+            print("%s : %s" % (crs2filename[crs], crewrite(crs)))
 
 
 def list_cache():
@@ -865,20 +867,20 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         if count is True:  # Display total volume of found files
             for fig, size in du_list_sort:
                 if fig == "total":
-                    print "%7s : %s" % (size, fig)
+                    print("%7s : %s" % (size, fig))
 
         else:  # retrieve disk-usage of each found file and total volume
             for fig, size in du_list_sort:
-                print "%7s : %s" % (size, fig)
+                print("%7s : %s" % (size, fig))
 
     elif count is True and len_new_dict != 0:
-        print "Number of files found:", len(work_dic)
+        print("Number of files found:", len(work_dic))
         if CRS is True:
             for crs in work_dic:
-                print crs
+                print(crs)
 
     elif remove is True and len_new_dict != 0:
-        print "Removed files:"
+        print("Removed files:")
         list_tmp_crs = []
         list_tmp_crs = new_dict.keys() if (
                 var_find or pattern is not "" or not_pattern is not "") else crs2filename.keys()
@@ -890,13 +892,13 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         if var_find or pattern is not "" or not_pattern is not "":
             if len(new_dict) != 0:
                 if new_dict != crs2filename:
-                    print "Filtered objects :"
+                    print("Filtered objects :")
                 else:
-                    print "Filtered objects = cache content"
+                    print("Filtered objects = cache content")
                 return map(crewrite, new_dict.keys())
             # else : print "No matching file "
         else:
-            print "Content of CliMAF cache"
+            print("Content of CliMAF cache")
             return map(crewrite, crs2filename.keys())
 
     # TBD
@@ -907,7 +909,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             dic_special = new_dict.copy()
         else:
             dic_special = crs2filename.copy()
-        print "List of marked figures as 'special'", dic_special.values()
+        print("List of marked figures as 'special'", dic_special.values())
         return dic_special  # TBD: declarer comme var globale et enlever son effacement dans creset
 
     new_dict.clear()

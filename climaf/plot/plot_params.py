@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # -- Import the dictionnaries of plot params:
+from __future__ import print_function
+
 from climaf.site_settings import *
 
 # --> Import the default CliMAF sets of plot params
@@ -106,18 +108,18 @@ def plot_params(variable, context, custom_plot_params=None):
             if cont in var_entry:
                 rep.update(var_entry[cont])
     else:
-        print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
+        print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
         # -- if not, we try to split
         tmp_variable = str.split(variable, '_')[0]
         if tmp_variable in per_variable:
-            print 'We will use the plot parameters of ' + tmp_variable
+            print('We will use the plot parameters of ' + tmp_variable)
             var_entry = per_variable[tmp_variable]
             for cont in ['default', context]:
                 if cont in var_entry:
                     rep.update(var_entry[cont])
         else:
-            print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
-            print 'We will use the default plot parameters.'
+            print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
+            print('We will use the default plot parameters.')
     return rep
 
 

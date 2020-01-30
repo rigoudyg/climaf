@@ -8,6 +8,8 @@ Call it as : python -m unittest -b -v -f test_1
 S.Senesi - dec 2014
 """
 
+from __future__ import print_function
+
 import unittest
 import os.path
 from climaf.api import *
@@ -24,30 +26,29 @@ class A_basic(unittest.TestCase):
 
     def test_1_print_dataset(self):
         pdg = repr(self.dg)
-        print pdg
+        print(pdg)
         expected = "ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')"
-        print expected
-        self.assertEqual(pdg, expected,
-                         'Issue printing a very basic dataset')
+        print(expected)
+        self.assertEqual(pdg, expected, 'Issue printing a very basic dataset')
 
     def test_2_declaring_and_applying_a_script(self):
         mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
         std = mean.sdev  # Secondary output 'std' is a 'property' of main output
         sd = repr(std)
         actual = sd
-        print "actual=", sd
+        print("actual=", sd)
         expected = "mean_and_std(ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')).sdev"
-        print "expected=", expected
+        print("expected=", expected)
         self.assertEqual(sd, expected, ' Issue building a compound expression (apply script)')
 
     def test_3_evaluating_a_script(self):
         mean = climaf.driver.capply("mean_and_std", self.dg)  # Main output is the return value of applying the script
         std = mean.sdev  # Secondary output 'std' is a 'property' of main output
-        print "std = ", std
+        print("std = ", std)
         fil = cfile(std)
         expected = climaf.cache.currentCache + '/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
-        print "actual=", fil
-        print "expected=", expected
+        print("actual=", fil)
+        print("expected=", expected)
         self.assertEqual(fil, expected, "Issue evaluating script application as a file")
 
     def test_4_plotting(self):
@@ -89,11 +90,11 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
                          'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
-        print repr(ds)
+        print(repr(ds))
         my_file = cfile(self.ds)
-        print "myfile = " + my_file
+        print("myfile = " + my_file)
         expected = climaf.cache.currentCache + '/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
-        print "expected = " + expected
+        print("expected = " + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 
     def tearDown(self):
@@ -122,15 +123,15 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
         files = self.ds.baseFiles()
         expected = "/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/1pctCO2/mon/atmos/Amon/r1i1p1/latest/tas/" \
                    "tas_Amon_CNRM-CM5_1pctCO2_r1i1p1_185001-189912.nc"
-        print "actual=" + files
-        print "expected=" + expected
+        print("actual=" + files)
+        print("expected=" + expected)
         self.assertEqual(files, expected, 'Issue accessing 1cptCO2 data files')
 
     def test_selecting_files(self):
         my_file = cfile(self.ds)
         expected = climaf.cache.currentCache + '/0edf6/7d617/2d79f/de87c/fd02e/c68ad/5e457/6421d/6ac8f/59811/11cee/3.nc'
-        print "actual=" + my_file
-        print "expected=" + expected
+        print("actual=" + my_file)
+        print("expected=" + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 
     def tearDown(self):
@@ -154,8 +155,8 @@ class C_OCMIP5_CIclad(unittest.TestCase):
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
         expected = climaf.cache.currentCache + '/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
-        print self.file
-        print expected
+        print(self.file)
+        print(expected)
         self.assertEqual(self.file, expected, 'Issue')
 
     def tearDown(self):
@@ -178,5 +179,5 @@ suite3 = unittest.TestLoader().loadTestsFromTestCase(C_OCMIP5_CIclad)
 alltests = unittest.TestSuite([suite1, suite2, suite3])
 
 if __name__ == '__main__':
-    print "Testing some CliMAF basic operations"
+    print("Testing some CliMAF basic operations")
     unittest.main()

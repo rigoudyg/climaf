@@ -13,6 +13,8 @@
 
 # -- For this, we use the python library argparse
 # --------------------------------------------------------------------------------------------------
+from __future__ import print_function
+
 import argparse
 
 import matplotlib
@@ -160,7 +162,7 @@ if args.max:
 offset = (float(args.offset) if args.offset else 0.)
 scale = (float(args.scale) if args.scale else 1.)
 
-print '==> args = ', args
+print('==> args = ', args)
 
 # -- We cut the strings to do python lists
 # --------------------------------------------------------------------------------------------------
@@ -171,9 +173,9 @@ labels_list = str.split(labels, '$')
 if args.highlight_period:
     highlight_period_list = str.split(args.highlight_period, ',')
     if not len(filenames_list) == len(highlight_period_list):
-        print 'Provided ', len(filenames_list), ' time series and only ', \
-            len(highlight_period_list), ' periods to highlight'
-        print '==> Discard highlighting'
+        print('Provided ', len(filenames_list), ' time series and only ', len(highlight_period_list),
+              ' periods to highlight')
+        print('==> Discard highlighting')
         args.highlight_period = None
 
 # --------------------------------------------------------------------------------------------------
@@ -285,14 +287,14 @@ for pathfilename in filenames_list:
         #   else:
         #      cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
         # datevar.append(cdftime.num2date(nctime))
-        print 'datevar = ', datevar
+        print('datevar = ', datevar)
         #
         x = np.array(datevar)
         # x = np.array(datevar)[0,:]
     # y = test_dat[:,0,0]
     y = np.squeeze(test_dat)
     if len(y.shape) > 1:
-        print "input data is not 1D"
+        print("input data is not 1D")
     handles_for_legend.append(
         # plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
         #     label=labels_list[filenames_list.index(pathfilename)])[0]
@@ -346,8 +348,8 @@ for pathfilename in filenames_list:
         endyear = int(dum[1])
         #
         ind = np.argwhere((x > datetime.datetime(startyear, 1, 1)) & (x < datetime.datetime(endyear, 12, 31))).flatten()
-        print 'highlight_period = ', highlight_period
-        print "highlight_period_lw_list[dataset_number] = ", highlight_period_lw_list[dataset_number]
+        print('highlight_period = ', highlight_period)
+        print("highlight_period_lw_list[dataset_number] = ", highlight_period_lw_list[dataset_number])
         plt.plot(x[ind], y[ind], lw=highlight_period_lw_list[dataset_number],
                  color=colors[dataset_number])
     #
@@ -378,7 +380,7 @@ if args.xlim:
             elif len(x_text) == 8:
                 x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
             else:
-                print '--> Date provided as x value could not be interpreted: ', xlim_date
+                print('--> Date provided as x value could not be interpreted: ', xlim_date)
         xlim_period.append(x_date)
     plt.xlim(xlim_period)
 
@@ -432,8 +434,8 @@ if draw_legend:
         # if add_custom_legend_to_default:
         # -- Do we start a new legend or append to the existing one?
         legend_handles = (handles_for_legend if args.append_custom_legend_to_default.lower() in ['true'] else [])
-        print 'colors = ', colors
-        print 'legend_colors_list = ', legend_colors_list
+        print('colors = ', colors)
+        print('legend_colors_list = ', legend_colors_list)
         for legend_label in legend_labels_list:
             leg_ind = legend_labels_list.index(legend_label)
             handle_dict = dict(label=legend_label)
@@ -442,7 +444,7 @@ if draw_legend:
         leg_dict.update(dict(handles=legend_handles))
 
     # !!!
-    print 'leg_dict = ', leg_dict
+    print('leg_dict = ', leg_dict)
     leg = plt.legend(**leg_dict)
     if args.legend_lw:
         legend_lw_list = str.split(args.legend_lw, ',')
@@ -455,7 +457,7 @@ if draw_legend:
                 legend_lw_list = [legend_lw_list[0]] * len(filenames_list) + legend_lw_list[1:len(legend_lw_list)]
 
         # for legobj in leg.legendHandles:
-        print 'legend_lw_list = ', legend_lw_list
+        print('legend_lw_list = ', legend_lw_list)
         for ind in range(0, len(leg.legendHandles)):
             leg.legendHandles[ind].set_linewidth(float(legend_lw_list[ind]))
 
@@ -495,12 +497,12 @@ if args.text:
             elif len(x_text) == 8:
                 x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
             else:
-                print '--> Date provided as x value could not be interpreted: ', x_text
+                print('--> Date provided as x value could not be interpreted: ', x_text)
         # -- y
         y_text = float(str.split(text_elt, ',')[1])
         # -- And text
         text = str.split(text_elt, ',')[2]
-        print 'text_elt = ', text_elt
+        print('text_elt = ', text_elt)
         # -- Plot the text
         plt.text(x_date, y_text, text,
                  fontsize=text_fontsize_list[text_ind],
@@ -520,4 +522,4 @@ plt.subplots_adjust(left=float(left_margin),
                     bottom=float(bottom_margin))
 
 plt.savefig(outfig)
-print outfig
+print(outfig)

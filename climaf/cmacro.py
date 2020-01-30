@@ -10,6 +10,8 @@ CliMAF macros module :
 
 """
 
+from __future__ import print_function
+
 import sys
 import os
 
@@ -245,9 +247,9 @@ def show(interp=True):
     """
     for m in cmacros:
         if interp:
-            print "% 15s : %s" % (m, crewrite(cmacros[m].buildcrs(), alsoAtTop=False))
+            print("% 15s : %s" % (m, crewrite(cmacros[m].buildcrs(), alsoAtTop=False)))
         else:
-            print "% 15s : %s" % (m, cmacros[m])
+            print("% 15s : %s" % (m, cmacros[m]))
 
 
 def instantiate(mac, operands, toplevel=True):

@@ -7,6 +7,8 @@
 #
 # Created : L.Vignon - 2017
 
+from __future__ import print_function
+
 import os
 import sys
 import subprocess
@@ -168,8 +170,8 @@ for host, username in host_user2:
         connect = ftp.FTP(host, login, password)
 
     etat = connect.getwelcome()
-    print 'Connect to host: %s' % host
-    print etat
+    print('Connect to host: %s' % host)
+    print(etat)
 
     for ffile in host_user2[host, username]:
         if not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile) or host in dynamic_host:
@@ -189,11 +191,11 @@ for host, username in host_user2:
                     local_file_ut_datetime = local_file_datetime.replace(tzinfo=tz.tzlocal()).astimezone(
                         tz.gettz('UTC'))
                     if time.mktime(local_file_ut_datetime.timetuple()) >= remote_timestamp:
-                        print 'Most recent file found in cache: %s is at %s \n' % \
-                              (ffile, os.path.expanduser(remote_cachedir) + '/' + host + ffile)
+                        print('Most recent file found in cache: %s is at %s \n' %
+                              (ffile, os.path.expanduser(remote_cachedir) + '/' + host + ffile))
                     else:
-                        print 'File found in cache %s is older than %s \n' % \
-                              (os.path.expanduser(remote_cachedir) + '/' + host + ffile, ffile)
+                        print('File found in cache %s is older than %s \n' %
+                              (os.path.expanduser(remote_cachedir) + '/' + host + ffile, ffile))
                         filetransfer = True
                 #                        connect.retrbinary('RETR '+filename, open(os.path.expanduser(remote_cachedir)+
                 #                        '/'+host+ffile, 'wb').write)
@@ -204,15 +206,15 @@ for host, username in host_user2:
             if (host in dynamic_host
                 and os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile) and filetransfer)\
                     or not os.path.exists(os.path.expanduser(remote_cachedir) + '/' + host + ffile):
-                print 'File %s transfered \n' % ffile
+                print('File %s transfered \n' % ffile)
                 connect.retrbinary('RETR ' + filename,
                                    open(os.path.expanduser(remote_cachedir) + '/' + host + ffile, 'wb').write)
                 # if host in dynamic_host and filetransfer: os.utime(os.path.expanduser(remote_cachedir)+'/'+host+ffile,
                 #  (timestamp, timestamp))
 
         else:
-            print 'File found in cache: %s is at %s \n' % (ffile,
-                                                           os.path.expanduser(remote_cachedir) + '/' + host + ffile)
+            print('File found in cache: %s is at %s \n' % (ffile,
+                                                           os.path.expanduser(remote_cachedir) + '/' + host + ffile))
 
     connect.quit()
 
@@ -234,6 +236,6 @@ try:
     mcdo.main(operator=operator, output_file=out, variable=var, period=period, region=region, alias=alias, units=units,
               vm=vm, input_files=loc_files)
     comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    print "Remote files %s were saved as local files as %s" % (files, loc_files)
+    print("Remote files %s were saved as local files as %s" % (files, loc_files))
 except:
     raise Climaf_Script_Error("Issue when executing: %s" % ' '.join(args))
