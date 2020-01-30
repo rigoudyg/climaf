@@ -104,6 +104,10 @@ if not already_inited and not onrtd:
     except:
         print("Warning: ncdump not found -> can't use ncdump from CliMAF")
     print("---")
+    #
+    # Check that the variable TMPDIR, if defined, points to an existing directory
+    if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
+        raise OSError("TMPDIR points to a non existing directory! Change the value of tthe variable to go on.")
 
     logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
     #
