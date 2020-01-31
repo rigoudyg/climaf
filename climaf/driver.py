@@ -75,7 +75,7 @@ def capply_script(script_name, *operands, **parameters):
 
     if script_name not in operators.scripts:
         raise Climaf_Driver_Error("Script %s is not know. Consider declaring it "
-                                  "with function 'cscript'", script_name)
+                                  "with function 'cscript' %s" % script_name)
     script = operators.scripts[script_name]
     # if len(operands) != script.inputs_number() :
     #     raise Climaf_Driver_Error("Operator %s is "
@@ -367,7 +367,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 else:
                     return obj
             else:
-                raise Climaf_Driver_Error("operator %s is not a script nor known operator", str(cobject.operator))
+                raise Climaf_Driver_Error("operator %s is not a script nor known operator %s" % str(cobject.operator))
         elif isinstance(cobject, classes.scriptChild):
             clogger.debug("Deal with scriptChild: %s" % cobject.crs)
             # Force evaluation of 'father' script

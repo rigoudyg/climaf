@@ -256,7 +256,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
             files_to_treat_before_merging.append(nemo_timefix(a_file))
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
-            files_to_treat_before_merging.append(aladin_coordfix(a_file), tmp, filevar)
+            files_to_treat_before_merging.append(aladin_coordfix(a_file, tmp, filevar))
         files_to_treat_before_merging.append(a_file)
 
     if len(files_to_treat_before_merging) > 1:

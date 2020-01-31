@@ -64,8 +64,8 @@ def clog_file(level=None):
     """
     Sets the verbosity level for CliMAF log messages on file CLIMAF_LOG_DIR/climaf.log
 
-   Args:
-     level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
+    Args:
+        level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
 
     Note : at CliMAF startup, the level is set to the value of environment variable $CLIMAF_LOGFILE_LEVEL
 
