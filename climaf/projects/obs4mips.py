@@ -12,9 +12,11 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 
 
 """
-import os.path
 
-if os.path.exists('/cnrm'):
+from climaf.site_settings import atCNRM
+
+
+if atCNRM:
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
 
