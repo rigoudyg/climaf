@@ -60,6 +60,9 @@ def load_standard_operators():
     cscript('divide', 'cdo div ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
+    cscript('select_level', 'cdo sellevel,${level} ${in} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
     cscript('space_average',
             scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
                          ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
