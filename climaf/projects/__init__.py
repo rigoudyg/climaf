@@ -42,13 +42,3 @@ addition to the one duly declared in the datafile
 __all__ = ["example", "cami", "cmip3", "cmip5", "ocmip5", "obs4mips", "em", "erai", "erai_land", "gpcc", "gpcp",
            "ceres", "cruts3", "file", "ref_climatos_and_ts", "igcm_out", "emn36", "nemo", "igcm_cmip6", "cmip6", "eobs",
            "cordex", "cmip6cerfacs", "ref_era5cerfacs"]
-
-
-from climaf.site_settings import atCNRM
-from climaf.operators import derive
-
-if atCNRM:
-    for variable in ["ua", "va", "ta", "hur", "hus", "zg"]:
-        for level in [850, 500, 200]:
-            derived_variable = variable + str(level)
-            derive("*", derived_variable, "select_level", "ua", level=str(level * 100))
