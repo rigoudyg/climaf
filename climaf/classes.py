@@ -1795,7 +1795,7 @@ class cpage(cobject):
                     page_height = 1000.
                 else:
                     raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape'")
+                        "if set, orientation must be 'portrait' or 'landscape' (not %s)"%orientation)
         self.page_width = page_width
         self.page_height = page_height
         self.title = title
