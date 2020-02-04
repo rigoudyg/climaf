@@ -27,8 +27,10 @@ Changes, newest first:
 
 - Vnext:
 
+  - operator `plot` now uses provided min/max for field scaling
+
   - operator `curves` also uses dash patterns when showing more than 10 curves 
-    
+  
   - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
 
   - Cache speed improvement : when computing a CliMAF object, default behaviour is to
