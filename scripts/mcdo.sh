@@ -71,11 +71,11 @@ seldate=$seldatebase
 
 # Prepare all selections (setmiss, aliasing, time, space, variable) :
 # construct CDO operators chain, optimizing operations list and order
-if [[ $ffile == *${filevar}_* ]] ; then 
-    # varname is in filename -> assume seldate before selvar is best
-    ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selregion" "$selvar" "$merge
+if [[ $ffile == */${filevar}_* ]] ; then 
+    # varname is at beginning of filename -> assume selvar is useless
+    ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selregion" "$merge
 else
-    # varname is not in filename -> assume selvar before selvar is best
+    # varname is not at begin. of filename -> assume selvar before seldate is best
     ops=$setmiss" "$setunits" "$selalias" "$seldate" "$selregion" "$selvar" "$merge
 fi
 [ "$operator" ] && ops="-"${operator}" "$ops
@@ -92,6 +92,9 @@ for file in $files ; do
     vfiles+=$file" "
 done
 vfiles=${vfiles/% /} # Discard last space character because CDO cannot !
+
+# One some occasions, there is no operation to perform, but we want a result in cache anyway
+[ -z "${ops// /}" ] && ops=copy
 
 time $CDO $ops "$vfiles" $out
 

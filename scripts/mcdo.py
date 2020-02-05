@@ -247,6 +247,10 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         else:
             cdo_commands_before_merge.append("-{}".format(operator))
 
+    # Some rare, tricky cases need that :
+    if len(cdo_commands_after_merge)==0 :
+        cdo_commands_after_merge.append("-copy")
+        
     files_to_treat_before_merging = list()
     for a_file in input_files:
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):

@@ -270,7 +270,8 @@ class cscript():
             else:
                 rank = 0
             if rank in self.inputs:
-                Climaf_Operator_Error(
+                #Climaf_Operator_Error(
+                clogger.warning(
                     "When defining %s : duplicate declaration for input #%d" % (name, rank))
             serie = (oc.group("serie") is not None)
             multiple = (oc.group("mult") is not None)

@@ -42,9 +42,9 @@ def load_standard_operators():
                          ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
                          '--vm="${missing}" ${ins}')
     #
-    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
-
+    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
+    cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
@@ -146,8 +146,7 @@ def load_standard_operators():
                                               'options=\'\"${options}\"\' aux_options=\'\"${aux_options}\"\' '
                                               'shade2_options=\'\"${shade2_options}\"\' shade2_var=\'\"${var_5}\"\' '
                                               'shade2_file=\'\"${in_5}\"\' '
-                                              'shade2_below=\'\"${shade2_below}\"\' '
-                                              'shade2_above=\'\"${shade2_above}\"\' '
+                                              'shade2_below=\'\"${shade2_below}\"\' shade2_above=\'\"${shade2_above}\"\' '
                                               'shading_options=\'\"${shading_options}\"\' myscale_aux=${scale_aux} '
                                               'myoffset_aux=${offset_aux} xpolyline=\'\"${xpolyline}\"\' '
                                               'ypolyline=\'\"${ypolyline}\"\' '

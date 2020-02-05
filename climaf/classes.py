@@ -111,6 +111,7 @@ class cproject():
         #
         self.facets = []
         self.facet_defaults = dict()
+        self.facet_authorized_values = dict()
         forced = ['project', 'simulation', 'variable', 'period', 'domain']
         for f in forced:
             self.facets.append(f)
@@ -195,6 +196,37 @@ def cdef(attribute, value=None, project=None):
         cprojects[project].facet_defaults[attribute] = value
 
 
+def cvalid(attribute, value=None, project=None):
+    """
+    Set or get the list of valid values for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
+    thos data files which match a dataset definition
+
+    Argument 'project' allows to restrict the use/query 
+    to the context of the given 'project'.
+
+    Example::
+
+    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
+    """
+
+    if project not in cprojects:
+        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+    if attribute == 'project':
+        project = None
+    #
+    if project and attribute not in cprojects[project].facets:
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+    if value is None:
+        rep = cprojects[project].facet_authorized_values.get(attribute, None)
+        if not rep:
+            rep = cprojects[None].facet_authorized_values.get(attribute, "")
+        return rep
+    else:
+        cprojects[project].facet_authorized_values[attribute] = value
+
+
+        
 cproject(None)
 cdef("domain", "global")
 
@@ -404,7 +436,7 @@ class cdataset(cobject):
         self.alias = varIsAliased(self.project, self.variable)
         #
         if "," in self.variable and self.alias:
-            filevar, scale, offset, units, filenameVar, missing = self.alias
+            filevar, scale, offset, units, filenameVar, missing, conditions = self.alias
             if filevar != self.variable or scale != 1. or offset != 0 or missing:
                 raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
@@ -497,8 +529,23 @@ class cdataset(cobject):
     def missingIsOK(self):
         if alias is None:
             return True
-        _, _, _, _, _, missing = self.alias
+        _, _, _, _, _, missing,_ = self.alias
         return missing is None
+
+    def matches_conditions(self,conditions) :
+        """
+        Return True if, for all keys in dict condition, the kvp
+        value for same key is among condition's value (which can be a list)
+        Example : 
+          with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
+          will return True
+        """
+        if conditions is None : return True
+        for key in conditions :
+            values=conditions[key]
+            if type(values) != type([]) : values=[values]
+            if self.kvp[key] not in values : return False
+        return True
 
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
@@ -619,7 +666,7 @@ class cdataset(cobject):
         """
         dic = self.kvp.copy()
         if self.alias:
-            filevar, _, _, _, filenameVar, _ = self.alias
+            filevar, _, _, _, filenameVar, _ ,conditions= self.alias
             req_var = dic["variable"]
             dic["variable"] = string.Template(filevar).safe_substitute(dic)
             if filenameVar:
@@ -1041,14 +1088,14 @@ class cens(cobject, dict):
         #
         dict.update(self, dic)
         #
-        keylist = self.keys()
+        keylist = [ k for k in self.keys()]
         try:
             from natsort import natsorted
             keylist = natsorted(keylist)
         except:
             keylist.sort()
         if order:
-            self.set_order(order, keylist)
+            self.set_order(order, None)
         elif sortfunc:
             self.order = sortfunc(keylist)
         else:
@@ -1569,29 +1616,37 @@ def crealms(project, dic):
     realms[project] = dic
 
 
-def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None, missing=None, filenameVar=None):
+def calias(project, variable, fileVariable=None, scale=1., offset=0.,
+           units=None, missing=None, filenameVar=None, conditions=None):
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
+    (see first example erai below)
+
+    Arg ``conditions`` allows to restrict the effect, based on the value
+    of some facets. It is a dictionary of applicable values or 
+    values'list, which keys are the facets  (see example CMIP6 below)
 
     Arg ``filenameVar`` allows to tell which fake variable name should be
     used when computing the filename for this variable in this project
-    (for optimisation purpose);
+    (for optimisation purpose); (see seconf example erai below)
 
     Can tell that a given constant must be interpreted as a missing value
+    (see 4th example, EM, below)
 
     ``variable`` may be a list. In that case, ``fileVariable`` and
     ``filenameVar``, if provided, should be parallel lists
 
     `` variable`` can be a comma separated list of variables, in which
     case this tells how variables are grouped in files (it make sense
-    to use filenameVar in that case, as this is a xway to provide the
+    to use filenameVar in that case, as this is a way to provide the
     label which is unique to this grouping of variable; scale, offset
     and missing args must be the same for all variables in that case
 
     Example ::
 
-    >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    >>> calias('CMIP6','evspsbl',scale=-1., conditions={ 'model':'CanESM5' , 'version': ['20180103', '20190112'] })
+    >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     >>> calias('data_CNRM','so,thetao',filenameVar='grid_T_table2.2')
 
@@ -1617,15 +1672,21 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None
         fileVariable = [fileVariable]
     if type(units) is not list:
         units = [units]
+    if conditions is not None :
+        for kw in conditions :
+            if kw not in cprojects[project].facets :
+                raise Climaf_Classes_Error(
+                    "Keyword \"%s\" is not allowed for project %s"%\
+                    (kw,project))
     for v, u, fv, fnv in zip(variable, units, fileVariable, filenameVar):
-        aliases[project][v] = (fv, scale, offset, u, fnv, missing)
+        aliases[project][v] = (fv, scale, offset, u, fnv, missing, conditions)
 
 
 def varIsAliased(project, variable):
     """
     Return a n-uplet (fileVariable, scale, offset, filevarName,
-    missing) defining how to compute a 'variable' which is not in
-    files, for the 'project'
+    missing,conditions) defining how to compute a 'variable' which 
+    is not in files, for the 'project'
     """
     if project in aliases and variable in aliases[project]:
         return aliases[project][variable]
@@ -1647,7 +1708,7 @@ class cpage(cobject):
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white",
-                 insert="", insert_width=0):
+                 insert="",insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -1736,7 +1797,7 @@ class cpage(cobject):
                     page_height = 1000.
                 else:
                     raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape'")
+                        "if set, orientation must be 'portrait' or 'landscape' (not %s)"%orientation)
         self.page_width = page_width
         self.page_height = page_height
         self.title = title
@@ -2132,7 +2193,8 @@ def domainOf(cobject):
     elif cobject is None:
         return "none"
     else:
-        clogger.error("Unkown class for argument " + repr(cobject))
+        if cobject != "" :
+            clogger.error("Unkown class for argument " + repr(cobject))
 
 
 def varOf(cobject): return attributeOf(cobject, "variable")

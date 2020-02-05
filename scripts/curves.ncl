@@ -177,11 +177,14 @@ begin
       status_exit(1)
     end if
     if (i .eq. 0) then
-      fld_min=min(fld)
-      fld_max=max(fld)
-    end if
-    if (fld_min .gt. min(fld)) then fld_min=min(fld) end if
-    if (fld_max .lt. max(fld)) then fld_max=max(fld) end if
+      fld_min=min(fld*tofloat(myscale)+tofloat(myoffset))
+      fld_max=max(fld*tofloat(myscale)+tofloat(myoffset))
+    else 
+      alt_fld_min=min(fld*tofloat(myscale_aux)+tofloat(myoffset_aux))
+      if (fld_min .gt. alt_fld_min) then fld_min=alt_fld_min end if
+      alt_fld_max=max(fld*tofloat(myscale_aux)+tofloat(myoffset_aux))
+      if (fld_max .lt. alt_fld_max) then fld_max=alt_fld_max end if
+     end if
    
     ;fld=fld*tofloat(myscale)+tofloat(myoffset)
     
@@ -307,16 +310,20 @@ begin
   res@xyLineThicknessF     = 3.0      ; default is 1
   res@xyMonoDashPattern    = True     ; force all solid lines
 
-  ;---Set resources for colors 
-  colornames=new(n, string)
-  if n .le. 9 then
-    stdcolors=(/"black","red","blue","green","orange","purple","violet","grey","brown"/)
+  ;---Set resources for colors
+  ncolors=10
+  set13=(/"black","red","blue","green","orange","purple","violet","grey","brown","darkgreen","cyan3","goldenrod4","rosybrown3"/)
+  set10=(/"black","red","blue","green","orange","purple","violet","grey","brown","darkgreen"/)
+  if n .le. ncolors then
+    stdcolors=set10
   else
     stdcolors=new(n, string)
-    stdcolors(0:8)=(/"black","red","blue","green","orange","purple","violet","grey","brown"/)
-    do i=0,(n-9)-1 stdcolors(i+9)=stdcolors(i) end do
+    stdcolors(0:ncolors-1)=set10
+    do i=ncolors,n-1 stdcolors(i)=stdcolors(i-ncolors) end do
   end if
+  ;print(stdcolors)
  
+  colornames=new(n, string)
   do i=0,n-1 colornames(i)=stdcolors(i) end do
 
   if isvar("colors") then 
@@ -506,6 +513,7 @@ begin
 
         ; Create plot
         res@xyLineColor = colornames(i)
+        res@xyDashPattern = i/ncolors 
         res@xyExplicitLegendLabels = "  "+tab_labels(i)
         
         if (i .eq. 0) then 

@@ -299,7 +299,7 @@ def clim_average(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.info('DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == "DJFM":
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
@@ -401,7 +401,7 @@ def clim_average_fast(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.info('DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == 'DJFM':
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
