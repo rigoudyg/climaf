@@ -38,7 +38,8 @@ logdir = "."
 
 # When evaluating an object, default behaviour is to search cache for including or begin objects
 # but this could be expensive
-dig_hard_into_cache=True
+dig_hard_into_cache = True
+
 
 def capply(climaf_operator, *operands, **parameters):
     """ Builds the object representing applying a CliMAF operator (script, function or macro)
@@ -298,7 +299,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
                 return cread(filename, classes.varOf(cobject))
         if not isinstance(cobject, classes.cpage) and not isinstance(cobject, classes.cpage_pdf) and \
                 not isinstance(cobject, classes.cens):
-            if dig_hard_into_cache :
+            if dig_hard_into_cache:
                 clogger.debug("Searching cache for including object for : " + repr(cobject))
                 ########################################################################
                 it, altperiod = cache.hasIncludingObject(cobject)
@@ -465,7 +466,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict["var"] = classes.varOf(op)
         if isinstance(op, classes.cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
-            if op.matches_conditions(conditions) :
+            if op.matches_conditions(conditions):
                 if scriptCall.flags.canAlias and "," not in classes.varOf(op):
                     # if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
                     subdict["var"] = Template(filevar).safe_substitute(op.kvp)
@@ -503,16 +504,16 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             label, multiple, serie = script.inputs[i]
             subdict[label] = infile
             # Provide the name of the variable in input file if script allows for
-            if isinstance(op, classes.cobject) :
+            if isinstance(op, classes.cobject):
                 subdict["var_%d" % i] = classes.varOf(op)
             if isinstance(op, classes.cdataset) and op.alias:
                 filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
-                if op.matches_conditions(conditions) :
+                if op.matches_conditions(conditions):
                     if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                        "," not in classes.varOf(op):
+                            "," not in classes.varOf(op):
                         subdict["var_%d" % i] = Template(filevar).safe_substitute(op.kvp)
                         subdict["alias_%d" % i] = "%s %s %f %f" % (classes.varOf(op),
-                                                    subdict["var_%d" % i], scale, offset)
+                                                                   subdict["var_%d" % i], scale, offset)
                     if units:
                         subdict["units_%d" % i] = units
                     if missing:
@@ -625,7 +626,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     tim1 = time.time()
     clogger.info("Launching command:" + template)
-    #print("Launching command:" + template)
+    # print("Launching command:" + template)
     #
     logfile = open(logdir + '/last.out', 'w')
     logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
@@ -633,7 +634,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError, inst:
         logfile.close()
-        raise Climaf_Driver_Error("Something went wrong when computing "+scriptCall.crs+". See file ./last.out for details")
+        raise Climaf_Driver_Error("Something went wrong when computing %s. See file ./last.out for details" %
+                                  scriptCall.crs)
 
     logfile.close()
     #
@@ -1027,7 +1029,7 @@ def get_fig_sizes(figfile):
     figsize = output_figsize.split(" ").pop(2)
     fig_width = figsize.split("x").pop(0)
     fig_height = figsize.split("x").pop(1)
-    return int(fig_width),int(fig_height)
+    return int(fig_width), int(fig_height)
 
         
 def cfilePage(cobj, deep, recurse_list=None):
@@ -1059,9 +1061,9 @@ def cfilePage(cobj, deep, recurse_list=None):
     usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
     if cobj.title is not "":
         usable_height -= cobj.ybox
-    if cobj.insert is not "" :
-        ins_base_width,ins_base_height=get_fig_sizes(cobj.insert)
-        insert_height=int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
+    if cobj.insert is not "":
+        ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
+        insert_height = int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
         usable_height -= insert_height
     #
     usable_width = cobj.page_width - xmargin * (len(cobj.widths) - 1.) - x_left_margin - x_right_margin
@@ -1086,7 +1088,7 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            fig_width,fig_height=get_fig_sizes(figfile)
+            fig_width, fig_height = get_fig_sizes(figfile)
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1115,9 +1117,8 @@ def cfilePage(cobj, deep, recurse_list=None):
             y += height + ymargin
 
     if cobj.insert != "":
-        args.extend([cobj.insert, "-geometry", "x%d+%d+%d"%\
-                     (insert_height,(cobj.page_width-cobj.insert_width)/2,y),
-                    "-composite"])
+        args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
+                     (insert_height, (cobj.page_width-cobj.insert_width) / 2, y), "-composite"])
 
     out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
     if cobj.page_trim:

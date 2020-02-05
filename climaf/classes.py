@@ -226,7 +226,6 @@ def cvalid(attribute, value=None, project=None):
         cprojects[project].facet_authorized_values[attribute] = value
 
 
-        
 cproject(None)
 cdef("domain", "global")
 
@@ -527,10 +526,10 @@ class cdataset(cobject):
     def missingIsOK(self):
         if alias is None:
             return True
-        _, _, _, _, _, missing,_ = self.alias
+        _, _, _, _, _, missing, _ = self.alias
         return missing is None
 
-    def matches_conditions(self,conditions) :
+    def matches_conditions(self, conditions):
         """
         Return True if, for all keys in dict condition, the kvp
         value for same key is among condition's value (which can be a list)
@@ -538,11 +537,14 @@ class cdataset(cobject):
           with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
           will return True
         """
-        if conditions is None : return True
-        for key in conditions :
-            values=conditions[key]
-            if type(values) != type([]) : values=[values]
-            if self.kvp[key] not in values : return False
+        if conditions is None:
+            return True
+        for key in conditions:
+            values = conditions[key]
+            if isinstance(values, list):
+                values = [values]
+            if self.kvp[key] not in values:
+                return False
         return True
 
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
@@ -664,7 +666,7 @@ class cdataset(cobject):
         """
         dic = self.kvp.copy()
         if self.alias:
-            filevar, _, _, _, filenameVar, _ ,conditions= self.alias
+            filevar, _, _, _, filenameVar, _, conditions = self.alias
             req_var = dic["variable"]
             dic["variable"] = string.Template(filevar).safe_substitute(dic)
             if filenameVar:
@@ -1086,7 +1088,7 @@ class cens(cobject, dict):
         #
         dict.update(self, dic)
         #
-        keylist = [ k for k in self.keys()]
+        keylist = [k for k in self.keys()]
         try:
             from natsort import natsorted
             keylist = natsorted(keylist)
@@ -1670,12 +1672,11 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
         fileVariable = [fileVariable]
     if type(units) is not list:
         units = [units]
-    if conditions is not None :
-        for kw in conditions :
-            if kw not in cprojects[project].facets :
+    if conditions is not None:
+        for kw in conditions:
+            if kw not in cprojects[project].facets:
                 raise Climaf_Classes_Error(
-                    "Keyword \"%s\" is not allowed for project %s"%\
-                    (kw,project))
+                    "Keyword \"%s\" is not allowed for project %s" % (kw, project))
     for v, u, fv, fnv in zip(variable, units, fileVariable, filenameVar):
         aliases[project][v] = (fv, scale, offset, u, fnv, missing, conditions)
 
@@ -1706,7 +1707,7 @@ class cpage(cobject):
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white",
-                 insert="",insert_width=0):
+                 insert="", insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -1795,7 +1796,7 @@ class cpage(cobject):
                     page_height = 1000.
                 else:
                     raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape' (not %s)"%orientation)
+                        "if set, orientation must be 'portrait' or 'landscape' (not %s)" % orientation)
         self.page_width = page_width
         self.page_height = page_height
         self.title = title
@@ -2191,7 +2192,7 @@ def domainOf(cobject):
     elif cobject is None:
         return "none"
     else:
-        if cobject != "" :
+        if cobject != "":
             clogger.error("Unkown class for argument " + repr(cobject))
 
 
