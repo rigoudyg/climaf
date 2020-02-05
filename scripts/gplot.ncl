@@ -797,10 +797,10 @@ begin
       print("Must provide args shade2_below and shade2_above when using arg shade2_options  !")
       status_exit(1)
     end if
-    if (.not. isvar("shade2_file") ) then
-      print("Must provide a shade2 field when using arg shade2_options !")
-      status_exit(1)
-    end if
+    ;if (.not. isvar("shade2_file") ) then
+    ;  print("Must provide a shade2 field when using arg shade2_options !")
+    ;  status_exit(1)
+    ;end if
   end if
   if isvar("shade2_file") then
     if (.not. isvar("shade2_options") ) then
@@ -912,14 +912,14 @@ begin
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
     if ismissing(power10) then
       print("Field has only missing values" )
-      power10=1
+      power10=0
     end if
   end if
 
   if power10.ge.4 then
     fld=fld/10^power10
   end if
-  
+
   ;-----------------------
   ; Auxiliary field: fld2
   ;-----------------------
@@ -1700,7 +1700,7 @@ begin
         if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
       end if
 
-      if isvar("shade2_options") then
+      if isvar("shade2_options") .and. isvar("shade2_file") then
         res_shade2=True
         res_shade2@gsnFrame= False
         res_shade2@gsnDraw=False
@@ -1725,7 +1725,7 @@ begin
         plot_shade2=gsn_csm_contour(wks,fld_shade2,res_shade2)
                                 ;
         opt_shade2=True
-        opt_shade2@gsnShadeFillScales=(/1.,0.66, 0.45/)
+        ;opt_shade2@gsnShadeFillScales=(/1.,0.66, 0.45/)
         opt_shade2@gsnShadeFillType = "pattern" ; "color" or "pattern"
         ;opt_shade2@gsnShadeLow = 17
         res_list(shade2_options, opt_shade2)
@@ -1825,7 +1825,7 @@ begin
     overlay(plot0,plot1)   
   end if
 
-  if isvar("shade2_options") then
+  if isvar("shade2_options") .and. isvar("shade2_file") then
     overlay(plot0,plot_shade2)
   end if
 
