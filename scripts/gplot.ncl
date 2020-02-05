@@ -908,6 +908,7 @@ begin
         vmax=tofloat(vmax/10^power10)
         vdelta=tofloat(vdelta/10^power10)
       end if
+    end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
     print(power10)
