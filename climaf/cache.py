@@ -212,17 +212,26 @@ def register(filename, crs, outfilename=None):
             command = 'exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
                       '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
                       (version, crs, filename)
-        clogger.debug("trying stamping by %s" % command)
-        command_return = os.system(command)
-        if command_return == 0 or stamping is not True:
-            return do_move(crs, filename, outfilename)
-        if command_return != 0:
-            if stamping is True:
-                raise Climaf_Cache_Error("Cannot stamp by command below. "
-                                         "You may set climaf.cache.stamping to Flase or None - see doc\n%s" % command)
-            elif stamping is None:
-                clogger.critical("Cannot stamp by %s" % command)
+        if command is None:
+            if stamping is None:
+                clogger.critical("Command is None and stamping is None. No stamping done.")
                 return True
+            elif stamping is True:
+                raise Climaf_Cache_Error("Cannot stamp by command None. "
+                                         "You may set climaf.cache.stamping to False or None - see doc\n%s" % command)
+        else:
+            clogger.debug("trying stamping by %s" % command)
+            command_return = os.system(command)
+            if command_return == 0 or stamping is not True:
+                return do_move(crs, filename, outfilename)
+            if command_return != 0:
+                if stamping is True:
+                    raise Climaf_Cache_Error("Cannot stamp by command below. "
+                                             "You may set climaf.cache.stamping to False or None - see doc\n%s" %
+                                             command)
+                elif stamping is None:
+                    clogger.critical("Cannot stamp by %s" % command)
+                    return True
     else:
         clogger.error("file %s does not exist (for crs %s)" % (filename, crs))
 
