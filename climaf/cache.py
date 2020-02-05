@@ -90,7 +90,7 @@ def generateUniqueFileName(expression, format="nc", option="new"):
     return rep
 
 
-def hash_to_path(vhash,format,option):
+def hash_to_path(vhash, format, option):
     prefix = ""
     if option == "new":
         rep = currentCache + "/" + prefix + vhash[0:2] + "/" + vhash[2:] + "." + format
