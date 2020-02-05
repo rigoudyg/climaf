@@ -1028,7 +1028,7 @@ def get_fig_sizes(figfile):
     figsize = output_figsize.split(" ").pop(2)
     fig_width = figsize.split("x").pop(0)
     fig_height = figsize.split("x").pop(1)
-    return int(fig_width),int(fig_height)
+    return int(fig_width), int(fig_height)
 
 
 def cfilePage(cobj, deep, recurse_list=None):
@@ -1060,9 +1060,9 @@ def cfilePage(cobj, deep, recurse_list=None):
     usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
     if cobj.title is not "":
         usable_height -= cobj.ybox
-    if cobj.insert is not "" :
-        ins_base_width,ins_base_height=get_fig_sizes(cobj.insert)
-        insert_height=int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
+    if cobj.insert is not "":
+        ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
+        insert_height = int((float(ins_base_height) * cobj.insert_width)/float(ins_base_width))
         usable_height -= insert_height
     #
     usable_width = cobj.page_width - xmargin * (len(cobj.widths) - 1.) - x_left_margin - x_right_margin

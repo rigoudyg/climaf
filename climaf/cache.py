@@ -166,8 +166,8 @@ def register(filename, crs, outfilename=None):
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     # It appears that we have to let some time to the file system  for updating its inode tables
-    def do_move(crs,filename, outfilename):
-        if outfilename is None :
+    def do_move(crs, filename, outfilename):
+        if outfilename is None:
             clogger.info("%s registered as %s" % (crs, filename))
             crs2filename[crs] = filename
             if crs in dropped_crs:
@@ -195,7 +195,7 @@ def register(filename, crs, outfilename=None):
     if os.path.exists(filename):
         if stamping is False:
             clogger.debug('No stamping')
-            return do_move(crs,filename, outfilename)
+            return do_move(crs, filename, outfilename)
         else:
             # while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
             if re.findall(".nc$", filename):
