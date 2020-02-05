@@ -289,8 +289,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     if len(ofu) == 0:
         clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
     for org, freq, urls in ofu:
-        if return_wildcards is not None and org is not "generic":
-            raise classes.Climaf_Error("Can handle multipe facet query only for organization=generic ")
+        if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
+            raise classes.Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies:
@@ -542,7 +542,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         alt.append(f)
                         continue
                 # But must also consider the case where there is no date pattern in file pattern
-                if not any([k in l for k in date_regexp_patt]) and f not in alt:
+                if not any([k in url for k in date_regexp_patt]) and f not in alt:
                     alt.append(f)
             lfiles = list(set(alt))  # JS: set(alt) to avoid double files
             clogger.debug("Globbing %d files for varname on %s : " % (len(lfiles), temp2))
@@ -570,7 +570,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                             alt.append(f)
                             continue
                     # But must also consider the case where there is no date pattern in file pattern
-                    if not any([k in l for k in date_regexp_patt]) and f not in alt:
+                    if not any([k in url for k in date_regexp_patt]) and f not in alt:
                         alt.append(f)
                 lfiles = alt
                 clogger.debug("Globbing %d files for filenamevar on %s: " % (len(lfiles), temp2))
@@ -693,7 +693,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 clogger.debug(
                     'Period is OK - Considering variable filtering on %s and %s for %s' % (variable, altvar, f))
                 # Filter against variable
-                if l.find("${variable}") >= 0:
+                if url.find("${variable}") >= 0:
                     if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
                                                    fperiod, periods, periods_dict):
                         clogger.debug('appending %s based on variable in filename' % f)
