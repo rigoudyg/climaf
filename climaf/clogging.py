@@ -122,8 +122,8 @@ def transl(level):
             return logging.WARNING
         elif level.lower() == 'error':
             return logging.ERROR
-        else :
-            raise ValueError("%s is not a log level"%level)
+        else:
+            raise ValueError("%s is not a log level" % level)
 
     else:
         return level
