@@ -46,7 +46,7 @@ class A_basic(unittest.TestCase):
         std = mean.sdev  # Secondary output 'std' is a 'property' of main output
         print("std = ", std)
         fil = cfile(std)
-        expected = climaf.cache.currentCache + '/80d64/1f8cf/b4a28/d74bb/e1c64/2cadf/9ec83/93b7e/32d7d/10042/7bb80/1.nc'
+        expected = climaf.cache.currentCache + '/80/d641f8cfb4a28d74bbe1c642cadf9ec8393b7e32d7d100427bb801.nc'
         print("actual=", fil)
         print("expected=", expected)
         self.assertEqual(fil, expected, "Issue evaluating script application as a file")
@@ -64,7 +64,7 @@ class A_basic(unittest.TestCase):
 
 
 def skipUnless_CNRM_Lustre():
-    if os.path.exists('/cnrm/aster'):
+    if os.path.exists('/cnrm'):
         return lambda func: func
     return unittest.skip("because CNRM's Lustre not available")
 
@@ -75,12 +75,13 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
     def setUp(self):
         climaf.cache.setNewUniqueCache(os.path.expanduser("~/tmp/climaf_tmp_cache_test_cmip5_drs"))
         # Declare the directory for CMIP5 data on CNRM's Lustre file system.
-        url_CMIP5_CNRM = ["/cnrm/cmip/cnrm/ESG"]
+        url_CMIP5_CNRM = ["/cnrm/cmip/cnrm/ESG", ]
         dataloc(project="CMIP5", organization="CMIP5_DRS", url=url_CMIP5_CNRM)
-        cdef("frequency", "monthly")
-        cdef("model", "CNRM-CM5")
-        cdef("project", "CMIP5")
-        self.ds = ds(experiment="1pctCO2", variable="tas", period="1860-1861")
+        cdef("frequency", "monthly", project="CMIP5")
+        cdef("model", "CNRM-CM5", project="CMIP5")
+        cdef("project", "CMIP5", project="CMIP5")
+        self.ds = ds(experiment="1pctCO2", variable="tas", period="1860-1861", table="Amon", realization="r1i1p1",
+                     version="v20110701", realm="atmos")
 
     def test_identifying_files(self):
         files = self.ds.baseFiles()
@@ -93,7 +94,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
         print(repr(ds))
         my_file = cfile(self.ds)
         print("myfile = " + my_file)
-        expected = climaf.cache.currentCache + '/9e2b8/cd121/59459/e6448/01904/e39fb/f1f63/f08f6/a7298/e2c5b/73469/3.nc'
+        expected = climaf.cache.currentCache + "/8e/addc6c1c6338007d28d8a424b8f786fcb0379df47fac86971c48ff.nc"
         print("expected = " + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 

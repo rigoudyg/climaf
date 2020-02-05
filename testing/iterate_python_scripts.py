@@ -46,9 +46,10 @@ for file in vfiles:
         print("'%s'..." % file)
 
     if args.upper_verbosity:
-        ex = subprocess.Popen(["python", file])
+        ex = subprocess.Popen("/usr/bin/env python %s" % file, shell=True)
     else:
-        ex = subprocess.Popen(["/usr/bin/python", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ex = subprocess.Popen("/usr/bin/env python %s" % file, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              shell=True)
 
     if ex.wait() == 0:  # code retour
         if args.verbosity:
