@@ -899,22 +899,22 @@ begin
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
   if ( controlMinMax ) then      
     power10=floattoint(log10(abs(vmax-vmin)))
+    if power10.ge.4 then
+      vmin=tofloat(vmin/10^power10)
+      vmax=tofloat(vmax/10^power10)
+      vdelta=tofloat(vdelta/10^power10)
+    end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
-  end if
-  
-  if ismissing(power10) then 
-    print("Field has only missing values" )
-    power10=1
-  else
-    if power10.ge.4 then
-      fld=fld/10^power10
-      if ( controlMinMax ) then
-        vmin=tofloat(vmin/10^power10)
-        vmax=tofloat(vmax/10^power10)
-        vdelta=tofloat(vdelta/10^power10)
-      end if
+    if ismissing(power10) then 
+      print("Field has only missing values" )
+      power10=1
     end if
+  end if
+
+  
+  if power10.ge.4 then
+    fld=fld/10^power10
   end if
   
   ;-----------------------
