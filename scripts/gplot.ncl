@@ -909,9 +909,11 @@ begin
   else
     if power10.ge.4 then
       fld=fld/10^power10
-      vmin=tofloat(vmin/10^power10)
-      vmax=tofloat(vmax/10^power10)
-      vdelta=tofloat(vdelta/10^power10)
+      if ( controlMinMax ) then
+        vmin=tofloat(vmin/10^power10)
+        vmax=tofloat(vmax/10^power10)
+        vdelta=tofloat(vdelta/10^power10)
+      end if
     end if
   end if
   
