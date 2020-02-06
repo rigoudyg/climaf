@@ -89,17 +89,18 @@ def generateUniqueFileName(expression, format="nc", option="new"):
     clogger.debug("returning %s" % rep)
     return rep
 
-def hash_to_path(vhash,format,option):
+
+def hash_to_path(vhash, format, option):
     prefix = ""
-    if option == "new" :
-        rep = currentCache + "/" + prefix + vhash[0:2] + "/"+ vhash [2:] + "." + format
+    if option == "new":
+        rep = currentCache + "/" + prefix + vhash[0:2] + "/" + vhash[2:] + "." + format
     else:
         rep = currentCache + "/" + prefix + stringToPath(vhash[0: fileNameLength - 1], directoryNameLength) + "." + format
     rep = os.path.expanduser(rep)
     return rep
 
 
-def alternate_filename(fpath) :
+def alternate_filename(fpath):
     """
     The cache tree structure has been changed from some CliMAF version. 
     Function alternate_filename, when provided with an old form path, 
@@ -107,20 +108,20 @@ def alternate_filename(fpath) :
     Useful for handling transition between cache structures
     """
     # Get file format
-    format=fpath.split(".")[-1]
+    format = fpath.split(".")[-1]
     # Remove cache root location prefix
-    relative_fpath=fpath[len(currentCache)+1:]
+    relative_fpath = fpath[len(currentCache)+1:]
     # Get name without slashes nor extension
-    vhash = relative_fpath.replace("/","").split(".")[0]
+    vhash = relative_fpath.replace("/", "").split(".")[0]
     #
     # Test if new path, i.e. with two letters before first "/"
-    if relative_fpath[2]=="/" : option="old"
-    else :                      option="new"
-    rep=hash_to_path(vhash,format,option)
+    if relative_fpath[2] == "/":
+        option = "old"
+    else:
+        option = "new"
+    rep = hash_to_path(vhash, format, option)
     return rep
     
-
-
 
 def stringToPath(name, length):
     """ Breaks NAME to a path with LENGTH characters-long directory names , for avoiding crowded directories"""
@@ -150,8 +151,8 @@ def searchFile(path):
 
 
 def register(filename, crs, outfilename=None):
-    def do_move(crs,filename, outfilename):
-        if outfilename is None : 
+    def do_move(crs, filename, outfilename):
+        if outfilename is None:
             clogger.info("%s registered as %s" % (crs, filename))
             crs2filename[crs] = filename
             if crs in dropped_crs:
@@ -167,7 +168,7 @@ def register(filename, crs, outfilename=None):
                     dropped_crs.remove(crs)
                 return True
             else:
-                #clogger.critical("cannot move by" % cmd)
+                # clogger.critical("cannot move by" % cmd)
                 raise Climaf_Cache_Error("cannot move (possibly after stamping) by %s" % cmd)
     """
     Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
@@ -190,9 +191,9 @@ def register(filename, crs, outfilename=None):
         waited += 1
     # time.sleep(0.5)
     if os.path.exists(filename):
-        if stamping is False :
+        if stamping is False:
             clogger.debug('No stamping')
-            return do_move(crs,filename, outfilename)
+            return do_move(crs, filename, outfilename)
         # while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
         if re.findall(".nc$", filename):
             command = "ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
@@ -211,16 +212,26 @@ def register(filename, crs, outfilename=None):
             command = 'exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
                       '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
                       (version, crs, filename)
-        clogger.debug("trying stamping by %s" % command)
-        command_return=os.system(command) 
-        if command_return==0 or stamping is not True :
-            return do_move(crs,filename, outfilename)
-        if command_return!=0 :
-            if stamping is True :
-                raise Climaf_Cache_Error("Cannot stamp by command below. You may set climaf.cache.stamping to Flase or None - see doc\n%s" % command)
-            elif stamping is None :
-                clogger.critical("Cannot stamp by %s" % command)
+        if command is None:
+            if stamping is None:
+                clogger.critical("Command is None and stamping is None. No stamping done.")
                 return True
+            elif stamping is True:
+                raise Climaf_Cache_Error("Cannot stamp by command None. "
+                                         "You may set climaf.cache.stamping to False or None - see doc\n%s" % command)
+        else:
+            clogger.debug("trying stamping by %s" % command)
+            command_return = os.system(command)
+            if command_return == 0 or stamping is not True:
+                return do_move(crs, filename, outfilename)
+            if command_return != 0:
+                if stamping is True:
+                    raise Climaf_Cache_Error("Cannot stamp by command below. "
+                                             "You may set climaf.cache.stamping to False or None - see doc\n%s" %
+                                             command)
+                elif stamping is None:
+                    clogger.critical("Cannot stamp by %s" % command)
+                    return True
     else:
         clogger.error("file %s does not exist (for crs %s)" % (filename, crs))
 
@@ -288,8 +299,8 @@ def hasMatchingObject(cobject, ds_func):
     key_to_rm = list()
     for crs in crs2filename:
         # First, basic, screening
-        if crs.split("(")[0] != cobject.crs.split("(")[0] :
-            return None,None
+        if crs.split("(")[0] != cobject.crs.split("(")[0]:
+            return None, None
         co = crs2eval.get(crs, None)
         if co is None:
             try:
@@ -302,8 +313,8 @@ def hasMatchingObject(cobject, ds_func):
             clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
-                f=crs2filename[crs]
-                if os.path.exists(f) or os.path.exists(alternate_filename(f)) :
+                f = crs2filename[crs]
+                if os.path.exists(f) or os.path.exists(alternate_filename(f)):
                     return co, altperiod
                 else:
                     clogger.debug("Removing %s from cache index, because file is missing", crs)
@@ -335,11 +346,11 @@ def hasExactObject(cobject):
     # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
     f = crs2filename.get(cobject.crs, None)
     if f:
-        if os.path.exists(f) :
+        if os.path.exists(f):
             return f
-        else :
-            g=alternate_filename(f)
-            if os.path.exists(g) :
+        else:
+            g = alternate_filename(f)
+            if os.path.exists(g):
                 return g
             else:
                 clogger.debug("Dropping cobject.crs from cache index, because file si missing")
@@ -353,11 +364,11 @@ def complement(crsb, crse, crs):
     file contents
     """
     fileb = crs2filename[crsb]
-    if not os.path.exists(fileb) :
-        fileb=alternate_filename(fileb)
+    if not os.path.exists(fileb):
+        fileb = alternate_filename(fileb)
     filee = crs2filename[crse]
-    if not os.path.exists(filee) :
-        filee=alternate_filename(filee)
+    if not os.path.exists(filee):
+        filee = alternate_filename(filee)
     filet = generateUniqueFileName(crs)
     command = "ncrcat -O %s %s %s" % (fileb, filee, filet)
     if os.system(command) != 0:
@@ -407,8 +418,8 @@ def cdrop(obj, rm=True, force=False):
     if crs in crs2filename:
         clogger.info("Discarding cached value for %s (except if protected)" % crs)
         fil = crs2filename[crs]
-        if not os.path.exists(fil) :
-            fil=alternate_filename(fil)
+        if not os.path.exists(fil):
+            fil = alternate_filename(fil)
         if rm:
             try:
                 if force:
@@ -424,7 +435,7 @@ def cdrop(obj, rm=True, force=False):
                     os.rmdir(path_file)
                 except OSError as ex:
                     pass
-                    #clogger.warning(ex)
+                    # clogger.warning(ex)
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache" % crs)
@@ -452,8 +463,9 @@ def cprotect(obj, stop=False):
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
     if crs in crs2filename:
-        f=crs2filename[crs]
-        if not os.path.exists(f) : f=alternate_filename(f)
+        f = crs2filename[crs]
+        if not os.path.exists(f):
+            f = alternate_filename(f)
         if stop is False:
             clogger.info("Protecting cached value for " + crs)
             os.system("chmod -w " + f)
@@ -536,10 +548,10 @@ def cload(alt=None):
             rep = pickle.load(cacheIndexFile)
         else:
             crs2filename = pickle.load(cacheIndexFile)
-            for c in crs2filename :
-                f=crs2filename[c]
-                if len(f.split("/")[-2]==directoryNameLength):
-                    crs2filename[c]=alternate_filename(f)
+            for c in crs2filename:
+                f = crs2filename[c]
+                if len(f.split("/")[-2] == directoryNameLength):
+                    crs2filename[c] = alternate_filename(f)
         cacheIndexFile.close()
     except:
         pass
@@ -576,10 +588,10 @@ def cload(alt=None):
                         (len(crs_not_yet_evaluable), repr(list(projects))))
         allow_error_on_ds(False)
     if alt:
-        for c in rep :
-            f=rep[c]
-            if len(f.split("/")[-2])==directoryNameLength:
-                rep[c]=alternate_filename(f)
+        for c in rep:
+            f = rep[c]
+            if len(f.split("/")[-2]) == directoryNameLength:
+                rep[c] = alternate_filename(f)
         return rep
 
 

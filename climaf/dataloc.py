@@ -289,8 +289,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     if len(ofu) == 0:
         clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
     for org, freq, urls in ofu:
-        if return_wildcards is not None and org is not "generic":
-            raise classes.Climaf_Error("Can handle multipe facet query only for organization=generic ")
+        if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
+            raise classes.Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in classes.frequencies:
@@ -424,7 +424,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         if fperiod is not None and periods is not None:
             clogger.debug('Adding period %s' % fperiod)
             periods.append(fperiod)
-        project=kwargs["project"]
+        project = kwargs["project"]
         #
         # first check that all facet values belong to the list of autorized
         # values possibly defined for each facet. Return False otherwise
@@ -435,9 +435,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     facet_value = oc.group(kw)
                 except:
                     continue
-                valid_values=classes.cvalid(kw,None,project)
-                if (type(valid_values) == type([])) and (facet_value not in valid_values):
-                    clogger.debug("Facet value %s for %s is not allowed"%(facet_value,kw))
+                valid_values = classes.cvalid(kw, None, project)
+                if isinstance(valid_values, list) and (facet_value not in valid_values):
+                    clogger.debug("Facet value %s for %s is not allowed" % (facet_value, kw))
                     return False
         #
         for kw in kwargs:
@@ -538,11 +538,11 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
             alt = []
             for f in lfiles:
                 for k in date_keywords:
-                    if re.search(date_regexp_patt[k], f) and not f in alt :
+                    if re.search(date_regexp_patt[k], f) and f not in alt:
                         alt.append(f)
                         continue
                 # But must also consider the case where there is no date pattern in file pattern
-                if not any([k in l for k in date_regexp_patt]) and not f in alt :
+                if not any([k in url for k in date_regexp_patt]) and f not in alt:
                     alt.append(f)
             lfiles = list(set(alt))  # JS: set(alt) to avoid double files
             clogger.debug("Globbing %d files for varname on %s : " % (len(lfiles), temp2))
@@ -566,11 +566,11 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 alt = []
                 for f in lfiles:
                     for k in date_keywords:
-                        if re.search(date_regexp_patt[k], f) and not f in alt:
+                        if re.search(date_regexp_patt[k], f) and f not in alt:
                             alt.append(f)
                             continue
                     # But must also consider the case where there is no date pattern in file pattern
-                    if not any([k in l for k in date_regexp_patt]) and not f in alt:
+                    if not any([k in url for k in date_regexp_patt]) and f not in alt:
                         alt.append(f)
                 lfiles = alt
                 clogger.debug("Globbing %d files for filenamevar on %s: " % (len(lfiles), temp2))
@@ -579,21 +579,22 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         # construct a regexp with a group name for all facets (but period)
         alt_basename = basename.replace("?", ".").replace("*", ".*")
         alt_kwargs = kwargs.copy()
-        def rreplace(thestring,replaced,replacement) :
+
+        def rreplace(thestring, replaced, replacement):
             # Does replace only the rightmost occurrence of REPLACED in
             # THESTRING by REPLACEMENT
             # We choose the rightmost because matching fields in filenames
             # (so, at right) is trickier than in pathnames when using wildcards
-            deb=thestring.rfind(replaced)
-            if deb >= 0 : 
-                end=deb+len(replaced)
-                return thestring[0:deb]+replacement+thestring[end:]
-            else :
+            deb = thestring.rfind(replaced)
+            if deb >= 0:
+                end = deb + len(replaced)
+                return thestring[0:deb] + replacement + thestring[end:]
+            else:
                 return thestring
         for kw in kwargs:
             if type(kwargs[kw]) is str:  # This excludes period attribute, which has a type
                 alt_kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
-                alt_basename = rreplace(alt_basename,r"${%s}" % kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]))
+                alt_basename = rreplace(alt_basename, r"${%s}" % kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]))
         facets_regexp = Template(alt_basename).safe_substitute(**alt_kwargs)
         #
         for k in date_regexp_keywords:
@@ -660,14 +661,14 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     if not remote_prefix and \
                             ((basename.find("${variable}") >= 0) or variable == '*' or
                              fileHasVar(f, variable) or (variable != altvar and fileHasVar(f, altvar))):
-                        if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
+                        if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on):
                             clogger.debug("adding fixed field :" + f)
                             rep.append(f)
                     # remote data
                     elif remote_prefix:
                         if (basename.find("${variable}") >= 0) or variable == '*' or \
                                 (variable != altvar and (f.find(altvar) >= 0)):
-                            if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
+                            if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on):
                                 clogger.debug("adding fixed field :" + remote_prefix + f)
                                 rep.append(remote_prefix + f)
                         else:
@@ -676,7 +677,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                                 "(which is instanciated by variable name or filenameVar)" % f)
                 else:
                     clogger.info("Cannot yet filter files re. time using only file content.")
-                    #if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
+                    # if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
                     #    rep.append(f)
 
             #
@@ -692,9 +693,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                 clogger.debug(
                     'Period is OK - Considering variable filtering on %s and %s for %s' % (variable, altvar, f))
                 # Filter against variable
-                if l.find("${variable}") >= 0:
+                if url.find("${variable}") >= 0:
                     if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
-                                                fperiod, periods, periods_dict):
+                                                   fperiod, periods, periods_dict):
                         clogger.debug('appending %s based on variable in filename' % f)
                         rep.append(remote_prefix + f)
                     continue
@@ -704,7 +705,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                             (variable == '*' or "," in variable or fileHasVar(f, variable) or
                              (altvar != variable and fileHasVar(f, altvar))):
                         if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
-                                                    fperiod, periods, periods_dict):
+                                                       fperiod, periods, periods_dict):
                             # Should check time period in the file if not date_regexp
                             clogger.debug('appending %s based on multi-var or var exists in file ' % f)
                             rep.append(f)
@@ -714,7 +715,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         if variable == '*' or "," in variable or \
                                 (variable != altvar and (f.find(altvar) >= 0)):
                             if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on,
-                                                        fperiod, periods, periods_dict) :
+                                                           fperiod, periods, periods_dict):
                                 # Should check time period in the file if not date_regexp
                                 clogger.debug('appending %s based on multi-var or altvar ' % (remote_prefix + f))
                                 rep.append(remote_prefix + f)

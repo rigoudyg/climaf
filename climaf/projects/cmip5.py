@@ -30,7 +30,7 @@ if atCNRM:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/cnrm/cmip/cnrm/ESG"
 
-#if root:
+# if root:
 if True:
     # -- Declare a CMIP5 CliMAF project
     # ------------------------------------ >
