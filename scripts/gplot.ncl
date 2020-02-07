@@ -904,16 +904,15 @@ begin
       power10=1
     else
       if power10.ge.4 then
-        fld=fld/10^power10
         vmin=tofloat(vmin/10^power10)
         vmax=tofloat(vmax/10^power10)
         vdelta=tofloat(vdelta/10^power10)
       end if
-    end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
-    if ismissing(power10) then
-      power10=0
+    if ismissing(power10) then 
+      print("Field has only missing values" )
+      power10=1
     end if
   end if
 
