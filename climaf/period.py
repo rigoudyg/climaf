@@ -180,6 +180,7 @@ def init_period(dates):
     """
 
     # clogger.debug("analyzing  %s"%dates)
+    dates=dates.encode('ascii')
     if not type(dates) is str:
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
     if dates == 'fx':

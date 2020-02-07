@@ -412,6 +412,8 @@ def cdrop(obj, rm=True, force=False):
             crs = "select(" + crs + ")"
     elif type(obj) is str:
         crs = obj
+    elif type(obj) is unicode:
+        crs=obj.encode('ascii')
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
