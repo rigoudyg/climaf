@@ -40,7 +40,10 @@ Changes, newest first:
     which comes after in the argument objects list)
 
   - fix for operator `plot`  : it actually uses user-provided max and min for 
-    scaling field s order  of magnitude
+    scaling field s order  of magnitude. Also, `min` and `max` can be set when
+    setting explicit levels through argument `colors`; this is useful when field
+    has very large values, largely beyond limits of explicit levels; but `delta`
+    must then also be set (despite it is not used)
 
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better

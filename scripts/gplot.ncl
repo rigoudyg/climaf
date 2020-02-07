@@ -906,6 +906,7 @@ begin
     end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
+    print(power10)
     if ismissing(power10) then 
       print("Field has only missing values" )
       power10=1
