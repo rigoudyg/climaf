@@ -218,7 +218,7 @@ def register(filename, crs, outfilename=None):
                 command = None
             if command is None:
                 if stamping is None:
-                    clogger.critical("Command is None and stamping is None. No stamping done.")
+                    clogger.error("Command is None and stamping is None. No stamping done.")
                     return True
                 elif stamping is True:
                     raise Climaf_Cache_Error("Cannot stamp by command None. "
