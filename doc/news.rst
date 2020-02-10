@@ -8,6 +8,11 @@ Changes, newest first:
 
 - V1.2.13:
 
+  - allow to save on heavy dataset selection : selection can be done once for all 
+    and will now be duly reused if CliMAF is forced to cache its value, simply by using :
+  
+    >>> cfile(ds(...))
+
   - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
     script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
     definitely moved to this CliMAF version; this is not mandatory, but will actually
@@ -26,6 +31,7 @@ Changes, newest first:
     to restrict its effect, based on the value of some facets, through a
     dictionary of criteria. Example, for a given model which CMIP6 data has
     an error for variable ``evspsbl``   on some data versions :
+
     >>> calias('CMIP6,'evspsbl,scale=_1,conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] })
 
   - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
@@ -40,16 +46,17 @@ Changes, newest first:
     which comes after in the argument objects list)
 
   - fix for operator `plot`  : it actually uses user-provided max and min for 
-    scaling field s order  of magnitude. Also, `min` and `max` can be set when
-    setting explicit levels through argument `colors`; this is useful when field
-    has very large values, largely beyond limits of explicit levels; but `delta`
-    must then also be set (despite it is not used)
+    scaling field s order  of magnitude. If using argument `colors` , min and max
+    will be derived from extreme values. This is useful when field
+    has very large values, largely beyond limits of explicit levels
 
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
     constrain the identification of files for a dataset, as e.g. for CMIP6
     when using wildcard such as grid="g*". It avoids mismatch between patterns
-    for fixed fields and pattenrs for variable fields
+    for fixed fields and pattenrs for variable fields. Example :
+
+     >>> cvalid('grid', ["gr", "gn", "gr1", "gr2"], project="CMIP6")
 
   - Projects CMIP5 and CMIP6 are defined even on systems where there is no known
     root location for that data; so, user can define facet 'root' later on, to match
@@ -229,7 +236,6 @@ Changes, newest first:
 
   - Bug fix on ds() for the access to daily datasets with the CMIP5 project
 
-======= end
 
 - 2017/05/02:
 

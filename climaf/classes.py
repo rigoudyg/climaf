@@ -1367,10 +1367,22 @@ class ctree(cobject):
         self.register()
 
     def buildcrs(self, crsrewrite=None, period=None):
-        """ Builds the CRS expression representing applying OPERATOR on OPERANDS with PARAMETERS.
+        """ Builds the CRS expression representing applying OPERATOR on 
+        OPERANDS with PARAMETERS.
         Forces period downtree if provided
         A function for rewriting operand's CRS may be provided
+
+        Special case : if operator is 'select' and sole operand is a dataset and there 
+        is no parameters, then return dataset's crs. This is the way to avoid 
+        repetitive data selection, when a data selection has been explictly cached
         """
+        first_op=self.operands[0]
+        if self.operator=='select' and len(self.operands)==1 and \
+           isinstance(first_op,cdataset) and \
+           len(self.parameters.keys())==0 :
+               return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
+        #
+        # General case
         # Operators are listed in alphabetical order; parameters too
         rep = self.operator + "("
         #

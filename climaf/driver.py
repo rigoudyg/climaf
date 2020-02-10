@@ -195,6 +195,11 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         recurse_list.append(cobject.crs)
         clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + repr(cobject.kvp))
         ds = cobject
+        cache_value=cache.hasExactObject(ds) 
+        if cache_value is not None :
+            clogger.debug("Dataset %s exists in cache" % ds)
+            cdedent()
+            return cache_value
         if ds.isLocal() or ds.isCached():
             clogger.debug("Dataset %s is local or cached " % ds)
             #  if the data is local, then
