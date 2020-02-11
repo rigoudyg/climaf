@@ -15,7 +15,7 @@ __all__ = ["site_settings", "cache", "classes", "clogging", "dataloc", "driver",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
-version = "1.2.12"
+version = "1.2.13"
 
 
 def tim(string=None):
