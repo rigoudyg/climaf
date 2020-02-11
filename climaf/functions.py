@@ -259,6 +259,7 @@ def annual_cycle(dat):
     """
     return ccdo(dat, operator="ymonavg")
 
+
 def annual_cycle_fast(dat):
     """
     Computes the annual cycle as the 12 climatological months of dat
@@ -475,10 +476,9 @@ def clim_average_fast(dat, season):
     return avg
 
 
-
 def summary(dat):
     """
-    Summary provides the informations on a CliMAF dataset or ensemble of datsets
+    Summary provides the informations on a CliMAF dataset or ensemble of datasets
     It displays the path and filenames, and the dictionary of pairs keyword-values
     associated with the dataset.
 

@@ -131,8 +131,8 @@ def generateUniqueFileName_safe(expression, operator=None, format="nc"):
         clogger.debug("must skip %s which CRS is %s" % (existing, getCRS(existing)))
         number += 2
         if number >= len(full):
-            clogger.critical("Critical issue in cache : " + len(full) + " digits is not enough for " + expression)
-            exit
+            clogger.critical("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
+            raise Climaf_Cache_Error("Critical issue in cache : " + str(len(full)) + " digits is not enough for " + expression)
         guess = full[0: number - 1]
         existing = searchFile(prefix + stringToPath(guess, directoryNameLength) + "." + format)
         if existing:
@@ -720,8 +720,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     """
 
     # cache directories
-    rep = os.path.expanduser(
-        cachedirs[0])  # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
+    # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
+    rep = os.path.expanduser(cachedirs[0])
 
     # command for research on size/age/access
     command = ""

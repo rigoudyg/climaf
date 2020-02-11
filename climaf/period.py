@@ -37,6 +37,22 @@ class cperiod():
                 self.pattern = pattern
 
     #
+    def __eq__(self, other):
+        test = not other == "*" and isinstance(other, cperiod)
+        if test and self.fx != other.fx:
+            test = False
+        if test and self.pattern != other.pattern:
+            test = False
+        start_self = getattr(self, "start", None)
+        start_other = getattr(other, "start", None)
+        if test and start_self != start_other:
+            test = False
+        stop_self = getattr(self, "stop", None)
+        stop_other = getattr(other, "stop", None)
+        if test and stop_self != stop_other:
+            test = False
+        return test
+    #
     def __repr__(self):
         return self.pr()
         # return("%04d%02d%02d%02d%02d-%04d%02d%02d%02d%02d"%(\
@@ -219,20 +235,20 @@ def init_period(dates):
     add_day = 0
     add_hour = 0
     add_minute = 0
-    if len(end) == 4:
+    if len(end) in [4, 5]:
         eyear = int(end[0:4]) + 1
-    elif len(end) == 6:
+    elif len(end) in [6, 7]:
         eyear = int(end[0:4])
         emonth = int(end[4:6]) + 1
         if emonth > 12:
             emonth = 1
             eyear = eyear + 1
-    elif len(end) == 8:
+    elif len(end) in [8, 9]:
         add_day = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
         eday = int(end[6:8])
-    elif len(end) == 10:
+    elif len(end) in [10, 11]:
         add_hour = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
@@ -287,7 +303,6 @@ def sort_periods_list(periods_list):
         return rep
 
     #
-    import copy
     clist = copy.copy(periods_list)
     sorted_tree = SortTree(clist.pop())
     while clist:
