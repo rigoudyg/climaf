@@ -94,7 +94,7 @@ class B_CMIP5_DRS_CNRM(unittest.TestCase):
         print(repr(ds))
         my_file = cfile(self.ds)
         print("myfile = " + my_file)
-        expected = climaf.cache.currentCache + "/8e/addc6c1c6338007d28d8a424b8f786fcb0379df47fac86971c48ff.nc"
+        expected = climaf.cache.currentCache + "/4d/e22e799a1b6a05edb1a9768fafe27efa5e6529d29d3d5c754c1096.nc"
         print("expected = " + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
 
