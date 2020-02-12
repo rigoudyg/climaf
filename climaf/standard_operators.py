@@ -5,6 +5,7 @@ Management of CliMAF standard operators
 
 """
 import os
+import subprocess
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
@@ -112,8 +113,8 @@ def load_standard_operators():
             sdev_var="std(%s)",
             commuteWithTimeConcatenation=True)
     #
-    # Declare plot scripts
-    cscript('ncview', 'ncview ${in} 1>/dev/null 2>&1&')
+    # Declare plot scripts (only where it is defined
+    cscript('ncview', 'ncview ${in} 1>/dev/null 2>&1&', fatal=False)
     #
     # plot: main field (main_file) + auxiliary field (aux_file, optional) + vectors (u_file & v_file, optionals)
     #

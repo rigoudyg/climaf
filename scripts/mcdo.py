@@ -259,7 +259,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         if a_file[0]!="/" :
             a_file = original_directory + "/" +  a_file
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
-            a_file = nemo_timefix(a_file)
+            a_file = nemo_timefix(a_file, tmp)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
             a_file = aladin_coordfix(a_file, tmp, filevar)
         files_to_treat_before_merging.append(a_file)

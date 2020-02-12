@@ -757,7 +757,7 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             raise Climaf_Driver_Error("")
         if period is not None:
-            clog.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
+            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
         from anynetcdf import ncf
         fileobj = ncf(datafile)
         # import netCDF4
