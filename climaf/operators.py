@@ -35,7 +35,8 @@ class scriptFlags():
                  canSelectTime=False, canSelectDomain=False,
                  canAggregateTime=False, canAlias=False,
                  canMissing=False, commuteWithEnsemble=True,
-                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
+                 doCatTime=False):
         self.canOpendap = canOpendap
         self.canSelectVar = canSelectVar
         self.canSelectTime = canSelectTime
@@ -46,6 +47,7 @@ class scriptFlags():
         self.commuteWithEnsemble = commuteWithEnsemble
         self.commuteWithTimeConcatenation = commuteWithTimeConcatenation
         self.commuteWithSpaceConcatenation = commuteWithSpaceConcatenation
+        self.doCatTime = doCatTime 
 
     def unset_selectors(self):
         self.canSelectVar = False
@@ -54,11 +56,10 @@ class scriptFlags():
         self.canAlias = False
         self.canMissing = False
 
-
 class cscript():
-    def __init__(self, name, command, format="nc", canOpendap=False,
+    def __init__(self, name, command, format="nc",  select=True, canOpendap=False,
                  commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
-                 canSelectVar=False, **kwargs):
+                 canSelectVar=False, doCatTime=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
@@ -70,6 +71,10 @@ class cscript():
             formats: 'png', 'pdf' or 'eps') or 'txt' (the text output are not managed by CliMAF,
             but only displayed - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF);
             defaults to 'nc'
+          select (bool, optional): should data selection/transformation be automatically done 
+            by CliMAF when applying this script directly to some dataset(s) (i.e. selection on 
+            variable, time, domain, aliasing ... according to the definition(s) of input dataset()s). 
+            Defaults to True
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
           commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
             of time periods ? set it to true, if the operator can be applied on time
@@ -77,6 +82,8 @@ class cscript():
             defaults to False
           commuteWithSpaceConcatenation (bool, optional): can the operation commute with concatenation
             of space domains ? defaults to False (see commuteWithTimeConcatenation)
+          doCatTime (bool, optional): does this script concatenate data over time. Defaults to False. 
+            See example in $CLIMAF/doc/operators_which_concatenate_over_time.html
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).
 
@@ -342,9 +349,15 @@ class cscript():
         self.name = name
         self.command = command
         self.fixedfields = None
-        self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime, canAlias,
+        if select :
+            self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime, canAlias,
                                  canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
-                                 commuteWithSpaceConcatenation)
+                                     commuteWithSpaceConcatenation,doCatTime)
+        else:
+            self.flags = scriptFlags(True,True,True,True,True,True, True,
+                                     commuteWithEnsemble, commuteWithTimeConcatenation,
+                                     commuteWithSpaceConcatenation,doCatTime)
+
         if format in known_formats or format in graphic_formats or format in none_formats:
             self.outputFormat = format
         else:

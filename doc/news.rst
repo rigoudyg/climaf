@@ -8,7 +8,19 @@ Changes, newest first:
 
 - V1.2.13:
 
-  - allow to save on heavy dataset selection : selection can be done once for all 
+  - handle **operators which concatenate data over time**, through new
+    :py:class:`~climaf.operators.cscript` argument `doCatTime`. See its doc and the
+    detailed example :download:`How to handle CliMAF operators that concatenate data over time
+    <../doc/operators_which_concatenate_over_time.html>`
+
+  - allow to systematically avoid automatic CliMAF selection on variable, time, domain,
+    aliasing for an operator; when applicable, this may save disk space; see
+    argument `select` in doc of :py:class:`~climaf.operators.cscript` and the example 
+    :download:`How to handle CliMAF operators that concatenate data over time
+    <../doc/operators_which_concatenate_over_time.html>`
+    
+  - allow to save on heavy dataset selection : selection on time, variable, domain, ...
+    can be done once for all 
     and will now be duly reused if CliMAF is forced to cache its value, simply by using :
   
     >>> cfile(ds(...))
