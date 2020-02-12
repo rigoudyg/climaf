@@ -31,7 +31,7 @@ import operators
 import cmacro
 from clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import init_period, cperiod
+from climaf.period import init_period, cperiod, merge_periods
 from climaf import xdg_bin
 
 logdir = "."
@@ -119,6 +119,7 @@ def capply_script(script_name, *operands, **parameters):
 def maketree(script_name, script, *operands, **parameters):
     # maketree takes care of
     #  - creating a ctree object representing the application of the scripts to its operands
+    #  - checking that the time period of result makes sense 
     #  - computing the variable name for all outputs, using dict script.outputs
     #  - for each secondary outputs, creating an attribute of the ctree named as this output
     add_dict = dict()
@@ -153,6 +154,9 @@ def maketree(script_name, script, *operands, **parameters):
             son.variable = template.substitute(parameters)
             rep.outputs[outname] = son
             setattr(rep, outname, son)
+    # Check that time period of output makes sense
+    p=timePeriod(rep)
+    #
     return rep
 
 
@@ -688,8 +692,18 @@ def timePeriod(cobject):
     if isinstance(cobject, classes.cdataset):
         return cobject.period
     elif isinstance(cobject, classes.ctree):
-        clogger.debug("for now, timePeriod logic for scripts output is basic (1st operand) - TBD")
-        return timePeriod(cobject.operands[0])
+        clogger.debug("timePeriod : processing %s,operands=%s"%(cobject.script,`cobject.operands`))
+        if cobject.script.flags.doCatTime and len(cobject.operands)>1:
+            clogger.debug("Building composite period for results of %s"%cobject.operator)
+            periods = [ timePeriod(op) for op in cobject.operands ]
+            merged_period = merge_periods(periods)
+            if len(merged_period) > 1 :
+                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s"%\
+                                          (cobject.operator,merged_period))
+            return merged_period[0]
+        else: 
+            clogger.debug("timePeriod logic for script is 'choose 1st operand' "%cobject.script)
+            return timePeriod(cobject.operands[0])
     elif isinstance(cobject, classes.scriptChild):
         clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
         return timePeriod(cobject.father)
