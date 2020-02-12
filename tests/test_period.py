@@ -193,8 +193,7 @@ class InitPeriodTests(unittest.TestCase):
             init_period(1850)
         with self.assertRaises(TypeError):
             init_period(1850, 1950)
-        with self.assertRaises(Climaf_Period_Error):
-            init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
+        init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
         init_period("1850")
         init_period("1500-2000")
         init_period("1500_2000")
@@ -289,6 +288,9 @@ class InitPeriodTests(unittest.TestCase):
         my_period = init_period("174512251324-184705131659")
         self.assertEqual(my_period.start, datetime(1745, 12, 25, 13, 24))
         self.assertEqual(my_period.end, datetime(1847, 5, 13, 17))
+        my_period = init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
+        self.assertEqual(my_period.start, datetime(1850, 01, 02))
+        self.assertEqual(my_period.end, datetime(1950, 05, 23))
 
 
 class SortPeriodsListTests(unittest.TestCase):

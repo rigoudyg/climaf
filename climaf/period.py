@@ -10,6 +10,7 @@ import re
 import datetime
 import copy
 from climaf.clogging import clogger, dedent
+import six
 
 
 class cperiod():
@@ -23,7 +24,7 @@ class cperiod():
 
     def __init__(self, start, end=None, pattern=None):
         self.fx = False
-        if isinstance(start, type('')) and start == 'fx':
+        if isinstance(start, six.string_types) and start == 'fx':
             self.fx = True
             self.pattern = 'fx'
         elif not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
@@ -196,11 +197,12 @@ def init_period(dates):
     """
 
     # clogger.debug("analyzing  %s"%dates)
-    if isinstance(dates,cperiod) :
+    if isinstance(dates, cperiod):
         return dates
-    dates=dates.encode('ascii')
-    if not type(dates) is str:
+    elif not isinstance(dates, six.string_types):
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
+    else:
+        dates = str(dates)
     if dates == 'fx':
         return cperiod('fx')
 
@@ -361,7 +363,7 @@ def lastyears(period, nyears):
     Returns a period ending at PERIOD's end and which duration is at most NYEARS
     """
     # print "period=",period, 'type=',type(period),'nyears=',nyears
-    if type(period) is str:
+    if isinstance(period, six.string_types):
         period = cperiod(period)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year
@@ -376,7 +378,7 @@ def firstyears(period, nyears):
     """
     Returns a period beginning at PERIOD's begin and which duration is at most NYEARS
     """
-    if type(period) is str:
+    if isinstance(period, six.string_types):
         period = cperiod(period)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year

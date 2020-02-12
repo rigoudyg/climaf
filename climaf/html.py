@@ -43,12 +43,12 @@ def header(title, style_file=None):
     <title>[ """ + title + """ ]</title>
     """
     trailer = """
-        </head>
-        <body>
-        <h1>""" + title + """</h1>
-        <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
-        <hr/> <!--- this draws a line --->
-        """
+    </head>
+    <body>
+    <h1>""" + title + """</h1>
+    <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
+    <hr/> <!--- this draws a line --->
+    """
     if style_file is not None:
         with open(style_file) as fic:
             style = \

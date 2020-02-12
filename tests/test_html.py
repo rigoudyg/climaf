@@ -34,6 +34,7 @@ class HeaderTests(unittest.TestCase):
     </head>
     <body>
     <h1>$TITLE</h1>
+    <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
     <hr/> <!--- this draws a line --->
     """ + "\n"
         cami_css_file = os.path.sep.join(os.path.abspath(climaf_based_file).split(os.path.sep)[:-1] + ["..", "climaf", "cami_style_css"])

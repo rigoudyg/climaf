@@ -12,6 +12,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 from __future__ import print_function
 
 import sys
+import six
 import os
 import os.path
 import re
@@ -413,10 +414,8 @@ def cdrop(obj, rm=True, force=False):
 
     if isinstance(obj, cobject):
         crs = repr(obj)
-    elif type(obj) is str:
-        crs = obj
-    elif type(obj) is unicode:
-        crs=obj.encode('ascii')
+    elif isinstance(obj, six.string_types):
+        crs = str(obj)
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
@@ -462,7 +461,7 @@ def cprotect(obj, stop=False):
         crs = repr(obj)
         if isinstance(obj, cdataset):
             crs = "select(" + crs + ")"
-    elif type(obj) is str:
+    elif isinstance(obj, six.string_types):
         crs = obj
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))

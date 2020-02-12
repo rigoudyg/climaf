@@ -60,7 +60,8 @@ class scriptFlags():
                (self.canMissing == other.canMissing) and \
                (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
                (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
-               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation)
+               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation) and \
+               (self.doCatTime == other.doCatTime)
 
     def unset_selectors(self):
         self.canSelectVar = False

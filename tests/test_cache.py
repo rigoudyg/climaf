@@ -14,10 +14,10 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
 
-from climaf.cache import setNewUniqueCache, generateUniqueFileName, generateUniqueFileName_unsafe, \
-    generateUniqueFileName_safe, stringToPath, searchFile, register, getCRS, rename, hasMatchingObject, \
-    hasIncludingObject, hasBeginObject, hasExactObject, complement, cdrop, cprotect, csync, cload, cload_for_project, \
-    craz, cdump, list_cache, clist, cls, crm, cdu, cwc, rebuild, Climaf_Cache_Error
+from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
+    searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \
+    complement, cdrop, cprotect, csync, cload, cload_for_project, craz, cdump, list_cache, clist, cls, crm, cdu, cwc, \
+    rebuild, Climaf_Cache_Error
 
 
 class SetNewUniqueCacheTests(unittest.TestCase):
@@ -40,46 +40,36 @@ class SetNewUniqueCacheTests(unittest.TestCase):
 
 class GenerateUniqueFileNameTests(unittest.TestCase):
 
-    def test_generateUniqueFileName_unsafe(self):
-        my_crs="ds('CMIP6%%tas%0185-1900%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')"
-        self.assertEqual(generateUniqueFileName_unsafe(my_crs), '/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc')
-        self.assertTrue(os.path.exists('/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/'))
-        self.assertEqual(generateUniqueFileName_unsafe(my_crs, format=None), "")
+    def test_generateUniqueFileName(self):
+        my_crs="ds('CMIP6%%tas%0185-1900%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%" \
+               "latest')"
+        my_basedir = os.path.sep.join([tmp_directory,
+                                       '7f'])
+        self.assertEqual(generateUniqueFileName(my_crs),
+                         os.path.sep.join([my_basedir, '19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251.nc']))
+        self.assertTrue(os.path.exists(my_basedir))
+        self.assertEqual(generateUniqueFileName(my_crs, format=None), "")
 
-    def test_generateUniqueFileName_safe(self):
-        my_crs="ds('CMIP6%%tas%0185-1900%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')"
-        self.assertEqual(generateUniqueFileName_safe(my_crs), '/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc')
-        self.assertTrue(os.path.exists('/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/'))
-        self.assertEqual(generateUniqueFileName_safe(my_crs, format=None), "")
-
-        def my_operator(expr):
-            return "toto"
-
-        def my_other_operator(expr):
-            return None
-
-        self.assertEqual(generateUniqueFileName_safe(my_crs, operator=my_operator), "/home/rigoudyg/tmp/tests/test_cache/toto/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc")
-        self.assertEqual(generateUniqueFileName_safe(my_crs, operator=my_other_operator), "/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc")
-        shutil.copy("/".join([rootpath[0], "..", "examples", "data", "NPv3.1ada_SE_1982_1991_1M_ua_pres.nc"]), '/home/rigoudyg/tmp/tests/test_cache/7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc')
-        with self.assertRaises(Climaf_Cache_Error):
-            generateUniqueFileName_safe(my_crs)
-        # TODO: Go on to test the usecases of the generateUniqueFileName_safe function
+        shutil.copy(os.sep.join([rootpath[0], "..", "examples", "data", "NPv3.1ada_SE_1982_1991_1M_ua_pres.nc"]),
+                    os.sep.join(['7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251.nc']))
+        # TODO: Go on to test the usecases of the generateUniqueFileName function
 
 
 class StringToPathTests(unittest.TestCase):
 
     def test_stringToPath(self):
         name = "7f19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251"
-        lenngth = 5
-        self.assertEqual(stringToPath(name, lenngth), "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1")
+        length = 5
+        self.assertEqual(stringToPath(name, length),
+                         "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1")
 
 
 class SearchFileTests(unittest.TestCase):
 
     def test_searchFile(self):
-        my_path_1 = "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1.nc"
-        my_path_2 = "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/2.nc"
-        my_path_3 = "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/3.nc"
+        my_path_1 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251.nc"
+        my_path_2 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6252.nc"
+        my_path_3 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6253.nc"
         os.symlink(my_path_2, my_path_3)
         self.assertEqual(searchFile(my_path_1), "/".join([tmp_directory, my_path_1]))
         self.assertEqual(searchFile(my_path_3), None)

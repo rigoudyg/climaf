@@ -119,7 +119,7 @@ class CrewriteTests(unittest.TestCase):
     def test_crewrite(self):
         crstest_1 = "plot(ccdo(llbox(ds('toto|AMIPV6ALB2G|ta|198001|global|monthly'),latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))"
         new_crstest_1 = crewrite(crstest_1)
-        self.assertEqual(new_crstest_1, "plot(ccdo(llbox(ds('toto|AMIPV6ALB2G|ta|198001|global|monthly'),latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")
+        self.assertEqual(new_crstest_1, "plot(ccdo(llbox(latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")
         crstest_2 = "plot(ccdo(llbox(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))"
         new_crstest_2 = crewrite(crstest_2)
         self.assertEqual(new_crstest_2, "plot(ccdo(llbox(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")

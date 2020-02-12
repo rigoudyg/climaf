@@ -103,13 +103,24 @@ class CscriptTest(unittest.TestCase):
         import sys
         self.assertTrue("mycdo2" in sys.modules["__main__"].__dict__)
 
+    def test_duplicate_entry(self):
+        my_script = cscript('mycdo3','(cdo ${operator} ${in_1} ${in_1} ${out})')
+        self.assertDictEqual(my_script.inputs, {1: ('in_1', False, False)})
+        self.assertDictEqual(my_script.outputs, {'': '%s', None: '%s'})
+        self.assertEqual(my_script.name, "mycdo3")
+        self.assertEqual(my_script.command, '(cdo ${operator} ${in_1} ${in_1} ${out})')
+        self.assertIsNone(my_script.fixedfields)
+        self.assertEqual(my_script.flags, scriptFlags())
+        self.assertEqual(my_script.outputFormat, "nc")
+        self.assertTrue("mycdo3" in globals())
+        import sys
+        self.assertTrue("mycdo3" in sys.modules["__main__"].__dict__)
+
     def test_errors(self):
         with self.assertRaises(Climaf_Operator_Error):
             cscript('mycdo2','(cdo ${operator} ${in_1} ${mmin_2} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
             cscript('mycdo2','(cdo ${operator} ${in_1} ${mmins_2} ${out})')
-        with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2','(cdo ${operator} ${in_1} ${in_1} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
             cscript('mycdo2','(cdo ${operator} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
@@ -154,8 +165,8 @@ class DeriveTest(unittest.TestCase):
         derive('*', dict(out='rscre'),'minus','rs','rscs')
         self.assertIsNone(derive("erai", "ta2", "minus", "t", "ta", "rscre"))
         from climaf.operators import derived_variables
-        self.assertEqual(derived_variables["erai"]["ta"], ('rescale', 'out', ['t'], {'scale': 1.0, 'offset': 0.0}))
-        self.assertEqual(derived_variables["*"]["rscre"], ('minus', 'out', ['rs', 'rscs'], {}))
+        self.assertEqual(derived_variables["erai"]["ta"], ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
+        self.assertEqual(derived_variables["*"]["rscre"], ('minus', 'rscre', ['rs', 'rscs'], {}))
         self.assertNotIn("ta2", derived_variables["erai"])
         with self.assertRaises(Climaf_Operator_Error):
             derive("CMIP5", dict(my_out_name='ta2'),'rescale', 't', scale=2., offset=-154.3)
@@ -193,8 +204,8 @@ class DerivedVariableTest(unittest.TestCase):
         self.assertIsNone(derived_variable("my_variable", "my_project"))
         self.assertIsNone(derived_variable("my_variable", "CMIP6"))
         self.assertIsNone(derived_variable("ta", "CMIP6"))
-        self.assertEqual(derived_variable("rscre", "erai"), ("minus", "out", ["rs", "rscs"], {}))
-        self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'out', ['t'], {'scale': 1.0, 'offset': 0.0}))
+        self.assertEqual(derived_variable("rscre", "erai"), ("minus", "rscre", ["rs", "rscs"], {}))
+        self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
 
 
 if __name__ == '__main__':
