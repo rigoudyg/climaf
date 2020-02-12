@@ -413,8 +413,6 @@ def cdrop(obj, rm=True, force=False):
 
     if isinstance(obj, cobject):
         crs = repr(obj)
-        if isinstance(obj, cdataset):
-            crs = "select(" + crs + ")"
     elif type(obj) is str:
         crs = obj
     elif type(obj) is unicode:
