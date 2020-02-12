@@ -446,6 +446,8 @@ class cdataset(cobject):
         self.register()
 
     def setperiod(self, period):
+        if isinstance(period,str) :
+            period=init_period(period)
         self.erase()
         self.period = period
         self.kvp['period'] = period
@@ -1401,12 +1403,14 @@ class ctree(cobject):
                 rep += par + "=" + repr(self.parameters[par]) + ","
         rep += ")"
         rep = rep.replace(",)", ")")
-        clogger.debug("Create crs for ctree: %s" % rep)
+        #clogger.debug("Create crs for ctree: %s" % rep)
         return rep
 
     def setperiod(self, period):
         """ modifies the period for all datasets of a tree"""
         self.erase()
+        if isinstance(period,str) :
+            period=init_period(period)
         for op in self.operands:
             op.setperiod(period)
         self.crs = self.buildcrs(period=period)
