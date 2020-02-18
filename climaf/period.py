@@ -53,6 +53,11 @@ class cperiod():
         if test and stop_self != stop_other:
             test = False
         return test
+
+    #
+    def __hash__(self):
+        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "stop", None)))
+
     #
     def __repr__(self):
         return self.pr()

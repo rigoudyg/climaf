@@ -11,6 +11,7 @@ Handles a database of attributes for describing organization and location of dat
 from __future__ import print_function
 
 import os
+import six
 import os.path
 import re
 import string
@@ -447,7 +448,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     facet_value = oc.group(kw)
                 except:
                     continue
-                if type(kwargs[kw]) is str and ("*" in kwargs[kw] or "?" in kwargs[kw]):
+                if isinstance(kwargs[kw], six.string_types) and ("*" in kwargs[kw] or "?" in kwargs[kw]):
                     if facet_value is not None:
                         if kw not in wildcards:
                             wildcards[kw] = set()
@@ -466,7 +467,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                             continue
                         if key not in periods_dict:
                             periods_dict[key] = set()
-                        # print "adding period %s for key %s"%(fperiod,key)
+                        clogger.debug("adding period %s for key %s in %s" % (str(fperiod), key, periods_dict))
                         periods_dict[key].add(fperiod)
                     else:
                         pass
