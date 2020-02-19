@@ -935,16 +935,14 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                 if ln and hard:
                     Climaf_Driver_Error("flags ln and hard are mutually exclusive")
                 elif ln:
-                    if os.path.exists(target):
-                        if not os.path.samefile(result, target):
-                            os.remove(target)
-                            shutil.move(result, target)
-                            os.symlink(target, result)
+                    if os.path.exists(target) or os.path.islink(target):
+                        os.remove(target)
+                        os.symlink(result, target)
                     else:
-                        if not os.path.exists(os.path.dirname(target)):
-                            os.makedirs(os.path.dirname(target))
-                        shutil.move(result, target)
-                        os.symlink(target, result)
+                        target_dir = os.path.dirname(target)
+                        if not os.path.exists(target_dir):
+                            os.makedirs(target_dir)
+                        os.symlink(result, target)
                 else:
                     # Must create hard link
                     # If result is a link, follow links for finding source of hard link
@@ -954,7 +952,6 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                         source = result
                     if source == target:
                         # This is a case where the file had already been symlinked to the same target name
-                        shutil.move(source, result)
                         os.link(result, target)
                     else:
                         if os.path.exists(target):
