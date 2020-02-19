@@ -2,7 +2,7 @@
 
 report_ensemble=${1:-1}
 echo $report_ensemble
-run_modules=${2:-"netcdfbasics period cache classes functions operators standard_operators cmacro html"}
+run_modules=${2:-"netcdfbasics period cache classes functions operators standard_operators cmacro html example_data_plot example_data_retrieval example_index_html"}
 echo $run_modules
 
 # Remove old results
