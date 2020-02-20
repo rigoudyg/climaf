@@ -22,7 +22,6 @@ if not isinstance(cpath, list):
 class DataGplotMaps(unittest.TestCase):
 
     def setUp(self):
-        craz()
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.tas = ds(project='example', simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
         self.sub_tas = llbox(self.tas, latmin=30, latmax=80, lonmin=60, lonmax=120)
@@ -199,15 +198,11 @@ class DataGplotMaps(unittest.TestCase):
         ref_plotmap_bis = os.sep.join([self.reference_directory, "test_A.10.png"])
         compare_picture_files(plot_map_bis, ref_plotmap_bis)
 
-    def tearDown(self):
-        craz()
-
 
 @skipUnless_CNRM_Lustre()
 class DataGplotMapsRotation(unittest.TestCase):
 
     def setUp(self):
-        craz()
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
         # -----------------------------------------------------------
         # Declare "data_CNRM" project with some 'standard' Nemo output files
@@ -349,14 +344,10 @@ class DataGplotMapsRotation(unittest.TestCase):
         ref_plotmap = os.sep.join([self.reference_directory, "test_B.6.png"])
         compare_picture_files(plot_map, ref_plotmap)
 
-    def tearDown(self):
-        craz()
-
 
 class DataGplotCrossSections(unittest.TestCase):
 
     def setUp(self):
-        craz()
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", period="1980")
         self.january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly',
@@ -471,14 +462,10 @@ class DataGplotCrossSections(unittest.TestCase):
         ref_plotcross_bis = os.sep.join([self.reference_directory, "test_C.8.png"])
         compare_picture_files(plot_cross_bis, ref_plotcross_bis)
 
-    def tearDown(self):
-        craz()
-
 
 class DataGplotProfiles(unittest.TestCase):
 
     def setUp(self):
-        craz()
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly',
                              period="198001")
@@ -531,14 +518,10 @@ class DataGplotProfiles(unittest.TestCase):
         ref_plotprofile = os.sep.join([self.reference_directory, "test_D.3.png"])
         compare_picture_files(plot_profile, ref_plotprofile)
 
-    def tearDown(self):
-        craz()
-
 
 class DataPlot(unittest.TestCase):
 
     def setUp(self):
-        craz()
         cdef("project", "example")
         cdef("frequency", "monthly")
         self.my_dataset = ds(simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
@@ -609,9 +592,6 @@ class DataPlot(unittest.TestCase):
         ref_pdfpage2 = os.sep.join([self.reference_directory, "test3.2.pdf"])
         compare_picture_files(pdfpage2, ref_pdfpage2)
 
-    def tearDown(self):
-        craz()
-
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -621,5 +601,7 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
+    craz()
     unittest.main()
+    craz()
     remove_dir_and_content(tmp_directory)

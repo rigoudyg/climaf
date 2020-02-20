@@ -104,12 +104,12 @@ def compare_picture_files(object_test, fic_ref, display=True):
         if display:
             cshow(object_test)
         # Compare the two files, display the difference if needed
-        try:
-            subprocess.check_call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
-                                  shell=True)
-        except subprocess.CalledProcessError:
+        rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
+                              shell=True)
+        if rep != 0:
             if display:
-                subprocess.check_call(display_cmd.format(diff_file))
-            raise ValueError("The files following files are different: %s - %s" % (file_test, file_ref))
-        finally:
+                subprocess.check_call(display_cmd.format(diff_file), shell=True)
+            os.remove(diff_file)
+            raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))
+        else:
             os.remove(diff_file)
