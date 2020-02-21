@@ -9,6 +9,7 @@ from climaf.site_settings import atIPSL, atCerfacs, atCNRM
 
 # -- Load only the ipsl derived variables if we are at IPSL
 if atIPSL:
+    import atmosphere_derived_variables
     import ipsl_derived_variables
 
 # Load atmosphere derived variables at Cerfacs

@@ -22,7 +22,11 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import datetime
+try:
+   from datetime import datetime
+except:
+   import datetime
+import cftime
 import numpy as np
 from netCDF4 import Dataset, num2date
 
@@ -269,14 +273,17 @@ for pathfilename in filenames_list:
         tvalue = num2date(nctime, units=t_unit, calendar=t_cal)
         datevar = []
         for elt in tvalue:
-            if not isinstance(elt, datetime.datetime):
+            #if not isinstance(elt, datetime.datetime):
+            if not isinstance(elt, datetime):
                 if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or \
-                        isinstance(elt, netcdftime._netcdftime.Datetime360Day):
+                        isinstance(elt, netcdftime._netcdftime.Datetime360Day) or \
+                              isinstance(elt,cftime.DatetimeNoLeap):
                     strdate = str.split(elt.strftime(), ' ')[0]
                     year = int(str.split(strdate, '-')[0])
                     month = int(str.split(strdate, '-')[1])
                     day = int(str.split(strdate, '-')[2])
-                    datevar.append(datetime.datetime(year, month, day))
+                    #datevar.append(datetime.datetime(year, month, day))
+                    datevar.append(datetime(year, month, day))
             else:
                 datevar.append(elt)
                 # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
@@ -348,7 +355,8 @@ for pathfilename in filenames_list:
         startyear = int(dum[0])
         endyear = int(dum[1])
         #
-        ind = np.argwhere((x > datetime.datetime(startyear, 1, 1)) & (x < datetime.datetime(endyear, 12, 31))).flatten()
+        #ind = np.argwhere((x > datetime.datetime(startyear, 1, 1)) & (x < datetime.datetime(endyear, 12, 31))).flatten()
+        ind = np.argwhere((x > datetime(startyear, 1, 1)) & (x < datetime(endyear, 12, 31))).flatten()
         print('highlight_period = ', highlight_period)
         print("highlight_period_lw_list[dataset_number] = ", highlight_period_lw_list[dataset_number])
         plt.plot(x[ind], y[ind], lw=highlight_period_lw_list[dataset_number],
@@ -367,19 +375,24 @@ if args.xlim:
     xlim_period = []
     for xlim_date in [xlim_start_date, xlim_end_date]:
         if len(xlim_date) == 4:
-            x_date = datetime.datetime(int(xlim_date), 8, 1)
+            x_date = datetime(int(xlim_date), 8, 1)
+            #x_date = datetime.datetime(int(xlim_date), 8, 1)
         else:
             if '-' in x_text or '_' in x_text:
                 sep_x = ('-' if '-' in x_text else '_')
                 split_x = str.split(xlim_date, sep_x)
                 if len(split_x) == 2:
-                    x_date = datetime.datetime(int(split_x[0]), int(split_x[1]))
+                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]))
+                    x_date = datetime(int(split_x[0]), int(split_x[1]))
                 elif len(split_x) == 3:
-                    x_date = datetime.datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
+                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
+                    x_date = datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
             elif len(x_text) == 6:
-                x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), 15)
+                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), 15)
+                x_date = datetime(int(x_text[0:4]), int(x_text[4:6]), 15)
             elif len(x_text) == 8:
-                x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
+                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
+                x_date = datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
             else:
                 print('--> Date provided as x value could not be interpreted: ', xlim_date)
         xlim_period.append(x_date)
@@ -484,19 +497,24 @@ if args.text:
         # -- treatment of the x value = date
         x_text = str.split(text_elt, ',')[0]
         if len(x_text) == 4:
-            x_date = datetime.datetime(int(x_text))
+            #x_date = datetime.datetime(int(x_text))
+            x_date = datetime(int(x_text))
         else:
             if '-' in x_text or '_' in x_text:
                 sep_x = ('-' if '-' in x_text else '_')
                 split_x = str.split(x_text, sep_x)
                 if len(split_x) == 2:
-                    x_date = datetime.datetime(int(split_x[0]), int(split_x[1]))
+                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]))
+                    x_date = datetime(int(split_x[0]), int(split_x[1]))
                 elif len(split_x) == 3:
-                    x_date = datetime.datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
+                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
+                    x_date = datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
             elif len(x_text) == 6:
-                x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]))
+                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]))
+                x_date = datetime(int(x_text[0:4]), int(x_text[4:6]))
             elif len(x_text) == 8:
-                x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
+                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
+                x_date = datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
             else:
                 print('--> Date provided as x value could not be interpreted: ', x_text)
         # -- y
