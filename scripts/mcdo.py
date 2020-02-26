@@ -161,6 +161,7 @@ def remove_dir_and_content(path_to_treat):
             contents = glob.glob(os.path.sep.join([path_to_treat, "*"]))
             for content in contents:
                 remove_dir_and_content(content)
+            os.removedirs(path_to_treat)
         else:
             os.remove(path_to_treat)
 
@@ -295,6 +296,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     else:
         raise ValueError("No input file to treat!")
 
+    os.chdir(original_directory)
     remove_dir_and_content(tmp)
 
 
