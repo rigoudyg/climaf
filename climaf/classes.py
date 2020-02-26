@@ -1377,9 +1377,8 @@ class ctree(cobject):
         repetitive data selection, when a data selection has been explictly cached
         """
         first_op=self.operands[0]
-        if self.operator=='select' and len(self.operands)==1 and \
-           isinstance(first_op,cdataset) and \
-           len(self.parameters.keys())==0 :
+        if self.operator=='select' and len(self.operands)==1 and isinstance(first_op, cdataset) and \
+           len(self.parameters.keys())==0 and first_op.alias is None:
                return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
         #
         # General case
