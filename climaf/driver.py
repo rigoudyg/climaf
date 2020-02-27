@@ -582,6 +582,13 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
     #
+    # Discard selection parameters if selection already occurred for first operand
+    # TBD : manage the cases where other operands didn't undergo selection
+    if cache.hasExactObject(scriptCall.operands[0]) :
+        for key in ["period","period_iso","var","domain","missing","alias","units"] :
+            if key in subdict :
+                subdict.pop(key)
+    #
     # print("subdict="+`subdict`)
     # Combine CRS and possibly member_label to provide/complement title
     if 'title' not in subdict:
