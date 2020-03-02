@@ -8,6 +8,9 @@ Changes, newest first:
 
 - V1.2.13:
 
+  - solve the issue of redundantly selecting on variable/period/domain ... for datasets
+    which already underwent such a selection; this saves on execution time
+  
   - handle **operators which concatenate data over time**, through new
     :py:class:`~climaf.operators.cscript` argument `doCatTime`. See its doc and the
     detailed example :download:`How to handle CliMAF operators that concatenate data over time
