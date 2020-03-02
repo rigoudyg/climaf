@@ -23,7 +23,7 @@ Changes, newest first:
        aliasing for a given operator; when applicable, this may save disk space; see
        argument `select` in doc of :py:class:`~climaf.operators.cscript` and the example
        :download:`How to handle CliMAF operators that concatenate data over time
-        <../doc/operators_which_concatenate_over_time.html>`
+       <../doc/operators_which_concatenate_over_time.html>`
 
 
   - Cache:
@@ -45,7 +45,7 @@ Changes, newest first:
 
     - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
-  - graphics:
+  - Graphics:
     
     - operator `curves` also uses dash patterns when showing more than 10 curves
 
@@ -77,7 +77,7 @@ Changes, newest first:
       object is possible using an empty string (useful when wanting to provide another,
       which comes after in the argument objects list)
 
-  - basics about datasets and projects:
+  - Datasets and projects:
 
     - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
       to restrict its effect, based on the value of some facets, through a
@@ -97,6 +97,11 @@ Changes, newest first:
     - Projects CMIP5 and CMIP6 are defined even on systems where there is no known
       root location for that data; so, user can define facet 'root' later on, to match
       their data architecture, without hacking the distributed code
+
+    - Handling attribute 'version' for derived variables : if a derived variable (say 'P-E')
+      is defined with e.g. version 'v20190801', this value will apply to selecting the
+      dataset for variable 'P', but  value 'latest' will be used for 'E'; this because
+      there are some occasions where the value of attribute 'version' is not the same among the variables
 
     - Remove a constraining, buggy check on ensemble members order
 
