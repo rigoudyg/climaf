@@ -8,122 +8,100 @@ Changes, newest first:
 
 - V1.2.13:
 
-  - solve the issue of redundantly selecting on variable/period/domain ... for datasets
-    which already underwent such a selection; this saves on execution time
+  - Re-work the handling of data selection for better performance:
+
+     - allow to **save heavy dataset selection** : selection on time, variable, domain, ...
+       can be done once for all  and will now be duly reused if CliMAF is forced to cache
+       its value, simply by using :
+
+       >>> cfile(ds(...some dataset...))
+
+     - automatically avoid redundant selection on variable/period/domain ... for 
+       datasets which already underwent such a selection
   
-  - handle **operators which concatenate data over time**, through new
-    :py:class:`~climaf.operators.cscript` argument `doCatTime`. See its doc and the
-    detailed example :download:`How to handle CliMAF operators that concatenate data over time
-    <../doc/operators_which_concatenate_over_time.html>`
+     - allow to systematically avoid automatic CliMAF selection on variable, time, domain,
+       aliasing for a given operator; when applicable, this may save disk space; see
+       argument `select` in doc of :py:class:`~climaf.operators.cscript` and the example
+       :download:`How to handle CliMAF operators that concatenate data over time
+        <../doc/operators_which_concatenate_over_time.html>`
 
-  - allow to systematically avoid automatic CliMAF selection on variable, time, domain,
-    aliasing for an operator; when applicable, this may save disk space; see
-    argument `select` in doc of :py:class:`~climaf.operators.cscript` and the example
-    :download:`How to handle CliMAF operators that concatenate data over time
-    <../doc/operators_which_concatenate_over_time.html>`
 
-  - allow to save on heavy dataset selection : selection on time, variable, domain, ...
-    can be done once for all
-    and will now be duly reused if CliMAF is forced to cache its value, simply by using :
+  - Cache:
 
-    >>> cfile(ds(...))
+    - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
+      script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
+      definitely moved to this CliMAF version; this is not mandatory, but will actually
+      lower your inodes/files use
 
-  - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
-    script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
-    definitely moved to this CliMAF version; this is not mandatory, but will actually
-    lower your inodes/files use
+    - Cache speed improvement : when computing a CliMAF object, default behaviour is to
+      search cache for 'including' or 'begin' objects (i.e. similar objects with different
+      period) but this could be expensive. Toggle **driver.dig_hard_into_cache** can be set to
+      False to avoid it
 
-  - operator `curves` also uses dash patterns when showing more than 10 curves
-
-  - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
-
-  - fixes:
+    - Variable climaf.cache.stamping can be set to None, which means :
+      put a stamp if possible, but don't bother if impossible. Reminder
+      : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
+      the Climaf Reference Synatx description of the data
 
     - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
+  - graphics:
+    
+    - operator `curves` also uses dash patterns when showing more than 10 curves
 
-- Vnext:
+    - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
+      the filename of an image to insert in the page, centered at the bottom, and
+      `insert_width` for tuning its size
 
-  - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
+    - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
+      hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
+      
+    - fixes for operator `plot`  : it actually uses user-provided max and min for
+      scaling field s order  of magnitude. If using argument `colors` , min and max
+      will be derived from extreme values. This is useful when field
+      has very large values, largely beyond limits of explicit levels
 
-  - Cache speed improvement : when computing a CliMAF object, default behaviour is to
-    search cache for 'including' or 'begin' objects (i.e. similar objects with different
-    period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
-    False to avoid it
+    - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
+      hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
 
-  - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
-    script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
-    definitely moved to this CliMAF version; this is not mandatory, but will actually
-    lower your inodes/files use
+  - Operators :
 
-  - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
-    to restrict its effect, based on the value of some facets, through a
-    dictionary of criteria. Example, for a given model which CMIP6 data has
-    an error for variable ``evspsbl``   on some data versions :
+    - handle **operators which concatenate data over time**, through new
+      :py:class:`~climaf.operators.cscript` argument `doCatTime`. See its doc and the
+      detailed example :download:`How to handle CliMAF operators that concatenate data over time
+      <../doc/operators_which_concatenate_over_time.html>`
 
-    >>> calias('CMIP6,'evspsbl,scale=_1,conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] })
+    - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
 
-  - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
-    the filename of an image to insert in the page, centered at the bottom, and
-    `insert_width` for tuning its size
+    - for climaf operators needing multiple optional input objects, providing a void
+      object is possible using an empty string (useful when wanting to provide another,
+      which comes after in the argument objects list)
 
-  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
-    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
+  - basics about datasets and projects:
 
-  - for climaf operators needing multiple optional input objects, providing a void
-    object is possible using an empty string (useful when wanting to provide another,
-    which comes after in the argument objects list)
+    - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
+      to restrict its effect, based on the value of some facets, through a
+      dictionary of criteria. Example, for a given model which CMIP6 data has
+      an error for variable ``evspsbl``   on some data versions :
 
-  - fixes for operator `plot`  : it actually uses user-provided max and min for
-    scaling field s order  of magnitude. If using argument `colors` , min and max
-    will be derived from extreme values. This is useful when field
-    has very large values, largely beyond limits of explicit levels
+      >>> calias('CMIP6,'evspsbl,scale=-1,conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] })
 
-  - Add function :py:func:`~climaf.classes.cvalid` for declaring a
-    list of allowed values for project facets/keywords. This allows to better
-    constrain the identification of files for a dataset, as e.g. for CMIP6
-    when using wildcard such as grid="g*". It avoids mismatch between patterns
-    for fixed fields and pattenrs for variable fields. Example :
+    - Add function :py:func:`~climaf.classes.cvalid` for declaring a
+      list of allowed values for project facets/keywords. This allows to better
+      constrain the identification of files for a dataset, as e.g. for CMIP6
+      when using wildcard such as grid="g*". It avoids mismatch between patterns
+      for fixed fields and pattenrs for variable fields. Example :
 
-     >>> cvalid('grid', ["gr", "gn", "gr1", "gr2"], project="CMIP6")
+      >>> cvalid('grid', ["gr", "gn", "gr1", "gr2"], project="CMIP6")
 
-  - Projects CMIP5 and CMIP6 are defined even on systems where there is no known
-    root location for that data; so, user can define facet 'root' later on, to match
-    their data architecture, without hacking the distributed code
+    - Projects CMIP5 and CMIP6 are defined even on systems where there is no known
+      root location for that data; so, user can define facet 'root' later on, to match
+      their data architecture, without hacking the distributed code
 
-  - Variable climaf.cache.stamping can be set to None, which means :
-    put a stamp if possible, but don't bother if impossible. Reminder
-    : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
-    the Climaf Reference Synatx description of the data
-
-  - Remove a constraining, buggy check on ensemble members order
+    - Remove a constraining, buggy check on ensemble members order
 
   - Change log level of message about how DJF clim works
 
-  - fixes:
-
-    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
-
-- V1.2.13:
-
-  - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
-    the filename of an image to insert in the page, centered at the bottom, and
-    `insert_width` for tuning its size
-
-  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
-    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
-
-  - for climaf operators needing multiple optional input objects, providing a void
-    object is possible using an empty string (useful when wanting to provide another,
-    which comes after in the argument objects list)
-
-  - fixes for operator `plot`  : it actually uses user-provided max and min for
-    scaling field s order  of magnitude; and it won't plot a small empty square at
-    the bottom right corner
-
-  - fixes:
-
-    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
 - V1.2.12:
 
