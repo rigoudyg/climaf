@@ -16,8 +16,11 @@ Changes, newest first:
 
        >>> cfile(ds(...some dataset...))
 
-     - automatically avoid redundant selection on variable/period/domain ... for 
-       datasets which already underwent such a selection
+     - A new feature was introduced to automatically avoid redundant selection on
+       variable/period/domain ... for datasets which already underwent such a selection.
+       This implies that the operators which actually need to know the name of the variable(s)
+       for the dataset(s) provided by CliMAF must now use keyword 'Var' instead of 'var' in
+       the script calling sequence declaration (see :py:class:`~climaf.operators.cscript` )
   
      - allow to systematically avoid automatic CliMAF selection on variable, time, domain,
        aliasing for a given operator; when applicable, this may save disk space; see
