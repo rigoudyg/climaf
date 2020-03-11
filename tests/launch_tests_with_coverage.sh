@@ -11,6 +11,9 @@ export PYTHONPATH=$PYTHONPATH:$PWD/..
 # Remove old results
 coverage erase
 rm -rf $PWD/htmlcov
+climaf_macros="$PWD/.climaf.macros_tests"
+rm -f ${climaf_macros}
+export CLIMAF_MACROS=${climaf_macros}
 
 # Run coverage with different tests
 # coverage run --parallel-mode --source=climaf,scripts test_import.py
@@ -30,6 +33,8 @@ else
         fi
     done
 fi
+
+rm -f ${climaf_macros}
 
 # Assemble results
 coverage combine

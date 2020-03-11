@@ -175,7 +175,7 @@ if not already_inited and not onrtd:
     tim(".climaf")
     #
     # Init and load macros
-    macroFilename = "~/.climaf.macros"
+    macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
     print("Available macros read from %s are : %s" % (macroFilename, repr(cmacro.cmacros.keys())),
           file=sys.stderr)
