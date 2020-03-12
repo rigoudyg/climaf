@@ -22,8 +22,8 @@ import getpass
 import netrc
 from functools import partial
 
-from climaf.environment import get_variable
-from climaf.utils import Climaf_Error
+from climaf.environment import get_variable, change_variable
+from climaf.utils import Climaf_Error, Climaf_Classes_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
@@ -1127,3 +1127,34 @@ def test2():
 
 if __name__ == "__main__":
     test2()
+
+
+def cvalid(attribute, value=None, project=None):
+    """
+    Set or get the list of valid values for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
+    those data files which match a dataset definition
+
+    Argument 'project' allows to restrict the use/query
+    to the context of the given 'project'.
+
+    Example::
+
+    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
+    """
+    cprojects = get_variable("cprojects")
+    if project not in cprojects:
+        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+    if attribute == 'project':
+        project = None
+    #
+    if project and attribute not in cprojects[project].facets:
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+    if value is None:
+        rep = cprojects[project].facet_authorized_values.get(attribute, None)
+        if not rep:
+            rep = cprojects[None].facet_authorized_values.get(attribute, "")
+        return rep
+    else:
+        cprojects[project].facet_authorized_values[attribute] = value
+    change_variable("cprojects", cprojects)

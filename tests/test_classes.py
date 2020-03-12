@@ -13,6 +13,7 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf.cache import setNewUniqueCache
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias
 from climaf.period import Climaf_Period_Error, init_period
+from climaf.environment import get_variable
 from env.site_settings import atCNRM
 
 
@@ -21,7 +22,7 @@ class CprojectTests(unittest.TestCase):
     def test_cproject_init(self):
         cproject("my_project", ("my_arg", "my_default"), "my_other_arg", separator="-",
                  ensemble=["my_first_ensemble_arg", "my_other_ensemble_arg"])
-        from climaf.classes import cprojects
+        cprojects = get_variable("cprojects")
         self.assertIn("my_project", cprojects)
         a_project = cprojects["my_project"]
         self.assertEqual(a_project.project, "my_project")
@@ -34,7 +35,7 @@ class CprojectTests(unittest.TestCase):
         self.assertEqual(a_project.attributes_for_ensemble,
                          ["simulation", "my_first_ensemble_arg", "my_other_ensemble_arg"])
         cproject("my_project", "my_other_arg", separator="-", sep=".")
-        from climaf.classes import cprojects
+        cprojects = get_variable("cprojects")
         self.assertIn("my_project", cprojects)
         a_project = cprojects["my_project"]
         self.assertEqual(a_project.project, "my_project")
@@ -49,7 +50,7 @@ class CprojectTests(unittest.TestCase):
 
     def test_cproject_repr(self):
         cproject("my_project", "my_other_arg", sep=".")
-        from climaf.classes import cprojects
+        cprojects = get_variable("cprojects")
         self.assertEqual(repr(cprojects["my_project"]),
                          "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
 
@@ -67,7 +68,7 @@ class CdefTests(unittest.TestCase):
         a = cdef("model", project="CMIP6")
         self.assertEqual(a, "*")
         cdef("model", value="CNRM-CM6-1", project="CMIP6")
-        from climaf.classes import cprojects
+        cprojects = get_variable("cprojects")
         self.assertEqual(cprojects["CMIP6"].facet_defaults["model"], "CNRM-CM6-1")
         with self.assertRaises(Climaf_Classes_Error):
             cdef("my_attribute", project="CMIP6")

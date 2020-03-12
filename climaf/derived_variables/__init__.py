@@ -5,7 +5,7 @@ from __future__ import print_function, division, absolute_import  # , unicode_li
 
 # Some projects like atmosphere_derived_variables, others don't
 # __all__= [ "atmosphere_derived_variables", "ocean_derived_variables" ]
-__all__ = ["ocean_derived_variables"]
+__all__ = ["ocean_derived_variables", ]
 
 from env.site_settings import atIPSL, atCerfacs, atCNRM
 

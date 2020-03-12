@@ -191,37 +191,6 @@ def cdef(attribute, value=None, project=None):
     change_variable("cprojects", cprojects)
 
 
-def cvalid(attribute, value=None, project=None):
-    """
-    Set or get the list of valid values for a CliMAF dataset attribute
-    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
-    thos data files which match a dataset definition
-
-    Argument 'project' allows to restrict the use/query
-    to the context of the given 'project'.
-
-    Example::
-
-    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
-    """
-    cprojects = get_variable("cprojects")
-    if project not in cprojects:
-        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
-    if attribute == 'project':
-        project = None
-    #
-    if project and attribute not in cprojects[project].facets:
-        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
-    if value is None:
-        rep = cprojects[project].facet_authorized_values.get(attribute, None)
-        if not rep:
-            rep = cprojects[None].facet_authorized_values.get(attribute, "")
-        return rep
-    else:
-        cprojects[project].facet_authorized_values[attribute] = value
-    change_variable("cprojects", cprojects)
-
-
 cproject(None)
 cdef("domain", "global")
 
@@ -321,7 +290,7 @@ def processDatasetArgs(**kwargs):
             attval['simulation'] = 'r0i0p0'
             attval['frequency'] = 'fx'
     # Special processing for CMIP6  : facet 'simulation' is forbidden (must use 'realization')
-    if (attval['project'] == 'CMIP6') and 'simulation' in kwargs and kwargs['simulation'] is not '':
+    if (attval['project'] == 'CMIP6') and 'simulation' in kwargs and len(kwargs['simulation']) > 0:
         raise Climaf_Classes_Error("You cannot use attribute 'simulation' in CMIP6; please use 'realization'. "
                                    "This if for kwargs=%s" % repr(kwargs))
 
