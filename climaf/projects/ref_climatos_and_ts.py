@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 
@@ -57,13 +57,12 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets_CESMEP/"
+    root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
 cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type',
          ensemble=['product'], separator='%')
-
 cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
 
 cdef('variable', '*', project='ref_climatos')
@@ -82,11 +81,6 @@ if root:
     patterns = [pattern1, pattern2]
     dataloc(project='ref_climatos', organization='generic', url=patterns)
 
-calias('ref_climatos', 'O2', scale=44.64)
-# Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
-# dataloc(project="ref_climatos",organization="generic",
-#        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
-calias(project='ref_climatos', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 ##########################################################################################
 
 
