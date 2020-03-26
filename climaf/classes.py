@@ -17,7 +17,7 @@ import os.path
 
 import dataloc
 from period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal import Decimal
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -38,6 +38,7 @@ class DataRetrieval(unittest.TestCase):
         self.assertEqual(ta_last.baseFiles(),
                          os.sep.join([self.climaf_dir, "examples/data/AMIPV6ALB2G/A/AMIPV6ALB2GPL1980.nc"]))
 
+    @skipUnless_CNRM_Lustre()
     def test_retrieval_subperiod(self):
         derive('*', 'rls', 'minus', 'rlds', 'rlus')
         g = ds(project='CMIP6', period='1850-1854', variable='rls', model='CNRM-CM6-1')

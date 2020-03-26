@@ -46,7 +46,7 @@ Example of a 'ref_ts' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
 root = None
 

@@ -15,7 +15,7 @@ import re
 import sys
 import subprocess
 import driver
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition

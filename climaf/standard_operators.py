@@ -9,8 +9,8 @@ import subprocess
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
-from climaf.clogging import clogger
-from climaf.site_settings import onCiclad
+from env.clogging import clogger
+from env.site_settings import onCiclad
 
 scriptpath = cpath[0] + "/../scripts/"
 binpath = cpath[0] + "/../bin/"

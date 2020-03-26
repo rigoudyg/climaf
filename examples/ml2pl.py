@@ -7,7 +7,7 @@
 
 
 from climaf.api import *
-from climaf.site_settings import onCiclad
+from env.site_settings import onCiclad
 
 clog('critical')
 

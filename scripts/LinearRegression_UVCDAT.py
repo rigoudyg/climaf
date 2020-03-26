@@ -8,7 +8,7 @@ import cdutil
 # from pcmdi_metrics.pcmdi.pmp_parser import *
 import genutil
 
-from climaf.site_settings import atCerfacs
+from env.site_settings import atCerfacs
 
 # import argparse
 # parser = argparse.ArgumentParser(description='Linear Regression between X and Y')

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -233,7 +233,7 @@ class CellTests(unittest.TestCase):
         self.test_altdir = "/home/common/tmp/cache/all/climaf"
         self.test_label = "A label"
         self.changed_filename = self.test_filename.replace(self.test_cachedir, self.test_altdir)
-        self.test_dirname = "/home/rigoudyg/tmp/cache/climaf"
+        self.test_dirname = os.sep.join([os.environ["HOME"], "tmp", "cache", "climaf"])
 
     def test_cell_not_work(self):
         with self.assertRaises(TypeError):

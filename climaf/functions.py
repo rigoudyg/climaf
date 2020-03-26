@@ -8,7 +8,7 @@ from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue
 from climaf import classes
-from clogging import clogger
+from env.clogging import clogger
 
 
 def cscalar(dat):

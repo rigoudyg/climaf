@@ -22,7 +22,7 @@ import os
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
-from climaf.site_settings import onCiclad
+from env.site_settings import onCiclad
 
 if onCiclad:
     cproject("OCMIP5", "model", "simulation", ("frequency", "monthly"), ensemble=["model"])

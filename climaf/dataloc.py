@@ -22,7 +22,7 @@ from string import Template
 import classes
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from operator import itemgetter
 import ftplib as ftp
 import getpass

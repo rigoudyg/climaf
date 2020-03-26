@@ -29,7 +29,7 @@ import classes
 import cache
 import operators
 import cmacro
-from clogging import clogger, indent as cindent, dedent as cdedent
+from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod, merge_periods
 from climaf import xdg_bin

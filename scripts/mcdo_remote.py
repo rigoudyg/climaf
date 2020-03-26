@@ -26,7 +26,7 @@ import mcdo
 
 # Climaf
 from climaf import __path__ as cpath, remote_cachedir
-from climaf.clogging import clogger, dedent as cdedent
+from env.clogging import clogger, dedent as cdedent
 from climaf.dataloc import remote_to_local_filename
 
 scriptpath = cpath[0] + "/../scripts/"

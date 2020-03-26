@@ -26,7 +26,7 @@ from operator import itemgetter
 from climaf import version
 from classes import compare_trees, cobject, cdataset, cprojects, guess_projects, allow_error_on_ds
 from cmacro import crewrite
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 import operators
 
 currentCache = None

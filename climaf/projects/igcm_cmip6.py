@@ -13,7 +13,7 @@ from __future__ import print_function
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, crealms, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip
+from env.site_settings import atTGCC, onCiclad, onSpip
 
 root = None
 login = None

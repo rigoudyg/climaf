@@ -26,7 +26,7 @@ from climaf.driver import cfile
 import pickle
 import shutil
 from collections import OrderedDict
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 
 def header(title, style_file=None):
@@ -593,7 +593,6 @@ def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
 
 
 class Climaf_Html_Error(Exception):
-    from clogging import clogger, dedent
 
     def __init__(self, valeur):
         self.valeur = valeur

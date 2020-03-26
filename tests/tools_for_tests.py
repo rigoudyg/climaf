@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -16,7 +16,7 @@ from climaf import xdg_bin
 
 
 def skipUnless_CNRM_Lustre():
-    if os.path.exists('/cnrm'):
+    if os.path.exists('/cnrm/cmip'):
         return lambda func: func
     return unittest.skip("because CNRM's Lustre not available")
 

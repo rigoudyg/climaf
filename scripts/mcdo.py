@@ -18,9 +18,8 @@ import glob
 import shutil
 import six
 
-from climaf.site_settings import onCiclad
-from climaf.anynetcdf import ncf
-from climaf.clogging import clogger, clog
+from env.site_settings import onCiclad
+from env.clogging import clogger, clog
 
 
 def correct_args_type(value):
