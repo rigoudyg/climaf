@@ -17,6 +17,7 @@ import time
 import glob
 import shutil
 import six
+import copy
 
 from env.site_settings import onCiclad
 from env.clogging import clogger, clog
@@ -176,6 +177,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # Initialize cdo commands
     cdo_commands_before_merge = list()
+    cdo_command_for_merge = None
     cdo_commands_after_merge = list()
 
     # Find out which command must be used for cdo
@@ -227,7 +229,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # Then, deal with merge time
     if len(input_files) > 1:
-        cdo_commands_after_merge.append("-mergetime")
+        cdo_command_for_merge = "-mergetime"
 
     # Then deal with date selection
     clogger.debug("Period considered: %s" % period)
@@ -283,7 +285,12 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             else:
                 clogger.error("Should not pass here...")
                 raise Exception("Should not pass here...")
-
+        if cdo_command_for_merge is not None:
+            tmp_output_file = os.sep.join([tmp, os.path.basename(output_file)])
+            cdo_command = " ".join([init_cdo_command, cdo_command_for_merge] + files_to_treat_after_merging +
+                                   [tmp_output_file, ])
+            call_subprocess(cdo_command)
+            files_to_treat_after_merging = [tmp_output_file, ]
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                files_to_treat_after_merging + [output_file, ])
         call_subprocess(cdo_command)
