@@ -13,6 +13,7 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf.cache import setNewUniqueCache
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias
 from climaf.period import Climaf_Period_Error, init_period
+from env.site_settings import atCNRM
 
 
 class CprojectTests(unittest.TestCase):
@@ -143,7 +144,10 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         self.assertEqual(a["model"], "CNRM-CM6-1")
         self.assertEqual(a["realization"], "r1i1p1f*")
         # TODO: Test the place on which the test is launched before this test
-        self.assertEqual(a["root"], "/cnrm/cmip")
+        if atCNRM:
+            self.assertEqual(a["root"], "/cnrm/cmip")
+        else:
+            self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
         self.assertEqual(a["table"], "*")
         self.assertEqual(a["variable"], "")
@@ -166,11 +170,17 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         self.assertEqual(a["model"], "")
         self.assertEqual(a["realization"], "r1i1p1")
         # TODO: Test the place on which the test is launched before this test
-        self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
+        if atCNRM:
+            self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
+        else:
+            self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
         self.assertEqual(a["table"], "*")
         self.assertEqual(a["variable"], "")
-        self.assertEqual(a["version"], "*")
+        if atCNRM:
+            self.assertEqual(a["version"], "*")
+        else:
+            self.assertEqual(a["version"], "latest")
         self.assertEqual(a["period"], init_period("1850-2000"))
         self.assertEqual(a["project"], "CMIP5")
         self.assertEqual(a["realm"], "*")
@@ -230,6 +240,10 @@ class CdatasetTests(unittest.TestCase):
 
     def setUp(self):
         # TODO: Write the test
+        if atCNRM:
+            self.root="/cnrm/cmip/cnrm/ESG"
+        else:
+            self.root = ""
         self.my_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
                                    simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989',
                                    version='last')
@@ -269,20 +283,20 @@ class CdatasetTests(unittest.TestCase):
         period_new = init_period("1980-1999")
         self.assertEqual(self.my_dataset.period, period_old)
         self.assertEqual(self.my_dataset.kvp["period"], period_old)
-        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')")
+        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
         self.my_dataset.setperiod(period_new)
         self.assertEqual(self.my_dataset.period, period_new)
         self.assertEqual(self.my_dataset.kvp["period"], period_new)
-        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1999%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')")
+        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1999%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
         self.my_dataset.setperiod(period_old)
 
     def test_cdataset_buildcrs(self):
-        self.assertEqual(self.my_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')")
-        self.assertEqual(self.my_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas%2000%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')")
+        self.assertEqual(self.my_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
+        self.assertEqual(self.my_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas%2000%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_dataset.buildcrs(crsrewrite=None), "")
-        self.assertEqual(self.my_other_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas,tos%fx%global%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')")
-        self.assertEqual(self.my_other_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas,tos%2000%global%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')")
+        self.assertEqual(self.my_other_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas,tos%fx%global%{}%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')".format(self.root))
+        self.assertEqual(self.my_other_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas,tos%2000%global%%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')".format(self.root))
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_other_dataset.buildcrs(crsrewrite=None), "")
 

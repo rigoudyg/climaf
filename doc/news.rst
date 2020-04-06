@@ -8,6 +8,13 @@ Changes, newest first:
 
 - V1.2.13:
 
+  - Change in CliMAf structure, creation of directory env which
+    contains site_settings.py (former climaf/site_settings.py) and clogging.py
+    (former climaf.clogging.py). This allows the use of the logger and the environement variables
+     which are used to determine on which server CliMAF runs in scripts.
+
+  - Rewrite mcdo.sh into mcdo.py to allow more flexibility and imrove ccdo calls.
+
   - handle **operators which concatenate data over time**, through new
     :py:class:`~climaf.operators.cscript` argument `doCatTime`. See its doc and the
     detailed example :download:`How to handle CliMAF operators that concatenate data over time
@@ -34,24 +41,10 @@ Changes, newest first:
 
   - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
 
-  - fixes:
-
-    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
-
-
-- Vnext:
-
-  - standard operator `ccdo3` allows to use e.g. CDO ternary operators such as `ifthenelse`
-
   - Cache speed improvement : when computing a CliMAF object, default behaviour is to
     search cache for 'including' or 'begin' objects (i.e. similar objects with different
     period) but this could be expensive. Toggle driver.dig_hard_into_cache can be set to
     False to avoid it
-
-  - cache structure is changed for saving i-nodes (files) (divide by 10 ...); please run
-    script **CLIMAF/scripts/reshape_cache.sh** for reshaping your cache, after you
-    definitely moved to this CliMAF version; this is not mandatory, but will actually
-    lower your inodes/files use
 
   - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
     to restrict its effect, based on the value of some facets, through a
@@ -101,26 +94,6 @@ Changes, newest first:
 
     - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
-- V1.2.13:
-
-  - :py:class:`~climaf.classes.cpage` has two additional arguments : `insert` for
-    the filename of an image to insert in the page, centered at the bottom, and
-    `insert_width` for tuning its size
-
-  - operator `plot` can superimpose a second overlay field, as for e.g. stippling +
-    hatching for AR6 figures. See `shade2` in :doc:`scripts/plot`.
-
-  - for climaf operators needing multiple optional input objects, providing a void
-    object is possible using an empty string (useful when wanting to provide another,
-    which comes after in the argument objects list)
-
-  - fixes for operator `plot`  : it actually uses user-provided max and min for
-    scaling field s order  of magnitude; and it won't plot a small empty square at
-    the bottom right corner
-
-  - fixes:
-
-    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
 - V1.2.12:
 
@@ -152,8 +125,6 @@ Changes, newest first:
     scaling field s order  of magnitude; and it won't plot a small empty square at
     the bottom right corner
 
-- Vnext:
-
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
     constrain the identification of files for a dataset, as e.g. for CMIP6
@@ -164,7 +135,7 @@ Changes, newest first:
     root location for that data; so, user can define facet 'root' later on, to match
     their data architecture, without hacking the distributed code
 
-  - Variable climaf.cache.stamping can be set to Noen, which means :
+  - Variable climaf.cache.stamping can be set to None, which means :
     put a stamp if possible, but don't botehr if impossible. Reminder
     : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
     the Climaf Reference Synatx description of the data
