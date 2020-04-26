@@ -792,35 +792,32 @@ begin
     end if
   end if
 
-  if isvar("shade2_options") then
-    if (.not. ( isvar("shade2_below") .and. isvar("shade2_above")  )) then
-      print("Must provide args shade2_below and shade2_above when using arg shade2_options  !")
-      status_exit(1)
-    end if
-    ;if (.not. isvar("shade2_file") ) then
-    ;  print("Must provide a shade2 field when using arg shade2_options !")
-    ;  status_exit(1)
-    ;end if
-  end if
+  
   if isvar("shade2_file") then
-    if (.not. isvar("shade2_options") ) then
-      print("Must provide shade2_options when providing a shade2_file !")
-      status_exit(1)
-    else
-      print("---------------------")
-      print("   STIPPLING FIELD   ")
-      print("---------------------")
-      useLatDim2=False
-      useXY_dummy=False
-      horizontal_dummy=False
-      vprofile_dummy=False
-      lat_exist2=True
-      lon_exist2=True
-      proj_data_dummy=False
-      shade2_field_select=""
-      array_shade2=field_reduce(shade2_file, shade2_var, "lin", useXY_dummy, horizontal_dummy, \
-          useLatDim2, vprofile_dummy, shade2_field_select, lat_exist2, lon_exist2, proj_data_dummy)
-      fld_shade2=array_shade2[0]
+    if (shade2_file .ne. "" ) then
+      if (.not. isvar("shade2_options") ) then
+        print("Must provide shade2_options when providing a shade2_file !")
+        status_exit(1)
+      else
+        if (.not. ( isvar("shade2_below") .and. isvar("shade2_above")  )) then
+          print("Must provide args shade2_below and shade2_above !")
+          status_exit(1)
+        end if
+        print("---------------------")
+        print("   STIPPLING FIELD   ")
+        print("---------------------")
+        useLatDim2=False
+        useXY_dummy=False
+        horizontal_dummy=False
+        vprofile_dummy=False
+        lat_exist2=True
+        lon_exist2=True
+        proj_data_dummy=False
+        shade2_field_select=""
+        array_shade2=field_reduce(shade2_file, shade2_var, "lin", useXY_dummy, horizontal_dummy, \
+        useLatDim2, vprofile_dummy, shade2_field_select, lat_exist2, lon_exist2, proj_data_dummy)
+        fld_shade2=array_shade2[0]
+      end if
     end if
   end if
 
@@ -897,26 +894,26 @@ begin
   delete(tmpfld)
 
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
+  
+  if ( .not. controlMinMax  .and. isvar("ccolors")) then
+    lcolors=str_split(ccolors," ")
+    vmin=tofloat(lcolors(0))
+    vmax=tofloat(lcolors(dimsizes(lcolors)-1 ))
+    vdelta=1. ; won't actually be used
+    controlMinMax=True    
+  end if
+  
   if ( controlMinMax ) then      
     power10=floattoint(log10(abs(vmax-vmin)))
-    if ismissing(power10) then
-      print("Field has only missing values" )
-      power10=1
-    else
-      if power10.ge.4 then
-        print("vmin")
-        print(vmin)
-        print("tofloat(vmin/10^power10)")
-        print(tofloat(vmin/10^power10))
-        vmin=tofloat(vmin/10^power10)
-        vmax=tofloat(vmax/10^power10)
-        vdelta=tofloat(vdelta/10^power10)
-      end if
+    if power10.ge.4 then
+      vmin=tofloat(vmin/10^power10)
+      vmax=tofloat(vmax/10^power10)
+      vdelta=tofloat(vdelta/10^power10)
     end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
     print(power10)
-    if ismissing(power10) then
+    if ismissing(power10) then 
       print("Field has only missing values" )
       power10=1
     end if
@@ -1227,15 +1224,16 @@ begin
       
     ; Levels
     res@cnFillOn=True 
-    if (controlMinMax) then 
-      res@cnLevelSelectionMode = "ManualLevels" 
-      res@cnMinLevelValF = vmin
-      res@cnMaxLevelValF = vmax
-      res@cnLevelSpacingF = vdelta
-    end if
-    if ( isvar("ccolors") ) then
+    if ( isvar("lcolors") ) then
       res@cnLevelSelectionMode = "ExplicitLevels"
-      res@cnLevels=tofloat(str_split(ccolors," "))
+      res@cnLevels=tofloat(lcolors)
+    else
+      if (controlMinMax) then 
+        res@cnLevelSelectionMode = "ManualLevels" 
+        res@cnMinLevelValF = vmin
+        res@cnMaxLevelValF = vmax
+        res@cnLevelSpacingF = vdelta
+      end if
     end if 
 
     res@cnLinesOn=False
@@ -1706,7 +1704,7 @@ begin
         if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
       end if
 
-      if isvar("shade2_options") .and. isvar("shade2_file") then
+      if isvar("fld_shade2") then
         res_shade2=True
         res_shade2@gsnFrame= False
         res_shade2@gsnDraw=False
@@ -1831,7 +1829,7 @@ begin
     overlay(plot0,plot1)   
   end if
 
-  if isvar("shade2_options") .and. isvar("shade2_file") then
+  if isvar("fld_shade2") then
     overlay(plot0,plot_shade2)
   end if
 
