@@ -1003,7 +1003,7 @@ def cMA(obj, deep=None):
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
-def cvalue(obj, index=0):
+def cvalue(obj, index=0,deep=False):
     """
     Return the value of the array for an object, after MV flattening, at a given index
 
@@ -1016,7 +1016,7 @@ def cvalue(obj, index=0):
 
     Does use the file representation of the object
     """
-    return cMA(obj).data.flat[index]
+    return cMA(obj,deep=deep).data.flat[index]
 
 
 def cexport(*args, **kwargs):
