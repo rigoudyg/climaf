@@ -800,9 +800,16 @@ def derive_variable(ds):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
     op, outname, inVarNames, params = operators.derived_variable(ds.variable, ds.project)
     inVars = []
+    first=True
     for varname in inVarNames:
         dic = copy.deepcopy(ds.kvp)
         dic['variable'] = varname
+        # If the dataset has a version attribute, it should be inherited only
+        # by the first input variable, an be set to "latest" for the next ones
+        # (it would be tricky to do something smarter TBD)
+        if not first and "version" in dic :
+            dic['version'] = "latest"
+        first=False
         inVars.append(classes.cdataset(**dic))
     params["add_variable"] = ds.variable
     # TODO: force the output variable to be well defined
