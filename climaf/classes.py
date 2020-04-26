@@ -533,17 +533,17 @@ class cdataset(cobject):
 
     def matches_conditions(self, conditions):
         """
-        Return True if, for all keys in dict condition, the kvp
-        value for same key is among condition's value (which can be a list)
+        Return True if, for all keys in dict conditions, the kvp
+        value of object for same key is among condition's values (which can be a list)
         Example :
           with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
-          will return True
+          the method will return True for both versions of that model
         """
         if conditions is None:
             return True
         for key in conditions:
             values = conditions[key]
-            if isinstance(values, list):
+            if not isinstance(values, list):
                 values = [values]
             if self.kvp[key] not in values:
                 return False
@@ -2243,7 +2243,7 @@ def attributeOf(cobject, attrib):
         return attributeOf(cobject.values()[0], attrib)
     elif getattr(cobject, attrib, None):
         value = getattr(cobject, attrib)
-        clogger.debug("Find value for object... %s" % value)
+        clogger.debug("Find value for object's %s... %s" % (attrib,value))
         return value
     elif isinstance(cobject, ctree):
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
