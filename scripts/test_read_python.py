@@ -71,7 +71,8 @@ def read_variable_from_netcdf(filename, variable, dimensions, time_dimension="ti
             else:
                 variable_dimensions_data.append(netcdf_fic.variables[dimension][:])
     if len(variable_dimensions_data) != len(dimensions):
-        raise ValueError("Some coordinates are not available in the file. You ask for %s and available dimensions are %s."
+        raise ValueError("Some coordinates are not available in the file. "
+                         "You ask for %s and available dimensions are %s."
                          % (str(list(variable_dataset.dimensions)), str(dimensions)))
     # Retrieve data
     variable_data = find_data_in_dataset(variable_dataset, dimensions)
@@ -82,7 +83,8 @@ def read_variable_from_netcdf(filename, variable, dimensions, time_dimension="ti
 
 
 # Read tas variable and dimensions (order given by the last result)
-tas_variable, tas_dimensions_data, tas_dimensions_label = read_variable_from_netcdf(filename, variable, dimensions, time_dimension)
+tas_variable, tas_dimensions_data, tas_dimensions_label = read_variable_from_netcdf(filename, variable, dimensions,
+                                                                                    time_dimension)
 
 # Determine the set of indexes
 time_dimension_index = tas_dimensions_label.index(time_dimension)

@@ -172,7 +172,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     # Create a temporary directory
     tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
     clogger.debug("Create temporary dir %s" % tmp)
-    original_directory=os.getcwd()
+    original_directory = os.getcwd()
     os.chdir(tmp)
 
     # Initialize cdo commands
@@ -256,10 +256,10 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     files_to_treat_before_merging = list()
     for a_file in input_files:
-        if a_file[0:2] == "./" :
+        if a_file[0:2] == "./":
             a_file = original_directory + a_file[1:]
-        if a_file[0]!="/" :
-            a_file = original_directory + "/" +  a_file
+        if a_file[0] != "/":
+            a_file = original_directory + "/" + a_file
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
             a_file = nemo_timefix(a_file, tmp)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):

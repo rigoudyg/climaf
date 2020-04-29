@@ -3,7 +3,8 @@
 # --------------------------------------------------------------------------------------------------
 # -- Interfacing the script with CliMAF: writing a command line taking arguments
 # -- The associated CliMAF operation is:
-#    cscript('ensemble_plot','python ensemble_plot.py --filenames="${mmin}" --outfig=${out} --labels=\'\"${labels}\"\' ', format='png')
+#    cscript('ensemble_plot','python ensemble_plot.py --filenames="${mmin}" --outfig=${out} '
+#                            '--labels=\'\"${labels}\"\' ', format='png')
 # -- Authors:
 # -    Jerome Servonnat - LSCE
 # -    Hugo Dayan - LSCE
@@ -23,9 +24,10 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 try:
-   from datetime import datetime
+    from datetime import datetime
 except:
-   import datetime
+    import datetime
+from datetime import timedelta
 import cftime
 import numpy as np
 from netCDF4 import Dataset, num2date
@@ -59,7 +61,9 @@ parser.add_argument('--variable', action='store', default=None, help='variable')
 parser.add_argument('--colors', action='store', default=None, help='colors separated by commas')
 parser.add_argument('--lw', action='store', default=None, help='lines thicknesses (commas separated)')
 parser.add_argument('--highlight_period', action='store', default=None,
-                    help='Highlight a period on a time series (thicker line) ; provide the periods yearstart_yearend separated by commas (Ex: 1980_2005,1990_2000 to highlight the first period on the first dataset, and the second period on the second dataset)')
+                    help='Highlight a period on a time series (thicker line) ; provide the periods yearstart_yearend '
+                         'separated by commas (Ex: 1980_2005,1990_2000 to highlight the first period on the first '
+                         'dataset, and the second period on the second dataset)')
 parser.add_argument('--highlight_period_lw', action='store', default=None, help='Thickness of the highlighted period')
 parser.add_argument('--min', action='store', default=None, help='minimum value')
 parser.add_argument('--max', action='store', default=None, help='maximum value')
@@ -74,7 +78,9 @@ parser.add_argument('--time_offset', action='store', default=None,
                     help='Add a time offset to the beginning of the time series')
 
 parser.add_argument('--text', action='store', default="",
-                    help='add some text in the plot; the user provides a triplet separared with commas x,y,text; separate the triplets with | if you want to provide multiple texts. Ex: x1,y1,text1|x2,y2,text2')
+                    help='add some text in the plot; the user provides a triplet separared with commas x,y,text; '
+                         'separate the triplets with | if you want to provide multiple texts. '
+                         'Ex: x1,y1,text1|x2,y2,text2')
 parser.add_argument('--text_fontsize', action='store', default="",
                     help='fontsize of the text (separate with commas if provide several')
 parser.add_argument('--text_colors', action='store', default="",
@@ -107,7 +113,9 @@ parser.add_argument('--legend_labels', action='store', default=None, help='Label
 parser.add_argument('--legend_xy_pos', action='store', default=None,
                     help='x,y Position of the corner of the box (by default = upper left corner). Example= "1.02,1"')
 parser.add_argument('--legend_loc', action='store', default=None,
-                    help='Choose the corner of the legend box to specify the position of the legend box; by default 2 (upper left corner), take values 1, 2, 3 or 4 (see resource loc of pyplot legend)')
+                    help='Choose the corner of the legend box to specify the position of the legend box; '
+                         'by default 2 (upper left corner), take values 1, 2, 3 or 4 '
+                         '(see resource loc of pyplot legend)')
 parser.add_argument('--legend_fontsize', action='store', default=None, help='Font size in the legend')
 parser.add_argument('--legend_ncol', action='store', default=None, help='Number of columns in the legend')
 parser.add_argument('--legend_frame', action='store', default="False",
@@ -263,17 +271,17 @@ for pathfilename in filenames_list:
     nctime = dat.variables[tname][:]
     t_unit = dat.variables[tname].units  # get unit  "days since 1950-01-01T00:00:00Z"
     if 'months' in t_unit:
-       if len(nctime) == 12:
-          x = np.array(range(1, 13))
-          datevar = []
-       else:
-          orig_date = str.split(str(t_unit), ' ')[2]
-          orig_year = int(str.split(orig_date, '-')[0])
-          orig_month = int(str.split(orig_date, '-')[1])
-          orig_day = int(str.split(orig_date, '-')[2][0:2])
-          tvalue = [datetime.datetime(orig_year, orig_month, orig_day) +
-                    datetime.timedelta(seconds=365.25 / 12 * 24.0 * 3600.0 * float(val)) for val in nctime]
-          x = np.array(tvalue)
+        if len(nctime) == 12:
+            x = np.array(range(1, 13))
+            datevar = []
+        else:
+            orig_date = str.split(str(t_unit), ' ')[2]
+            orig_year = int(str.split(orig_date, '-')[0])
+            orig_month = int(str.split(orig_date, '-')[1])
+            orig_day = int(str.split(orig_date, '-')[2][0:2])
+            tvalue = [datetime(orig_year, orig_month, orig_day) +
+                      timedelta(seconds=365.25 / 12 * 24.0 * 3600.0 * float(val)) for val in nctime]
+            x = np.array(tvalue)
     else:
         try:
             t_cal = dat.variables[tname].calendar
@@ -287,9 +295,8 @@ for pathfilename in filenames_list:
             print('elt = ', elt)
             print('dir(datetime) = ', dir(datetime))
             if not isinstance(elt, datetime):
-                if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or \
-                        isinstance(elt, netcdftime._netcdftime.Datetime360Day) or \
-                              isinstance(elt,cftime.DatetimeNoLeap):
+                if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
+                                    cftime.DatetimeNoLeap)):
                     strdate = str.split(elt.strftime(), ' ')[0]
                     year = int(str.split(strdate, '-')[0])
                     month = int(str.split(strdate, '-')[1])
@@ -300,7 +307,7 @@ for pathfilename in filenames_list:
                 # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
         # , calendar=u"gregorian")
         # -- Garde-fou calendar
-        # if not isinstance(cdftime.num2date(nctime)[0], datetime.datetime):
+        # if not isinstance(cdftime.num2date(nctime)[0], datetime):
         #   if isinstance(cdftime.num2date(nctime)[0], netcdftime._netcdftime.DatetimeNoLeap):
         #
         #   else:
@@ -391,16 +398,12 @@ if args.xlim:
                 sep_x = ('-' if '-' in x_text else '_')
                 split_x = str.split(xlim_date, sep_x)
                 if len(split_x) == 2:
-                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]))
                     x_date = datetime(int(split_x[0]), int(split_x[1]))
                 elif len(split_x) == 3:
-                    #x_date = datetime.datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
                     x_date = datetime(int(split_x[0]), int(split_x[1]), int(split_x[2]))
             elif len(x_text) == 6:
-                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), 15)
                 x_date = datetime(int(x_text[0:4]), int(x_text[4:6]), 15)
             elif len(x_text) == 8:
-                #x_date = datetime.datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
                 x_date = datetime(int(x_text[0:4]), int(x_text[4:6]), int(x_text[6:8]))
             else:
                 print('--> Date provided as x value could not be interpreted: ', xlim_date)

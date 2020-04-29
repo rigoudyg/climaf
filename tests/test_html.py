@@ -37,10 +37,12 @@ class HeaderTests(unittest.TestCase):
     <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
     <hr/> <!--- this draws a line --->
     """ + "\n"
-        cami_css_file = os.path.sep.join(os.path.abspath(climaf_based_file).split(os.path.sep)[:-1] + ["..", "climaf", "cami_style_css"])
+        cami_css_file = os.path.sep.join(os.path.abspath(climaf_based_file).split(os.path.sep)[:-1] +
+                                         ["..", "climaf", "cami_style_css"])
         with open(cami_css_file) as f:
             cami_css_style = f.read()
-        cesmep_css_file = os.path.sep.join(os.path.abspath(climaf_based_file).split(os.path.sep)[:-1] + ["..", "climaf", "cesmep_style_css"])
+        cesmep_css_file = os.path.sep.join(os.path.abspath(climaf_based_file).split(os.path.sep)[:-1] +
+                                           ["..", "climaf", "cesmep_style_css"])
         with open(cesmep_css_file) as f:
             cesmep_css_style = f.read()
         template = string.Template(template)
@@ -243,7 +245,8 @@ class CellTests(unittest.TestCase):
         self.assertEqual(cell(self.test_label, filename=self.test_filename),
                          self.test_template.safe_substitute(LINK=link(self.test_label, self.test_filename, None, True)))
         self.assertEqual(cell(self.test_label, filename=self.test_filename, altdir=self.test_altdir),
-                         self.test_template.safe_substitute(LINK=link(self.test_label, self.changed_filename, None, True)))
+                         self.test_template.safe_substitute(LINK=link(self.test_label, self.changed_filename, None,
+                                                                      True)))
 
     def test_cell_dirname_not_None_filename_None(self):
         self.assertEqual(cell(self.test_label, filename=None, dirname=self.test_dirname),
@@ -298,8 +301,9 @@ class CinstantiateTests(unittest.TestCase):
 class CompareCompanionTests(unittest.TestCase):
 
     def test_compareCompanion(self):
-        rep = ' <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js">'\
-              '</script>\n <script type="text/javascript" '\
+        rep = ' <script type="text/javascript" ' \
+              'src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js">' \
+              '</script>\n <script type="text/javascript" ' \
               'src="https://cdn.rawgit.com/PBrockmann/compareCompanion/master/compareCompanion.js"></script> \n'
         self.assertEqual(compareCompanion(), rep)
 

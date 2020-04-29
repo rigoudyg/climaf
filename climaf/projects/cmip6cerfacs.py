@@ -38,7 +38,8 @@ cdef('realization', 'r*i1p1f*', project='CMIP6CERFACS')
 cdef('grid', 'g*', project='CMIP6CERFACS')
 
 # -- Specify the pattern
-root1 = "/data/scratch/globc/dcom/CMIP6/${mip}/${institute}/${model}/${simulation}/${realization}/${table}/*/${grid}/latest/"
+root1 = "/data/scratch/globc/dcom/CMIP6/${mip}/${institute}/${model}/${simulation}/${realization}/${table}/*/${grid}/" \
+        "latest/"
 pathfiles1 = root1 + "${variable}_${table}_${model}_${simulation}_${realization}_${grid}_${PERIOD}.nc"
 
 # -- call the dataloc CliMAF function

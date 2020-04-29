@@ -37,7 +37,8 @@ fileNameLength = 60
 safe = False
 #: The length of subdir names when segmenting cache filenames
 directoryNameLength = 5
-#: Define whether we stamp the data files with their CRS. True means mandatory. None means : please try. False means : don't try
+#: Define whether we stamp the data files with their CRS.
+# True means mandatory. None means : please try. False means : don't try
 stamping = True
 #: The index associating filenames to CRS expressions
 crs2filename = dict()
@@ -203,14 +204,15 @@ def register(filename, crs, outfilename=None):
                 command = "ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
                           "Framework version %s (http://climaf.rtfd.org)\" %s" % (crs, version, filename)
             elif re.findall(".png$", filename):
-                crs2 = crs.replace("%", "\%")
-                command = "convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" \"CLImate Model Assessment Framework version " \
+                crs2 = crs.replace(r"%", r"\%")
+                command = "convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
+                          "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
                           (crs2, version, filename, filename, filename, filename)
             elif re.findall(".pdf$", filename):
                 tmpfile = str(uuid.uuid4())
-                command = "pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" >> %s " \
-                          "&& pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s" % \
+                command = "pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
+                          ">> %s && pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s" % \
                           (filename, tmpfile, crs, tmpfile, filename, tmpfile, filename, filename, filename, tmpfile)
             elif re.findall(".eps$", filename):
                 command = 'exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
@@ -224,7 +226,8 @@ def register(filename, crs, outfilename=None):
                     return True
                 elif stamping is True:
                     raise Climaf_Cache_Error("Cannot stamp by command None. "
-                                             "You may set climaf.cache.stamping to False or None - see doc\n%s" % command)
+                                             "You may set climaf.cache.stamping to False or None - see doc\n%s" %
+                                             command)
             else:
                 clogger.debug("trying stamping by %s" % command)
                 command_return = os.system(command)
@@ -275,8 +278,8 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
-        l = [c for c in crs2filename if crs2filename[c] == filename or crs2filename[c] == alternate_filename(filename)]
-        for c in l:
+        for c in [f for f in crs2filename if crs2filename[f] == filename or
+                                             crs2filename[f] == alternate_filename(filename)]:
             crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs)

@@ -29,7 +29,8 @@ class CprojectTests(unittest.TestCase):
                                             "my_other_arg"])
         self.assertDictEqual(a_project.facet_defaults, dict(my_arg="my_default"))
         self.assertEqual(a_project.separator, "-")
-        self.assertEqual(a_project.crs, "${project}-${simulation}-${variable}-${period}-${domain}-${my_arg}-${my_other_arg}")
+        self.assertEqual(a_project.crs,
+                         "${project}-${simulation}-${variable}-${period}-${domain}-${my_arg}-${my_other_arg}")
         self.assertEqual(a_project.attributes_for_ensemble,
                          ["simulation", "my_first_ensemble_arg", "my_other_ensemble_arg"])
         cproject("my_project", "my_other_arg", separator="-", sep=".")
@@ -41,16 +42,16 @@ class CprojectTests(unittest.TestCase):
         self.assertDictEqual(a_project.facet_defaults, dict())
         self.assertEqual(a_project.separator, ".")
         self.assertEqual(a_project.crs, "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
-        self.assertEqual(a_project.attributes_for_ensemble, ["simulation",])
+        self.assertEqual(a_project.attributes_for_ensemble, ["simulation", ])
         with self.assertRaises(Climaf_Classes_Error):
             cproject("my_project", "my_other_arg", sep=",")
         del cprojects["my_project"]
 
-
     def test_cproject_repr(self):
         cproject("my_project", "my_other_arg", sep=".")
         from climaf.classes import cprojects
-        self.assertEqual(repr(cprojects["my_project"]), "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
+        self.assertEqual(repr(cprojects["my_project"]),
+                         "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
 
     @unittest.skipUnless(False, "Test not yet written")
     def test_cproject_crs2ds(self):
@@ -241,11 +242,11 @@ class CdatasetTests(unittest.TestCase):
     def setUp(self):
         # TODO: Write the test
         if atCNRM:
-            self.root="/cnrm/cmip/cnrm/ESG"
+            self.root = "/cnrm/cmip/cnrm/ESG"
         else:
             self.root = ""
         self.my_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
-                                   simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989',
+                                   simulation='r2i3p9', domain=[40, 60, -10, 20], variable='tas', period='1980-1989',
                                    version='last')
         self.my_other_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical',
                                          frequency='annual_cycle', simulation='r2i3p9',
@@ -257,15 +258,17 @@ class CdatasetTests(unittest.TestCase):
         self.assertEqual(self.my_dataset.simulation, "r2i3p9")
         self.assertEqual(self.my_dataset.variable, "tas")
         self.assertEqual(self.my_dataset.period, init_period("1980-1989"))
-        self.assertEqual(self.my_dataset.domain, [40,60,-10,20])
+        self.assertEqual(self.my_dataset.domain, [40, 60, -10, 20])
         self.assertEqual(self.my_dataset.model, "CNRM-CM5")
         self.assertEqual(self.my_dataset.frequency, "monthly")
         self.assertDictEqual(self.my_dataset.kvp,
                              processDatasetArgs(project='CMIP5', model='CNRM-CM5', experiment='historical',
-                                                frequency='monthly', simulation='r2i3p9', domain=[40,60,-10,20],
+                                                frequency='monthly', simulation='r2i3p9', domain=[40, 60, -10, 20],
                                                 variable='tas', period='1980-1989', version='last'))
         self.assertFalse(self.my_dataset.alias)
-        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')")
+        self.assertEqual(self.my_dataset.crs,
+                         "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%/cnrm/cmip/cnrm/ESG%CNRM-CM5%*%historical%"
+                         "r1i1p1%monthly%*%last')")
         self.assertIsNone(self.my_dataset.files)
         self.assertIsNone(self.my_dataset.local_copies_of_remote_files)
         #
@@ -276,27 +279,40 @@ class CdatasetTests(unittest.TestCase):
         # Try to find a test for which there is a problem with alias and variables
         with self.assertRaises(Climaf_Classes_Error):
             cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='annual_cycle',
-                     simulation='r2i3p9', domain=[40,60,-10,20], variable='tas,tos', period='1980-1989', version='last')
+                     simulation='r2i3p9', domain=[40, 60, -10, 20], variable='tas,tos', period='1980-1989',
+                     version='last')
 
     def test_cdataset_setperiod(self):
         period_old = init_period("1980-1989")
         period_new = init_period("1980-1999")
         self.assertEqual(self.my_dataset.period, period_old)
         self.assertEqual(self.my_dataset.kvp["period"], period_old)
-        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
+        self.assertEqual(self.my_dataset.crs,
+                         "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*"
+                         "%last')".format(self.root))
         self.my_dataset.setperiod(period_new)
         self.assertEqual(self.my_dataset.period, period_new)
         self.assertEqual(self.my_dataset.kvp["period"], period_new)
-        self.assertEqual(self.my_dataset.crs, "ds('CMIP5%r2i3p9%tas%1980-1999%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
+        self.assertEqual(self.my_dataset.crs,
+                         "ds('CMIP5%r2i3p9%tas%1980-1999%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*"
+                         "%last')".format(self.root))
         self.my_dataset.setperiod(period_old)
 
     def test_cdataset_buildcrs(self):
-        self.assertEqual(self.my_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
-        self.assertEqual(self.my_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas%2000%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*%last')".format(self.root))
+        self.assertEqual(self.my_dataset.buildcrs(),
+                         "ds('CMIP5%r2i3p9%tas%1980-1989%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*"
+                         "%last')".format(self.root))
+        self.assertEqual(self.my_dataset.buildcrs(period=init_period("2000")),
+                         "ds('CMIP5%r2i3p9%tas%2000%[40, 60, -10, 20]%{}%CNRM-CM5%*%historical%r1i1p1%monthly%*"
+                         "%last')".format(self.root))
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_dataset.buildcrs(crsrewrite=None), "")
-        self.assertEqual(self.my_other_dataset.buildcrs(), "ds('CMIP5%r2i3p9%tas,tos%fx%global%{}%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')".format(self.root))
-        self.assertEqual(self.my_other_dataset.buildcrs(period=init_period("2000")), "ds('CMIP5%r2i3p9%tas,tos%2000%global%%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*%last')".format(self.root))
+        self.assertEqual(self.my_other_dataset.buildcrs(),
+                         "ds('CMIP5%r2i3p9%tas,tos%fx%global%{}%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*"
+                         "%last')".format(self.root))
+        self.assertEqual(self.my_other_dataset.buildcrs(period=init_period("2000")),
+                         "ds('CMIP5%r2i3p9%tas,tos%2000%global%%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*"
+                         "%last')".format(self.root))
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_other_dataset.buildcrs(crsrewrite=None), "")
 

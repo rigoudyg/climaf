@@ -374,8 +374,8 @@ class cscript():
                 if format in known_formats or format in graphic_formats or format in none_formats:
                     self.outputFormat = format
                 else:
-                    raise Climaf_Operator_Error(
-                        "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
+                    raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
+                                                ', '.join([repr(x) for x in graphic_formats]))
                 scripts[name] = self
 
                 # Init doc string for the operator

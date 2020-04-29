@@ -41,8 +41,8 @@ class SetNewUniqueCacheTests(unittest.TestCase):
 class GenerateUniqueFileNameTests(unittest.TestCase):
 
     def test_generateUniqueFileName(self):
-        my_crs="ds('CMIP6%%tas%0185-1900%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%" \
-               "latest')"
+        my_crs = "ds('CMIP6%%tas%0185-1900%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%" \
+                 "latest')"
         my_basedir = os.path.sep.join([tmp_directory,
                                        '7f'])
         self.assertEqual(generateUniqueFileName(my_crs),

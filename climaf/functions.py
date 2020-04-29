@@ -155,7 +155,7 @@ def fadd(dat1, dat2):
             res_dict = dict()
             for mem in dat1:
                 res_dict[mem] = plus(dat1[mem], dat2[mem])
-            return cens(res_dict, order = dat1.order)
+            return cens(res_dict, order=dat1.order)
         else:
             raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
                                        "Members of dat1 =%s ; Members of dat2 =%s\n"
@@ -190,7 +190,7 @@ def fsub(dat1, dat2):
             res_dict = dict()
             for mem in dat1:
                 res_dict[mem] = minus(dat1[mem], dat2[mem])
-            return cens(res_dict, order = dat1.order)
+            return cens(res_dict, order=dat1.order)
         else:
             raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
                                        "Members of dat1 =%s ; Members of dat2 =%s\n"

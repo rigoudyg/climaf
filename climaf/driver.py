@@ -155,7 +155,7 @@ def maketree(script_name, script, *operands, **parameters):
             rep.outputs[outname] = son
             setattr(rep, outname, son)
     # Check that time period of output makes sense
-    p=timePeriod(rep)
+    p = timePeriod(rep)
     #
     return rep
 
@@ -199,8 +199,8 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         recurse_list.append(cobject.crs)
         clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + repr(cobject.kvp))
         ds = cobject
-        cache_value=cache.hasExactObject(ds)
-        if cache_value is not None :
+        cache_value = cache.hasExactObject(ds)
+        if cache_value is not None:
             clogger.debug("Dataset %s exists in cache" % ds)
             cdedent()
             return cache_value
@@ -692,17 +692,17 @@ def timePeriod(cobject):
     if isinstance(cobject, classes.cdataset):
         return cobject.period
     elif isinstance(cobject, classes.ctree):
-        clogger.debug("timePeriod : processing %s,operands=%s"%(cobject.script,`cobject.operands`))
-        if cobject.script.flags.doCatTime and len(cobject.operands)>1:
-            clogger.debug("Building composite period for results of %s"%cobject.operator)
-            periods = [ timePeriod(op) for op in cobject.operands ]
+        clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
+        if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
+            clogger.debug("Building composite period for results of %s" % cobject.operator)
+            periods = [timePeriod(op) for op in cobject.operands]
             merged_period = merge_periods(periods)
-            if len(merged_period) > 1 :
-                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s"%\
-                                          (cobject.operator,merged_period))
+            if len(merged_period) > 1:
+                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s" %
+                                          (cobject.operator, merged_period))
             return merged_period[0]
         else: 
-            clogger.debug("timePeriod logic for script is 'choose 1st operand' "%cobject.script)
+            clogger.debug("timePeriod logic for script is 'choose 1st operand' " % cobject.script)
             return timePeriod(cobject.operands[0])
     elif isinstance(cobject, classes.scriptChild):
         clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
