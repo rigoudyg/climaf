@@ -118,7 +118,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
         cdef("frequency", "monthly")
         cdef("model", "CNRM-CM5")
         cdef("project", "CMIP5")
-        self.ds = ds(experiment="1pctCO2", variable="tas", period="1860-1861", version="latest")
+        self.ds = ds(experiment="1pctCO2", table='Amon', variable="tas", period="1860-1861", version="latest")
 
     def test_identifying_files(self):
         files = self.ds.baseFiles()
@@ -130,7 +130,8 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
 
     def test_selecting_files(self):
         my_file = cfile(self.ds)
-        expected = climaf.cache.currentCache + '/0edf6/7d617/2d79f/de87c/fd02e/c68ad/5e457/6421d/6ac8f/59811/11cee/3.nc'
+        #expected = climaf.cache.currentCache + '/0edf6/7d617/2d79f/de87c/fd02e/c68ad/5e457/6421d/6ac8f/59811/11cee/3.nc'
+        expected = climaf.cache.currentCache +'/fe/e23d2f2ebb886d6582e6e0f3e7b3867294a5237cc5b0d32b9c537c.nc'
         print("actual=" + my_file)
         print("expected=" + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')
@@ -155,7 +156,8 @@ class C_OCMIP5_CIclad(unittest.TestCase):
         self.file = mfile
 
     def test_selecting_CACO3_for_IPSL_CM4(self):
-        expected = climaf.cache.currentCache + '/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
+        #expected = climaf.cache.currentCache + '/53cf8/0439f/63e5f/d4f69/2c765/1fb84/cb015/b69de/04c95/0ae5a/e696d/d.nc'
+        expected = climaf.cache.currentCache + '/06/c691240148fd94dd8deadae3f137066ff700d14a8f410e64efc69b.nc'
         print(self.file)
         print(expected)
         self.assertEqual(self.file, expected, 'Issue')
