@@ -32,9 +32,9 @@ import cftime
 import numpy as np
 from netCDF4 import Dataset, num2date
 
-from env.site_settings import atCerfacs
+from env.site_settings import atCerfacs, onCiclad
 
-if atCerfacs:
+if atCerfacs or onCiclad:
     import netcdftime
 else:
     try:
