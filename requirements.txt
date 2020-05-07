@@ -1,9 +1,10 @@
 netcdf4
 numpy
 sphinx>=1.8.4,<2.0.0
-netcdftime
-netCDF4
-cftime
-matplotlib
-cartopy
-python-dateutil
+# netcdftime
+# netCDF4
+# cftime
+# matplotlib
+# Cython>0.15.1
+# cartopy==0.17
+# python-dateutil
