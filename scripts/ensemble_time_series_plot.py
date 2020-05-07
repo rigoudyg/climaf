@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
 from netCDF4 import Dataset, num2date
+import cftime
 from climaf.site_settings import atCerfacs, onCiclad
 if atCerfacs or onCiclad:
     import netcdftime
@@ -255,9 +256,8 @@ for pathfilename in filenames_list:
       datevar = []
       for elt in tvalue:
           print 'elt = ',elt
-          print 'dir(datetime) = ',dir(datetime)
           if not isinstance(elt, datetime.datetime):
-             if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or isinstance(elt, netcdftime._netcdftime.Datetime360Day):
+             if isinstance(elt, netcdftime._netcdftime.DatetimeNoLeap) or isinstance(elt, netcdftime._netcdftime.Datetime360Day) or isinstance(elt, cftime.DatetimeNoLeap):
                 strdate = str.split(elt.strftime(),' ')[0]
                 year  = int( str.split(strdate,'-')[0] )
                 month = int( str.split(strdate,'-')[1] )
