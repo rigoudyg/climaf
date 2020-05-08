@@ -8,10 +8,10 @@ Changes, newest first:
 
 - V1.2.13:
 
-  - Change in CliMAf structure, creation of directory env which
+  - Change in CliMAF code structure: creation of directory env which
     contains site_settings.py (former climaf/site_settings.py) and clogging.py
-    (former climaf.clogging.py). This allows the use of the logger and the environement variables
-     which are used to determine on which server CliMAF runs in scripts.
+    (former climaf/clogging.py). This allows the use of the logger and the environement 
+    variables which are used to determine on which server CliMAF runs in scripts.
 
   - Rewrite mcdo.sh into mcdo.py to allow more flexibility and imrove ccdo calls.
 
@@ -49,7 +49,7 @@ Changes, newest first:
   - :py:func:`~climaf.classes.calias` has new arg ``conditions`` which allows
     to restrict its effect, based on the value of some facets, through a
     dictionary of criteria. Example, for a given model which CMIP6 data has
-    an error for variable ``evspsbl``   on some data versions :
+    an error for variable ``evspsbl`` on some data versions :
 
     >>> calias('CMIP6,'evspsbl,scale=_1,conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] })
 
@@ -81,6 +81,10 @@ Changes, newest first:
     root location for that data; so, user can define facet 'root' later on, to match
     their data architecture, without hacking the distributed code
 
+  - CliMAF startup can be quicker if you don't need that it checks all external
+    tools it uses; this is activated by setting enviornment variable
+    CLIMAF_CHECK_DEPENDENCIES to 'no' or '0'
+    
   - Variable climaf.cache.stamping can be set to None, which means :
     put a stamp if possible, but don't bother if impossible. Reminder
     : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
