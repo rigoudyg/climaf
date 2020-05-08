@@ -1829,7 +1829,7 @@ begin
     overlay(plot0,plot1)   
   end if
 
-  if isvar("fld_shade2") then
+  if isvar("fld_shade2") .and. (min(fld_shade2).ne.max(fld_shade2)) then
     overlay(plot0,plot_shade2)
   end if
 
