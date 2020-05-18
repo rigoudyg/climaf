@@ -587,7 +587,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
     if cache.hasExactObject(scriptCall.operands[0]) :
-        for key in ["period","period_iso","var","domain","missing","alias","units"] :
+        # for key in ["period","period_iso","var","domain","missing","alias","units"]:
+        for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
             if key in subdict :
                 subdict.pop(key)
     #
