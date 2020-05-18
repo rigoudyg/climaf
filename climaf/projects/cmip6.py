@@ -43,7 +43,7 @@ if True:
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
     cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment',
-             'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
+             'realization', 'grid', 'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
 
     for project in ['CMIP6', 'CMIP6_extent']:
         # --> systematic arguments = simulation, frequency, variable
@@ -71,6 +71,7 @@ if True:
         calias(project, 'O2', 'o2')
 
     cdef('extent_experiment', 'ssp585', project='CMIP6_extent')
+    cdef('extent_version', 'latest',    project='CMIP6_extent')
 
     # -------------
     # -- Define the patterns
@@ -79,7 +80,7 @@ if True:
     patterns1 = [base_pattern1 + "_${PERIOD}" + ".nc", base_pattern1 + ".nc"]
 
     base_pattern2 = "${root}/CMIP6/${mip}/${institute}/${model}/${extent_experiment}/${realization}/${table}/" \
-                    "${variable}/${grid}/${version}/" \
+                    "${variable}/${grid}/${extent_version}/" \
                     "${variable}_${table}_${model}_${extent_experiment}_${realization}_${grid}"
     patterns2 = [base_pattern2 + "_${PERIOD}" + ".nc", ]
 
