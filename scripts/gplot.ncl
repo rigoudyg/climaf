@@ -900,10 +900,10 @@ begin
     vmin=tofloat(lcolors(0))
     vmax=tofloat(lcolors(dimsizes(lcolors)-1 ))
     vdelta=1. ; won't actually be used
-    controlMinMax=True    
+    controlMinMax=True
   end if
   
-  if ( controlMinMax ) then      
+  if ( controlMinMax ) then
     power10=floattoint(log10(abs(vmax-vmin)))
     if power10.ge.4 then
       vmin=tofloat(vmin/10^power10)

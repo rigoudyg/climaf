@@ -13,7 +13,7 @@ from tests.tools_for_tests import remove_dir_and_content, compare_picture_files,
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
 from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
-    cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo
+    cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
 
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)
@@ -560,6 +560,7 @@ class DataPlot(unittest.TestCase):
         curve_ref = os.sep.join([self.reference_directory, "test_2.png"])
         compare_picture_files(curve, curve_ref)
 
+
     @unittest.expectedFailure
     def test_data_plot_3(self):
         """
@@ -610,6 +611,17 @@ class DataPlot(unittest.TestCase):
                              background='yellow')
         ref_pdfpage2 = os.sep.join([self.reference_directory, "test3.2.pdf"])
         compare_picture_files(pdfpage2, ref_pdfpage2)
+
+    def test_data_plot_4(self):
+        my_ds = fds(os.sep.join(cpath + ["..", "tests", "test_data",
+                                         "cdnc_AERmon_CNRM-CM6-1_piControl_r1i1p1f2_1850.nc"]),
+                    variable="cdnc", period="1850")
+        my_plot_1 = plot(my_ds)
+        ref_my_plot_1 = os.sep.join([self.reference_directory, "test4.1.png"])
+        compare_picture_files(my_plot_1, ref_my_plot_1)
+        my_plot_2 = plot(my_ds, min=100000000., max=2000000000., delta=10000000.)
+        ref_my_plot_2 = os.sep.join([self.reference_directory, "test4.2.png"])
+        compare_picture_files(my_plot_2, ref_my_plot_2)
 
 
 if __name__ == '__main__':
