@@ -207,7 +207,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         if ds.isLocal() or ds.isCached():
             clogger.debug("Dataset %s is local or cached " % ds)
             #  if the data is local, then
-            #   if the user can select the data and aggregate time, and requested format is
+            #   if the caller operator can select the data and aggregate time, and requested format is
             #     'file' return the filenames
             #   else : read the data, create a cache file for that, and recurse
             #
@@ -473,6 +473,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
+        subdict["Var"] = classes.varOf(op)
         if isinstance(op, classes.cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
             if op.matches_conditions(conditions):
@@ -499,6 +500,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict["domain"] = classes.domainOf(op)
     else:
         subdict["var"] = classes.varOf(scriptCall)
+        subdict["Var"] = classes.varOf(scriptCall)
     i = 0
     for op in scriptCall.operands:
         if op:
@@ -581,6 +583,13 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
+    #
+    # Discard selection parameters if selection already occurred for first operand
+    # TBD : manage the cases where other operands didn't undergo selection
+    if cache.hasExactObject(scriptCall.operands[0]) :
+        for key in ["period","period_iso","var","domain","missing","alias","units"] :
+            if key in subdict :
+                subdict.pop(key)
     #
     # print("subdict="+`subdict`)
     # Combine CRS and possibly member_label to provide/complement title
@@ -800,9 +809,16 @@ def derive_variable(ds):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
     op, outname, inVarNames, params = operators.derived_variable(ds.variable, ds.project)
     inVars = []
+    first=True
     for varname in inVarNames:
         dic = copy.deepcopy(ds.kvp)
         dic['variable'] = varname
+        # If the dataset has a version attribute, it should be inherited only
+        # by the first input variable, an be set to "latest" for the next ones
+        # (it would be tricky to do something smarter TBD)
+        if not first and "version" in dic :
+            dic['version'] = "latest"
+        first=False
         inVars.append(classes.cdataset(**dic))
     params["add_variable"] = ds.variable
     # TODO: force the output variable to be well defined
