@@ -11,7 +11,7 @@ import os
 
 # Created : S.Sénési - 2014
 
-__all__ = ["site_settings", "cache", "classes", "clogging", "dataloc", "driver", "netcdfbasics",
+__all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
@@ -52,8 +52,8 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
-    import clogging
-    import site_settings
+    import env.clogging as clogging
+    import env.site_settings as site_settings
     import cache
     import standard_operators
     import cmacro
@@ -132,7 +132,7 @@ if not already_inited and not onrtd:
     #
     # Check that the variable TMPDIR, if defined, points to an existing directory
     if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
-        #raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
+        # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
         os.makedirs(os.environ["TMPDIR"])
 
     logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))

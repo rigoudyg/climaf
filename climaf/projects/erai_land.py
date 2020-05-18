@@ -25,7 +25,7 @@ Example of an 'erai_land' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     cproject('erai-land', 'grid')  # no grid writes as '_' , otherwise as e.g. 'T127'

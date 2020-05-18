@@ -17,10 +17,10 @@ import time
 import glob
 import shutil
 import six
+import copy
 
-from climaf.site_settings import onCiclad
-from climaf.anynetcdf import ncf
-from climaf.clogging import clogger, clog
+from env.site_settings import onCiclad
+from env.clogging import clogger, clog
 
 
 def correct_args_type(value):
@@ -172,11 +172,12 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     # Create a temporary directory
     tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
     clogger.debug("Create temporary dir %s" % tmp)
-    original_directory=os.getcwd()
+    original_directory = os.getcwd()
     os.chdir(tmp)
 
     # Initialize cdo commands
     cdo_commands_before_merge = list()
+    cdo_command_for_merge = None
     cdo_commands_after_merge = list()
 
     # Find out which command must be used for cdo
@@ -228,7 +229,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # Then, deal with merge time
     if len(input_files) > 1:
-        cdo_commands_after_merge.append("-mergetime")
+        cdo_command_for_merge = "-mergetime"
 
     # Then deal with date selection
     clogger.debug("Period considered: %s" % period)
@@ -255,10 +256,10 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     files_to_treat_before_merging = list()
     for a_file in input_files:
-        if a_file[0:2] == "./" :
+        if a_file[0:2] == "./":
             a_file = original_directory + a_file[1:]
-        if a_file[0]!="/" :
-            a_file = original_directory + "/" +  a_file
+        if a_file[0] != "/":
+            a_file = original_directory + "/" + a_file
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
             a_file = nemo_timefix(a_file, tmp)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
@@ -284,7 +285,12 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             else:
                 clogger.error("Should not pass here...")
                 raise Exception("Should not pass here...")
-
+        if cdo_command_for_merge is not None:
+            tmp_output_file = os.sep.join([tmp, os.path.basename(output_file)])
+            cdo_command = " ".join([init_cdo_command, cdo_command_for_merge] + files_to_treat_after_merging +
+                                   [tmp_output_file, ])
+            call_subprocess(cdo_command)
+            files_to_treat_after_merging = [tmp_output_file, ]
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                files_to_treat_after_merging + [output_file, ])
         call_subprocess(cdo_command)

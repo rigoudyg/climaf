@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -327,7 +327,8 @@ class MergePeriodsTests(unittest.TestCase):
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
         my_period_4 = cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))
         unordered_list = [my_period_1, my_period_4, my_period_3, my_period_2]
-        result_list = [cperiod(datetime(1740, 5, 6), datetime(1950, 3, 4)), cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))]
+        result_list = [cperiod(datetime(1740, 5, 6), datetime(1950, 3, 4)),
+                       cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))]
         self.assertEqual(merge_periods(unordered_list), result_list)
 
 
@@ -376,7 +377,7 @@ class FirstYearsTest(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_last_years(self):
-        my_period = cperiod(datetime(1850, 6, 23), datetime(1859,1,1))
+        my_period = cperiod(datetime(1850, 6, 23), datetime(1859, 1, 1))
         self.assertEqual(firstyears(my_period, 1), repr(init_period("18500623-18510622")))
         self.assertEqual(firstyears(my_period, 15), repr(my_period))
 

@@ -46,8 +46,6 @@ Changes, newest first:
       : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
       the Climaf Reference Synatx description of the data
 
-    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
-
   - Graphics:
     
     - operator `curves` also uses dash patterns when showing more than 10 curves
@@ -109,6 +107,18 @@ Changes, newest first:
     - Remove a constraining, buggy check on ensemble members order
 
   - Change log level of message about how DJF clim works
+  
+  - Structure:
+    - Change in CliMAf structure, creation of directory env which
+    contains site_settings.py (former climaf/site_settings.py) and clogging.py
+    (former climaf.clogging.py). This allows the use of the logger and the environement variables
+     which are used to determine on which server CliMAF runs in scripts.
+
+    - Rewrite mcdo.sh into mcdo.py to allow more flexibility and improve ccdo calls.
+
+  - Fixes:
+
+    - Bugfix for cache searching of a subperiod of a derived variable already in the cache.
 
 
 - V1.2.12:
@@ -141,8 +151,6 @@ Changes, newest first:
     scaling field s order  of magnitude; and it won't plot a small empty square at
     the bottom right corner
 
-- Vnext:
-
   - Add function :py:func:`~climaf.classes.cvalid` for declaring a
     list of allowed values for project facets/keywords. This allows to better
     constrain the identification of files for a dataset, as e.g. for CMIP6
@@ -153,7 +161,7 @@ Changes, newest first:
     root location for that data; so, user can define facet 'root' later on, to match
     their data architecture, without hacking the distributed code
 
-  - Variable climaf.cache.stamping can be set to Noen, which means :
+  - Variable climaf.cache.stamping can be set to None, which means :
     put a stamp if possible, but don't botehr if impossible. Reminder
     : the stamp is a NetCDF (or PNG, or PDF) metadata which includes
     the Climaf Reference Synatx description of the data

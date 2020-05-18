@@ -3,7 +3,7 @@
 # -- Import the dictionnaries of plot params:
 from __future__ import print_function
 
-from climaf.site_settings import *
+from env.site_settings import *
 
 # --> Import the default CliMAF sets of plot params
 # --> for atmosphere

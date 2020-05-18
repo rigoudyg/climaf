@@ -15,5 +15,5 @@ from climaf.api import derive, calias
 
 
 derive('*', 'dtr', 'minus', 'tasmax', 'tasmin')
-
+derive('IGCM_OUT', 'pme', 'minus', 'precip', 'evap')
 calias('CMIP6', 'wfo', 'wfonocorr')

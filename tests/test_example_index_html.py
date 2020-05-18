@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -72,8 +72,7 @@ class HtmlIndexCreation(unittest.TestCase):
         # several cells with the same structure. We also illustrate here various ways
         # to control the size of a thumbnail (fixed) image, and of the image which shows
         # when the mouse passes over the link label or thumbnail
-        index += open_line('Surface temperature') + \
-                 cell('DJF', my_slice('tas', 'DJF'), thumbnail=60) + \
+        index += open_line('Surface temperature') + cell('DJF', my_slice('tas', 'DJF'), thumbnail=60) + \
                  cell('MAM', my_slice('tas', 'MAM'), thumbnail="60*60", hover=True) + \
                  cell('JJA', my_slice('tas', 'JJA'), thumbnail="60x60", hover="200x200") + \
                  close_line()

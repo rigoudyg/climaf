@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from climaf.clogging import clogger
+from env.clogging import clogger
 
 try:
     from Scientific.IO.NetCDF import NetCDFFile as ncf

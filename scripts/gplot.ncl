@@ -519,8 +519,8 @@ begin
       if (ystyle .eq. "log") then useXY=False end if
    
       ; get latitude and/or longitude name
-      latnames=(/"lat", "LAT", "latitude", "nav_lat"/)     ; dimnames(0,:)
-      lonnames=(/"lon", "LON", "longitude", "nav_lon"/)    ; dimnames(1,:)
+      latnames=(/"lat", "LAT", "latitude", "nav_lat", "nav_lat_grid_M", "nav_lat_grid_U", "nav_lat_grid_V"/)     ; dimnames(0,:)
+      lonnames=(/"lon", "LON", "longitude", "nav_lon", "nav_lon_grid_M", "nav_lon_grid_U", "nav_lon_grid_V"/)    ; dimnames(1,:)
       dimnames=(/latnames, lonnames/)
 
       do k=0,1 
@@ -904,6 +904,10 @@ begin
       power10=1
     else
       if power10.ge.4 then
+        print("vmin")
+        print(vmin)
+        print("tofloat(vmin/10^power10)")
+        print(tofloat(vmin/10^power10))
         vmin=tofloat(vmin/10^power10)
         vmax=tofloat(vmax/10^power10)
         vdelta=tofloat(vdelta/10^power10)

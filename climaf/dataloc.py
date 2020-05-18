@@ -22,7 +22,7 @@ from string import Template
 import classes
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from operator import itemgetter
 import ftplib as ftp
 import getpass
@@ -178,7 +178,7 @@ class dataloc():
         #
         self.urls = alt2
         # Register new dataloc only if not already registered
-        if not (any([l == self for l in locs])):
+        if not (any([loc == self for loc in locs])):
             locs.append(self)
 
     def __eq__(self, other):
@@ -245,8 +245,8 @@ def isLocal(project, model, simulation, frequency):
         return False
     rep = True
     for org, freq, llocs in ofu:
-        for l in llocs:
-            if re.findall(".*:.*", l):
+        for loc in llocs:
+            if re.findall(".*:.*", loc):
                 rep = False
     return rep
 
@@ -607,7 +607,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         #
         # Construct regexp for extracting dates from filename
         date_regexp = None
-        template_toreg = template.replace("*", ".*").replace("?", r".").replace("+", "\+")
+        template_toreg = template.replace("*", ".*").replace("?", r".").replace(r"+", r"\+")
         # print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords:
             # print "searchin "+key+" in "+template

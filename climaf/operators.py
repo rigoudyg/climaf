@@ -15,7 +15,7 @@ import re
 import sys
 import subprocess
 import driver
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
@@ -377,8 +377,8 @@ class cscript():
                 if format in known_formats or format in graphic_formats or format in none_formats:
                     self.outputFormat = format
                 else:
-                    raise Climaf_Operator_Error(
-                        "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
+                    raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
+                                                ', '.join([repr(x) for x in graphic_formats]))
                 scripts[name] = self
 
                 # Init doc string for the operator
