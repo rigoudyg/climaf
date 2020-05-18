@@ -62,9 +62,9 @@ def plot_params(variable, context, custom_plot_params=None):
 
     >>> var = 'pr'
     >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))
-    # here, the annual mean climatology of a CMIP5 dataset for variable var
+    >>> # here, the annual mean climatology of a CMIP5 dataset for variable var
     >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...))
-    # the annual mean climatology of a reference dataset for variable var
+    >>> # the annual mean climatology of a reference dataset for variable var
 
     >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
     >>> niceplot_params=plot_params(var,'full_field')
