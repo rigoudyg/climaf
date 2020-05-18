@@ -311,7 +311,7 @@ class CdatasetTests(unittest.TestCase):
                          "ds('CMIP5%r2i3p9%tas,tos%fx%global%{}%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*"
                          "%last')".format(self.root))
         self.assertEqual(self.my_other_dataset.buildcrs(period=init_period("2000")),
-                         "ds('CMIP5%r2i3p9%tas,tos%2000%global%%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*"
+                         "ds('CMIP5%r2i3p9%tas,tos%2000%global%{}%CNRM-CM5%*%historical%r1i1p1%annual_cycle%*"
                          "%last')".format(self.root))
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_other_dataset.buildcrs(crsrewrite=None), "")
