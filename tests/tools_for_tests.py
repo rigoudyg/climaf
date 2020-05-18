@@ -76,7 +76,7 @@ def compare_netcdf_files(file_test, file_ref, display=False):
         raise ValueError("Files' content are different.")
 
 
-def compare_picture_files(object_test, fic_ref, display=True):
+def compare_picture_files(object_test, fic_ref, display=False, display_error=True):
     # TODO: Check the metadata of the files
     # Transform the strings in list of strings
     fic_test = cfile(object_test)
@@ -107,7 +107,7 @@ def compare_picture_files(object_test, fic_ref, display=True):
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
                               shell=True)
         if rep != 0:
-            if display:
+            if display_error:
                 subprocess.check_call(display_cmd.format(diff_file), shell=True)
             os.remove(diff_file)
             raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))

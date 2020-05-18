@@ -544,7 +544,7 @@ class cdataset(cobject):
         for key in conditions:
             values = conditions[key]
             if not isinstance(values, list):
-                values = [values]
+                values = [values, ]
             if self.kvp[key] not in values:
                 return False
         return True

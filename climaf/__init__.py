@@ -103,9 +103,9 @@ if not already_inited and not onrtd:
                 print("ncdump " + binary_info + " => " + my_which('ncdump'))
         except:
             print("Warning: ncdump not found -> can't use ncdump from CliMAF")
-            # Check that tools for stamping are available or enforce stamping to None
-            print("Check stamping requirements")
-            do_stamping = True
+        # Check that tools for stamping are available or enforce stamping to None
+        print("Check stamping requirements")
+        do_stamping = True
         try:
             print("nco (ncatted) found -> " + my_which("ncatted"))
         except:
