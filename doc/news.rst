@@ -9,6 +9,7 @@ Changes, newest first:
 - V1.2.13:
 
   - Structure:
+
     - Change in CliMAf structure, creation of directory env which
       contains site_settings.py (former climaf/site_settings.py) and clogging.py
       (former climaf.clogging.py). This allows the use of the logger and the environement variables
