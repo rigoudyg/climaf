@@ -1354,7 +1354,7 @@ begin
       res@mpFillColors = (/-1,-1,-1,-1/)
       res@mpPerimOn = False
       res@mpGeophysicalLineThicknessF = 2
-      res@mpFillon=False
+      res@mpFillOn=False
       res@mpFillDrawOrder="PostDraw"
       if (focus .eq. "land")  then 
         print("Greying out oceans")
