@@ -1297,6 +1297,7 @@ begin
       res2@cnLineLabelsOn = False
       res2@cnLineLabelBackgroundColor = -1
       res2@cnInfoLabelString = ""
+      res2@cnInfoLabelOn = False
     
       res2@cnLinesOn=True
       if ( isvar("shade_below") .or. isvar("shade_above") ) then
@@ -1353,7 +1354,7 @@ begin
       res@mpFillColors = (/-1,-1,-1,-1/)
       res@mpPerimOn = False
       res@mpGeophysicalLineThicknessF = 2
-      res@mpFillOn=False
+      res@mpFillon=False
       res@mpFillDrawOrder="PostDraw"
       if (focus .eq. "land")  then 
         print("Greying out oceans")
@@ -1718,6 +1719,7 @@ begin
         res_shade2@cnLineLabelsOn = False
         res_shade2@cnLineLabelBackgroundColor = -1
         res_shade2@cnInfoLabelString = ""
+        res_shade2@cnInfoLabelOn = False
 
         res_shade2@cnLinesOn=False
         ;res_shade2@gsnContourNegLineDashPattern = 1
