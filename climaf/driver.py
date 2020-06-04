@@ -469,7 +469,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         infile = invalues[0]
         if (scriptCall.operator != 'remote_select') and \
                 not all(map(os.path.exists, infile.split(" "))):
-            raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:" % infile)
+            raise Climaf_Driver_Error("Internal error : for script %s and 1st operand %s, some input file does not exist among %s:" % \
+                                      (scriptCall.operator,op,infile))
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
@@ -945,6 +946,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
         return result
     else:
         target = os.path.abspath(os.path.expanduser(target))
+        target_dir = os.path.dirname(target)
         if isinstance(object, climaf.classes.cens):
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is not None:
@@ -958,7 +960,6 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                             shutil.move(result, target)
                             os.symlink(target, result)
                     else:
-                        target_dir = os.path.dirname(target)
                         if not os.path.exists(target_dir):
                             os.makedirs(target_dir)
                         shutil.move(result, target)
@@ -979,6 +980,8 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                             os.remove(target)
                         os.link(source, target)
             else:
+                if not os.path.exists(target_dir):
+                            os.makedirs(target_dir)
                 shutil.copyfile(result, target)
         return target
 
