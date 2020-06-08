@@ -1,14 +1,35 @@
-{ "creators": [
-        { "name": "Sénési, Stéphane", },
-        { "name": "Servonnat, Jérôme", },
-        { "name": "Rigoudy, Gaëlle", },
-        { "name": "Vignon, Ludivine", },
-
+{
+    "creators": [
+	{
+	    "name": "Sénési, Stéphane"
+	},
+	{
+	    "name": "Servonnat, Jérôme"
+	},
+	{
+	    "name": "Rigoudy, Gaëlle"
+	},
+	{
+	    "name": "Vignon, Ludivine"
+	}
     ],
-
+    
     "description": "CliMAF allows to build python-scripted workflows for accessing Climate Model outputs, gluing external utilities (such as CDO) for computation, caching intermediate results, creating Ncl based figures and assembling them in html pages.",
-    "license": {
-        "id": "CeCILL-C"
-    },
-    "title": "CliMAF, a Climate Model Assessment Framework"
+    
+    "license": { "id": "CeCILL-C" },
+    
+    "title": "CliMAF, a Climate Model Assessment Framework",
+
+    "keywords": [
+        "Earth sciences",
+	"python",
+	"worflow",
+	"NetCDF",
+        "climate",
+	"CF",
+	"CDO",
+	"Earth System Model",
+	"climate change"
+	]
+    
 }
