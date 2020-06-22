@@ -905,7 +905,7 @@ begin
   
   if ( controlMinMax ) then
     power10=floattoint(log10(abs(vmax-vmin)))
-    if power10.ge.4 then
+    if (power10 .ge. 4) then
       vmin=tofloat(vmin/10^power10)
       vmax=tofloat(vmax/10^power10)
       vdelta=tofloat(vdelta/10^power10)
@@ -919,7 +919,7 @@ begin
     end if
   end if
 
-  if power10.ge.4 then
+  if (power10 .ge. 4) then
     fld=fld/10^power10
   end if
 
