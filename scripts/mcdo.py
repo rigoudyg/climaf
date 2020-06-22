@@ -42,6 +42,13 @@ def correct_list_args(value):
         return [v.strip() for v in value.split(",")]
 
 
+def print_in_file(*args, **kwargs):
+    output_file = kwargs.get("output_file", None)
+    if output_file is not None:
+        with open(output_file, "a") as output_fic:
+            output_fic.write(" ".join(args) + "\n")
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("input_files", nargs=argparse.REMAINDER, type=correct_args_type)
@@ -57,6 +64,7 @@ def parse_args():
     parser.add_argument("--alias", type=correct_list_args, help="Alias to be used")
     parser.add_argument("--units", type=correct_args_type, help="Units of the variable")
     parser.add_argument("--vm", type=correct_args_type, help="")
+    parser.add_argument("--test", help="Test the script, provide output file")
 
     args = parser.parse_args()
     return dict(input_files=args.input_files, operator=args.operator, output_file=args.output_file,
@@ -85,14 +93,16 @@ def clim_timefix(file_to_treat):
         return None
 
 
-def nemo_timefix(file_to_treat, tmp_dir):
+def nemo_timefix(file_to_treat, tmp_dir, test=None):
     # Rename alternate time_counter variables to 'time_counter' for some kind
     # of Nemo outputs  (Nemo 3.2 had a bug when using IOIPSL ...)
     # Echoes the name of a file with renamed variable (be it a modified file or a copy)
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
     nemo_fix_match = nemo_fix_pattern.match(file_to_treat)
     if nemo_fix_match:
-        rep = subprocess.check_output(["ncdump", "-h", file_to_treat])
+        current_command = " ".join(["ncdump", "-h", file_to_treat])
+        print_in_file(current_command, output_file=test)
+        rep = subprocess.check_output(current_command, shell=True)
         rep = rep.split("\n")
         if any([nemo_coordinates_pattern.match(line) for line in rep]):
             if nemo_fix_pattern_mon.match(file_to_treat):
@@ -106,23 +116,33 @@ def nemo_timefix(file_to_treat, tmp_dir):
             out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
             if os.path.isfile(out):
                 os.remove(out)
-            if subprocess.check_output(["ncdump", "-k", file_to_treat]) == "classic":
+                print_in_file("rm -f {}".format(out), output_file=test)
+            current_command = " ".join(["ncdump", "-k", file_to_treat])
+            print_in_file(current_command, output_file=test)
+            if subprocess.check_output(current_command, shell=True) == "classic":
                 temp = file_to_treat
             else:
                 temp = out
-                subprocess.check_output(["ncks", "-3", file_to_treat, temp])
-            subprocess.check_output(["ncrename", "-d", ".{},time_counter".format(var2rename),
-                                     "-v {},time_counter".format(var2rename), temp, out])
+                current_command = ["ncks", "-3", file_to_treat, temp]
+                print_in_file(current_command, output_file=test)
+                subprocess.check_output(current_command, shell=True)
+            current_command = ["ncrename", "-d", ".{},time_counter".format(var2rename),
+                               "-v {},time_counter".format(var2rename), temp, out]
+            print_in_file(current_command, output_file=test)
+            subprocess.check_output(current_command, shell=True)
             for lvar in vars2d:
-                subprocess.check_output(["ncatted", "-a", "coordinates,{},m,c,nav_lat nav_lon".format(lvar), out])
+                current_command = ["ncatted", "-a", "coordinates,{},m,c,nav_lat nav_lon".format(lvar), out]
+                print_in_file(current_command, output_file=test)
+                subprocess.check_output(current_command, shell=True)
             for lvar in vars3d:
-                subprocess.check_output(["ncatted", "-a", "coordinates,{},m,c,depth nav_lat nav_lon".format(lvar), out])
-
+                current_command = ["ncatted", "-a", "coordinates,{},m,c,depth nav_lat nav_lon".format(lvar), out]
+                print_in_file(current_command, output_file=test)
+                subprocess.check_output(current_command, shell=True)
     else:
         return file_to_treat
 
 
-def aladin_coordfix(file_to_treat, tmp_dir, filevar):
+def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     # Rename attribute 'coordinates' of file variable $filevar to 'latitude longitude'
     # for some kind of ALADIN outputs which have 'lat lon' (or 'lon lat') for attribute 'coordinates'
     # of file variable (particularly for outputs created with post-treatment tool called 'postald')
@@ -130,16 +150,24 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar):
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
     if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not(re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
                                                               not(re.compile(r".*MED-11.*.nc").match(file_to_treat))):
-        rep = subprocess.check_output(["ncdump", "-h", file_to_treat])
+        current_command = ["ncdump", "-h", file_to_treat]
+        print_in_file(current_command, output_file=test)
+        rep = subprocess.check_output(current_command, shell=True)
         rep = rep.split("\n")
         if any([aladin_coordinates_pattern.match(line) for line in rep]):
             out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
             if os.path.isfile(out):
                 os.remove(out)
-            subprocess.check_output(["ncks", "-3", file_to_treat, out])
-            subprocess.check_output(["ncatted", "-a coordinates,{},o,c,'latitude longitude'".format(filevar), out])
+            current_command = ["ncks", "-3", file_to_treat, out]
+            print_in_file(current_command, output_file=test)
+            subprocess.check_output(current_command, shell=True)
+            current_command = ["ncatted", "-a coordinates,{},o,c,'latitude longitude'".format(filevar), out]
+            print_in_file(current_command, output_file=test)
+            subprocess.check_output(current_command, shell=True)
             if os.access(file_to_treat, os.W_OK):
+                print_in_file("rm -f {}".format(file_to_treat), output_file=test)
                 os.remove(file_to_treat)
+                print_in_file("mv {} {}".format(out, file_to_treat), output_file=test)
                 shutil.move(out, file_to_treat)
                 return file_to_treat
             else:
@@ -148,9 +176,10 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar):
         return file_to_treat
 
 
-def call_subprocess(command):
+def call_subprocess(command, test=None):
     clogger.debug("Command launched %s" % command)
     clogger.debug("Time at launch %s" % time.time())
+    print_in_file(command, output_file=test)
     clogger.debug(subprocess.check_output(command, shell=True))
     clogger.debug("Time at end %s" % time.time())
 
@@ -166,8 +195,29 @@ def remove_dir_and_content(path_to_treat):
             os.remove(path_to_treat)
 
 
+def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, output_file, test=None):
+    if len(files_to_treat) <= 0:
+        raise ValueError("No input file!")
+    elif len(files_to_treat) <= 10:
+        cdo_command = " ".join([init_cdo_command, cdo_command] + files_to_treat + [output_file, ])
+        print_in_file(cdo_command, output_file=test)
+        call_subprocess(cdo_command)
+        return [output_file, ]
+    else:
+        tmp_output_file_1 = output_file.replace(".nc", "1.nc")
+        tmp_output_file_2 = output_file.replace(".nc", "2.nc")
+        tmp_output_file = [tmp_output_file_1, tmp_output_file_2]
+        apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat[0:10], tmp_output_file_1)
+        if not os.path.isfile(tmp_output_file_1):
+            raise OSError("Could not create file %s" % tmp_output_file_1)
+        apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat[10:], tmp_output_file_2)
+        if not os.path.isfile(tmp_output_file_2):
+            raise OSError("Could not create file %s" % tmp_output_file_2)
+        return apply_cdo_command_on_slice(init_cdo_command, cdo_command, tmp_output_file, output_file)
+
+
 def main(input_files, output_file, variable=None, alias=None, region=None, units=None, vm=None, period=None,
-         operator=None,  apply_operator_after_merge=None):
+         operator=None, apply_operator_after_merge=None, test=None):
     clog("debug")
     # Create a temporary directory
     tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
@@ -177,6 +227,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # Initialize cdo commands
     cdo_commands_before_merge = list()
+    cdo_commands_for_selvar = list()
     cdo_command_for_merge = None
     cdo_commands_after_merge = list()
 
@@ -191,21 +242,19 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     # If needed, select the variable first or compute it if it is an alias
     clogger.debug("Alias and variable considered: %s -- %s" % (alias, variable))
-    if variable is not None:
-        var = variable
-        file_var = var
-        # JS#print "var in mcdo.py  = ", var
-        # JS#print "-selname,{}".format(str(var))
-        # JS#cdo_commands_before_merge.append("-selname,{}".format(var))
-        cdo_commands_before_merge.append("-selname,"+var)
     if alias is not None:
         var, filevar, scale, offset = alias[:]
-        if variable is not None and filevar != variable:
-            clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
-            raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
+        if variable is not None and var != variable:
+            clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
+            raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
         else:
-            cdo_commands_before_merge.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
-            cdo_commands_before_merge.append("-selname,{}".format(var))
+            cdo_commands_for_selvar.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
+            cdo_commands_for_selvar.append("-selname,{}".format(var))
+    else:
+        filevar = variable
+        if variable is not None:
+            var = variable
+            cdo_commands_for_selvar.append("-selname," + var)
 
     # Then, if needed, select the domain
     clogger.debug("Region considered: %s" % region)
@@ -223,7 +272,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             cdo_commands_before_merge.append("-setattribute,{}@units={}".format(variable, units.replace(" ", "*")))
 
     # Then, if needed, deal with missing values
-    clogger.debug("Vm considered: %s" % vm)
+    clogger.debug("Missing values considered: %s" % vm)
     if vm is not None:
         cdo_commands_before_merge.append("-setctomiss,{}".format(vm))
 
@@ -256,28 +305,36 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
 
     files_to_treat_before_merging = list()
     for a_file in input_files:
-        if a_file[0:2] == "./":
-            a_file = original_directory + a_file[1:]
-        if a_file[0] != "/":
-            a_file = original_directory + "/" + a_file
+        if a_file.startswith("./"):
+            a_file = os.path.sep.join([original_directory, re.sub(r"^\./", "", a_file)])
+        if not a_file.startswith(os.path.sep):
+            a_file = os.path.sep.join([original_directory, a_file])
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
-            a_file = nemo_timefix(a_file, tmp)
+            a_file = nemo_timefix(a_file, tmp, test=test)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
-            a_file = aladin_coordfix(a_file, tmp, filevar)
+            a_file = aladin_coordfix(a_file, tmp, filevar, test=test)
         files_to_treat_before_merging.append(a_file)
 
     if len(files_to_treat_before_merging) > 1:
         files_to_treat_after_merging = list()
         for a_file in files_to_treat_before_merging:
-            tmp_file_name = a_file.split(os.path.sep)[-1]
+            tmp_file_name = os.path.basename(a_file)
             tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
             while os.path.exists(tmp_file_path):
                 tmp_file_name = "_".join(["tmp", tmp_file_name])
                 tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
             if not os.path.isfile(tmp_file_name):
-                cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_before_merge)) +
-                                       [a_file, tmp_file_name])
-                call_subprocess(cdo_command)
+                if len(cdo_commands_for_selvar) == 1 and os.path.basename(a_file).startswith(filevar):
+                    total_cdo_commands_before_merge = cdo_commands_before_merge
+                else:
+                    total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+                if len(total_cdo_commands_before_merge) > 0:
+                    cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
+                                           [a_file, tmp_file_path])
+                    print_in_file(cdo_command, output_file=test)
+                    call_subprocess(cdo_command)
+                else:
+                    os.symlink(a_file, tmp_file_path)
                 if not os.path.isfile(tmp_file_path):
                     clogger.error("Could not create the file %s" % tmp_file_path)
                     raise Exception("Could not create the file %s" % tmp_file_path)
@@ -287,17 +344,23 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
                 raise Exception("Should not pass here...")
         if cdo_command_for_merge is not None:
             tmp_output_file = os.sep.join([tmp, os.path.basename(output_file)])
-            cdo_command = " ".join([init_cdo_command, cdo_command_for_merge] + files_to_treat_after_merging +
-                                   [tmp_output_file, ])
-            call_subprocess(cdo_command)
-            files_to_treat_after_merging = [tmp_output_file, ]
+            files_to_treat_after_merging = apply_cdo_command_on_slice(init_cdo_command=init_cdo_command,
+                                                                      cdo_command=cdo_command_for_merge,
+                                                                      files_to_treat=files_to_treat_after_merging,
+                                                                      output_file=tmp_output_file, test=test)
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                files_to_treat_after_merging + [output_file, ])
+        print_in_file(cdo_command, output_file=test)
         call_subprocess(cdo_command)
     elif len(files_to_treat_before_merging) == 1:
+        if len(cdo_commands_for_selvar) == 1 and os.path.basename(files_to_treat_before_merging[0]).startswith(filevar):
+            total_cdo_commands_before_merge = cdo_commands_before_merge
+        else:
+            total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
-                               list(reversed(cdo_commands_before_merge)) + files_to_treat_before_merging +
+                               list(reversed(total_cdo_commands_before_merge)) + files_to_treat_before_merging +
                                [output_file, ])
+        print_in_file(cdo_command, output_file=test)
         call_subprocess(cdo_command)
     else:
         raise ValueError("No input file to treat!")

@@ -1,0 +1,1 @@
+cdo -O -f nc -copy -sellevel,85000 -selname,taC -expr,taC=ta*1+-273.15 _CLIMAF_PATH_/../examples/data/AMIPV6ALB2G/A/AMIPV6ALB2GPL1980.nc _TEST_PATH_/test_1.nc
