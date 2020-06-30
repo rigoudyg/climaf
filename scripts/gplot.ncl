@@ -894,26 +894,6 @@ begin
   delete(tmpfld)
 
   controlMinMax= isvar("vmin") .and. isvar("vmax") .and. isvar("vdelta")
-<<<<<<< HEAD
-  if ( controlMinMax ) then      
-    ;power10=floattoint(log10(abs(vmax-vmin)))
-    power10=1
-    ;if ismissing(power10) then
-    ;  print("Field has only missing values" )
-    ;  power10=1
-    ;else
-    ;  if power10.ge.4 then
-    ;    print("vmin")
-    ;    print(vmin)
-    ;    print("tofloat(vmin/10^power10)")
-    ;    print(tofloat(vmin/10^power10))
-    ;    vmin=tofloat(vmin/10^power10)
-    ;    vmax=tofloat(vmax/10^power10)
-    ;    vdelta=tofloat(vdelta/10^power10)
-    ;  end if
-    ;end if
-=======
-  
   if ( .not. controlMinMax  .and. isvar("ccolors")) then
     lcolors=str_split(ccolors," ")
     vmin=tofloat(lcolors(0))
@@ -929,7 +909,6 @@ begin
       vmax=tofloat(vmax/10^power10)
       vdelta=tofloat(vdelta/10^power10)
     end if
->>>>>>> RIGOUDY/V1.2.13_post
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
     print(power10)
@@ -939,15 +918,9 @@ begin
     end if
   end if
 
-<<<<<<< HEAD
-  ;if power10.ge.4 then
-  ;  fld=fld/10^power10
-  ;end if
-=======
   if (power10 .ge. 4) then
     fld=fld/10^power10
   end if
->>>>>>> RIGOUDY/V1.2.13_post
 
   ;-----------------------
   ; Auxiliary field: fld2
