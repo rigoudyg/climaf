@@ -15,7 +15,7 @@ import re
 import sys
 import subprocess
 import driver
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
@@ -171,14 +171,17 @@ class cscript():
          -  **var, var_<digit>** : when a script can select a variable in a
             multi-variable input stream, this is declared by adding this
             keyword in the calling sequence; CliMAF will replace it by the
-            actual variable name to process; 'var' stands for first input
+            actual variable name to process, but only if it has not already filtered
+            data for that variable; 'var' stands for first input
             stream, 'var_<digit>' for the next ones;
 
             - in the example above, we assume that external binary CDO is
               not tasked with selecting the variable, and that CliMAF must
               feed CDO with a datafile where it has already performed the
               selection
-
+        
+            - if the script MUST receive the name of the variable in all 
+              circumstances, use keyword **Var**
 
          - **period, period_<digit>** : when a script can select a time
            period in the content of a file or stream, it should declare it
@@ -349,7 +352,7 @@ class cscript():
                         self.outputs[''] = outvarnames.get('', "%s")
                 # clogger.debug("outputs = "+`self.outputs`)
                 #
-                canSelectVar = canSelectVar or (command.find("${var}") > 0)
+                canSelectVar = canSelectVar or (command.find("${var}") > 0) or (command.find("${Var}") > 0)
                 canAggregateTime = (command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
                 canAlias = (command.find("${alias}") > 0)
                 canMissing = (command.find("${missing}") > 0)
@@ -374,8 +377,8 @@ class cscript():
                 if format in known_formats or format in graphic_formats or format in none_formats:
                     self.outputFormat = format
                 else:
-                    raise Climaf_Operator_Error(
-                        "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
+                    raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
+                                                ', '.join([repr(x) for x in graphic_formats]))
                 scripts[name] = self
 
                 # Init doc string for the operator

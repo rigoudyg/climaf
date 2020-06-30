@@ -13,7 +13,7 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 
 """
 
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 
 if atCNRM:

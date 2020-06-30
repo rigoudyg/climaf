@@ -19,7 +19,7 @@ Example for a CMIP6 dataset declaration ::
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef, cvalid
-from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 root = None
 if atTGCC:
@@ -43,7 +43,7 @@ if True:
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
     cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment',
-             'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
+             'realization', 'grid', 'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
 
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
@@ -80,9 +80,9 @@ if True:
     # -- IPSL-CM6 special historical-EXT experiment
     project='IPSL-CM6_historical-EXT'
     cdef('root',        root,                       project=project)
-    cdef('institute',   'IPSL',                        project=project)
-    cdef('model',       'IPSL-CM6A-LR',                        project=project)
-    cdef('mip',         'CMIP',                        project=project)
+    cdef('institute',   'IPSL',                     project=project)
+    cdef('model',       'IPSL-CM6A-LR',             project=project)
+    cdef('mip',         'CMIP',                     project=project)
     cdef('grid',        'g*',                       project=project)
     cvalid('grid',      ["gr", "gn", "gr1", "gr2"], project=project)
     cdef('realization', 'r1i1p1f*',                 project=project)
@@ -97,7 +97,7 @@ if True:
     patterns1 = [base_pattern1 + "_${PERIOD}" + ".nc", base_pattern1 + ".nc"]
 
     base_pattern2 = "${root}/CMIP6/${mip}/${institute}/${model}/${extent_experiment}/${realization}/${table}/" \
-                    "${variable}/${grid}/${version}/" \
+                    "${variable}/${grid}/${extent_version}/" \
                     "${variable}_${table}_${model}_${extent_experiment}_${realization}_${grid}"
     patterns2 = [base_pattern2 + "_${PERIOD}" + ".nc", ]
 

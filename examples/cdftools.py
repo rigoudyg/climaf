@@ -111,8 +111,8 @@ else:
     cfile(my_cdfmean_prof)
 
     # Compute vertical profile on geographical domain [35.4,39,-14,-10]
-    my_cdfmean_prof_box = ccdfmean_profile_box(duo, pos_grid='U', latmin=35.4, latmax=39, lonmin=-14, lonmax=-10, kmin=1,
-                                               kmax=2)
+    my_cdfmean_prof_box = ccdfmean_profile_box(duo, pos_grid='U', latmin=35.4, latmax=39, lonmin=-14, lonmax=-10,
+                                               kmin=1, kmax=2)
     cfile(my_cdfmean_prof_box)
 
     # Compute spatial variance

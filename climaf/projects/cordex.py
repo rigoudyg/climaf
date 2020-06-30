@@ -18,7 +18,7 @@ Attributes are :
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 root = None
 if onCiclad:

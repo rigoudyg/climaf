@@ -18,6 +18,7 @@ Example for a CMIP6 dataset declaration ::
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 
+
 # Declare CMIP6CERFACS project
 cproject('CMIP6CERFACS', 'model', 'simulation', 'institute', 'mip', 'table', 'realization', 'grid', separator='%')
 # --> systematic arguments = simulation, frequency, variable
@@ -37,17 +38,12 @@ cdef('realization', 'r*i1p1f*', project='CMIP6CERFACS')
 cdef('grid', 'g*', project='CMIP6CERFACS')
 
 # -- Specify the pattern
-root1 = "/data/scratch/globc/dcom/CMIP6/${mip}/${institute}/${model}/${model}_${simulation}_${realization}/"
+root1 = "/data/scratch/globc/dcom/CMIP6/${mip}/${institute}/${model}/${simulation}/${realization}/${table}/*/${grid}/" \
+        "latest/"
 pathfiles1 = root1 + "${variable}_${table}_${model}_${simulation}_${realization}_${grid}_${PERIOD}.nc"
-root2 = "/data/scratch/globc/dcom/PRIMAVERA/WP6_HIGHRESMIP/${model}_${simulation}_${realization}/"
-pathfiles2 = root2 + "${variable}_${table}_${model}_${simulation}_${realization}_${grid}_${PERIOD}.nc"
-root3 = "/data/scratch/globc/vrousseau/MODELE/${model}_${simulation}_${realization}/"
-pathfiles3 = root3 + "${variable}_${table}_${model}_${simulation}_${realization}_${grid}_${PERIOD}.nc"
 
 # -- call the dataloc CliMAF function
 dataloc(project='CMIP6CERFACS', organization='generic', url=[pathfiles1])
-dataloc(project='CMIP6CERFACS', organization='generic', url=[pathfiles2])
-dataloc(project='CMIP6CERFACS', organization='generic', url=[pathfiles3])
 
 # -- Define alias if necessary
 calias("CMIP6CERFACS", "msftmyz", scale=1.e-3)

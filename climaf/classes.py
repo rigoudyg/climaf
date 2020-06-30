@@ -17,7 +17,7 @@ import os.path
 
 import dataloc
 from period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal import Decimal
 
@@ -446,8 +446,8 @@ class cdataset(cobject):
         self.register()
 
     def setperiod(self, period):
-        if isinstance(period,str) :
-            period=init_period(period)
+        if isinstance(period, str):
+            period = init_period(period)
         self.erase()
         self.period = period
         self.kvp['period'] = period
@@ -533,18 +533,18 @@ class cdataset(cobject):
 
     def matches_conditions(self, conditions):
         """
-        Return True if, for all keys in dict condition, the kvp
-        value for same key is among condition's value (which can be a list)
+        Return True if, for all keys in dict conditions, the kvp
+        value of object for same key is among condition's values (which can be a list)
         Example :
           with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
-          will return True
+          the method will return True for both versions of that model
         """
         if conditions is None:
             return True
         for key in conditions:
             values = conditions[key]
-            if isinstance(values, list):
-                values = [values]
+            if not isinstance(values, list):
+                values = [values, ]
             if self.kvp[key] not in values:
                 return False
         return True
@@ -971,7 +971,7 @@ class cdataset(cobject):
 
                 if 'cell_methods' in fileobj.variables[var].__dict__:  # time mean
 
-                    regex = re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
+                    regex = re.compile(r'.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
                     cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
                     if cell_meth_att:
                         if cell_meth_att.group(2) == 'hours':
@@ -1132,7 +1132,7 @@ class cens(cobject, dict):
         self.register()
 
     def items(self):
-        return [(l, self[l]) for l in self.order]
+        return [(elt, self[elt]) for elt in self.order]
 
     def copy(self):
         e = cens(self,
@@ -1242,7 +1242,7 @@ def eds(first=None, **kwargs):
         return cens(d, order=attval[attr])
     else:
         # Must construct the cartesian product of all list-type attributes
-        listattr2 = [l for l in listattr]
+        listattr2 = [att for att in listattr]
         if first is not None:
             listattr2.remove(first)
             att = first
@@ -1376,10 +1376,10 @@ class ctree(cobject):
         is no parameters, then return dataset's crs. This is the way to avoid
         repetitive data selection, when a data selection has been explictly cached
         """
-        first_op=self.operands[0]
-        if self.operator=='select' and len(self.operands)==1 and isinstance(first_op, cdataset) and \
-           len(self.parameters.keys())==0 and first_op.alias is None:
-               return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
+        first_op = self.operands[0]
+        if self.operator == 'select' and len(self.operands) == 1 and isinstance(first_op, cdataset) and \
+                len(self.parameters.keys()) == 0 and first_op.alias is None:
+            return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
         #
         # General case
         # Operators are listed in alphabetical order; parameters too
@@ -1400,14 +1400,14 @@ class ctree(cobject):
                 rep += par + "=" + repr(self.parameters[par]) + ","
         rep += ")"
         rep = rep.replace(",)", ")")
-        #clogger.debug("Create crs for ctree: %s" % rep)
+        # clogger.debug("Create crs for ctree: %s" % rep)
         return rep
 
     def setperiod(self, period):
         """ modifies the period for all datasets of a tree"""
         self.erase()
-        if isinstance(period,str) :
-            period=init_period(period)
+        if isinstance(period, str):
+            period = init_period(period)
         for op in self.operands:
             op.setperiod(period)
         self.crs = self.buildcrs(period=period)
@@ -2243,7 +2243,7 @@ def attributeOf(cobject, attrib):
         return attributeOf(cobject.values()[0], attrib)
     elif getattr(cobject, attrib, None):
         value = getattr(cobject, attrib)
-        clogger.debug("Find value for object... %s" % value)
+        clogger.debug("Find value for object's %s... %s" % (attrib,value))
         return value
     elif isinstance(cobject, ctree):
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")

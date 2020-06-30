@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -53,10 +53,10 @@ class DimsOfFileTests(unittest.TestCase):
 
     def test_dims(self):
         my_file = "/".join([rootpath[0], "..", "examples", "data", "NPv3.1ada_SE_1982_1991_1M_ua_pres.nc"])
-        self.assertEqual(dimsOfFile(my_file), ["lat", "presnivs", "time_counter", "lon"])
+        self.assertListEqual(sorted(dimsOfFile(my_file)), ["lat", "lon", "presnivs", "time_counter"])
         my_file = "/".join(
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
-        self.assertEqual(dimsOfFile(my_file), ["lat", "nb2", "lon", "time"])
+        self.assertEqual(sorted(dimsOfFile(my_file)), ["lat", "lon", "nb2", "time"])
 
 
 class FileHasDimTests(unittest.TestCase):

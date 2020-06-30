@@ -21,7 +21,7 @@ Example of an 'erai' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     cproject('erai', ('grid', '_'),

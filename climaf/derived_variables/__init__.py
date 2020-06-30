@@ -5,7 +5,7 @@
 # __all__= [ "atmosphere_derived_variables", "ocean_derived_variables" ]
 __all__ = ["ocean_derived_variables"]
 
-from climaf.site_settings import atIPSL, atCerfacs, atCNRM
+from env.site_settings import atIPSL, atCerfacs, atCNRM
 
 # -- Load only the ipsl derived variables if we are at IPSL
 if atIPSL:

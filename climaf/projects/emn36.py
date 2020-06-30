@@ -28,7 +28,7 @@ Seaice fields are still to be described
 """
 # S.Senesi - april 2016
 
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     from climaf.dataloc import dataloc

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -10,13 +10,14 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 import os
 import subprocess
 import unittest
+import re
 
 from climaf.api import cshow, ncview, cfile
 from climaf import xdg_bin
 
 
 def skipUnless_CNRM_Lustre():
-    if os.path.exists('/cnrm'):
+    if os.path.exists('/cnrm/cmip'):
         return lambda func: func
     return unittest.skip("because CNRM's Lustre not available")
 
@@ -60,23 +61,39 @@ def compare_html_files(file_test, file_ref):
     return rep == "y"
 
 
+def compare_text_files(file_test, file_ref, **kwargs):
+    if not os.path.exists(file_test) or not os.path.exists(file_ref):
+        raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
+    with open(file_test, "r") as fic:
+        content_test = fic.read()
+    with open(file_ref, "r") as fic:
+        content_ref = fic.read()
+    for (key, value) in kwargs.iteritems():
+        content_test = content_test.replace(key, value)
+        content_ref = content_ref.replace(key, value)
+    content_test = re.sub(os.path.sep.join(["climaf_\w+"]), "climaf_XXX", content_test)
+    if content_test != content_ref:
+        raise ValueError("The content of files %s and %s are different:\n%s\n%s" % (file_test, file_ref, content_test,
+                                                                                    content_ref))
+
+
 def compare_netcdf_files(file_test, file_ref, display=False):
     # Todo: Check the metadata of the files
-    if not os.path.exists(cfile(file_test)) or not os.path.exists(file_ref):
-        raise OSError("Check files existence: %s - %s" % (cfile(file_test), file_ref))
+    if not os.path.exists(file_test) or not os.path.exists(file_ref):
+        raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
     if file_ref.split(".")[-1] != "nc":
         raise ValueError("This function only apply to netcdf files.")
-    if cfile(file_test).split(".")[-1] != file_ref.split(".")[-1]:
-        raise ValueError("Files have different formats: %s / %s" % (os.path.basename(cfile(file_test)),
+    if file_test.split(".")[-1] != file_ref.split(".")[-1]:
+        raise ValueError("Files have different formats: %s / %s" % (os.path.basename(file_test),
                                                                     os.path.basename(file_ref)))
     if display:
         ncview(file_test)
-    rep = subprocess.check_output("cdo diffn {} {}".format(cfile(file_test), file_ref), shell=True)
+    rep = subprocess.check_output("cdo diffn {} {}".format(file_test, file_ref), shell=True)
     if len(rep.split("\n")) > 1:
-        raise ValueError("Files' content are different.")
+        raise ValueError("The content of files %s and %s are different" % (file_test, file_ref))
 
 
-def compare_picture_files(object_test, fic_ref, display=True):
+def compare_picture_files(object_test, fic_ref, display=False, display_error=True):
     # TODO: Check the metadata of the files
     # Transform the strings in list of strings
     fic_test = cfile(object_test)
@@ -107,7 +124,7 @@ def compare_picture_files(object_test, fic_ref, display=True):
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
                               shell=True)
         if rep != 0:
-            if display:
+            if display_error:
                 subprocess.check_call(display_cmd.format(diff_file), shell=True)
             os.remove(diff_file)
             raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))

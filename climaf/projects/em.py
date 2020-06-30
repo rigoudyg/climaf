@@ -45,7 +45,7 @@ value (which is ill described in data files); see code for details
 """
 # S.Senesi - april 2016
 
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     from climaf.dataloc import dataloc

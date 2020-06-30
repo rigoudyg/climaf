@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 
-Quick links : :ref:`Subscribe to mailing list <https://climaf.readthedocs.io/en/master/community.html>` | :ref:`News <news>` | :ref:`Functions <API>` |
+Quick links : :ref:`Subscribe to mailing list <community>` | :ref:`News <news>` | :ref:`Functions <API>` |
 :ref:`standard_operators` | :ref:`howto` | :ref:`examples` |  :ref:`contents`
 
 .. |logo| image:: CliMAF_front_image.png
@@ -14,7 +14,7 @@ Quick links : :ref:`Subscribe to mailing list <https://climaf.readthedocs.io/en/
 
 
 Discover CliMAF: essentials of the documentation to get started 
-========================================================
+===============================================================
 
 - `What is CliMAF <https://climaf.readthedocs.io/en/master/index.html#climaf-a-climate-model-assessment-framework>`_?
 - Using CliMAF: `installation, use of existing installations (ESPRI mesocenter, CNRM, CERFACS) <https://climaf.readthedocs.io/en/master/installing.html>`_

@@ -87,8 +87,8 @@ from driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, e
 from dataloc import dataloc
 from operators import cscript, scripts as cscripts, operators, fixed_fields, derive
 from cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect
-from clogging import clogger, clog, clog_file, logdir
-from site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
+from env.clogging import clogger, clog, clog_file, logdir
+from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 from plot.plot_params import plot_params, hovm_params
 from plot.varlongname import varlongname
 from derived_variables import *

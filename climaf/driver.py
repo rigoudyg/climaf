@@ -29,7 +29,7 @@ import classes
 import cache
 import operators
 import cmacro
-from clogging import clogger, indent as cindent, dedent as cdedent
+from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod, merge_periods
 from climaf import xdg_bin
@@ -155,7 +155,7 @@ def maketree(script_name, script, *operands, **parameters):
             rep.outputs[outname] = son
             setattr(rep, outname, son)
     # Check that time period of output makes sense
-    p=timePeriod(rep)
+    p = timePeriod(rep)
     #
     return rep
 
@@ -199,15 +199,15 @@ def ceval(cobject, userflags=None, format="MaskedArray",
         recurse_list.append(cobject.crs)
         clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + repr(cobject.kvp))
         ds = cobject
-        cache_value=cache.hasExactObject(ds)
-        if cache_value is not None :
+        cache_value = cache.hasExactObject(ds)
+        if cache_value is not None:
             clogger.debug("Dataset %s exists in cache" % ds)
             cdedent()
             return cache_value
         if ds.isLocal() or ds.isCached():
             clogger.debug("Dataset %s is local or cached " % ds)
             #  if the data is local, then
-            #   if the user can select the data and aggregate time, and requested format is
+            #   if the caller operator can select the data and aggregate time, and requested format is
             #     'file' return the filenames
             #   else : read the data, create a cache file for that, and recurse
             #
@@ -469,10 +469,12 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         infile = invalues[0]
         if (scriptCall.operator != 'remote_select') and \
                 not all(map(os.path.exists, infile.split(" "))):
-            raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:" % infile)
+            raise Climaf_Driver_Error("Internal error : for script %s and 1st operand %s, some input file does not exist among %s:" % \
+                                      (scriptCall.operator,op,infile))
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
+        subdict["Var"] = classes.varOf(op)
         if isinstance(op, classes.cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
             if op.matches_conditions(conditions):
@@ -499,6 +501,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict["domain"] = classes.domainOf(op)
     else:
         subdict["var"] = classes.varOf(scriptCall)
+        subdict["Var"] = classes.varOf(scriptCall)
     i = 0
     for op in scriptCall.operands:
         if op:
@@ -581,6 +584,14 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
+    #
+    # Discard selection parameters if selection already occurred for first operand
+    # TBD : manage the cases where other operands didn't undergo selection
+    if cache.hasExactObject(scriptCall.operands[0]) :
+        # for key in ["period","period_iso","var","domain","missing","alias","units"]:
+        for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
+            if key in subdict :
+                subdict.pop(key)
     #
     # print("subdict="+`subdict`)
     # Combine CRS and possibly member_label to provide/complement title
@@ -692,17 +703,17 @@ def timePeriod(cobject):
     if isinstance(cobject, classes.cdataset):
         return cobject.period
     elif isinstance(cobject, classes.ctree):
-        clogger.debug("timePeriod : processing %s,operands=%s"%(cobject.script,`cobject.operands`))
-        if cobject.script.flags.doCatTime and len(cobject.operands)>1:
-            clogger.debug("Building composite period for results of %s"%cobject.operator)
-            periods = [ timePeriod(op) for op in cobject.operands ]
+        clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
+        if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
+            clogger.debug("Building composite period for results of %s" % cobject.operator)
+            periods = [timePeriod(op) for op in cobject.operands]
             merged_period = merge_periods(periods)
-            if len(merged_period) > 1 :
-                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s"%\
-                                          (cobject.operator,merged_period))
+            if len(merged_period) > 1:
+                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s" %
+                                          (cobject.operator, merged_period))
             return merged_period[0]
         else: 
-            clogger.debug("timePeriod logic for script is 'choose 1st operand' "%cobject.script)
+            clogger.debug("timePeriod logic for script is 'choose 1st operand' " % cobject.script)
             return timePeriod(cobject.operands[0])
     elif isinstance(cobject, classes.scriptChild):
         clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
@@ -800,9 +811,16 @@ def derive_variable(ds):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
     op, outname, inVarNames, params = operators.derived_variable(ds.variable, ds.project)
     inVars = []
+    first=True
     for varname in inVarNames:
         dic = copy.deepcopy(ds.kvp)
         dic['variable'] = varname
+        # If the dataset has a version attribute, it should be inherited only
+        # by the first input variable, an be set to "latest" for the next ones
+        # (it would be tricky to do something smarter TBD)
+        if not first and "version" in dic :
+            dic['version'] = "latest"
+        first=False
         inVars.append(classes.cdataset(**dic))
     params["add_variable"] = ds.variable
     # TODO: force the output variable to be well defined
@@ -928,6 +946,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
         return result
     else:
         target = os.path.abspath(os.path.expanduser(target))
+        target_dir = os.path.dirname(target)
         if isinstance(object, climaf.classes.cens):
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is not None:
@@ -941,7 +960,6 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                             shutil.move(result, target)
                             os.symlink(target, result)
                     else:
-                        target_dir = os.path.dirname(target)
                         if not os.path.exists(target_dir):
                             os.makedirs(target_dir)
                         shutil.move(result, target)
@@ -962,6 +980,8 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                             os.remove(target)
                         os.link(source, target)
             else:
+                if not os.path.exists(target_dir):
+                            os.makedirs(target_dir)
                 shutil.copyfile(result, target)
         return target
 
@@ -996,7 +1016,7 @@ def cMA(obj, deep=None):
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
-def cvalue(obj, index=0):
+def cvalue(obj, index=0,deep=False):
     """
     Return the value of the array for an object, after MV flattening, at a given index
 
@@ -1009,7 +1029,7 @@ def cvalue(obj, index=0):
 
     Does use the file representation of the object
     """
-    return cMA(obj).data.flat[index]
+    return cMA(obj,deep=deep).data.flat[index]
 
 
 def cexport(*args, **kwargs):

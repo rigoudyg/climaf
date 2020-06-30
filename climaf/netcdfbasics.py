@@ -3,7 +3,7 @@
 
 import re
 
-from climaf.clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from climaf.period import cperiod
 
 
@@ -28,16 +28,17 @@ def varOfFile(filename):
 
 def varsOfFile(filename):
     """
-    returns the list of non-dimensions variable in NetCDF file FILENAME
+    Returns the list of non-dimensions variable in NetCDF file FILENAME
     """
     from anynetcdf import ncf
     lvars = []
     fileobj = ncf(filename, 'r')
     vars = fileobj.variables
     if isinstance(vars, dict):
-        vars = vars.keys()
-    for filevar in vars:
+        svars = vars.keys()
+    for filevar in svars:
         if ((filevar not in fileobj.dimensions) and
+                # other variables linked to dimensions
                 not re.findall("^lat", filevar) and
                 not re.findall("^lon", filevar) and
                 not re.findall("^LAT", filevar) and
@@ -47,6 +48,13 @@ def varsOfFile(filename):
                 not re.findall("^time_", filevar) and
                 not re.findall("_bnds$", filevar)):
             lvars.append(filevar)
+    # case of scalar coordinates
+    if isinstance(vars, dict):
+        for var in vars.keys()  :
+            if var in lvars and \
+               (hasattr(vars[var],"axis") or hasattr(vars[var],"bounds")):
+                lvars.remove(var)
+
     fileobj.close()
     return lvars
 
