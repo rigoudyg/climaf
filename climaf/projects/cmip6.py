@@ -45,6 +45,11 @@ if True:
     cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment',
              'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
+    # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
+    # ------------------------------------ >
+    cproject('IPSL-CM6_historical-EXT', 'root', 'model', 'institute', 'mip', 'table', 'experiment',
+             'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
+
     for project in ['CMIP6', 'CMIP6_extent']:
         # --> systematic arguments = simulation, frequency, variable
         # -- Set the aliases for the frequency
@@ -71,6 +76,19 @@ if True:
         calias(project, 'O2', 'o2')
 
     cdef('extent_experiment', 'ssp585', project='CMIP6_extent')
+    #
+    # -- IPSL-CM6 special historical-EXT experiment
+    project='IPSL-CM6_historical-EXT'
+    cdef('root',        root,                       project=project)
+    cdef('institute',   'IPSL',                        project=project)
+    cdef('model',       'IPSL-CM6A-LR',                        project=project)
+    cdef('mip',         'CMIP',                        project=project)
+    cdef('grid',        'g*',                       project=project)
+    cvalid('grid',      ["gr", "gn", "gr1", "gr2"], project=project)
+    cdef('realization', 'r1i1p1f*',                 project=project)
+    cdef('experiment',  'historical',               project=project)
+    cdef('version',     'latest',                   project=project)
+    cdef('table',       '*',                        project=project)
 
     # -------------
     # -- Define the patterns
@@ -91,3 +109,12 @@ if True:
     # -- CMIP6_extent
     dataloc(project='CMIP6_extent', organization='generic', url=patterns1)
     dataloc(project='CMIP6_extent', organization='generic', url=patterns2)
+
+    # -- IPSL-CM6_historical-EXT
+    base_pattern3 = "${root}/CMIP6/${mip}/${institute}/${model}/${experiment}-EXT/${realization}/${table}/"
+    base_pattern3 += "${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}"
+    patterns3 = [base_pattern3 + "_${PERIOD}" + ".nc", base_pattern3 + ".nc"]
+
+    dataloc(project='IPSL-CM6_historical-EXT', url=patterns3)
+
+
