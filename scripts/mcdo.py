@@ -244,7 +244,7 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     clogger.debug("Alias and variable considered: %s -- %s" % (alias, variable))
     if alias is not None:
         var, filevar, scale, offset = alias[:]
-        if variable is not None and var != variable:
+        if variable is not None and filevar != variable:
             clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
             raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
         else:
