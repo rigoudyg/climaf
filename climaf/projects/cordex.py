@@ -22,7 +22,7 @@ from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 root = None
 if onCiclad:
-    root = "/prodigfs/project"
+    root = "/bdd"
 # if atCNRM:
 #   # Declare a list of root directories for IPSL data at TGCC
 #   root="/cnrm/cmip"
@@ -38,12 +38,15 @@ if root:
                '${realization}/${model}/${model_version}/${frequency}/${variable}/${version}/' \
                '${variable}_${CORDEX_domain}_${driving_model}_${extent_experiment}_${realization}_${model}_' \
                '${model_version}_${frequency}_${PERIOD}.nc'
-
+    patternfx = '${root}/CORDEX/output/${CORDEX_domain}/${institute}/${driving_model}/${experiment}/${realization}/' \
+               '${model}/${model_version}/${frequency}/${variable}/${version}/' \
+               '${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_' \
+               'fx.nc'
     # -- CORDEX
     cproject('CORDEX', 'root', 'model', 'CORDEX_domain', 'model_version', 'frequency', 'driving_model',
              'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'],
              separator='%')
-    dataloc(project='CORDEX', url=[pattern1])
+    dataloc(project='CORDEX', url=[patternfx,pattern1])
     cdef('experiment', '*', project='CORDEX')
     cdef('model_version', '*', project='CORDEX')
 
