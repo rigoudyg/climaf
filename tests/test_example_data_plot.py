@@ -122,8 +122,6 @@ class DataGplotMaps(unittest.TestCase):
     def test_gplot_maps_5(self):
         """
         Same map but with an other vector style: curly vectors (default: "LineArrow")
-
-        TODO: Check why this test fails
         """
         plot_map = plot(self.tas, self.sub_tas, self.uas, self.vas,
                         title='2 fields (automatic contours levels for auxiliary field) + vectors (curly)',
@@ -365,8 +363,6 @@ class DataGplotCrossSections(unittest.TestCase):
         """
         A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale,
         and addition of a box
-
-        TODO: Check why this test fails
         """
         plot_cross = plot(self.january_ta_zonal_mean, title='1 field cross-section (without contours lines)', y="log",
                           xpolyline="-60.0, -30.0, -30.0, -60.0, -60.0", ypolyline="70.0, 70.0, 50.0, 50.0, 70.0")
@@ -488,8 +484,6 @@ class DataGplotProfiles(unittest.TestCase):
     def test_gplot_profiles_1(self):
         """
         One profile, with a logarithmic scale
-
-        TODO: Check why this test fails
         """
         plot_profile = plot(self.january_ta_profile, title='A profile', y="log")
         self.assertEqual(str(plot_profile),
@@ -501,8 +495,6 @@ class DataGplotProfiles(unittest.TestCase):
     def test_gplot_profiles_2(self):
         """
         Two profiles, with a index-linear spacing for vertical axis (default)
-
-        TODO: Check why this test fails
         """
         plot_profile = plot(self.january_ta_profile, self.january_ta_profile2, title='Two profiles', y="lin")
         self.assertEqual(str(plot_profile),
@@ -516,8 +508,6 @@ class DataGplotProfiles(unittest.TestCase):
     def test_gplot_profiles_3(self):
         """
         A (t,z) profile, with a a logarithmic scale
-
-        TODO: Check why this test fails
         """
         plot_profile = plot(self.ta_profile, self.ta_profile2, title='Profiles (t,z)', y="log", invXY=True)
         self.assertEqual(str(plot_profile),
@@ -557,7 +547,6 @@ class DataPlot(unittest.TestCase):
 
     def test_data_plot_3(self):
         """
-        TODO: Check why this test fails
         """
         fig1 = plot(self.my_dataset_light_80, title="title", resolution="1600*2400")
         page1 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
