@@ -38,7 +38,7 @@ class McdoTests(unittest.TestCase):
         test_output_file = os.path.sep.join([tmp_directory, output_file])
         ref_output_file = os.path.sep.join([self.ref_dir, output_file])
         mcdo_main(input_files=[self.input_file_1], output_file=test_output_file,
-                  variable="taC", alias=["taC", "ta", "1", "-273.15"], region=None, units=None, vm=None,
+                  variable="ta", alias=["taC", "ta", "1", "-273.15"], region=None, units=None, vm=None,
                   period=None, operator="sellevel,85000", apply_operator_after_merge=False, test=test_log)
         compare_text_files(test_log, ref_log, _CLIMAF_PATH_=rootpath[0], _TEST_PATH_=tmp_directory)
         compare_netcdf_files(test_output_file, ref_output_file)

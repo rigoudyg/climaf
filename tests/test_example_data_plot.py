@@ -119,7 +119,6 @@ class DataGplotMaps(unittest.TestCase):
         ref_plotmap = os.sep.join([self.reference_directory, "test_A.5.png"])
         compare_picture_files(plot_map, ref_plotmap)
 
-    @unittest.expectedFailure
     def test_gplot_maps_5(self):
         """
         Same map but with an other vector style: curly vectors (default: "LineArrow")
@@ -362,7 +361,6 @@ class DataGplotCrossSections(unittest.TestCase):
         self.january_ta_zonal_mean2 = ccdo(self.january_cross_field, operator="zonmean")
         self.ta_zonal_mean2 = ccdo(self.cross_field, operator="zonmean")
 
-    @unittest.expectedFailure
     def test_gplot_cross_sections_1(self):
         """
         A vertical cross-section in pressure coordinates of one field without contours lines and with logarithmic scale,
@@ -487,7 +485,6 @@ class DataGplotProfiles(unittest.TestCase):
         self.january_ta_profile2 = ccdo(self.january_ta_zonal_mean2, operator="mermean")
         self.ta_profile2 = ccdo(self.ta_zonal_mean2, operator="mermean")
 
-    @unittest.expectedFailure
     def test_gplot_profiles_1(self):
         """
         One profile, with a logarithmic scale
@@ -501,7 +498,6 @@ class DataGplotProfiles(unittest.TestCase):
         ref_plotprofile = os.sep.join([self.reference_directory, "test_D.1.png"])
         compare_picture_files(plot_profile, ref_plotprofile)
 
-    @unittest.expectedFailure
     def test_gplot_profiles_2(self):
         """
         Two profiles, with a index-linear spacing for vertical axis (default)
@@ -517,7 +513,6 @@ class DataGplotProfiles(unittest.TestCase):
         ref_plotprofile = os.sep.join([self.reference_directory, "test_D.2.png"])
         compare_picture_files(plot_profile, ref_plotprofile)
 
-    @unittest.expectedFailure
     def test_gplot_profiles_3(self):
         """
         A (t,z) profile, with a a logarithmic scale
@@ -560,8 +555,6 @@ class DataPlot(unittest.TestCase):
         curve_ref = os.sep.join([self.reference_directory, "test_2.png"])
         compare_picture_files(curve, curve_ref)
 
-
-    @unittest.expectedFailure
     def test_data_plot_3(self):
         """
         TODO: Check why this test fails
