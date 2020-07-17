@@ -15,7 +15,7 @@ def is_derived_variable(variable, project):
     """ True if the variable is a derived variable, either in provided project
     or in wildcard project '*'
     """
-    derived_variables = get_variable("derived_variables")
+    derived_variables = get_variable("climaf_derived_variables")
     rep = (project in derived_variables and variable in derived_variables[project] or
            "*" in derived_variables and variable in derived_variables["*"])
     clogger.debug("Checking if variable %s is derived for project %s : %s" % (variable, project, rep))
@@ -25,7 +25,7 @@ def is_derived_variable(variable, project):
 def derived_variable(variable, project):
     """ Returns the entry defining a derived variable in requested project or in wildcard project '*'
     """
-    derived_variables = get_variable("derived_variables")
+    derived_variables = get_variable("climaf_derived_variables")
     if project in derived_variables and variable in derived_variables[project]:
         rep = derived_variables[project][variable]
     elif "*" in derived_variables and variable in derived_variables["*"]:
@@ -83,7 +83,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
     # are single derived variable names, and which will be used at the
     # object evaluation step
     # Also : some consistency checks w.r.t. script definition
-    scripts = get_variable("scripts")
+    scripts = get_variable("climaf_scripts")
     if Operator in scripts:
         if not isinstance(derivedVar, dict):
             derivedVar = dict(out=derivedVar)
@@ -100,15 +100,15 @@ def derive(project, derivedVar, Operator, *invars, **params):
                 return
             # TBD : check parameters number  ( need to build
             # its list in cscript.init() )
-            derived_variables = get_variable("derived_variables")
+            derived_variables = get_variable("climaf_derived_variables")
             if project not in derived_variables:
                 derived_variables[project] = dict()
             clogger.debug("Add derive variable %s obtained with operator %s, output variable %s, input variables %s "
                           "and parameters %s" % (derivedVar[outname], str(Operator), derivedVar[outname],
                                                  str(list(invars)), str(params)))
             derived_variables[project][derivedVar[outname]] = (Operator, derivedVar[outname], list(invars), params)
-            change_variable("derived_variables", derived_variables)
-    elif Operator in get_variable("operators"):
+            change_variable("climaf_derived_variables", derived_variables)
+    elif Operator in get_variable("climaf_operators"):
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else:
         clogger.error("second argument (%s) must be a script or operator, already declared" % repr(Operator))

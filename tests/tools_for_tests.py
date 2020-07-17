@@ -11,6 +11,7 @@ import os
 import subprocess
 import unittest
 import re
+import sys
 
 from climaf.api import cshow, ncview, cfile
 from climaf import xdg_bin
@@ -57,7 +58,12 @@ def compare_html_files(file_test, file_ref):
     os.system("firefox file://{} &".format(file_ref))
     rep = None
     while rep not in ["y", "n"]:
-        rep = raw_input("Are the html pages identical? y/n\n").lower()
+        if sys.version.startswith("2."):
+            rep = raw_input("Are the html pages identical? y/n\n").lower()
+        elif sys.version.startswith("3."):
+            rep = input("Are the html pages identical? y/n\n").lower()
+        else:
+            raise ValueError("Unknown python version %s" % sys.version)
     return rep == "y"
 
 

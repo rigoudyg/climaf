@@ -41,7 +41,7 @@ from climaf.api import *
 if not atCNRM:
     print("Not at CNRM, stop.")
     exit(0)
-elif 'ccdfmean' not in get_variable("scripts"):
+elif 'ccdfmean' not in cscripts:
     print("CDFtools not available")
     exit(0)
 else:

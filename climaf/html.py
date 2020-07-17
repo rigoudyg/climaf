@@ -14,8 +14,6 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 
 
 """
-from __future__ import print_function
-
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
@@ -23,6 +21,7 @@ import re
 import pickle
 import shutil
 from collections import OrderedDict
+from collections.abc import KeysView, ValuesView
 from env.clogging import clogger, dedent
 from functools import reduce
 import six
@@ -368,16 +367,17 @@ def flines(func, fargs, sargs, common_args=[],
 
     """
     rep = ""
-    for farg in fargs:
-        args = [farg, sargs] + common_args
+    for farg in list(fargs):
         if other_fargs:
-            args = args + other_fargs.get(farg, None)
-        args = args + other_sargs
+            other_args = other_fargs.get(farg, None)
+        else:
+            other_args = list()
         if isinstance(fargs, list):
             title = repr(farg)
         else:
             title = fargs.get(farg, repr(farg))
-        rep += fline(func, *args, title=title, thumbnail=thumbnail, hover=hover, dirname=dirname, **kwargs)
+        rep += fline(func, farg=farg, sargs=sargs, common_args=common_args, other_args=other_args, title=title,
+                     thumbnail=thumbnail, hover=hover, dirname=dirname, **kwargs)
     return rep
 
 
@@ -459,9 +459,9 @@ def fline(func, farg, sargs, title=None,
     if not title:
         title = repr(farg)
     imposed_labels = True
-    if not isinstance(sargs, dict):
+    if not isinstance(sargs, (dict, OrderedDict)):
         imposed_labels = False
-        if not isinstance(sargs, list):
+        if not isinstance(sargs, (list, KeysView, ValuesView)):
             print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:

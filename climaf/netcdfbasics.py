@@ -125,10 +125,9 @@ def model_id(filename):
     from .anynetcdf import ncf
     rep = 'no_model'
     clogger.debug("opening " + filename)
-    f = ncf(filename, 'r')
-    if 'model_id' in dir(f):
-        rep = f.model_id
-    f.close()
+    with ncf(filename, 'r') as f:
+        if 'model_id' in f.__dir__():
+            rep = f.model_id
     return rep
 
 
@@ -147,7 +146,7 @@ def timeLimits(filename):
     f = ncf(filename)
     if 'time_bnds' in f.variables:
         tim = f.variables['time_bnds']
-        if 'units' in dir(tim):
+        if 'units' in tim.__dir__():
             start = tim[0, 0]
             end = tim[-1, 1]
             ct = netcdftime.utime(tim.units, calendar=tim.calendar)

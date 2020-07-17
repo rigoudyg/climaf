@@ -24,7 +24,7 @@ class DeriveTest(unittest.TestCase):
         derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
         derive('*', dict(out='rscre'), 'minus', 'rs', 'rscs')
         self.assertIsNone(derive("erai", "ta2", "minus", "t", "ta", "rscre"))
-        derived_variables = get_variable("derived_variables")
+        derived_variables = get_variable("climaf_derived_variables")
         self.assertEqual(derived_variables["erai"]["ta"], ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
         self.assertEqual(derived_variables["*"]["rscre"], ('minus', 'rscre', ['rs', 'rscs'], {}))
         self.assertNotIn("ta2", derived_variables["erai"])

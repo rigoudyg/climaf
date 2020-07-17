@@ -224,7 +224,7 @@ class cscript(object):
            "CNRM-CM5 is fine$IPSL-CM5-LR is not bad$CCSM-29 is ..."
 
         """
-        scripts = get_variable("scripts")
+        scripts = get_variable("climaf_scripts")
         # Check that script name do not clash with an existing symbol
         if name in sys.modules['__main__'].__dict__ and name not in scripts:
             clogger.error("trying to define %s as an operator, "
@@ -237,7 +237,7 @@ class cscript(object):
             # Check now that script is executable
             scriptcommand = command.split(' ')[0].replace("(", "")
             try:
-                executable = subprocess.check_output("which {}".format(scriptcommand), shell=True)
+                executable = str(subprocess.check_output("which {}".format(scriptcommand), shell=True))
                 executable = executable.replace("\n", "")
                 clogger.debug("Found %s" % executable)
                 #
@@ -332,15 +332,15 @@ class cscript(object):
                     self.flags = scriptFlags(True, True, True, True, True, True, True,
                                              commuteWithEnsemble, commuteWithTimeConcatenation,
                                              commuteWithSpaceConcatenation, doCatTime)
-                graphic_formats = get_variable("graphic_formats")
-                if format in get_variable("known_formats") or format in graphic_formats or \
-                        format in get_variable("none_formats"):
+                graphic_formats = get_variable("climaf_graphic_formats")
+                if format in get_variable("climaf_known_formats") or format in graphic_formats or \
+                        format in get_variable("climaf_none_formats"):
                     self.outputFormat = format
                 else:
                     raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
                                                 ', '.join([repr(x) for x in graphic_formats]))
                 scripts[name] = self
-                change_variable("scripts", scripts)
+                change_variable("climaf_scripts", scripts)
 
                 # Init doc string for the operator
                 doc = "CliMAF wrapper for command : %s" % self.command
@@ -417,10 +417,10 @@ def fixed_fields(operator, *paths):
     else:
         namelist = operator
 
-    scripts = get_variable("scripts")
+    scripts = get_variable("climaf_scripts")
     for name_op in namelist:
         scripts[name_op].fixedfields = paths
-    change_variable("scripts", scripts)
+    change_variable("climaf_scripts", scripts)
 
 
 class coperator(object):

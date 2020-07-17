@@ -33,7 +33,7 @@ class MacroTests(unittest.TestCase):
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm)
         my_macro = macro('eu_cross_section', fig_ezm)
-        from climaf.cmacro import cmacros
+        cmacros = get_variable("climaf_macros")
         self.assertEqual(cmacros["eu_cross_section"].buildcrs(),
                          "plot(ccdo(llbox(ARG,latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")
         self.assertEqual(cmacros["eu_cross_section"].buildcrs().replace("ARG", january_ta.buildcrs()),
@@ -160,7 +160,9 @@ class CrewriteTests(unittest.TestCase):
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm, format="eps")
         my_macro = macro('eu_cross_section', fig_ezm, [january_ta2, ])
+        clog("debug")
         my_crewrite = crewrite(fig_ezm.buildcrs())
+        clog("info")
         self.assertEqual(my_crewrite,
                          "eu_cross_section(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),"
                          "ds('example|AMIPV6ALB2G|ta|19800101|global|monthly'))")
@@ -224,19 +226,18 @@ class ReadWriteTests(unittest.TestCase):
         my_macro = macro("my_bias", my_bias, [mean_january_ta, ])
         self.my_macro_file = os.path.sep.join([tmp_directory, "my_macro_test.json"])
         write(self.my_macro_file)
-        from climaf.cmacro import cmacros
-        for a_macro in list(cmacros):
-            del cmacros[a_macro]
+        change_variable("climaf_macros", dict())
+        cmacros = get_variable("climaf_macros")
         self.assertNotIn("my_bias", cmacros)
 
     def test_read(self):
-        from climaf.cmacro import cmacros
+        cmacros = get_variable("climaf_macros")
         self.assertNotIn("my_bias", cmacros)
         read("my_macro.txt")
-        from climaf.cmacro import cmacros
+        cmacros = get_variable("climaf_macros")
         self.assertNotIn("my_bias", cmacros)
         read(self.my_macro_file)
-        from climaf.cmacro import cmacros
+        cmacros = get_variable("climaf_macros")
         self.assertIn("my_bias", cmacros)
 
     def test_write(self):

@@ -195,7 +195,7 @@ class InitPeriodTests(unittest.TestCase):
             init_period(1850)
         with self.assertRaises(TypeError):
             init_period(1850, 1950)
-        init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
+        init_period(cperiod(datetime(1850, 1, 2), datetime(1950, 5, 23)))
         init_period("1850")
         init_period("1500-2000")
         init_period("1500_2000")
@@ -290,9 +290,9 @@ class InitPeriodTests(unittest.TestCase):
         my_period = init_period("174512251324-184705131659")
         self.assertEqual(my_period.start, datetime(1745, 12, 25, 13, 24))
         self.assertEqual(my_period.end, datetime(1847, 5, 13, 17))
-        my_period = init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
-        self.assertEqual(my_period.start, datetime(1850, 01, 02))
-        self.assertEqual(my_period.end, datetime(1950, 05, 23))
+        my_period = init_period(cperiod(datetime(1850, 1, 2), datetime(1950, 5, 23)))
+        self.assertEqual(my_period.start, datetime(1850, 1, 2))
+        self.assertEqual(my_period.end, datetime(1950, 5, 23))
 
 
 class SortPeriodsListTests(unittest.TestCase):
@@ -321,9 +321,7 @@ class MergePeriodsTests(unittest.TestCase):
         # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
         pass
 
-    @unittest.expectedFailure
     def test_merge(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))

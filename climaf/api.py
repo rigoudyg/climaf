@@ -82,8 +82,7 @@ from .projects import *
 #####################################################################################################################
 #
 from .classes import cdef, cdataset, ds, cproject, cpage, cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms
-from climaf.environment import cprojects, aliases
-from .cmacro import macro, cmacros
+from .cmacro import macro
 from .driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from .dataloc import dataloc
 from .operators import cscript, fixed_fields
@@ -98,14 +97,24 @@ from .functions import *
 from .easyCMIP_functions import *
 
 
-@property
+def cprojects():
+    return get_variable("climaf_projects")
+
+
+def aliases():
+    return get_variable("climaf_aliases")
+
+
 def cscripts():
-    return get_variable("scripts")
+    return get_variable("climaf_scripts")
 
 
-@property
 def operators():
-    return get_variable("operators")
+    return get_variable("climaf_operators")
+
+
+def cmacros():
+    return get_variable("climaf_macros")
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not

@@ -301,7 +301,7 @@ def hasMatchingObject(cobject, ds_func):
     # First read index from file if it is yet empty - No : done at startup
     # if len(crs2filename.keys()) == 0 : cload()
     def op_squeezes_time(operator):
-        return not get_variable("scripts")[operator].flags.commuteWithTimeConcatenation
+        return not get_variable("climaf_scripts")[operator].flags.commuteWithTimeConcatenation
 
     #
     global crs2eval
@@ -635,7 +635,7 @@ def craz(force=False, hideError=False):
             os.system("rm -fR " + cc + "/*")
             crs2filename = dict()
         else:
-            list_of_crs = crs2filename.keys()
+            list_of_crs = list(crs2filename)
             for crs in list_of_crs:
                 if cdrop(crs):
                     clogger.debug('Removed file: %s', generateUniqueFileName(crs))

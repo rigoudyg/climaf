@@ -60,7 +60,6 @@ if not already_inited and not onrtd:
     from . import cmacro
     from . import operators
     import subprocess
-    import commands
 
 
     def my_which(soft):
@@ -84,25 +83,25 @@ if not already_inited and not onrtd:
         print("---")
         print("Required softwares to run CliMAF => you are using the following versions/installations:")
         try:
-            print("ncl " + commands.getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
+            print("ncl " + subprocess.getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
         except:
             print("Warning: ncl not found -> can't use CliMAF plotting scripts")
         try:
-            tmp = str.split(commands.getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
+            tmp = str.split(subprocess.getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
             print("cdo " + tmp[tmp.index('version') + 1] + " => " + my_which('cdo'))
         except:
             print("Error: cdo not found -> CDO is mandatory to run CliMAF")
         try:
-            tmp = str.split(commands.getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
+            tmp = str.split(subprocess.getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
             print("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + my_which('ncks'))
         except:
             print("Warning: nco not found -> can't use nco from CliMAF")
         try:
             if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
-                ncdump_ret = commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
+                ncdump_ret = subprocess.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
                 print("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + my_which('ncdump'))
             else:
-                binary_info = commands.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
+                binary_info = subprocess.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
                 binary_info = binary_info.split("version")[-1].split("of")[0].strip()
                 print("ncdump " + binary_info + " => " + my_which('ncdump'))
         except:
@@ -182,7 +181,8 @@ if not already_inited and not onrtd:
     # Init and load macros
     macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
-    print("Available macros read from %s are : %s" % (macroFilename, repr(list(cmacro.cmacros))),
+    print("Available macros read from %s are : %s" % (macroFilename,
+                                                      repr(list(environment.get_variable("climaf_macros")))),
           file=sys.stderr)
     tim("macros")
     #
@@ -196,8 +196,8 @@ if not already_inited and not onrtd:
     if cache.stamping:
         # Check if exiv2 is installed
         #
-        graphic_formats = environment.get_variable("graphic_formats")
+        graphic_formats = environment.get_variable("climaf_graphic_formats")
         if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in graphic_formats:
             graphic_formats.remove('eps')
             print("exiv2 is not installed so you can not use 'eps' output format")
-            environment.change_variable("graphic_formats", graphic_formats)
+            environment.change_variable("climaf_graphic_formats", graphic_formats)

@@ -105,7 +105,7 @@ class FixedFieldsTest(unittest.TestCase):
         fixed_fields(['plot', ],
                      ('coordinates.nc',
                       '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
-        scripts = get_variable("scripts")
+        scripts = get_variable("climaf_scripts")
         self.assertEqual(scripts["minus"].fixedfields,
                          (('mesh_hgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
                           ('mesh_zgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc')))

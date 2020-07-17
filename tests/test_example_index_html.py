@@ -19,6 +19,7 @@ from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
 from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
 from climaf import cachedir
+from collections import OrderedDict
 
 
 if not isinstance(cpath, list):
@@ -92,7 +93,9 @@ class HtmlIndexCreation(unittest.TestCase):
         # over lines changing values of first arg to the function (here: the variable name),
         # use function 'flines', which loops on the list provided as second arg (it can also be a
         # dict with similar keys and which values are line titles)
-        seasons = {'Year': 'ANN', 'Winter': 'DJF'}
+        seasons = OrderedDict()
+        seasons["Year"] = "ANN"
+        seasons["Winter"] = "DJF"
         index += open_table(title='variable/season', columns=seasons.keys(), spacing=5)
         lvars = {
             "rst": "short wave at top ",

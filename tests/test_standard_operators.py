@@ -23,7 +23,7 @@ class StandardOperatorsTests(unittest.TestCase):
         load_standard_operators()
         import sys
         list_of_objects_in_main = sys.modules["__main__"].__dict__
-        scripts = get_variable("scripts")
+        scripts = get_variable("climaf_scripts")
         for script in scripts:
             self.assertIn(script, globals())
             self.assertIn(script, list_of_objects_in_main)

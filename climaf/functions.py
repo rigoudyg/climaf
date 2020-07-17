@@ -591,7 +591,7 @@ def projects():
     """
     Lists available projects and their associated facets.
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     print('-- Available projects:')
     for key in list(cprojects):
         print('-- Project:', key)

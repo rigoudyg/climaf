@@ -14,34 +14,37 @@ from climaf.utils import Climaf_Error
 # Variables
 
 #: Dictionary of declared projects (type is cproject)
-cprojects = dict()
+climaf_projects = dict()
 
 #: Dictionary of aliases dictionaries
-aliases = dict()
+climaf_aliases = dict()
 
 #: Dictionary of frequency names dictionaries
-frequencies = dict()
+climaf_frequencies = dict()
 
 #: Dictionary of realms names dictionaries
-realms = dict()
+climaf_realms = dict()
 
 #: Dictionary of scripts names dictionaries
-scripts = dict()
+climaf_scripts = dict()
 
 #: Dictionary of operators names dictionaries
-operators = dict()
+climaf_operators = dict()
 
 #: Dictionary of derived variables names dictionaries
-derived_variables = dict()
+climaf_derived_variables = dict()
+
+#: Dictionary of macros names
+climaf_macros = dict()
 
 #: List of known formats
-known_formats = ['nc', 'graph', 'txt']
+climaf_known_formats = ['nc', 'graph', 'txt']
 
 #: List of graphic formats
-graphic_formats = ['png', 'pdf', 'eps']
+climaf_graphic_formats = ['png', 'pdf', 'eps']
 
 #: List of none formats
-none_formats = [None, 'txt']
+climaf_none_formats = [None, 'txt']
 
 #: Log directory
 logdir = "."
@@ -50,7 +53,10 @@ logdir = "."
 # Tools to deal with variables
 def get_variable(variable):
     if variable in globals():
-        return copy.deepcopy(globals()[variable])
+        if variable != "climaf_macros":
+            return copy.deepcopy(globals()[variable])
+        else:
+            return copy.copy(globals()[variable])
     else:
         raise Climaf_Error("Unknown variable %s." % variable)
 

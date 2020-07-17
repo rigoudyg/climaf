@@ -32,7 +32,7 @@ from climaf.operators_scripts import scriptFlags
 from climaf.operators_derive import is_derived_variable, derived_variable, derive
 from climaf import classes
 from climaf import cache
-from climaf.cmacro import cmacros, instantiate
+from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
 from climaf.period import init_period, cperiod, merge_periods
@@ -55,7 +55,8 @@ def capply(climaf_operator, *operands, **parameters):
     :param parameters: parameters to be passed to the climaf operator (not available for macros)
     :return: a list of CliMAF objects (stored if auto-store is on)
     """
-    scripts = get_variable("scripts")
+    scripts = get_variable("climaf_scripts")
+    cmacros = get_variable("climaf_macros")
     res = None
     if operands is None or operands[0] is None and not classes.allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
@@ -65,14 +66,14 @@ def capply(climaf_operator, *operands, **parameters):
         res = capply_script(climaf_operator, *operands, **parameters)
         # Evaluate object right now if there is no output to manage
         op = scripts[climaf_operator]
-        if op.outputFormat in get_variable("none_formats"):
+        if op.outputFormat in get_variable("climaf_none_formats"):
             ceval(res, userflags=copy.copy(op.flags))
     elif climaf_operator in cmacros:
         if len(parameters) > 0:
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
         clogger.debug("applying macro %s to" % climaf_operator + repr(opds))
         res = instantiate(cmacros[climaf_operator], *operands)
-    elif climaf_operator in get_variable("operators"):
+    elif climaf_operator in get_variable("climaf_operators"):
         clogger.debug("applying operator %s to" % climaf_operator + repr(opds) + repr(parameters))
         res = capply_operator(climaf_operator, *operands, **parameters)
     else:
@@ -98,7 +99,7 @@ def capply_script(script_name, *operands, **parameters):
     :param parameters: parameters to be passed to the script
     :return: an object that represents the application of the script
     """
-    scripts = get_variable("scripts")
+    scripts = get_variable("climaf_scripts")
     if script_name not in scripts:
         raise Climaf_Driver_Error("Script %s is not know. Consider declaring it with function 'cscript'", script_name)
     script = scripts[script_name]
@@ -372,7 +373,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     # the cache doesn't have a similar tree, let us recursively eval subtrees
     ##########################################################################
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
-    if cobject.operator in get_variable("scripts"):
+    if cobject.operator in get_variable("climaf_scripts"):
         clogger.debug("Script %s found" % cobject.operator)
         file = ceval_script(cobject, deep,
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
@@ -381,7 +382,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
             return file
         else:
             return cread(file, classes.varOf(cobject))
-    elif cobject.operator in get_variable("operators"):
+    elif cobject.operator in get_variable("climaf_operators"):
         clogger.debug("Operator %s found" % cobject.operator)
         # TODO: Implement ceval_operator
         obj = ceval_operator(cobject, deep)
@@ -621,7 +622,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     """
     if format not in ["MaskedArray", "file", "txt"]:
         raise Climaf_Driver_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join(
-            [repr(x) for x in get_variable("graphic_formats")]))
+            [repr(x) for x in get_variable("climaf_graphic_formats")]))
     #
     if userflags is None:
         userflags = scriptFlags()
@@ -666,7 +667,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
 
     Returns a CLiMAF cache data filename
     """
-    script = get_variable("scripts")[scriptCall.operator]
+    script = get_variable("climaf_scripts")[scriptCall.operator]
     template = Template(script.command)
     # Evaluate input data
     invalues = []
@@ -777,8 +778,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    graphic_formats = get_variable("graphic_formats")
-    if script.outputFormat not in get_variable("none_formats"):
+    graphic_formats = get_variable("climaf_graphic_formats")
+    if script.outputFormat not in get_variable("climaf_none_formats"):
         if script.outputFormat == "graph":
             if 'format' in scriptCall.parameters:
                 if scriptCall.parameters['format'] in graphic_formats:
@@ -912,7 +913,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         with open(get_variable("logdir") + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
-    if script.outputFormat in get_variable("none_formats"):
+    if script.outputFormat in get_variable("climaf_none_formats"):
         return None
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
@@ -1006,19 +1007,18 @@ def cread(datafile, varname=None, period=None):
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
         from .anynetcdf import ncf
-        fileobj = ncf(datafile)
-        # import netCDF4
-        # fileobj=netCDF4.Dataset(datafile)
-        # Note taken from the CDOpy developper : .data is not backwards
-        # compatible to old scipy versions, [:] is
-        data = fileobj.variables[varname][:]
-        import numpy.ma
-        if '_FillValue' in dir(fileobj.variables[varname]):
-            fillv = fileobj.variables[varname]._FillValue
-            rep = numpy.ma.array(data, mask=data == fillv)
-        else:
-            rep = numpy.ma.array(data)
-        fileobj.close()
+        with ncf(datafile) as fileobj:
+            # import netCDF4
+            # fileobj=netCDF4.Dataset(datafile)
+            # Note taken from the CDOpy developper : .data is not backwards
+            # compatible to old scipy versions, [:] is
+            data = fileobj.variables[varname][:]
+            import numpy.ma
+            if '_FillValue' in dir(fileobj.variables[varname]):
+                fillv = fileobj.variables[varname]._FillValue
+                rep = numpy.ma.array(data, mask=data == fillv)
+            else:
+                rep = numpy.ma.array(data)
         return rep
     else:
         clogger.error("cannot yet handle %s" % datafile)
@@ -1299,9 +1299,10 @@ def cimport(cobject, crs):
 
 def get_fig_sizes(figfile):
     args_figsize = ["identify", figfile]
-    comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output_figsize = comm_figsize.stdout.read()
-    figsize = output_figsize.split(" ").pop(2)
+    output_figsize = subprocess.getoutput(" ".join(args_figsize))
+    # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # output_figsize = comm_figsize.stdout.read()
+    figsize = str(output_figsize).split(" ").pop(2)
     fig_width = figsize.split("x").pop(0)
     fig_height = figsize.split("x").pop(1)
     return int(fig_width), int(fig_height)
@@ -1409,7 +1410,10 @@ def cfilePage(cobj, deep, recurse_list=None):
 
     comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait() != 0:
-        raise Climaf_Driver_Error("Compositing failed : %s" % comm.stderr.read())
+        err = comm.stderr.read()
+        comm.stderr.close()
+        comm.stdout.close()
+        raise Climaf_Driver_Error("Compositing failed : %s" % err)
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
@@ -1485,7 +1489,10 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     clogger.debug("Compositing figures : %s" % repr(args))
     comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if comm.wait() != 0:
-        raise Climaf_Driver_Error("Compositing failed : %s" % comm.stderr.read())
+        err = comm.stderr.read()
+        comm.stderr.close()
+        comm.stdout.close()
+        raise Climaf_Driver_Error("Compositing failed : %s" % err)
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))

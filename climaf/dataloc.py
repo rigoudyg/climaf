@@ -294,13 +294,13 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
             raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
-        frequencies = get_variable("frequencies")
+        frequencies = get_variable("climaf_frequencies")
         if "frequency" in kwargs and project in frequencies:
             normfreq = kwargs2['frequency']
             if normfreq in frequencies[project]:
                 kwargs2['frequency'] = frequencies[project][normfreq]
         # JS # Convert normalized realm to project-specific realm if applicable
-        realms = get_variable("realms")
+        realms = get_variable("climaf_realms")
         if "realm" in kwargs and project in realms:
             normrealm = kwargs2['realm']
             if normrealm in realms[project]:
@@ -1141,7 +1141,7 @@ def cvalid(attribute, value=None, project=None):
 
     >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     if project not in cprojects:
         raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
     if attribute == 'project':
@@ -1156,4 +1156,4 @@ def cvalid(attribute, value=None, project=None):
         return rep
     else:
         cprojects[project].facet_authorized_values[attribute] = value
-    change_variable("cprojects", cprojects)
+    change_variable("climaf_projects", cprojects)

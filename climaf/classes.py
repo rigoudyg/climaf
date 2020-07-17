@@ -97,7 +97,7 @@ class cproject(object):
         used when accessing datafiles); see :py:func:`~climaf.classes.cfreqs`)
 
         """
-        cprojects = get_variable("cprojects")
+        cprojects = get_variable("climaf_projects")
         if name in cprojects:
             clogger.warning("Redefining project %s" % name)
         self.project = name
@@ -125,7 +125,7 @@ class cproject(object):
         if self.separator == ",":
             raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
         cprojects[name] = self
-        change_variable("cprojects", cprojects)
+        change_variable("climaf_projects", cprojects)
         self.crs = ""
         # Build the pattern for the datasets CRS for this cproject
         for f in self.facets:
@@ -173,7 +173,7 @@ def cdef(attribute, value=None, project=None):
     >>> cdef('project','OCMPI5')
     >>> cdef('frequency','monthly',project='OCMPI5')
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     if project not in cprojects:
         raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
     if attribute == 'project':
@@ -188,7 +188,7 @@ def cdef(attribute, value=None, project=None):
         return rep
     else:
         cprojects[project].facet_defaults[attribute] = value
-    change_variable("cprojects", cprojects)
+    change_variable("climaf_projects", cprojects)
 
 
 cproject(None)
@@ -243,7 +243,7 @@ def processDatasetArgs(**kwargs):
     Also complement with default values as handled by the
     project's definition and by cdef()
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     if 'project' in kwargs:
         project = kwargs['project']
     else:
@@ -393,7 +393,7 @@ class cdataset(cobject):
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
         if self.frequency in ['seasonal', 'annual_cycle']:
             self.period.fx = True
-        frequencies = get_variable("frequencies")
+        frequencies = get_variable("climaf_frequencies")
         freqs_dic = frequencies.get(self.project, None)
         # print freqs_dic
         if freqs_dic:
@@ -425,7 +425,7 @@ class cdataset(cobject):
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
-        cprojects = get_variable("cprojects")
+        cprojects = get_variable("climaf_projects")
         crs_template = string.Template(cprojects[self.project].crs)
         dic = self.kvp.copy()
         if period is not None:
@@ -701,7 +701,7 @@ class cdataset(cobject):
                 else:
                     if kw == 'variable':  # Should take care of aliasing to fileVar
                         matching_vars = set()
-                        aliases = get_variable("aliases")
+                        aliases = get_variable("climaf_aliases")
                         paliases = aliases.get(self.project, [])
                         for variable in paliases:
                             if val == paliases[variable][0]:
@@ -854,7 +854,7 @@ class cdataset(cobject):
             for filename in files.split():
                 fileobj = ncf(filename)
                 #
-                aliases = get_variable("aliases")
+                aliases = get_variable("climaf_aliases")
                 if self.project in aliases and var in aliases[self.project]:
                     var = aliases[self.project][var][0]
                 #
@@ -1181,7 +1181,7 @@ def eds(first=None, **kwargs):
     of these attributes appears first in member labels
 
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     attval = processDatasetArgs(**kwargs)
     # Check that any facet/attribute of type 'list' (for defining an
     # ensemble) is OK for the project, and that there is at most one
@@ -1529,7 +1529,7 @@ def ds(*args, **kwargs):
 
     crs = args[0]
     results = []
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     for cproj in cprojects:
         try:
             dataset = cprojects[cproj].crs2ds(crs)
@@ -1573,9 +1573,9 @@ def cfreqs(project, dic):
     >>> cfreqs('CMIP5',{'monthly':'mon' , 'daily':'day' })
     """
     #
-    frequencies = get_variable("frequencies")
+    frequencies = get_variable("climaf_frequencies")
     frequencies[project] = dic
-    change_variable("frequencies", frequencies)
+    change_variable("climaf_frequencies", frequencies)
 
 
 def crealms(project, dic):
@@ -1595,9 +1595,9 @@ def crealms(project, dic):
     >>> crealms('CMIP5',{'atmos':'ATM' , 'ocean':'OCE' })
     """
     #
-    realms = get_variable("realms")
+    realms = get_variable("climaf_realms")
     realms[project] = dic
-    change_variable("realms", realms)
+    change_variable("climaf_realms", realms)
 
 
 def calias(project, variable, fileVariable=None, scale=1., offset=0.,
@@ -1640,14 +1640,14 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
     variable.
 
     """
-    cprojects = get_variable("cprojects")
+    cprojects = get_variable("climaf_projects")
     if not fileVariable:
         fileVariable = variable
     if not filenameVar:
         filenameVar = None
-    if project not in get_variable("cprojects"):
+    if project not in get_variable("climaf_projects"):
         raise Climaf_Classes_Error("project %s is not known" % project)
-    aliases = get_variable("aliases")
+    aliases = get_variable("climaf_aliases")
     if project not in aliases:
         aliases[project] = dict()
     if not isinstance(variable, list):
@@ -1665,7 +1665,7 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
                     "Keyword \"%s\" is not allowed for project %s" % (kw, project))
     for v, u, fv, fnv in zip(variable, units, fileVariable, filenameVar):
         aliases[project][v] = (fv, scale, offset, u, fnv, missing, conditions)
-    change_variable("aliases", aliases)
+    change_variable("climaf_aliases", aliases)
 
 
 def varIsAliased(project, variable):
@@ -1674,7 +1674,7 @@ def varIsAliased(project, variable):
     missing,conditions) defining how to compute a 'variable' which
     is not in files, for the 'project'
     """
-    aliases = get_variable("aliases")
+    aliases = get_variable("climaf_aliases")
     if project in aliases and variable in aliases[project]:
         return aliases[project][variable]
 
