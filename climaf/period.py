@@ -11,6 +11,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import re
 import datetime
 import six
+import copy
 
 from env.clogging import clogger, dedent
 

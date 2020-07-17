@@ -27,7 +27,6 @@ from climaf.utils import Climaf_Error, Climaf_Classes_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
-from climaf.classes import cvalid
 
 
 locs = []

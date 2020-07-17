@@ -11,11 +11,11 @@ import os
 
 # Created : S.Sénési - 2014
 
-__all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
+__all__ = ["environment", "cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
-version = "1.2.13"
+version = "2.0.0"
 
 
 def tim(string=None):
@@ -53,9 +53,8 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
-    from . import environment
     import env.clogging as clogging
-    import env.site_settings import site_settings
+    import env.site_settings as site_settings
     from . import cache
     from . import standard_operators
     from . import cmacro

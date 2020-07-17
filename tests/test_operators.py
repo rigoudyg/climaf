@@ -4,6 +4,8 @@
 """
 Test the operators module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -11,52 +13,8 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
-from climaf.operators import scriptFlags, cscript, fixed_fields, coperator, derive, is_derived_variable, \
-    derived_variable, Climaf_Operator_Error
-
-
-class ScriptFlagsTests(unittest.TestCase):
-
-    def test_scriptFlags_noargs(self):
-        my_script_flag = scriptFlags()
-        self.assertFalse(my_script_flag.canOpendap)
-        self.assertFalse(my_script_flag.canSelectVar)
-        self.assertFalse(my_script_flag.canSelectTime)
-        self.assertFalse(my_script_flag.canSelectDomain)
-        self.assertFalse(my_script_flag.canAggregateTime)
-        self.assertFalse(my_script_flag.canAlias)
-        self.assertFalse(my_script_flag.canMissing)
-        self.assertTrue(my_script_flag.commuteWithEnsemble)
-        self.assertFalse(my_script_flag.commuteWithTimeConcatenation)
-        self.assertFalse(my_script_flag.commuteWithSpaceConcatenation)
-
-    def test_scriptFlags_args(self):
-        my_script_flag = scriptFlags(canSelectVar=True, commuteWithSpaceConcatenation=True, canMissing=True)
-        self.assertFalse(my_script_flag.canOpendap)
-        self.assertTrue(my_script_flag.canSelectVar)
-        self.assertFalse(my_script_flag.canSelectTime)
-        self.assertFalse(my_script_flag.canSelectDomain)
-        self.assertFalse(my_script_flag.canAggregateTime)
-        self.assertFalse(my_script_flag.canAlias)
-        self.assertTrue(my_script_flag.canMissing)
-        self.assertTrue(my_script_flag.commuteWithEnsemble)
-        self.assertFalse(my_script_flag.commuteWithTimeConcatenation)
-        self.assertTrue(my_script_flag.commuteWithSpaceConcatenation)
-        my_script_flag.unset_selectors()
-        self.assertFalse(my_script_flag.canOpendap)
-        self.assertFalse(my_script_flag.canSelectVar)
-        self.assertFalse(my_script_flag.canSelectTime)
-        self.assertFalse(my_script_flag.canSelectDomain)
-        self.assertFalse(my_script_flag.canAggregateTime)
-        self.assertFalse(my_script_flag.canAlias)
-        self.assertFalse(my_script_flag.canMissing)
-        self.assertTrue(my_script_flag.commuteWithEnsemble)
-        self.assertFalse(my_script_flag.commuteWithTimeConcatenation)
-        self.assertTrue(my_script_flag.commuteWithSpaceConcatenation)
-
-    def test_equality(self):
-        self.assertTrue(scriptFlags() == scriptFlags(canOpendap=False))
-        self.assertFalse(scriptFlags() == scriptFlags(commuteWithEnsemble=False))
+from climaf.operators import scriptFlags, cscript, fixed_fields, coperator, Climaf_Operator_Error
+from climaf.environment import get_variable
 
 
 class CscriptTest(unittest.TestCase):
@@ -75,6 +33,7 @@ class CscriptTest(unittest.TestCase):
 
     def test_simple_cscript(self):
         my_script = cscript('mycdo', '(cdo ${operator} ${in} ${out})')
+        self.assertTrue(isinstance(my_script, cscript))
         self.assertDictEqual(my_script.inputs, {0: ('in', False, False)})
         self.assertDictEqual(my_script.outputs, {None: '%s', '': '%s'})
         self.assertEqual(my_script.name, "mycdo")
@@ -146,7 +105,7 @@ class FixedFieldsTest(unittest.TestCase):
         fixed_fields(['plot', ],
                      ('coordinates.nc',
                       '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
-        from climaf.operators import scripts
+        scripts = get_variable("scripts")
         self.assertEqual(scripts["minus"].fixedfields,
                          (('mesh_hgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
                           ('mesh_zgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc')))
@@ -161,56 +120,6 @@ class CoperatorTest(unittest.TestCase):
     def test_coperator(self):
         # TODO: Implement this test
         pass
-
-
-class DeriveTest(unittest.TestCase):
-
-    def test_derive_from_script(self):
-        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
-        derive('*', dict(out='rscre'), 'minus', 'rs', 'rscs')
-        self.assertIsNone(derive("erai", "ta2", "minus", "t", "ta", "rscre"))
-        from climaf.operators import derived_variables
-        self.assertEqual(derived_variables["erai"]["ta"], ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
-        self.assertEqual(derived_variables["*"]["rscre"], ('minus', 'rscre', ['rs', 'rscs'], {}))
-        self.assertNotIn("ta2", derived_variables["erai"])
-        with self.assertRaises(Climaf_Operator_Error):
-            derive("CMIP5", dict(my_out_name='ta2'), 'rescale', 't', scale=2., offset=-154.3)
-
-    @unittest.skipUnless(False, "Not implemented")
-    def test_derive_from_operator(self):
-        # TODO: Implement this test
-        pass
-
-    @unittest.skipUnless(False, "Not implemented")
-    def test_derive_from_sth_else(self):
-        # TODO: Implement this test and modify CliMAF in this scope
-        pass
-
-
-class IsDerivedVariableTest(unittest.TestCase):
-
-    def setUp(self):
-        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
-        derive('*', 'rscre', 'minus', 'rs', 'rscs')
-
-    def test_is_derived_variable(self):
-        self.assertTrue(is_derived_variable("ta", "erai"))
-        self.assertTrue(is_derived_variable("rscre", "erai"))
-        self.assertFalse(is_derived_variable("ta", "CMIP6"))
-
-
-class DerivedVariableTest(unittest.TestCase):
-
-    def setUp(self):
-        derive("erai", 'ta', 'rescale', 't', scale=1., offset=0.)
-        derive('*', 'rscre', 'minus', 'rs', 'rscs')
-
-    def test_derived_variable(self):
-        self.assertIsNone(derived_variable("my_variable", "my_project"))
-        self.assertIsNone(derived_variable("my_variable", "CMIP6"))
-        self.assertIsNone(derived_variable("ta", "CMIP6"))
-        self.assertEqual(derived_variable("rscre", "erai"), ("minus", "rscre", ["rs", "rscs"], {}))
-        self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
 
 
 if __name__ == '__main__':

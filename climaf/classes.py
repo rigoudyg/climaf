@@ -1134,12 +1134,7 @@ class cens(cobject, dict):
             self.order = self.sortfunc(list(self))
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = "cens({"
-        for m in self.order:
-            rep += "'" + m + "'" + ":" + self[m].buildcrs(crsrewrite=crsrewrite, period=period) + ","
-        rep = rep + "}"
-        rep = rep.replace(",}", "}")
-        rep = rep + ")"
+        rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period)) for m in self.order])
         return rep
 
     def check(self):
@@ -1349,28 +1344,26 @@ class ctree(cobject):
         repetitive data selection, when a data selection has been explictly cached
         """
         first_op = self.operands[0]
-        if self.operator == 'select' and len(self.operands) == 1 and isinstance(first_op, cdataset) and \
-                len(self.parameters.keys()) == 0 and first_op.alias is None:
+        if self.operator in ['select', ] and len(self.operands) == 1 and isinstance(first_op, cdataset) and \
+                len(list(self.parameters)) == 0 and first_op.alias is None:
             return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
         #
         # General case
         # Operators are listed in alphabetical order; parameters too
-        rep = self.operator + "("
+        rep = list()
         #
-        ops = [o for o in self.operands]
-        for op in ops:
-            if op:
-                opcrs = op.buildcrs(crsrewrite=crsrewrite, period=period)
-                if crsrewrite:
-                    opcrs = crsrewrite(opcrs)
-                rep += opcrs + ","
+        for op in [o for o in self.operands if o]:
+            opcrs = op.buildcrs(crsrewrite=crsrewrite, period=period)
+            if crsrewrite:
+                opcrs = crsrewrite(opcrs)
+            rep.append(opcrs)
         #
-        clefs = self.parameters.keys()
-        for par in sorted(list(clefs)):
-            if par != 'member_label':
-                rep += par + "=" + repr(self.parameters[par]) + ","
-        rep += ")"
-        rep = rep.replace(",)", ")")
+        for par in [p for p in sorted(list(self.parameters)) if p not in ["member_label", ]]:
+            value = self.parameters[par]
+            if isinstance(value, six.string_types):
+                value = str(value)
+            rep.append("{}={}".format(par, repr(value)))
+        rep = "%s(%s)" % (self.operator, ",".join(rep))
         # clogger.debug("Create crs for ctree: %s" % rep)
         return rep
 
@@ -1407,7 +1400,7 @@ class scriptChild(cobject):
         tmp = self.father.buildcrs(period=period)
         if crsrewrite:
             tmp = crsrewrite(tmp)
-        return tmp + "." + self.varname
+        return ".".join([tmp, self.varname])
 
 
 def compare_trees(tree1, tree2, func, filter_on_operator=None):
@@ -1551,7 +1544,7 @@ def ds(*args, **kwargs):
         else:
             raise Climaf_Classes_Error(e)
     elif len(results) == 0:
-        e = "CRS expression %s is not valid for any project in %s" % (crs, repr(list(cprojects.keys)))
+        e = "CRS expression %s is not valid for any project in %s" % (crs, repr(list(cprojects)))
         if allow_errors_on_ds_call:
             clogger.debug(e)
         else:
@@ -1900,34 +1893,19 @@ class cpage(cobject):
         self.heights = [round(1. / ny, 2) for i in range(ny)]
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = "cpage(["
+        rep = list()
         for line in self.fig_lines:
-            rep += "["
-            for f in line:
-                if f:
-                    rep += f.buildcrs(crsrewrite=crsrewrite) + ","
-                else:
-                    rep += repr(None) + ","
-            rep += " ],"
+            rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
+                                           for f in line]))
 
-        if self.title is "":
-            rep += ("]," + repr(self.widths) + "," + repr(self.heights) + ", fig_trim='%s', page_trim='%s', format='"
-                    + self.format + "', page_width=%d, page_height=%d)") \
-                   % (self.fig_trim, self.page_trim, self.page_width, self.page_height)
-
-        else:
-            rep += ("]," + repr(self.widths) + "," + repr(self.heights) +
-                    ", fig_trim='%s', page_trim='%s', format='" + self.format +
-                    "', page_width=%d, page_height=%d, title='" + self.title +
-                    "', x=%d, y=%d, ybox=%d, pt=%d, font='" + self.font +
-                    "', gravity='" + self.gravity + "', background='" + self.background +
-                    "', insert='" + self.insert + "', insert_width=%d'" +
-                    "')") \
-                   % (self.fig_trim, self.page_trim, self.page_width, self.page_height, self.x, self.y, self.ybox,
-                      self.pt, self.insert_width)
-
-        rep = rep.replace(",]", "]")
-        rep = rep.replace(", ]", "]")
+        param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
+                (repr(self.widths), repr(self.heights), self.fig_trim, self.page_trim, self.format, self.page_width,
+                 self.page_height)
+        if isinstance(self.title, six.string_types) and len(self.title) != 0:
+            param = "%s, title='%s', x=%d, y=%d, ybox=%d, pt=%d, font='%s', gravity='%s', backgroud='%s', " \
+                    "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
+                                                      self.gravity, self.background, self.insert, self.insert_width)
+        rep = "cpage([%s],%s)" % (",".join(rep), param)
 
         return rep
 
@@ -2077,30 +2055,17 @@ class cpage_pdf(cobject):
         self.crs = self.buildcrs()
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = "cpage_pdf(["
+        rep = list()
         for line in self.fig_lines:
-            rep += "["
-            for f in line:
-                if f:
-                    rep += f.buildcrs(crsrewrite=crsrewrite) + ","
-                else:
-                    rep += repr(None) + ","
-            rep += " ],"
+            rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
+                                           for f in line]))
 
-        if self.title is "":
-            rep += ("]," + repr(self.widths) + "," + repr(self.heights) +
-                    "', page_width=%d, page_height=%d, scale=%.2f, openright='%s')") \
-                   % (self.page_width, self.page_height, self.scale, self.openright)
-
-        else:
-            rep += ("]," + repr(self.widths) + "," + repr(self.heights) +
-                    "', page_width=%d, page_height=%d, scale=%.2f, openright='%s', title='"
-                    + self.title + "', x=%d, y=%d, titlebox='%s', pt='" + self.pt + "', font='"
-                    + self.font + "', background='" + self.background + "')") \
-                   % (self.page_width, self.page_height, self.scale, self.openright, self.x, self.y, self.titlebox)
-
-        rep = rep.replace(",]", "]")
-        rep = rep.replace(", ]", "]")
+        param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
+                (repr(self.widths), repr(self.heights), self.page_width, self.page_height, self.scale, self.openright)
+        if isinstance(self.title, six.string_types) and len(self.title) != 0:
+            param = "%s, title='%s', x=%d, y=%d, titlebox='%s', pt='%s', font='%s', backgroud='%s'" % \
+                    (param, self.title, self.x, self.y, self.titlebox, self.pt, self.font, self.background)
+        rep = "cpage_pdf([%s],%s)" % (",".join(rep), param)
 
         return rep
 

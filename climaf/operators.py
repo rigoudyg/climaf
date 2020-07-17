@@ -340,6 +340,7 @@ class cscript(object):
                     raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
                                                 ', '.join([repr(x) for x in graphic_formats]))
                 scripts[name] = self
+                change_variable("scripts", scripts)
 
                 # Init doc string for the operator
                 doc = "CliMAF wrapper for command : %s" % self.command

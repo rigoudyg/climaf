@@ -163,11 +163,7 @@ def crewrite(crs, alsoAtTop=True):
                               repr(macro(None, co)))
                 argl = cmatch(cmacros[m], co)
                 if len(argl) > 0:
-                    rep = m + "("
-                    for arg in argl:
-                        rep += crewrite(arg.buildcrs(crsrewrite=crewrite)) + ","
-                    rep += ")"
-                    rep = rep.replace(",)", ")")
+                    rep = m + "({})".format(",".join([crewrite(arg.buildcrs(crsrewrite=crewrite)) for arg in argl]))
                     return rep
         # No macro matches at top level, or top level not wished.
         # Let us dig a bit

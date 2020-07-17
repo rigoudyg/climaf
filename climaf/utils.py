@@ -7,7 +7,7 @@ CliMAF utilities.
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from climaf.clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 
 class Climaf_Classes_Error(Exception):

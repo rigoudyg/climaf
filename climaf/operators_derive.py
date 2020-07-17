@@ -6,7 +6,7 @@ CliMAF derive operators tools.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from climaf.clogging import clogger
+from env.clogging import clogger
 from climaf.environment import get_variable, change_variable
 from climaf.utils import Climaf_Operator_Error
 

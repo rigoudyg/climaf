@@ -2,7 +2,7 @@
 
 report_ensemble=${1:-1}
 echo $report_ensemble
-run_modules=${2:-"netcdfbasics period cache classes functions operators standard_operators cmacro html example_data_plot example_data_retrieval example_index_html mcdo"}
+run_modules=${2:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro html example_data_plot example_data_retrieval example_index_html mcdo"}
 echo $run_modules
 
 # Add CliMAF path to environment

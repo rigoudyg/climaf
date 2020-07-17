@@ -132,9 +132,15 @@ def link(label, filename, thumbnail=None, hover=True):
         set as 3 times that of thumbnail width and height
       - if thumbnail is None, size is '200*200'
     """
+    if filename is not None and not isinstance(filename, six.string_types):
+        raise TypeError("The filename provided should be None or a string, not %s" % filename)
+    if label is not None and not isinstance(label, six.string_types):
+        raise TypeError("The label provided should be None or a string, not %s" % label)
     if filename:
         regex = re.compile('(?P<width>[0-9]+)[x*](?P<height>[0-9]+)')
         if thumbnail is not None:
+            thumbnail_width = None
+            thumbnail_height = None
             if isinstance(thumbnail, six.string_types):
                 thumbnail_regex_match = regex.match(thumbnail)
                 if thumbnail_regex_match:
@@ -182,7 +188,6 @@ def link(label, filename, thumbnail=None, hover=True):
                       ' WIDTH=' + str(thumbnail_width) + ' SRC="' + str(filename) + '"></a>'
 
         else:
-
             if hover:
                 if isinstance(hover, six.string_types):
                     hover_regex_match = regex.match(hover)
@@ -320,8 +325,8 @@ def line(list_of_pairs, title="", thumbnail=None, hover=True, dirname=None, altd
     as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps').
     This allows to generate a portable atlas in dirname
     """
-    labels = []
-    figures = []
+    labels = list()
+    figures = list()
 
     for e in list_of_pairs:
         if isinstance(e, tuple):
