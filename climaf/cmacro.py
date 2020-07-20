@@ -183,8 +183,8 @@ def cmatch(macro, cobj):
     clogger.debug("matching " + repr(macro) + " and " + repr(cobj))
     if isinstance(cobj, ctree) and isinstance(macro, ctree) and macro.operator == cobj.operator:
         nok = False
-        for mpara, para in zip(macro.parameters, cobj.parameters):
-            if mpara != para or  macro.parameters[para] != cobj.parameters[para]:
+        for mpara, para in zip(sorted(list(macro.parameters)), sorted(list(cobj.parameters))):
+            if mpara != para or macro.parameters[para] != cobj.parameters[para]:
                 nok = True
         if nok:
             return []

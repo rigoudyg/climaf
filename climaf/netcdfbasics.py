@@ -126,7 +126,7 @@ def model_id(filename):
     rep = 'no_model'
     clogger.debug("opening " + filename)
     with ncf(filename, 'r') as f:
-        if 'model_id' in f.__dir__():
+        if 'model_id' in dir(f):
             rep = f.model_id
     return rep
 
@@ -146,7 +146,7 @@ def timeLimits(filename):
     f = ncf(filename)
     if 'time_bnds' in f.variables:
         tim = f.variables['time_bnds']
-        if 'units' in tim.__dir__():
+        if 'units' in dir(tim):
             start = tim[0, 0]
             end = tim[-1, 1]
             ct = netcdftime.utime(tim.units, calendar=tim.calendar)

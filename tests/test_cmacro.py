@@ -160,9 +160,7 @@ class CrewriteTests(unittest.TestCase):
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm, format="eps")
         my_macro = macro('eu_cross_section', fig_ezm, [january_ta2, ])
-        clog("debug")
         my_crewrite = crewrite(fig_ezm.buildcrs())
-        clog("info")
         self.assertEqual(my_crewrite,
                          "eu_cross_section(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),"
                          "ds('example|AMIPV6ALB2G|ta|19800101|global|monthly'))")

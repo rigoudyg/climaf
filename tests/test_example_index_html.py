@@ -113,7 +113,7 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        self.assertTrue(compare_html_files(absout, self.reference_index_1))
+        compare_html_files(absout, self.reference_index_1)
 
     def test_html_index_2(self):
         ###################################################################################
@@ -135,7 +135,7 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        self.assertTrue(compare_html_files(out, self.reference_index_2))
+        compare_html_files(out, self.reference_index_2)
 
     def tearDown(self):
         craz()

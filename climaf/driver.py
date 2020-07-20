@@ -25,6 +25,11 @@ from datetime import datetime
 from functools import reduce
 from six import string_types
 
+try:
+    from commands import getoutput, getstatusoutput
+except ImportError:
+    from subprocess import getoutput, getstatusoutput
+
 
 # Climaf modules
 import climaf
@@ -1299,7 +1304,7 @@ def cimport(cobject, crs):
 
 def get_fig_sizes(figfile):
     args_figsize = ["identify", figfile]
-    output_figsize = subprocess.getoutput(" ".join(args_figsize))
+    output_figsize = getoutput(" ".join(args_figsize))
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)

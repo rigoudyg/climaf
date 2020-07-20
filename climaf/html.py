@@ -21,7 +21,10 @@ import re
 import pickle
 import shutil
 from collections import OrderedDict
-from collections.abc import KeysView, ValuesView
+try:
+    from collections.abc import KeysView, ValuesView
+except ImportError:
+    from _abcoll import KeysView, ValuesView
 from env.clogging import clogger, dedent
 from functools import reduce
 import six

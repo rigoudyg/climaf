@@ -59,6 +59,10 @@ if not already_inited and not onrtd:
     from . import standard_operators
     from . import cmacro
     from . import operators
+    try:
+        from commands import getoutput, getstatusoutput
+    except ImportError:
+        from subprocess import getoutput, getstatusoutput
     import subprocess
 
 
@@ -83,25 +87,25 @@ if not already_inited and not onrtd:
         print("---")
         print("Required softwares to run CliMAF => you are using the following versions/installations:")
         try:
-            print("ncl " + subprocess.getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
+            print("ncl " + getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
         except:
             print("Warning: ncl not found -> can't use CliMAF plotting scripts")
         try:
-            tmp = str.split(subprocess.getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
+            tmp = str.split(getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
             print("cdo " + tmp[tmp.index('version') + 1] + " => " + my_which('cdo'))
         except:
             print("Error: cdo not found -> CDO is mandatory to run CliMAF")
         try:
-            tmp = str.split(subprocess.getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
+            tmp = str.split(getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
             print("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + my_which('ncks'))
         except:
             print("Warning: nco not found -> can't use nco from CliMAF")
         try:
             if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
-                ncdump_ret = subprocess.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
+                ncdump_ret = getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
                 print("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + my_which('ncdump'))
             else:
-                binary_info = subprocess.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
+                binary_info = getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
                 binary_info = binary_info.split("version")[-1].split("of")[0].strip()
                 print("ncdump " + binary_info + " => " + my_which('ncdump'))
         except:
