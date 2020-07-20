@@ -225,7 +225,7 @@ begin
         if ( ( (.not. ismissing(str_match(fld&$coord$@standard_name,"Time"))) .or. (.not. ismissing(str_match(fld&$coord$@standard_name,"time"))) ) \
           .or. ( (.not. ismissing(str_match(coord,"Time"))) .or. (.not. ismissing(str_match(coord,"time"))) ) ) \
           .and. isatt(fld&$coord$,"units") .and. (fld&$coord$@units .ne. unit_first_file) then
-          fld&$coord$=cd_convert(fld&$coord$, unit_first_file)
+          fld&$coord$=tofloat(cd_convert(fld&$coord$, unit_first_file))
         end if
 
 	; data vector for X axis
@@ -496,7 +496,7 @@ begin
         if ( ( (.not. ismissing(str_match(fld&$coord$@standard_name,"Time"))) .or. (.not. ismissing(str_match(fld&$coord$@standard_name,"time"))) ) \
           .or. ( (.not. ismissing(str_match(coord,"Time"))) .or. (.not. ismissing(str_match(coord,"time"))) ) ) \
           .and. isatt(fld&$coord$,"units") .and. (fld&$coord$@units .ne. unit_first_file) then
-          fld&$coord$=cd_convert(fld&$coord$, unit_first_file)
+          fld&$coord$=tofloat(cd_convert(fld&$coord$, unit_first_file))
         end if
 
         ; Store coordinate in 'ax'

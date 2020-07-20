@@ -151,6 +151,8 @@ class dataloc(object):
         self.simulation = simulation
         self.frequency = frequency
         self.organization = organization
+        self.realm = realm
+        self.table = table
         if organization not in ['EM', 'CMIP5_DRS', 'generic']:
             raise Climaf_Error("Cannot process organization " + organization)
         if isinstance(url, list):
@@ -191,15 +193,17 @@ class dataloc(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        return self.model + self.project + self.simulation + self.frequency + self.organization + repr(self.urls)
+        return self.model + self.project + self.simulation + self.frequency + self.realm + self.table + \
+               self.organization + repr(self.urls)
 
     def pr(self):
         print("For model " + self.model + " of project " + self.project +
               " for simulation " + self.simulation + " and freq " + self.frequency +
-              " locations are : " + repr(self.urls) + " and org is :" + self.organization)
+              " locations are : " + repr(self.urls) + " and org is :" + self.organization +
+              " and table is :" + self.table + " and realm is :" + self.realm)
 
 
-def getlocs(project="*", model="*", simulation="*", frequency="*"):
+def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", table="*"):
     """ Returns the list of org,freq,url triples which may match the
     list of given attributes values (allowing for wildcards '*') and which have
     the lowest number of wildcards (*) in attributes
@@ -207,22 +211,11 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     """
     rep = []
     for loc in locs:
-        stars = 0
-        # loc.pr()
-        if loc.project == "*" or project == loc.project:
-            if loc.project == "*" or project == "*":
-                stars += 1
-            if loc.model == "*" or model == loc.model:
-                if loc.model == "*" or model == "*":
-                    stars += 1
-                if loc.simulation == "*" or simulation == loc.simulation:
-                    if loc.simulation == "*" or simulation == "*":
-                        stars += 1
-                    if loc.frequency == "*" or frequency == loc.frequency:
-                        if loc.frequency == "*" or frequency == "*":
-                            stars += 1
-                        rep.append((loc.organization, loc.frequency, loc.urls, stars))
-                        # print("appended")
+        list_loc = [(loc.project, project), (loc.model, model), (loc.simulation, simulation),
+                    (loc.frequency, frequency), (loc.realm, realm), (loc.table, table)]
+        if all([f[0] in ["*", f[1]] or f[1] == "*" for f in list_loc]):
+            stars = [f[0] == "*" or f[1] == "*" for f in list_loc].count(True)
+            rep.append((loc.organization, loc.frequency, loc.urls, stars))
     # Must mimimize the number of '*' ? (allows wildcards in dir names, avoid too generic cases)
     # When multiple answers with wildcards, return the ones with the lowest number
     filtered = []
@@ -237,10 +230,10 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     return filtered
 
 
-def isLocal(project, model, simulation, frequency):
+def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     if project == 'file':
         return True
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
+    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
     if len(ofu) == 0:
         return False
     rep = True
@@ -275,20 +268,16 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     rep = []
     project = kwargs['project']
     simulation = kwargs['simulation']
+    model = kwargs.get("model", "*")
+    frequency = kwargs.get("frequency", "*")
+    realm = kwargs.get("realm", "*")
+    table = kwargs.get("table", "*")
 
-    if 'model' in kwargs:
-        model = kwargs['model']
-    else:
-        model = "*"
-    if 'frequency' in kwargs:
-        frequency = kwargs['frequency']
-    else:
-        frequency = "*"
-
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
+    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
     clogger.debug("locs=" + repr(ofu))
     if len(ofu) == 0:
-        clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
+        clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
+                                                                          table))
     for org, freq, urls in ofu:
         if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
             raise Climaf_Error("Can handle multiple facet query only for organization=generic ")

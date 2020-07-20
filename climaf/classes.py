@@ -456,7 +456,8 @@ class cdataset(cobject):
     def isLocal(self):
         # return self.baseFiles().find(":")<0
         model = getattr(self, "model", "*")
-        return isLocal(project=self.project, model=model, simulation=self.simulation, frequency=self.frequency)
+        return isLocal(project=self.project, model=model, simulation=self.simulation, frequency=self.frequency,
+                       realm=self.kvp.get("realm", "*"), table=self.kvp.get("table", "*"))
 
     def isCached(self):
         """ TBD : analyze if a remote dataset is locally cached
@@ -467,7 +468,8 @@ class cdataset(cobject):
         return rep
 
     def oneVarPerFile(self):
-        locs = getlocs(project=self.project, model=self.model, simulation=self.simulation, frequency=self.frequency)
+        locs = getlocs(project=self.project, model=self.model, simulation=self.simulation, frequency=self.frequency,
+                       realm=self.kvp.get("realm", "*"), table=self.kvp.get("table", "*"))
         return all([org for org, freq, url in locs])
 
     def periodIsFine(self):

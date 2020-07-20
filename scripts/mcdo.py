@@ -245,8 +245,8 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     if alias is not None:
         var, filevar, scale, offset = alias[:]
         if variable is not None and filevar != variable:
-            clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
-            raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, var))
+            clogger.error("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
+            raise Exception("Incoherence between variable and input aliased variable: %s %s" % (variable, filevar))
         else:
             cdo_commands_for_selvar.append("-expr,{}={}*{}+{}".format(var, filevar, scale, offset))
             cdo_commands_for_selvar.append("-selname,{}".format(var))
