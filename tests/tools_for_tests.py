@@ -16,6 +16,7 @@ import six
 
 from climaf.api import cshow, ncview, cfile
 from climaf import xdg_bin
+from env.environment import *
 
 
 def skipUnless_CNRM_Lustre():

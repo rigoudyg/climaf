@@ -37,9 +37,6 @@ fileNameLength = 60
 safe = False
 #: The length of subdir names when segmenting cache filenames
 directoryNameLength = 5
-#: Define whether we stamp the data files with their CRS.
-# True means mandatory. None means : please try. False means : don't try
-stamping = True
 #: The index associating filenames to CRS expressions
 crs2filename = dict()
 #: The dictionary associating CRS expressions to their evaluation
@@ -200,24 +197,26 @@ def register(filename, crs, outfilename=None):
             return do_move(crs, filename, outfilename)
         else:
             # while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
-            if re.findall(".nc$", filename):
-                command = "ncatted -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
-                          "Framework version %s (http://climaf.rtfd.org)\" %s" % (crs, version, filename)
-            elif re.findall(".png$", filename):
+            if re.findall(".nc$", filename) and ncatted_software is not None:
+                command = "%s -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
+                          "Framework version %s (http://climaf.rtfd.org)\" %s" % (ncatted_software, crs, version,
+                                                                                  filename)
+            elif re.findall(".png$", filename) and convert_software is not None:
                 crs2 = crs.replace(r"%", r"\%")
-                command = "convert -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
+                command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
-                          (crs2, version, filename, filename, filename, filename)
-            elif re.findall(".pdf$", filename):
+                          (convert_software, crs2, version, filename, filename, filename, filename)
+            elif re.findall(".pdf$", filename) and pdftk_software is not None:
                 tmpfile = str(uuid.uuid4())
-                command = "pdftk %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
-                          ">> %s && pdftk %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s" % \
-                          (filename, tmpfile, crs, tmpfile, filename, tmpfile, filename, filename, filename, tmpfile)
-            elif re.findall(".eps$", filename):
-                command = 'exiv2 -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
+                command = "%s %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
+                          ">> %s && %s %s update_info %s output %s.pdf && mv -f %s.pdf %s && rm -f %s" % \
+                          (pdftk_software, filename, tmpfile, crs, tmpfile, pdftk_software, filename, tmpfile, filename,
+                           filename, filename, tmpfile)
+            elif re.findall(".eps$", filename) and exiv2_software is not None:
+                command = '%s -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
                           '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
-                          (version, crs, filename)
+                          (exiv2_software, version, crs, filename)
             else:
                 command = None
             if command is None:
