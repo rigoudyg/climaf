@@ -1220,7 +1220,10 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                 if not os.path.exists(target_dir):
                             os.makedirs(target_dir)
                 shutil.copyfile(result, target)
-        return target
+        if not os.path.exists(target):
+            raise Climaf_Driver_Error("Issue during the creation of the target file %s" % target)
+        else:
+            return target
 
 
 def cshow(obj):
@@ -1440,11 +1443,11 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     ymargin = 30.  # Vertical shift between figures
     #
     # page size and creation
-    page_size = "{%dpx,%dpx}" % (cobj.page_width, cobj.page_height)
-    fig_nb = "%dx%d" % (len(cobj.fig_lines[0]), len(cobj.fig_lines))
-    fig_delta = "%d %d" % (xmargin, ymargin)
-    preamb = "\\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} " \
-             "\\geometry{vmargin=%dcm,hmargin=2cm}" % cobj.y
+    page_size = '"{%dpx,%dpx}"' % (cobj.page_width, cobj.page_height)
+    fig_nb = '"%dx%d"' % (len(cobj.fig_lines[0]), len(cobj.fig_lines))
+    fig_delta = '"%d %d"' % (xmargin, ymargin)
+    preamb = '"\\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} ' \
+             '\\geometry{vmargin=%dcm,hmargin=2cm}"' % cobj.y
 
     args = ["pdfjam", "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta, "--nup",
             fig_nb]  # "%s"%preamb
@@ -1473,11 +1476,11 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
             pt = cobj.pt
 
         if cobj.titlebox:
-            latex_command = r"\begin{center} \hspace{%dcm} \setlength{\fboxrule}{0.5pt} " \
-                            r"\setlength{\fboxsep}{2mm} \fcolorbox{black}{%s}{\%s{\fontfamily{%s}\selectfont %s}}"\
-                            r" \end{center}" % (cobj.x, cobj.background, pt, cobj.font, cobj.title)
+            latex_command = r'"\begin{center} \hspace{%dcm} \setlength{\fboxrule}{0.5pt} ' \
+                            r'\setlength{\fboxsep}{2mm} \fcolorbox{black}{%s}{\%s{\fontfamily{%s}\selectfont %s}}'\
+                            r' \end{center}"' % (cobj.x, cobj.background, pt, cobj.font, cobj.title)
         else:
-            latex_command = r"\begin{center} \hspace{%dcm} \%s{\fontfamily{%s}\selectfont %s} \end{center}" \
+            latex_command = r'"\begin{center} \hspace{%dcm} \%s{\fontfamily{%s}\selectfont %s} \end{center}"' \
                             % (cobj.x, pt, cobj.font, cobj.title)
         args.extend(["--pagecommand", latex_command])
 
@@ -1488,12 +1491,16 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     args.extend(["--outfile", out_fig])
 
     clogger.debug("Compositing figures : %s" % repr(args))
-    comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if comm.wait() != 0:
-        err = comm.stderr.read()
-        comm.stderr.close()
-        comm.stdout.close()
-        raise Climaf_Driver_Error("Compositing failed : %s" % err)
+    try:
+        subprocess.check_call(" ".join(args), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        raise Climaf_Driver_Error("Compositing failed for command %s" % " ".join(args))
+    # comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # if comm.wait() != 0:
+    #     err = comm.stderr.read()
+    #     comm.stderr.close()
+    #     comm.stdout.close()
+    #     raise Climaf_Driver_Error("Compositing failed : %s" % err)
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
