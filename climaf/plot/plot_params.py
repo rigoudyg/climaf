@@ -5,6 +5,8 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.site_settings import *
+from env.environment import *
+
 
 # --> Import the default CliMAF sets of plot params
 # --> for atmosphere

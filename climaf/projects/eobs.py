@@ -16,6 +16,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.environment import *
 
 if onCiclad:
     # -- Create E-OBS CliMAF project

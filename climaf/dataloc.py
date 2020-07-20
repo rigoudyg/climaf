@@ -22,14 +22,11 @@ import getpass
 import netrc
 from functools import partial
 
-from climaf.environment import get_variable, change_variable
+from env.environment import *
 from climaf.utils import Climaf_Error, Climaf_Classes_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
-
-
-locs = []
 
 
 class dataloc(object):
@@ -279,17 +276,15 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
         clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
                                                                           table))
     for org, freq, urls in ofu:
-        if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
+        if return_wildcards is not None and len(return_wildcards) > 0 and org != "generic":
             raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
-        frequencies = get_variable("climaf_frequencies")
         if "frequency" in kwargs and project in frequencies:
             normfreq = kwargs2['frequency']
             if normfreq in frequencies[project]:
                 kwargs2['frequency'] = frequencies[project][normfreq]
         # JS # Convert normalized realm to project-specific realm if applicable
-        realms = get_variable("climaf_realms")
         if "realm" in kwargs and project in realms:
             normrealm = kwargs2['realm']
             if normrealm in realms[project]:
@@ -1130,7 +1125,6 @@ def cvalid(attribute, value=None, project=None):
 
     >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
     """
-    cprojects = get_variable("climaf_projects")
     if project not in cprojects:
         raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
     if attribute == 'project':
@@ -1145,4 +1139,3 @@ def cvalid(attribute, value=None, project=None):
         return rep
     else:
         cprojects[project].facet_authorized_values[attribute] = value
-    change_variable("climaf_projects", cprojects)

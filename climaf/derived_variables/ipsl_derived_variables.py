@@ -5,6 +5,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 from climaf.api import calias
 from climaf.operators_derive import derive
+from env.environment import *
 
 # Content was sent to various places : prokect IGCM_OUT, atmposphere_derived_variables, ocean_derived_variables
 

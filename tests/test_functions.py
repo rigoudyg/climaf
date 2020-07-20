@@ -19,6 +19,7 @@ from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub
     implot, diff_regrid, diff_regridn, tableau, annual_cycle, clim_average, clim_average_fast, summary, projects, \
     lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
     ts_plot, iplot_members
+from env.environment import *
 
 
 class CscalarTests(unittest.TestCase):

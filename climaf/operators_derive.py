@@ -7,7 +7,7 @@ CliMAF derive operators tools.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.clogging import clogger
-from climaf.environment import get_variable, change_variable
+from env.environment import *
 from climaf.utils import Climaf_Operator_Error
 
 
@@ -15,7 +15,6 @@ def is_derived_variable(variable, project):
     """ True if the variable is a derived variable, either in provided project
     or in wildcard project '*'
     """
-    derived_variables = get_variable("climaf_derived_variables")
     rep = (project in derived_variables and variable in derived_variables[project] or
            "*" in derived_variables and variable in derived_variables["*"])
     clogger.debug("Checking if variable %s is derived for project %s : %s" % (variable, project, rep))
@@ -25,7 +24,6 @@ def is_derived_variable(variable, project):
 def derived_variable(variable, project):
     """ Returns the entry defining a derived variable in requested project or in wildcard project '*'
     """
-    derived_variables = get_variable("climaf_derived_variables")
     if project in derived_variables and variable in derived_variables[project]:
         rep = derived_variables[project][variable]
     elif "*" in derived_variables and variable in derived_variables["*"]:
@@ -83,8 +81,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
     # are single derived variable names, and which will be used at the
     # object evaluation step
     # Also : some consistency checks w.r.t. script definition
-    scripts = get_variable("climaf_scripts")
-    if Operator in scripts:
+    if Operator in cscripts:
         if not isinstance(derivedVar, dict):
             derivedVar = dict(out=derivedVar)
         for outname in derivedVar:
@@ -93,22 +90,20 @@ def derive(project, derivedVar, Operator, *invars, **params):
                      or outname not in Operator.outvarnames)):
                 raise Climaf_Operator_Error("%s is not a named  output for operator %s; type help(%s)" %
                                             (outname, Operator, Operator))
-            s = scripts[Operator]
+            s = cscripts[Operator]
             if s.inputs_number() != len(invars):
                 clogger.error("number of input variables for operator %s is %d, which is inconsistent with "
                               "script declaration : %s" % (s.name, len(invars), s.command))
                 return
             # TBD : check parameters number  ( need to build
             # its list in cscript.init() )
-            derived_variables = get_variable("climaf_derived_variables")
             if project not in derived_variables:
                 derived_variables[project] = dict()
             clogger.debug("Add derive variable %s obtained with operator %s, output variable %s, input variables %s "
                           "and parameters %s" % (derivedVar[outname], str(Operator), derivedVar[outname],
                                                  str(list(invars)), str(params)))
             derived_variables[project][derivedVar[outname]] = (Operator, derivedVar[outname], list(invars), params)
-            change_variable("climaf_derived_variables", derived_variables)
-    elif Operator in get_variable("climaf_operators"):
+    elif Operator in operators:
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else:
         clogger.error("second argument (%s) must be a script or operator, already declared" % repr(Operator))

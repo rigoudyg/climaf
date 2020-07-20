@@ -20,6 +20,7 @@ from climaf.html import header, section, vspace, link_on_its_own_line, line, ope
     close_line, cell, fline, flines, trailer
 from climaf import cachedir
 from collections import OrderedDict
+from env.environment import *
 
 
 if not isinstance(cpath, list):

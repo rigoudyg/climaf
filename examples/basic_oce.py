@@ -17,6 +17,8 @@ import os
 
 from climaf.api import *
 
+clog("debug")
+
 # Define default value for some dataset facets
 cdef("project", "CMIP5")
 cdef("frequency", "monthly")

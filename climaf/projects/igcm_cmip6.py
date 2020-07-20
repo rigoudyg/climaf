@@ -12,6 +12,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 
+from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, crealms, cdef
 from env.site_settings import atTGCC, onCiclad, onSpip

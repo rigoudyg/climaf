@@ -14,7 +14,7 @@ from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
 from climaf.standard_operators import load_standard_operators
-from climaf.environment import get_variable
+from env.environment import *
 
 
 class StandardOperatorsTests(unittest.TestCase):
@@ -23,8 +23,7 @@ class StandardOperatorsTests(unittest.TestCase):
         load_standard_operators()
         import sys
         list_of_objects_in_main = sys.modules["__main__"].__dict__
-        scripts = get_variable("climaf_scripts")
-        for script in scripts:
+        for script in cscripts:
             self.assertIn(script, globals())
             self.assertIn(script, list_of_objects_in_main)
 

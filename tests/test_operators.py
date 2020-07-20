@@ -14,7 +14,7 @@ from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator, Climaf_Operator_Error
-from climaf.environment import get_variable
+from env.environment import *
 
 
 class CscriptTest(unittest.TestCase):
@@ -105,11 +105,10 @@ class FixedFieldsTest(unittest.TestCase):
         fixed_fields(['plot', ],
                      ('coordinates.nc',
                       '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'))
-        scripts = get_variable("climaf_scripts")
-        self.assertEqual(scripts["minus"].fixedfields,
+        self.assertEqual(cscripts["minus"].fixedfields,
                          (('mesh_hgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_hgr.nc'),
                           ('mesh_zgr.nc', '/data/climaf/${project}/${model}/ORCA1_mesh_zgr.nc')))
-        self.assertEqual(scripts["plot"].fixedfields,
+        self.assertEqual(cscripts["plot"].fixedfields,
                          (('coordinates.nc',
                            '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'), ))
 

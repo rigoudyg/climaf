@@ -24,6 +24,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
 from env.site_settings import atCNRM
+from env.environment import *
 
 if atCNRM:
     cproject('erai', ('grid', '_'),

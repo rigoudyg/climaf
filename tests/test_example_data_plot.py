@@ -16,6 +16,7 @@ from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
 from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
     cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
+from env.environment import *
 
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)

@@ -14,6 +14,7 @@ from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
 from climaf.operators import scriptFlags
+from env.environment import *
 
 
 class ScriptFlagsTests(unittest.TestCase):

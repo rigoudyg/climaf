@@ -15,6 +15,7 @@ Example for a CMIP6 dataset declaration ::
 
 
 """
+from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 

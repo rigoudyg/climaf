@@ -47,6 +47,7 @@ Example of a 'era5cerfacs' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
+from env.environment import *
 from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
 root = None

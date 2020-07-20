@@ -17,6 +17,7 @@ from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_period
     intersect_periods_list, lastyears, firstyears
 
 from climaf.cache import setNewUniqueCache
+from env.environment import *
 
 
 class CreatePeriodDefinedTests(unittest.TestCase):

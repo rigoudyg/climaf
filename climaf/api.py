@@ -95,26 +95,7 @@ from .plot.varlongname import varlongname
 from .derived_variables import *
 from .functions import *
 from .easyCMIP_functions import *
-
-
-def cprojects():
-    return get_variable("climaf_projects")
-
-
-def aliases():
-    return get_variable("climaf_aliases")
-
-
-def cscripts():
-    return get_variable("climaf_scripts")
-
-
-def operators():
-    return get_variable("climaf_operators")
-
-
-def cmacros():
-    return get_variable("climaf_macros")
+from env.environment import *
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not

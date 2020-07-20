@@ -4,6 +4,7 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from climaf.api import *
+from env.environment import *
 
 
 # -- easyCMIP_functions contains an ensemble of functionalities for

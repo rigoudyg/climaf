@@ -7,6 +7,7 @@ import re
 
 from env.clogging import clogger, dedent
 from climaf.period import cperiod
+from env.environment import *
 
 
 class Climaf_Netcdf_Error(Exception):

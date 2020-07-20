@@ -8,7 +8,7 @@ from climaf.operators import *
 from climaf.driver import cvalue, cfile
 from climaf import classes
 from env.clogging import clogger
-from climaf.environment import get_variable
+from env.environment import *
 from six import string_types
 
 
@@ -591,7 +591,6 @@ def projects():
     """
     Lists available projects and their associated facets.
     """
-    cprojects = get_variable("climaf_projects")
     print('-- Available projects:')
     for key in list(cprojects):
         print('-- Project:', key)

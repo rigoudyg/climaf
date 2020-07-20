@@ -4,6 +4,9 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from env.environment import *
+
+
 dict_plot_params = {
     'gpp': {
         'default': {'color': 'precip3_16lev', 'units': 'kg.m-2.s-1'},

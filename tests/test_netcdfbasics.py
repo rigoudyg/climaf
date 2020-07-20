@@ -17,6 +17,7 @@ from climaf.netcdfbasics import varOfFile, varsOfFile, fileHasVar, fileHasDim, d
 from climaf.period import init_period
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as rootpath
+from env.environment import *
 
 
 class VarsOfFileTests(unittest.TestCase):

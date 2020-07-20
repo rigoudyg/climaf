@@ -11,7 +11,7 @@ import os
 
 # Created : S.Sénési - 2014
 
-__all__ = ["environment", "cache", "classes", "dataloc", "driver", "netcdfbasics",
+__all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
@@ -42,8 +42,8 @@ onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not already_inited and not onrtd:
     import sys
-    from . import environment
-    logdir = environment.get_variable("logdir")
+
+    from env.environment import *
 
     #
     already_inited = True
@@ -185,8 +185,7 @@ if not already_inited and not onrtd:
     # Init and load macros
     macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
-    print("Available macros read from %s are : %s" % (macroFilename,
-                                                      repr(list(environment.get_variable("climaf_macros")))),
+    print("Available macros read from %s are : %s" % (macroFilename, repr(list(cmacros))),
           file=sys.stderr)
     tim("macros")
     #
@@ -200,8 +199,7 @@ if not already_inited and not onrtd:
     if cache.stamping:
         # Check if exiv2 is installed
         #
-        graphic_formats = environment.get_variable("climaf_graphic_formats")
+        # graphic_formats = environment.get_variable("climaf_graphic_formats")
         if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in graphic_formats:
             graphic_formats.remove('eps')
             print("exiv2 is not installed so you can not use 'eps' output format")
-            environment.change_variable("climaf_graphic_formats", graphic_formats)

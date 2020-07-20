@@ -4,6 +4,7 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.clogging import clogger
+from env.environment import *
 
 try:
     from Scientific.IO.NetCDF import NetCDFFile as ncf

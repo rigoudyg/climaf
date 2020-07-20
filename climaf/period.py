@@ -14,6 +14,7 @@ import six
 import copy
 
 from env.clogging import clogger, dedent
+from env.environment import *
 
 
 class cperiod(object):

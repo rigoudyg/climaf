@@ -15,6 +15,9 @@ from tests.tools_for_tests import remove_dir_and_content
 
 
 testmodules = [
+    "env.clogging",
+    "env.environment",
+    "env.site_settings",
     "climaf",
     "climaf.api",
     "climaf.anynetcdf",

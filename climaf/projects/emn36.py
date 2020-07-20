@@ -31,6 +31,7 @@ Seaice fields are still to be described
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.site_settings import atCNRM
+from env.environment import *
 
 if atCNRM:
     from climaf.dataloc import dataloc

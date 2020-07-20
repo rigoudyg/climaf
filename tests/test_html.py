@@ -20,6 +20,7 @@ from climaf.driver import cfile
 from climaf.html import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
+from env.environment import *
 
 
 class HeaderTests(unittest.TestCase):

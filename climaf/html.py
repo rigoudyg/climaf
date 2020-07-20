@@ -33,6 +33,7 @@ from climaf import __path__ as cpath
 from climaf.cache import getCRS
 from climaf import cachedir
 from climaf.driver import cfile
+from env.environment import *
 
 
 def header(title, style_file=None):

@@ -19,7 +19,7 @@ import six
 
 from .classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 from env.clogging import clogger, dedent
-from .environment import get_variable, change_variable
+from env.environment import *
 
 
 def macro(name, cobj, lobjects=[]):
@@ -74,7 +74,6 @@ def macro(name, cobj, lobjects=[]):
 
     See also much more explanations in the example at :download:`macro.py <../examples/macro.py>`
     """
-    cmacros = get_variable("climaf_macros")
     if isinstance(cobj, six.string_types):
         s = cobj
         # Next line used for interpreting macros's CRS
@@ -113,9 +112,8 @@ def macro(name, cobj, lobjects=[]):
         rep = None
     if name and rep:
         cmacros[name] = rep
-        change_variable("climaf_macros", cmacros)
         doc = "A CliMAF macro, which text is " + repr(rep)
-        defs = 'def %s(*args) :\n  """%s"""\n  from climaf.api import cmacros ; return instantiate(cmacros()["%s"],[ x for x in args])\n' \
+        defs = 'def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n' \
                % (name, doc, name)
         exec(defs, globals())
         exec("from climaf.cmacro import %s" % name, sys.modules['__main__'].__dict__)
@@ -126,7 +124,7 @@ def macro(name, cobj, lobjects=[]):
 
 def define_new_macro(name, doc):
     # Define the new macro code
-    codestring = compile('def %s(*args) :\n  """%s"""\n  from climaf.api import cmacros ; return instantiate(cmacros()["%s"], args)\n'
+    codestring = compile('def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"], args)\n'
                          % (name, doc, name), name, "exec")
     code = types.CodeType(codestring.co_argcount, codestring.co_kwonlyargcount, codestring.co_nlocals,
                           codestring.co_stacksize, codestring.co_flags, codestring, codestring.co_consts,
@@ -156,7 +154,6 @@ def crewrite(crs, alsoAtTop=True):
         clogger.debug("Issue when rewriting %s" % crs)
         return crs
     allow_error_on_ds(False)
-    cmacros = get_variable("climaf_macros")
     rep = None
     if isinstance(co, ctree) or isinstance(co, scriptChild) or isinstance(co, cpage):
         if alsoAtTop:
@@ -216,7 +213,6 @@ def read(filename):
     Read macro dictionary from filename, and add it to cmacros[]
     """
     import json
-    cmacros = get_variable("climaf_macros")
     macros_texts = None
     try:
         macrofile = open(os.path.expanduser(filename), "r")
@@ -237,7 +233,6 @@ def write(filename):
     Writes macros dictionary to disk ; should be called before exit
 
     """
-    cmacros = get_variable("climaf_macros")
     import json
     filen = os.path.expanduser(filename)
     try:
@@ -256,7 +251,6 @@ def show(interp=True):
     """
     List the macros, searching also for macro usage in macros (except if arg ``interp`` is True)
     """
-    cmacros = get_variable("climaf_macros")
     for m in cmacros:
         if interp:
             print("% 15s : %s" % (m, crewrite(cmacros[m].buildcrs(), alsoAtTop=False)))
