@@ -15,7 +15,6 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf.cache import setNewUniqueCache
 from climaf.operators import scriptFlags
 from env.environment import *
-from climaf.api import clog
 
 
 class ScriptFlagsTests(unittest.TestCase):
@@ -70,7 +69,5 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    clog("debug")
     unittest.main()
-    clog("info")
     remove_dir_and_content(tmp_directory)

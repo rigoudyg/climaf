@@ -20,7 +20,6 @@ from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub
     lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
     ts_plot, iplot_members
 from env.environment import *
-from climaf.api import clog
 
 
 class CscalarTests(unittest.TestCase):
@@ -268,7 +267,5 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    clog("debug")
     unittest.main()
-    clog("info")
     remove_dir_and_content(tmp_directory)

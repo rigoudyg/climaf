@@ -18,7 +18,6 @@ from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_period
 
 from climaf.cache import setNewUniqueCache
 from env.environment import *
-from climaf.api import clog
 
 
 class CreatePeriodDefinedTests(unittest.TestCase):
@@ -392,7 +391,5 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
-    clog("debug")
     unittest.main()
-    clog("info")
     remove_dir_and_content(tmp_directory)

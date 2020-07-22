@@ -14,7 +14,6 @@ from tests.tools_for_tests import remove_dir_and_content, compare_netcdf_files, 
 
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as rootpath
-from climaf.api import clog
 
 from scripts.mcdo import main as mcdo_main
 
@@ -69,7 +68,5 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
-    clog("debug")
     unittest.main()
-    clog("info")
     remove_dir_and_content(tmp_directory)

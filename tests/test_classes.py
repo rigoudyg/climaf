@@ -17,7 +17,6 @@ from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy
 from climaf.period import Climaf_Period_Error, init_period
 from env.environment import *
 from env.site_settings import atCNRM
-from climaf.api import clog
 
 
 class CprojectTests(unittest.TestCase):
@@ -701,7 +700,5 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    clog("debug")
     unittest.main()
-    clog("info")
     remove_dir_and_content(tmp_directory)
