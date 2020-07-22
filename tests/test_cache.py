@@ -17,6 +17,7 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
 from env.environment import *
+from climaf.api import clog
 
 from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
     searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \
@@ -328,5 +329,7 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
+    clog("debug")
     unittest.main()
+    clog("info")
     remove_dir_and_content(tmp_directory)

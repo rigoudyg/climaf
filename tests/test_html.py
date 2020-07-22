@@ -21,6 +21,7 @@ from climaf.html import header, trailer, vspace, section, open_table, close_tabl
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
 from env.environment import *
+from climaf.api import clog
 
 
 class HeaderTests(unittest.TestCase):
@@ -336,5 +337,7 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
+    clog("debug")
     unittest.main()
+    clog("info")
     remove_dir_and_content(tmp_directory)

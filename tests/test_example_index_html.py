@@ -15,7 +15,7 @@ from tests.tools_for_tests import remove_dir_and_content, compare_html_files
 
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
-from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
+from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz, clog
 from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
 from climaf import cachedir
@@ -150,5 +150,7 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
+    clog("debug")
     unittest.main()
+    clog("info")
     remove_dir_and_content(tmp_directory)

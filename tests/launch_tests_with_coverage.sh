@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-report_ensemble=${1:-1}
+version=${1:-2}
+report_ensemble=${2:-1}
 echo $report_ensemble
-run_modules=${2:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro html example_data_plot example_data_retrieval example_index_html mcdo"}
+run_modules=${3:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro html example_data_plot example_data_retrieval example_index_html mcdo"}
 echo $run_modules
 
 # Add CliMAF path to environment
@@ -18,16 +19,16 @@ export CLIMAF_MACROS=${climaf_macros}
 # Run coverage with different tests
 # coverage run --parallel-mode --source=climaf,scripts test_import.py
 
-if [[ "$report_ensemble" == "1" ]]; then
+if [[ "$version" == "2" ]]; then
     for module in $run_modules; do
-        coverage run --parallel-mode --source=climaf,scripts "test_${module}.py"
+        python2 "test_${module}.py"
         if [ ! $? -eq 0 ] ; then
             exit 1
         fi
     done
 else
     for module in $run_modules; do
-        coverage run --parallel-mode --source="climaf.${module}" "test_${module}.py"
+        python3 "test_${module}.py"
         if [ ! $? -eq 0 ] ; then
             exit 1
         fi

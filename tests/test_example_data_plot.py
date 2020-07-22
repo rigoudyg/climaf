@@ -15,7 +15,7 @@ from tests.tools_for_tests import remove_dir_and_content, compare_picture_files,
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
 from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
-    cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
+    cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds, clog
 from env.environment import *
 
 if not isinstance(cpath, list):
@@ -618,6 +618,8 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     craz()
+    clog("debug")
     unittest.main()
+    clog("info")
     craz()
     remove_dir_and_content(tmp_directory)
