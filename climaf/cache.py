@@ -222,7 +222,7 @@ def register(filename, crs, outfilename=None):
             if command is None:
                 if stamping is None:
                     clogger.error("Command is None and stamping is None. No stamping done.")
-                    return True
+                    return do_move(crs, filename, outfilename)
                 elif stamping is True:
                     raise Climaf_Cache_Error("Cannot stamp by command None. "
                                              "You may set climaf.cache.stamping to False or None - see doc\n%s" %

@@ -890,11 +890,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         try:
             subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
         except subprocess.CalledProcessError as inst:
-            logfile.close()
             raise Climaf_Driver_Error("Something went wrong when computing %s. See file ./last.out for details" %
                                       scriptCall.crs)
 
-    logfile.close()
     #
     # For remote files, we supply ds.local_copies_of_remote_files
     # for local filenames in order to can use ds.check()
