@@ -1006,18 +1006,17 @@ def cread(datafile, varname=None, period=None):
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
         from .anynetcdf import ncf
-        with ncf(datafile) as fileobj:
-            # import netCDF4
-            # fileobj=netCDF4.Dataset(datafile)
-            # Note taken from the CDOpy developper : .data is not backwards
-            # compatible to old scipy versions, [:] is
-            data = fileobj.variables[varname][:]
-            import numpy.ma
-            if '_FillValue' in dir(fileobj.variables[varname]):
-                fillv = fileobj.variables[varname]._FillValue
-                rep = numpy.ma.array(data, mask=data == fillv)
-            else:
-                rep = numpy.ma.array(data)
+        fileobj = ncf(datafile)
+        # Note taken from the CDOpy developper : .data is not backwards
+        # compatible to old scipy versions, [:] is
+        data = fileobj.variables[varname][:]
+        import numpy.ma
+        if '_FillValue' in dir(fileobj.variables[varname]):
+            fillv = fileobj.variables[varname]._FillValue
+            rep = numpy.ma.array(data, mask=data == fillv)
+        else:
+            rep = numpy.ma.array(data)
+        fileobj.close()
         return rep
     else:
         clogger.error("cannot yet handle %s" % datafile)
