@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Examples for vertical interpolation
@@ -7,7 +7,7 @@
 
 
 from climaf.api import *
-from climaf.site_settings import onCiclad
+from env.site_settings import onCiclad
 
 clog('critical')
 

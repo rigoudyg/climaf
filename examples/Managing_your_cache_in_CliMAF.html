@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Managing_your_cache_in_CliMAF</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+<title>Managing_your_cache_in_CliMAF</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
 
 <style type="text/css">
     /*!
@@ -199,7 +204,6 @@ th {
   *:before,
   *:after {
     background: transparent !important;
-    color: #000 !important;
     box-shadow: none !important;
     text-shadow: none !important;
   }
@@ -6744,15 +6748,15 @@ button.close {
 *
 */
 /*!
- *  Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
 /* FONT PATH
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?v=4.2.0');
-  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('../components/font-awesome/fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('../components/font-awesome/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('../components/font-awesome/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
+  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?v=4.7.0');
+  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('../components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('../components/font-awesome/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'), url('../components/font-awesome/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('../components/font-awesome/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -6809,6 +6813,19 @@ button.close {
   border: solid 0.08em #eee;
   border-radius: .1em;
 }
+.fa-pull-left {
+  float: left;
+}
+.fa-pull-right {
+  float: right;
+}
+.fa.fa-pull-left {
+  margin-right: .3em;
+}
+.fa.fa-pull-right {
+  margin-left: .3em;
+}
+/* Deprecated as of 4.4.0 */
 .pull-right {
   float: right;
 }
@@ -6824,6 +6841,10 @@ button.close {
 .fa-spin {
   -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
+}
+.fa-pulse {
+  -webkit-animation: fa-spin 1s infinite steps(8);
+  animation: fa-spin 1s infinite steps(8);
 }
 @-webkit-keyframes fa-spin {
   0% {
@@ -6846,31 +6867,31 @@ button.close {
   }
 }
 .fa-rotate-90 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
   -webkit-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
   transform: rotate(90deg);
 }
 .fa-rotate-180 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
   -webkit-transform: rotate(180deg);
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
 .fa-rotate-270 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
   -webkit-transform: rotate(270deg);
   -ms-transform: rotate(270deg);
   transform: rotate(270deg);
 }
 .fa-flip-horizontal {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
   -webkit-transform: scale(-1, 1);
   -ms-transform: scale(-1, 1);
   transform: scale(-1, 1);
 }
 .fa-flip-vertical {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
   -webkit-transform: scale(1, -1);
   -ms-transform: scale(1, -1);
   transform: scale(1, -1);
@@ -7355,6 +7376,7 @@ button.close {
 .fa-twitter:before {
   content: "\f099";
 }
+.fa-facebook-f:before,
 .fa-facebook:before {
   content: "\f09a";
 }
@@ -7367,6 +7389,7 @@ button.close {
 .fa-credit-card:before {
   content: "\f09d";
 }
+.fa-feed:before,
 .fa-rss:before {
   content: "\f09e";
 }
@@ -8004,7 +8027,8 @@ button.close {
 .fa-male:before {
   content: "\f183";
 }
-.fa-gittip:before {
+.fa-gittip:before,
+.fa-gratipay:before {
   content: "\f184";
 }
 .fa-sun-o:before {
@@ -8108,7 +8132,7 @@ button.close {
 .fa-digg:before {
   content: "\f1a6";
 }
-.fa-pied-piper:before {
+.fa-pied-piper-pp:before {
   content: "\f1a7";
 }
 .fa-pied-piper-alt:before {
@@ -8234,6 +8258,7 @@ button.close {
   content: "\f1ce";
 }
 .fa-ra:before,
+.fa-resistance:before,
 .fa-rebel:before {
   content: "\f1d0";
 }
@@ -8247,6 +8272,8 @@ button.close {
 .fa-git:before {
   content: "\f1d3";
 }
+.fa-y-combinator-square:before,
+.fa-yc-square:before,
 .fa-hacker-news:before {
   content: "\f1d4";
 }
@@ -8414,6 +8441,657 @@ button.close {
 }
 .fa-meanpath:before {
   content: "\f20c";
+}
+.fa-buysellads:before {
+  content: "\f20d";
+}
+.fa-connectdevelop:before {
+  content: "\f20e";
+}
+.fa-dashcube:before {
+  content: "\f210";
+}
+.fa-forumbee:before {
+  content: "\f211";
+}
+.fa-leanpub:before {
+  content: "\f212";
+}
+.fa-sellsy:before {
+  content: "\f213";
+}
+.fa-shirtsinbulk:before {
+  content: "\f214";
+}
+.fa-simplybuilt:before {
+  content: "\f215";
+}
+.fa-skyatlas:before {
+  content: "\f216";
+}
+.fa-cart-plus:before {
+  content: "\f217";
+}
+.fa-cart-arrow-down:before {
+  content: "\f218";
+}
+.fa-diamond:before {
+  content: "\f219";
+}
+.fa-ship:before {
+  content: "\f21a";
+}
+.fa-user-secret:before {
+  content: "\f21b";
+}
+.fa-motorcycle:before {
+  content: "\f21c";
+}
+.fa-street-view:before {
+  content: "\f21d";
+}
+.fa-heartbeat:before {
+  content: "\f21e";
+}
+.fa-venus:before {
+  content: "\f221";
+}
+.fa-mars:before {
+  content: "\f222";
+}
+.fa-mercury:before {
+  content: "\f223";
+}
+.fa-intersex:before,
+.fa-transgender:before {
+  content: "\f224";
+}
+.fa-transgender-alt:before {
+  content: "\f225";
+}
+.fa-venus-double:before {
+  content: "\f226";
+}
+.fa-mars-double:before {
+  content: "\f227";
+}
+.fa-venus-mars:before {
+  content: "\f228";
+}
+.fa-mars-stroke:before {
+  content: "\f229";
+}
+.fa-mars-stroke-v:before {
+  content: "\f22a";
+}
+.fa-mars-stroke-h:before {
+  content: "\f22b";
+}
+.fa-neuter:before {
+  content: "\f22c";
+}
+.fa-genderless:before {
+  content: "\f22d";
+}
+.fa-facebook-official:before {
+  content: "\f230";
+}
+.fa-pinterest-p:before {
+  content: "\f231";
+}
+.fa-whatsapp:before {
+  content: "\f232";
+}
+.fa-server:before {
+  content: "\f233";
+}
+.fa-user-plus:before {
+  content: "\f234";
+}
+.fa-user-times:before {
+  content: "\f235";
+}
+.fa-hotel:before,
+.fa-bed:before {
+  content: "\f236";
+}
+.fa-viacoin:before {
+  content: "\f237";
+}
+.fa-train:before {
+  content: "\f238";
+}
+.fa-subway:before {
+  content: "\f239";
+}
+.fa-medium:before {
+  content: "\f23a";
+}
+.fa-yc:before,
+.fa-y-combinator:before {
+  content: "\f23b";
+}
+.fa-optin-monster:before {
+  content: "\f23c";
+}
+.fa-opencart:before {
+  content: "\f23d";
+}
+.fa-expeditedssl:before {
+  content: "\f23e";
+}
+.fa-battery-4:before,
+.fa-battery:before,
+.fa-battery-full:before {
+  content: "\f240";
+}
+.fa-battery-3:before,
+.fa-battery-three-quarters:before {
+  content: "\f241";
+}
+.fa-battery-2:before,
+.fa-battery-half:before {
+  content: "\f242";
+}
+.fa-battery-1:before,
+.fa-battery-quarter:before {
+  content: "\f243";
+}
+.fa-battery-0:before,
+.fa-battery-empty:before {
+  content: "\f244";
+}
+.fa-mouse-pointer:before {
+  content: "\f245";
+}
+.fa-i-cursor:before {
+  content: "\f246";
+}
+.fa-object-group:before {
+  content: "\f247";
+}
+.fa-object-ungroup:before {
+  content: "\f248";
+}
+.fa-sticky-note:before {
+  content: "\f249";
+}
+.fa-sticky-note-o:before {
+  content: "\f24a";
+}
+.fa-cc-jcb:before {
+  content: "\f24b";
+}
+.fa-cc-diners-club:before {
+  content: "\f24c";
+}
+.fa-clone:before {
+  content: "\f24d";
+}
+.fa-balance-scale:before {
+  content: "\f24e";
+}
+.fa-hourglass-o:before {
+  content: "\f250";
+}
+.fa-hourglass-1:before,
+.fa-hourglass-start:before {
+  content: "\f251";
+}
+.fa-hourglass-2:before,
+.fa-hourglass-half:before {
+  content: "\f252";
+}
+.fa-hourglass-3:before,
+.fa-hourglass-end:before {
+  content: "\f253";
+}
+.fa-hourglass:before {
+  content: "\f254";
+}
+.fa-hand-grab-o:before,
+.fa-hand-rock-o:before {
+  content: "\f255";
+}
+.fa-hand-stop-o:before,
+.fa-hand-paper-o:before {
+  content: "\f256";
+}
+.fa-hand-scissors-o:before {
+  content: "\f257";
+}
+.fa-hand-lizard-o:before {
+  content: "\f258";
+}
+.fa-hand-spock-o:before {
+  content: "\f259";
+}
+.fa-hand-pointer-o:before {
+  content: "\f25a";
+}
+.fa-hand-peace-o:before {
+  content: "\f25b";
+}
+.fa-trademark:before {
+  content: "\f25c";
+}
+.fa-registered:before {
+  content: "\f25d";
+}
+.fa-creative-commons:before {
+  content: "\f25e";
+}
+.fa-gg:before {
+  content: "\f260";
+}
+.fa-gg-circle:before {
+  content: "\f261";
+}
+.fa-tripadvisor:before {
+  content: "\f262";
+}
+.fa-odnoklassniki:before {
+  content: "\f263";
+}
+.fa-odnoklassniki-square:before {
+  content: "\f264";
+}
+.fa-get-pocket:before {
+  content: "\f265";
+}
+.fa-wikipedia-w:before {
+  content: "\f266";
+}
+.fa-safari:before {
+  content: "\f267";
+}
+.fa-chrome:before {
+  content: "\f268";
+}
+.fa-firefox:before {
+  content: "\f269";
+}
+.fa-opera:before {
+  content: "\f26a";
+}
+.fa-internet-explorer:before {
+  content: "\f26b";
+}
+.fa-tv:before,
+.fa-television:before {
+  content: "\f26c";
+}
+.fa-contao:before {
+  content: "\f26d";
+}
+.fa-500px:before {
+  content: "\f26e";
+}
+.fa-amazon:before {
+  content: "\f270";
+}
+.fa-calendar-plus-o:before {
+  content: "\f271";
+}
+.fa-calendar-minus-o:before {
+  content: "\f272";
+}
+.fa-calendar-times-o:before {
+  content: "\f273";
+}
+.fa-calendar-check-o:before {
+  content: "\f274";
+}
+.fa-industry:before {
+  content: "\f275";
+}
+.fa-map-pin:before {
+  content: "\f276";
+}
+.fa-map-signs:before {
+  content: "\f277";
+}
+.fa-map-o:before {
+  content: "\f278";
+}
+.fa-map:before {
+  content: "\f279";
+}
+.fa-commenting:before {
+  content: "\f27a";
+}
+.fa-commenting-o:before {
+  content: "\f27b";
+}
+.fa-houzz:before {
+  content: "\f27c";
+}
+.fa-vimeo:before {
+  content: "\f27d";
+}
+.fa-black-tie:before {
+  content: "\f27e";
+}
+.fa-fonticons:before {
+  content: "\f280";
+}
+.fa-reddit-alien:before {
+  content: "\f281";
+}
+.fa-edge:before {
+  content: "\f282";
+}
+.fa-credit-card-alt:before {
+  content: "\f283";
+}
+.fa-codiepie:before {
+  content: "\f284";
+}
+.fa-modx:before {
+  content: "\f285";
+}
+.fa-fort-awesome:before {
+  content: "\f286";
+}
+.fa-usb:before {
+  content: "\f287";
+}
+.fa-product-hunt:before {
+  content: "\f288";
+}
+.fa-mixcloud:before {
+  content: "\f289";
+}
+.fa-scribd:before {
+  content: "\f28a";
+}
+.fa-pause-circle:before {
+  content: "\f28b";
+}
+.fa-pause-circle-o:before {
+  content: "\f28c";
+}
+.fa-stop-circle:before {
+  content: "\f28d";
+}
+.fa-stop-circle-o:before {
+  content: "\f28e";
+}
+.fa-shopping-bag:before {
+  content: "\f290";
+}
+.fa-shopping-basket:before {
+  content: "\f291";
+}
+.fa-hashtag:before {
+  content: "\f292";
+}
+.fa-bluetooth:before {
+  content: "\f293";
+}
+.fa-bluetooth-b:before {
+  content: "\f294";
+}
+.fa-percent:before {
+  content: "\f295";
+}
+.fa-gitlab:before {
+  content: "\f296";
+}
+.fa-wpbeginner:before {
+  content: "\f297";
+}
+.fa-wpforms:before {
+  content: "\f298";
+}
+.fa-envira:before {
+  content: "\f299";
+}
+.fa-universal-access:before {
+  content: "\f29a";
+}
+.fa-wheelchair-alt:before {
+  content: "\f29b";
+}
+.fa-question-circle-o:before {
+  content: "\f29c";
+}
+.fa-blind:before {
+  content: "\f29d";
+}
+.fa-audio-description:before {
+  content: "\f29e";
+}
+.fa-volume-control-phone:before {
+  content: "\f2a0";
+}
+.fa-braille:before {
+  content: "\f2a1";
+}
+.fa-assistive-listening-systems:before {
+  content: "\f2a2";
+}
+.fa-asl-interpreting:before,
+.fa-american-sign-language-interpreting:before {
+  content: "\f2a3";
+}
+.fa-deafness:before,
+.fa-hard-of-hearing:before,
+.fa-deaf:before {
+  content: "\f2a4";
+}
+.fa-glide:before {
+  content: "\f2a5";
+}
+.fa-glide-g:before {
+  content: "\f2a6";
+}
+.fa-signing:before,
+.fa-sign-language:before {
+  content: "\f2a7";
+}
+.fa-low-vision:before {
+  content: "\f2a8";
+}
+.fa-viadeo:before {
+  content: "\f2a9";
+}
+.fa-viadeo-square:before {
+  content: "\f2aa";
+}
+.fa-snapchat:before {
+  content: "\f2ab";
+}
+.fa-snapchat-ghost:before {
+  content: "\f2ac";
+}
+.fa-snapchat-square:before {
+  content: "\f2ad";
+}
+.fa-pied-piper:before {
+  content: "\f2ae";
+}
+.fa-first-order:before {
+  content: "\f2b0";
+}
+.fa-yoast:before {
+  content: "\f2b1";
+}
+.fa-themeisle:before {
+  content: "\f2b2";
+}
+.fa-google-plus-circle:before,
+.fa-google-plus-official:before {
+  content: "\f2b3";
+}
+.fa-fa:before,
+.fa-font-awesome:before {
+  content: "\f2b4";
+}
+.fa-handshake-o:before {
+  content: "\f2b5";
+}
+.fa-envelope-open:before {
+  content: "\f2b6";
+}
+.fa-envelope-open-o:before {
+  content: "\f2b7";
+}
+.fa-linode:before {
+  content: "\f2b8";
+}
+.fa-address-book:before {
+  content: "\f2b9";
+}
+.fa-address-book-o:before {
+  content: "\f2ba";
+}
+.fa-vcard:before,
+.fa-address-card:before {
+  content: "\f2bb";
+}
+.fa-vcard-o:before,
+.fa-address-card-o:before {
+  content: "\f2bc";
+}
+.fa-user-circle:before {
+  content: "\f2bd";
+}
+.fa-user-circle-o:before {
+  content: "\f2be";
+}
+.fa-user-o:before {
+  content: "\f2c0";
+}
+.fa-id-badge:before {
+  content: "\f2c1";
+}
+.fa-drivers-license:before,
+.fa-id-card:before {
+  content: "\f2c2";
+}
+.fa-drivers-license-o:before,
+.fa-id-card-o:before {
+  content: "\f2c3";
+}
+.fa-quora:before {
+  content: "\f2c4";
+}
+.fa-free-code-camp:before {
+  content: "\f2c5";
+}
+.fa-telegram:before {
+  content: "\f2c6";
+}
+.fa-thermometer-4:before,
+.fa-thermometer:before,
+.fa-thermometer-full:before {
+  content: "\f2c7";
+}
+.fa-thermometer-3:before,
+.fa-thermometer-three-quarters:before {
+  content: "\f2c8";
+}
+.fa-thermometer-2:before,
+.fa-thermometer-half:before {
+  content: "\f2c9";
+}
+.fa-thermometer-1:before,
+.fa-thermometer-quarter:before {
+  content: "\f2ca";
+}
+.fa-thermometer-0:before,
+.fa-thermometer-empty:before {
+  content: "\f2cb";
+}
+.fa-shower:before {
+  content: "\f2cc";
+}
+.fa-bathtub:before,
+.fa-s15:before,
+.fa-bath:before {
+  content: "\f2cd";
+}
+.fa-podcast:before {
+  content: "\f2ce";
+}
+.fa-window-maximize:before {
+  content: "\f2d0";
+}
+.fa-window-minimize:before {
+  content: "\f2d1";
+}
+.fa-window-restore:before {
+  content: "\f2d2";
+}
+.fa-times-rectangle:before,
+.fa-window-close:before {
+  content: "\f2d3";
+}
+.fa-times-rectangle-o:before,
+.fa-window-close-o:before {
+  content: "\f2d4";
+}
+.fa-bandcamp:before {
+  content: "\f2d5";
+}
+.fa-grav:before {
+  content: "\f2d6";
+}
+.fa-etsy:before {
+  content: "\f2d7";
+}
+.fa-imdb:before {
+  content: "\f2d8";
+}
+.fa-ravelry:before {
+  content: "\f2d9";
+}
+.fa-eercast:before {
+  content: "\f2da";
+}
+.fa-microchip:before {
+  content: "\f2db";
+}
+.fa-snowflake-o:before {
+  content: "\f2dc";
+}
+.fa-superpowers:before {
+  content: "\f2dd";
+}
+.fa-wpexplorer:before {
+  content: "\f2de";
+}
+.fa-meetup:before {
+  content: "\f2e0";
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+}
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
 }
 /*!
 *
@@ -8694,6 +9372,10 @@ div.traceback-wrapper {
   max-width: 800px;
   margin: auto;
 }
+div.traceback-wrapper pre.traceback {
+  max-height: 600px;
+  overflow: auto;
+}
 /**
  * Primary styles
  *
@@ -8719,6 +9401,10 @@ body > #header {
   z-index: 100;
 }
 body > #header #header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
   padding-bottom: 5px;
   padding-top: 5px;
   box-sizing: border-box;
@@ -8750,13 +9436,16 @@ body > #header .header-bar {
   padding-top: 1px;
   padding-bottom: 1px;
 }
-@media (max-width: 991px) {
-  #ipython_notebook {
-    margin-left: 10px;
-  }
-}
 [dir="rtl"] #ipython_notebook {
+  margin-right: 10px;
+  margin-left: 0;
+}
+[dir="rtl"] #ipython_notebook.pull-left {
   float: right !important;
+  float: right;
+}
+.flex-spacer {
+  flex: 1;
 }
 #noscript {
   width: auto;
@@ -8791,8 +9480,14 @@ body > #header .header-bar {
 input.ui-button {
   padding: 0.3em 0.9em;
 }
+span#kernel_logo_widget {
+  margin: 0 10px;
+}
 span#login_widget {
   float: right;
+}
+[dir="rtl"] span#login_widget {
+  float: left;
 }
 span#login_widget > .button,
 #logout {
@@ -8908,6 +9603,9 @@ span#login_widget > .button .badge,
   overflow: auto;
   flex: 1;
 }
+.modal-header {
+  cursor: move;
+}
 @media (min-width: 768px) {
   .modal .modal-dialog {
     width: 700px;
@@ -8928,6 +9626,19 @@ span#login_widget > .button .badge,
   display: inline-block;
   margin-bottom: -4px;
 }
+[dir="rtl"] .center-nav form.pull-left {
+  float: right !important;
+  float: right;
+}
+[dir="rtl"] .center-nav .navbar-text {
+  float: right;
+}
+[dir="rtl"] .navbar-inner {
+  text-align: right;
+}
+[dir="rtl"] div.text-left {
+  text-align: right;
+}
 /*!
 *
 * IPython tree view
@@ -8944,34 +9655,42 @@ span#login_widget > .button .badge,
   margin: 0;
 }
 .alternate_upload input.fileinput {
-  text-align: center;
-  vertical-align: middle;
-  display: inline;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
   opacity: 0;
   z-index: 2;
-  width: 12ex;
-  margin-right: -12ex;
+}
+.alternate_upload .btn-xs > input.fileinput {
+  margin: -1px -5px;
 }
 .alternate_upload .btn-upload {
+  position: relative;
   height: 22px;
+}
+::-webkit-file-upload-button {
+  cursor: pointer;
 }
 /**
  * Primary styles
  *
  * Author: Jupyter Development Team
  */
-[dir="rtl"] #tabs li {
-  float: right;
-}
 ul#tabs {
   margin-bottom: 4px;
-}
-[dir="rtl"] ul#tabs {
-  margin-right: 0px;
 }
 ul#tabs a {
   padding-top: 6px;
   padding-bottom: 4px;
+}
+[dir="rtl"] ul#tabs.nav-tabs > li {
+  float: right;
+}
+[dir="rtl"] ul#tabs.nav.nav-tabs {
+  padding-right: 0;
 }
 ul.breadcrumb a:focus,
 ul.breadcrumb a:hover {
@@ -8991,15 +9710,13 @@ ul.breadcrumb span {
 .list_toolbar .tree-buttons {
   padding-top: 1px;
 }
-[dir="rtl"] .list_toolbar .tree-buttons {
+[dir="rtl"] .list_toolbar .tree-buttons .pull-right {
   float: left !important;
+  float: left;
 }
-[dir="rtl"] .list_toolbar .pull-right {
-  padding-top: 1px;
-  float: left !important;
-}
-[dir="rtl"] .list_toolbar .pull-left {
-  float: right !important;
+[dir="rtl"] .list_toolbar .col-sm-4,
+[dir="rtl"] .list_toolbar .col-sm-8 {
+  float: right;
 }
 .dynamic-buttons {
   padding-top: 3px;
@@ -9055,7 +9772,7 @@ ul.breadcrumb span {
 .list_item > div input {
   margin-right: 7px;
   margin-left: 14px;
-  vertical-align: baseline;
+  vertical-align: text-bottom;
   line-height: 22px;
   position: relative;
   top: -1px;
@@ -9065,6 +9782,9 @@ ul.breadcrumb span {
   margin-left: -1px;
   vertical-align: baseline;
   line-height: 22px;
+}
+[dir="rtl"] .list_item > div input {
+  margin-right: 0;
 }
 .new-file input[type=checkbox] {
   visibility: hidden;
@@ -9080,6 +9800,14 @@ ul.breadcrumb span {
   margin-left: 7px;
   line-height: 22px;
   vertical-align: baseline;
+}
+.item_modified {
+  margin-right: 7px;
+  margin-left: 7px;
+}
+[dir="rtl"] .item_modified.pull-right {
+  float: left !important;
+  float: left;
 }
 .item_buttons {
   line-height: 1em;
@@ -9108,6 +9836,14 @@ ul.breadcrumb span {
   margin-right: 7px;
   float: left;
 }
+[dir="rtl"] .item_buttons.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .item_buttons .kernel-name {
+  margin-left: 7px;
+  float: right;
+}
 .toolbar_info {
   height: 24px;
   line-height: 24px;
@@ -9133,18 +9869,32 @@ ul.breadcrumb span {
   background-color: transparent;
   font-weight: bold;
 }
+.sort_button {
+  display: inline-block;
+  padding-left: 7px;
+}
+[dir="rtl"] .sort_button.pull-right {
+  float: left !important;
+  float: left;
+}
 #tree-selector {
   padding-right: 0px;
-}
-[dir="rtl"] #tree-selector a {
-  float: right;
 }
 #button-select-all {
   min-width: 50px;
 }
+[dir="rtl"] #button-select-all.btn {
+  float: right ;
+}
 #select-all {
   margin-left: 7px;
   margin-right: 2px;
+  margin-top: 2px;
+  height: 16px;
+}
+[dir="rtl"] #select-all.pull-left {
+  float: right !important;
+  float: right;
 }
 .menu_icon {
   margin-right: 2px;
@@ -9162,6 +9912,12 @@ ul.breadcrumb span {
   -moz-osx-font-smoothing: grayscale;
   content: "\f114";
 }
+.folder_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.folder_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .folder_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9178,6 +9934,12 @@ ul.breadcrumb span {
   content: "\f02d";
   position: relative;
   top: -1px;
+}
+.notebook_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.notebook_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .notebook_icon:before.pull-left {
   margin-right: .3em;
@@ -9197,6 +9959,12 @@ ul.breadcrumb span {
   top: -1px;
   color: #5cb85c;
 }
+.running_notebook_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.running_notebook_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .running_notebook_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9214,6 +9982,12 @@ ul.breadcrumb span {
   position: relative;
   top: -2px;
 }
+.file_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.file_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .file_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9228,8 +10002,11 @@ ul#new-menu {
   left: auto;
   right: 0;
 }
-[dir="rtl"] #new-menu {
-  text-align: right;
+#new-menu .dropdown-header {
+  font-size: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0 0 3px;
+  margin: -3px 20px 0;
 }
 .kernel-menu-icon {
   padding-right: 12px;
@@ -9276,9 +10053,6 @@ ul#new-menu {
 #running .panel-group .panel .panel-body .list_container .list_item:last-child {
   border-bottom: 0px;
 }
-[dir="rtl"] #running .col-sm-8 {
-  float: right !important;
-}
 .delete-button {
   display: none;
 }
@@ -9286,6 +10060,12 @@ ul#new-menu {
   display: none;
 }
 .rename-button {
+  display: none;
+}
+.move-button {
+  display: none;
+}
+.download-button {
   display: none;
 }
 .shutdown-button {
@@ -9328,6 +10108,12 @@ ul#new-menu {
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
 }
+.dirty-indicator.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator.fa-pull-right {
+  margin-left: .3em;
+}
 .dirty-indicator.pull-left {
   margin-right: .3em;
 }
@@ -9342,6 +10128,12 @@ ul#new-menu {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
+}
+.dirty-indicator-dirty.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-dirty.fa-pull-right {
+  margin-left: .3em;
 }
 .dirty-indicator-dirty.pull-left {
   margin-right: .3em;
@@ -9358,6 +10150,12 @@ ul#new-menu {
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
 }
+.dirty-indicator-clean.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-clean.fa-pull-right {
+  margin-left: .3em;
+}
 .dirty-indicator-clean.pull-left {
   margin-right: .3em;
 }
@@ -9372,6 +10170,12 @@ ul#new-menu {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f00c";
+}
+.dirty-indicator-clean:before.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-clean:before.fa-pull-right {
+  margin-left: .3em;
 }
 .dirty-indicator-clean:before.pull-left {
   margin-right: .3em;
@@ -9417,14 +10221,132 @@ ul#new-menu {
     box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
   }
 }
+.CodeMirror-dialog {
+  background-color: #fff;
+}
 /*!
 *
 * IPython notebook
 *
 */
-/* CSS font colors for translated ANSI colors. */
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
 .ansibold {
   font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
 }
 /* use dark versions for foreground, to improve visibility */
 .ansiblack {
@@ -9503,12 +10425,20 @@ div.cell {
   /* This acts as a spacer between cells, that is outside the border */
   margin: 0px;
   outline: none;
-  border-left-width: 1px;
-  padding-left: 5px;
-  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
 }
 div.cell.jupyter-soft-selected {
-  border-left-color: #90CAF9;
   border-left-color: #E3F2FD;
   border-left-width: 1px;
   padding-left: 5px;
@@ -9521,27 +10451,39 @@ div.cell.jupyter-soft-selected {
     border-color: transparent;
   }
 }
-div.cell.selected {
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
   border-color: #ababab;
-  border-left-width: 0px;
-  padding-left: 6px;
-  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
 }
 @media print {
-  div.cell.selected {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
     border-color: transparent;
   }
 }
-div.cell.selected.jupyter-soft-selected {
-  border-left-width: 0;
-  padding-left: 6px;
-  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
-}
 .edit_mode div.cell.selected {
   border-color: #66BB6A;
-  border-left-width: 0px;
-  padding-left: 6px;
-  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
 }
 @media print {
   .edit_mode div.cell.selected {
@@ -9737,7 +10679,9 @@ div.input_area > div.highlight > pre {
 .CodeMirror-lines {
   /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
   /* we have set a different line-height and want this to scale with that. */
-  padding: 0.4em;
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
 }
 .CodeMirror-linenumber {
   padding: 0 8px 0 4px;
@@ -9747,11 +10691,24 @@ div.input_area > div.highlight > pre {
   border-top-left-radius: 2px;
 }
 .CodeMirror pre {
-  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
-  /* .CodeMirror-lines */
-  padding: 0;
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
   border: 0;
   border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
 }
 /*
 
@@ -10005,6 +10962,9 @@ div.output_area img.unconfined,
 div.output_area svg.unconfined {
   max-width: none;
 }
+div.output_area .mglyph > img {
+  max-width: none;
+}
 /* This is needed to protect the pre formating from global settings such
    as that of bootstrap */
 .output {
@@ -10043,7 +11003,7 @@ div.output_area svg.unconfined {
 }
 div.output_area pre {
   margin: 0;
-  padding: 0;
+  padding: 1px 0 1px 0;
   border: 0;
   vertical-align: baseline;
   color: black;
@@ -10203,39 +11163,35 @@ div.output_unrecognized a:hover {
 .rendered_html h6:first-child {
   margin-top: 1em;
 }
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
 .rendered_html ul {
   list-style: disc;
-  margin: 0em 2em;
-  padding-left: 0px;
 }
 .rendered_html ul ul {
   list-style: square;
-  margin: 0em 2em;
+  margin-top: 0;
 }
 .rendered_html ul ul ul {
   list-style: circle;
-  margin: 0em 2em;
 }
 .rendered_html ol {
   list-style: decimal;
-  margin: 0em 2em;
-  padding-left: 0px;
 }
 .rendered_html ol ol {
   list-style: upper-alpha;
-  margin: 0em 2em;
+  margin-top: 0;
 }
 .rendered_html ol ol ol {
   list-style: lower-alpha;
-  margin: 0em 2em;
 }
 .rendered_html ol ol ol ol {
   list-style: lower-roman;
-  margin: 0em 2em;
 }
 .rendered_html ol ol ol ol ol {
   list-style: decimal;
-  margin: 0em 2em;
 }
 .rendered_html * + ul {
   margin-top: 1em;
@@ -10249,14 +11205,23 @@ div.output_unrecognized a:hover {
 }
 .rendered_html pre {
   margin: 1em 2em;
+  padding: 0px;
+  background-color: #fff;
+}
+.rendered_html code {
+  background-color: #eff0f1;
+}
+.rendered_html p code {
+  padding: 1px 5px;
+}
+.rendered_html pre code {
+  background-color: #fff;
 }
 .rendered_html pre,
 .rendered_html code {
   border: 0;
-  background-color: #fff;
   color: #000;
   font-size: 100%;
-  padding: 0px;
 }
 .rendered_html blockquote {
   margin: 1em 2em;
@@ -10264,24 +11229,36 @@ div.output_unrecognized a:hover {
 .rendered_html table {
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid black;
+  border: none;
   border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
 }
 .rendered_html tr,
 .rendered_html th,
 .rendered_html td {
-  border: 1px solid black;
-  border-collapse: collapse;
-  margin: 1em 2em;
-}
-.rendered_html td,
-.rendered_html th {
-  text-align: left;
+  text-align: right;
   vertical-align: middle;
-  padding: 4px;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
 }
 .rendered_html th {
   font-weight: bold;
+}
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
 }
 .rendered_html * + table {
   margin-top: 1em;
@@ -10308,6 +11285,15 @@ div.output_unrecognized a:hover {
 .rendered_html img.unconfined,
 .rendered_html svg.unconfined {
   max-width: none;
+}
+.rendered_html .alert {
+  margin-bottom: initial;
+}
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] .rendered_html p {
+  text-align: right;
 }
 div.text_cell {
   /* Old browsers */
@@ -10362,8 +11348,17 @@ h6:hover .anchor-link {
   overflow-x: auto;
   overflow-y: hidden;
 }
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered .rendered_html td {
+  max-width: none;
+}
 .text_cell.unrendered .text_cell_render {
   display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
 }
 .cm-header-1,
 .cm-header-2,
@@ -10500,6 +11495,28 @@ kbd {
   padding-top: 1px;
   padding-bottom: 1px;
 }
+.jupyter-keybindings {
+  padding: 1px;
+  line-height: 24px;
+  border-bottom: 1px solid gray;
+}
+.jupyter-keybindings input {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.jupyter-keybindings i {
+  padding: 6px;
+}
+.well code {
+  background-color: #ffffff;
+  border-color: #ababab;
+  border-width: 1px;
+  border-style: solid;
+  padding: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
 /* CSS for the cell toolbar */
 .celltoolbar {
   border: thin solid #CFCFCF;
@@ -10632,6 +11649,152 @@ select[multiple].celltoolbar select {
   margin-left: 5px;
   margin-right: 5px;
 }
+.tags_button_container {
+  width: 100%;
+  display: flex;
+}
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+.tag-container > * {
+  margin: 0 4px;
+}
+.remove-tag-btn {
+  margin-left: 4px;
+}
+.tags-input {
+  display: flex;
+}
+.cell-tag:last-child:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  /* Fade to background color of cell toolbar */
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), #EEE);
+}
+.tags-input > * {
+  margin-left: 4px;
+}
+.cell-tag,
+.tags-input input,
+.tags-input button {
+  display: block;
+  width: 100%;
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #555555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 1px;
+  box-shadow: none;
+  width: inherit;
+  font-size: inherit;
+  height: 22px;
+  line-height: 22px;
+  padding: 0px 4px;
+  display: inline-block;
+}
+.cell-tag:focus,
+.tags-input input:focus,
+.tags-input button:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.cell-tag::-moz-placeholder,
+.tags-input input::-moz-placeholder,
+.tags-input button::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.cell-tag:-ms-input-placeholder,
+.tags-input input:-ms-input-placeholder,
+.tags-input button:-ms-input-placeholder {
+  color: #999;
+}
+.cell-tag::-webkit-input-placeholder,
+.tags-input input::-webkit-input-placeholder,
+.tags-input button::-webkit-input-placeholder {
+  color: #999;
+}
+.cell-tag::-ms-expand,
+.tags-input input::-ms-expand,
+.tags-input button::-ms-expand {
+  border: 0;
+  background-color: transparent;
+}
+.cell-tag[disabled],
+.tags-input input[disabled],
+.tags-input button[disabled],
+.cell-tag[readonly],
+.tags-input input[readonly],
+.tags-input button[readonly],
+fieldset[disabled] .cell-tag,
+fieldset[disabled] .tags-input input,
+fieldset[disabled] .tags-input button {
+  background-color: #eeeeee;
+  opacity: 1;
+}
+.cell-tag[disabled],
+.tags-input input[disabled],
+.tags-input button[disabled],
+fieldset[disabled] .cell-tag,
+fieldset[disabled] .tags-input input,
+fieldset[disabled] .tags-input button {
+  cursor: not-allowed;
+}
+textarea.cell-tag,
+textarea.tags-input input,
+textarea.tags-input button {
+  height: auto;
+}
+select.cell-tag,
+select.tags-input input,
+select.tags-input button {
+  height: 30px;
+  line-height: 30px;
+}
+textarea.cell-tag,
+textarea.tags-input input,
+textarea.tags-input button,
+select[multiple].cell-tag,
+select[multiple].tags-input input,
+select[multiple].tags-input button {
+  height: auto;
+}
+.cell-tag,
+.tags-input button {
+  padding: 0px 4px;
+}
+.cell-tag {
+  background-color: #fff;
+  white-space: nowrap;
+}
+.tags-input input[type=text]:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #ccc;
+}
 .completions {
   position: absolute;
   z-index: 110;
@@ -10657,16 +11820,28 @@ select[multiple].celltoolbar select {
 .completions select option.context {
   color: #286090;
 }
-#kernel_logo_widget {
-  float: right !important;
-  float: right;
-}
 #kernel_logo_widget .current_kernel_logo {
   display: none;
   margin-top: -1px;
   margin-bottom: -1px;
   width: 32px;
   height: 32px;
+}
+[dir="rtl"] #kernel_logo_widget {
+  float: left !important;
+  float: left;
+}
+.modal .modal-body .move-path {
+  display: flex;
+  flex-direction: row;
+  justify-content: space;
+  align-items: center;
+}
+.modal .modal-body .move-path .server-root {
+  padding-right: 20px;
+}
+.modal .modal-body .move-path .path-input {
+  flex: 1;
 }
 #menubar {
   box-sizing: border-box;
@@ -10688,11 +11863,41 @@ select[multiple].celltoolbar select {
 #menubar .navbar-collapse {
   clear: left;
 }
+[dir="rtl"] #menubar .navbar-toggle {
+  float: right;
+}
+[dir="rtl"] #menubar .navbar-collapse {
+  clear: right;
+}
+[dir="rtl"] #menubar .navbar-nav {
+  float: right;
+}
+[dir="rtl"] #menubar .nav {
+  padding-right: 0px;
+}
+[dir="rtl"] #menubar .navbar-nav > li {
+  float: right;
+}
+[dir="rtl"] #menubar .navbar-right {
+  float: left !important;
+}
+[dir="rtl"] ul.dropdown-menu {
+  text-align: right;
+  left: auto;
+}
+[dir="rtl"] ul#new-menu.dropdown-menu {
+  right: auto;
+  left: 0;
+}
 .nav-wrapper {
   border-bottom: 1px solid #e7e7e7;
 }
 i.menu-icon {
   padding-top: 4px;
+}
+[dir="rtl"] i.menu-icon.pull-right {
+  float: left !important;
+  float: left;
 }
 ul#help_menu li a {
   overflow: hidden;
@@ -10700,6 +11905,17 @@ ul#help_menu li a {
 }
 ul#help_menu li a i {
   margin-right: -1.2em;
+}
+[dir="rtl"] ul#help_menu li a {
+  padding-left: 2.2em;
+}
+[dir="rtl"] ul#help_menu li a i {
+  margin-right: 0;
+  margin-left: -1.2em;
+}
+[dir="rtl"] ul#help_menu li a i.pull-right {
+  float: left !important;
+  float: left;
 }
 .dropdown-submenu {
   position: relative;
@@ -10709,6 +11925,10 @@ ul#help_menu li a i {
   left: 100%;
   margin-top: -6px;
   margin-left: -1px;
+}
+[dir="rtl"] .dropdown-submenu > .dropdown-menu {
+  right: 100%;
+  margin-right: -1px;
 }
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
@@ -10727,11 +11947,23 @@ ul#help_menu li a i {
   margin-top: 2px;
   margin-right: -10px;
 }
+.dropdown-submenu > a:after.fa-pull-left {
+  margin-right: .3em;
+}
+.dropdown-submenu > a:after.fa-pull-right {
+  margin-left: .3em;
+}
 .dropdown-submenu > a:after.pull-left {
   margin-right: .3em;
 }
 .dropdown-submenu > a:after.pull-right {
   margin-left: .3em;
+}
+[dir="rtl"] .dropdown-submenu > a:after {
+  float: left;
+  content: "\f0d9";
+  margin-right: 0;
+  margin-left: -10px;
 }
 .dropdown-submenu:hover > a:after {
   color: #262626;
@@ -10748,6 +11980,10 @@ ul#help_menu li a i {
   float: right;
   z-index: 10;
 }
+[dir="rtl"] #notification_area {
+  float: left !important;
+  float: left;
+}
 .indicator_area {
   float: right !important;
   float: right;
@@ -10758,6 +11994,10 @@ ul#help_menu li a i {
   z-index: 10;
   text-align: center;
   width: auto;
+}
+[dir="rtl"] .indicator_area {
+  float: left !important;
+  float: left;
 }
 #kernel_indicator {
   float: right !important;
@@ -10775,6 +12015,12 @@ ul#help_menu li a i {
   padding-left: 5px;
   padding-right: 5px;
 }
+[dir="rtl"] #kernel_indicator {
+  float: left !important;
+  float: left;
+  border-left: 0;
+  border-right: 1px solid;
+}
 #modal_indicator {
   float: right !important;
   float: right;
@@ -10785,6 +12031,10 @@ ul#help_menu li a i {
   z-index: 10;
   text-align: center;
   width: auto;
+}
+[dir="rtl"] #modal_indicator {
+  float: left !important;
+  float: left;
 }
 #readonly-indicator {
   float: right !important;
@@ -10815,6 +12065,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f040";
 }
+.edit_mode .modal_indicator:before.fa-pull-left {
+  margin-right: .3em;
+}
+.edit_mode .modal_indicator:before.fa-pull-right {
+  margin-left: .3em;
+}
 .edit_mode .modal_indicator:before.pull-left {
   margin-right: .3em;
 }
@@ -10829,6 +12085,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: ' ';
+}
+.command_mode .modal_indicator:before.fa-pull-left {
+  margin-right: .3em;
+}
+.command_mode .modal_indicator:before.fa-pull-right {
+  margin-left: .3em;
 }
 .command_mode .modal_indicator:before.pull-left {
   margin-right: .3em;
@@ -10845,6 +12107,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f10c";
 }
+.kernel_idle_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_idle_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .kernel_idle_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -10859,6 +12127,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f111";
+}
+.kernel_busy_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_busy_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .kernel_busy_icon:before.pull-left {
   margin-right: .3em;
@@ -10875,6 +12149,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f1e2";
 }
+.kernel_dead_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_dead_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .kernel_dead_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -10889,6 +12169,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f127";
+}
+.kernel_disconnected_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_disconnected_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .kernel_disconnected_icon:before.pull-left {
   margin-right: .3em;
@@ -11279,27 +12565,46 @@ div#pager .ui-resizable-handle::after {
   flex: 1;
 }
 span.save_widget {
-  margin-top: 6px;
+  height: 30px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  width: 50%;
+  flex: 1;
 }
 span.save_widget span.filename {
-  height: 1em;
+  height: 100%;
   line-height: 1em;
-  padding: 3px;
   margin-left: 16px;
   border: none;
   font-size: 146.5%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   border-radius: 2px;
 }
 span.save_widget span.filename:hover {
   background-color: #e6e6e6;
 }
+[dir="rtl"] span.save_widget.pull-left {
+  float: right !important;
+  float: right;
+}
+[dir="rtl"] span.save_widget span.filename {
+  margin-left: 0;
+  margin-right: 16px;
+}
 span.checkpoint_status,
 span.autosave_status {
   font-size: small;
+  white-space: nowrap;
+  padding: 0 5px;
 }
 @media (max-width: 767px) {
   span.save_widget {
     font-size: small;
+    padding: 0 0 0 5px;
   }
   span.checkpoint_status,
   span.autosave_status {
@@ -11343,6 +12648,9 @@ span.autosave_status {
   margin-top: 0px;
   margin-left: 5px;
 }
+.toolbar-btn-label {
+  margin-left: 6px;
+}
 #maintoolbar {
   margin-bottom: -3px;
   margin-top: -8px;
@@ -11362,6 +12670,10 @@ span.autosave_status {
 }
 .select-xs {
   height: 24px;
+}
+[dir="rtl"] .btn-group > .btn,
+.btn-group-vertical > .btn {
+  float: right;
 }
 .pulse,
 .dropdown-menu > li > a.pulse,
@@ -11512,6 +12824,10 @@ ul.typeahead-list i {
   margin-left: -10px;
   width: 18px;
 }
+[dir="rtl"] ul.typeahead-list i {
+  margin-left: 0;
+  margin-right: -10px;
+}
 ul.typeahead-list {
   max-height: 80vh;
   overflow: auto;
@@ -11520,6 +12836,13 @@ ul.typeahead-list > li > a {
   /** Firefox bug **/
   /* see https://github.com/jupyter/notebook/issues/559 */
   white-space: normal;
+}
+ul.typeahead-list  > li > a.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .typeahead-list {
+  text-align: right;
 }
 .cmd-palette .modal-body {
   padding: 7px;
@@ -11531,10 +12854,19 @@ ul.typeahead-list > li > a {
   outline: none;
 }
 .no-shortcut {
-  display: none;
+  min-width: 20px;
+  color: transparent;
+}
+[dir="rtl"] .no-shortcut.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .command-shortcut.pull-right {
+  float: left !important;
+  float: left;
 }
 .command-shortcut:before {
-  content: "(command)";
+  content: "(command mode)";
   padding-right: 3px;
   color: #777777;
 }
@@ -11543,6 +12875,10 @@ ul.typeahead-list > li > a {
   padding-right: 3px;
   color: #777777;
 }
+[dir="rtl"] .edit-shortcut.pull-right {
+  float: left !important;
+  float: left;
+}
 #find-and-replace #replace-preview .match,
 #find-and-replace #replace-preview .insert {
   background-color: #BBDEFB;
@@ -11550,6 +12886,12 @@ ul.typeahead-list > li > a {
   border-style: solid;
   border-width: 1px;
   border-radius: 0px;
+}
+[dir="ltr"] #find-and-replace .input-group-btn + .form-control {
+  border-left: none;
+}
+[dir="rtl"] #find-and-replace .input-group-btn + .form-control {
+  border-right: none;
 }
 #find-and-replace #replace-preview .replace .match {
   background-color: #FFCDD2;
@@ -11675,45 +13017,6 @@ ul.typeahead-list > li > a {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
-<style type="text/css">
-    
-/* Temporary definitions which will become obsolete with Notebook release 5.0 */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-bold { font-weight: bold; }
-
-    </style>
 
 
 <style type="text/css">
@@ -11747,7 +13050,7 @@ div#notebook {
 
 <!-- Loading mathjax macro -->
 <!-- Load mathjax -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_HTML"></script>
     <!-- MathJax configuration -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -11780,7 +13083,7 @@ div#notebook {
 <span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://vesg.ipsl.upmc.fr/thredds/fileServer/IPSLFS/jservon/CliMAF_Notebooks_html/CliMAF-logo-small.png&#39;</span><span class="p">)</span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11790,7 +13093,7 @@ div#notebook {
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[1]:</div>
+    <div class="prompt output_prompt">Out[1]:</div>
 
 
 
@@ -11805,56 +13108,33 @@ div#notebook {
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="A-science-oriented-framework-to-ease-the-analysis-of-climate-model-simulations">A science-oriented framework to ease the analysis of climate model simulations<a class="anchor-link" href="#A-science-oriented-framework-to-ease-the-analysis-of-climate-model-simulations">&#182;</a></h3><h5 id="WP5-ANR-Convergence">WP5 ANR Convergence<a class="anchor-link" href="#WP5-ANR-Convergence">&#182;</a></h5><h5 id="Project-leaders:-St&#233;phane-S&#233;n&#233;si-(CNRM-GAME),-J&#233;r&#244;me-Servonnat-(LSCE-IPSL)">Project leaders: St&#233;phane S&#233;n&#233;si (CNRM-GAME), J&#233;r&#244;me Servonnat (LSCE-IPSL)<a class="anchor-link" href="#Project-leaders:-St&#233;phane-S&#233;n&#233;si-(CNRM-GAME),-J&#233;r&#244;me-Servonnat-(LSCE-IPSL)">&#182;</a></h5><h5 id="Developers:-Ludivine-Vignon-(CNRM-GAME),-Laurent-Franchisteguy-(CNRM-GAME),-Patrick-Brockmann-(LSCE-IPSL),-Sylvana-Ramos-Buarque-(CNRM-GAME)">Developers: Ludivine Vignon (CNRM-GAME), Laurent Franchisteguy (CNRM-GAME), Patrick Brockmann (LSCE-IPSL), Sylvana Ramos-Buarque (CNRM-GAME)<a class="anchor-link" href="#Developers:-Ludivine-Vignon-(CNRM-GAME),-Laurent-Franchisteguy-(CNRM-GAME),-Patrick-Brockmann-(LSCE-IPSL),-Sylvana-Ramos-Buarque-(CNRM-GAME)">&#182;</a></h5><h5 id="Beta-testing:-Olivier-Marti-(LSCE-IPSL),-Marie-Pierre-Moine-(CERFACS),-Emilia-Sanchez-Gomez-(CERFACS)">Beta-testing: Olivier Marti (LSCE-IPSL), Marie-Pierre Moine (CERFACS), Emilia Sanchez-Gomez (CERFACS)<a class="anchor-link" href="#Beta-testing:-Olivier-Marti-(LSCE-IPSL),-Marie-Pierre-Moine-(CERFACS),-Emilia-Sanchez-Gomez-(CERFACS)">&#182;</a></h5><h5 id="Contributors:-you!">Contributors: you!<a class="anchor-link" href="#Contributors:-you!">&#182;</a></h5><h2 id="-"> <a class="anchor-link" href="#-">&#182;</a></h2><h5 id="contact:-climaf@meteo.fr">contact: climaf@meteo.fr<a class="anchor-link" href="#contact:-climaf@meteo.fr">&#182;</a></h5>
+<h3 id="A-science-oriented-framework-to-ease-the-analysis-of-climate-model-simulations">A science-oriented framework to ease the analysis of climate model simulations<a class="anchor-link" href="#A-science-oriented-framework-to-ease-the-analysis-of-climate-model-simulations">&#182;</a></h3><h5 id="WP5-ANR-Convergence">WP5 ANR Convergence<a class="anchor-link" href="#WP5-ANR-Convergence">&#182;</a></h5><h5 id="Development-team:-St&#233;phane-S&#233;n&#233;si-(CNRM-GAME),-Ga&#235;lle-Rigoudy-(CNRM-GAME),-J&#233;r&#244;me-Servonnat-(LSCE-IPSL),-Ludivine-Vignon-(CNRM-GAME),-Laurent-Franchisteguy-(CNRM-GAME),-Patrick-Brockmann-(LSCE-IPSL)">Development team: St&#233;phane S&#233;n&#233;si (CNRM-GAME), Ga&#235;lle Rigoudy (CNRM-GAME), J&#233;r&#244;me Servonnat (LSCE-IPSL), Ludivine Vignon (CNRM-GAME), Laurent Franchisteguy (CNRM-GAME), Patrick Brockmann (LSCE-IPSL)<a class="anchor-link" href="#Development-team:-St&#233;phane-S&#233;n&#233;si-(CNRM-GAME),-Ga&#235;lle-Rigoudy-(CNRM-GAME),-J&#233;r&#244;me-Servonnat-(LSCE-IPSL),-Ludivine-Vignon-(CNRM-GAME),-Laurent-Franchisteguy-(CNRM-GAME),-Patrick-Brockmann-(LSCE-IPSL)">&#182;</a></h5><h5 id="Beta-testing:-Olivier-Marti-(LSCE-IPSL),-Marie-Pierre-Moine-(CERFACS),-Emilia-Sanchez-Gomez-(CERFACS)">Beta-testing: Olivier Marti (LSCE-IPSL), Marie-Pierre Moine (CERFACS), Emilia Sanchez-Gomez (CERFACS)<a class="anchor-link" href="#Beta-testing:-Olivier-Marti-(LSCE-IPSL),-Marie-Pierre-Moine-(CERFACS),-Emilia-Sanchez-Gomez-(CERFACS)">&#182;</a></h5><h2 id="-"> <a class="anchor-link" href="#-">&#182;</a></h2><h5 id="contact:-climaf@meteo.fr">contact: climaf@meteo.fr<a class="anchor-link" href="#contact:-climaf@meteo.fr">&#182;</a></h5><h5 id="users-list:-climaf-users@meteo.f">users list: climaf-users@meteo.f<a class="anchor-link" href="#users-list:-climaf-users@meteo.f">&#182;</a></h5>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The goals of CliMAF are to provide the scientists with simplified and science-oriented means for :</p>
-<ul>
-<li>accessing both model and references data</li>
-<li>pre-tretament (period and geographical selections, regridding, averaging like seasonal mean computations...)</li>
-<li>plotting  maps, cross-sections and time series</li>
-<li>building  atlases</li>
-<li>plugging personal scripts in an atlas or in an analysis workflow</li>
-<li>sharing such scripts</li>
-<li>handlling ensembles (multi-model, multi-realization)
-CliMAF provides full managment of the outputs by handling the naming of the output files; it also stores the information on "how I obtained this file" under the form of an expression called CRS (CliMAF Reference Syntax) that allows checking for the existing files and avoid recomputing the same files twice (or more).</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1><h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Understand-how-the-CliMAF-cache-works-and-manage-the-content">Understand how the CliMAF cache works and manage the content<a class="anchor-link" href="#Understand-how-the-CliMAF-cache-works-and-manage-the-content">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this notebook we will see how the CliMAF cache works and how to:</p>
 <ul>
 <li><ol>
-<li>totally erase the content of the cache</li>
+<li>totally erase the content of the cache: craz</li>
 </ol>
 </li>
 <li><ol>
@@ -11862,15 +13142,15 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 </ol>
 </li>
 <li><ol>
-<li>remove one specific result</li>
+<li>remove one specific result: cdrop</li>
 </ol>
 </li>
 <li><ol>
-<li>remove results using criteria: pattern, age...</li>
+<li>remove results using criteria: pattern, age... =&gt; crm</li>
 </ol>
 </li>
 <li><ol>
-<li>remove everything but a list of results you want to keep</li>
+<li>VERY IMPORTANT: remove everything but a list of results you want to keep: cprotect</li>
 </ol>
 </li>
 <li><ol>
@@ -11883,8 +13163,7 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="The-goal-of-this-notebook-is-to-give-you-the-keys-to-manage-the-content-of-your-cache-by-yourself-(and-potentially-setup-automatic-cleaning-at-the-end-of-your-scripts)">The goal of this notebook is to give you the keys to manage the content of your cache by yourself (and potentially setup automatic cleaning at the end of your scripts)<a class="anchor-link" href="#The-goal-of-this-notebook-is-to-give-you-the-keys-to-manage-the-content-of-your-cache-by-yourself-(and-potentially-setup-automatic-cleaning-at-the-end-of-your-scripts)">&#182;</a></h3><h3 id="See-the-documentation-on-the-tools-to-manage-the-cache-for-more-details:">See the documentation on the tools to manage the cache for more details:<a class="anchor-link" href="#See-the-documentation-on-the-tools-to-manage-the-cache-for-more-details:">&#182;</a></h3><p><a href="https://climaf.readthedocs.io/en/master/functions_results_cache.html">https://climaf.readthedocs.io/en/master/functions_results_cache.html</a></p>
 
@@ -11892,16 +13171,14 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="First,-import-climaf">First, import climaf<a class="anchor-link" href="#First,-import-climaf">&#182;</a></h2>
 </div>
@@ -11909,13 +13186,13 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">climaf.api</span> <span class="kn">import</span> <span class="o">*</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11925,13 +13202,50 @@ CliMAF provides full managment of the outputs by handling the naming of the outp
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Climaf version = 1.2.8
-Cache directory set to : /prodigfs/ipslfs/dods/jservon/climafcache_test (use $CLIMAF_CACHE if set) 
-Cache directory for remote data set to : /prodigfs/ipslfs/dods/jservon/climafcache_test/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
+<pre>CliMAF version = 1.2.13
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CliMAF install =&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_V1.2.13_post
+python =&gt; /modfs/modtools-phw/miniconda2/envs/analyse_2.7/bin/python
+---
+Required softwares to run CliMAF =&gt; you are using the following versions/installations:
+ncl 6.6.2 =&gt; /modfs/modtools-phw/miniconda2/envs/analyse_2.7/bin/ncl
+cdo 1.9.6 =&gt; /opt/nco/1.9/bin/cdo
+nco (ncks) 4.5.2 =&gt; /opt/nco-4.5.2/bin/ncks
+ncdump fichier =&gt; /modfs/modtools-phw/miniconda2/envs/analyse_2.7/bin/ncdump
+Check stamping requirements
+nco (ncatted) found -&gt; /opt/nco-4.5.2/bin/ncatted
+convert found -&gt; /usr/bin/convert
+pdftk found -&gt; /usr/bin/pdftk
+exiv2 found -&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_V1.2.13_post/bin/exiv2
+---
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
+Cache directory for remote data set to : /data/jservon/climafcache/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
+warning  : When defining temp_penalty : duplicate declaration for input #0
+warning  : When defining cquantile : duplicate declaration for input #0
+warning  : When defining cquantile : duplicate declaration for input #0
 Available macros read from ~/.climaf.macros are : []
 </pre>
 </div>
@@ -11942,8 +13256,7 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="And-set-verbosity-('critical'--&gt;-minimum-;-'debug'--&gt;-maximum)">And set verbosity ('critical' -&gt; minimum ; 'debug' -&gt; maximum)<a class="anchor-link" href="#And-set-verbosity-('critical'--&gt;-minimum-;-'debug'--&gt;-maximum)">&#182;</a></h3>
 </div>
@@ -11957,30 +13270,27 @@ Available macros read from ~/.climaf.macros are : []
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clog</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">)</span> <span class="c1"># min verbosity = critical &lt; warning &lt; info &lt; debug = max verbosity</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="...-and-dont'-forget-to-open-the-documentation-in-case-you-have-questions.">... and dont' forget to open the documentation in case you have questions.<a class="anchor-link" href="#...-and-dont'-forget-to-open-the-documentation-in-case-you-have-questions.">&#182;</a></h3><h3 id="http://climaf.readthedocs.org/"><a href="http://climaf.readthedocs.org/">http://climaf.readthedocs.org/</a><a class="anchor-link" href="#http://climaf.readthedocs.org/">&#182;</a></h3><h3 id="-&gt;-Use-the-&quot;Quick-search&quot;-space-to-search-for-what-you-are-interested-in,-it-is-really-powerfull!">-&gt; Use the "Quick search" space to search for what you are interested in, it is really powerfull!<a class="anchor-link" href="#-&gt;-Use-the-&quot;Quick-search&quot;-space-to-search-for-what-you-are-interested-in,-it-is-really-powerfull!">&#182;</a></h3><h3 id="-"> <a class="anchor-link" href="#-">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="1.-Start-with-a-brand-new-cache:-totally-erase-the-content-of-the-cache">1. Start with a brand new cache: totally erase the content of the cache<a class="anchor-link" href="#1.-Start-with-a-brand-new-cache:-totally-erase-the-content-of-the-cache">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="!!-Be-careful-when-you-do-this!!-it-will-completely-remove-all-the-results-of-your-cache!">!! Be careful when you do this!! it will completely remove all the results of your cache!<a class="anchor-link" href="#!!-Be-careful-when-you-do-this!!-it-will-completely-remove-all-the-results-of-your-cache!">&#182;</a></h3><h3 id="!!-Consider-using-a-'test'-cache-to-do-this-(simply-add-'test'-at-the-end-of-your-CLIMAF_CACHE-variable,-and-re-start)">!! Consider using a 'test' cache to do this (simply add 'test' at the end of your CLIMAF_CACHE variable, and re-start)<a class="anchor-link" href="#!!-Consider-using-a-'test'-cache-to-do-this-(simply-add-'test'-at-the-end-of-your-CLIMAF_CACHE-variable,-and-re-start)">&#182;</a></h3>
 </div>
@@ -11988,7 +13298,7 @@ Available macros read from ~/.climaf.macros are : []
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Check which cache your are using</span>
@@ -11996,7 +13306,7 @@ Available macros read from ~/.climaf.macros are : []
 <span class="n">cachedirs</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12006,13 +13316,13 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[47]:</div>
+    <div class="prompt output_prompt">Out[3]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test&#39;]</pre>
+<pre>[&#39;/data/jservon/climafcache_test&#39;]</pre>
 </div>
 
 </div>
@@ -12022,62 +13332,9 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="If-you-already-have-a-cache,-you-can-see-an-index-file-at-its-root-path:">If you already have a cache, you can see an index file at its root path:<a class="anchor-link" href="#If-you-already-have-a-cache,-you-can-see-an-index-file-at-its-root-path:">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cachedir</span> <span class="o">=</span> <span class="n">cachedirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="o">!</span>cat <span class="nv">$cachedir</span>/index
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>(dp0
-S&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
-p1
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/00926/2109c/c4299/c4033/34be2/09559/f88d8/0fa7a/372f5/b39b7/95e7f/2.nc&#39;
-p2
-sS&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
-p3
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;
-p4
-sS&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
-p5
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/8524c/b1079/b42f6/e1d50/937d0/bd25c/f76a6/796e6/98331/a9540/6a99e/d.nc&#39;
-p6
-s.</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">clist will retrieve the list of the CRS of the existing results from the index file $CLIMAF_CACHE/index<a class="anchor-link" href="#clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12086,10 +13343,11 @@ s.</pre>
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cachedir</span> <span class="o">=</span> <span class="n">cachedirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="o">!</span>cat <span class="nv">$cachedir</span>/index
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12099,7 +13357,45 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>cat: /data/jservon/climafcache_test/index: Aucun fichier ou dossier de ce type
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">clist will retrieve the list of the CRS of the existing results from the index file $CLIMAF_CACHE/index<a class="anchor-link" href="#clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12110,7 +13406,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[4]:</div>
+    <div class="prompt output_prompt">Out[5]:</div>
 
 
 
@@ -12126,8 +13422,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="For-demo-purposes,-we-will-start-with-a-clean-cache.">For demo purposes, we will start with a clean cache.<a class="anchor-link" href="#For-demo-purposes,-we-will-start-with-a-clean-cache.">&#182;</a></h2><h2 id="Use-craz()-to-fully-erase-your-cache-and-restart-with-a-clean-one">Use craz() to fully erase your cache and restart with a clean one<a class="anchor-link" href="#Use-craz()-to-fully-erase-your-cache-and-restart-with-a-clean-one">&#182;</a></h2><p><a href="https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=craz#craz-reset-cache">https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=craz#craz-reset-cache</a></p>
 
@@ -12142,14 +13437,13 @@ s.</pre>
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Now-check-the-content-of-your-cache-with-clist()">Now check the content of your cache with clist()<a class="anchor-link" href="#Now-check-the-content-of-your-cache-with-clist()">&#182;</a></h2><h3 id="clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">clist will retrieve the list of the CRS of the existing results from the index file $CLIMAF_CACHE/index<a class="anchor-link" href="#clist-will-retrieve-the-list-of-the-CRS-of-the-existing-results-from-the-index-file-$CLIMAF_CACHE/index">&#182;</a></h3>
 </div>
@@ -12163,7 +13457,7 @@ s.</pre>
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12173,7 +13467,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12184,7 +13478,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[7]:</div>
+    <div class="prompt output_prompt">Out[7]:</div>
 
 
 
@@ -12200,16 +13494,14 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Because-we've-just-cleaned-it,-your-cache-is-now-totally-empty.">Because we've just cleaned it, your cache is now totally empty.<a class="anchor-link" href="#Because-we've-just-cleaned-it,-your-cache-is-now-totally-empty.">&#182;</a></h3><h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1><h2 id="2.-How-CliMAF-stores-its-results-and-knows-that-those-results-exist-(and-are-linked-with-sequences-of-operations)">2. How CliMAF stores its results and knows that those results exist (and are linked with sequences of operations)<a class="anchor-link" href="#2.-How-CliMAF-stores-its-results-and-knows-that-those-results-exist-(and-are-linked-with-sequences-of-operations)">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="As-an-example,-we-will-extract-a-dataset-from-the-CMIP5-archive-and-do-some-pretreatments-to-add-results-to-the-cache">As an example, we will extract a dataset from the CMIP5 archive and do some pretreatments to add results to the cache<a class="anchor-link" href="#As-an-example,-we-will-extract-a-dataset-from-the-CMIP5-archive-and-do-some-pretreatments-to-add-results-to-the-cache">&#182;</a></h3>
 </div>
@@ -12217,7 +13509,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Let&#39;s get some data as a start</span>
@@ -12228,12 +13520,11 @@ s.</pre>
                <span class="n">period</span><span class="o">=</span><span class="s1">&#39;1980-2000&#39;</span><span class="p">,</span>
                <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
                <span class="n">simulation</span><span class="o">=</span><span class="s1">&#39;r1i1p1&#39;</span><span class="p">,</span>
-               <span class="n">version</span><span class="o">=</span><span class="s1">&#39;*&#39;</span>
                <span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12243,20 +13534,20 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[6]:</div>
+    <div class="prompt output_prompt">Out[9]:</div>
 
 
 
@@ -12270,11 +13561,11 @@ s.</pre>
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;*&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;r1i1p1&#39;,
  &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;*&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12284,8 +13575,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="At-this-stage,-dat_cmip5-is-only-a-python-object.-CliMAF-does-not-load-data-in-memory.">At this stage, dat_cmip5 is only a python object. CliMAF does not load data in memory.<a class="anchor-link" href="#At-this-stage,-dat_cmip5-is-only-a-python-object.-CliMAF-does-not-load-data-in-memory.">&#182;</a></h2>
 </div>
@@ -12293,13 +13583,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dat_cmip5</span><span class="o">.</span><span class="n">crs</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12309,13 +13599,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[7]:</div>
+    <div class="prompt output_prompt">Out[10]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#34;ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;)&#34;</pre>
+<pre>&#34;ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;)&#34;</pre>
 </div>
 
 </div>
@@ -12325,8 +13615,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="If-I-want-to-get-the-result-of-this-data-request,-I-use-cfile()-to-return-the-netcdf-file:">If I want to get the result of this data request, I use cfile() to return the netcdf file:<a class="anchor-link" href="#If-I-want-to-get-the-result-of-this-data-request,-I-use-cfile()-to-return-the-netcdf-file:">&#182;</a></h2><p><a href="https://climaf.readthedocs.io/en/master/functions_results_numeric.html?highlight=cfile#cfile-get-the-file-value-of-a-climaf-object">https://climaf.readthedocs.io/en/master/functions_results_numeric.html?highlight=cfile#cfile-get-the-file-value-of-a-climaf-object</a></p>
 <h2 id="CliMAF-automatically-provides-a-unique-name-to-the-output-based-on:">CliMAF automatically provides a unique name to the output based on:<a class="anchor-link" href="#CliMAF-automatically-provides-a-unique-name-to-the-output-based-on:">&#182;</a></h2><ul>
@@ -12339,13 +13628,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cfile</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12355,13 +13644,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[8]:</div>
+    <div class="prompt output_prompt">Out[11]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/b6643/744db/7be11/778ac/604dd/7bb87/b8e3c/32344/5c5a1/6671b/e7851/9.nc&#39;</pre>
+<pre>&#39;/data/jservon/climafcache_test/89f3a/1535f/b106c/37247/4f837/36150/4ecdb/20086/2a547/68ba7/cd864/2.nc&#39;</pre>
 </div>
 
 </div>
@@ -12371,8 +13660,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="When-using-cfile-on-your-CliMAF-object,-CliMAF-stores-the-CRS-of-the-new-results-in-the-cache-in-the-memory-of-the-python-session">When using cfile on your CliMAF object, CliMAF stores the CRS of the new results in the cache in the memory of the python session<a class="anchor-link" href="#When-using-cfile-on-your-CliMAF-object,-CliMAF-stores-the-CRS-of-the-new-results-in-the-cache-in-the-memory-of-the-python-session">&#182;</a></h2>
 </div>
@@ -12380,13 +13668,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12396,7 +13684,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12407,13 +13695,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[9]:</div>
+    <div class="prompt output_prompt">Out[12]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;]</pre>
+<pre>[&#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;]</pre>
 </div>
 
 </div>
@@ -12423,8 +13711,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="If-you-reinvoke-cfile-on-the-same-object,-it-will:">If you reinvoke cfile on the same object, it will:<a class="anchor-link" href="#If-you-reinvoke-cfile-on-the-same-object,-it-will:">&#182;</a></h2><ul>
 <li>scan this list</li>
@@ -12437,13 +13724,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cfile</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12453,13 +13740,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[10]:</div>
+    <div class="prompt output_prompt">Out[13]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/b6643/744db/7be11/778ac/604dd/7bb87/b8e3c/32344/5c5a1/6671b/e7851/9.nc&#39;</pre>
+<pre>&#39;/data/jservon/climafcache_test/89f3a/1535f/b106c/37247/4f837/36150/4ecdb/20086/2a547/68ba7/cd864/2.nc&#39;</pre>
 </div>
 
 </div>
@@ -12469,8 +13756,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Let's-add-some-more-stuff-in-the-cache">Let's add some more stuff in the cache<a class="anchor-link" href="#Let's-add-some-more-stuff-in-the-cache">&#182;</a></h2>
 </div>
@@ -12478,14 +13764,14 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;ref_climatos&#39;</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;tos&#39;</span><span class="p">,</span> <span class="n">product</span><span class="o">=</span><span class="s1">&#39;WOA13-v2&#39;</span><span class="p">,</span><span class="n">clim_period</span><span class="o">=</span><span class="s1">&#39;195501-201212&#39;</span><span class="p">)</span>
 <span class="n">summary</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12495,7 +13781,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12506,19 +13792,23 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[11]:</div>
+    <div class="prompt output_prompt">Out[18]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;clim_period&#39;: &#39;*&#39;,
+<pre>{&#39;clim_period&#39;: &#39;195501-201212&#39;,
+ &#39;clim_period_begin&#39;: &#39;*&#39;,
+ &#39;clim_period_end&#39;: &#39;*&#39;,
  &#39;domain&#39;: &#39;global&#39;,
  &#39;frequency&#39;: &#39;annual_cycle&#39;,
+ &#39;obs_type&#39;: &#39;*&#39;,
  &#39;period&#39;: fx,
  &#39;product&#39;: &#39;WOA13-v2&#39;,
  &#39;project&#39;: &#39;ref_climatos&#39;,
  &#39;simulation&#39;: &#39;refproduct&#39;,
+ &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;}</pre>
 </div>
 
@@ -12530,7 +13820,7 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Compute a DJF climatology</span>
@@ -12551,7 +13841,7 @@ s.</pre>
 <span class="n">cfile</span><span class="p">(</span><span class="n">myplot</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12561,13 +13851,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[12]:</div>
+    <div class="prompt output_prompt">Out[19]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;</pre>
+<pre>&#39;/data/jservon/climafcache_test/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;</pre>
 </div>
 
 </div>
@@ -12577,8 +13867,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="When-you-cfile(myplot),-CliMAF-will:">When you cfile(myplot), CliMAF will:<a class="anchor-link" href="#When-you-cfile(myplot),-CliMAF-will:">&#182;</a></h2><ul>
 <li>analyse the 'tree of operations' that lead to the result</li>
@@ -12592,13 +13881,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12608,7 +13897,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12619,21 +13908,21 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[13]:</div>
+    <div class="prompt output_prompt">Out[20]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -12643,8 +13932,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="3.-Remove-one-specific-result:-cdrop">3. Remove one specific result: cdrop<a class="anchor-link" href="#3.-Remove-one-specific-result:-cdrop">&#182;</a></h2><p><a href="https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#cdrop-erase-a-result-s-file">https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#cdrop-erase-a-result-s-file</a></p>
 
@@ -12652,8 +13940,7 @@ s.</pre>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Let's-say-that-we-want-to-remove-the-regridded-climatologies-only.-We-use-cdrop-to-do-this:">Let's say that we want to remove the regridded climatologies only. We use cdrop to do this:<a class="anchor-link" href="#Let's-say-that-we-want-to-remove-the-regridded-climatologies-only.-We-use-cdrop-to-do-this:">&#182;</a></h3>
 </div>
@@ -12661,14 +13948,14 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdrop</span><span class="p">(</span><span class="n">rgrd_dat</span><span class="p">)</span>
 <span class="n">cdrop</span><span class="p">(</span><span class="n">rgrd_ref</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12678,7 +13965,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[14]:</div>
+    <div class="prompt output_prompt">Out[21]:</div>
 
 
 
@@ -12694,215 +13981,9 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="You-can-confirm-with-clist()-that-the-files-are-removed:">You can confirm with clist() that the files are removed:<a class="anchor-link" href="#You-can-confirm-with-clist()-that-the-files-are-removed:">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Content of CliMAF cache
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[15]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="4.-Remove-results-using-conditions-(pattern,-age,-size):-crm">4. Remove results using conditions (pattern, age, size): crm<a class="anchor-link" href="#4.-Remove-results-using-conditions-(pattern,-age,-size):-crm">&#182;</a></h2><p><a href="https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#crm-remove-some-files-from-cache">https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#crm-remove-some-files-from-cache</a></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Now,-we-would-like-to-clean-all-the-results-associated-with-the-CNRM-CM5-simulations">Now, we would like to clean all the results associated with the CNRM-CM5 simulations<a class="anchor-link" href="#Now,-we-would-like-to-clean-all-the-results-associated-with-the-CNRM-CM5-simulations">&#182;</a></h3><h3 id="We-use-crm(pattern='CNRM-CM5')-to-remove-all-the-results-containing-'CNRM-CM5'-in-their-CRS:">We use crm(pattern='CNRM-CM5') to remove all the results containing 'CNRM-CM5' in their CRS:<a class="anchor-link" href="#We-use-crm(pattern='CNRM-CM5')-to-remove-all-the-results-containing-'CNRM-CM5'-in-their-CRS:">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Removed files:
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[16]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;))&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Now-you-should-only-have-the-reference-and-its-climatology">Now you should only have the reference and its climatology<a class="anchor-link" href="#Now-you-should-only-have-the-reference-and-its-climatology">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Content of CliMAF cache
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[17]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">We can also use crm() to remove files on their age. For instance, let's remove all the results that haven't been touched for more than 20 days:<a class="anchor-link" href="#We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">(We've started with a new cache... so the demo might not be very impressive... it won't actually return anything)<a class="anchor-link" href="#(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">Or remove files on their sizes; remove all the files bigger than 2M<a class="anchor-link" href="#Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12911,10 +13992,10 @@ s.</pre>
 <div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="s1">&#39;2M&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12924,7 +14005,72 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[22]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.-Remove-results-using-conditions-(pattern,-age,-size):-crm">4. Remove results using conditions (pattern, age, size): crm<a class="anchor-link" href="#4.-Remove-results-using-conditions-(pattern,-age,-size):-crm">&#182;</a></h2><p><a href="https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#crm-remove-some-files-from-cache">https://climaf.readthedocs.io/en/master/functions_results_cache.html?highlight=cdrop#crm-remove-some-files-from-cache</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Now,-we-would-like-to-clean-all-the-results-associated-with-the-CNRM-CM5-simulations">Now, we would like to clean all the results associated with the CNRM-CM5 simulations<a class="anchor-link" href="#Now,-we-would-like-to-clean-all-the-results-associated-with-the-CNRM-CM5-simulations">&#182;</a></h3><h3 id="We-use-crm(pattern='CNRM-CM5')-to-remove-all-the-results-containing-'CNRM-CM5'-in-their-CRS:">We use crm(pattern='CNRM-CM5') to remove all the results containing 'CNRM-CM5' in their CRS:<a class="anchor-link" href="#We-use-crm(pattern='CNRM-CM5')-to-remove-all-the-results-containing-'CNRM-CM5'-in-their-CRS:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12935,13 +14081,17 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[22]:</div>
+    <div class="prompt output_prompt">Out[23]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;select(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;))&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -12951,22 +14101,21 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Check-the-sizes-of-the-elements-in-the-cache-with-cdu()">Check the sizes of the elements in the cache with cdu()<a class="anchor-link" href="#Check-the-sizes-of-the-elements-in-the-cache-with-cdu()">&#182;</a></h3>
+<h3 id="Now-you-should-only-have-the-reference-and-its-climatology">Now you should only have the reference and its climatology<a class="anchor-link" href="#Now-you-should-only-have-the-reference-and-its-climatology">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdu</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12976,13 +14125,142 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre> 260.0K : ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
-   3.0M : ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)
-   3.2M : total
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[24]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">We can also use crm() to remove files on their age. For instance, let's remove all the results that haven't been touched for more than 20 days:<a class="anchor-link" href="#We-can-also-use-crm()-to-remove-files-on-their-age.-For-instance,-let's-remove-all-the-results-that-haven't-been-touched-for-more-than-20-days:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">(We've started with a new cache... so the demo might not be very impressive... it won't actually return anything)<a class="anchor-link" href="#(We've-started-with-a-new-cache...-so-the-demo-might-not-be-very-impressive...-it-won't-actually-return-anything)">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">Or remove files on their sizes; remove all the files bigger than 2M<a class="anchor-link" href="#Or-remove-files-on-their-sizes;-remove-all-the-files-bigger-than-2M">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="s1">&#39;2M&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Removed files:
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[26]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Check-the-sizes-of-the-elements-in-the-cache-with-cdu()">Check the sizes of the elements in the cache with cdu()<a class="anchor-link" href="#Check-the-sizes-of-the-elements-in-the-cache-with-cdu()">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdu</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre> 260.0K : total
+ 260.0K : ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
 </pre>
 </div>
 </div>
@@ -12992,8 +14270,7 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="=&gt;-you-can-combine-those-conditions:">=&gt; you can combine those conditions:<a class="anchor-link" href="#=&gt;-you-can-combine-those-conditions:">&#182;</a></h3>
 </div>
@@ -13007,22 +14284,20 @@ s.</pre>
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">crm</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;CNRM-CM5&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="s1">&#39;+20&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s1">&#39;3M&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="5.-Last-step:-remove-everything-but-a-list-of-results-you-want-to-keep!">5. Last step: remove everything but a list of results you want to keep!<a class="anchor-link" href="#5.-Last-step:-remove-everything-but-a-list-of-results-you-want-to-keep!">&#182;</a></h2>
+<h3 id="-"> <a class="anchor-link" href="#-">&#182;</a></h3><h2 id="5.-VERY-IMPORTANT:-remove-everything-but-a-list-of-results-you-want-to-keep">5. VERY IMPORTANT: remove everything but a list of results you want to keep<a class="anchor-link" href="#5.-VERY-IMPORTANT:-remove-everything-but-a-list-of-results-you-want-to-keep">&#182;</a></h2><h3 id="This-way-you-select-the-results-you-really-need-and-clean-everything-else:-very-important-when-you-are-using-large-datasets">This way you select the results you really need and clean everything else: very important when you are using large datasets<a class="anchor-link" href="#This-way-you-select-the-results-you-really-need-and-clean-everything-else:-very-important-when-you-are-using-large-datasets">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Let's-start-by-putting-some-results-back-in-the-cache:">Let's start by putting some results back in the cache:<a class="anchor-link" href="#Let's-start-by-putting-some-results-back-in-the-cache:">&#182;</a></h3>
 </div>
@@ -13030,14 +14305,14 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- And execute the final object</span>
 <span class="n">cfile</span><span class="p">(</span><span class="n">myplot</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13047,13 +14322,13 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[34]:</div>
+    <div class="prompt output_prompt">Out[28]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;</pre>
+<pre>&#39;/data/jservon/climafcache_test/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;</pre>
 </div>
 
 </div>
@@ -13064,13 +14339,13 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13080,7 +14355,7 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -13091,20 +14366,19 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[35]:</div>
+    <div class="prompt output_prompt">Out[29]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
- &#34;ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
- &#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;)&#34;,
+ &#34;minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -13114,10 +14388,104 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">We will make a list of the CRS of the results we want to keep:<a class="anchor-link" href="#We-will-make-a-list-of-the-CRS-of-the-results-we-want-to-keep:">&#182;</a></h3><h3 id="=&gt;-djf_dat,-djf_ref,-and-myplot">=&gt; djf_dat, djf_ref, and myplot<a class="anchor-link" href="#=&gt;-djf_dat,-djf_ref,-and-myplot">&#182;</a></h3>
+<h3 id="We-use-the-function-cprotect()-on-some-results-we-want-to-keep:">We use the function cprotect() on some results we want to keep:<a class="anchor-link" href="#We-use-the-function-cprotect()-on-some-results-we-want-to-keep:">&#182;</a></h3><h3 id="=&gt;-djf_dat,-djf_ref,-and-myplot">=&gt; djf_dat, djf_ref, and myplot<a class="anchor-link" href="#=&gt;-djf_dat,-djf_ref,-and-myplot">&#182;</a></h3><h3 id="cprotect-will-change-the-'write'-rights-of-the-file:-you-can't-delete-them-(except-with-a-cdrop(...,-force=True))">cprotect will change the 'write' rights of the file: you can't delete them (except with a cdrop(..., force=True))<a class="anchor-link" href="#cprotect-will-change-the-'write'-rights-of-the-file:-you-can't-delete-them-(except-with-a-cdrop(...,-force=True))">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cprotect</span><span class="p">(</span><span class="n">djf_dat</span><span class="p">)</span>
+<span class="n">cprotect</span><span class="p">(</span><span class="n">djf_ref</span><span class="p">)</span>
+<span class="n">cprotect</span><span class="p">(</span><span class="n">myplot</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Now-I-just-clean-the-cache-with-craz(),-and-it-will-erase-everything-but-my-protected-files">Now I just clean the cache with craz(), and it will erase everything but my protected files<a class="anchor-link" href="#Now-I-just-clean-the-cache-with-craz(),-and-it-will-erase-everything-but-my-protected-files">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">craz</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Content of CliMAF cache
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[32]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="This-way-you-only-keep-the-results-you-really-need,-if-your-intermediate-results-take-too-much-space-or-inodes!">This way you only keep the results you really need, if your intermediate results take too much space or inodes!<a class="anchor-link" href="#This-way-you-only-keep-the-results-you-really-need,-if-your-intermediate-results-take-too-much-space-or-inodes!">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="If-you-want-to-delete-a-protected-file,-use-cdrop()">If you want to delete a protected file, use cdrop()<a class="anchor-link" href="#If-you-want-to-delete-a-protected-file,-use-cdrop()">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13126,16 +14494,30 @@ s.</pre>
 <div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_results</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_dat</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">djf_ref</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-<span class="n">keep_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myplot</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
-
-<span class="c1">## You can also write:</span>
-<span class="c1">#keep_results = [dat_cmip5.crs, ref.crs, myplot.crs]</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cdrop</span><span class="p">(</span><span class="n">myplot</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
+    </div>
 </div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[36]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>True</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -13145,131 +14527,10 @@ s.</pre>
 <div class="prompt input_prompt">In&nbsp;[37]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">keep_results</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[37]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="And-simply-get-the-list-of-all-the-elements-of-the-cache-with-clist,-and-remove-with-cdrop-all-the-results-that-are-not-in-the-list-keep_results">And simply get the list of all the elements of the cache with clist, and remove with cdrop all the results that are not in the list keep_results<a class="anchor-link" href="#And-simply-get-the-list-of-all-the-elements-of-the-cache-with-clist,-and-remove-with-cdrop-all-the-results-that-are-not-in-the-list-keep_results">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">clean_cache_and_keep_results</span><span class="p">(</span><span class="n">keep_results</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">clist</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">elt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_results</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;Remove &#39;</span><span class="p">,</span><span class="n">elt</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="n">cdrop</span><span class="p">(</span><span class="n">elt</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;We keep &#39;</span><span class="p">,</span> <span class="n">elt</span> 
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-            <span class="k">print</span> <span class="s1">&#39;--&#39;</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[39]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">clean_cache_and_keep_results</span><span class="p">(</span><span class="n">keep_results</span><span class="p">)</span>    
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Content of CliMAF cache
-We keep  ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
---
---
-Remove  regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)
---
---
-We keep  plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))
---
---
-Remove  minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;))
---
---
-Remove  ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;)
---
---
-Remove  regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)
---
---
-Remove  ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;)
---
---
-We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)
---
---
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
-<div class="inner_cell">
-    <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clist</span><span class="p">()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13279,7 +14540,7 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -13290,15 +14551,14 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[40]:</div>
+    <div class="prompt output_prompt">Out[37]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
- &#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;,
- &#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
+<pre>[&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;,
+ &#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;]</pre>
 </div>
 
 </div>
@@ -13308,16 +14568,7 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="This-way-you-only-keep-the-results-you-really-need,-if-your-intermediate-results-take-too-much-space-or-inodes!">This way you only keep the results you really need, if your intermediate results take too much space or inodes!<a class="anchor-link" href="#This-way-you-only-keep-the-results-you-really-need,-if-your-intermediate-results-take-too-much-space-or-inodes!">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="6.-Synchronize-the-file-$CLIMAF_CACHE/index-with-the-actual-content-of-the-cache:-csync(True)">6. Synchronize the file $CLIMAF_CACHE/index with the actual content of the cache: csync(True)<a class="anchor-link" href="#6.-Synchronize-the-file-$CLIMAF_CACHE/index-with-the-actual-content-of-the-cache:-csync(True)">&#182;</a></h2><h3 id="CliMAF-reads-the-content-of-the-cache-at-the-beginning-of-the-session,-and-then-stores-the-CRS-of-the-new-results-in-memory-(and-not-in-the-index-file-during-the-session)">CliMAF reads the content of the cache at the beginning of the session, and then stores the CRS of the new results in memory (and not in the index file during the session)<a class="anchor-link" href="#CliMAF-reads-the-content-of-the-cache-at-the-beginning-of-the-session,-and-then-stores-the-CRS-of-the-new-results-in-memory-(and-not-in-the-index-file-during-the-session)">&#182;</a></h3><h3 id="This-can-have-drawbacks-when:">This can have drawbacks when:<a class="anchor-link" href="#This-can-have-drawbacks-when:">&#182;</a></h3><ul>
 <li>you have multiple processes working on the same cache =&gt; typically when you use parallel processes</li>
@@ -13330,14 +14581,14 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[50]:</div>
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Check the content of the index file:</span>
 <span class="o">!</span>cat <span class="nv">$cachedir</span>/index
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13347,24 +14598,12 @@ We keep  ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WO
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>(dp0
-S&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
-p1
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/00926/2109c/c4299/c4033/34be2/09559/f88d8/0fa7a/372f5/b39b7/95e7f/2.nc&#39;
-p2
-sS&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
-p3
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;
-p4
-sS&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
-p5
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/8524c/b1079/b42f6/e1d50/937d0/bd25c/f76a6/796e6/98331/a9540/6a99e/d.nc&#39;
-p6
-s.</pre>
+.</pre>
 </div>
 </div>
 
@@ -13374,28 +14613,28 @@ s.</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[51]:</div>
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- Synchronize</span>
-<span class="n">csync</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">csync</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[52]:</div>
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># -- And check the index file after</span>
 <span class="o">!</span>cat <span class="nv">$cachedir</span>/index
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13405,22 +14644,22 @@ s.</pre>
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>(dp0
-S&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
+S&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
 p1
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/00926/2109c/c4299/c4033/34be2/09559/f88d8/0fa7a/372f5/b39b7/95e7f/2.nc&#39;
+S&#39;/data/jservon/climafcache_test/7d3ba/57a5f/418c6/8686d/5cefa/429b1/5d0b3/25fa1/89af1/e487f/476eb/6.nc&#39;
 p2
-sS&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/prodigfs/project%CNRM-CM5%*%historical%r1i1p1%monthly%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
+sS&#34;plot(minus(regridn(ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;),regridn(ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%195501-201212%*%*%*%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;),cdogrid=&#39;r360x180&#39;)))&#34;
 p3
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/29523/272b5/8548f/c1823/dd39f/7bfcf/14d49/5b97e/97e1d/0f43d/8ad0c/e.png&#39;
+S&#39;/data/jservon/climafcache_test/36dc7/12dea/f1e02/5fb40/ebfcb/12074/1e7e4/0d6ba/ca5af/e5493/c2ce7/d.png&#39;
 p4
-sS&#34;ccdo(ccdo(ds(&#39;ref_climatos%refproduct%tos%fx%global%annual_cycle%WOA13-v2%*&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
+sS&#34;ccdo(ccdo(ds(&#39;CMIP5%r1i1p1%tos%1980-2000%global%/bdd%CNRM-CM5%*%historical%r1i1p1%monthly%*%latest&#39;),operator=&#39;ymonavg&#39;),operator=&#39;timmean -seltimestep,1,2,12&#39;)&#34;
 p5
-S&#39;/prodigfs/ipslfs/dods/jservon/climafcache_test/8524c/b1079/b42f6/e1d50/937d0/bd25c/f76a6/796e6/98331/a9540/6a99e/d.nc&#39;
+S&#39;/data/jservon/climafcache_test/f97c9/0b1fc/f7160/ac47c/1f338/d17d7/01930/d2d7e/061b9/22f09/ec16b/a.nc&#39;
 p6
 s.</pre>
 </div>
@@ -13431,12 +14670,24 @@ s.</pre>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="This-was-how-to-use-the-CliMAF-cache!">This was how to use the CliMAF cache!<a class="anchor-link" href="#This-was-how-to-use-the-CliMAF-cache!">&#182;</a></h2><h2 id="-"> <a class="anchor-link" href="#-">&#182;</a></h2><h2 id="-"> <a class="anchor-link" href="#-">&#182;</a></h2><h2 id="-&gt;-go-back-to-the-other-examples-to-see-more-on-data-access,-how-to-work-with-ensembles,-build-an-html-page...">-&gt; go back to the other examples to see more on data access, how to work with ensembles, build an html page...<a class="anchor-link" href="#-&gt;-go-back-to-the-other-examples-to-see-more-on-data-access,-how-to-work-with-ensembles,-build-an-html-page...">&#182;</a></h2><h2 id="-"> <a class="anchor-link" href="#-">&#182;</a></h2>
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
     </div>
   </div>

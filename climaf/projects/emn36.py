@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """This module declares project emn36 , base on data organization 'generic', for
 handling Nemo36 data such as organized by EM
@@ -28,7 +28,7 @@ Seaice fields are still to be described
 """
 # S.Senesi - april 2016
 
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     from climaf.dataloc import dataloc

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -9,12 +9,14 @@ CNRM's Lustre, using the pre-defined 'projects' : gpcp, gpcc, erai, erai-land, c
 
 # S.Senesi - may 2015
 
+from __future__ import print_function
+
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
 from climaf.api import *
 
 if not atCNRM:
-    print "This example script access data available only at CNRM"
+    print("This example script access data available only at CNRM")
     exit(0)
 
 # Playing with GPCP data

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CMIP3 outputs on e.g. Ciclad
@@ -18,7 +18,7 @@ Example for a CMIP3 dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 root = None
 if onCiclad:

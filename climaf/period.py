@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """  Basic types and syntax for managing time periods in CLIMAF
 
@@ -9,7 +9,8 @@
 import re
 import datetime
 import copy
-from climaf.clogging import clogger, dedent
+from env.clogging import clogger, dedent
+import six
 
 
 class cperiod():
@@ -23,7 +24,7 @@ class cperiod():
 
     def __init__(self, start, end=None, pattern=None):
         self.fx = False
-        if isinstance(start, type('')) and start == 'fx':
+        if isinstance(start, six.string_types) and start == 'fx':
             self.fx = True
             self.pattern = 'fx'
         elif not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
@@ -35,6 +36,27 @@ class cperiod():
                 self.pattern = self.__repr__()
             else:
                 self.pattern = pattern
+
+    #
+    def __eq__(self, other):
+        test = not other == "*" and isinstance(other, cperiod)
+        if test and self.fx != other.fx:
+            test = False
+        if test and self.pattern != other.pattern:
+            test = False
+        start_self = getattr(self, "start", None)
+        start_other = getattr(other, "start", None)
+        if test and start_self != start_other:
+            test = False
+        stop_self = getattr(self, "stop", None)
+        stop_other = getattr(other, "stop", None)
+        if test and stop_self != stop_other:
+            test = False
+        return test
+
+    #
+    def __hash__(self):
+        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "stop", None)))
 
     #
     def __repr__(self):
@@ -180,8 +202,12 @@ def init_period(dates):
     """
 
     # clogger.debug("analyzing  %s"%dates)
-    if not type(dates) is str:
+    if isinstance(dates, cperiod):
+        return dates
+    elif not isinstance(dates, six.string_types):
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
+    else:
+        dates = str(dates)
     if dates == 'fx':
         return cperiod('fx')
 
@@ -219,20 +245,20 @@ def init_period(dates):
     add_day = 0
     add_hour = 0
     add_minute = 0
-    if len(end) == 4:
+    if len(end) in [4, 5]:
         eyear = int(end[0:4]) + 1
-    elif len(end) == 6:
+    elif len(end) in [6, 7]:
         eyear = int(end[0:4])
         emonth = int(end[4:6]) + 1
         if emonth > 12:
             emonth = 1
             eyear = eyear + 1
-    elif len(end) == 8:
+    elif len(end) in [8, 9]:
         add_day = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
         eday = int(end[6:8])
-    elif len(end) == 10:
+    elif len(end) in [10, 11]:
         add_hour = 1
         eyear = int(end[0:4])
         emonth = int(end[4:6])
@@ -287,7 +313,6 @@ def sort_periods_list(periods_list):
         return rep
 
     #
-    import copy
     clist = copy.copy(periods_list)
     sorted_tree = SortTree(clist.pop())
     while clist:
@@ -343,7 +368,7 @@ def lastyears(period, nyears):
     Returns a period ending at PERIOD's end and which duration is at most NYEARS
     """
     # print "period=",period, 'type=',type(period),'nyears=',nyears
-    if type(period) is str:
+    if isinstance(period, six.string_types):
         period = cperiod(period)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year
@@ -358,7 +383,7 @@ def firstyears(period, nyears):
     """
     Returns a period beginning at PERIOD's begin and which duration is at most NYEARS
     """
-    if type(period) is str:
+    if isinstance(period, six.string_types):
         period = cperiod(period)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year

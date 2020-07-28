@@ -1,12 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
 
 import numpy as np
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue
 from climaf import classes
-from clogging import clogger
+from env.clogging import clogger
 
 
 def cscalar(dat):
@@ -36,6 +38,34 @@ def apply_scale_offset(dat, scale, offset):
 
 #
 
+def ensemble_intersection(ensembles):
+    """
+    Takes a list of CliMAF ensembles as arguments and return their intersection (common members):
+     --> list of CliMAF ensembles with matching members
+    """
+    if not isinstance(ensembles, list):
+        ensembles = [ensembles]
+    for tmpens in ensembles:
+        if not isinstance(tmpens, climaf.classes.cens):
+            raise classes.Climaf_Error("Argument number %s is not a CliMAF ensemble = %s" %
+                                       (str(ensembles.index(tmpens) + 1), tmpens))
+    #
+    members = ensembles[0].order
+    for tmpens in ensembles:
+        members = list(set(members) & set(tmpens.order))
+    if members:
+        ens_list = []
+        for tmpens in ensembles:
+            ens_dict = dict()
+            for mem in sorted(members):
+                ens_dict[mem] = tmpens[mem]
+            ens_list.append(cens(ens_dict, order=sorted(members)))
+        return ens_list
+            
+    else:
+        raise classes.Climaf_Error("Your CliMAF ensembles have no member in common among all them; "
+                                   "check them manually with .order")
+
 
 def fmul(dat1, dat2):
     """
@@ -52,11 +82,26 @@ def fmul(dat1, dat2):
       >>> c = '-1'  #a constant
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+        if dat1.order == dat2.order:
+            res_dict = dict()
+            for mem in dat1:
+                res_dict[mem] = multiply(dat1[mem], dat2[mem])
+            return cens(res_dict, order=dat1.order)
+        else:
+            raise climaf.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                                      "Members of dat1 =%s ; Members of dat2 =%s\n"
+                                      "use ensemble_intersection(dat1,dat2) to get two ensembles "
+                                      "with only their common members" % (dat1.order, dat2.order))
+    elif isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:
         return ccdo2(dat1, dat2, operator='mul')
+
+
+
+
 
 
 def fdiv(dat1, dat2):
@@ -75,7 +120,18 @@ def fdiv(dat1, dat2):
       >>> ds1_times_c = fdiv(ds1,c) # ds1 * c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+        if dat1.order == dat2.order:
+            res_dict = dict()
+            for mem in dat1:
+                res_dict[mem] = divide(dat1[mem], dat2[mem])
+            return cens(res_dict, order=dat1.order)
+        else:
+            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
+                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only "
+                                       "their common members" % (dat1.order, dat2.order))
+    elif isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='divc,' + c)
     else:
@@ -98,9 +154,21 @@ def fadd(dat1, dat2):
       >>> ds1_plus_c = fadd(ds1,c) # ds1 + c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+        if dat1.order == dat2.order:
+            res_dict = dict()
+            for mem in dat1:
+                res_dict[mem] = plus(dat1[mem], dat2[mem])
+            return cens(res_dict, order=dat1.order)
+        else:
+            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
+                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only"
+                                       " their common members" % (dat1.order, dat2.order))
+    elif isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='addc,' + c)
+
     else:
         return ccdo2(dat1, dat2, operator='add')
 
@@ -121,7 +189,18 @@ def fsub(dat1, dat2):
       >>> ds1_minus_c = fsub(ds1,c) # ds1 - c
 
     """
-    if isinstance(dat2, (str, float, int)):
+    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+        if dat1.order == dat2.order:
+            res_dict = dict()
+            for mem in dat1:
+                res_dict[mem] = minus(dat1[mem], dat2[mem])
+            return cens(res_dict, order=dat1.order)
+        else:
+            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
+                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only their"
+                                       " common members" % (dat1.order, dat2.order))
+    elif isinstance(dat2, (str, float, int, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='subc,' + c)
     else:
@@ -160,8 +239,8 @@ def getLevs(dat, zmin=0, zmax=100000, convertPressureUnit=None):
     my_levs = None
     levname = None
     for varname in fileobj.variables:
-        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht',
-                               'plev'] or 'plev' in varname.lower():
+        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'plev'] or \
+                'plev' in varname.lower():
             levname = varname
     levunits = fileobj.variables[levname].units
     try:
@@ -258,17 +337,6 @@ def annual_cycle(dat):
 
     """
     return ccdo(dat, operator="ymonavg")
-
-def annual_cycle_fast(dat):
-    """
-    Computes the annual cycle as the 12 climatological months of dat
-    (wrapper of ccdo with operator ymonavg)
-
-      >>> dat= ....   # some dataset, with whatever variable
-      >>> annual_cycle_dat = annual_cycle(dat)
-
-    """
-    return ccdo_fast(dat, operator="ymonavg")
 
 
 def clim_average(dat, season):
@@ -403,7 +471,7 @@ def clim_average_fast(dat, season):
     else:
         #
         # -- Compute the annual cycle
-        scyc = annual_cycle_fast(dat)
+        scyc = annual_cycle(dat)
         #
         # -- Classic atmospheric seasons
         selmonths = selmonth = None
@@ -432,7 +500,7 @@ def clim_average_fast(dat, season):
             selmonths = '4,5,6'
 
         if selmonths:
-            avg = ccdo_fast(scyc, operator='timmean -seltimestep,' + selmonths)
+            avg = ccdo(scyc, operator='timmean -seltimestep,' + selmonths)
             # avg = ccdo(scyc,operator='timmean -selmon,'+selmonths)
         #
         #
@@ -462,23 +530,22 @@ def clim_average_fast(dat, season):
         if str(season).lower() in ['december', 'dec', '12']:
             selmonth = '12'
         if selmonth:
-            avg = ccdo_fast(scyc, operator='selmon,' + selmonth)
+            avg = ccdo(scyc, operator='selmon,' + selmonth)
         #
         # -- Annual Maximum
         if str(season).lower() in ['max', 'annual max', 'annual_max']:
-            avg = ccdo_fast(scyc, operator='timmax')
+            avg = ccdo(scyc, operator='timmax')
         #
         # -- Annual Minimum
         if str(season).lower() in ['min', 'annual min', 'annual_min']:
-            avg = ccdo_fast(scyc, operator='timmin')
+            avg = ccdo(scyc, operator='timmin')
     #
     return avg
 
 
-
 def summary(dat):
     """
-    Summary provides the informations on a CliMAF dataset or ensemble of datsets
+    Summary provides the informations on a CliMAF dataset or ensemble of datasets
     It displays the path and filenames, and the dictionary of pairs keyword-values
     associated with the dataset.
 
@@ -489,39 +556,48 @@ def summary(dat):
         if len(dat.keys()) > 0:
             kvp = getattr(dat[dat.keys()[0]], 'kvp', None)
             if kvp:
-                print 'Keys - values:'
-                print kvp
-            print '-- Ensemble members:'
+                print('Keys - values:')
+                print(kvp)
+            print('-- Ensemble members:')
         for m in dat.order:
             obj = dat[m]
             if isinstance(obj, climaf.classes.cdataset):
-                print m
+                print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
                     for f in str.split(files, ' '):
-                        print f
+                        print(f)
             else:
                 print(m + " : " + repr(obj))
-            print '--'
+            print('--')
     elif isinstance(dat, classes.cdataset):
         if not dat.baseFiles(ensure_dataset=False):
-            print '-- No file found for:'
+            print('-- No file found for:')
         else:
-            for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
-                print f
+            tmpkvp = dat.explore('choices')
+            keytest = None
+            for key in tmpkvp:
+                if isinstance(tmpkvp[key], list) and len(tmpkvp[key]) > 1:
+                    keytest = key
+                    print('Multiple available values for attribute "' + key + '" that is set to "*" in your ds() call: '
+                          , tmpkvp[key])
+                    print('Specify one of them (within ds() or with cdef())')
+            if not keytest:
+                for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                    print(f)
         return dat.kvp
     else:
-        print "Cannot handle " + repr(dat)
+        print("Cannot handle " + repr(dat))
 
 
 def projects():
     """
     Lists available projects and their associated facets.
     """
-    print '-- Available projects:'
+    print('-- Available projects:')
     for key in cprojects.keys():
-        print '-- Project:', key
-        print 'Facets =>', cprojects[key]
+        print('-- Project:', key)
+        print('Facets =>', cprojects[key])
 
 
 #
@@ -556,12 +632,12 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
     file1 = cfile(dat1)
     clogger.debug('file1 = %s' % file1)
     ncfile1 = ncf(file1)
-
+     
     # -- First, we check the unit of the vertical dimension of file1
     levname1 = None
     for varname in ncfile1.variables:
-        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht',
-                               'olevel'] or 'plev' in varname.lower():
+        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] or \
+                'plev' in varname.lower():
             levname1 = varname
     if not levname1:
         clogger.debug('Name of the vertical axis not found for dat1')
@@ -583,8 +659,8 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
 
         levname2 = None
         for varname in ncfile2.variables:
-            if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht',
-                                   'olevel'] or 'plev' in varname.lower():
+            if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] or \
+                    'plev' in varname.lower():
                 levname2 = varname
         clogger.debug('levname2 = %s' % levname2)
         if not levname2:
@@ -768,7 +844,7 @@ def ts_plot(ts, **kwargs):
         # -- Case 1: it's a single CliMAF dataset
         if not isinstance(ts, list):
             if not isinstance(ts, dict):
-                ts_name = ts.crs
+                ts_name = str(ts.crs)
                 ens_ts = cens({ts_name: ts})
             else:
                 ens_ts = cens(ts)

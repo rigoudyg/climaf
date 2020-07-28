@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for
@@ -12,9 +12,11 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 
 
 """
-import os.path
 
-if os.path.exists('/cnrm'):
+from env.site_settings import atCNRM
+
+
+if atCNRM:
     from climaf.dataloc import dataloc
     from climaf.classes import cproject, calias, cfreqs
 

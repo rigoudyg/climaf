@@ -1,5 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
 
 # How to export CliMAF results as NetCDF files or Numpy Masked Arrays
 #####################################################################
@@ -31,7 +33,7 @@ saFile = cfile(sa, "~/tmp/space_average_link.nc", ln=True)
 saFile = cfile(sa, "~/tmp/space_average_hard.nc", hard=True)
 
 # Looking at the result
-print saFile
+print(saFile)
 os.system("ncdump -h " + saFile)
 
 # Computing and exporting a CliMAF object as a NumPy Masked Array

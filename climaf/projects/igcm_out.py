@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IGCM outputs produced by libIGCM for all frequencies,
@@ -117,10 +117,12 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 
 """
 
+from __future__ import print_function
+
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip
+from env.site_settings import atTGCC, onCiclad, onSpip
 
 root = None
 login = None
@@ -134,7 +136,7 @@ if onCiclad:
 if onSpip:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/Users/marti/Volumes/CURIE/ccc/store/cont003/dsm"
-    print 'igcm_out : declaration root sur Spip : ', root
+    print('igcm_out : declaration root sur Spip : ', root)
 
 if root:
 

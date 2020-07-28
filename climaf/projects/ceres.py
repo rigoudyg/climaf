@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -18,7 +18,7 @@ Example of a 'ceres' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     cproject('ceres')

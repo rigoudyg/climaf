@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Created : S.Sénési - nov 2015
 # Adapter : J.Servonnat - april 2016
@@ -426,25 +426,25 @@ dict_plot_params = {
     'va850': {
         'default': {'color': 'BlueWhiteOrangeRed', 'units': 'm/s'},
         'full_field': {'colors': '-10 -8 -6 -5 -4 -3 -2 -1 1 2 3 4 5 6 8 10'},
-        'bias': {'min': 5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
+        'bias': {'min': -5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'min': -1, 'max': 1, 'delta': 0.05, 'color': 'BlueWhiteOrangeRed'},
     },
     'va700': {
         'default': {'color': 'BlueWhiteOrangeRed', 'units': 'm/s'},
         'full_field': {'colors': '-10 -8 -6 -5 -4 -3 -2 -1 1 2 3 4 5 6 8 10'},
-        'bias': {'min': 5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
+        'bias': {'min': -5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'min': -1, 'max': 1, 'delta': 0.05, 'color': 'BlueWhiteOrangeRed'},
     },
     'va500': {
         'default': {'color': 'BlueWhiteOrangeRed', 'units': 'm/s'},
         'full_field': {'colors': '-10 -8 -6 -5 -4 -3 -2 -1 1 2 3 4 5 6 8 10'},
-        'bias': {'min': 5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
+        'bias': {'min': -5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'min': -1, 'max': 1, 'delta': 0.05, 'color': 'BlueWhiteOrangeRed'},
     },
     'va200': {
         'default': {'color': 'BlueWhiteOrangeRed', 'units': 'm/s'},
         'full_field': {'colors': '-10 -8 -6 -5 -4 -3 -2 -1 1 2 3 4 5 6 8 10'},
-        'bias': {'min': 5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
+        'bias': {'min': -5, 'max': 5, 'delta': 0.5, 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'min': -1, 'max': 1, 'delta': 0.05, 'color': 'BlueWhiteOrangeRed'},
     },
     'ta850': {

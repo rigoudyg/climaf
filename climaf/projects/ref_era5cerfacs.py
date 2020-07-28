@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -31,7 +31,8 @@ climatologies with eds() as in:
 
 Default values of the attributes for time_series (**ref_era5cerfacs**) :
 
-- product : '*' : necessary so that the C-ESM-EP identifies that it is an observational product and not a model simulation
+- product : '*' : necessary so that the C-ESM-EP identifies that it is an observational product and not a model
+                  simulation
 - period : '1900-2050'
 - frequency : 'monthly'
 
@@ -46,7 +47,7 @@ Example of a 'era5cerfacs' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
 root = None
 
@@ -57,7 +58,7 @@ if atTGCC:
 if atIDRIS:
     root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
 if atCerfacs:
-    root="/data/scratch/globc/dcom/globc_obs/OBS4MIPS_ANA4MIPS_CMOR/Tier1/ERA5/"
+    root = "/data/scratch/globc/dcom/globc_obs/OBS4MIPS_ANA4MIPS_CMOR/Tier1/ERA5/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
 
@@ -80,4 +81,4 @@ if root:
     pattern1 = root + "${variable}_${table}_${obs_type}_${product}_${PERIOD}.nc"
     dataloc(project='ref_era5cerfacs', organization='generic', url=[pattern1])
 
-#calias("ref_era5cerfacs","tas",offset=273.15)
+# calias("ref_era5cerfacs","tas",offset=273.15)

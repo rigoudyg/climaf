@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver
@@ -8,6 +8,8 @@
 """
 # Created : S.Sénési - 2014
 
+from __future__ import print_function
+
 import re
 import string
 import copy
@@ -15,7 +17,7 @@ import os.path
 
 import dataloc
 from period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 from netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 from decimal import Decimal
 
@@ -109,6 +111,7 @@ class cproject():
         #
         self.facets = []
         self.facet_defaults = dict()
+        self.facet_authorized_values = dict()
         forced = ['project', 'simulation', 'variable', 'period', 'domain']
         for f in forced:
             self.facets.append(f)
@@ -191,6 +194,36 @@ def cdef(attribute, value=None, project=None):
         return rep
     else:
         cprojects[project].facet_defaults[attribute] = value
+
+
+def cvalid(attribute, value=None, project=None):
+    """
+    Set or get the list of valid values for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
+    thos data files which match a dataset definition
+
+    Argument 'project' allows to restrict the use/query
+    to the context of the given 'project'.
+
+    Example::
+
+    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
+    """
+
+    if project not in cprojects:
+        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+    if attribute == 'project':
+        project = None
+    #
+    if project and attribute not in cprojects[project].facets:
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+    if value is None:
+        rep = cprojects[project].facet_authorized_values.get(attribute, None)
+        if not rep:
+            rep = cprojects[None].facet_authorized_values.get(attribute, "")
+        return rep
+    else:
+        cprojects[project].facet_authorized_values[attribute] = value
 
 
 cproject(None)
@@ -316,7 +349,7 @@ def processDatasetArgs(**kwargs):
             errmsg += " " + e
     if errmsg != "":
         raise Climaf_Classes_Error(errmsg)
-    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*",]:
+    if 'period' in attval and not isinstance(attval['period'], cperiod) and attval['period'] not in ["*", ]:
         Climaf_Classes_Error("at end of  process.. : period is not a cperiod")
     return attval
 
@@ -402,7 +435,7 @@ class cdataset(cobject):
         self.alias = varIsAliased(self.project, self.variable)
         #
         if "," in self.variable and self.alias:
-            filevar, scale, offset, units, filenameVar, missing = self.alias
+            filevar, scale, offset, units, filenameVar, missing, conditions = self.alias
             if filevar != self.variable or scale != 1. or offset != 0 or missing:
                 raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
@@ -413,6 +446,8 @@ class cdataset(cobject):
         self.register()
 
     def setperiod(self, period):
+        if isinstance(period, str):
+            period = init_period(period)
         self.erase()
         self.period = period
         self.kvp['period'] = period
@@ -438,11 +473,9 @@ class cdataset(cobject):
             except:
                 raise Climaf_Classes_Error("Cannot proceed with errata: Cannot resolve ambiguities on %s" % repr(self))
             # CMIP6.CMIP.CNRM-CERFACS.CNRM-ESM2-1.1pctCO2.r1i1p1f2.Emon.expfe.gn.v20181018
-            ref = "%s.%s.%s.%s.%s.%s.%s.%s.%s.v%s" % ("CMIP6", res.kvp['mip'],
-                                                      res.kvp['institute'], res.kvp['model'], res.kvp['experiment'],
-                                                      res.kvp['realization'],
-                                                      res.kvp['table'], res.kvp['variable'], res.kvp['grid'],
-                                                      res.kvp['version'])
+            ref = ".".join(["CMIP6", res.kvp["mip"], res.kvp["institute"], res.kvp["model"], res.kvp["experiment"],
+                            res.kvp["realization"], res.kvp["table"], res.kvp["variable"], res.kvp["grid"],
+                            "v" + res.kvp["version"]])
             clogger.warning("Querying errata service %s using %s" % (service, browser))
             os.system("%s %s%s &" % (browser, service, ref))
             # voir le fichier api_errata_Atef.py pour faire mieux
@@ -495,8 +528,26 @@ class cdataset(cobject):
     def missingIsOK(self):
         if alias is None:
             return True
-        _, _, _, _, _, missing = self.alias
+        _, _, _, _, _, missing, _ = self.alias
         return missing is None
+
+    def matches_conditions(self, conditions):
+        """
+        Return True if, for all keys in dict conditions, the kvp
+        value of object for same key is among condition's values (which can be a list)
+        Example :
+          with conditions={ "model":"CanESM5" , "version": ["20180103", "20190112"] }
+          the method will return True for both versions of that model
+        """
+        if conditions is None:
+            return True
+        for key in conditions:
+            values = conditions[key]
+            if not isinstance(values, list):
+                values = [values, ]
+            if self.kvp[key] not in values:
+                return False
+        return True
 
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
@@ -617,7 +668,7 @@ class cdataset(cobject):
         """
         dic = self.kvp.copy()
         if self.alias:
-            filevar, _, _, _, filenameVar, _ = self.alias
+            filevar, _, _, _, filenameVar, _, conditions = self.alias
             req_var = dic["variable"]
             dic["variable"] = string.Template(filevar).safe_substitute(dic)
             if filenameVar:
@@ -856,9 +907,9 @@ class cdataset(cobject):
                 return
 
             if ((self.frequency == 'monthly' or not self.frequency)
-                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.))\
+                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.)) \
                     or (self.frequency == 'yearly' and
-                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.))\
+                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.)) \
                     or (self.frequency == 'decadal' and
                         (filedate_delta > 3653. * 24. * 3600. or filedate_delta < 3651. * 24. * 3600.)):
 
@@ -920,7 +971,7 @@ class cdataset(cobject):
 
                 if 'cell_methods' in fileobj.variables[var].__dict__:  # time mean
 
-                    regex = re.compile('.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
+                    regex = re.compile(r'.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
                     cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
                     if cell_meth_att:
                         if cell_meth_att.group(2) == 'hours':
@@ -1039,14 +1090,14 @@ class cens(cobject, dict):
         #
         dict.update(self, dic)
         #
-        keylist = self.keys()
+        keylist = [k for k in self.keys()]
         try:
             from natsort import natsorted
             keylist = natsorted(keylist)
         except:
             keylist.sort()
         if order:
-            self.set_order(order, keylist)
+            self.set_order(order, None)
         elif sortfunc:
             self.order = sortfunc(keylist)
         else:
@@ -1059,11 +1110,11 @@ class cens(cobject, dict):
         ordered_list = [o for o in order]
         ordered_list.sort()
         if ordered_keylist is None:
-            ordered_keylist = [o for o in self]
+            ordered_keylist = self.keys()
             ordered_keylist.sort()
-        if ordered_list != ordered_keylist:
+        if sorted(ordered_list) != sorted(ordered_keylist):
             raise Climaf_Classes_Error(
-                "Labels list (as described by order list) does not match ensemble labels list : %s   and %s" %
+                "Order list does not match dict keys list : %s   and %s" %
                 (repr(ordered_list), repr(ordered_keylist)))
         self.order = order
 
@@ -1081,7 +1132,7 @@ class cens(cobject, dict):
         self.register()
 
     def items(self):
-        return [(l, self[l]) for l in self.order]
+        return [(elt, self[elt]) for elt in self.order]
 
     def copy(self):
         e = cens(self,
@@ -1191,14 +1242,14 @@ def eds(first=None, **kwargs):
         return cens(d, order=attval[attr])
     else:
         # Must construct the cartesian product of all list-type attributes
-        listattr2 = [l for l in listattr]
+        listattr2 = [att for att in listattr]
         if first is not None:
             listattr2.remove(first)
             att = first
         else:
             # Use the first attributes declared as ensemble-prone for the project
             for a in cprojects[attval["project"]].attributes_for_ensemble:
-                print "Checkin listattribute", a, "against", listattr2
+                print("Checkin listattribute", a, "against", listattr2)
                 if a in listattr2:
                     listattr2.remove(a)
                     att = a
@@ -1303,6 +1354,10 @@ class ctree(cobject):
             p = parameters["period"]
             if isinstance(p, cperiod):
                 parameters["period"] = repr(p)
+        if "variable" in parameters:
+            self.variable = parameters["variable"]
+        else:
+            self.variable = None
         self.parameters = parameters
         for o in operands:
             if o and not isinstance(o, cobject):
@@ -1312,10 +1367,21 @@ class ctree(cobject):
         self.register()
 
     def buildcrs(self, crsrewrite=None, period=None):
-        """ Builds the CRS expression representing applying OPERATOR on OPERANDS with PARAMETERS.
+        """ Builds the CRS expression representing applying OPERATOR on
+        OPERANDS with PARAMETERS.
         Forces period downtree if provided
         A function for rewriting operand's CRS may be provided
+
+        Special case : if operator is 'select' and sole operand is a dataset and there
+        is no parameters, then return dataset's crs. This is the way to avoid
+        repetitive data selection, when a data selection has been explictly cached
         """
+        first_op = self.operands[0]
+        if self.operator == 'select' and len(self.operands) == 1 and isinstance(first_op, cdataset) and \
+                len(self.parameters.keys()) == 0 and first_op.alias is None:
+            return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
+        #
+        # General case
         # Operators are listed in alphabetical order; parameters too
         rep = self.operator + "("
         #
@@ -1330,15 +1396,18 @@ class ctree(cobject):
         clefs = self.parameters.keys()
         clefs.sort()
         for par in clefs:
-            if par != 'member_label':
+            if par != 'member_label':  # and self.parameters[par] is not None:
                 rep += par + "=" + repr(self.parameters[par]) + ","
         rep += ")"
         rep = rep.replace(",)", ")")
+        # clogger.debug("Create crs for ctree: %s" % rep)
         return rep
 
     def setperiod(self, period):
         """ modifies the period for all datasets of a tree"""
         self.erase()
+        if isinstance(period, str):
+            period = init_period(period)
         for op in self.operands:
             op.setperiod(period)
         self.crs = self.buildcrs(period=period)
@@ -1353,14 +1422,14 @@ class scriptChild(cobject):
         """
         self.father = cobject
         self.varname = varname
+        self.variable = varname
         self.crs = self.buildcrs()
         self.file = None
         self.register()
 
     def setperiod(self, period):
         self.erase()
-        self.crs = self.father.crs.buildcrs(period=period)
-        self.crs += "." + self.varname
+        self.crs = self.buildcrs(period=period)
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
@@ -1386,20 +1455,37 @@ def compare_trees(tree1, tree2, func, filter_on_operator=None):
     FUNC cannot return None as a valid value
     """
     if isinstance(tree1, cdataset) and isinstance(tree2, cdataset):
-        return func(tree1, tree2)
+        rep = func(tree1, tree2)
+        clogger.debug("Comparison of two datasets...")
+        clogger.debug("... %s" % str(rep))
+        return rep
     elif isinstance(tree1, ctree) and isinstance(tree2, ctree):
+        clogger.debug("Comparison of two trees...")
         if tree1.operator == tree2.operator:
             if filter_on_operator:
                 if filter_on_operator(tree1.operator):
+                    clogger.debug("Operator filtered: %s" % tree1.operator)
                     return None
             if tree1.parameters == tree2.parameters:
-                return (reduce(lambda a, b: a if repr(a) == repr(b) else None,
-                               [compare_trees(op1, op2, func, filter_on_operator)
-                                for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                clogger.debug("Parameters are coherent: %s" % tree1.parameters)
+                rep = (reduce(lambda a, b: a if repr(a) == repr(b) else None,
+                              [compare_trees(op1, op2, func, filter_on_operator)
+                               for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                clogger.debug("... %s" % str(rep))
+                return rep
+            else:
+                clogger.debug("Parameters are not coherent: %s/%s" % (tree1.parameters, tree2.parameters))
+                return None
     elif isinstance(tree1, scriptChild) and isinstance(tree2, scriptChild):
+        clogger.debug("Comparison of two scriptChild...")
         if tree1.varname == tree2.varname:
-            return compare_trees(tree1.father, tree2.father,
-                                 func, filter_on_operator)
+            clogger.debug("... varnames are coherent: %s" % tree1.varname)
+            rep = compare_trees(tree1.father, tree2.father, func, filter_on_operator)
+            clogger.debug("... %s" % str(rep))
+            return rep
+        else:
+            clogger.debug("... varnames are not coherent: %s/%s" % (tree1.varname, tree2.varname))
+            return None
 
 
 allow_errors_on_ds_call = True  # False
@@ -1545,29 +1631,37 @@ def crealms(project, dic):
     realms[project] = dic
 
 
-def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None, missing=None, filenameVar=None):
+def calias(project, variable, fileVariable=None, scale=1., offset=0.,
+           units=None, missing=None, filenameVar=None, conditions=None):
     """ Declare that in ``project``, ``variable`` is to be computed by
     reading ``filevariable``, and applying ``scale`` and ``offset``;
+    (see first example erai below)
+
+    Arg ``conditions`` allows to restrict the effect, based on the value
+    of some facets. It is a dictionary of applicable values or
+    values'list, which keys are the facets  (see example CMIP6 below)
 
     Arg ``filenameVar`` allows to tell which fake variable name should be
     used when computing the filename for this variable in this project
-    (for optimisation purpose);
+    (for optimisation purpose); (see seconf example erai below)
 
     Can tell that a given constant must be interpreted as a missing value
+    (see 4th example, EM, below)
 
     ``variable`` may be a list. In that case, ``fileVariable`` and
     ``filenameVar``, if provided, should be parallel lists
 
     `` variable`` can be a comma separated list of variables, in which
     case this tells how variables are grouped in files (it make sense
-    to use filenameVar in that case, as this is a xway to provide the
+    to use filenameVar in that case, as this is a way to provide the
     label which is unique to this grouping of variable; scale, offset
     and missing args must be the same for all variables in that case
 
     Example ::
 
-    >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    >>> calias('CMIP6','evspsbl',scale=-1., conditions={ 'model':'CanESM5' , 'version': ['20180103', '20190112'] })
+    >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
     >>> calias('data_CNRM','so,thetao',filenameVar='grid_T_table2.2')
 
@@ -1593,15 +1687,20 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0., units=None
         fileVariable = [fileVariable]
     if type(units) is not list:
         units = [units]
+    if conditions is not None:
+        for kw in conditions:
+            if kw not in cprojects[project].facets:
+                raise Climaf_Classes_Error(
+                    "Keyword \"%s\" is not allowed for project %s" % (kw, project))
     for v, u, fv, fnv in zip(variable, units, fileVariable, filenameVar):
-        aliases[project][v] = (fv, scale, offset, u, fnv, missing)
+        aliases[project][v] = (fv, scale, offset, u, fnv, missing, conditions)
 
 
 def varIsAliased(project, variable):
     """
     Return a n-uplet (fileVariable, scale, offset, filevarName,
-    missing) defining how to compute a 'variable' which is not in
-    files, for the 'project'
+    missing,conditions) defining how to compute a 'variable' which
+    is not in files, for the 'project'
     """
     if project in aliases and variable in aliases[project]:
         return aliases[project][variable]
@@ -1622,7 +1721,8 @@ class cpage(cobject):
                  fig_trim=True, page_trim=True, format="png",
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
-                 font="Times-New-Roman", gravity="North", background="white"):
+                 font="Times-New-Roman", gravity="North", background="white",
+                 insert="", insert_width=0):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -1652,8 +1752,12 @@ class cpage(cobject):
            CLiMAF default: 1500.
           orientation (str,optional): if set, it supersedes page_width and
            page_height with values 1000*1500 (for portrait) or 1500*1000 (for landscape)
-          title (str, optional) : append a label below or above (depending optional
+          title (str, optional) : append a label below or above (depending on optional
            argument 'gravity') figures in the page.
+          insert(str,optional) : the filename for an image to insert (centered at the
+           bottom)
+          insert_width(int,optional) : the width at which the inserted image will be
+           scaled (in pixels)
 
         If title is activated:
 
@@ -1707,7 +1811,7 @@ class cpage(cobject):
                     page_height = 1000.
                 else:
                     raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape'")
+                        "if set, orientation must be 'portrait' or 'landscape' (not %s)" % orientation)
         self.page_width = page_width
         self.page_height = page_height
         self.title = title
@@ -1718,6 +1822,8 @@ class cpage(cobject):
         self.font = font
         self.gravity = gravity
         self.background = background
+        self.insert = insert
+        self.insert_width = insert_width
         if self.ybox < (self.y + self.pt):
             raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
         if not isinstance(fig_lines, list) and not isinstance(fig_lines, cens):
@@ -1792,7 +1898,7 @@ class cpage(cobject):
             nx, ny = 2, 3
         elif n in range(7, 9):
             nx, ny = 2, 4
-        elif n in range(9,13):
+        elif n in range(9, 13):
             nx, ny = 3, 4
         elif n in range(13, 16):
             nx, ny = 3, 5
@@ -1834,9 +1940,11 @@ class cpage(cobject):
                     ", fig_trim='%s', page_trim='%s', format='" + self.format +
                     "', page_width=%d, page_height=%d, title='" + self.title +
                     "', x=%d, y=%d, ybox=%d, pt=%d, font='" + self.font +
-                    "', gravity='" + self.gravity + "', background='" + self.background + "')") \
+                    "', gravity='" + self.gravity + "', background='" + self.background +
+                    "', insert='" + self.insert + "', insert_width=%d'" +
+                    "')") \
                    % (self.fig_trim, self.page_trim, self.page_width, self.page_height, self.x, self.y, self.ybox,
-                      self.pt)
+                      self.pt, self.insert_width)
 
         rep = rep.replace(",]", "]")
         rep = rep.replace(", ]", "]")
@@ -2099,7 +2207,8 @@ def domainOf(cobject):
     elif cobject is None:
         return "none"
     else:
-        clogger.error("Unkown class for argument " + repr(cobject))
+        if cobject != "":
+            clogger.error("Unkown class for argument " + repr(cobject))
 
 
 def varOf(cobject): return attributeOf(cobject, "variable")
@@ -2133,10 +2242,20 @@ def attributeOf(cobject, attrib):
     elif isinstance(cobject, cens):
         return attributeOf(cobject.values()[0], attrib)
     elif getattr(cobject, attrib, None):
-        return getattr(cobject, attrib)
+        value = getattr(cobject, attrib)
+        clogger.debug("Find value for object's %s... %s" % (attrib,value))
+        return value
     elif isinstance(cobject, ctree):
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")
-        return attributeOf(cobject.operands[0], attrib)
+        # TODO: Check which operands in the correct one
+        value = getattr(cobject, attrib, None)
+        if value is None:
+            value = attributeOf(cobject.operands[0], attrib)
+            clogger.debug("Find value for current first operand... %s" % value)
+            return value
+        else:
+            clogger.debug("Find value for current object... %s" % value)
+            return value
     elif isinstance(cobject, cdummy):
         return "dummy"
     elif isinstance(cobject, cpage) or isinstance(cobject, cpage_pdf):

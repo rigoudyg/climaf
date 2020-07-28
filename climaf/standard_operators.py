@@ -1,15 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Management of CliMAF standard operators
 
 """
 import os
+import subprocess
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
-from climaf.clogging import clogger
-from climaf.site_settings import onCiclad
+from env.clogging import clogger
+from env.site_settings import onCiclad
 
 scriptpath = cpath[0] + "/../scripts/"
 binpath = cpath[0] + "/../bin/"
@@ -26,22 +27,25 @@ def load_standard_operators():
     # Compute scripts
     #
     cscript('select',
-            scriptpath + 'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins} ',
+            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+                         '--vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('remote_select',
-            'python ' + scriptpath + 'mcdo_remote.py "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" '
-                                     '"${alias}" "${units}" "${missing}" ${ins} ',
+            scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                         ' --period="${period_iso}" --domain="${domain}" '
+                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath + 'mcdo.sh "${operator}" "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}')
+            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+                         '--vm="${missing}" ${ins}')
     #
-    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
-
+    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
+    cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
@@ -57,31 +61,32 @@ def load_standard_operators():
     cscript('divide', 'cdo div ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
+    cscript('select_level', 'cdo sellevel,${level} ${in} ${out}',
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
     cscript('space_average',
-            scriptpath + 'mcdo.sh fldmean "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}',
+            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True)
     cscript('space_average_fast',
-            scriptpath + 'mcdo.sh fldmean "${out}" "" "" "" "" "" '
-                         '"" ${ins}',
+            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average',
-            scriptpath + 'mcdo.sh timmean  "${out}" "${var}" "${period_iso}" "${domain}" "${alias}" "${units}" '
-                         '"${missing}" ${ins}',
+            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithSpaceConcatenation=True)
     cscript('time_average_fast',
-            scriptpath + 'mcdo.sh timmean  "${out}" "" "" "" "" "" '
-                         '"" ${ins}',
+            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox',
-            scriptpath + 'mcdo.sh ""  "${out}" "${var}" "${period_iso}" "${latmin},${latmax},${lonmin},${lonmax}" '
-                         '"${alias}" "${units}" "${missing}" ${ins}',
+            scriptpath + 'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
+                         ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
+                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     cscript('llbox_fast',
-            scriptpath + 'mcdo.sh ""  "${out}" "" "" "${latmin},${latmax},${lonmin},${lonmax}" '
-                         '"" "" "" ${ins}',
+            scriptpath + 'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
 
     #
@@ -102,31 +107,31 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('mean_and_std',
-            scriptpath + 'mean_and_std.sh ${in} ${var} ${out} ${out_sdev}',
+            scriptpath + 'mean_and_std.sh ${in} ${Var} ${out} ${out_sdev}',
             # This tells CliMAF how to compute varname for name output 'sdev'
             # using input varname
             sdev_var="std(%s)",
             commuteWithTimeConcatenation=True)
     #
-    # Declare plot scripts
-    cscript('ncview', 'ncview ${in} 1>/dev/null 2>&1&')
+    # Declare plot scripts (only where it is defined
+    cscript('ncview', 'ncview ${in} 1>/dev/null 2>&1&', fatal=False)
     #
     # plot: main field (main_file) + auxiliary field (aux_file, optional) + vectors (u_file & v_file, optionals)
     #
-    cscript('plot', '(ncl -Q ' + scriptpath + 'gplot.ncl main_file=\'\"${in}\"\' aux_file=\'\"${in_2}\"\' '
-                                              'u_file=\'\"${in_3}\"\' v_file=\'\"${in_4}\"\' rotation=${rotation} '
-                                              'plotname=\'\"${out}\"\' colormap=\'\"${color}\"\' vmin=${min} '
-                                              'vmax=${max} vdelta=${delta} main_var=\'\"${var}\"\' '
-                                              'aux_var=\'\"${var_2}\"\' u_var=\'\"${var_3}\"\' v_var=\'\"${var_4}\"\' '
-                                              'title=\'\"${title}\"\' myscale=${scale} myoffset=${offset} '
+    cscript('plot', '(ncl -Q ' + scriptpath + 'gplot.ncl main_file=\'"${in}"\' aux_file=\'"${in_2}"\' '
+                                              'u_file=\'"${in_3}"\' v_file=\'"${in_4}"\' rotation=${rotation} '
+                                              'plotname=\'"${out}"\' colormap=\'"${color}"\' vmin=${min} '
+                                              'vmax=${max} vdelta=${delta} main_var=\'"${Var}"\' '
+                                              'aux_var=\'"${var_2}"\' u_var=\'"${var_3}"\' v_var=\'"${var_4}"\' '
+                                              'title=\'"${title}"\' myscale=${scale} myoffset=${offset} '
                                               'mpCenterLonF=${mpCenterLonF} vcRefMagnitudeF=${vcRefMagnitudeF} '
                                               'vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
-                                              'vcGlyphStyle=\'\"${vcGlyphStyle}\"\' '
-                                              'vcLineArrowColor=\'\"${vcLineArrowColor}\"\' units=\'\"${units}\"\' '
-                                              'y=\'\"${y}\"\' ccolors=\'\"${colors}\"\' level=${level} time=${time} '
-                                              'date=\'\"${date}\"\' proj=\'\"${proj}\"\' contours=\'\"${contours}\"\' '
-                                              'focus=\'\"${focus}\"\' type=\'\"${format}\"\' '
-                                              'resolution=\'\"${resolution}\"\' trim=${trim} fmt=\'\"${fmt}\"\' '
+                                              'vcGlyphStyle=\'"${vcGlyphStyle}"\' '
+                                              'vcLineArrowColor=\'"${vcLineArrowColor}"\' units=\'"${units}"\' '
+                                              'y=\'"${y}"\' ccolors=\'"${colors}"\' level=${level} time=${time} '
+                                              'date=\'"${date}"\' proj=\'"${proj}"\' contours=\'"${contours}"\' '
+                                              'focus=\'"${focus}"\' type=\'"${format}"\' '
+                                              'resolution=\'"${resolution}"\' trim=${trim} fmt=\'"${fmt}"\' '
                                               'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} '
                                               'reverse=${reverse} tmYLLabelFontHeightF=${tmYLLabelFontHeightF} '
                                               'tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
@@ -134,15 +139,19 @@ def load_standard_operators():
                                               'tiXAxisFontHeightF=${tiXAxisFontHeightF} '
                                               'tiYAxisFontHeightF=${tiYAxisFontHeightF} '
                                               'gsnPolarLabelFontHeightF=${gsnPolarLabelFontHeightF} '
-                                              'tiMainFont=\'\"${tiMainFont}\"\' tiMainFontHeightF=${tiMainFontHeightF} '
-                                              'tiMainPosition=\'\"${tiMainPosition}\"\' '
-                                              'gsnLeftString=\'\"${gsnLeftString}\"\' '
-                                              'gsnRightString=\'\"${gsnRightString}\"\' '
-                                              'gsnCenterString=\'\"${gsnCenterString}\"\' '
-                                              'gsnStringFont=\'\"${gsnStringFont}\"\' '
+                                              'tiMainFont=\'"${tiMainFont}"\' tiMainFontHeightF=${tiMainFontHeightF} '
+                                              'tiMainPosition=\'"${tiMainPosition}"\' '
+                                              'gsnLeftString=\'"${gsnLeftString}"\' '
+                                              'gsnRightString=\'"${gsnRightString}"\' '
+                                              'gsnCenterString=\'"${gsnCenterString}"\' '
+                                              'gsnStringFont=\'"${gsnStringFont}"\' '
                                               'gsnStringFontHeightF=${gsnStringFontHeightF} '
                                               'shade_below=${shade_below} shade_above=${shade_above} '
-                                              'options=\'\"${options}\"\' aux_options=\'\"${aux_options}\"\' '
+                                              'options=\'"${options}"\' aux_options=\'"${aux_options}"\' '
+                                              'shade2_options=\'\"${shade2_options}\"\' shade2_var=\'\"${var_5}\"\' '
+                                              'shade2_file=\'\"${in_5}\"\' '
+                                              'shade2_below=\'\"${shade2_below}\"\' '
+                                              'shade2_above=\'\"${shade2_above}\"\' '
                                               'shading_options=\'\"${shading_options}\"\' myscale_aux=${scale_aux} '
                                               'myoffset_aux=${offset_aux} xpolyline=\'\"${xpolyline}\"\' '
                                               'ypolyline=\'\"${ypolyline}\"\' '
@@ -152,7 +161,7 @@ def load_standard_operators():
     # curves: plot a series of xy curves (along time, lat, lon or pressure/z_index) for an ensemble
     #
     cscript('curves', '(ncl -Q ' + scriptpath + 'curves.ncl infile=\'\"${mmin}\"\' '
-                                                'plotname=\'\"${out}\"\' var=\'\"${var}\"\' title=\'\"${title}\"\' '
+                                                'plotname=\'\"${out}\"\' var=\'\"${Var}\"\' title=\'\"${title}\"\' '
                                                 'y=\'\"${y}\"\' labels=\'\"${labels}\"\' colors=\'\"${colors}\"\' '
                                                 'units=\'\"${units}\"\' X_axis=\'\"${X_axis}\"\' fmt=\'\"${fmt}\"\' '
                                                 'options=\'\"${options}\"\' aux_options=\'\"${aux_options}\"\' '
@@ -165,7 +174,7 @@ def load_standard_operators():
     # hovm : to plot Hovmoller diagrams
     #
     cscript('hovm',
-            '(ncl -Q ' + scriptpath + 'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${var}\"\' '
+            '(ncl -Q ' + scriptpath + 'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${Var}\"\' '
                                       ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' '
                                       'lonE=\'\"${lonE}\"\' '
                                       ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} '
@@ -191,7 +200,7 @@ def load_standard_operators():
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
     #
     cscript('slice',
-            "ncks -O -F -v ${var} -d ${dim},${min},${max} ${in} tmp.nc ; "
+            "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} tmp.nc ; "
             "ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
     #
     cscript("mask", "cdo setctomiss,${miss} ${in} ${out}")
@@ -201,12 +210,12 @@ def load_standard_operators():
     # Add nav_lon and nav_lat to a file
     cscript('add_nav_lat',
             'cp ${in} ${out} ; ncks -A ${nav_lat_file} ${out} ;'
-            ' ncatted -O -a coordinates,${var},o,c,"${coordinates}" ${out}')
+            ' ncatted -O -a coordinates,${Var},o,c,"${coordinates}" ${out}')
     cscript('add_nav_lon_nav_lat_from_mesh_mask',
             'cp ${in} ${out} ; ncks -A -v nav_lon,nav_lat ${mesh_mask_file} ${out}')
     #
-    cscript('get_oneVar', 'ncks -v ${var} ${in} ${out}')
-    cscript('cncks', 'ncks -v ${var} ${in} ${out}')
+    cscript('get_oneVar', 'ncks -v ${Var} ${in} ${out}')
+    cscript('cncks', 'ncks -v ${Var} ${in} ${out}')
     # cscript('cnco','${operator} ${arg} ${in} ${out}')
     #
     # ensemble_ts_plot
@@ -215,7 +224,7 @@ def load_standard_operators():
                                      '--filenames="${mmin}" '
                                      '--outfig=${out} '
                                      '--labels=\'\"${labels}\"\' '
-                                     '--variable=${var} '
+                                     '--variable=${Var} '
                                      '--colors="${colors}" '
                                      '--min="${min}" '
                                      '--max="${max}" '
@@ -303,29 +312,29 @@ def load_cdftools_operators():
     # cdfmean
     #
     cscript('ccdfmean',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x '
-            '-v mean_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt',
+            'cdfmean ${in} ${Var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x '
+            '-v mean_${Var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt',
             _var="mean_3D%s", canSelectVar=True)
     #
     cscript('ccdfmean_profile',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x '
-            '-v mean_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt',
+            'cdfmean ${in} ${Var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; ncks -O -x '
+            '-v mean_3D${Var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt',
             _var="mean_%s", canSelectVar=True)
     #
     cscript('ccdfmean_profile_box',
-            'cdfmean ${in} ${var} ${pos_grid} $(cdffindij ${lonmin} ${lonmax} ${latmin} ${latmax} -c mask.nc '
-            '-p ${pos_grid} | sed -n 3p) ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${var} cdfmean.nc ${out}; '
+            'cdfmean ${in} ${Var} ${pos_grid} $(cdffindij ${lonmin} ${lonmax} ${latmin} ${latmax} -c mask.nc '
+            '-p ${pos_grid} | sed -n 3p) ${kmin} ${kmax} ${opt}; ncks -O -x -v mean_3D${Var} cdfmean.nc ${out}; '
             'rm -f cdfmean.nc cdfmean.txt',
             _var="mean_%s")
     #
     cscript('ccdfvar',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x '
-            '-v mean_${var},mean_3D${var},var_${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt',
+            'cdfmean ${in} ${Var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x '
+            '-v mean_${Var},mean_3D${Var},var_${Var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt',
             _var="var_3D%s", canSelectVar=True)
     #
     cscript('ccdfvar_profile',
-            'cdfmean ${in} ${var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x '
-            '-v mean_${var},mean_3D${var},var_3D${var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt',
+            'cdfmean ${in} ${Var} ${pos_grid} ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} -var ${opt}; ncks -O -x '
+            '-v mean_${Var},mean_3D${Var},var_3D${Var} cdfmean.nc ${out}; rm -f cdfmean.nc cdfmean.txt cdfvar.txt',
             _var="var_%s", canSelectVar=True)
 
     #
@@ -411,14 +420,14 @@ def load_cdftools_operators():
     # cdfzonalmean
     #
     cscript('ccdfzonalmean',
-            'cdfzonalmean ${in} ${point_type} -var ${var} ${opt}; varname=${var}; ncrename '
-            '-v zo${varname:2}_glo,zo${var}_glo zonalmean.nc ${out}; rm -f zonalmean.nc',
+            'cdfzonalmean ${in} ${point_type} -var ${Var} ${opt}; varname=${Var}; ncrename '
+            '-v zo${varname:2}_glo,zo${Var}_glo zonalmean.nc ${out}; rm -f zonalmean.nc',
             _var="zo%s_glo", canSelectVar=True)
     #
     # cdfzonalmean_bas
     #
     cscript('ccdfzonalmean_bas',
-            'cdfzonalmean ${in} ${point_type} new_maskglo.nc -var ${var} ${opt}; varname=${var}; '
+            'cdfzonalmean ${in} ${point_type} new_maskglo.nc -var ${Var} ${opt}; varname=${Var}; '
             'ncks -O -v zo${varname:2}_${basin} zonalmean.nc tmpfile.nc; ncrename -v zo${varname:2}_${basin},'
-            'zo${var}_${basin} tmpfile.nc ${out}; rm -f tmpfile.nc zonalmean.nc',
+            'zo${Var}_${basin} tmpfile.nc ${out}; rm -f tmpfile.nc zonalmean.nc',
             _var="zo%s_${basin}", canSelectVar=True)

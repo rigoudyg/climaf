@@ -1,5 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
 
 __doc__ = """
 Example for CliMAF access to data organized according to CMIP5 DRS such as :
@@ -35,12 +37,12 @@ tas1pc = ds(project='CMIP5', model="CNRM-CM5", experiment="1pctCO2", variable="t
 # in one single string). CliMAF will search them at the data location
 # which is the most specific among all declared data locations
 files = tas1pc.baseFiles()
-print files
+print(files)
 
 # Let CliMAF generate a file with the exact dataset in its disk cache
 # (select period and/or variables, aggregate files...)
 my_file = cfile(tas1pc)
-print my_file
+print(my_file)
 
 # Check file size and content
 os.system("ls -al " + my_file)

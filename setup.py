@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from setuptools import find_packages
@@ -31,7 +31,7 @@ setup(name='climaf',
       keywords='python climate model',
       author='Stéphane Sénési',
       author_email="",
-      url='https://github.com/senesis/climaf',
+      url='https://github.com/rigoudyg/climaf',
       license="CeCILL-C license",
       packages=find_packages(),
       include_package_data=True,
@@ -55,6 +55,7 @@ setup(name='climaf',
           'scripts/mcdo_remote.py',
           'scripts/mcdo.sh',
           'scripts/mcdo_aux.sh',
+          'scripts/mcdo.py',
           'scripts/mean_and_std.sh',
           'scripts/ml2pl.sh',
           'scripts/ml2pl',

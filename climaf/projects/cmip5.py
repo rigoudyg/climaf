@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CMIP5 outputs produced by
@@ -20,7 +20,7 @@ Example for a CMIP5 dataset declaration ::
 import os
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 
 root = None
 if onCiclad:
@@ -30,7 +30,8 @@ if atCNRM:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/cnrm/cmip/cnrm/ESG"
 
-if root:
+# if root:
+if True:
     # -- Declare a CMIP5 CliMAF project
     # ------------------------------------ >
     cproject('CMIP5', 'root', 'model', 'table', 'experiment', 'realization', 'frequency', 'realm',
@@ -86,7 +87,10 @@ if root:
         cdef('realm', '*', project=project)
         cdef('realization', 'r1i1p1', project=project)
         cdef('experiment', 'historical', project=project)
-        cdef('version', '*', project=project)
+        if atCNRM:
+            cdef('version', '*', project=project)
+        else:
+            cdef('version', 'latest', project=project)
         cdef('frequency', '*', project=project)
     cdef('extent_experiment', 'rcp85', project='CMIP5_extent')
 
@@ -102,7 +106,7 @@ if root:
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CMIP5-Adjust', var, var + 'Adjust')
 
-    cdef('root', '/prodigfs/project' , project='CMIP5-Adjust')
+    cdef('root', root, project='CMIP5-Adjust')
     # cdef('institute'      , '*'           , project='CMIP5-Adjust')
     cdef('table', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
     cdef('realm', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities

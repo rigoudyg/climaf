@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 CliMAF module ``html`` defines functions for building some html index
@@ -14,6 +14,7 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 
 
 """
+from __future__ import print_function
 
 import os
 import re
@@ -25,6 +26,7 @@ from climaf.driver import cfile
 import pickle
 import shutil
 from collections import OrderedDict
+from env.clogging import clogger, dedent
 
 
 def header(title, style_file=None):
@@ -33,19 +35,20 @@ def header(title, style_file=None):
     sheet will apply
     """
     rep = """
-    <?xml version="1.0" encoding="iso-8859-1"?> 
+    <?xml version="1.0" encoding="iso-8859-1"?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">    
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
     <head>
     <title>[ """ + title + """ ]</title>
     """
     trailer = """
-        </head>
-        <body>
-        <h1>""" + title + """</h1>
-        <hr/> <!--- this draws a line --->
-        """
+    </head>
+    <body>
+    <h1>""" + title + """</h1>
+    <a href="https://climaf.readthedocs.io/en/master/"><center>CliMAF documentation</center></a>
+    <hr/> <!--- this draws a line --->
+    """
     if style_file is not None:
         with open(style_file) as fic:
             style = \
@@ -126,21 +129,29 @@ def link(label, filename, thumbnail=None, hover=True):
       - if thumbnail is None, size is '200*200'
     """
     if filename:
+        regex = re.compile('(?P<width>[0-9]+)[x*](?P<height>[0-9]+)')
         if thumbnail is not None:
-
-            regex = re.compile('([0-9]+)[x*]([0-9]+)')
-            if isinstance(thumbnail, basestring) and regex.search(thumbnail):
-                thumbnail_width = regex.search(thumbnail).group(1)
-                thumbnail_height = regex.search(thumbnail).group(2)
+            thumbnail_width = None
+            thumbnail_height = None
+            if isinstance(thumbnail, basestring):
+                thumbnail_regex_match = regex.match(thumbnail)
+                if thumbnail_regex_match:
+                    thumbnail_width = thumbnail_regex_match.groupdict()["width"]
+                    thumbnail_height = thumbnail_regex_match.groupdict()["height"]
             else:
                 thumbnail_width = thumbnail
                 thumbnail_height = thumbnail
+            if thumbnail_width is not None and not isinstance(thumbnail_width, int):
+                thumbnail_width = int(thumbnail_width)
+            if thumbnail_height is not None and not isinstance(thumbnail_height, int):
+                thumbnail_height = int(thumbnail_height)
 
             if hover:
                 if isinstance(hover, basestring):
-                    if regex.search(hover):
-                        hover_width = regex.search(hover).group(1)
-                        hover_height = regex.search(hover).group(2)
+                    hover_regex_match = regex.match(hover)
+                    if hover_regex_match:
+                        hover_width = hover_regex_match.groupdict()["width"]
+                        hover_height = hover_regex_match.groupdict()["height"]
                     else:
                         try:
                             int(hover)
@@ -153,6 +164,11 @@ def link(label, filename, thumbnail=None, hover=True):
                 else:
                     hover_width = 3 * int(thumbnail_width)
                     hover_height = 3 * int(thumbnail_height)
+
+                if hover_height is not None and not isinstance(hover_height, int):
+                    hover_height = int(hover_height)
+                if hover_width is not None and not isinstance(hover_width, int):
+                    hover_width = int(hover_width)
 
                 rep = '<A class="info" HREF="' + filename + '"><IMG HEIGHT=' + repr(thumbnail_height) + \
                       ' WIDTH=' + repr(thumbnail_width) + ' SRC="' + filename + '"><span><IMG HEIGHT=' + \
@@ -167,9 +183,10 @@ def link(label, filename, thumbnail=None, hover=True):
 
             if hover:
                 if isinstance(hover, basestring):
-                    if regex.search(hover):
-                        hover_width = regex.search(hover).group(1)
-                        hover_height = regex.search(hover).group(2)
+                    hover_regex_match = regex.match(hover)
+                    if hover_regex_match:
+                        hover_width = hover_regex_match.groupdict()["width"]
+                        hover_height = hover_regex_match.groupdict()["height"]
                     else:
                         try:
                             int(hover)
@@ -182,6 +199,11 @@ def link(label, filename, thumbnail=None, hover=True):
                 else:
                     hover_width = 200
                     hover_height = 200
+
+                if hover_height is not None and not isinstance(hover_height, int):
+                    hover_height = int(hover_height)
+                if hover_width is not None and not isinstance(hover_width, int):
+                    hover_width = int(hover_width)
 
                 rep = '<A class="info" HREF="' + filename + '">' + label + '<span><IMG HEIGHT=' + \
                       repr(hover_height) + ' WIDTH=' + repr(hover_width) + ' SRC="' + \
@@ -231,7 +253,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
         if filename:
             tmpfilename, filextension = os.path.splitext(os.path.basename(filename))
 
-            regex = re.compile('([a-z]+)\_([a-z]+)([0-9]+)')
+            regex = re.compile(r'([a-z]+)\_([a-z]+)([0-9]+)')
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
             from datetime import datetime
@@ -253,9 +275,13 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                atlas_index_r = file(os.path.expanduser(index_atlas), "r")
-                tt = pickle.load(atlas_index_r)
-                atlas_index_r.close()
+                print('index_atlas in html.py = ', index_atlas)
+                try:
+                    atlas_index_r = file(os.path.expanduser(index_atlas), "r")
+                    tt = pickle.load(atlas_index_r)
+                    atlas_index_r.close()
+                except:
+                    tt = index_dict
                 # -- Append the file
                 tt.update(index_dict)
             # -- Save the file
@@ -431,8 +457,7 @@ def fline(func, farg, sargs, title=None,
     if not isinstance(sargs, dict):
         imposed_labels = False
         if not isinstance(sargs, list):
-            print "Issue with second args :" + \
-                  "not a dict nor a list (got `sargs`) "
+            print("Issue with second args : not a dict nor a list (got `sargs`) ")
             return
         else:
             sargs = OrderedDict(zip(sargs, sargs))
@@ -459,8 +484,6 @@ def fline(func, farg, sargs, title=None,
         rep += cell(lab, rfig, thumbnail, hover, dirname)
     rep += close_line()
     return rep
-
-
 # cinstantiate("index.html","inst.html")
 
 
@@ -516,8 +539,8 @@ def cinstantiate(objin, filout=None, should_exec=True):
         return rep
 
 
-# TODO : a function which copy all images referenced by the index, and modifies
-# the index accordingly (for 'saving' the image package)
+# TODO: a function which copy all images referenced by the index, and modifies the index accordingly
+#  (for 'saving' the image package)
 def compareCompanion():
     """ Includes the compareCompanion Javascript functionality
         developed by Patrick Brockmann (patrick.brockmann@lsce.ipsl.fr)
@@ -540,40 +563,37 @@ def start_line(title):
     return tmpindex
 
 
+blank_cell = cachedir + '/Empty.png'
 
-def safe_mode_cfile_plot(myplot,do_cfile=True,safe_mode=True):
+
+def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
     # Need to create cachedir if it does not exist yet
     if not os.path.isdir(cachedir):
         os.makedirs(cachedir)
-    blank_cell = cachedir + '/Empty.png'
     if not os.path.isfile(blank_cell):
         shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
 
     if not do_cfile:
-       return myplot
-       #
+        return myplot
+        #
     else:
-       # -- We try to 'cfile' the plot
-       if not safe_mode:
-          print '-- plot function is not in safe mode --'
-          return cfile(myplot)
-       else:
-          try:
-             plot_filename = cfile(myplot)
-             print '--> Successfully plotted ',myplot
-             return plot_filename
-          except:
-             # -- In case it didn't work, we try to see if it comes from the availability of the data
-             print '!! Plotting failed ',myplot
-             print "set clog('debug') and safe_mode=False to identify where the plotting failed"
-             return blank_cell
-
-
-
+        # -- We try to 'cfile' the plot
+        if not safe_mode:
+            print('-- plot function is not in safe mode --')
+            return cfile(myplot)
+        else:
+            try:
+                plot_filename = cfile(myplot)
+                print('--> Successfully plotted ', myplot)
+                return plot_filename
+            except:
+                # -- In case it didn't work, we try to see if it comes from the availability of the data
+                print('!! Plotting failed ', myplot)
+                print("set clog('debug') and safe_mode=False to identify where the plotting failed")
+                return blank_cell
 
 
 class Climaf_Html_Error(Exception):
-    from clogging import clogger, dedent
 
     def __init__(self, valeur):
         self.valeur = valeur

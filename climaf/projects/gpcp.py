@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -23,7 +23,7 @@ Example of an 'gpcp' project dataset declaration ::
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     cproject('gpcp', 'grid', ('frequency', 'monthly'), separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'

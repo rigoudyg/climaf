@@ -1,7 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # -- Import the dictionnaries of plot params:
-from climaf.site_settings import *
+from __future__ import print_function
+
+from env.site_settings import *
 
 # --> Import the default CliMAF sets of plot params
 # --> for atmosphere
@@ -60,9 +62,9 @@ def plot_params(variable, context, custom_plot_params=None):
 
     >>> var = 'pr'
     >>> climato_dat = time_average(ds(variable=var, project='CMIP5', ...))
-    # here, the annual mean climatology of a CMIP5 dataset for variable var
+    >>> # here, the annual mean climatology of a CMIP5 dataset for variable var
     >>> climato_ref = time_average(ds(variable=var, project='ref_climatos',...))
-    # the annual mean climatology of a reference dataset for variable var
+    >>> # the annual mean climatology of a reference dataset for variable var
 
     >>> bias = diff_regrid(climato_dat,climato_ref)         # We compute the bias map with diff_regrid()
     >>> niceplot_params=plot_params(var,'full_field')
@@ -106,18 +108,18 @@ def plot_params(variable, context, custom_plot_params=None):
             if cont in var_entry:
                 rep.update(var_entry[cont])
     else:
-        print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
+        print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
         # -- if not, we try to split
         tmp_variable = str.split(variable, '_')[0]
         if tmp_variable in per_variable:
-            print 'We will use the plot parameters of ' + tmp_variable
+            print('We will use the plot parameters of ' + tmp_variable)
             var_entry = per_variable[tmp_variable]
             for cont in ['default', context]:
                 if cont in var_entry:
                     rep.update(var_entry[cont])
         else:
-            print 'Message from plot_params: ' + variable + ' is not in the list of defined plot parameters'
-            print 'We will use the default plot parameters.'
+            print('Message from plot_params: ' + variable + ' is not in the list of defined plot parameters')
+            print('We will use the default plot parameters.')
     return rep
 
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -13,7 +13,7 @@ The specific attributes are:
 
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
 if onCiclad:
     # -- Create E-OBS CliMAF project

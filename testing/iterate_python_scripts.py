@@ -1,5 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
 
 import subprocess
 import sys
@@ -28,7 +30,7 @@ args = parser.parse_args()
 
 # print args
 if args.verbosity:
-    print "verbosity turned on"
+    print("verbosity turned on")
 
 if args.infile:
     vfiles = args.infile
@@ -41,22 +43,23 @@ else:
 for file in vfiles:
 
     if args.verbosity or args.upper_verbosity:
-        print "'%s'..." % file
+        print("'%s'..." % file)
 
     if args.upper_verbosity:
-        ex = subprocess.Popen(["python", file])
+        ex = subprocess.Popen("/usr/bin/env python %s" % file, shell=True)
     else:
-        ex = subprocess.Popen(["/usr/bin/python", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ex = subprocess.Popen("/usr/bin/env python %s" % file, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              shell=True)
 
     if ex.wait() == 0:  # code retour
         if args.verbosity:
-            print "Success"
+            print("Success")
     else:
         if args.verbosity:
-            print ex.stdout.read()
-            print ex.stderr.read()
-        print "Failure"
+            print(ex.stdout.read())
+            print(ex.stderr.read())
+        print("Failure")
         sys.exit(1)
 
 if not args.verbosity:
-    print "Success"
+    print("Success")

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """This module declares project em, base on data organization 'generic'
 
@@ -35,9 +35,9 @@ is an issue with the name of time coordinates, which lead to some
 nav_lat/nav_lon coordinates being discarded during CDO processing. You
 can tell CLiMAF to deal automatically with that, at the expense of
 computing time, by setting and exporting environment variable
-CLIMAF_FIX_NEMO_TIME to any value except 'no' BEFORE launching
+CLIMAF_FIX_NEMO_TIME to any value except 'no', '0' and 'None' BEFORE launching
 CliMAF. What CliMAF does in that case shows in
-:download:`../scripts/mcdo.sh` (see function nemo_timefix())
+:download:`../scripts/mcdo.py` (see function nemo_timefix())
 
 A number of Seaice fields are duly described with 1.e+20 as missing
 value (which is ill described in data files); see code for details
@@ -45,7 +45,7 @@ value (which is ill described in data files); see code for details
 """
 # S.Senesi - april 2016
 
-from climaf.site_settings import atCNRM
+from env.site_settings import atCNRM
 
 if atCNRM:
     from climaf.dataloc import dataloc

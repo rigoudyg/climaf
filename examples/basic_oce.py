@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Example for CliMAF use with ORCA data
@@ -10,6 +10,9 @@ This example will work as is on CNRM's Lustre or Ciclad
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
+
+from __future__ import print_function
+
 import os
 
 from climaf.api import *
@@ -33,12 +36,12 @@ tos = ds(experiment="historical", variable="tos", period="186001", table="Omon",
 # Display the basic filenames involved in the dataset (all filenames
 # in one single string). CliMAF will search them at the data location
 # which is the most specific among all declared data locations
-print tos.baseFiles()
+print(tos.baseFiles())
 
 # Let CliMAF provide the filename for the exact dataset in its disk
 # cache (select period and/or variables, aggregate files...)
 my_file = cfile(tos)
-print my_file
+print(my_file)
 
 # Check file size and content
 

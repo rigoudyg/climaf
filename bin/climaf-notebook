@@ -1,0 +1,53 @@
+#!/bin/bash
+myport=$( grep $USER  /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_V1.2.13/bin/cmip6.notebook.txt | awk '{print $2 }' )
+
+SHORT_HOST="$(hostname -s)"
+echo
+case $SHORT_HOST in
+    ciclad-ng|ciclad2|loholt*|camelot)
+    echo -e  "\033[1;31mplease do not run this on login node $SHORT_HOST use:\033[m"
+    echo -e  "First, submit an interactive session then load module and run notebook:" 
+    echo -e  "\033[1;31mYou could cut and past the 3 command line under:\033[m"
+    echo -e  "qsub -IVX -l mem=9g,vmem=9g,walltime=06:00:00"
+    echo -e  "module load climaf"
+    echo -e  "climaf-notebook"
+    exit 1 ;;
+    ciclad*) SSH_TUNNEL="ssh -L ${myport}:${SHORT_HOST}:${myport} ${USER}@ciclad2.ipsl.jussieu.fr" ;;
+    merlin*) SSH_TUNNEL="ssh -L ${myport}:${SHORT_HOST}:${myport} ${USER}@loholt2.ipsl.polytechnique.fr" ;;
+esac
+if netstat -at | grep -w $myport > /dev/null
+then 
+   echo "You already have a climaf-notebook running" 
+   echo "only one per user could be running" 
+   lsof|grep "$myport (LISTEN)" 
+   exit 1
+fi
+echo
+echo -e "\033[1;31m FIRST STEP: Open your port \033[m"
+echo "     - open a terminal on your computer (!! not on Ciclad, Loholt, Cerbere, Idefix... on your local machine)"
+echo "     - and connect to the Mesocenter with this blue command: "
+echo -e "\033[1;34m $SSH_TUNNEL \033[m"
+echo
+echo -e "\033[1;31m And keep this terminal open until the end of your jupyter session. \033[m"
+echo 
+#echo -e "\033[1;31mCOMMAND 2 IN THE URL PRODUCED BY NOTEBOOK, YOU HAVE TO REPLACE \033[m$SHORT_HOST\033[1;31m BY \033[mlocalhost"
+#echo -e "\033[1;31m          BEFORE PASTING IN YOUR LOCAL LAPTOP OR WORKSTATION BROWSER (firefox,chrome ...)\033[m"  
+if [ ! "analyse_env_2.7"="$CONDA_DEFAULT_ENV" ]
+then
+  source activate analyse_env_2.7
+fi
+echo
+echo -e "\033[1;31m SECOND STEP: \033[m"
+echo "    - in the url below (returned by Jupyter), replace --> $SHORT_HOST with --> localhost"
+echo "    - and paste in a browser on your computer (Chrome, Firefox...)"
+echo "    # Example: this is what Jupyter should typically return:"
+echo "    http://ciclad17:7144/?token=fa3b97e0ecf84afa9954da15056e9c6aef8bf6353e64ba81&token=fa3b97e0ecf84afa9954da15056e9c6aef8bf6353e64ba81"
+echo "    # And this is what you should copy and paste in your local browser:"
+echo "    http://localhost:7144/?token=fa3b97e0ecf84afa9954da15056e9c6aef8bf6353e64ba81&token=fa3b97e0ecf84afa9954da15056e9c6aef8bf6353e64ba81"
+echo
+echo -e "\033[1;31m Have fun! \033[m"
+echo
+echo -e "\033[1;31m (wait until Jupyter returns the url... it might take some seconds...) \033[m"
+
+jupyter notebook --no-browser --port=${myport} --ip=$SHORT_HOST 
+# dommage ca marche pas 2>&1 |sed -e 's/$SHORT_HOST/localhost/'

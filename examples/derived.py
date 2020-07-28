@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ CliMAF - example for derived variables
 
@@ -10,6 +10,8 @@ It can be used to define a CliMAF dataset
 """
 
 # S.Senesi - sept 2014
+
+from __future__ import print_function
 
 # Load Climaf functions and site settings
 # This sets logical flags 'onCiclad' and 'atCNRM'
@@ -39,7 +41,7 @@ derive('*', 'crest', 'minus', 'rst', 'rstcs')
 
 # Ask for actually compute the variable as a file
 my_file = cfile(creShortTop)
-print my_file
+print(my_file)
 
 if my_file is None:
     exit(1)

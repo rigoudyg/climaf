@@ -120,6 +120,9 @@ Configuring CliMAF
    adresses the wrong variable attribute 'coordinates' with 'lat lon'
    to 'latitude longitude'.
 
+ - CLIMAF_CHECK_DEPENDENCIES : if set to anything but 'yes', this will
+   avoid that CLiMAF checks and prints external tools version at startup
+
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
   functions; this will be executed at the end of climaf import; the code 
   must use fully qualified names for Python functions (as in e.g. ``climaf.operators.cscript``): it des not

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 
@@ -8,12 +8,14 @@ CliMAF handling of external scripts and binaries , and of internal operators (Py
 
 # Created : S.Senesi - 2014
 
+from __future__ import print_function
+
 import os
 import re
 import sys
 import subprocess
 import driver
-from clogging import clogger, dedent
+from env.clogging import clogger, dedent
 
 # Next definition can be splitted in a set managed by an administrator, and
 # other sets managed and fed by users. But it should be enforced that no redefinition
@@ -33,7 +35,8 @@ class scriptFlags():
                  canSelectTime=False, canSelectDomain=False,
                  canAggregateTime=False, canAlias=False,
                  canMissing=False, commuteWithEnsemble=True,
-                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False):
+                 commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
+                 doCatTime=False):
         self.canOpendap = canOpendap
         self.canSelectVar = canSelectVar
         self.canSelectTime = canSelectTime
@@ -44,6 +47,21 @@ class scriptFlags():
         self.commuteWithEnsemble = commuteWithEnsemble
         self.commuteWithTimeConcatenation = commuteWithTimeConcatenation
         self.commuteWithSpaceConcatenation = commuteWithSpaceConcatenation
+        self.doCatTime = doCatTime
+
+    def __eq__(self, other):
+        return isinstance(other, scriptFlags) and \
+               (self.canOpendap == other.canOpendap) and \
+               (self.canSelectVar == other.canSelectVar) and \
+               (self.canSelectTime == other.canSelectTime) and \
+               (self.canSelectDomain == other.canSelectDomain) and \
+               (self.canAggregateTime == other.canAggregateTime) and \
+               (self.canAlias == other.canAlias) and \
+               (self.canMissing == other.canMissing) and \
+               (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
+               (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
+               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation) and \
+               (self.doCatTime == other.doCatTime)
 
     def unset_selectors(self):
         self.canSelectVar = False
@@ -54,9 +72,9 @@ class scriptFlags():
 
 
 class cscript():
-    def __init__(self, name, command, format="nc", canOpendap=False,
+    def __init__(self, name, command, format="nc",  select=True, canOpendap=False,
                  commuteWithTimeConcatenation=False, commuteWithSpaceConcatenation=False,
-                 canSelectVar=False, **kwargs):
+                 canSelectVar=False, doCatTime=False, fatal=False, **kwargs):
         """
         Declare a script or binary as a 'CliMAF operator', and define a Python function with the same name
 
@@ -68,6 +86,10 @@ class cscript():
             formats: 'png', 'pdf' or 'eps') or 'txt' (the text output are not managed by CliMAF,
             but only displayed - 'txt' allows to use e.g. 'ncdump -h' from inside CliMAF);
             defaults to 'nc'
+          select (bool, optional): should data selection/transformation be automatically done
+            by CliMAF when applying this script directly to some dataset(s) (i.e. selection on
+            variable, time, domain, aliasing ... according to the definition(s) of input dataset()s).
+            Defaults to True
           canOpendap (bool, optional): is the script able to use OpenDAP URIs ? default to False
           commuteWithTimeConcatenation (bool, optional): can the operation commute with concatenation
             of time periods ? set it to true, if the operator can be applied on time
@@ -75,6 +97,9 @@ class cscript():
             defaults to False
           commuteWithSpaceConcatenation (bool, optional): can the operation commute with concatenation
             of space domains ? defaults to False (see commuteWithTimeConcatenation)
+          doCatTime (bool, optional): does this script concatenate data over time. Defaults to False.
+            See example in $CLIMAF/doc/operators_which_concatenate_over_time.html
+          fatal (bool, optional): if False and the executable is not available, do not crash but print a warning
           **kwargs : possible keyword arguments, with keys matching '<outname>_var', for providing
             a format string allowing to compute the variable name for output 'outname' (see below).
 
@@ -146,14 +171,17 @@ class cscript():
          -  **var, var_<digit>** : when a script can select a variable in a
             multi-variable input stream, this is declared by adding this
             keyword in the calling sequence; CliMAF will replace it by the
-            actual variable name to process; 'var' stands for first input
+            actual variable name to process, but only if it has not already filtered
+            data for that variable; 'var' stands for first input
             stream, 'var_<digit>' for the next ones;
 
             - in the example above, we assume that external binary CDO is
               not tasked with selecting the variable, and that CliMAF must
               feed CDO with a datafile where it has already performed the
               selection
-
+        
+            - if the script MUST receive the name of the variable in all 
+              circumstances, use keyword **Var**
 
          - **period, period_<digit>** : when a script can select a time
            period in the content of a file or stream, it should declare it
@@ -244,131 +272,141 @@ class cscript():
             clogger.error("trying to define %s as an operator, "
                           "while it exists as smthing else" % name)
             return None
-        if name in scripts:
-            clogger.warning("Redefining CliMAF script %s" % name)
-        #
-        # Check now that script is executable
-        scriptcommand = command.split(' ')[0].replace("(", "")
-        ex = subprocess.Popen(['which', scriptcommand], stdout=subprocess.PIPE)
-        if ex.wait() != 0:
-            Climaf_Operator_Error("defining %s : command %s is not "
-                                  "executable" % (name, scriptcommand))
-        executable = ex.stdout.read().replace('\n', '')
-        #
-        # Analyze inputs field keywords and populate dict
-        # attribute 'inputs' with some properties
-        self.inputs = dict()
-        commuteWithEnsemble = True
-        it = re.finditer(
-            r"\${(?P<keyw>(?P<mult>mm)?in(?P<serie>s)?(_(?P<n>([\d]+)))?)}",
-            command)
-        for oc in it:
-            if oc.group("n") is not None:
-                rank = int(oc.group("n"))
-            else:
-                rank = 0
-            if rank in self.inputs:
-                Climaf_Operator_Error(
-                    "When defining %s : duplicate declaration for input #%d" % (name, rank))
-            serie = (oc.group("serie") is not None)
-            multiple = (oc.group("mult") is not None)
-            if multiple:
-                if rank != 0:
-                    raise Climaf_Operator_Error(
-                        "Only first operand may accept members")
-                if serie:
-                    raise Climaf_Operator_Error(
-                        "Operand %s cannot both accept"
-                        "members and files set" % oc.group("keyw"))
-                commuteWithEnsemble = False
-            self.inputs[rank] = (oc.group("keyw"), multiple, serie)
-        if len(self.inputs) == 0:
-            Climaf_Operator_Error(
-                "When defining %s : command %s must include at least one of "
-                "${in} ${ins} ${mmin} or ${in_..} ... for specifying how CliMAF"
-                " will provide the input filename(s)" % (name, command))
-        # print self.inputs
-        for i in range(len(self.inputs)):
-            if i + 1 not in self.inputs and not (i == 0 and 0 in self.inputs):
-                Climaf_Operator_Error(
-                    "When defining %s : error in input sequence for rank %d" % (name, i + 1))
-        #
-        # Check if command includes an argument allowing for
-        # providing an output filename
-        if command.find("${out") < 0:
-            if format is not "txt":
-                format = None
-        #
-        # Search in call arguments for keywords matching "<output_name>_var"
-        # which may provide format string for 'computing' outputs variable
-        # name from input variable name
-        outvarnames = dict()
-        pattern = r"^(.*)_var$"
-        for p in kwargs:
-            if re.match(pattern, p):
-                outvarnames[re.findall(pattern, p)[0]] = kwargs[p]
-        clogger.debug("outvarnames for script %s = %s" % (name, repr(outvarnames)))
-        #
-        # Analyze outputs names , associated variable names
-        # (or format strings), and store it in attribute dict 'outputs'
-        self.outputs = dict()
-        it = re.finditer(r"\${out(_(?P<outname>[\w-]*))?}", command)
-        for occ in it:
-            outname = occ.group("outname")
-            if outname is not None:
-                if outname in outvarnames:
-                    self.outputs[outname] = outvarnames[outname]
-                else:
-                    self.outputs[outname] = "%s"  # outname
-            else:
-                self.outputs[None] = outvarnames.get('', "%s")
-                self.outputs[''] = outvarnames.get('', "%s")
-        # clogger.debug("outputs = "+`self.outputs`)
-        #
-        canSelectVar = canSelectVar or (command.find("${var}") > 0)
-        canAggregateTime = (command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
-        canAlias = (command.find("${alias}") > 0)
-        canMissing = (command.find("${missing}") > 0)
-        canSelectTime = False
-        if command.find("${period}") > 0 or command.find("${period_1}") > 0:
-            canSelectTime = True
-        if command.find("${period_iso}") > 0 or command.find("${period_iso_1}") > 0:
-            canSelectTime = True
-        canSelectDomain = (command.find("${domain}") > 0 or command.find("${domain_1}") > 0)
-        #
-        self.name = name
-        self.command = command
-        self.fixedfields = None
-        self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime, canAlias,
-                                 canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
-                                 commuteWithSpaceConcatenation)
-        if format in known_formats or format in graphic_formats or format in none_formats:
-            self.outputFormat = format
         else:
-            raise Climaf_Operator_Error(
-                "Allowed formats yet are : 'object', 'nc', 'txt', %s" % ', '.join([repr(x) for x in graphic_formats]))
-        scripts[name] = self
+            if name in scripts:
+                clogger.warning("Redefining CliMAF script %s" % name)
+            #
+            # Check now that script is executable
+            scriptcommand = command.split(' ')[0].replace("(", "")
+            try:
+                executable = subprocess.check_output("which {}".format(scriptcommand), shell=True)
+                executable = executable.replace("\n", "")
+                clogger.debug("Found %s" % executable)
+                #
+                # Analyze inputs field keywords and populate dict
+                # attribute 'inputs' with some properties
+                self.inputs = dict()
+                commuteWithEnsemble = True
+                it = re.finditer(
+                    r"\${(?P<keyw>(?P<mult>mm)?in(?P<serie>s)?(_(?P<n>([\d]+)))?)}",
+                    command)
+                for oc in it:
+                    if oc.group("n") is not None:
+                        rank = int(oc.group("n"))
+                    else:
+                        rank = 0
+                    if rank in self.inputs:
+                        clogger.warning("When defining %s : duplicate declaration for input #%d" % (name, rank))
+                    serie = (oc.group("serie") is not None)
+                    multiple = (oc.group("mult") is not None)
+                    if multiple:
+                        if rank != 0:
+                            raise Climaf_Operator_Error(
+                                "Only first operand may accept members")
+                        if serie:
+                            raise Climaf_Operator_Error(
+                                "Operand %s cannot both accept"
+                                "members and files set" % oc.group("keyw"))
+                        commuteWithEnsemble = False
+                    self.inputs[rank] = (oc.group("keyw"), multiple, serie)
+                if len(self.inputs) == 0:
+                    raise Climaf_Operator_Error(
+                        "When defining %s : command %s must include at least one of "
+                        "${in} ${ins} ${mmin} or ${in_..} ... for specifying how CliMAF"
+                        " will provide the input filename(s)" % (name, command))
+                # print self.inputs
+                for i in range(len(self.inputs)):
+                    if i + 1 not in self.inputs and not (i == 0 and 0 in self.inputs):
+                        raise Climaf_Operator_Error(
+                            "When defining %s : error in input sequence for rank %d" % (name, i + 1))
+                #
+                # Check if command includes an argument allowing for
+                # providing an output filename
+                if command.find("${out") < 0:
+                    if format is not "txt":
+                        format = None
+                #
+                # Search in call arguments for keywords matching "<output_name>_var"
+                # which may provide format string for 'computing' outputs variable
+                # name from input variable name
+                outvarnames = dict()
+                pattern = r"^(.*)_var$"
+                for p in kwargs:
+                    if re.match(pattern, p):
+                        outvarnames[re.findall(pattern, p)[0]] = kwargs[p]
+                clogger.debug("outvarnames for script %s = %s" % (name, repr(outvarnames)))
+                #
+                # Analyze outputs names , associated variable names
+                # (or format strings), and store it in attribute dict 'outputs'
+                self.outputs = dict()
+                it = re.finditer(r"\${out(_(?P<outname>[\w-]*))?}", command)
+                for occ in it:
+                    outname = occ.group("outname")
+                    if outname is not None:
+                        if outname in outvarnames:
+                            self.outputs[outname] = outvarnames[outname]
+                        else:
+                            self.outputs[outname] = "%s"  # outname
+                    else:
+                        self.outputs[None] = outvarnames.get('', "%s")
+                        self.outputs[''] = outvarnames.get('', "%s")
+                # clogger.debug("outputs = "+`self.outputs`)
+                #
+                canSelectVar = canSelectVar or (command.find("${var}") > 0) or (command.find("${Var}") > 0)
+                canAggregateTime = (command.find("${ins}") > 0 or command.find("${ins_1}") > 0)
+                canAlias = (command.find("${alias}") > 0)
+                canMissing = (command.find("${missing}") > 0)
+                canSelectTime = False
+                if command.find("${period}") > 0 or command.find("${period_1}") > 0:
+                    canSelectTime = True
+                if command.find("${period_iso}") > 0 or command.find("${period_iso_1}") > 0:
+                    canSelectTime = True
+                canSelectDomain = (command.find("${domain}") > 0 or command.find("${domain_1}") > 0)
+                #
+                self.name = name
+                self.command = command
+                self.fixedfields = None
+                if select:
+                    self.flags = scriptFlags(canOpendap, canSelectVar, canSelectTime, canSelectDomain, canAggregateTime,
+                                             canAlias, canMissing, commuteWithEnsemble, commuteWithTimeConcatenation,
+                                             commuteWithSpaceConcatenation, doCatTime)
+                else:
+                    self.flags = scriptFlags(True, True, True, True, True, True, True,
+                                             commuteWithEnsemble, commuteWithTimeConcatenation,
+                                             commuteWithSpaceConcatenation, doCatTime)
+                if format in known_formats or format in graphic_formats or format in none_formats:
+                    self.outputFormat = format
+                else:
+                    raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %
+                                                ', '.join([repr(x) for x in graphic_formats]))
+                scripts[name] = self
 
-        # Init doc string for the operator
-        doc = "CliMAF wrapper for command : %s" % self.command
-        # try to get a better doc string from colocated doc/directory
-        docfilename = os.path.dirname(__file__) + "/../doc/scripts/" + name + ".rst"
-        # print "docfilen= "+docfilename
-        try:
-            docfile = open(docfilename)
-            doc = docfile.read()
-            docfile.close()
-        except:
-            pass
-        #
-        # creates a function named as requested, which will invoke
-        # capply with that name and same arguments
-        defs = 'def %s(*args,**dic) :\n  """%s"""\n  return driver.capply("%s",*args,**dic)\n' \
-               % (name, doc, name)
-        exec defs in globals()  #
-        exec "from climaf.operators import %s" % name in \
-            sys.modules['__main__'].__dict__
-        clogger.debug("CliMAF script %s has been declared" % name)
+                # Init doc string for the operator
+                doc = "CliMAF wrapper for command : %s" % self.command
+                # try to get a better doc string from colocated doc/directory
+                docfilename = os.path.dirname(__file__) + "/../doc/scripts/" + name + ".rst"
+                # print "docfilen= "+docfilename
+                try:
+                    docfile = open(docfilename)
+                    doc = docfile.read()
+                    docfile.close()
+                except:
+                    pass
+                #
+                # creates a function named as requested, which will invoke
+                # capply with that name and same arguments
+                defs = 'def %s(*args,**dic) :\n  """%s"""\n  return driver.capply("%s",*args,**dic)\n' \
+                       % (name, doc, name)
+                exec defs in globals()  #
+                exec "from climaf.operators import %s" % name in \
+                    sys.modules['__main__'].__dict__
+                clogger.debug("CliMAF script %s has been declared" % name)
+            except subprocess.CalledProcessError:
+                if fatal:
+                    raise Climaf_Operator_Error("defining %s : command %s is not executable" % (name, scriptcommand))
+                else:
+                    clogger.warning("defining %s : command %s is not executable" % (name, scriptcommand))
+                    return None
 
     def __repr__(self):
         return "CliMAF operator : " + self.name
@@ -378,10 +416,10 @@ class cscript():
         of a script which are inputs
 
         """
-        l = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
+        args = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
         ls = []
         old = None
-        for e in l:
+        for e in args:
             if e != old:
                 ls.append(e)
             old = e
@@ -471,7 +509,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
     names; example ::
 
     >>> cscript('vertical_interp', 'vinterp.sh ${in} surface_pressure=${in_2} ${out_l500} ${out_l850} method=${opt}')
-    >>> derive('*', {'z500' : 'l500' , 'z850' : 'l850'},'vertical_interp', 'zg', 'ps', opt='log'}
+    >>> derive('*', {'z500' : 'l500' , 'z850' : 'l850'},'vertical_interp', 'zg', 'ps', opt='log')
 
     """
     # Action : register the information in a dedicated dict which keys
@@ -486,7 +524,7 @@ def derive(project, derivedVar, Operator, *invars, **params):
                     (not getattr(Operator, "outvarnames", None)
                      or outname not in Operator.outvarnames)):
                 raise Climaf_Operator_Error(
-                    "%s is not a named  ouput for operator %s; type help(%s)" % (outname, Operator, Operator))
+                    "%s is not a named  output for operator %s; type help(%s)" % (outname, Operator, Operator))
             s = scripts[Operator]
             if s.inputs_number() != len(invars):
                 clogger.error("number of input variables for operator %s is %d, which is inconsistent with "
@@ -496,7 +534,10 @@ def derive(project, derivedVar, Operator, *invars, **params):
             # its list in cscript.init() )
             if project not in derived_variables:
                 derived_variables[project] = dict()
-            derived_variables[project][derivedVar[outname]] = (Operator, outname, list(invars), params)
+            clogger.debug("Add derive variable %s obtained with operator %s, output variable %s, input variables %s "
+                          "and parameters %s" % (derivedVar[outname], str(Operator), derivedVar[outname],
+                                                 str(list(invars)), str(params)))
+            derived_variables[project][derivedVar[outname]] = (Operator, derivedVar[outname], list(invars), params)
     elif Operator in operators:
         clogger.warning("Cannot yet handle derived variables based on internal operators")
     else:
@@ -538,8 +579,8 @@ class Climaf_Operator_Error(Exception):
 
 if __name__ == "__main__":
     def ceval(script_name, *args, **dic):
-        print script_name, " has been called with args=", args, " and dic=", dic
-        print "Command would be:",
+        print(script_name, " has been called with args=", args, " and dic=", dic)
+        print("Command would be:",)
 
 
     cscript('test_script', 'echo $*')

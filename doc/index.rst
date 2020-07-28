@@ -4,13 +4,24 @@
    contain the root `toctree` directive.
 
 
-Quick links : :ref:`News <news>` | :ref:`Functions <API>` |
+Quick links : :ref:`Subscribe to mailing list <community>` | :ref:`News <news>` | :ref:`Functions <API>` |
 :ref:`standard_operators` | :ref:`howto` | :ref:`examples` |  :ref:`contents`
 
 .. |logo| image:: CliMAF_front_image.png
      :scale: 100%
 
 |logo| 
+
+
+Discover CliMAF: essentials of the documentation to get started 
+===============================================================
+
+- `What is CliMAF <https://climaf.readthedocs.io/en/master/index.html#climaf-a-climate-model-assessment-framework>`_?
+- Using CliMAF: `installation, use of existing installations (ESPRI mesocenter, CNRM, CERFACS) <https://climaf.readthedocs.io/en/master/installing.html>`_
+- Getting started with CliMAF: `a collection of demo notebooks <https://climaf.readthedocs.io/en/master/index.html#can-climaf-make-my-scientific-life-easier>`_
+- `A notebook for CMIP6 with CliMAF at CLIMERI <../examples/CMIP6_analysis_with_CliMAF.html>`
+- `Subscribe to CliMAF users mailing list <https://climaf.readthedocs.io/en/master/community.html>`_ to stay in the loop!
+
 
 
 CliMAF - a Climate Model Assessment Framework
@@ -46,11 +57,9 @@ CliMAF was designed to answer those specifications of CliMAF:
   - We don’t want to **recompute what has already been computed once**
   
   - We want to use this library to build a **custom set of diagnostics** as well as a **big evaluation package** like the `CliMAF Earth System Model Evaluation Platform <https://github.com/jservonnat/C-ESM-EP/wiki>`_
-  
 
 .. image:: CliMAF_structure.png
      :scale: 80%
-
 
 
 Can CliMAF make my scientific life easier?
@@ -63,6 +72,10 @@ You want to know what CliMAF is about? Here are some notebooks to illustrate int
  - :download:`Getting started with plot() <../examples/Getting-started-with-plot-in-CliMAF.html>` : some illustrations of the main features of the CliMAF plot operator (:doc:`scripts/plot`) to find out quickly how you can do some of the maps we like to do in climate science 
  - :download:`gathering my results in an html page <../examples/Gathering_my_results_in_an_html_page.html>`
  - or :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`
+
+And to go further on data analysis:
+ - `CMIP6 data analysis <../examples/CMIP6_analysis_with_CliMAF.html>`
+ - `working with CORDEX ensembles <../examples/CORDEX_ensembles_analysis_with_CliMAF.html>`
 
 The links point to the html versions of the notebooks.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Computig and plotting an annual cycle
@@ -30,7 +30,7 @@ figfile = cfile(fig_avg)
 
 # Next command to ensure exit code is meaningful (for testing purposes)
 if figfile is None:
-        exit(1)
+    exit(1)
 
 # Also test an operator which computed mean and standard deviation in one call
 help(mean_and_std)

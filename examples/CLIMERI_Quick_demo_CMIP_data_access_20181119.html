@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>CLIMERI_Quick_demo_CMIP_data_access_20181119</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+<title>CLIMERI_Quick_demo_CMIP_data_access_20181119</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
 
 <style type="text/css">
     /*!
@@ -199,7 +204,6 @@ th {
   *:before,
   *:after {
     background: transparent !important;
-    color: #000 !important;
     box-shadow: none !important;
     text-shadow: none !important;
   }
@@ -6744,15 +6748,15 @@ button.close {
 *
 */
 /*!
- *  Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
 /* FONT PATH
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?v=4.2.0');
-  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), url('../components/font-awesome/fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), url('../components/font-awesome/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'), url('../components/font-awesome/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg');
+  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?v=4.7.0');
+  src: url('../components/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('../components/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('../components/font-awesome/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'), url('../components/font-awesome/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('../components/font-awesome/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -6809,6 +6813,19 @@ button.close {
   border: solid 0.08em #eee;
   border-radius: .1em;
 }
+.fa-pull-left {
+  float: left;
+}
+.fa-pull-right {
+  float: right;
+}
+.fa.fa-pull-left {
+  margin-right: .3em;
+}
+.fa.fa-pull-right {
+  margin-left: .3em;
+}
+/* Deprecated as of 4.4.0 */
 .pull-right {
   float: right;
 }
@@ -6824,6 +6841,10 @@ button.close {
 .fa-spin {
   -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear;
+}
+.fa-pulse {
+  -webkit-animation: fa-spin 1s infinite steps(8);
+  animation: fa-spin 1s infinite steps(8);
 }
 @-webkit-keyframes fa-spin {
   0% {
@@ -6846,31 +6867,31 @@ button.close {
   }
 }
 .fa-rotate-90 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
   -webkit-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
   transform: rotate(90deg);
 }
 .fa-rotate-180 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
   -webkit-transform: rotate(180deg);
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
 .fa-rotate-270 {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
   -webkit-transform: rotate(270deg);
   -ms-transform: rotate(270deg);
   transform: rotate(270deg);
 }
 .fa-flip-horizontal {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
   -webkit-transform: scale(-1, 1);
   -ms-transform: scale(-1, 1);
   transform: scale(-1, 1);
 }
 .fa-flip-vertical {
-  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);
+  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
   -webkit-transform: scale(1, -1);
   -ms-transform: scale(1, -1);
   transform: scale(1, -1);
@@ -7355,6 +7376,7 @@ button.close {
 .fa-twitter:before {
   content: "\f099";
 }
+.fa-facebook-f:before,
 .fa-facebook:before {
   content: "\f09a";
 }
@@ -7367,6 +7389,7 @@ button.close {
 .fa-credit-card:before {
   content: "\f09d";
 }
+.fa-feed:before,
 .fa-rss:before {
   content: "\f09e";
 }
@@ -8004,7 +8027,8 @@ button.close {
 .fa-male:before {
   content: "\f183";
 }
-.fa-gittip:before {
+.fa-gittip:before,
+.fa-gratipay:before {
   content: "\f184";
 }
 .fa-sun-o:before {
@@ -8108,7 +8132,7 @@ button.close {
 .fa-digg:before {
   content: "\f1a6";
 }
-.fa-pied-piper:before {
+.fa-pied-piper-pp:before {
   content: "\f1a7";
 }
 .fa-pied-piper-alt:before {
@@ -8234,6 +8258,7 @@ button.close {
   content: "\f1ce";
 }
 .fa-ra:before,
+.fa-resistance:before,
 .fa-rebel:before {
   content: "\f1d0";
 }
@@ -8247,6 +8272,8 @@ button.close {
 .fa-git:before {
   content: "\f1d3";
 }
+.fa-y-combinator-square:before,
+.fa-yc-square:before,
 .fa-hacker-news:before {
   content: "\f1d4";
 }
@@ -8414,6 +8441,657 @@ button.close {
 }
 .fa-meanpath:before {
   content: "\f20c";
+}
+.fa-buysellads:before {
+  content: "\f20d";
+}
+.fa-connectdevelop:before {
+  content: "\f20e";
+}
+.fa-dashcube:before {
+  content: "\f210";
+}
+.fa-forumbee:before {
+  content: "\f211";
+}
+.fa-leanpub:before {
+  content: "\f212";
+}
+.fa-sellsy:before {
+  content: "\f213";
+}
+.fa-shirtsinbulk:before {
+  content: "\f214";
+}
+.fa-simplybuilt:before {
+  content: "\f215";
+}
+.fa-skyatlas:before {
+  content: "\f216";
+}
+.fa-cart-plus:before {
+  content: "\f217";
+}
+.fa-cart-arrow-down:before {
+  content: "\f218";
+}
+.fa-diamond:before {
+  content: "\f219";
+}
+.fa-ship:before {
+  content: "\f21a";
+}
+.fa-user-secret:before {
+  content: "\f21b";
+}
+.fa-motorcycle:before {
+  content: "\f21c";
+}
+.fa-street-view:before {
+  content: "\f21d";
+}
+.fa-heartbeat:before {
+  content: "\f21e";
+}
+.fa-venus:before {
+  content: "\f221";
+}
+.fa-mars:before {
+  content: "\f222";
+}
+.fa-mercury:before {
+  content: "\f223";
+}
+.fa-intersex:before,
+.fa-transgender:before {
+  content: "\f224";
+}
+.fa-transgender-alt:before {
+  content: "\f225";
+}
+.fa-venus-double:before {
+  content: "\f226";
+}
+.fa-mars-double:before {
+  content: "\f227";
+}
+.fa-venus-mars:before {
+  content: "\f228";
+}
+.fa-mars-stroke:before {
+  content: "\f229";
+}
+.fa-mars-stroke-v:before {
+  content: "\f22a";
+}
+.fa-mars-stroke-h:before {
+  content: "\f22b";
+}
+.fa-neuter:before {
+  content: "\f22c";
+}
+.fa-genderless:before {
+  content: "\f22d";
+}
+.fa-facebook-official:before {
+  content: "\f230";
+}
+.fa-pinterest-p:before {
+  content: "\f231";
+}
+.fa-whatsapp:before {
+  content: "\f232";
+}
+.fa-server:before {
+  content: "\f233";
+}
+.fa-user-plus:before {
+  content: "\f234";
+}
+.fa-user-times:before {
+  content: "\f235";
+}
+.fa-hotel:before,
+.fa-bed:before {
+  content: "\f236";
+}
+.fa-viacoin:before {
+  content: "\f237";
+}
+.fa-train:before {
+  content: "\f238";
+}
+.fa-subway:before {
+  content: "\f239";
+}
+.fa-medium:before {
+  content: "\f23a";
+}
+.fa-yc:before,
+.fa-y-combinator:before {
+  content: "\f23b";
+}
+.fa-optin-monster:before {
+  content: "\f23c";
+}
+.fa-opencart:before {
+  content: "\f23d";
+}
+.fa-expeditedssl:before {
+  content: "\f23e";
+}
+.fa-battery-4:before,
+.fa-battery:before,
+.fa-battery-full:before {
+  content: "\f240";
+}
+.fa-battery-3:before,
+.fa-battery-three-quarters:before {
+  content: "\f241";
+}
+.fa-battery-2:before,
+.fa-battery-half:before {
+  content: "\f242";
+}
+.fa-battery-1:before,
+.fa-battery-quarter:before {
+  content: "\f243";
+}
+.fa-battery-0:before,
+.fa-battery-empty:before {
+  content: "\f244";
+}
+.fa-mouse-pointer:before {
+  content: "\f245";
+}
+.fa-i-cursor:before {
+  content: "\f246";
+}
+.fa-object-group:before {
+  content: "\f247";
+}
+.fa-object-ungroup:before {
+  content: "\f248";
+}
+.fa-sticky-note:before {
+  content: "\f249";
+}
+.fa-sticky-note-o:before {
+  content: "\f24a";
+}
+.fa-cc-jcb:before {
+  content: "\f24b";
+}
+.fa-cc-diners-club:before {
+  content: "\f24c";
+}
+.fa-clone:before {
+  content: "\f24d";
+}
+.fa-balance-scale:before {
+  content: "\f24e";
+}
+.fa-hourglass-o:before {
+  content: "\f250";
+}
+.fa-hourglass-1:before,
+.fa-hourglass-start:before {
+  content: "\f251";
+}
+.fa-hourglass-2:before,
+.fa-hourglass-half:before {
+  content: "\f252";
+}
+.fa-hourglass-3:before,
+.fa-hourglass-end:before {
+  content: "\f253";
+}
+.fa-hourglass:before {
+  content: "\f254";
+}
+.fa-hand-grab-o:before,
+.fa-hand-rock-o:before {
+  content: "\f255";
+}
+.fa-hand-stop-o:before,
+.fa-hand-paper-o:before {
+  content: "\f256";
+}
+.fa-hand-scissors-o:before {
+  content: "\f257";
+}
+.fa-hand-lizard-o:before {
+  content: "\f258";
+}
+.fa-hand-spock-o:before {
+  content: "\f259";
+}
+.fa-hand-pointer-o:before {
+  content: "\f25a";
+}
+.fa-hand-peace-o:before {
+  content: "\f25b";
+}
+.fa-trademark:before {
+  content: "\f25c";
+}
+.fa-registered:before {
+  content: "\f25d";
+}
+.fa-creative-commons:before {
+  content: "\f25e";
+}
+.fa-gg:before {
+  content: "\f260";
+}
+.fa-gg-circle:before {
+  content: "\f261";
+}
+.fa-tripadvisor:before {
+  content: "\f262";
+}
+.fa-odnoklassniki:before {
+  content: "\f263";
+}
+.fa-odnoklassniki-square:before {
+  content: "\f264";
+}
+.fa-get-pocket:before {
+  content: "\f265";
+}
+.fa-wikipedia-w:before {
+  content: "\f266";
+}
+.fa-safari:before {
+  content: "\f267";
+}
+.fa-chrome:before {
+  content: "\f268";
+}
+.fa-firefox:before {
+  content: "\f269";
+}
+.fa-opera:before {
+  content: "\f26a";
+}
+.fa-internet-explorer:before {
+  content: "\f26b";
+}
+.fa-tv:before,
+.fa-television:before {
+  content: "\f26c";
+}
+.fa-contao:before {
+  content: "\f26d";
+}
+.fa-500px:before {
+  content: "\f26e";
+}
+.fa-amazon:before {
+  content: "\f270";
+}
+.fa-calendar-plus-o:before {
+  content: "\f271";
+}
+.fa-calendar-minus-o:before {
+  content: "\f272";
+}
+.fa-calendar-times-o:before {
+  content: "\f273";
+}
+.fa-calendar-check-o:before {
+  content: "\f274";
+}
+.fa-industry:before {
+  content: "\f275";
+}
+.fa-map-pin:before {
+  content: "\f276";
+}
+.fa-map-signs:before {
+  content: "\f277";
+}
+.fa-map-o:before {
+  content: "\f278";
+}
+.fa-map:before {
+  content: "\f279";
+}
+.fa-commenting:before {
+  content: "\f27a";
+}
+.fa-commenting-o:before {
+  content: "\f27b";
+}
+.fa-houzz:before {
+  content: "\f27c";
+}
+.fa-vimeo:before {
+  content: "\f27d";
+}
+.fa-black-tie:before {
+  content: "\f27e";
+}
+.fa-fonticons:before {
+  content: "\f280";
+}
+.fa-reddit-alien:before {
+  content: "\f281";
+}
+.fa-edge:before {
+  content: "\f282";
+}
+.fa-credit-card-alt:before {
+  content: "\f283";
+}
+.fa-codiepie:before {
+  content: "\f284";
+}
+.fa-modx:before {
+  content: "\f285";
+}
+.fa-fort-awesome:before {
+  content: "\f286";
+}
+.fa-usb:before {
+  content: "\f287";
+}
+.fa-product-hunt:before {
+  content: "\f288";
+}
+.fa-mixcloud:before {
+  content: "\f289";
+}
+.fa-scribd:before {
+  content: "\f28a";
+}
+.fa-pause-circle:before {
+  content: "\f28b";
+}
+.fa-pause-circle-o:before {
+  content: "\f28c";
+}
+.fa-stop-circle:before {
+  content: "\f28d";
+}
+.fa-stop-circle-o:before {
+  content: "\f28e";
+}
+.fa-shopping-bag:before {
+  content: "\f290";
+}
+.fa-shopping-basket:before {
+  content: "\f291";
+}
+.fa-hashtag:before {
+  content: "\f292";
+}
+.fa-bluetooth:before {
+  content: "\f293";
+}
+.fa-bluetooth-b:before {
+  content: "\f294";
+}
+.fa-percent:before {
+  content: "\f295";
+}
+.fa-gitlab:before {
+  content: "\f296";
+}
+.fa-wpbeginner:before {
+  content: "\f297";
+}
+.fa-wpforms:before {
+  content: "\f298";
+}
+.fa-envira:before {
+  content: "\f299";
+}
+.fa-universal-access:before {
+  content: "\f29a";
+}
+.fa-wheelchair-alt:before {
+  content: "\f29b";
+}
+.fa-question-circle-o:before {
+  content: "\f29c";
+}
+.fa-blind:before {
+  content: "\f29d";
+}
+.fa-audio-description:before {
+  content: "\f29e";
+}
+.fa-volume-control-phone:before {
+  content: "\f2a0";
+}
+.fa-braille:before {
+  content: "\f2a1";
+}
+.fa-assistive-listening-systems:before {
+  content: "\f2a2";
+}
+.fa-asl-interpreting:before,
+.fa-american-sign-language-interpreting:before {
+  content: "\f2a3";
+}
+.fa-deafness:before,
+.fa-hard-of-hearing:before,
+.fa-deaf:before {
+  content: "\f2a4";
+}
+.fa-glide:before {
+  content: "\f2a5";
+}
+.fa-glide-g:before {
+  content: "\f2a6";
+}
+.fa-signing:before,
+.fa-sign-language:before {
+  content: "\f2a7";
+}
+.fa-low-vision:before {
+  content: "\f2a8";
+}
+.fa-viadeo:before {
+  content: "\f2a9";
+}
+.fa-viadeo-square:before {
+  content: "\f2aa";
+}
+.fa-snapchat:before {
+  content: "\f2ab";
+}
+.fa-snapchat-ghost:before {
+  content: "\f2ac";
+}
+.fa-snapchat-square:before {
+  content: "\f2ad";
+}
+.fa-pied-piper:before {
+  content: "\f2ae";
+}
+.fa-first-order:before {
+  content: "\f2b0";
+}
+.fa-yoast:before {
+  content: "\f2b1";
+}
+.fa-themeisle:before {
+  content: "\f2b2";
+}
+.fa-google-plus-circle:before,
+.fa-google-plus-official:before {
+  content: "\f2b3";
+}
+.fa-fa:before,
+.fa-font-awesome:before {
+  content: "\f2b4";
+}
+.fa-handshake-o:before {
+  content: "\f2b5";
+}
+.fa-envelope-open:before {
+  content: "\f2b6";
+}
+.fa-envelope-open-o:before {
+  content: "\f2b7";
+}
+.fa-linode:before {
+  content: "\f2b8";
+}
+.fa-address-book:before {
+  content: "\f2b9";
+}
+.fa-address-book-o:before {
+  content: "\f2ba";
+}
+.fa-vcard:before,
+.fa-address-card:before {
+  content: "\f2bb";
+}
+.fa-vcard-o:before,
+.fa-address-card-o:before {
+  content: "\f2bc";
+}
+.fa-user-circle:before {
+  content: "\f2bd";
+}
+.fa-user-circle-o:before {
+  content: "\f2be";
+}
+.fa-user-o:before {
+  content: "\f2c0";
+}
+.fa-id-badge:before {
+  content: "\f2c1";
+}
+.fa-drivers-license:before,
+.fa-id-card:before {
+  content: "\f2c2";
+}
+.fa-drivers-license-o:before,
+.fa-id-card-o:before {
+  content: "\f2c3";
+}
+.fa-quora:before {
+  content: "\f2c4";
+}
+.fa-free-code-camp:before {
+  content: "\f2c5";
+}
+.fa-telegram:before {
+  content: "\f2c6";
+}
+.fa-thermometer-4:before,
+.fa-thermometer:before,
+.fa-thermometer-full:before {
+  content: "\f2c7";
+}
+.fa-thermometer-3:before,
+.fa-thermometer-three-quarters:before {
+  content: "\f2c8";
+}
+.fa-thermometer-2:before,
+.fa-thermometer-half:before {
+  content: "\f2c9";
+}
+.fa-thermometer-1:before,
+.fa-thermometer-quarter:before {
+  content: "\f2ca";
+}
+.fa-thermometer-0:before,
+.fa-thermometer-empty:before {
+  content: "\f2cb";
+}
+.fa-shower:before {
+  content: "\f2cc";
+}
+.fa-bathtub:before,
+.fa-s15:before,
+.fa-bath:before {
+  content: "\f2cd";
+}
+.fa-podcast:before {
+  content: "\f2ce";
+}
+.fa-window-maximize:before {
+  content: "\f2d0";
+}
+.fa-window-minimize:before {
+  content: "\f2d1";
+}
+.fa-window-restore:before {
+  content: "\f2d2";
+}
+.fa-times-rectangle:before,
+.fa-window-close:before {
+  content: "\f2d3";
+}
+.fa-times-rectangle-o:before,
+.fa-window-close-o:before {
+  content: "\f2d4";
+}
+.fa-bandcamp:before {
+  content: "\f2d5";
+}
+.fa-grav:before {
+  content: "\f2d6";
+}
+.fa-etsy:before {
+  content: "\f2d7";
+}
+.fa-imdb:before {
+  content: "\f2d8";
+}
+.fa-ravelry:before {
+  content: "\f2d9";
+}
+.fa-eercast:before {
+  content: "\f2da";
+}
+.fa-microchip:before {
+  content: "\f2db";
+}
+.fa-snowflake-o:before {
+  content: "\f2dc";
+}
+.fa-superpowers:before {
+  content: "\f2dd";
+}
+.fa-wpexplorer:before {
+  content: "\f2de";
+}
+.fa-meetup:before {
+  content: "\f2e0";
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+}
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
 }
 /*!
 *
@@ -8694,6 +9372,10 @@ div.traceback-wrapper {
   max-width: 800px;
   margin: auto;
 }
+div.traceback-wrapper pre.traceback {
+  max-height: 600px;
+  overflow: auto;
+}
 /**
  * Primary styles
  *
@@ -8719,6 +9401,10 @@ body > #header {
   z-index: 100;
 }
 body > #header #header-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5px;
   padding-bottom: 5px;
   padding-top: 5px;
   box-sizing: border-box;
@@ -8750,13 +9436,16 @@ body > #header .header-bar {
   padding-top: 1px;
   padding-bottom: 1px;
 }
-@media (max-width: 991px) {
-  #ipython_notebook {
-    margin-left: 10px;
-  }
-}
 [dir="rtl"] #ipython_notebook {
+  margin-right: 10px;
+  margin-left: 0;
+}
+[dir="rtl"] #ipython_notebook.pull-left {
   float: right !important;
+  float: right;
+}
+.flex-spacer {
+  flex: 1;
 }
 #noscript {
   width: auto;
@@ -8791,8 +9480,14 @@ body > #header .header-bar {
 input.ui-button {
   padding: 0.3em 0.9em;
 }
+span#kernel_logo_widget {
+  margin: 0 10px;
+}
 span#login_widget {
   float: right;
+}
+[dir="rtl"] span#login_widget {
+  float: left;
 }
 span#login_widget > .button,
 #logout {
@@ -8908,6 +9603,9 @@ span#login_widget > .button .badge,
   overflow: auto;
   flex: 1;
 }
+.modal-header {
+  cursor: move;
+}
 @media (min-width: 768px) {
   .modal .modal-dialog {
     width: 700px;
@@ -8928,6 +9626,19 @@ span#login_widget > .button .badge,
   display: inline-block;
   margin-bottom: -4px;
 }
+[dir="rtl"] .center-nav form.pull-left {
+  float: right !important;
+  float: right;
+}
+[dir="rtl"] .center-nav .navbar-text {
+  float: right;
+}
+[dir="rtl"] .navbar-inner {
+  text-align: right;
+}
+[dir="rtl"] div.text-left {
+  text-align: right;
+}
 /*!
 *
 * IPython tree view
@@ -8944,34 +9655,42 @@ span#login_widget > .button .badge,
   margin: 0;
 }
 .alternate_upload input.fileinput {
-  text-align: center;
-  vertical-align: middle;
-  display: inline;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
   opacity: 0;
   z-index: 2;
-  width: 12ex;
-  margin-right: -12ex;
+}
+.alternate_upload .btn-xs > input.fileinput {
+  margin: -1px -5px;
 }
 .alternate_upload .btn-upload {
+  position: relative;
   height: 22px;
+}
+::-webkit-file-upload-button {
+  cursor: pointer;
 }
 /**
  * Primary styles
  *
  * Author: Jupyter Development Team
  */
-[dir="rtl"] #tabs li {
-  float: right;
-}
 ul#tabs {
   margin-bottom: 4px;
-}
-[dir="rtl"] ul#tabs {
-  margin-right: 0px;
 }
 ul#tabs a {
   padding-top: 6px;
   padding-bottom: 4px;
+}
+[dir="rtl"] ul#tabs.nav-tabs > li {
+  float: right;
+}
+[dir="rtl"] ul#tabs.nav.nav-tabs {
+  padding-right: 0;
 }
 ul.breadcrumb a:focus,
 ul.breadcrumb a:hover {
@@ -8991,15 +9710,13 @@ ul.breadcrumb span {
 .list_toolbar .tree-buttons {
   padding-top: 1px;
 }
-[dir="rtl"] .list_toolbar .tree-buttons {
+[dir="rtl"] .list_toolbar .tree-buttons .pull-right {
   float: left !important;
+  float: left;
 }
-[dir="rtl"] .list_toolbar .pull-right {
-  padding-top: 1px;
-  float: left !important;
-}
-[dir="rtl"] .list_toolbar .pull-left {
-  float: right !important;
+[dir="rtl"] .list_toolbar .col-sm-4,
+[dir="rtl"] .list_toolbar .col-sm-8 {
+  float: right;
 }
 .dynamic-buttons {
   padding-top: 3px;
@@ -9055,7 +9772,7 @@ ul.breadcrumb span {
 .list_item > div input {
   margin-right: 7px;
   margin-left: 14px;
-  vertical-align: baseline;
+  vertical-align: text-bottom;
   line-height: 22px;
   position: relative;
   top: -1px;
@@ -9065,6 +9782,9 @@ ul.breadcrumb span {
   margin-left: -1px;
   vertical-align: baseline;
   line-height: 22px;
+}
+[dir="rtl"] .list_item > div input {
+  margin-right: 0;
 }
 .new-file input[type=checkbox] {
   visibility: hidden;
@@ -9080,6 +9800,14 @@ ul.breadcrumb span {
   margin-left: 7px;
   line-height: 22px;
   vertical-align: baseline;
+}
+.item_modified {
+  margin-right: 7px;
+  margin-left: 7px;
+}
+[dir="rtl"] .item_modified.pull-right {
+  float: left !important;
+  float: left;
 }
 .item_buttons {
   line-height: 1em;
@@ -9108,6 +9836,14 @@ ul.breadcrumb span {
   margin-right: 7px;
   float: left;
 }
+[dir="rtl"] .item_buttons.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .item_buttons .kernel-name {
+  margin-left: 7px;
+  float: right;
+}
 .toolbar_info {
   height: 24px;
   line-height: 24px;
@@ -9133,18 +9869,32 @@ ul.breadcrumb span {
   background-color: transparent;
   font-weight: bold;
 }
+.sort_button {
+  display: inline-block;
+  padding-left: 7px;
+}
+[dir="rtl"] .sort_button.pull-right {
+  float: left !important;
+  float: left;
+}
 #tree-selector {
   padding-right: 0px;
-}
-[dir="rtl"] #tree-selector a {
-  float: right;
 }
 #button-select-all {
   min-width: 50px;
 }
+[dir="rtl"] #button-select-all.btn {
+  float: right ;
+}
 #select-all {
   margin-left: 7px;
   margin-right: 2px;
+  margin-top: 2px;
+  height: 16px;
+}
+[dir="rtl"] #select-all.pull-left {
+  float: right !important;
+  float: right;
 }
 .menu_icon {
   margin-right: 2px;
@@ -9162,6 +9912,12 @@ ul.breadcrumb span {
   -moz-osx-font-smoothing: grayscale;
   content: "\f114";
 }
+.folder_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.folder_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .folder_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9178,6 +9934,12 @@ ul.breadcrumb span {
   content: "\f02d";
   position: relative;
   top: -1px;
+}
+.notebook_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.notebook_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .notebook_icon:before.pull-left {
   margin-right: .3em;
@@ -9197,6 +9959,12 @@ ul.breadcrumb span {
   top: -1px;
   color: #5cb85c;
 }
+.running_notebook_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.running_notebook_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .running_notebook_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9214,6 +9982,12 @@ ul.breadcrumb span {
   position: relative;
   top: -2px;
 }
+.file_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.file_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .file_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -9228,8 +10002,11 @@ ul#new-menu {
   left: auto;
   right: 0;
 }
-[dir="rtl"] #new-menu {
-  text-align: right;
+#new-menu .dropdown-header {
+  font-size: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0 0 3px;
+  margin: -3px 20px 0;
 }
 .kernel-menu-icon {
   padding-right: 12px;
@@ -9276,9 +10053,6 @@ ul#new-menu {
 #running .panel-group .panel .panel-body .list_container .list_item:last-child {
   border-bottom: 0px;
 }
-[dir="rtl"] #running .col-sm-8 {
-  float: right !important;
-}
 .delete-button {
   display: none;
 }
@@ -9286,6 +10060,12 @@ ul#new-menu {
   display: none;
 }
 .rename-button {
+  display: none;
+}
+.move-button {
+  display: none;
+}
+.download-button {
   display: none;
 }
 .shutdown-button {
@@ -9328,6 +10108,12 @@ ul#new-menu {
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
 }
+.dirty-indicator.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator.fa-pull-right {
+  margin-left: .3em;
+}
 .dirty-indicator.pull-left {
   margin-right: .3em;
 }
@@ -9342,6 +10128,12 @@ ul#new-menu {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
+}
+.dirty-indicator-dirty.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-dirty.fa-pull-right {
+  margin-left: .3em;
 }
 .dirty-indicator-dirty.pull-left {
   margin-right: .3em;
@@ -9358,6 +10150,12 @@ ul#new-menu {
   -moz-osx-font-smoothing: grayscale;
   width: 20px;
 }
+.dirty-indicator-clean.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-clean.fa-pull-right {
+  margin-left: .3em;
+}
 .dirty-indicator-clean.pull-left {
   margin-right: .3em;
 }
@@ -9372,6 +10170,12 @@ ul#new-menu {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f00c";
+}
+.dirty-indicator-clean:before.fa-pull-left {
+  margin-right: .3em;
+}
+.dirty-indicator-clean:before.fa-pull-right {
+  margin-left: .3em;
 }
 .dirty-indicator-clean:before.pull-left {
   margin-right: .3em;
@@ -9417,14 +10221,132 @@ ul#new-menu {
     box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
   }
 }
+.CodeMirror-dialog {
+  background-color: #fff;
+}
 /*!
 *
 * IPython notebook
 *
 */
-/* CSS font colors for translated ANSI colors. */
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
 .ansibold {
   font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
 }
 /* use dark versions for foreground, to improve visibility */
 .ansiblack {
@@ -9503,12 +10425,20 @@ div.cell {
   /* This acts as a spacer between cells, that is outside the border */
   margin: 0px;
   outline: none;
-  border-left-width: 1px;
-  padding-left: 5px;
-  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
 }
 div.cell.jupyter-soft-selected {
-  border-left-color: #90CAF9;
   border-left-color: #E3F2FD;
   border-left-width: 1px;
   padding-left: 5px;
@@ -9521,27 +10451,39 @@ div.cell.jupyter-soft-selected {
     border-color: transparent;
   }
 }
-div.cell.selected {
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
   border-color: #ababab;
-  border-left-width: 0px;
-  padding-left: 6px;
-  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
 }
 @media print {
-  div.cell.selected {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
     border-color: transparent;
   }
 }
-div.cell.selected.jupyter-soft-selected {
-  border-left-width: 0;
-  padding-left: 6px;
-  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
-}
 .edit_mode div.cell.selected {
   border-color: #66BB6A;
-  border-left-width: 0px;
-  padding-left: 6px;
-  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
 }
 @media print {
   .edit_mode div.cell.selected {
@@ -9737,7 +10679,9 @@ div.input_area > div.highlight > pre {
 .CodeMirror-lines {
   /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
   /* we have set a different line-height and want this to scale with that. */
-  padding: 0.4em;
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
 }
 .CodeMirror-linenumber {
   padding: 0 8px 0 4px;
@@ -9747,11 +10691,24 @@ div.input_area > div.highlight > pre {
   border-top-left-radius: 2px;
 }
 .CodeMirror pre {
-  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
-  /* .CodeMirror-lines */
-  padding: 0;
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
   border: 0;
   border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
 }
 /*
 
@@ -10005,6 +10962,9 @@ div.output_area img.unconfined,
 div.output_area svg.unconfined {
   max-width: none;
 }
+div.output_area .mglyph > img {
+  max-width: none;
+}
 /* This is needed to protect the pre formating from global settings such
    as that of bootstrap */
 .output {
@@ -10043,7 +11003,7 @@ div.output_area svg.unconfined {
 }
 div.output_area pre {
   margin: 0;
-  padding: 0;
+  padding: 1px 0 1px 0;
   border: 0;
   vertical-align: baseline;
   color: black;
@@ -10203,39 +11163,35 @@ div.output_unrecognized a:hover {
 .rendered_html h6:first-child {
   margin-top: 1em;
 }
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
 .rendered_html ul {
   list-style: disc;
-  margin: 0em 2em;
-  padding-left: 0px;
 }
 .rendered_html ul ul {
   list-style: square;
-  margin: 0em 2em;
+  margin-top: 0;
 }
 .rendered_html ul ul ul {
   list-style: circle;
-  margin: 0em 2em;
 }
 .rendered_html ol {
   list-style: decimal;
-  margin: 0em 2em;
-  padding-left: 0px;
 }
 .rendered_html ol ol {
   list-style: upper-alpha;
-  margin: 0em 2em;
+  margin-top: 0;
 }
 .rendered_html ol ol ol {
   list-style: lower-alpha;
-  margin: 0em 2em;
 }
 .rendered_html ol ol ol ol {
   list-style: lower-roman;
-  margin: 0em 2em;
 }
 .rendered_html ol ol ol ol ol {
   list-style: decimal;
-  margin: 0em 2em;
 }
 .rendered_html * + ul {
   margin-top: 1em;
@@ -10249,14 +11205,23 @@ div.output_unrecognized a:hover {
 }
 .rendered_html pre {
   margin: 1em 2em;
+  padding: 0px;
+  background-color: #fff;
+}
+.rendered_html code {
+  background-color: #eff0f1;
+}
+.rendered_html p code {
+  padding: 1px 5px;
+}
+.rendered_html pre code {
+  background-color: #fff;
 }
 .rendered_html pre,
 .rendered_html code {
   border: 0;
-  background-color: #fff;
   color: #000;
   font-size: 100%;
-  padding: 0px;
 }
 .rendered_html blockquote {
   margin: 1em 2em;
@@ -10264,24 +11229,36 @@ div.output_unrecognized a:hover {
 .rendered_html table {
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid black;
+  border: none;
   border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
 }
 .rendered_html tr,
 .rendered_html th,
 .rendered_html td {
-  border: 1px solid black;
-  border-collapse: collapse;
-  margin: 1em 2em;
-}
-.rendered_html td,
-.rendered_html th {
-  text-align: left;
+  text-align: right;
   vertical-align: middle;
-  padding: 4px;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
 }
 .rendered_html th {
   font-weight: bold;
+}
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
 }
 .rendered_html * + table {
   margin-top: 1em;
@@ -10308,6 +11285,15 @@ div.output_unrecognized a:hover {
 .rendered_html img.unconfined,
 .rendered_html svg.unconfined {
   max-width: none;
+}
+.rendered_html .alert {
+  margin-bottom: initial;
+}
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] .rendered_html p {
+  text-align: right;
 }
 div.text_cell {
   /* Old browsers */
@@ -10362,8 +11348,17 @@ h6:hover .anchor-link {
   overflow-x: auto;
   overflow-y: hidden;
 }
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered .rendered_html td {
+  max-width: none;
+}
 .text_cell.unrendered .text_cell_render {
   display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
 }
 .cm-header-1,
 .cm-header-2,
@@ -10500,6 +11495,28 @@ kbd {
   padding-top: 1px;
   padding-bottom: 1px;
 }
+.jupyter-keybindings {
+  padding: 1px;
+  line-height: 24px;
+  border-bottom: 1px solid gray;
+}
+.jupyter-keybindings input {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.jupyter-keybindings i {
+  padding: 6px;
+}
+.well code {
+  background-color: #ffffff;
+  border-color: #ababab;
+  border-width: 1px;
+  border-style: solid;
+  padding: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
 /* CSS for the cell toolbar */
 .celltoolbar {
   border: thin solid #CFCFCF;
@@ -10632,6 +11649,152 @@ select[multiple].celltoolbar select {
   margin-left: 5px;
   margin-right: 5px;
 }
+.tags_button_container {
+  width: 100%;
+  display: flex;
+}
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+.tag-container > * {
+  margin: 0 4px;
+}
+.remove-tag-btn {
+  margin-left: 4px;
+}
+.tags-input {
+  display: flex;
+}
+.cell-tag:last-child:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  /* Fade to background color of cell toolbar */
+  background: linear-gradient(to right, rgba(0, 0, 0, 0), #EEE);
+}
+.tags-input > * {
+  margin-left: 4px;
+}
+.cell-tag,
+.tags-input input,
+.tags-input button {
+  display: block;
+  width: 100%;
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #555555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 1px;
+  box-shadow: none;
+  width: inherit;
+  font-size: inherit;
+  height: 22px;
+  line-height: 22px;
+  padding: 0px 4px;
+  display: inline-block;
+}
+.cell-tag:focus,
+.tags-input input:focus,
+.tags-input button:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.cell-tag::-moz-placeholder,
+.tags-input input::-moz-placeholder,
+.tags-input button::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.cell-tag:-ms-input-placeholder,
+.tags-input input:-ms-input-placeholder,
+.tags-input button:-ms-input-placeholder {
+  color: #999;
+}
+.cell-tag::-webkit-input-placeholder,
+.tags-input input::-webkit-input-placeholder,
+.tags-input button::-webkit-input-placeholder {
+  color: #999;
+}
+.cell-tag::-ms-expand,
+.tags-input input::-ms-expand,
+.tags-input button::-ms-expand {
+  border: 0;
+  background-color: transparent;
+}
+.cell-tag[disabled],
+.tags-input input[disabled],
+.tags-input button[disabled],
+.cell-tag[readonly],
+.tags-input input[readonly],
+.tags-input button[readonly],
+fieldset[disabled] .cell-tag,
+fieldset[disabled] .tags-input input,
+fieldset[disabled] .tags-input button {
+  background-color: #eeeeee;
+  opacity: 1;
+}
+.cell-tag[disabled],
+.tags-input input[disabled],
+.tags-input button[disabled],
+fieldset[disabled] .cell-tag,
+fieldset[disabled] .tags-input input,
+fieldset[disabled] .tags-input button {
+  cursor: not-allowed;
+}
+textarea.cell-tag,
+textarea.tags-input input,
+textarea.tags-input button {
+  height: auto;
+}
+select.cell-tag,
+select.tags-input input,
+select.tags-input button {
+  height: 30px;
+  line-height: 30px;
+}
+textarea.cell-tag,
+textarea.tags-input input,
+textarea.tags-input button,
+select[multiple].cell-tag,
+select[multiple].tags-input input,
+select[multiple].tags-input button {
+  height: auto;
+}
+.cell-tag,
+.tags-input button {
+  padding: 0px 4px;
+}
+.cell-tag {
+  background-color: #fff;
+  white-space: nowrap;
+}
+.tags-input input[type=text]:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #ccc;
+}
 .completions {
   position: absolute;
   z-index: 110;
@@ -10657,16 +11820,28 @@ select[multiple].celltoolbar select {
 .completions select option.context {
   color: #286090;
 }
-#kernel_logo_widget {
-  float: right !important;
-  float: right;
-}
 #kernel_logo_widget .current_kernel_logo {
   display: none;
   margin-top: -1px;
   margin-bottom: -1px;
   width: 32px;
   height: 32px;
+}
+[dir="rtl"] #kernel_logo_widget {
+  float: left !important;
+  float: left;
+}
+.modal .modal-body .move-path {
+  display: flex;
+  flex-direction: row;
+  justify-content: space;
+  align-items: center;
+}
+.modal .modal-body .move-path .server-root {
+  padding-right: 20px;
+}
+.modal .modal-body .move-path .path-input {
+  flex: 1;
 }
 #menubar {
   box-sizing: border-box;
@@ -10688,11 +11863,41 @@ select[multiple].celltoolbar select {
 #menubar .navbar-collapse {
   clear: left;
 }
+[dir="rtl"] #menubar .navbar-toggle {
+  float: right;
+}
+[dir="rtl"] #menubar .navbar-collapse {
+  clear: right;
+}
+[dir="rtl"] #menubar .navbar-nav {
+  float: right;
+}
+[dir="rtl"] #menubar .nav {
+  padding-right: 0px;
+}
+[dir="rtl"] #menubar .navbar-nav > li {
+  float: right;
+}
+[dir="rtl"] #menubar .navbar-right {
+  float: left !important;
+}
+[dir="rtl"] ul.dropdown-menu {
+  text-align: right;
+  left: auto;
+}
+[dir="rtl"] ul#new-menu.dropdown-menu {
+  right: auto;
+  left: 0;
+}
 .nav-wrapper {
   border-bottom: 1px solid #e7e7e7;
 }
 i.menu-icon {
   padding-top: 4px;
+}
+[dir="rtl"] i.menu-icon.pull-right {
+  float: left !important;
+  float: left;
 }
 ul#help_menu li a {
   overflow: hidden;
@@ -10700,6 +11905,17 @@ ul#help_menu li a {
 }
 ul#help_menu li a i {
   margin-right: -1.2em;
+}
+[dir="rtl"] ul#help_menu li a {
+  padding-left: 2.2em;
+}
+[dir="rtl"] ul#help_menu li a i {
+  margin-right: 0;
+  margin-left: -1.2em;
+}
+[dir="rtl"] ul#help_menu li a i.pull-right {
+  float: left !important;
+  float: left;
 }
 .dropdown-submenu {
   position: relative;
@@ -10709,6 +11925,10 @@ ul#help_menu li a i {
   left: 100%;
   margin-top: -6px;
   margin-left: -1px;
+}
+[dir="rtl"] .dropdown-submenu > .dropdown-menu {
+  right: 100%;
+  margin-right: -1px;
 }
 .dropdown-submenu:hover > .dropdown-menu {
   display: block;
@@ -10727,11 +11947,23 @@ ul#help_menu li a i {
   margin-top: 2px;
   margin-right: -10px;
 }
+.dropdown-submenu > a:after.fa-pull-left {
+  margin-right: .3em;
+}
+.dropdown-submenu > a:after.fa-pull-right {
+  margin-left: .3em;
+}
 .dropdown-submenu > a:after.pull-left {
   margin-right: .3em;
 }
 .dropdown-submenu > a:after.pull-right {
   margin-left: .3em;
+}
+[dir="rtl"] .dropdown-submenu > a:after {
+  float: left;
+  content: "\f0d9";
+  margin-right: 0;
+  margin-left: -10px;
 }
 .dropdown-submenu:hover > a:after {
   color: #262626;
@@ -10748,6 +11980,10 @@ ul#help_menu li a i {
   float: right;
   z-index: 10;
 }
+[dir="rtl"] #notification_area {
+  float: left !important;
+  float: left;
+}
 .indicator_area {
   float: right !important;
   float: right;
@@ -10758,6 +11994,10 @@ ul#help_menu li a i {
   z-index: 10;
   text-align: center;
   width: auto;
+}
+[dir="rtl"] .indicator_area {
+  float: left !important;
+  float: left;
 }
 #kernel_indicator {
   float: right !important;
@@ -10775,6 +12015,12 @@ ul#help_menu li a i {
   padding-left: 5px;
   padding-right: 5px;
 }
+[dir="rtl"] #kernel_indicator {
+  float: left !important;
+  float: left;
+  border-left: 0;
+  border-right: 1px solid;
+}
 #modal_indicator {
   float: right !important;
   float: right;
@@ -10785,6 +12031,10 @@ ul#help_menu li a i {
   z-index: 10;
   text-align: center;
   width: auto;
+}
+[dir="rtl"] #modal_indicator {
+  float: left !important;
+  float: left;
 }
 #readonly-indicator {
   float: right !important;
@@ -10815,6 +12065,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f040";
 }
+.edit_mode .modal_indicator:before.fa-pull-left {
+  margin-right: .3em;
+}
+.edit_mode .modal_indicator:before.fa-pull-right {
+  margin-left: .3em;
+}
 .edit_mode .modal_indicator:before.pull-left {
   margin-right: .3em;
 }
@@ -10829,6 +12085,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: ' ';
+}
+.command_mode .modal_indicator:before.fa-pull-left {
+  margin-right: .3em;
+}
+.command_mode .modal_indicator:before.fa-pull-right {
+  margin-left: .3em;
 }
 .command_mode .modal_indicator:before.pull-left {
   margin-right: .3em;
@@ -10845,6 +12107,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f10c";
 }
+.kernel_idle_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_idle_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .kernel_idle_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -10859,6 +12127,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f111";
+}
+.kernel_busy_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_busy_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .kernel_busy_icon:before.pull-left {
   margin-right: .3em;
@@ -10875,6 +12149,12 @@ ul#help_menu li a i {
   -moz-osx-font-smoothing: grayscale;
   content: "\f1e2";
 }
+.kernel_dead_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_dead_icon:before.fa-pull-right {
+  margin-left: .3em;
+}
 .kernel_dead_icon:before.pull-left {
   margin-right: .3em;
 }
@@ -10889,6 +12169,12 @@ ul#help_menu li a i {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   content: "\f127";
+}
+.kernel_disconnected_icon:before.fa-pull-left {
+  margin-right: .3em;
+}
+.kernel_disconnected_icon:before.fa-pull-right {
+  margin-left: .3em;
 }
 .kernel_disconnected_icon:before.pull-left {
   margin-right: .3em;
@@ -11279,27 +12565,46 @@ div#pager .ui-resizable-handle::after {
   flex: 1;
 }
 span.save_widget {
-  margin-top: 6px;
+  height: 30px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  width: 50%;
+  flex: 1;
 }
 span.save_widget span.filename {
-  height: 1em;
+  height: 100%;
   line-height: 1em;
-  padding: 3px;
   margin-left: 16px;
   border: none;
   font-size: 146.5%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   border-radius: 2px;
 }
 span.save_widget span.filename:hover {
   background-color: #e6e6e6;
 }
+[dir="rtl"] span.save_widget.pull-left {
+  float: right !important;
+  float: right;
+}
+[dir="rtl"] span.save_widget span.filename {
+  margin-left: 0;
+  margin-right: 16px;
+}
 span.checkpoint_status,
 span.autosave_status {
   font-size: small;
+  white-space: nowrap;
+  padding: 0 5px;
 }
 @media (max-width: 767px) {
   span.save_widget {
     font-size: small;
+    padding: 0 0 0 5px;
   }
   span.checkpoint_status,
   span.autosave_status {
@@ -11343,6 +12648,9 @@ span.autosave_status {
   margin-top: 0px;
   margin-left: 5px;
 }
+.toolbar-btn-label {
+  margin-left: 6px;
+}
 #maintoolbar {
   margin-bottom: -3px;
   margin-top: -8px;
@@ -11362,6 +12670,10 @@ span.autosave_status {
 }
 .select-xs {
   height: 24px;
+}
+[dir="rtl"] .btn-group > .btn,
+.btn-group-vertical > .btn {
+  float: right;
 }
 .pulse,
 .dropdown-menu > li > a.pulse,
@@ -11512,6 +12824,10 @@ ul.typeahead-list i {
   margin-left: -10px;
   width: 18px;
 }
+[dir="rtl"] ul.typeahead-list i {
+  margin-left: 0;
+  margin-right: -10px;
+}
 ul.typeahead-list {
   max-height: 80vh;
   overflow: auto;
@@ -11520,6 +12836,13 @@ ul.typeahead-list > li > a {
   /** Firefox bug **/
   /* see https://github.com/jupyter/notebook/issues/559 */
   white-space: normal;
+}
+ul.typeahead-list  > li > a.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .typeahead-list {
+  text-align: right;
 }
 .cmd-palette .modal-body {
   padding: 7px;
@@ -11531,10 +12854,19 @@ ul.typeahead-list > li > a {
   outline: none;
 }
 .no-shortcut {
-  display: none;
+  min-width: 20px;
+  color: transparent;
+}
+[dir="rtl"] .no-shortcut.pull-right {
+  float: left !important;
+  float: left;
+}
+[dir="rtl"] .command-shortcut.pull-right {
+  float: left !important;
+  float: left;
 }
 .command-shortcut:before {
-  content: "(command)";
+  content: "(command mode)";
   padding-right: 3px;
   color: #777777;
 }
@@ -11543,6 +12875,10 @@ ul.typeahead-list > li > a {
   padding-right: 3px;
   color: #777777;
 }
+[dir="rtl"] .edit-shortcut.pull-right {
+  float: left !important;
+  float: left;
+}
 #find-and-replace #replace-preview .match,
 #find-and-replace #replace-preview .insert {
   background-color: #BBDEFB;
@@ -11550,6 +12886,12 @@ ul.typeahead-list > li > a {
   border-style: solid;
   border-width: 1px;
   border-radius: 0px;
+}
+[dir="ltr"] #find-and-replace .input-group-btn + .form-control {
+  border-left: none;
+}
+[dir="rtl"] #find-and-replace .input-group-btn + .form-control {
+  border-right: none;
 }
 #find-and-replace #replace-preview .replace .match {
   background-color: #FFCDD2;
@@ -11675,45 +13017,6 @@ ul.typeahead-list > li > a {
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
-<style type="text/css">
-    
-/* Temporary definitions which will become obsolete with Notebook release 5.0 */
-.ansi-black-fg { color: #3E424D; }
-.ansi-black-bg { background-color: #3E424D; }
-.ansi-black-intense-fg { color: #282C36; }
-.ansi-black-intense-bg { background-color: #282C36; }
-.ansi-red-fg { color: #E75C58; }
-.ansi-red-bg { background-color: #E75C58; }
-.ansi-red-intense-fg { color: #B22B31; }
-.ansi-red-intense-bg { background-color: #B22B31; }
-.ansi-green-fg { color: #00A250; }
-.ansi-green-bg { background-color: #00A250; }
-.ansi-green-intense-fg { color: #007427; }
-.ansi-green-intense-bg { background-color: #007427; }
-.ansi-yellow-fg { color: #DDB62B; }
-.ansi-yellow-bg { background-color: #DDB62B; }
-.ansi-yellow-intense-fg { color: #B27D12; }
-.ansi-yellow-intense-bg { background-color: #B27D12; }
-.ansi-blue-fg { color: #208FFB; }
-.ansi-blue-bg { background-color: #208FFB; }
-.ansi-blue-intense-fg { color: #0065CA; }
-.ansi-blue-intense-bg { background-color: #0065CA; }
-.ansi-magenta-fg { color: #D160C4; }
-.ansi-magenta-bg { background-color: #D160C4; }
-.ansi-magenta-intense-fg { color: #A03196; }
-.ansi-magenta-intense-bg { background-color: #A03196; }
-.ansi-cyan-fg { color: #60C6C8; }
-.ansi-cyan-bg { background-color: #60C6C8; }
-.ansi-cyan-intense-fg { color: #258F8F; }
-.ansi-cyan-intense-bg { background-color: #258F8F; }
-.ansi-white-fg { color: #C5C1B4; }
-.ansi-white-bg { background-color: #C5C1B4; }
-.ansi-white-intense-fg { color: #A1A6B2; }
-.ansi-white-intense-bg { background-color: #A1A6B2; }
-
-.ansi-bold { font-weight: bold; }
-
-    </style>
 
 
 <style type="text/css">
@@ -11747,7 +13050,7 @@ div#notebook {
 
 <!-- Loading mathjax macro -->
 <!-- Load mathjax -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_HTML"></script>
     <!-- MathJax configuration -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -11780,7 +13083,7 @@ div#notebook {
 <span class="n">Image</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://vesg.ipsl.upmc.fr/thredds/fileServer/IPSLFS/jservon/CliMAF_Notebooks_html/CliMAF-logo-small.png&#39;</span><span class="p">)</span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11790,7 +13093,7 @@ div#notebook {
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[1]:</div>
+    <div class="prompt output_prompt">Out[1]:</div>
 
 
 
@@ -11805,8 +13108,7 @@ div#notebook {
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Import-CliMAF">Import CliMAF<a class="anchor-link" href="#Import-CliMAF">&#182;</a></h1>
 </div>
@@ -11820,7 +13122,7 @@ div#notebook {
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">climaf.api</span> <span class="kn">import</span> <span class="o">*</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11830,12 +13132,52 @@ div#notebook {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(&#39;LC debug :&#39;, False)
+CliMAF install =&gt; /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_gr_V1.2.13
+python =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/analyse_env_2.7/bin/python
+---
+Required softwares to run CliMAF =&gt; you are using the following versions/installations:
+ncl 6.6.2 =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/analyse_env_2.7/bin/ncl
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>Climaf version = 1.2.8
-Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
+<pre>CliMAF version = 1.2.13
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>cdo 1.9.6 =&gt; /opt/nco/1.9/bin/cdo
+nco (ncks) 4.5.2 =&gt; /opt/nco-4.5.2/bin/ncks
+ncdump fichier =&gt; /prodigfs/ipslfs/dods/jservon/miniconda/envs/analyse_env_2.7/bin/ncdump
+---
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Cache directory set to : /data/jservon/climafcache (use $CLIMAF_CACHE if set) 
 Cache directory for remote data set to : /data/jservon/climafcache/remote_data (use $CLIMAF_REMOTE_CACHE if set) 
 Available macros read from ~/.climaf.macros are : []
 </pre>
@@ -11847,16 +13189,14 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="We-will-work-on-CMIP5,-CMIP6,-and-IPSLCM6-simulations">We will work on CMIP5, CMIP6, and IPSLCM6 simulations<a class="anchor-link" href="#We-will-work-on-CMIP5,-CMIP6,-and-IPSLCM6-simulations">&#182;</a></h1><h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Let's-start-with-CMIP5-simulations">Let's start with CMIP5 simulations<a class="anchor-link" href="#Let's-start-with-CMIP5-simulations">&#182;</a></h2>
 </div>
@@ -11880,7 +13220,7 @@ Available macros read from ~/.climaf.macros are : []
 <span class="c1"># -&gt; The user can then refine the request to select only one file</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11890,20 +13230,20 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[2]:</div>
+    <div class="prompt output_prompt">Out[2]:</div>
 
 
 
@@ -11917,11 +13257,11 @@ Available macros read from ~/.climaf.macros are : []
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;*&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;&#39;,
  &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;*&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -11931,16 +13271,14 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Note-that-eventually-dat_cmip5-has-to-point-only-to-one-simulation!">Note that eventually dat_cmip5 has to point only to one simulation!<a class="anchor-link" href="#Note-that-eventually-dat_cmip5-has-to-point-only-to-one-simulation!">&#182;</a></h2><h1 id="-"> <a class="anchor-link" href="#-">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Get-the-values-matching-the-wildcards-'*'">Get the values matching the wildcards '*'<a class="anchor-link" href="#Get-the-values-matching-the-wildcards-'*'">&#182;</a></h3><h3 id="This-great-new-functionality:-dat.explore-!!">This great new functionality: dat.explore !!<a class="anchor-link" href="#This-great-new-functionality:-dat.explore-!!">&#182;</a></h3><p><a href="https://climaf.readthedocs.io/en/master/functions_data.html#cdataset-explore-explore-data-and-periods-and-match-joker-attributes">https://climaf.readthedocs.io/en/master/functions_data.html#cdataset-explore-explore-data-and-periods-and-match-joker-attributes</a></p>
 
@@ -11955,7 +13293,7 @@ Available macros read from ~/.climaf.macros are : []
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dat_cmip5</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11965,13 +13303,13 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[3]:</div>
+    <div class="prompt output_prompt">Out[3]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>{&#39;realm&#39;: &#39;ocean&#39;, &#39;table&#39;: &#39;Omon&#39;, &#39;version&#39;: &#39;v20130101&#39;}</pre>
+<pre>{&#39;realm&#39;: &#39;ocean&#39;, &#39;table&#39;: &#39;Omon&#39;}</pre>
 </div>
 
 </div>
@@ -11981,8 +13319,7 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="We-have-only-value-one-by-keyword:-automatically-complete-the-keywords/pairs-values-with-explore('resolve')">We have only value one by keyword: automatically complete the keywords/pairs values with explore('resolve')<a class="anchor-link" href="#We-have-only-value-one-by-keyword:-automatically-complete-the-keywords/pairs-values-with-explore('resolve')">&#182;</a></h3><p>Not mandatory but highly recommanded</p>
 
@@ -11998,7 +13335,7 @@ Available macros read from ~/.climaf.macros are : []
 <span class="n">ok_dat_cmip5</span><span class="o">.</span><span class="n">kvp</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12008,7 +13345,7 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[4]:</div>
+    <div class="prompt output_prompt">Out[4]:</div>
 
 
 
@@ -12022,11 +13359,11 @@ Available macros read from ~/.climaf.macros are : []
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;ocean&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;&#39;,
  &#39;table&#39;: &#39;Omon&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;v20130101&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12036,8 +13373,7 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Automatic-selection-of-the-available-period:-the-full-available-period,-or-the-last-XX-years!">Automatic selection of the available period: the full available period, or the last XX years!<a class="anchor-link" href="#Automatic-selection-of-the-available-period:-the-full-available-period,-or-the-last-XX-years!">&#182;</a></h2>
 </div>
@@ -12059,7 +13395,7 @@ Available macros read from ~/.climaf.macros are : []
 <span class="n">summary</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12069,19 +13405,19 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[5]:</div>
+    <div class="prompt output_prompt">Out[5]:</div>
 
 
 
@@ -12095,11 +13431,11 @@ Available macros read from ~/.climaf.macros are : []
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;ocean&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;&#39;,
  &#39;table&#39;: &#39;Omon&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;v20130101&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12125,7 +13461,7 @@ Available macros read from ~/.climaf.macros are : []
 <span class="n">summary</span><span class="p">(</span><span class="n">dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12135,33 +13471,33 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_185001-185912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_186001-186912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_187001-187912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_188001-188912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_189001-189912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_190001-190912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_191001-191912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_192001-192912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_193001-193912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_194001-194912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_195001-195912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_196001-196912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_197001-197912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/v20130101/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+<pre>/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_185001-185912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_186001-186912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_187001-187912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_188001-188912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_189001-189912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_190001-190912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_191001-191912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_192001-192912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_193001-193912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_194001-194912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_195001-195912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_196001-196912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_197001-197912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[6]:</div>
+    <div class="prompt output_prompt">Out[6]:</div>
 
 
 
@@ -12175,11 +13511,11 @@ Available macros read from ~/.climaf.macros are : []
  &#39;project&#39;: &#39;CMIP5&#39;,
  &#39;realization&#39;: &#39;r1i1p1&#39;,
  &#39;realm&#39;: &#39;*&#39;,
- &#39;root&#39;: &#39;/prodigfs/project&#39;,
+ &#39;root&#39;: &#39;/bdd&#39;,
  &#39;simulation&#39;: &#39;&#39;,
  &#39;table&#39;: &#39;*&#39;,
  &#39;variable&#39;: &#39;tos&#39;,
- &#39;version&#39;: &#39;*&#39;}</pre>
+ &#39;version&#39;: &#39;latest&#39;}</pre>
 </div>
 
 </div>
@@ -12189,8 +13525,7 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="I-want-to-actually-get-the-netcdf-file-that-corresponds-to-my-request:">I want to actually get the netcdf file that corresponds to my request:<a class="anchor-link" href="#I-want-to-actually-get-the-netcdf-file-that-corresponds-to-my-request:">&#182;</a></h2><h4 id="CliMAF-provides-automatically-a-path/filename-based-on-the-path-to-the-CliMAF-cache-and-a-hash-of-the-CliMAF-expression-(sequence-of-CliMAF-operations-that-lead-to-the-result)">CliMAF provides automatically a path/filename based on the path to the CliMAF cache and a hash of the CliMAF expression (sequence of CliMAF operations that lead to the result)<a class="anchor-link" href="#CliMAF-provides-automatically-a-path/filename-based-on-the-path-to-the-CliMAF-cache-and-a-hash-of-the-CliMAF-expression-(sequence-of-CliMAF-operations-that-lead-to-the-result)">&#182;</a></h4>
 </div>
@@ -12204,7 +13539,7 @@ Available macros read from ~/.climaf.macros are : []
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">cfile</span><span class="p">(</span><span class="n">ok_dat_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12214,7 +13549,7 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[7]:</div>
+    <div class="prompt output_prompt">Out[7]:</div>
 
 
 
@@ -12230,16 +13565,14 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Now-that-my-file-is-in-the-cache,-if-I-ask-for-the-result-of-the-same-object,-CliMAF-will-scan-the-cache-and-directly-return-the-file-corresponding-to-the-sequence-of-operations;-if-it's-not-in-the-cache,-it-will-execute-it">Now that my file is in the cache, if I ask for the result of the same object, CliMAF will scan the cache and directly return the file corresponding to the sequence of operations; if it's not in the cache, it will execute it<a class="anchor-link" href="#Now-that-my-file-is-in-the-cache,-if-I-ask-for-the-result-of-the-same-object,-CliMAF-will-scan-the-cache-and-directly-return-the-file-corresponding-to-the-sequence-of-operations;-if-it's-not-in-the-cache,-it-will-execute-it">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Working-now-on-an-ensemble:-I-want-the-same-request,-but-for-all-the-models-available-on-the-CMIP5-archive-at-CLIMERI">Working now on an ensemble: I want the same request, but for all the models available on the CMIP5 archive at CLIMERI<a class="anchor-link" href="#Working-now-on-an-ensemble:-I-want-the-same-request,-but-for-all-the-models-available-on-the-CMIP5-archive-at-CLIMERI">&#182;</a></h2><h3 id="model='*'">model='*'<a class="anchor-link" href="#model='*'">&#182;</a></h3>
 </div>
@@ -12247,7 +13580,7 @@ Available macros read from ~/.climaf.macros are : []
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">req_cmip5</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s1">&#39;CMIP5&#39;</span><span class="p">,</span>
@@ -12260,14 +13593,13 @@ Available macros read from ~/.climaf.macros are : []
                <span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="With-explore('choices'),-I-can-check-what-CliMAF-found:">With explore('choices'), I can check what CliMAF found:<a class="anchor-link" href="#With-explore('choices'),-I-can-check-what-CliMAF-found:">&#182;</a></h3>
 </div>
@@ -12275,13 +13607,13 @@ Available macros read from ~/.climaf.macros are : []
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">req_cmip5</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12291,7 +13623,7 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[9]:</div>
+    <div class="prompt output_prompt">Out[8]:</div>
 
 
 
@@ -12299,51 +13631,52 @@ Available macros read from ~/.climaf.macros are : []
 <div class="output_text output_subarea output_execute_result">
 <pre>{&#39;model&#39;: [&#39;ACCESS1-0&#39;,
   &#39;ACCESS1-3&#39;,
-  &#39;CESM1-CAM5-1-FV2&#39;,
-  &#39;IPSL-CM5B-LR&#39;,
-  &#39;GFDL-ESM2M&#39;,
-  &#39;CMCC-CMS&#39;,
-  &#39;HadCM3&#39;,
-  &#39;MIROC-ESM&#39;,
-  &#39;HadGEM2-ES&#39;,
-  &#39;CanESM2&#39;,
-  &#39;FGOALS-s2&#39;,
-  &#39;MPI-ESM-P&#39;,
-  &#39;MRI-ESM1&#39;,
-  &#39;MPI-ESM-MR&#39;,
-  &#39;CSIRO-Mk3-6-0&#39;,
-  &#39;CESM1-BGC&#39;,
-  &#39;HadGEM2-AO&#39;,
-  &#39;inmcm4&#39;,
-  &#39;CESM1-FASTCHEM&#39;,
-  &#39;GISS-E2-R-CC&#39;,
   &#39;BNU-ESM&#39;,
-  &#39;CNRM-CM5-2&#39;,
-  &#39;FGOALS-g2&#39;,
-  &#39;GFDL-CM2p1&#39;,
-  &#39;GFDL-ESM2G&#39;,
-  &#39;CMCC-CM&#39;,
-  &#39;EC-EARTH&#39;,
-  &#39;CanCM4&#39;,
   &#39;CCSM4&#39;,
-  &#39;NorESM1-M&#39;,
+  &#39;CESM1-BGC&#39;,
+  &#39;CESM1-CAM5&#39;,
+  &#39;CESM1-CAM5-1-FV2&#39;,
+  &#39;CESM1-FASTCHEM&#39;,
   &#39;CESM1-WACCM&#39;,
-  &#39;IPSL-CM5A-MR&#39;,
-  &#39;IPSL-CM5A-LR&#39;,
-  &#39;GFDL-CM3&#39;,
-  &#39;GISS-E2-H&#39;,
-  &#39;MIROC-ESM-CHEM&#39;,
-  &#39;MRI-CGCM3&#39;,
-  &#39;NorESM1-ME&#39;,
-  &#39;MIROC5&#39;,
-  &#39;GISS-E2-R&#39;,
-  &#39;HadGEM2-CC&#39;,
-  &#39;GISS-E2-H-CC&#39;,
   &#39;CMCC-CESM&#39;,
-  &#39;bcc-csm1-1-m&#39;,
+  &#39;CMCC-CM&#39;,
+  &#39;CMCC-CMS&#39;,
+  &#39;CNRM-CM5&#39;,
+  &#39;CNRM-CM5-2&#39;,
+  &#39;CSIRO-Mk3-6-0&#39;,
+  &#39;CanCM4&#39;,
+  &#39;CanESM2&#39;,
+  &#39;EC-EARTH&#39;,
+  &#39;FGOALS-g2&#39;,
+  &#39;FGOALS-s2&#39;,
+  &#39;GFDL-CM2p1&#39;,
+  &#39;GFDL-CM3&#39;,
+  &#39;GFDL-ESM2G&#39;,
+  &#39;GFDL-ESM2M&#39;,
+  &#39;GISS-E2-H&#39;,
+  &#39;GISS-E2-H-CC&#39;,
+  &#39;GISS-E2-R&#39;,
+  &#39;GISS-E2-R-CC&#39;,
+  &#39;HadCM3&#39;,
+  &#39;HadGEM2-AO&#39;,
+  &#39;HadGEM2-CC&#39;,
+  &#39;HadGEM2-ES&#39;,
+  &#39;IPSL-CM5A-LR&#39;,
+  &#39;IPSL-CM5A-MR&#39;,
+  &#39;IPSL-CM5B-LR&#39;,
+  &#39;MIROC-ESM&#39;,
+  &#39;MIROC-ESM-CHEM&#39;,
+  &#39;MIROC5&#39;,
   &#39;MPI-ESM-LR&#39;,
+  &#39;MPI-ESM-MR&#39;,
+  &#39;MPI-ESM-P&#39;,
+  &#39;MRI-CGCM3&#39;,
+  &#39;MRI-ESM1&#39;,
+  &#39;NorESM1-M&#39;,
+  &#39;NorESM1-ME&#39;,
   &#39;bcc-csm1-1&#39;,
-  &#39;CESM1-CAM5&#39;],
+  &#39;bcc-csm1-1-m&#39;,
+  &#39;inmcm4&#39;],
  &#39;realm&#39;: &#39;ocean&#39;,
  &#39;table&#39;: &#39;Omon&#39;}</pre>
 </div>
@@ -12355,10 +13688,29 @@ Available macros read from ~/.climaf.macros are : []
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="And-directly-build-an-ensemble-from-it-with-explore('ensemble'):">And directly build an ensemble from it with explore('ensemble'):<a class="anchor-link" href="#And-directly-build-an-ensemble-from-it-with-explore('ensemble'):">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ens_cmip5</span> <span class="o">=</span> <span class="n">req_cmip5</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;ensemble&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="With-summary-I-can-check-the-files-behind-the-request-of-each-member:">With summary I can check the files behind the request of each member:<a class="anchor-link" href="#With-summary-I-can-check-the-files-behind-the-request-of-each-member:">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12367,31 +13719,10 @@ Available macros read from ~/.climaf.macros are : []
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ens_cmip5</span> <span class="o">=</span> <span class="n">req_cmip5</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;ensemble&#39;</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="With-summary-I-can-check-the-files-behind-the-request-of-each-member:">With summary I can check the files behind the request of each member:<a class="anchor-link" href="#With-summary-I-can-check-the-files-behind-the-request-of-each-member:">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
-<div class="inner_cell">
-    <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">summary</span><span class="p">(</span><span class="n">ens_cmip5</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12401,184 +13732,189 @@ Available macros read from ~/.climaf.macros are : []
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Keys - values:
-{&#39;domain&#39;: &#39;global&#39;, &#39;realm&#39;: &#39;ocean&#39;, &#39;version&#39;: &#39;latest&#39;, &#39;period&#39;: 1980-2000, &#39;simulation&#39;: &#39;&#39;, &#39;project&#39;: &#39;CMIP5&#39;, &#39;experiment&#39;: &#39;historical&#39;, &#39;frequency&#39;: &#39;monthly&#39;, &#39;realization&#39;: &#39;r1i1p1&#39;, &#39;variable&#39;: &#39;tos&#39;, &#39;table&#39;: &#39;Omon&#39;, &#39;model&#39;: &#39;ACCESS1-0&#39;, &#39;root&#39;: &#39;/prodigfs/project&#39;}
+{&#39;domain&#39;: &#39;global&#39;, &#39;realm&#39;: &#39;ocean&#39;, &#39;version&#39;: &#39;latest&#39;, &#39;period&#39;: 1980-2000, &#39;simulation&#39;: &#39;&#39;, &#39;project&#39;: &#39;CMIP5&#39;, &#39;experiment&#39;: &#39;historical&#39;, &#39;frequency&#39;: &#39;monthly&#39;, &#39;realization&#39;: &#39;r1i1p1&#39;, &#39;variable&#39;: &#39;tos&#39;, &#39;table&#39;: &#39;Omon&#39;, &#39;model&#39;: &#39;ACCESS1-0&#39;, &#39;root&#39;: &#39;/bdd&#39;}
 -- Ensemble members:
 ACCESS1-0
-/prodigfs/project/CMIP5/output/CSIRO-BOM/ACCESS1-0/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_ACCESS1-0_historical_r1i1p1_185001-200512.nc
+/bdd/CMIP5/output/CSIRO-BOM/ACCESS1-0/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_ACCESS1-0_historical_r1i1p1_185001-200512.nc
 --
 ACCESS1-3
-/prodigfs/project/CMIP5/output/CSIRO-BOM/ACCESS1-3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_ACCESS1-3_historical_r1i1p1_185001-200512.nc
---
-CESM1-CAM5-1-FV2
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5-1-FV2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-CAM5-1-FV2_historical_r1i1p1_185001-200512.nc
---
-IPSL-CM5B-LR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5B-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5B-LR_historical_r1i1p1_185001-200512.nc
---
-GFDL-ESM2M
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_197601-198012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_198101-198512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_198601-199012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_199101-199512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_199601-200012.nc
---
-CMCC-CMS
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_200001-200512.nc
---
-HadCM3
-/prodigfs/project/CMIP5/output/MOHC/HadCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadCM3_historical_r1i1p1_195912-198411.nc
-/prodigfs/project/CMIP5/output/MOHC/HadCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadCM3_historical_r1i1p1_198412-200512.nc
---
-MIROC-ESM
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC-ESM_historical_r1i1p1_185001-200512.nc
---
-HadGEM2-ES
-/prodigfs/project/CMIP5/output/MOHC/HadGEM2-ES/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
---
-CanESM2
-/prodigfs/project/CMIP5/output/CCCma/CanESM2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CanESM2_historical_r1i1p1_185001-200512.nc
---
-FGOALS-s2
-/prodigfs/project/CMIP5/output/LASG-IAP/FGOALS-s2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-s2_historical_r1i1p1_185001-200412.nc
---
-MPI-ESM-P
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-P/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-P_historical_r1i1p1_185001-200512.nc
---
-MRI-ESM1
-/prodigfs/project/CMIP5/output/MRI/MRI-ESM1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MRI-ESM1_historical_r1i1p1_185101-200512.nc
---
-MPI-ESM-MR
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-MR_historical_r1i1p1_190001-199912.nc
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-MR_historical_r1i1p1_200001-200512.nc
---
-CSIRO-Mk3-6-0
-/prodigfs/project/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CSIRO-Mk3-6-0_historical_r1i1p1_185001-200512.nc
---
-CESM1-BGC
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-BGC_historical_r1i1p1_185001-200512.nc
---
-HadGEM2-AO
-/prodigfs/project/CMIP5/output/NIMR-KMA/HadGEM2-AO/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-AO_historical_r1i1p1_186001-200512.nc
---
-inmcm4
-/prodigfs/project/CMIP5/output/INM/inmcm4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_inmcm4_historical_r1i1p1_185001-200512.nc
---
-CESM1-FASTCHEM
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-FASTCHEM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-FASTCHEM_historical_r1i1p1_185001-200512.nc
---
-GISS-E2-R-CC
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-R-CC_historical_r1i1p1_197601-200012.nc
+/bdd/CMIP5/output/CSIRO-BOM/ACCESS1-3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_ACCESS1-3_historical_r1i1p1_185001-200512.nc
 --
 BNU-ESM
-/prodigfs/project/CMIP5/output/BNU/BNU-ESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_BNU-ESM_historical_r1i1p1_185001-200512.nc
---
-CNRM-CM5-2
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_200001-200512.nc
---
-FGOALS-g2
-/prodigfs/project/CMIP5/output/LASG-CESS/FGOALS-g2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-g2_historical_r1i1p1_195001-199912.nc
-/prodigfs/project/CMIP5/output/LASG-CESS/FGOALS-g2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-g2_historical_r1i1p1_200001-200512.nc
---
-GFDL-CM2p1
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_197601-198012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_198101-198512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_198601-199012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_199101-199512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_199601-200012.nc
---
-GFDL-ESM2G
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_197601-198012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_198101-198512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_198601-199012.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_199101-199512.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_199601-200012.nc
---
-CMCC-CM
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_200001-200512.nc
---
-EC-EARTH
-/prodigfs/project/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_198001-198912.nc
-/prodigfs/project/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_199001-199912.nc
-/prodigfs/project/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_200001-200601.nc
---
-CanCM4
-/prodigfs/project/CMIP5/output/CCCma/CanCM4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CanCM4_historical_r1i1p1_196101-200512.nc
+/bdd/CMIP5/output/BNU/BNU-ESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_BNU-ESM_historical_r1i1p1_185001-200512.nc
 --
 CCSM4
-/prodigfs/project/CMIP5/output/NCAR/CCSM4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CCSM4_historical_r1i1p1_185001-200512.nc
+/bdd/CMIP5/output/NCAR/CCSM4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CCSM4_historical_r1i1p1_185001-200512.nc
 --
-NorESM1-M
-/prodigfs/project/CMIP5/output/NCC/NorESM1-M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_NorESM1-M_historical_r1i1p1_185001-200512.nc
---
-CESM1-WACCM
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-WACCM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-WACCM_historical_r1i1p1_185001-200512.nc
---
-IPSL-CM5A-MR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5A-MR_historical_r1i1p1_185001-200512.nc
---
-IPSL-CM5A-LR
-/prodigfs/project/CMIP5/output/IPSL/IPSL-CM5A-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5A-LR_historical_r1i1p1_185001-200512.nc
---
-GFDL-CM3
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_198001-198412.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_198501-198912.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_199001-199412.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_199501-199912.nc
-/prodigfs/project/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_200001-200412.nc
---
-GISS-E2-H
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-H_historical_r1i1p1_195101-200512.nc
---
-MIROC-ESM-CHEM
-/prodigfs/project/CMIP5/output/MIROC/MIROC-ESM-CHEM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC-ESM-CHEM_historical_r1i1p1_185001-200512.nc
---
-MRI-CGCM3
-/prodigfs/project/CMIP5/output/MRI/MRI-CGCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MRI-CGCM3_historical_r1i1p1_185001-200512.nc
---
-NorESM1-ME
-/prodigfs/project/CMIP5/output/NCC/NorESM1-ME/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_NorESM1-ME_historical_r1i1p1_185001-200512.nc
---
-MIROC5
-/prodigfs/project/CMIP5/output/MIROC/MIROC5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC5_historical_r1i1p1_185001-201212.nc
---
-GISS-E2-R
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-R/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-R_historical_r1i1p1_197601-200012.nc
---
-HadGEM2-CC
-/prodigfs/project/CMIP5/output/MOHC/HadGEM2-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-CC_historical_r1i1p1_195912-200511.nc
---
-GISS-E2-H-CC
-/prodigfs/project/CMIP5/output/NASA-GISS/GISS-E2-H-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-H-CC_historical_r1i1p1_195101-201012.nc
---
-CMCC-CESM
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_197601-198112.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_198201-198712.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_198801-199312.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_199401-199912.nc
-/prodigfs/project/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_200001-200512.nc
---
-bcc-csm1-1-m
-/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1-m/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_bcc-csm1-1-m_historical_r1i1p1_185001-201212.nc
---
-MPI-ESM-LR
-/prodigfs/project/CMIP5/output/MPI-M/MPI-ESM-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-LR_historical_r1i1p1_185001-200512.nc
---
-bcc-csm1-1
-/prodigfs/project/CMIP5/output/BCC/bcc-csm1-1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_bcc-csm1-1_historical_r1i1p1_185001-201212.nc
+CESM1-BGC
+/bdd/CMIP5/output/NSF-DOE-NCAR/CESM1-BGC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-BGC_historical_r1i1p1_185001-200512.nc
 --
 CESM1-CAM5
-/prodigfs/project/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-CAM5_historical_r1i1p1_185001-200512.nc
+/bdd/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-CAM5_historical_r1i1p1_185001-200512.nc
+--
+CESM1-CAM5-1-FV2
+/bdd/CMIP5/output/NSF-DOE-NCAR/CESM1-CAM5-1-FV2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-CAM5-1-FV2_historical_r1i1p1_185001-200512.nc
+--
+CESM1-FASTCHEM
+/bdd/CMIP5/output/NSF-DOE-NCAR/CESM1-FASTCHEM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-FASTCHEM_historical_r1i1p1_185001-200512.nc
+--
+CESM1-WACCM
+/bdd/CMIP5/output/NSF-DOE-NCAR/CESM1-WACCM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CESM1-WACCM_historical_r1i1p1_185001-200512.nc
+--
+CMCC-CESM
+/bdd/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_197601-198112.nc
+/bdd/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_198201-198712.nc
+/bdd/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_198801-199312.nc
+/bdd/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_199401-199912.nc
+/bdd/CMIP5/output/CMCC/CMCC-CESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CESM_historical_r1i1p1_200001-200512.nc
+--
+CMCC-CM
+/bdd/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CMCC/CMCC-CM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CM_historical_r1i1p1_200001-200512.nc
+--
+CMCC-CMS
+/bdd/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CMCC/CMCC-CMS/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CMCC-CMS_historical_r1i1p1_200001-200512.nc
+--
+CNRM-CM5
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5_historical_r1i1p1_200001-200512.nc
+--
+CNRM-CM5-2
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/CNRM-CERFACS/CNRM-CM5-2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CNRM-CM5-2_historical_r1i1p1_200001-200512.nc
+--
+CSIRO-Mk3-6-0
+/bdd/CMIP5/output/CSIRO-QCCCE/CSIRO-Mk3-6-0/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CSIRO-Mk3-6-0_historical_r1i1p1_185001-200512.nc
+--
+CanCM4
+/bdd/CMIP5/output/CCCma/CanCM4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CanCM4_historical_r1i1p1_196101-200512.nc
+--
+CanESM2
+/bdd/CMIP5/output/CCCma/CanESM2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_CanESM2_historical_r1i1p1_185001-200512.nc
+--
+EC-EARTH
+/bdd/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_198001-198912.nc
+/bdd/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_199001-199912.nc
+/bdd/CMIP5/output/ICHEC/EC-EARTH/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_EC-EARTH_historical_r1i1p1_200001-200601.nc
+--
+FGOALS-g2
+/bdd/CMIP5/output/LASG-CESS/FGOALS-g2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-g2_historical_r1i1p1_195001-199912.nc
+/bdd/CMIP5/output/LASG-CESS/FGOALS-g2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-g2_historical_r1i1p1_200001-200512.nc
+--
+FGOALS-s2
+/bdd/CMIP5/output/LASG-IAP/FGOALS-s2/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_FGOALS-s2_historical_r1i1p1_185001-200412.nc
+--
+GFDL-CM2p1
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_197601-198012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_198101-198512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_198601-199012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_199101-199512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM2p1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM2p1_historical_r1i1p1_199601-200012.nc
+--
+GFDL-CM3
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_198001-198412.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_198501-198912.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_199001-199412.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_199501-199912.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-CM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-CM3_historical_r1i1p1_200001-200412.nc
+--
+GFDL-ESM2G
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_197601-198012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_198101-198512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_198601-199012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_199101-199512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2G/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2G_historical_r1i1p1_199601-200012.nc
+--
+GFDL-ESM2M
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_197601-198012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_198101-198512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_198601-199012.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_199101-199512.nc
+/bdd/CMIP5/output/NOAA-GFDL/GFDL-ESM2M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GFDL-ESM2M_historical_r1i1p1_199601-200012.nc
+--
+GISS-E2-H
+/bdd/CMIP5/output/NASA-GISS/GISS-E2-H/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-H_historical_r1i1p1_195101-200512.nc
+--
+GISS-E2-H-CC
+/bdd/CMIP5/output/NASA-GISS/GISS-E2-H-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-H-CC_historical_r1i1p1_195101-201012.nc
+--
+GISS-E2-R
+/bdd/CMIP5/output/NASA-GISS/GISS-E2-R/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-R_historical_r1i1p1_197601-200012.nc
+--
+GISS-E2-R-CC
+/bdd/CMIP5/output/NASA-GISS/GISS-E2-R-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_GISS-E2-R-CC_historical_r1i1p1_197601-200012.nc
+--
+HadCM3
+/bdd/CMIP5/output/MOHC/HadCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadCM3_historical_r1i1p1_195912-198411.nc
+/bdd/CMIP5/output/MOHC/HadCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadCM3_historical_r1i1p1_198412-200512.nc
+--
+HadGEM2-AO
+/bdd/CMIP5/output/NIMR-KMA/HadGEM2-AO/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-AO_historical_r1i1p1_186001-200512.nc
+--
+HadGEM2-CC
+/bdd/CMIP5/output/MOHC/HadGEM2-CC/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-CC_historical_r1i1p1_195912-200511.nc
+--
+HadGEM2-ES
+/bdd/CMIP5/output/MOHC/HadGEM2-ES/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
+--
+IPSL-CM5A-LR
+/bdd/CMIP5/output/IPSL/IPSL-CM5A-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5A-LR_historical_r1i1p1_185001-200512.nc
+--
+IPSL-CM5A-MR
+/bdd/CMIP5/output/IPSL/IPSL-CM5A-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5A-MR_historical_r1i1p1_185001-200512.nc
+--
+IPSL-CM5B-LR
+/bdd/CMIP5/output/IPSL/IPSL-CM5B-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_IPSL-CM5B-LR_historical_r1i1p1_185001-200512.nc
+--
+MIROC-ESM
+/bdd/CMIP5/output/MIROC/MIROC-ESM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC-ESM_historical_r1i1p1_185001-200512.nc
+--
+MIROC-ESM-CHEM
+/bdd/CMIP5/output/MIROC/MIROC-ESM-CHEM/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC-ESM-CHEM_historical_r1i1p1_185001-200512.nc
+--
+MIROC5
+/bdd/CMIP5/output/MIROC/MIROC5/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MIROC5_historical_r1i1p1_185001-201212.nc
+--
+MPI-ESM-LR
+/bdd/CMIP5/output/MPI-M/MPI-ESM-LR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-LR_historical_r1i1p1_185001-200512.nc
+--
+MPI-ESM-MR
+/bdd/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-MR_historical_r1i1p1_190001-199912.nc
+/bdd/CMIP5/output/MPI-M/MPI-ESM-MR/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-MR_historical_r1i1p1_200001-200512.nc
+--
+MPI-ESM-P
+/bdd/CMIP5/output/MPI-M/MPI-ESM-P/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MPI-ESM-P_historical_r1i1p1_185001-200512.nc
+--
+MRI-CGCM3
+/bdd/CMIP5/output/MRI/MRI-CGCM3/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MRI-CGCM3_historical_r1i1p1_185001-200512.nc
+--
+MRI-ESM1
+/bdd/CMIP5/output/MRI/MRI-ESM1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_MRI-ESM1_historical_r1i1p1_185101-200512.nc
+--
+NorESM1-M
+/bdd/CMIP5/output/NCC/NorESM1-M/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_NorESM1-M_historical_r1i1p1_185001-200512.nc
+--
+NorESM1-ME
+/bdd/CMIP5/output/NCC/NorESM1-ME/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_NorESM1-ME_historical_r1i1p1_185001-200512.nc
+--
+bcc-csm1-1
+/bdd/CMIP5/output/BCC/bcc-csm1-1/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_bcc-csm1-1_historical_r1i1p1_185001-201212.nc
+--
+bcc-csm1-1-m
+/bdd/CMIP5/output/BCC/bcc-csm1-1-m/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_bcc-csm1-1-m_historical_r1i1p1_185001-201212.nc
+--
+inmcm4
+/bdd/CMIP5/output/INM/inmcm4/historical/mon/ocean/Omon/r1i1p1/latest/tos/tos_Omon_inmcm4_historical_r1i1p1_185001-200512.nc
 --
 </pre>
 </div>
@@ -12589,8 +13925,7 @@ CESM1-CAM5
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Now-I-want-to-compute,-say,-a-DJF-climatology,-and-regrid-all-the-models-on-a-common-CDO-grid">Now I want to compute, say, a DJF climatology, and regrid all the models on a common CDO grid<a class="anchor-link" href="#Now-I-want-to-compute,-say,-a-DJF-climatology,-and-regrid-all-the-models-on-a-common-CDO-grid">&#182;</a></h2>
 </div>
@@ -12608,7 +13943,7 @@ CESM1-CAM5
 <span class="n">rgrd_djf_ens_cmip5</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12618,7 +13953,7 @@ CESM1-CAM5
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[12]:</div>
+    <div class="prompt output_prompt">Out[12]:</div>
 
 
 
@@ -12634,8 +13969,7 @@ CESM1-CAM5
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="OK-the-pretreatment-is-convincing-but-I-feel-limited-in-your-CliMAF-stuff...-I-prefer-to-use-my-own-scripts">OK the pretreatment is convincing but I feel limited in your CliMAF stuff... I prefer to use my own scripts<a class="anchor-link" href="#OK-the-pretreatment-is-convincing-but-I-feel-limited-in-your-CliMAF-stuff...-I-prefer-to-use-my-own-scripts">&#182;</a></h2><h2 id="No-problem!">No problem!<a class="anchor-link" href="#No-problem!">&#182;</a></h2><p>You can either plug your own script (and benefit downstream from the smart cache, plot functions,
 and functions to build an html page)
@@ -12654,7 +13988,7 @@ and functions to build an html page)
 <span class="n">save_req_file</span><span class="p">(</span><span class="n">rgrd_djf_ens_cmip5</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;all_CMIP5_models_for_my_request.txt&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12664,7 +13998,7 @@ and functions to build an html page)
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12731,7 +14065,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 <div class=" highlight hl-ipython2"><pre><span></span><span class="o">!</span>cat all_CMIP5_models_for_my_request.txt
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12741,7 +14075,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -12801,8 +14135,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Let's-work-now-on-some-CMIP6-outputs:-get-all-the-historical-members-of-the-IPSL-CM6-'grand-ensemble'">Let's work now on some CMIP6 outputs: get all the historical members of the IPSL-CM6 'grand ensemble'<a class="anchor-link" href="#Let's-work-now-on-some-CMIP6-outputs:-get-all-the-historical-members-of-the-IPSL-CM6-'grand-ensemble'">&#182;</a></h2>
 </div>
@@ -12823,7 +14156,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
                <span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12836,7 +14169,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">req_cmip6</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12846,7 +14179,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[16]:</div>
+    <div class="prompt output_prompt">Out[16]:</div>
 
 
 
@@ -12895,8 +14228,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="And-last-but-not-least:-working-on-IPSL-(libIGCM)-outputs">And last but not least: working on IPSL (libIGCM) outputs<a class="anchor-link" href="#And-last-but-not-least:-working-on-IPSL-(libIGCM)-outputs">&#182;</a></h2>
 </div>
@@ -12919,7 +14251,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 <span class="n">req_ipsl</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -12929,7 +14261,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[18]:</div>
+    <div class="prompt output_prompt">Out[18]:</div>
 
 
 
@@ -13076,7 +14408,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 <span class="n">summary</span><span class="p">(</span><span class="n">req_ipsl</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -13086,7 +14418,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -13097,7 +14429,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[21]:</div>
+    <div class="prompt output_prompt">Out[21]:</div>
 
 
 
@@ -13128,8 +14460,7 @@ CESM1-CAM5 /data/jservon/climafcache/05339/2c6d8/e3011/8840d/ed022/b5675/c2fc5/d
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Questions?">Questions?<a class="anchor-link" href="#Questions?">&#182;</a></h1>
 </div>
