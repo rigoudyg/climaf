@@ -9,7 +9,7 @@ diagnostics or utilities:
   - All do return CliMAF objects. 
   - Operators are implemented as external scripts or binaries, while 'object functions' are implemented as python
     functions.
-  - operators can be used to define derived variables using function :py:func:`~climaf.operators.derive`, while 'object
+  - operators can be used to define derived variables using function :py:func:`~climaf.operators_derive.derive`, while 'object
     functions' cannot
 
 

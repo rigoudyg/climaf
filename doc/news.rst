@@ -6,6 +6,33 @@ What's new
 
 Changes, newest first:
 
+
+- V2.0.0:
+
+  - Python 3 compatibility:
+    - This new version is fully compatible with both python2 and python3.
+      It has been tested with python 2.7 and python 3.7.
+      Tests with other versions will come soon.
+
+    - To avoid cycling import, the module ``climaf.operator`` has been split into three modules:
+      ``climaf.operator`` (still here), ``climaf.operator_derive`` and ``climaf.operator_scripts``.
+
+    - :py:func:`climaf.operator.ceval` has been modified to call functions specific to CliMAF types
+      (:py:func:`climaf.operator.ceval_for_cdataset`, :py:func:`climaf.operator.ceval_for_ctree`,
+      :py:func:`climaf.operator.ceval_for_ScriptChild`, :py:func:`climaf.operator.ceval_for_cpage`,
+      :py:func:`climaf.operator.ceval_for_cpage_pdf`, :py:func:`climaf.operator.ceval_for_cens`,
+      :py:func:`climaf.operator.ceval_for_string`)
+
+    - Variables used everywhere in CliMAF and available for everyone have been moved to ``env.environment``
+      (``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``, ``derived_variables``,
+      ``cmacros``, ``known_formats``, ``graphic_formats``, ``none_formats``, ``locs``).
+
+  - Project definition:
+    - Data location can now depends on table, realm in addition to experiment, project... via py:func:`climaf.dataloc.dataloc`
+
+  - Operator:
+    - Standard operator ``slice`` has been renamed into ``cslice_average`` and ``cslice_select`` has been created.
+
 - V1.2.13:
 
   - Structure:
@@ -91,8 +118,8 @@ Changes, newest first:
   - Datasets and projects:
   
     - CliMAF startup can be quicker if you don't need that it checks all external
-    tools it uses; this is activated by setting enviornment variable
-    CLIMAF_CHECK_DEPENDENCIES to 'no' or '0'
+      tools it uses; this is activated by setting enviornment variable
+      CLIMAF_CHECK_DEPENDENCIES to 'no' or '0'
     
     - Variable climaf.cache.stamping can be set to None, which means :
       put a stamp if possible, but don't bother if impossible. Reminder : 

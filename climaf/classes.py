@@ -355,7 +355,7 @@ class cdataset(cobject):
 
            - either a variable actually included in the datafiles,
 
-           - or a 'derived' variable (see  :py:func:`~climaf.operators.derive` ),
+           - or a 'derived' variable (see  :py:func:`~climaf.operators_derive.derive` ),
 
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
@@ -1253,7 +1253,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     The following restriction apply to such datasets :
 
     - functions :py:func:`~climaf.classes.calias` and
-      :py:func:`~climaf.operators.derive` cannot be used for project
+      :py:func:`~climaf.operators_derive.derive` cannot be used for project
       'file'
 
     Results are unforeseen if all variables do not have the same time axis
