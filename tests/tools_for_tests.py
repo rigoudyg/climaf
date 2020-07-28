@@ -96,7 +96,8 @@ def compare_text_files(file_test, file_ref, **kwargs):
     for (key, value) in kwargs.items():
         content_test = content_test.replace(key, value)
         content_ref = content_ref.replace(key, value)
-    content_test = re.sub(os.path.sep.join(["climaf_\w+"]), "climaf_XXX", content_test)
+    content_test = re.sub(os.path.sep.join([os.environ.get("TMPDIR", "/tmp"), "climaf_\w+"]), "/tmp/climaf_XXX",
+                          content_test)
     if content_test != content_ref:
         raise ValueError("The content of files %s and %s are different:\n%s\n%s" % (file_test, file_ref, content_test,
                                                                                     content_ref))
