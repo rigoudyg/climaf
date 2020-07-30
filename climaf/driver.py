@@ -818,8 +818,8 @@ def derive_variable(ds):
         # If the dataset has a version attribute, it should be inherited only
         # by the first input variable, an be set to "latest" for the next ones
         # (it would be tricky to do something smarter TBD)
-        if not first and "version" in dic :
-            dic['version'] = "latest"
+        #if not first and "version" in dic :
+        #    dic['version'] = "latest"
         first=False
         inVars.append(classes.cdataset(**dic))
     params["add_variable"] = ds.variable

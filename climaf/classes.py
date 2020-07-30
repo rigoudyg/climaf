@@ -778,10 +778,10 @@ class cdataset(cobject):
             for kw in wildcards:
                 entry = wildcards[kw]
                 if type(entry) is list and len(entry) > 1:
-                    raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among :"
+                    raise Climaf_Classes_Error("This dataset (%s) is ambiguous on attribute %s='%s'; please choose among :"
                                                " %s or use either 'ensure_dataset=False' (with method baseFiles or "
                                                "listfiles) or 'option=\'choices\' (with method explore)" %
-                                               (kw, dic[kw], entry))
+                                               (self.crs,kw, dic[kw], entry))
             self.files = files
         else:
             raise Climaf_Classes_Error("Unknown option %s" % option)
@@ -1083,7 +1083,7 @@ class cens(cobject, dict):
 
         """
         if not all(map(lambda x: isinstance(x, str), dic.keys())):
-            raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
+            raise Climaf_Classes_Error("Ensemble keys/labels must be strings : "+`dic.keys()`)
         if not all(map(lambda x: isinstance(x, cobject), dic.values())):
             raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
         self.sortfunc = sortfunc
@@ -1287,7 +1287,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
 
     - simulation : the filename basename (without suffix '.nc')
     - variable : the set of variables in the data file
-    - period : the period actually covered by the data file (if it has time_bnds)
+    - period : the period actually covered by the data file if it has time_bnds
+      or 'fx' if it doesn't
     - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
     - project  : 'file' (with separator = '|')
 
@@ -1327,7 +1328,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     fperiod = timeLimits(filename)
     if period is None:
         if fperiod is None:
-            raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
+            period='fx'
+            #raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
     else:
@@ -1904,7 +1906,11 @@ class cpage(cobject):
             nx, ny = 3, 5
         elif n in range(16, 21):
             nx, ny = 4, 5
-        elif n >= 21:
+        elif n in range(21, 25):
+            nx, ny = 4, 6
+        elif n in range(25, 36):
+            nx, ny = 5, 7
+        elif n >= 36 :
             raise Climaf_Classes_Error("Too many figures in page")
         lines = []
         for i in range(len(figs)):
