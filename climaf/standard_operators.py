@@ -47,6 +47,12 @@ def load_standard_operators():
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
+    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF 
+    # do not loose track of variable name for the output of some CDO operators
+    # because it takes it from operand ${in_1}, while some CDO operators impose to have it second
+    cscript('ccdo2_flip', 'cdo ${operator} ${in_2} ${in_1} ${out}')
+    cscript('ccdo3_flip', 'cdo ${operator} ${in_3} ${in_1} ${in_2} ${out}')
+    #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
