@@ -20,7 +20,10 @@ import getpass
 import netrc
 from dateutil import tz
 import future
-import tkinter
+try:
+    import tkinter
+except ImportError:
+    import Tkinter as tkinter
 import argparse
 from collections import defaultdict
 import mcdo

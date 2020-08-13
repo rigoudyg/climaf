@@ -7,6 +7,7 @@ echo $python_version
 run_modules=${3:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro html example_data_plot example_data_retrieval example_index_html mcdo"}
 echo $run_modules
 run_coverage=${4:-0}
+echo $run_coverage
 
 if [ $run_coverage -eq 1 ] ; then
     coverage_binary="coverage${python_version}"
@@ -32,8 +33,9 @@ if [ $run_coverage -eq 0 ] ; then
     ${run_command_line} "test_import.py"
 fi
 for module in $run_modules; do
+    echo $PWD
     if [ $run_coverage -eq 0 ] ; then
-        ${run_command_line} "test_${module}"
+        ${run_command_line} "test_${module}.py"
         if [ ! $? -eq 0 ] ; then
             exit 1
         fi

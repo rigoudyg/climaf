@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -11,6 +11,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 #: Dictionary of declared projects (type is cproject)
 import os
+import sys
 import subprocess
 try:
     from commands import getoutput, getstatusoutput
@@ -77,8 +78,7 @@ def bash_command_to_str(cmd):
 
 
 if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") == "yes":
-    python_software = my_which("python")
-    print("python => " + python_software)
+    print("python => " + sys.version)
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:

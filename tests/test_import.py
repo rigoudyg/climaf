@@ -23,7 +23,6 @@ testmodules = [
     "climaf.anynetcdf",
     "climaf.cache",
     "climaf.classes",
-    "climaf.clogging",
     "climaf.cmacro",
     "climaf.dataloc",
     "climaf.driver",
@@ -32,9 +31,11 @@ testmodules = [
     "climaf.html",
     "climaf.netcdfbasics",
     "climaf.operators",
+    "climaf.operators_derive",
+    "climaf.operators_scripts",
     "climaf.period",
-    "climaf.site_settings",
-    "climaf.standard_operators"
+    "climaf.standard_operators",
+    "climaf.utils",
 ]
 
 
