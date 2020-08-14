@@ -202,7 +202,7 @@ def register(filename, crs, outfilename=None):
                           "Framework version %s (http://climaf.rtfd.org)\" %s" % (ncatted_software, crs, version,
                                                                                   filename)
             elif re.findall(".png$", filename) and convert_software is not None:
-                crs2 = crs.replace(r"%", r"\%")
+                crs2 = crs.replace(r"%", r"\%").replace(r'"', r'\"')
                 command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
