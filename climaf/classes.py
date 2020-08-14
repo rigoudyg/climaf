@@ -1860,7 +1860,13 @@ class cpage(cobject):
             nx, ny = 3, 5
         elif n in range(16, 21):
             nx, ny = 4, 5
-        elif n >= 21:
+        elif n in range(21, 25):
+            nx, ny = 4, 6
+        elif n in range(25, 36):
+            nx, ny = 5, 7
+        elif n in range(36, 49):
+            nx, ny = 6, 8
+        elif n >= 49 :
             raise Climaf_Classes_Error("Too many figures in page")
         lines = []
         for i in range(len(figs)):
