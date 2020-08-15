@@ -1300,7 +1300,8 @@ def cimport(cobject, crs):
 
 def get_fig_sizes(figfile):
     args_figsize = ["identify", figfile]
-    output_figsize = getoutput(" ".join(args_figsize))
+    # On some sites, getoutput first lines have warning messages
+    output_figsize = getoutput(" ".join(args_figsize)).split("\n")[-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)
