@@ -372,12 +372,18 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    #
     # the cache doesn't have a similar tree, let us recursively eval subtrees
     ##########################################################################
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
     if cobject.operator in cscripts:
         clogger.debug("Script %s found" % cobject.operator)
-        file = ceval_script(cobject, deep,
+        file = ceval_script(cobject, down_deep,
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
         if format == 'file':
@@ -468,10 +474,16 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
                 return ceval(cobject)
         #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
+    #
+    #  Only deep=True can propagate downward !
+    if deep :
+        down_deep= True
+    else :
+        down_deep= None
     # Force evaluation of 'father' script
-    if ceval_script(cobject.father, deep, recurse_list=recurse_list) is not None:
+    if ceval_script(cobject.father, down_deep, recurse_list=recurse_list) is not None:
         # Re-evaluate, which should succeed using cache
-        rep = ceval(cobject, userflags, format, deep, recurse_list=recurse_list)
+        rep = ceval(cobject, userflags, format, None, recurse_list=recurse_list)
         cdedent()
         return rep
     else:
@@ -507,7 +519,13 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    file = cfilePage(cobject, deep, recurse_list=recurse_list)
+    #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    file = cfilePage(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
         return file
@@ -544,7 +562,14 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    file = cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
+    #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    #
+    file = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
         return file
@@ -585,6 +610,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     for member in cobject.order:
         # print ("evaluating member %s"%member)
         d[member] = ceval(cobject[member], copy.copy(userflags), format, deep, recurse_list=recurse_list)
+    cdedent()
     if format == "file":
         return reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
     else:
@@ -1253,7 +1279,7 @@ def cMA(obj, deep=None):
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
-def cvalue(obj, index=0,deep=False):
+def cvalue(obj, index=0,deep=None):
     """
     Return the value of the array for an object, after MV flattening, at a given index
 
@@ -1366,7 +1392,10 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            fig_width, fig_height = get_fig_sizes(figfile)
+            try :
+                fig_width, fig_height = get_fig_sizes(figfile)
+            except :
+                raise Climaf_Driver_Error("Issue with figure "+str(fig))
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
