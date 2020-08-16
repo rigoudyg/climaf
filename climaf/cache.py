@@ -350,10 +350,8 @@ def hasBeginObject(cobject):
 
 
 def hasExactObject(cobject):
-    # First read index from file if it is yet empty
-    # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
-    f = crs2filename.get(cobject.crs, None)
-    if f:
+    for format in known_formats + graphic_formats :
+        f=generateUniqueFileName(cobject.crs, format=format, create_dirs=False)
         if os.path.exists(f):
             return f
         else:
