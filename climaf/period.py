@@ -323,8 +323,17 @@ def sort_periods_list(periods_list):
         insert(clist.pop(), sorted_tree)
     return walk(sorted_tree)
 
+def merge_periods(remain_to_merge, already_merged=[],handle_360_days_year=True):
+    """
+    Provided with a list of periods (even un-sorted), returns a list of periods 
+    where all consecutive periods have been merged.
 
-def merge_periods(remain_to_merge, already_merged=[]):
+    Argument 'already_merged' is used only in the underlying recursion, and shouldn't 
+    usually be provided
+
+    Argument 'handle_360_days_year' allows to merge consecutive periods which miss 
+    only a 31st december,such as in the case with 360-days calendars. It defauklt is True 
+    """
     if already_merged == []:
         if len(remain_to_merge) < 2:
             return remain_to_merge
