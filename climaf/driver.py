@@ -1327,12 +1327,13 @@ def cimport(cobject, crs):
 def get_fig_sizes(figfile):
     args_figsize = ["identify", figfile]
     # On some sites, getoutput first lines have warning messages
-    output_figsize = getoutput(" ".join(args_figsize)).split("\n")[-1]
+    # Furthermore, in case of missing file, last line could be an error -> only consider lines beginning with figfile
+    output_figsize = getoutput(" ".join(args_figsize)).split("\n")
+    output_figsize = [l for l in output_figsize if l.startswith(figfile)][-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)
-    fig_width = figsize.split("x").pop(0)
-    fig_height = figsize.split("x").pop(1)
+    (fig_width, fig_height) = figsize.split("x")
     return int(fig_width), int(fig_height)
 
 
@@ -1392,9 +1393,9 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            try :
+            try:
                 fig_width, fig_height = get_fig_sizes(figfile)
-            except :
+            except:
                 raise Climaf_Driver_Error("Issue with figure "+str(fig))
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
@@ -1434,17 +1435,20 @@ def cfilePage(cobj, deep, recurse_list=None):
         splice = "0x%d" % cobj.ybox
         annotate = "+%d+%d" % (cobj.x, cobj.y)
         args.extend(["-gravity", cobj.gravity, "-background", cobj.background, "-splice", splice, "-font", cobj.font,
-                     "-pointsize", "%d" % cobj.pt, "-annotate", annotate, cobj.title])
+                     "-pointsize", "%d" % cobj.pt, "-annotate", annotate, '"%s"' % cobj.title])
 
     args.append(out_fig)
     clogger.debug("Compositing figures : %s" % repr(args))
 
-    comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if comm.wait() != 0:
-        err = comm.stderr.read()
-        comm.stderr.close()
-        comm.stdout.close()
+    try:
+        with open("tmp.err", "w") as fic:
+            out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
+    except subprocess.CalledProcessError:
+        with open("tmp.err") as fic:
+            err = fic.read()
         raise Climaf_Driver_Error("Compositing failed : %s" % err)
+    finally:
+        os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
@@ -1519,15 +1523,14 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
 
     clogger.debug("Compositing figures : %s" % repr(args))
     try:
-        subprocess.check_call(" ".join(args), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        with open("tmp.err", "w") as fic:
+            out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
     except subprocess.CalledProcessError:
-        raise Climaf_Driver_Error("Compositing failed for command %s" % " ".join(args))
-    # comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # if comm.wait() != 0:
-    #     err = comm.stderr.read()
-    #     comm.stderr.close()
-    #     comm.stdout.close()
-    #     raise Climaf_Driver_Error("Compositing failed : %s" % err)
+        with open("tmp.err") as fic:
+            err = fic.read()
+        raise Climaf_Driver_Error("Compositing failed : %s" % err)
+    finally:
+        os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
