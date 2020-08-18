@@ -323,20 +323,33 @@ def sort_periods_list(periods_list):
         insert(clist.pop(), sorted_tree)
     return walk(sorted_tree)
 
+def merge_periods(remain_to_merge, already_merged=[],handle_360_days_year=True):
+    """
+    Provided with a list of periods (even un-sorted), returns a list of periods 
+    where all consecutive periods have been merged.
 
-def merge_periods(remain_to_merge, already_merged=[]):
+    Argument 'already_merged' is used only in the underlying recursion, and shouldn't 
+    usually be provided
+
+    Argument 'handle_360_days_year' allows to merge consecutive periods which miss 
+    only a 31st december,such as in the case with 360-days calendars. It defauklt is True 
+    """
     if already_merged == []:
         if len(remain_to_merge) < 2:
             return remain_to_merge
         sorted = sort_periods_list(remain_to_merge)
-        return merge_periods(sorted[1:], [sorted[0]])
+        return merge_periods(sorted[1:], [sorted[0]],handle_360_days_year)
     if len(remain_to_merge) > 0:
         last = already_merged[-1]
         next_one = remain_to_merge.pop(0)
         # print "last.end=",last.end,"next.start=",next_one.start
         # if (last.end == next_one.start) :
         #    already_merged[-1]=cperiod(last.start,next_one.end)
-        if next_one.start <= last.end:
+        if next_one.start <= last.end or \
+           (handle_360_days_year and \
+            last.end.month==12 and last.end.day==31 and \
+            next_one.start.month==1 and next_one.start.day==1 and \
+            next_one.start.year==last.end.year+1) :
             if next_one.end > last.end:
                 # the next period is not entirely included in the
                 # last merged one
@@ -346,7 +359,7 @@ def merge_periods(remain_to_merge, already_merged=[]):
             already_merged.append(next_one)
     #
     if len(remain_to_merge) > 0:
-        return merge_periods(remain_to_merge, already_merged)
+        return merge_periods(remain_to_merge, already_merged,handle_360_days_year)
     else:
         return already_merged
 

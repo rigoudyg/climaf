@@ -3,7 +3,7 @@
 
 """
 CliMAF environment tools.
-Those variables are used everywhere and should be move to a distinct directory.
+Those variables are used everywhere ; hence, they are grouped here for easing import.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 

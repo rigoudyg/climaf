@@ -65,7 +65,7 @@ def setNewUniqueCache(path, raz=True):
         craz(hideError=True)
 
 
-def generateUniqueFileName(expression, format="nc", option="new"):
+def generateUniqueFileName(expression, format="nc", option="new", create_dirs=True):
     """
     Generate a filename path from string EXPRESSION and FILEFORMAT,
     almost unique for the expression and the cache directory
@@ -78,24 +78,25 @@ def generateUniqueFileName(expression, format="nc", option="new"):
     #
     if format is None:
         return ""
-    prefix = ""
-    vhash = hashlib.sha224(expression.encode("utf-8")).hexdigest()
-    rep = hash_to_path(vhash, format, option="new")
-    # Create the relevant directory, so that user scripts don't have to care
-    dirn = os.path.dirname(rep)
-    if not os.path.exists(dirn):
-        os.makedirs(dirn)
-    clogger.debug("returning %s" % rep)
-    return rep
-
-
-def hash_to_path(vhash, format, option):
-    prefix = ""
-    if option == "new":
-        rep = currentCache + "/" + prefix + vhash[0:2] + "/" + vhash[2:] + "." + format
     else:
-        rep = currentCache + "/" + prefix + stringToPath(vhash[0: fileNameLength - 1], directoryNameLength) + "." + \
-              format
+        prefix = ""
+        vhash = hashlib.sha224(expression.encode("utf-8")).hexdigest()
+        rep = hash_to_path(vhash, format, option=option, prefix=prefix)
+        # Create the relevant directory, so that user scripts don't have to care
+        if create_dirs:
+            dirn = os.path.dirname(rep)
+            if not os.path.exists(dirn):
+                os.makedirs(dirn)
+        clogger.debug("returning %s" % rep)
+        return rep
+
+
+def hash_to_path(vhash, format, option, prefix=""):
+    if option == "new":
+        rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
+    else:
+        rep = os.sep.join([currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
+    rep = ".".join([rep, format])
     rep = os.path.expanduser(rep)
     return rep
 
@@ -202,7 +203,7 @@ def register(filename, crs, outfilename=None):
                           "Framework version %s (http://climaf.rtfd.org)\" %s" % (ncatted_software, crs, version,
                                                                                   filename)
             elif re.findall(".png$", filename) and convert_software is not None:
-                crs2 = crs.replace(r"%", r"\%")
+                crs2 = crs.replace(r"%", r"\%").replace(r'"', r'\"')
                 command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
@@ -350,19 +351,24 @@ def hasBeginObject(cobject):
 
 
 def hasExactObject(cobject):
-    # First read index from file if it is yet empty
-    # NO! : done at startup - if len(crs2filename.keys()) == 0 : cload()
-    f = crs2filename.get(cobject.crs, None)
-    if f:
+    i = 0
+    found = False
+    formats_to_test = known_formats + graphic_formats
+    while not found and i < len(formats_to_test):
+        f = generateUniqueFileName(cobject.crs, format=formats_to_test[i], create_dirs=False)
         if os.path.exists(f):
-            return f
+            found = True
         else:
-            g = alternate_filename(f)
-            if os.path.exists(g):
-                return g
+            f = alternate_filename(f)
+            if os.path.exists(f):
+                found = True
             else:
-                clogger.debug("Dropping cobject.crs from cache index, because file si missing")
-                crs2filename.pop(cobject.crs)
+                i += 1
+    if found:
+        return f
+    elif cobject.crs in crs2filename:
+        clogger.debug("Dropping cobject.crs from cache index, because file is missing")
+        crs2filename.pop(cobject.crs)
 
 
 def complement(crsb, crse, crs):

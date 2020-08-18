@@ -151,7 +151,7 @@ def compare_picture_files(object_test, fic_ref, display=False, display_error=Tru
             cshow(object_test)
         # Compare the two files, display the difference if needed
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
-                              shell=True)
+                              shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if rep != 0:
             if display_error:
                 subprocess.check_call(display_cmd.format(diff_file), shell=True)

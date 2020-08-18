@@ -6,6 +6,14 @@ What's new
 
 Changes, newest first:
 
+- running:
+
+  - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable 
+    available as output of those CDO operators which use an ancilary field as first
+    argument (as e.g. 'ifthen' and 'ifthenelse' ).
+
+  - Function :py:func:`~climaf.period.merge_periods` will merge consecutive periods even if they
+    miss a 31st december (such as in 360-days calendars)
 
 - V2.0.0:
 

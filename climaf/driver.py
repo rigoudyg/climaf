@@ -372,12 +372,18 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    #
     # the cache doesn't have a similar tree, let us recursively eval subtrees
     ##########################################################################
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
     if cobject.operator in cscripts:
         clogger.debug("Script %s found" % cobject.operator)
-        file = ceval_script(cobject, deep,
+        file = ceval_script(cobject, down_deep,
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
         if format == 'file':
@@ -468,10 +474,16 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
                 return ceval(cobject)
         #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
+    #
+    #  Only deep=True can propagate downward !
+    if deep :
+        down_deep= True
+    else :
+        down_deep= None
     # Force evaluation of 'father' script
-    if ceval_script(cobject.father, deep, recurse_list=recurse_list) is not None:
+    if ceval_script(cobject.father, down_deep, recurse_list=recurse_list) is not None:
         # Re-evaluate, which should succeed using cache
-        rep = ceval(cobject, userflags, format, deep, recurse_list=recurse_list)
+        rep = ceval(cobject, userflags, format, None, recurse_list=recurse_list)
         cdedent()
         return rep
     else:
@@ -507,7 +519,13 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    file = cfilePage(cobject, deep, recurse_list=recurse_list)
+    #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    file = cfilePage(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
         return file
@@ -544,7 +562,14 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    file = cfilePage_pdf(cobject, deep, recurse_list=recurse_list)
+    #
+    #  Only deep=True can propagate downward !
+    if deep:
+        down_deep= True
+    else :
+        down_deep= None
+    #
+    file = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
         return file
@@ -585,6 +610,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     for member in cobject.order:
         # print ("evaluating member %s"%member)
         d[member] = ceval(cobject[member], copy.copy(userflags), format, deep, recurse_list=recurse_list)
+    cdedent()
     if format == "file":
         return reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
     else:
@@ -1253,7 +1279,7 @@ def cMA(obj, deep=None):
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
-def cvalue(obj, index=0,deep=False):
+def cvalue(obj, index=0,deep=None):
     """
     Return the value of the array for an object, after MV flattening, at a given index
 
@@ -1300,12 +1326,14 @@ def cimport(cobject, crs):
 
 def get_fig_sizes(figfile):
     args_figsize = ["identify", figfile]
-    output_figsize = getoutput(" ".join(args_figsize))
+    # On some sites, getoutput first lines have warning messages
+    # Furthermore, in case of missing file, last line could be an error -> only consider lines beginning with figfile
+    output_figsize = getoutput(" ".join(args_figsize)).split("\n")
+    output_figsize = [l for l in output_figsize if l.startswith(figfile)][-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)
-    fig_width = figsize.split("x").pop(0)
-    fig_height = figsize.split("x").pop(1)
+    (fig_width, fig_height) = figsize.split("x")
     return int(fig_width), int(fig_height)
 
 
@@ -1365,7 +1393,10 @@ def cfilePage(cobj, deep, recurse_list=None):
             args.extend([figfile, "-geometry", scaling, "-composite"])
 
             # Real size of figure in pixels: [fig_width x fig_height]
-            fig_width, fig_height = get_fig_sizes(figfile)
+            try:
+                fig_width, fig_height = get_fig_sizes(figfile)
+            except:
+                raise Climaf_Driver_Error("Issue with figure "+str(fig))
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1404,17 +1435,20 @@ def cfilePage(cobj, deep, recurse_list=None):
         splice = "0x%d" % cobj.ybox
         annotate = "+%d+%d" % (cobj.x, cobj.y)
         args.extend(["-gravity", cobj.gravity, "-background", cobj.background, "-splice", splice, "-font", cobj.font,
-                     "-pointsize", "%d" % cobj.pt, "-annotate", annotate, cobj.title])
+                     "-pointsize", "%d" % cobj.pt, "-annotate", annotate, '"%s"' % cobj.title])
 
     args.append(out_fig)
     clogger.debug("Compositing figures : %s" % repr(args))
 
-    comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if comm.wait() != 0:
-        err = comm.stderr.read()
-        comm.stderr.close()
-        comm.stdout.close()
+    try:
+        with open("tmp.err", "w") as fic:
+            out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
+    except subprocess.CalledProcessError:
+        with open("tmp.err") as fic:
+            err = fic.read()
         raise Climaf_Driver_Error("Compositing failed : %s" % err)
+    finally:
+        os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
@@ -1489,15 +1523,14 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
 
     clogger.debug("Compositing figures : %s" % repr(args))
     try:
-        subprocess.check_call(" ".join(args), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        with open("tmp.err", "w") as fic:
+            out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
     except subprocess.CalledProcessError:
-        raise Climaf_Driver_Error("Compositing failed for command %s" % " ".join(args))
-    # comm = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # if comm.wait() != 0:
-    #     err = comm.stderr.read()
-    #     comm.stderr.close()
-    #     comm.stdout.close()
-    #     raise Climaf_Driver_Error("Compositing failed : %s" % err)
+        with open("tmp.err") as fic:
+            err = fic.read()
+        raise Climaf_Driver_Error("Compositing failed : %s" % err)
+    finally:
+        os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
