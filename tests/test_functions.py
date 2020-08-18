@@ -10,7 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import unittest
 
-from tests.tools_for_tests import remove_dir_and_content
+from tests.tools_for_tests import remove_dir_and_content, compare_netcdf_files
 
 from climaf.cache import setNewUniqueCache
 from climaf.driver import cfile
@@ -18,8 +18,13 @@ from climaf.classes import ds
 from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub, iplot, getLevs, vertical_average, \
     implot, diff_regrid, diff_regridn, tableau, annual_cycle, clim_average, clim_average_fast, summary, projects, \
     lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
-    ts_plot, iplot_members
+    ts_plot, iplot_members, xfmul
 from env.environment import *
+from env.clogging import clog
+
+from climaf import __path__ as cpath
+if not isinstance(cpath, list):
+    cpath = cpath.split(os.sep)
 
 
 class CscalarTests(unittest.TestCase):
@@ -43,6 +48,20 @@ class FmulTests(unittest.TestCase):
     def test_fmul(self):
         # TODO: Implement the test
         pass
+
+
+class XfmulTests(unittest.TestCase):
+
+    def setUp(self):
+        self.data_1 = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", period="1980")
+        self.constant = 8.
+        self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_functions"])
+
+    def test_xfmul_constant(self):
+        data = xfmul(self.data_1, constant=self.constant)
+        compare_netcdf_files(data, os.sep.join([self.reference_directory, "xfmul-1.nc"]))
+        data = xfmul(self.data_1, self.data_1)
+        compare_netcdf_files(data, os.sep.join([self.reference_directory, "xfmul-2.nc"]))
 
 
 class FdivTests(unittest.TestCase):

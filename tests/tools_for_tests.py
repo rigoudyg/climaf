@@ -105,18 +105,22 @@ def compare_text_files(file_test, file_ref, **kwargs):
 
 def compare_netcdf_files(file_test, file_ref, display=False):
     # Todo: Check the metadata of the files
-    if not os.path.exists(file_test) or not os.path.exists(file_ref):
-        raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
+    if not (isinstance(file_test, six.string_types) and os.path.isfile(file_test)):
+        fic_test = cfile(file_test)
+    else:
+        fic_test = file_test
+    if not os.path.exists(fic_test) or not os.path.exists(file_ref):
+        raise OSError("Check files existence: %s - %s" % (fic_test, file_ref))
     if file_ref.split(".")[-1] != "nc":
         raise ValueError("This function only apply to netcdf files.")
-    if file_test.split(".")[-1] != file_ref.split(".")[-1]:
-        raise ValueError("Files have different formats: %s / %s" % (os.path.basename(file_test),
+    if fic_test.split(".")[-1] != file_ref.split(".")[-1]:
+        raise ValueError("Files have different formats: %s / %s" % (os.path.basename(fic_test),
                                                                     os.path.basename(file_ref)))
     if display:
-        ncview(file_test)
-    rep = subprocess.check_output("cdo diffn {} {}".format(file_test, file_ref), shell=True)
+        ncview(fic_test)
+    rep = subprocess.check_output("cdo diffn {} {}".format(fic_test, file_ref), shell=True)
     if len(str(rep).split("\n")) > 1:
-        raise ValueError("The content of files %s and %s are different" % (file_test, file_ref))
+        raise ValueError("The content of files %s and %s are different" % (fic_test, file_ref))
 
 
 def compare_picture_files(object_test, fic_ref, display=False, display_error=True):
