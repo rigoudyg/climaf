@@ -265,11 +265,11 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
     # Then, if needed, change the units
     clogger.debug("Units considered: %s" % units)
     if units is not None:
-        if variable is None:
-            clogger.error("Units can be used only if variable is specified")
-            raise Exception("Units can be used only if variable is specified")
+        if var is None:
+            clogger.error("Units can be used only if variable or alias is specified")
+            raise Exception("Units can be used only if variable or alias is specified")
         else:
-            cdo_commands_before_merge.append("-setattribute,{}@units={}".format(variable, units.replace(" ", "*")))
+            cdo_commands_before_merge.append("-setattribute,{}@units={}".format(var, units.replace(" ", "*")))
 
     # Then, if needed, deal with missing values
     clogger.debug("Missing values considered: %s" % vm)
