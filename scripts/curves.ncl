@@ -169,8 +169,11 @@ begin
       if i .ne. 0 then delete(fld) end if
       if (getfilevartypes(ffile,var) .eq. "short") then
         fld = short2flt( ffile->$var$ )
+      else if (getfilevartypes(ffile,var) .eq. "double") then
+        fld = tofloat( ffile->$var$ )
       else
         fld = ffile->$var$
+      end if
       end if
     else
       print("File "+infile+" does not include variable "+var)
