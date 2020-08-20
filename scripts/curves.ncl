@@ -170,7 +170,7 @@ begin
       if (getfilevartypes(ffile,var) .eq. "short") then
         fld = short2flt( ffile->$var$ )
       else if (getfilevartypes(ffile,var) .eq. "double") then
-        fld = tofloat( ffile->$var$ )
+        fld = dble2flt( ffile->$var$ )
       else
         fld = ffile->$var$
       end if
@@ -228,7 +228,7 @@ begin
         if ( ( (.not. ismissing(str_match(fld&$coord$@standard_name,"Time"))) .or. (.not. ismissing(str_match(fld&$coord$@standard_name,"time"))) ) \
           .or. ( (.not. ismissing(str_match(coord,"Time"))) .or. (.not. ismissing(str_match(coord,"time"))) ) ) \
           .and. isatt(fld&$coord$,"units") .and. (fld&$coord$@units .ne. unit_first_file) then
-          fld&$coord$=tofloat(cd_convert(fld&$coord$, unit_first_file))
+          fld&$coord$=dble2flt(cd_convert(fld&$coord$, unit_first_file))
         end if
 
 	; data vector for X axis
