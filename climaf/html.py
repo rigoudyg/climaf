@@ -514,7 +514,8 @@ def cinstantiate(objin, filout=None, should_exec=True):
         if should_exec:
             # print "Executing %s"%expression
             # try :
-            exec(expression, globals())
+            #exec(expression, globals())
+            pass
             # except :
             #    print "Issue executing %s"%expression
         return ""

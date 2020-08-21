@@ -99,7 +99,7 @@ class HtmlIndexCreation(unittest.TestCase):
         seasons["Winter"] = "DJF"
         index += open_table(title='variable/season', columns=seasons.keys(), spacing=5)
         lvars = {
-            "rst": "short wave at top ",
+            "ps": "pressure at surface ",
             "ta": " upper air temp"}
         index += flines(my_slice, lvars, seasons.values(), thumbnail=60)
         # (Argument thumbnail allows to control the size of the small image displayed

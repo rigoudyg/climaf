@@ -146,6 +146,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip")
+        elif onCiclad:
+            self.root = "/bdd"
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -172,6 +174,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
+        elif onCiclad:
+            self.root = "/bdd"
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -242,6 +246,8 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         if atCNRM:
             self.root = "/cnrm/cmip/cnrm/ESG"
+        elif onCiclad:
+            self.root = "/bdd"
         else:
             self.root = ""
         self.my_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',
