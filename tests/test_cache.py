@@ -18,10 +18,10 @@ from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
 from env.environment import *
 
-from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
-    searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \
-    complement, cdrop, cprotect, csync, cload, cload_for_project, craz, cdump, list_cache, clist, cls, crm, cdu, cwc, \
-    rebuild, Climaf_Cache_Error
+from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path,\
+    register, getCRS, rename,  hasExactObject, \
+    cdrop, cprotect, csync, craz, cdump, clist, cls, crm, cdu, cwc, \
+    Climaf_Cache_Error
 
 
 class SetNewUniqueCacheTests(unittest.TestCase):
@@ -59,26 +59,6 @@ class GenerateUniqueFileNameTests(unittest.TestCase):
         # TODO: Go on to test the usecases of the generateUniqueFileName function
 
 
-class StringToPathTests(unittest.TestCase):
-
-    def test_stringToPath(self):
-        name = "7f19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251"
-        length = 5
-        self.assertEqual(stringToPath(name, length),
-                         "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1")
-
-
-class SearchFileTests(unittest.TestCase):
-
-    def test_searchFile(self):
-        my_path_1 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251.nc"
-        my_path_2 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6252.nc"
-        my_path_3 = "7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6253.nc"
-        os.symlink(my_path_2, my_path_3)
-        self.assertEqual(searchFile(my_path_1), "/".join([tmp_directory, my_path_1]))
-        self.assertEqual(searchFile(my_path_3), None)
-
-
 class RegisterTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "The test is not written")
@@ -103,42 +83,10 @@ class RenameTests(unittest.TestCase):
         pass
 
 
-class HasMatchingObjectTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_hasMatchingObject(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
-class HasIncludingObjectTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_hasIncludingObject(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
-class HasBeginObjectTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_hasbeginObject(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
 class HasExactObjectTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "The test is not written")
     def test_hasExactObject(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
-class ComplementTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_complement(self):
         # TODO: Implement the tests for this function
         pass
 
@@ -167,22 +115,6 @@ class CsyncTests(unittest.TestCase):
         pass
 
 
-class CloadTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_cload(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
-class CloadForProjectTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_cload_for_project(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
 class CrazTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "The test is not written")
@@ -198,86 +130,6 @@ class CdumpTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
-
-class ListCacheTests(unittest.TestCase):
-
-    def test_list_cache(self):
-        import os
-        from climaf.cache import cachedirs
-        list_ref = list()
-        for cachedir in cachedirs:
-            for (d, subd, files) in os.walk(cachedir):
-                for f in files:
-                    if True in [f.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]]:
-                        list_ref.append(os.path.sep.join([d, f]))
-        self.assertEqual(list_cache(), list_ref)
-
-
-class ClistTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_clist(self):
-        # TODO: Implement the tests for this function
-        import os
-        from climaf.cache import cachedirs
-        # TODO: Once implemented, deal with several cachedirs
-        cachedir = cachedirs[0]
-
-        def find_files(rep, size="", age="", access=0, pattern="", not_pattern="", usage=False, count=False,
-                       remove=False, CRS=False, special=False):
-            list_ref = list()
-            dict_ref = dict()
-            if usage:
-                dict_usage = dict()
-            for (d, subd, files) in os.walk(rep):
-                for f in files:
-                    fname = os.path.sep.join([d, f])
-                    test = (True in [fname.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]])
-                    fname_stats = os.stat(fname)
-                    size = size.strip()
-                    if test and size:
-                        if size.endswith("k"):
-                            size = int(size[:-1])*1024
-                        elif size.endswith("M"):
-                            size = int(size[:-1])*1024*1024
-                        elif size.endswith("G"):
-                            size = int(size[:-1])*1024*1024*1024
-                        elif size.endswith("T"):
-                            size = int(size[:-1])*1024*1024*1024*1024
-                        else:
-                            try:
-                                size = int(size)
-                            except ValueError:
-                                raise Exception("Could not deal with value %s as a size for a file")
-                        test = fname_stats.st_size > size
-                    if test and age:
-                        test = fname_stats.st_ctime > (age * 24 * 3600)
-                    if test and access != 0:
-                        test = fname_stats.st_atime > (access * 24 * 3600)
-                    if test:
-                        fcrs = getCRS(fname)
-                        import re
-                        test = re.search(pattern, crewrite(fcrs)) or re.search(pattern, fname)
-                        if test:
-                            test = (re.search(not_pattern, crewrite(fcrs)) is None) \
-                                   and (re.search(not_pattern, fname) is None)
-                        if test:
-                            list_ref.append(fname)
-                            dict_ref[fcrs] = fname
-                            if usage:
-                                dict_usage[fcrs] = size
-            if usage:
-                du_list_sort = dict_usage.items()
-                from operator import itemgetter
-                du_list_sort.sort(key=itemgetter(1), reverse=False)
-                unit = ["K", "M", "G", "T"]
-                for n, pair in enumerate(du_list_sort):
-                    i = 0
-                    flt = float(pair[1])
-                    while flt >= 1024. and i < 4:
-                        flt /= 1024.
-                        i += 1
-                    du_list_sort[n] = (du_list_sort[n][0], "%6.1f%s" % (flt, unit[i]))
 
 
 class ClsTests(unittest.TestCase):
@@ -308,14 +160,6 @@ class CwcTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "The test is not written")
     def test_cwc(self):
-        # TODO: Implement the tests for this function
-        pass
-
-
-class RebuildTests(unittest.TestCase):
-
-    @unittest.skipUnless(False, "The test is not written")
-    def test_rebuild(self):
         # TODO: Implement the tests for this function
         pass
 
