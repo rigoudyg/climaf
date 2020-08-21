@@ -8,6 +8,14 @@ Changes, newest first:
 
 - running:
 
+  - The cache is now handled without any index. This allows much better performance for heavily loaded
+    caches (including lower memory usage), at the expense of some functions disappearing : clist(), 
+    cls(), crm(), cdu(), cwc(). Also, using cache content for extracting sub-objects (e.g. sub-periods) is no
+    more active. A few functions become useless : csync(), rebuild(). Function cprotect() still works
+
+  - The old cache structure (with numerous levels of directories) is deprecated. So, **users who want to
+    keep an old-structure cache content must** run script $CLIMAF/scripts/reshape_cache.sh 
+
   - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable 
     available as output of those CDO operators which use an ancilary field as first
     argument (as e.g. 'ifthen' and 'ifthenelse' ).

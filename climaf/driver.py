@@ -331,45 +331,6 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    if dig_hard_into_cache:
-        clogger.debug("Searching cache for including object for : " + repr(cobject))
-        ########################################################################
-        it, altperiod = cache.hasIncludingObject(cobject)
-        # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
-        # it=None
-        if it:
-            clogger.info("Including object found in cache : %s" % it.crs)
-            if format == 'file':
-                clogger.info("Selecting " + repr(cobject) + " out of it")
-                # Just select (if necessary for the user) the portion relevant to the request
-                rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
-                cdedent()
-                return rep
-            else:
-                clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
-                              "including object found for : " % format + repr(cobject))
-            #
-        clogger.debug("Searching cache for begin  object for : " + repr(cobject))
-        ########################################################################
-        it, comp_period = cache.hasBeginObject(cobject)
-        clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
-        # it=None
-        if it:
-            clogger.info("partial result found in cache for %s : %s" % (cobject.crs, it.crs))
-            clogger.debug("comp_period=" + repr(comp_period))
-            begcrs = it.crs
-            # Build complement object for end, and eval it
-            comp = copy.deepcopy(it)
-            comp.setperiod(comp_period)
-            evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
-            set_variable(evalcomp, cobject.variable, format=format)
-            rep = cache.complement(begcrs, comp.crs, cobject.crs)
-            cdedent()
-            if format == 'file':
-                return rep
-            else:
-                return ceval(cobject)
-        #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
     #  Only deep=True can propagate downward !
@@ -434,45 +395,6 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
             return filename
         else:
             return cread(filename, classes.varOf(cobject))
-    if dig_hard_into_cache:
-        clogger.debug("Searching cache for including object for : " + repr(cobject))
-        ########################################################################
-        it, altperiod = cache.hasIncludingObject(cobject)
-        # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
-        # it=None
-        if it:
-            clogger.info("Including object found in cache : %s" % it.crs)
-            if format == 'file':
-                clogger.info("Selecting " + repr(cobject) + " out of it")
-                # Just select (if necessary for the user) the portion relevant to the request
-                rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
-                cdedent()
-                return rep
-            else:
-                clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
-                              "including object found for : " % format + repr(cobject))
-            #
-        clogger.debug("Searching cache for begin  object for : " + repr(cobject))
-        ########################################################################
-        it, comp_period = cache.hasBeginObject(cobject)
-        clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
-        # it=None
-        if it:
-            clogger.info("partial result found in cache for %s : %s" % (cobject.crs, it.crs))
-            clogger.debug("comp_period=" + repr(comp_period))
-            begcrs = it.crs
-            # Build complement object for end, and eval it
-            comp = copy.deepcopy(it)
-            comp.setperiod(comp_period)
-            evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
-            set_variable(evalcomp, cobject.variable, format=format)
-            rep = cache.complement(begcrs, comp.crs, cobject.crs)
-            cdedent()
-            if format == 'file':
-                return rep
-            else:
-                return ceval(cobject)
-        #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
     #  Only deep=True can propagate downward !

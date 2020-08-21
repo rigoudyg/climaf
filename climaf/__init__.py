@@ -119,10 +119,6 @@ if not already_inited and not onrtd:
           file=sys.stderr)
     tim("macros")
     #
-    # Load cache index
-    cache.cload()
-    tim("cload")
-    #
     atexit.register(cmacro.write, macroFilename)
     atexit.register(cache.csync)
     tim("atexit")
