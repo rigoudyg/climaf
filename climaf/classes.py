@@ -202,10 +202,10 @@ class cobject(object):
 
     def __str__(self):
         # return "Climaf object : "+self.crs
-        return self.buildcrs()
+        return self.crs
 
     def __repr__(self):
-        return self.buildcrs()
+        return self.crs
 
     def register(self):
         pass
@@ -1127,7 +1127,11 @@ class cens(cobject, dict):
             self.order = self.sortfunc(list(self))
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period)) for m in self.order])
+        if crsrewrite is None and period is None:
+            # A useful optimization, for multi-model studies
+            rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].crs) for m in self.order])
+        else:
+            rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period)) for m in self.order])
         return rep
 
     def check(self):
@@ -1338,14 +1342,20 @@ class ctree(cobject):
         first_op = self.operands[0]
         if self.operator in ['select', ] and len(self.operands) == 1 and isinstance(first_op, cdataset) and \
                 len(list(self.parameters)) == 0 and first_op.alias is None:
-            return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
+            if crsrewrite is None and period is None:
+                return first_op.crs
+            else:
+                return first_op.buildcrs(crsrewrite=crsrewrite, period=period)
         #
         # General case
         # Operators are listed in alphabetical order; parameters too
         rep = list()
         #
         for op in [o for o in self.operands if o]:
-            opcrs = op.buildcrs(crsrewrite=crsrewrite, period=period)
+            if crsrewrite is None and period is None:
+                opcrs = op.crs
+            else:
+                opcrs = op.buildcrs(crsrewrite=crsrewrite, period=period)
             if crsrewrite:
                 opcrs = crsrewrite(opcrs)
             rep.append(opcrs)
@@ -1389,7 +1399,10 @@ class scriptChild(cobject):
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
-        tmp = self.father.buildcrs(period=period)
+        if period is None :
+            tmp = self.father.crs
+        else:
+            tmp = self.father.buildcrs(period=period)
         if crsrewrite:
             tmp = crsrewrite(tmp)
         return ".".join([tmp, self.varname])
@@ -1884,10 +1897,12 @@ class cpage(cobject):
     def buildcrs(self, crsrewrite=None, period=None):
         rep = list()
         for line in self.fig_lines:
-            rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
+            if crsrewrite is not None:
+                rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
                                            for f in line]))
-
-        param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
+            else:
+                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
+            param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
                 (repr(self.widths), repr(self.heights), self.fig_trim, self.page_trim, self.format, self.page_width,
                  self.page_height)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
@@ -2046,8 +2061,11 @@ class cpage_pdf(cobject):
     def buildcrs(self, crsrewrite=None, period=None):
         rep = list()
         for line in self.fig_lines:
-            rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
+            if crsrewrite is not None :
+                rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
                                            for f in line]))
+            else:
+                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
 
         param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
                 (repr(self.widths), repr(self.heights), self.page_width, self.page_height, self.scale, self.openright)

@@ -314,7 +314,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -417,7 +417,7 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -502,7 +502,7 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -545,7 +545,7 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -589,7 +589,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -1428,7 +1428,7 @@ def cfilePage(cobj, deep, recurse_list=None):
         args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
                      (insert_height, (cobj.page_width - cobj.insert_width) / 2, y), "-composite"])
 
-    out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
+    out_fig = cache.generateUniqueFileName(cobj.crs, format=cobj.format)
     if cobj.page_trim:
         args.append("-trim")
     if cobj.title != "":
@@ -1517,7 +1517,7 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
 
     #
     # launch process and registering output in cache
-    out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format='pdf')
+    out_fig = cache.generateUniqueFileName(cobj.crs, format='pdf')
 
     args.extend(["--outfile", out_fig])
 
