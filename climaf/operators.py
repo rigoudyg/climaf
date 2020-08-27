@@ -280,7 +280,7 @@ class cscript(object):
                 # Check if command includes an argument allowing for
                 # providing an output filename
                 if command.find("${out") < 0:
-                    if format is not "txt":
+                    if format not in ["txt", ]:
                         format = None
                 #
                 # Search in call arguments for keywords matching "<output_name>_var"
@@ -331,8 +331,7 @@ class cscript(object):
                     self.flags = scriptFlags(True, True, True, True, True, True, True,
                                              commuteWithEnsemble, commuteWithTimeConcatenation,
                                              commuteWithSpaceConcatenation, doCatTime)
-                if format in known_formats or format in graphic_formats or \
-                        format in none_formats:
+                if format in known_formats or format in graphic_formats or format in none_formats:
                     self.outputFormat = format
                 else:
                     raise Climaf_Operator_Error("Allowed formats yet are : 'object', 'nc', 'txt', %s" %

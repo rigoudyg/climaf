@@ -915,7 +915,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         logfile.write("\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
         try:
             subprocess.check_call(template, stdout=logfile, stderr=subprocess.STDOUT, shell=True)
-        except subprocess.CalledProcessError as inst:
+        except subprocess.CalledProcessError:
             raise Climaf_Driver_Error("Something went wrong when computing %s. See file ./last.out for details" %
                                       scriptCall.crs)
 
@@ -933,8 +933,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         for ll, lt in script.fixedfields:
             if not files_exist[ll]:
                 os.system("rm -f " + ll)
-    # Handle ouptuts
-    if script.outputFormat == "txt":
+    # Handle outputs
+    if script.outputFormat in ["txt", ]:
         with open(logdir + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
