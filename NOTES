@@ -34,3 +34,18 @@ Posons que la sélection 'de base' de région de CliMAF sert surtout à économi
 
 
 
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+Comparaison entre modifs : suppresion_index_cache et economie_sur_CRS
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+Ceci sur une carte typique avec 2 période de 20 ans, mais une variabililité sur
+3 périodes de 3 ans, le tout pour deux modèles (CNRM, IPSL)
+
+                                   best          sans_index      eco_CRS     base
+Run à cache vide :                41'28(3)       50'25(3)        44'25(3)   47'30(3)
+2° run, résultat disp en cache     0'47           1'26            0'37       1'50    
+3° run, un modèle en moins         1'20           1'59            1'17       2'36
+
+fig16 (saison hybrides), tous modèles
+cache vide                                       10h03(20)       11h30(3)   10h01'(3)
+2° run, résultat disp en cache                   20'             22'           24'        

@@ -8,6 +8,19 @@ Changes, newest first:
 
 - running:
 
+  - **Scalar values computed using :py:func:`~climaf.driver.cvalue` are now cached**; users can reset the
+    corresponding in-memory and disk caches (both together) using :py:func:`~climaf.cache.raz_cvalues`.
+    Variable cache.handle_cvalues allows (when set to False) to de-activate this cache.
+
+        - Note : function cvalue now returns a Python float (instead of a numpy.float64)
+
+	- Internals :
+	   - this uses an in-memory dict (cache.cvalues) and a Json file (cvalues.json);
+	   - by default, the dict key is the hashed CRS of cvalue's object argument (with cvalue's index argument as suffix)
+	   - variable cache.handle_cvalues can be set to
+	       - False, for de-activating the cache
+               - 'by_crs', for using the objects CRS has dict key value (but some CRS are very long)
+
   - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable 
     available as output of those CDO operators which use an ancilary field as first
     argument (as e.g. 'ifthen' and 'ifthenelse' ).
