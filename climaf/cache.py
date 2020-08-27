@@ -20,6 +20,7 @@ import time
 import pickle
 import uuid
 import hashlib
+import json
 from operator import itemgetter
 
 from env.environment import *
@@ -31,6 +32,8 @@ from env.clogging import clogger
 
 currentCache = None
 cachedirs = None
+handle_cvalues='by_hash' # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
+cvalues={}
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
 fileNameLength = 60
 #: Define whether we try to have safe naming of cache objects using adaptative filename length
@@ -91,7 +94,7 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
         return rep
 
 
-def hash_to_path(vhash, format, option, prefix=""):
+def hash_to_path(vhash, format, option="new", prefix=""):
     if option == "new":
         rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
@@ -1024,4 +1027,55 @@ def rebuild():
             clogger.warning("File %s is removed" % files)
     return crs2filename
 
+
+def store_cvalue(crs,index,value):
+    """
+    Stores a scalar, as computed by cvalue, in a scalars cache
+    """
+    if handle_cvalues is not False :
+        if handle_cvalues=="by_crs" :
+            key=hashlib.sha224((crs+"%d"%index).encode("utf-8")).hexdigest()
+        else :
+            key=crs+"[%d]"%index
+        cvalues[key]=value
+
+def has_cvalue(crs,index):
+    """
+    Returns a scalar, as computed by cvalue, from the scalars cache (or None if not cached)
+    """
+    if handle_cvalues is not False :
+        if handle_cvalues=="by_crs" :
+            key=hashlib.sha224((crs+"%d"%index).encode("utf-8")).hexdigest()
+        else :
+            key=crs+"[%d]"%index
+        return cvalues.get(key,None)
+
+def load_cvalues() :
+    """
+    Load in memory the cache of 'cvalue' scalars, from json file cvalues.json
+    """
+    global cvalues
+    if handle_cvalues is not False :
+        cache_file="%s/cvalues.json"%(currentCache)
+        if os.path.exists(cache_file) :
+            with open(cache_file,"r") as f :
+                cvalues=json.load(f)
+    
+
+def sync_cvalues():
+    """
+    Write on disk the in-memory dict of 'cvalue' scalars, in json file cvalues.json
+    """
+    if handle_cvalues is not False :
+        with open("%s/cvalues.json"%(currentCache),"w") as f :
+            json.dump(cvalues,f,separators=(',', ': '),indent=3,ensure_ascii=True)
+
+def raz_cvalues():
+    """
+    Clear in-memory and on-disk cache of 'cvalue' scalars
+    """
+    if handle_cvalues is not False :
+        cvalues={}
+        sync_cvalues()
+    
 

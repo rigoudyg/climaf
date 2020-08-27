@@ -1292,7 +1292,13 @@ def cvalue(obj, index=0,deep=None):
 
     Does use the file representation of the object
     """
-    return cMA(obj,deep=deep).data.flat[index]
+    rep=None
+    if deep is None :
+        rep=cache.has_cvalue(obj.crs,index)
+    if rep is None :
+        rep=float(cMA(obj,deep=deep).data.flat[index])
+        cache.store_cvalue(obj.crs,index,rep)
+    return rep
 
 
 def cexport(*args, **kwargs):
