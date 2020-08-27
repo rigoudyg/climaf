@@ -53,7 +53,9 @@ Main functions are :
 
  - ``cprotect`` : protect the cached file for an object from deletion
 
- - ``craz``     : reset cache
+ - ``craz``     : reset fields cache
+
+ - ``raz_cvalues`` : reset scalar values cache
 
  - ``csync``    : save cache index to disk
 
@@ -87,7 +89,7 @@ from .driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, 
 from .dataloc import dataloc
 from .operators import cscript, fixed_fields
 from climaf.operators_derive import derive
-from .cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect
+from .cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect, raz_cvalues
 from env.clogging import clogger, clog, clog_file, logdir
 from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 from .plot.plot_params import plot_params, hovm_params
