@@ -212,13 +212,16 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     :return:
     """
     recurse_list.append(cobject.crs)
-    clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + repr(cobject.kvp))
+    clogger.debug("Evaluating dataset operand " + cobject.crs + " having kvp= " + repr(cobject.kvp))
     ds = cobject
     cache_value = cache.hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
         cdedent()
-        return cache_value
+        if format == 'file':
+            return cache_value
+        else:
+            return cread(cache_value, classes.varOf(ds))
     if ds.isLocal() or ds.isCached():
         clogger.debug("Dataset %s is local or cached " % ds)
         #  if the data is local, then
@@ -244,7 +247,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 set_variable(derived_value, ds.variable, format=format)
             cdedent()
             return derived_value
-        elif noselect(userflags, ds, format):
+        elif noselect(userflags, ds, format) and format=="file" :
             # The caller is assumed to be able to select the needed sub-period or variable
             # and to select the variable
             clogger.debug("Delivering file set or sets is OK for the target use")
@@ -1275,7 +1278,7 @@ def cMA(obj, deep=None):
       a Masked Array containing the object's value
 
     """
-    clogger.debug("cMA called with arguments" + str(obj))
+    clogger.debug("cMA called with arguments : " + str(obj))
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
