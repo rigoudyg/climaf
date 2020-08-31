@@ -19,7 +19,7 @@ Discover CliMAF: essentials of the documentation to get started
 - `What is CliMAF <https://climaf.readthedocs.io/en/master/index.html#climaf-a-climate-model-assessment-framework>`_?
 - Using CliMAF: `installation, use of existing installations (ESPRI mesocenter, CNRM, CERFACS) <https://climaf.readthedocs.io/en/master/installing.html>`_
 - Getting started with CliMAF: `a collection of demo notebooks <https://climaf.readthedocs.io/en/master/index.html#can-climaf-make-my-scientific-life-easier>`_
-- `A notebook for CMIP6 with CliMAF at CLIMERI <../examples/CMIP6_analysis_with_CliMAF.html>`
+- :download:`A notebook for CMIP6 with CliMAF at CLIMERI <../examples/CMIP6_analysis_with_CliMAF.html>`
 - `Subscribe to CliMAF users mailing list <https://climaf.readthedocs.io/en/master/community.html>`_ to stay in the loop!
 
 
@@ -74,8 +74,8 @@ You want to know what CliMAF is about? Here are some notebooks to illustrate int
  - or :download:`the most common operators for pretreatments and the basis of how to plug a script <../examples/Main_operators_and_how_to_plug_your_script.html>`
 
 And to go further on data analysis:
- - `CMIP6 data analysis <../examples/CMIP6_analysis_with_CliMAF.html>`
- - `working with CORDEX ensembles <../examples/CORDEX_ensembles_analysis_with_CliMAF.html>`
+ - :download:`CMIP6 data analysis <../examples/CMIP6_analysis_with_CliMAF.html>`
+ - :download:`working with CORDEX ensembles <../examples/CORDEX_ensembles_analysis_with_CliMAF.html>`
 
 The links point to the html versions of the notebooks.
 
