@@ -562,7 +562,8 @@ def summary(dat):
                 print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
-                    for f in str.split(files, ' '):
+                    #for f in str.split(files, ' '):
+                    for f in files.split():
                         print(f)
             else:
                 print(m + " : " + repr(obj))
@@ -580,7 +581,8 @@ def summary(dat):
                           , tmpkvp[key])
                     print('Specify one of them (within ds() or with cdef())')
             if not keytest:
-                for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                #for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                for f in dat.baseFiles(ensure_dataset=False).split():
                     print(f)
         return dat.kvp
     else:
