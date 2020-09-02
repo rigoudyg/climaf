@@ -229,6 +229,7 @@ def load_standard_operators():
                                      '--min="${min}" '
                                      '--max="${max}" '
                                      '--lw="${lw}" '
+                                     '--alphas="${alphas}" '
                                      '--offset="${offset}" --scale="${scale}" '
                                      '--highlight_period="${highlight_period}" '
                                      '--highlight_period_lw="${highlight_period_lw}" '
@@ -431,3 +432,7 @@ def load_cdftools_operators():
             'ncks -O -v zo${varname:2}_${basin} zonalmean.nc tmpfile.nc; ncrename -v zo${varname:2}_${basin},'
             'zo${Var}_${basin} tmpfile.nc ${out}; rm -f tmpfile.nc zonalmean.nc',
             _var="zo%s_${basin}", canSelectVar=True)
+    #
+    # rmse_xyt
+    cscript('rmse_xyt','cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+
