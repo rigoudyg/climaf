@@ -230,6 +230,7 @@ def load_standard_operators():
                                      '--max="${max}" '
                                      '--lw="${lw}" '
                                      '--alphas="${alphas}" '
+                                     '--linestyles="${linestyles}" '
                                      '--offset="${offset}" --scale="${scale}" '
                                      '--highlight_period="${highlight_period}" '
                                      '--highlight_period_lw="${highlight_period_lw}" '
