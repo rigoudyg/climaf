@@ -30,7 +30,7 @@ import cftime
 import numpy as np
 from netCDF4 import Dataset, num2date
 
-from climaf.site_settings import atCerfacs, onCiclad
+from env.site_settings import atCerfacs, onCiclad
 
 if atCerfacs or onCiclad:
     import netcdftime
