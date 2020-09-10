@@ -187,10 +187,7 @@ def call_subprocess(command, test=None):
 def remove_dir_and_content(path_to_treat):
     if os.path.exists(path_to_treat):
         if os.path.isdir(path_to_treat):
-            contents = glob.glob(os.path.sep.join([path_to_treat, "*"]))
-            for content in contents:
-                remove_dir_and_content(content)
-            os.removedirs(path_to_treat)
+            shutil.rmtree(path_to_treat)
         else:
             os.remove(path_to_treat)
 
@@ -216,15 +213,30 @@ def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, ou
         return apply_cdo_command_on_slice(init_cdo_command, cdo_command, tmp_output_file, output_file)
 
 
-def main(input_files, output_file, variable=None, alias=None, region=None, units=None, vm=None, period=None,
-         operator=None, apply_operator_after_merge=None, test=None):
-    clog("debug")
-    # Create a temporary directory
-    tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
-    clogger.debug("Create temporary dir %s" % tmp)
-    original_directory = os.getcwd()
-    os.chdir(tmp)
+def change_to_tmp_dir(func):
+    def change_dir(**kwargs):
+        clog("debug")
+        clogger.debug("TMPDIR found: %s" % os.environ.get("TMPDIR", None))
+        # Create a temporary directory
+        tmp = tempfile.mkdtemp(prefix="climaf_mcdo", dir=os.environ.get("TMPDIR", None))
+        clogger.debug("Create temporary dir %s" % tmp)
+        original_directory = os.getcwd()
+        os.chdir(tmp)
+        kwargs["tmp"] = tmp
+        kwargs["original_directory"] = original_directory
+        try:
+            func(**kwargs)
+        except:
+            raise
+        finally:
+            os.chdir(original_directory)
+            remove_dir_and_content(tmp)
+    return change_dir
 
+
+@change_to_tmp_dir
+def main(input_files, output_file, tmp, original_directory, variable=None, alias=None, region=None, units=None, vm=None,
+         period=None, operator=None, apply_operator_after_merge=None, test=None):
     # Initialize cdo commands
     cdo_commands_before_merge = list()
     cdo_commands_for_selvar = list()
@@ -364,9 +376,6 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
         call_subprocess(cdo_command)
     else:
         raise ValueError("No input file to treat!")
-
-    os.chdir(original_directory)
-    remove_dir_and_content(tmp)
 
 
 if __name__ == "__main__":

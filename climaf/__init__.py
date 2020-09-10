@@ -134,6 +134,8 @@ if not already_inited and not onrtd:
     # Check that the variable TMPDIR, if defined, points to an existing directory
     if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
         # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
+        if os.path.exists(os.environ["TMPDIR"]):
+            os.remove(os.environ["TMPDIR"])
         os.makedirs(os.environ["TMPDIR"])
 
     logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))

@@ -358,7 +358,7 @@ def load_cdftools_operators():
             _var="heatc_2D,heatc_3D", canSelectVar=True)
     #
     cscript('ccdfheatcm',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc '
+            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfheatc '
             '$tmp_file ${imin} ${imax} ${jmin} ${jmax} ${kmin} ${kmax} ${opt}; mv cdfheatc.nc ${out}; rm -f cdfheatc.nc'
             ' $tmp_file',
             _var="heatc_2D,heatc_3D", canSelectVar=True)
@@ -396,7 +396,7 @@ def load_cdftools_operators():
             canSelectVar=True)
     #
     cscript('ccdfmxlheatcm',
-            'echo ""; tmp_file=`echo $(mktemp /tmp/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc '
+            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc '
             '$tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file',
             _var="somxlheatc", canSelectVar=True)
 
