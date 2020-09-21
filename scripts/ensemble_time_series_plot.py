@@ -60,6 +60,8 @@ parser.add_argument('--variable', action='store', default=None, help='variable')
 # --> colors = ${colors}
 parser.add_argument('--colors', action='store', default=None, help='colors separated by commas')
 parser.add_argument('--lw', action='store', default=None, help='lines thicknesses (commas separated)')
+parser.add_argument('--alphas', action='store', default=None, help='lines opacity (commas separated, 0 = transparent, 1=opac)')
+parser.add_argument('--linestyles', action='store', default=None, help='lines styles (https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html)')
 parser.add_argument('--highlight_period', action='store', default=None,
                     help='Highlight a period on a time series (thicker line) ; provide the periods yearstart_yearend '
                          'separated by commas (Ex: 1980_2005,1990_2000 to highlight the first period on the first '
@@ -155,7 +157,7 @@ args, unknown = parser.parse_known_args()
 
 filenames = args.filenames
 outfig = args.outfig
-labels = str.replace(args.labels, '"', '')  # -- We remove the " from labels
+labels = args.labels.replace('"', '')  # -- We remove the " from labels
 #  -> the string ${labels} provided by CliMAF contains $. If we simply provide a string with $
 #     to python, the $ and strings immediately following it are removed it to the string.
 #     For instance: label_1$label_2$label_3 will be converted to _1_2_3
@@ -175,12 +177,12 @@ print('==> args = ', args)
 
 # -- We cut the strings to do python lists
 # --------------------------------------------------------------------------------------------------
-filenames_list = str.split(filenames, ' ')
-labels_list = str.split(labels, '$')
+filenames_list = filenames.split(' ')
+labels_list = labels.split('$')
 # colors_list    = str.split(colors,',')
 
 if args.highlight_period:
-    highlight_period_list = str.split(args.highlight_period, ',')
+    highlight_period_list = args.highlight_period.split(',')
     if not len(filenames_list) == len(highlight_period_list):
         print('Provided ', len(filenames_list), ' time series and only ', len(highlight_period_list),
               ' periods to highlight')
@@ -195,7 +197,7 @@ if args.highlight_period:
 
 # -- Colors
 if args.colors:
-    colors = str.split(args.colors, ',')
+    colors = args.colors.split(',')
 else:
     colors = ['royalblue', 'red', 'green', 'mediumturquoise', 'orange',
               'navy', 'limegreen', 'steelblue', 'fuchsia',
@@ -207,14 +209,35 @@ colors = colors + colors
 
 # -- Line width
 if args.lw:
-    lw_list = str.split(args.lw, ',')
+    lw_list = args.lw.split(',')
     if len(lw_list) == 1:
         lw_list = lw_list * len(filenames_list)
 else:
     lw_list = [0.4] * len(filenames_list)
 
+# -- alphas
+if args.alphas:
+    alphas_list = str.split(args.alphas,',')
+    if len(alphas_list)==1:
+        alphas_list = alphas_list * len(filenames_list)
+else:
+    alphas_list = [1] * len(filenames_list)
+
+# -- line styles
+if args.linestyles:
+    linestyles_list = str.split(args.linestyles,',')
+    if len(linestyles_list)==1:
+        linestyles_list = linestyles_list * len(filenames_list)
+else:
+    linestyles_list = ['solid'] * len(filenames_list)
+for elt in linestyles_list:
+    if '-' in elt:
+        dumsplit = elt.split('-')
+        print((0, tuple( map(int, dumsplit[1:len(dumsplit)]) )))
+        linestyles_list[linestyles_list.index(elt)] = (0,  tuple( map(int, dumsplit[1:len(dumsplit)]) ) ) 
+
 if args.highlight_period_lw:
-    highlight_period_lw_list = str.split(args.highlight_period_lw, ',')
+    highlight_period_lw_list = args.highlight_period_lw.split(',')
     if len(highlight_period_lw_list) == 1:
         highlight_period_lw_list = highlight_period_lw_list * len(filenames_list)
 else:
@@ -223,23 +246,23 @@ else:
 
 # -- Start plot
 if args.fig_size:
-    fig_width = float(str.split(args.fig_size, '*')[0])
-    fig_height = float(str.split(args.fig_size, '*')[1])
+    fig_width = float(args.fig_size.split('*')[0])
+    fig_height = float(args.fig_size.split('*')[1])
     plt.figure(figsize=(fig_width, fig_height))
 else:
     plt.figure(figsize=(15, 5))
 
 # -- Plot the horizontal lines
 if args.horizontal_lines_values:
-    horizontal_lines_values_list = str.split(args.horizontal_lines_values, ',')
+    horizontal_lines_values_list = args.horizontal_lines_values.split( ',')
     if args.horizontal_lines_lw:
-        horizontal_lines_lw_list = str.split(args.horizontal_lines_lw, ',')
+        horizontal_lines_lw_list = args.horizontal_lines_lw.split(',')
     else:
         horizontal_lines_lw_list = [2] * len(horizontal_lines_values_list)
     if len(horizontal_lines_lw_list) == 1 and len(horizontal_lines_values_list) > 1:
         horizontal_lines_lw_list = horizontal_lines_lw_list * len(horizontal_lines_values_list)
     if args.horizontal_lines_colors:
-        horizontal_lines_colors_list = str.split(args.horizontal_lines_colors, ',')
+        horizontal_lines_colors_list =  args.horizontal_lines_colors.split(',')
     else:
         horizontal_lines_colors_list = ['black'] * len(horizontal_lines_values_list)
     if len(horizontal_lines_colors_list) == 1 and len(horizontal_lines_values_list) > 1:
@@ -271,10 +294,10 @@ for pathfilename in filenames_list:
             x = np.array(range(1, 13))
             datevar = []
         else:
-            orig_date = str.split(str(t_unit), ' ')[2]
-            orig_year = int(str.split(orig_date, '-')[0])
-            orig_month = int(str.split(orig_date, '-')[1])
-            orig_day = int(str.split(orig_date, '-')[2][0:2])
+            orig_date  = str(t_unit).split(' ')[2]
+            orig_year  = int(orig_date.split('-')[0])
+            orig_month = int(orig_date.split('-')[1])
+            orig_day   = int(orig_date.split('-')[2][0:2])
             tvalue = [cdatetime(orig_year, orig_month, orig_day) +
                       timedelta(seconds=365.25 / 12 * 24.0 * 3600.0 * float(val)) for val in nctime]
             x = np.array(tvalue)
@@ -291,10 +314,10 @@ for pathfilename in filenames_list:
             if not isinstance(elt, cdatetime):
                 if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
                                     cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
-                    strdate = str.split(elt.strftime(), ' ')[0]
-                    year = int(str.split(strdate, '-')[0])
-                    month = int(str.split(strdate, '-')[1])
-                    day = int(str.split(strdate, '-')[2])
+                    strdate =  elt.strftime().split(' ')[0]
+                    year = int(strdate.split('-')[0])
+                    month = int(strdate.split('-')[1])
+                    day = int(strdate.split('-')[2])
                     datevar.append(cdatetime(year, month, day))
             else:
                 datevar.append(elt)
@@ -315,10 +338,19 @@ for pathfilename in filenames_list:
     y = np.squeeze(test_dat)
     if len(y.shape) > 1:
         print("input data is not 1D")
+    print('lw_list[dataset_number]',lw_list[dataset_number])
+    print('colors[dataset_number]',colors[dataset_number])
+    print('linestyles_list[dataset_number]',linestyles_list[dataset_number])
+    print('alphas_list[dataset_number]',alphas_list[dataset_number])
+
     handles_for_legend.append(
         # plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
         #     label=labels_list[filenames_list.index(pathfilename)])[0]
-        plt.plot(x, y, lw=lw_list[dataset_number], color=colors[dataset_number],
+        plt.plot(x, y,
+                 lw=int(lw_list[dataset_number]),
+                 color=colors[dataset_number],
+                 linestyle=linestyles_list[dataset_number],
+                 alpha=float(alphas_list[dataset_number]),
                  label=labels_list[dataset_number])[0]
     )
     # datevar = []
@@ -363,14 +395,17 @@ for pathfilename in filenames_list:
         # highlight_period = highlight_period_list[filenames_list.index(pathfilename)]
         highlight_period = highlight_period_list[dataset_number]  # filenames_list.index(pathfilename)]
         sep = ('_' if '_' in highlight_period else '-')
-        dum = str.split(highlight_period, sep)
+        dum = highlight_period.split(sep)
         startyear = int(dum[0])
         endyear = int(dum[1])
         #
         ind = np.argwhere((x > cdatetime(startyear, 1, 1)) & (x < cdatetime(endyear, 12, 31))).flatten()
         print('highlight_period = ', highlight_period)
         print("highlight_period_lw_list[dataset_number] = ", highlight_period_lw_list[dataset_number])
-        plt.plot(x[ind], y[ind], lw=highlight_period_lw_list[dataset_number],
+        plt.plot(x[ind], y[ind],
+                 lw=highlight_period_lw_list[dataset_number],
+                 alpha=alphas_list[dataset_number],
+                 linestyle=linestyles_list[dataset_number],
                  color=colors[dataset_number])
     #
     dataset_number = dataset_number + 1
@@ -380,17 +415,18 @@ plt.grid()
 
 # -- Force setting the X limits
 if args.xlim:
-    xlim_start_date = str.split(args.xlim, ',')[0]
-    xlim_end_date = str.split(args.xlim, ',')[1]
+    xlim_start_date = args.xlim.split(',')[0]
+    xlim_end_date = args.xlim.split(',')[1]
 
     xlim_period = []
     for xlim_date in [xlim_start_date, xlim_end_date]:
         if len(xlim_date) == 4:
             x_date = cdatetime(int(xlim_date), 8, 1)
         else:
+            x_text = xlim_date
             if '-' in x_text or '_' in x_text:
                 sep_x = ('-' if '-' in x_text else '_')
-                split_x = str.split(xlim_date, sep_x)
+                split_x = xlim_date.split(sep_x)
                 if len(split_x) == 2:
                     x_date = cdatetime(int(split_x[0]), int(split_x[1]))
                 elif len(split_x) == 3:
@@ -406,7 +442,7 @@ if args.xlim:
 
 # -- Force setting the Y limits
 if args.ylim:
-    plt.ylim([float(str.split(args.ylim, ',')[0]), float(str.split(args.ylim, ',')[1])])
+    plt.ylim([float(args.ylim.split(',')[0]), float(args.ylim.split(',')[1])])
 
 
 # -- Add the titles
@@ -445,13 +481,13 @@ if draw_legend:
     legend_fontsize = (args.legend_fontsize if args.legend_fontsize else '12')
     legend_ncol = (args.legend_ncol if args.legend_ncol else 1)
     legend_frame = (True if args.legend_frame.lower() in ['true'] else False)
-    legend_colors_list = (str.split(args.legend_colors, ',') if args.legend_colors else colors)
-    leg_dict = dict(bbox_to_anchor=(float(str.split(legend_xy_pos, ',')[0]), float(str.split(legend_xy_pos, ',')[1])),
+    legend_colors_list = (args.legend_colors.split(',') if args.legend_colors else colors)
+    leg_dict = dict(bbox_to_anchor=(float(legend_xy_pos.split(',')[0]), float(legend_xy_pos.split(',')[1])),
                     loc=int(legend_loc), borderaxespad=0., prop={'size': float(legend_fontsize)}, ncol=int(legend_ncol),
                     frameon=legend_frame)
     # -- If the user provides a custom list of legend labels
     if args.legend_labels:
-        legend_labels_list = str.split(args.legend_labels, ',')
+        legend_labels_list = args.legend_labels.split(',')
         # if add_custom_legend_to_default:
         # -- Do we start a new legend or append to the existing one?
         legend_handles = (handles_for_legend if args.append_custom_legend_to_default.lower() in ['true'] else [])
@@ -468,7 +504,7 @@ if draw_legend:
     print('leg_dict = ', leg_dict)
     leg = plt.legend(**leg_dict)
     if args.legend_lw:
-        legend_lw_list = str.split(args.legend_lw, ',')
+        legend_lw_list = args.legend_lw.split(',')
         if len(legend_lw_list) == 1:
             legend_lw_list = legend_lw_list * len(leg.legendHandles)
         if args.legend_labels and args.append_custom_legend_to_default.lower() in ['true']:
@@ -484,31 +520,31 @@ if draw_legend:
 
 # -- Add some text
 if args.text:
-    text_list = str.split(args.text, '|')
-    text_fontsize_list = (str.split(args.text_fontsize, ',') if args.text_fontsize else [12] * len(text_list))
+    text_list = args.text.split('|')
+    text_fontsize_list = (args.text_fontsize.split(',') if args.text_fontsize else [12] * len(text_list))
     if len(text_fontsize_list) == 1 and len(text_list) > 1:
         text_fontsize_list = text_fontsize_list * len(text_list)
-    text_colors_list = (str.split(args.text_colors, ',') if args.text_colors else ['black'] * len(text_list))
+    text_colors_list = (args.text_colors.split(',') if args.text_colors else ['black'] * len(text_list))
     if len(text_colors_list) == 1 and len(text_list) > 1:
         text_colors_list = text_colors_list * len(text_list)
-    text_verticalalignment_list = (str.split(args.text_verticalalignment, ',') if args.text_verticalalignment
+    text_verticalalignment_list = (args.text_verticalalignment.split(',') if args.text_verticalalignment
                                    else ['bottom'] * len(text_list))
     if len(text_verticalalignment_list) == 1 and len(text_list) > 1:
         text_verticalalignment_list = text_verticalalignment_list * len(text_list)
-    text_horizontalalignment_list = (str.split(args.text_horizontalalignment, ',') if args.text_horizontalalignment
+    text_horizontalalignment_list = (args.text_horizontalalignment.split(',') if args.text_horizontalalignment
                                      else ['left'] * len(text_list))
     if len(text_horizontalalignment_list) == 1 and len(text_list) > 1:
         text_horizontalalignment_list = text_horizontalalignment_list * len(text_list)
     for text_elt in text_list:
         text_ind = text_list.index(text_elt)
         # -- treatment of the x value = date
-        x_text = str.split(text_elt, ',')[0]
+        x_text = text_elt.split(',')[0]
         if len(x_text) == 4:
             x_date = cdatetime(int(x_text))
         else:
             if '-' in x_text or '_' in x_text:
                 sep_x = ('-' if '-' in x_text else '_')
-                split_x = str.split(x_text, sep_x)
+                split_x = x_text.split(sep_x)
                 if len(split_x) == 2:
                     x_date = cdatetime(int(split_x[0]), int(split_x[1]))
                 elif len(split_x) == 3:
@@ -520,9 +556,9 @@ if args.text:
             else:
                 print('--> Date provided as x value could not be interpreted: ', x_text)
         # -- y
-        y_text = float(str.split(text_elt, ',')[1])
+        y_text = float(text_elt.split(',')[1])
         # -- And text
-        text = str.split(text_elt, ',')[2]
+        text = text_elt.split(',')[2]
         print('text_elt = ', text_elt)
         # -- Plot the text
         plt.text(x_date, y_text, text,

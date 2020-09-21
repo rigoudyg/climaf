@@ -27,6 +27,8 @@ Remarks :
 
    - ``colors``: colors separated by commas
    - ``lw``: lines thicknesses (commas separated)
+   - ``alphas``: lines opacity (commas separated, between 0 and 1)
+   - ``linestyles``: lines styles (commas separated) (see https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html for the values)
    - ``highlight_period``: Highlight a period on a time series (thicker line) ; provide the periods yearstart_yearend separated by commas (Ex: 1980_2005,1990_2000 to highlight the first period on the first dataset, and the second period on the second dataset)
    - ``highlight_period_lw``: Thickness of the highlighted period
    - ``min``, ``max``: minimum and maximum value

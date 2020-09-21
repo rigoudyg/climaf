@@ -11,6 +11,7 @@ from env.clogging import clogger
 from env.environment import *
 from six import string_types
 
+import numpy as np
 
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
@@ -94,7 +95,7 @@ def fmul(dat1, dat2):
                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
                                       "use ensemble_intersection(dat1,dat2) to get two ensembles "
                                       "with only their common members" % (dat1.order, dat2.order))
-    elif isinstance(dat2, string_types + [int, float, np.float32]):
+    elif isinstance(dat2, string_types + (int, float, np.float32) ):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:
@@ -128,7 +129,7 @@ def fdiv(dat1, dat2):
                                        "Members of dat1 =%s ; Members of dat2 =%s\n"
                                        "use ensemble_intersection(dat1,dat2) to get two ensembles with only "
                                        "their common members" % (dat1.order, dat2.order))
-    elif isinstance(dat2, string_types + [int, float, np.float32]):
+    elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='divc,' + c)
     else:
@@ -162,7 +163,7 @@ def fadd(dat1, dat2):
                                        "Members of dat1 =%s ; Members of dat2 =%s\n"
                                        "use ensemble_intersection(dat1,dat2) to get two ensembles with only"
                                        " their common members" % (dat1.order, dat2.order))
-    elif isinstance(dat2, string_types + [int, float, np.float32]):
+    elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='addc,' + c)
 
@@ -197,7 +198,7 @@ def fsub(dat1, dat2):
                                        "Members of dat1 =%s ; Members of dat2 =%s\n"
                                        "use ensemble_intersection(dat1,dat2) to get two ensembles with only their"
                                        " common members" % (dat1.order, dat2.order))
-    elif isinstance(dat2, string_types + [int, float, np.float32]):
+    elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='subc,' + c)
     else:
@@ -562,7 +563,8 @@ def summary(dat):
                 print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
-                    for f in str.split(files, ' '):
+                    #for f in str.split(files, ' '):
+                    for f in files.split():
                         print(f)
             else:
                 print(m + " : " + repr(obj))
@@ -580,7 +582,8 @@ def summary(dat):
                           , tmpkvp[key])
                     print('Specify one of them (within ds() or with cdef())')
             if not keytest:
-                for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                #for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
+                for f in dat.baseFiles(ensure_dataset=False).split():
                     print(f)
         return dat.kvp
     else:
@@ -855,11 +858,10 @@ def ts_plot(ts, **kwargs):
                     elts_order.append(list(ts_elt)[0])
                     elts_dict.update(ts_elt)
                 else:
-                    ts_name = ts.crs
+                    ts_name = ts_elt.crs
                     elts_order.append(ts_name)
                     elts_dict.update({ts_name: ts_elt})
             ens_ts = cens(elts_dict, order=elts_order)
-            ens_ts.set_order(elts_order)
 
     else:
         ens_ts = ts.copy()

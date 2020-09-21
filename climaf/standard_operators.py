@@ -240,6 +240,8 @@ def load_standard_operators():
                                      '--labels=\'\"${labels}\"\' '
                                      '--variable=${Var} '
                                      '--colors="${colors}" '
+                                     '--alphas="${alphas}" '
+                                     '--linestyles="${linestyles}" '
                                      '--min="${min}" '
                                      '--max="${max}" '
                                      '--lw="${lw}" '
