@@ -1290,7 +1290,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     fperiod = timeLimits(filename)
     if period is None:
         if fperiod is None:
-            raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
+            period="fx"
+            #raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
     else:
