@@ -1064,11 +1064,22 @@ def load_cvalues() :
 
 def sync_cvalues():
     """
-    Write on disk the in-memory dict of 'cvalue' scalars, in json file cvalues.json
+    Read the on-disk of 'cvalue' scalars, update it with the in-memory one and 
+    write it in json file cvalues.json
     """
+    global cvalues
+
     if handle_cvalues is not False :
-        with open("%s/cvalues.json"%(currentCache),"w") as f :
+        ccache="%s/cvalues.json"%(currentCache)
+        tmp="%s/cvalues_tmp.json"%(currentCache)
+        #
+        with open(ccache,"r") as f :
+            onfile=json.load(f)
+        onfile.update(cvalues)
+        cvalues=onfile
+        with open(tmp,"w") as f :
             json.dump(cvalues,f,separators=(',', ': '),indent=3,ensure_ascii=True)
+        os.rename(tmp,ccache)
 
 def raz_cvalues():
     """
