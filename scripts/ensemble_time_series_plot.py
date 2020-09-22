@@ -211,7 +211,7 @@ if args.lw:
     if len(lw_list) == 1:
         lw_list = lw_list * len(filenames_list)
 else:
-    lw_list = [0.4] * len(filenames_list)
+    lw_list = ['1'] * len(filenames_list)
 
 # -- alphas
 if args.alphas:
@@ -345,7 +345,7 @@ for pathfilename in filenames_list:
         # plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
         #     label=labels_list[filenames_list.index(pathfilename)])[0]
         plt.plot(x, y,
-                 lw=int(lw_list[dataset_number]),
+                 lw=float(lw_list[dataset_number]),
                  color=colors[dataset_number],
                  linestyle=linestyles_list[dataset_number],
                  alpha=float(alphas_list[dataset_number]),
