@@ -82,8 +82,6 @@ if root:
         cdef('driving_model', '*', project=project)
         cdef('CORDEX_domain', '*', project=project)
         cdef('model', '*', project=project)
-    # -- Overwrite root only for CORDEX-Adjust 
-    cdef('root', '/prodigfs/project', project='CORDEX-Adjust')
 
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:
         calias('CORDEX-Adjust', var, var + 'Adjust')

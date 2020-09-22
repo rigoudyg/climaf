@@ -1,5 +1,5 @@
 #!/bin/bash
-myport=$( grep $USER  /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/climaf_V1.2.13/bin/cmip6.notebook.txt | awk '{print $2 }' )
+myport=$( grep $USER  /ciclad-home/jservon/Evaluation/CliMAF/climaf_installs/notebook_user_port.txt | awk '{print $2 }' )
 
 SHORT_HOST="$(hostname -s)"
 echo

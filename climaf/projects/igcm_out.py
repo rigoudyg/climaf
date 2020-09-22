@@ -131,7 +131,7 @@ if atTGCC:
     root = "/ccc/store/cont003/thredds"
 if onCiclad:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
-    root = "/ccc/store/cont003/thredds"
+    root = "/thredds/tgcc/store"
     login = "fabric"
 if onSpip:
     # Declare a list of root directories for IPSL data at TGCC

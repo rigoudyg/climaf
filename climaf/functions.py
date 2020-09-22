@@ -859,7 +859,7 @@ def ts_plot(ts, **kwargs):
                     elts_order.append(ts_elt.keys()[0])
                     elts_dict.update(ts_elt)
                 else:
-                    ts_name = ts.crs
+                    ts_name = ts_elt.crs
                     elts_order.append(ts_name)
                     elts_dict.update({ts_name: ts_elt})
             ens_ts = cens(elts_dict, order=elts_order)
