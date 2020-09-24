@@ -138,6 +138,16 @@ def nemo_timefix(file_to_treat, tmp_dir, test=None):
                 current_command = ["ncatted", "-a", "coordinates,{},m,c,depth nav_lat nav_lon".format(lvar), out]
                 print_in_file(current_command, output_file=test)
                 subprocess.check_output(current_command, shell=True)
+            if os.access(file_to_treat, os.W_OK):
+                print_in_file("rm -f {}".format(file_to_treat), output_file=test)
+                os.remove(file_to_treat)
+                print_in_file("mv {} {}".format(out, file_to_treat), output_file=test)
+                shutil.move(out, file_to_treat)
+                return file_to_treat
+            else:
+                return out
+        else:
+            return file_to_treat
     else:
         return file_to_treat
 
@@ -202,6 +212,8 @@ def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, ou
         cdo_command = " ".join([init_cdo_command, cdo_command] + files_to_treat + [output_file, ])
         print_in_file(cdo_command, output_file=test)
         call_subprocess(cdo_command)
+        for f in files_to_treat:
+            os.remove(f)
         return [output_file, ]
     else:
         tmp_output_file_1 = output_file.replace(".nc", "1.nc")
@@ -216,15 +228,40 @@ def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, ou
         return apply_cdo_command_on_slice(init_cdo_command, cdo_command, tmp_output_file, output_file)
 
 
-def main(input_files, output_file, variable=None, alias=None, region=None, units=None, vm=None, period=None,
-         operator=None, apply_operator_after_merge=None, test=None):
-    clog("debug")
-    # Create a temporary directory
-    tmp = tempfile.mkdtemp(prefix="climaf_mcdo")
-    clogger.debug("Create temporary dir %s" % tmp)
-    original_directory = os.getcwd()
-    os.chdir(tmp)
+def find_tmp_filename(filename, tmp):
+    tmp_file_name = os.path.basename(filename)
+    tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+    while os.path.exists(tmp_file_path):
+        tmp_file_name = "_".join(["tmp", tmp_file_name])
+        tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+    return tmp_file_path
 
+
+def change_to_tmp_dir(func):
+    def change_dir(**kwargs):
+        clog("debug")
+        clogger.debug("TMPDIR found: %s" % os.environ.get("TMPDIR", None))
+        # Create temporary directory
+        tmp = tempfile.mkdtemp(prefix="climaf_", dir=os.environ.get("TMPDIR", None))
+        clogger.debug("Create temporary dir: %s" % tmp)
+        original_directory = os.getcwd()
+        os.chdir(tmp)
+        kwargs["tmp"] = tmp
+        kwargs["original_directory"] = original_directory
+        try:
+            func(**kwargs)
+        except:
+            raise
+        finally:
+            # Always remove the content of the directory
+            os.chdir(original_directory)
+            remove_dir_and_content(tmp)
+    return change_dir
+
+
+@change_to_tmp_dir
+def main(input_files, output_file, tmp, original_directory, variable=None, alias=None, region=None, units=None, vm=None,
+         period=None, operator=None, apply_operator_after_merge=None, test=None):
     # Initialize cdo commands
     cdo_commands_before_merge = list()
     cdo_commands_for_selvar = list()
@@ -309,41 +346,35 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
             a_file = os.path.sep.join([original_directory, re.sub(r"^\./", "", a_file)])
         if not a_file.startswith(os.path.sep):
             a_file = os.path.sep.join([original_directory, a_file])
+        l_file = find_tmp_filename(a_file, tmp)
+        os.symlink(a_file, l_file)
         if os.environ.get("CLIMAF_FIX_NEMO_TIME", False):
-            a_file = nemo_timefix(a_file, tmp, test=test)
+            l_file = nemo_timefix(l_file, tmp, test=test)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
-            a_file = aladin_coordfix(a_file, tmp, filevar, test=test)
-        files_to_treat_before_merging.append(a_file)
+            l_file = aladin_coordfix(l_file, tmp, filevar, test=test)
+        files_to_treat_before_merging.append(l_file)
 
     if len(files_to_treat_before_merging) > 1:
         files_to_treat_after_merging = list()
         for a_file in files_to_treat_before_merging:
-            tmp_file_name = os.path.basename(a_file)
-            tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-            while os.path.exists(tmp_file_path):
-                tmp_file_name = "_".join(["tmp", tmp_file_name])
-                tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-            if not os.path.isfile(tmp_file_name):
-                if len(cdo_commands_for_selvar) == 1 and os.path.basename(a_file).startswith(filevar):
-                    total_cdo_commands_before_merge = cdo_commands_before_merge
-                else:
-                    total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
-                if len(total_cdo_commands_before_merge) > 0:
-                    cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
-                                           [a_file, tmp_file_path])
-                    print_in_file(cdo_command, output_file=test)
-                    call_subprocess(cdo_command)
-                else:
-                    os.symlink(a_file, tmp_file_path)
-                if not os.path.isfile(tmp_file_path):
-                    clogger.error("Could not create the file %s" % tmp_file_path)
-                    raise Exception("Could not create the file %s" % tmp_file_path)
-                files_to_treat_after_merging.append(tmp_file_path)
+            tmp_file_path = find_tmp_filename(a_file, tmp)
+            if len(cdo_commands_for_selvar) == 1 and os.path.basename(a_file).startswith(filevar):
+                total_cdo_commands_before_merge = cdo_commands_before_merge
             else:
-                clogger.error("Should not pass here...")
-                raise Exception("Should not pass here...")
+                total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+            if len(total_cdo_commands_before_merge) > 0:
+                cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
+                                       [a_file, tmp_file_path])
+                print_in_file(cdo_command, output_file=test)
+                call_subprocess(cdo_command)
+                os.remove(a_file)
+                shutil.move(tmp_file_path, a_file)
+            if not os.path.isfile(a_file):
+                clogger.error("Could not create the file %s" % a_file)
+                raise Exception("Could not create the file %s" % a_file)
+            files_to_treat_after_merging.append(a_file)
         if cdo_command_for_merge is not None:
-            tmp_output_file = os.sep.join([tmp, os.path.basename(output_file)])
+            tmp_output_file = find_tmp_filename(output_file, tmp)
             files_to_treat_after_merging = apply_cdo_command_on_slice(init_cdo_command=init_cdo_command,
                                                                       cdo_command=cdo_command_for_merge,
                                                                       files_to_treat=files_to_treat_after_merging,
@@ -352,6 +383,8 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
                                files_to_treat_after_merging + [output_file, ])
         print_in_file(cdo_command, output_file=test)
         call_subprocess(cdo_command)
+        for f in files_to_treat_after_merging:
+            os.remove(f)
     elif len(files_to_treat_before_merging) == 1:
         if len(cdo_commands_for_selvar) == 1 and os.path.basename(files_to_treat_before_merging[0]).startswith(filevar):
             total_cdo_commands_before_merge = cdo_commands_before_merge
@@ -362,11 +395,9 @@ def main(input_files, output_file, variable=None, alias=None, region=None, units
                                [output_file, ])
         print_in_file(cdo_command, output_file=test)
         call_subprocess(cdo_command)
+        os.remove(files_to_treat_before_merging[0])
     else:
         raise ValueError("No input file to treat!")
-
-    os.chdir(original_directory)
-    remove_dir_and_content(tmp)
 
 
 if __name__ == "__main__":
