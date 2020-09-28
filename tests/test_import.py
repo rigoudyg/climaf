@@ -18,7 +18,7 @@ testmodules = [
     "climaf.anynetcdf",
     "climaf.cache",
     "climaf.classes",
-    "climaf.clogging",
+    "env.clogging",
     "climaf.cmacro",
     "climaf.dataloc",
     "climaf.driver",
@@ -28,7 +28,7 @@ testmodules = [
     "climaf.netcdfbasics",
     "climaf.operators",
     "climaf.period",
-    "climaf.site_settings",
+    "env.site_settings",
     "climaf.standard_operators"
 ]
 
