@@ -31,9 +31,15 @@ class cperiod(object):
         if isinstance(start, six.string_types) and start == 'fx':
             self.fx = True
             self.pattern = 'fx'
-        elif not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
-            raise Climaf_Period_Error("issue with start or end, types=%s, %s" % (type(start), type(end)))
-        else:
+        else :
+            if not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
+                try :
+                    # Assuming start and end use Netcdf advanced calendars (e.g. noleap or 360-day)
+                    # and trying to carry on anyway with dumb python datetime package
+                    start = start._to_real_datetime()
+                    end   =   end._to_real_datetime()
+                except :
+                    raise Climaf_Period_Error("issue with start or end, %s : %s,\n%s : %s" % (type(start), str(start), type(end), str(end)))
             self.start = start
             self.end = end
             if pattern is None:
