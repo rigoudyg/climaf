@@ -144,7 +144,7 @@ def timeLimits(filename):
     f = ncf(filename)
     if 'time_bnds' in f.variables:
         tim = f.variables['time_bnds']
-        if 'units' in dir(tim):
+        if 'units' in dir(tim) and 'calendar' in dir(tim) :
             start = tim[0, 0]
             end = tim[-1, 1]
             ct = netcdftime.utime(tim.units, calendar=tim.calendar)
