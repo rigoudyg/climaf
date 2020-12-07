@@ -144,9 +144,10 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertEqual(self.my_period.end, self.my_date_2)
 
     def test_eq(self):
-        self.assertTrue(self.my_period == self.my_period_1)
-        self.assertFalse(cperiod("fx") == self.my_period)
-        self.assertTrue(self.my_period_3 != self.my_period_4)
+        self.assertEqual(self.my_period, self.my_period_1)
+        self.assertNotEqual(cperiod("fx"), self.my_period)
+        self.assertNotEqual(self.my_period_3, self.my_period_4)
+        self.assertNotEqual(self.my_period_3, self.my_period_6)
 
     @unittest.expectedFailure
     def test_repr(self):
