@@ -197,10 +197,7 @@ def call_subprocess(command, test=None):
 def remove_dir_and_content(path_to_treat):
     if os.path.exists(path_to_treat):
         if os.path.isdir(path_to_treat):
-            contents = glob.glob(os.path.sep.join([path_to_treat, "*"]))
-            for content in contents:
-                remove_dir_and_content(content)
-            os.removedirs(path_to_treat)
+            shutil.rmtree(path_to_treat)
         else:
             os.remove(path_to_treat)
 
@@ -228,22 +225,13 @@ def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, ou
         return apply_cdo_command_on_slice(init_cdo_command, cdo_command, tmp_output_file, output_file)
 
 
-def find_tmp_filename(filename, tmp):
-    tmp_file_name = os.path.basename(filename)
-    tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-    while os.path.exists(tmp_file_path):
-        tmp_file_name = "_".join(["tmp", tmp_file_name])
-        tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
-    return tmp_file_path
-
-
 def change_to_tmp_dir(func):
     def change_dir(**kwargs):
         clog("debug")
         clogger.debug("TMPDIR found: %s" % os.environ.get("TMPDIR", None))
-        # Create temporary directory
-        tmp = tempfile.mkdtemp(prefix="climaf_", dir=os.environ.get("TMPDIR", None))
-        clogger.debug("Create temporary dir: %s" % tmp)
+        # Create a temporary directory
+        tmp = tempfile.mkdtemp(prefix="climaf_mcdo", dir=os.environ.get("TMPDIR", None))
+        clogger.debug("Create temporary dir %s" % tmp)
         original_directory = os.getcwd()
         os.chdir(tmp)
         kwargs["tmp"] = tmp
@@ -253,7 +241,6 @@ def change_to_tmp_dir(func):
         except:
             raise
         finally:
-            # Always remove the content of the directory
             os.chdir(original_directory)
             remove_dir_and_content(tmp)
     return change_dir

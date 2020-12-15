@@ -84,6 +84,7 @@ def fmul(dat1, dat2):
       >>> c = '-1'  #a constant
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
+    #
     if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
         if dat1.order == dat2.order:
             res_dict = dict()
@@ -185,7 +186,7 @@ def fsub(dat1, dat2):
       >>> ds1= .... #some dataset, with whatever variable
       >>> c = '-1'  #a constant
       >>> ds1_minus_c = fsub(ds1,c) # ds1 - c
-
+      >>> just to check
     """
     if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
         if dat1.order == dat2.order:
