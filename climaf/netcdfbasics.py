@@ -54,9 +54,8 @@ def varsOfFile(filename):
             lvars.append(filevar)
     # case of scalar coordinates
     if isinstance(vars, dict):
-        for var in vars.keys()  :
-            if var in lvars and \
-               (hasattr(vars[var],"axis") or hasattr(vars[var],"bounds")):
+        for var in vars.keys():
+            if var in lvars and (hasattr(vars[var], "axis") or hasattr(vars[var], "bounds")):
                 lvars.remove(var)
 
     fileobj.close()

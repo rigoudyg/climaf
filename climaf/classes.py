@@ -551,7 +551,8 @@ class cdataset(cobject):
 
         Real life example for options ``choices`` and ``ensemble`` ::
 
-          >>> rst=ds(project="CMIP6", model='*', experiment="*ontrol*", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
+          >>> rst=ds(project="CMIP6", model='*', experiment="*ontrol*", realization="r1i1p1f*", table="Amon",
+          ...        variable="rsut", period="1980-1981")
           >>> clog('info')
           >>> rst.explore('choices')
           info     : Attribute institute has matching value CNRM-CERFACS
@@ -564,14 +565,18 @@ class cdataset(cobject):
           'realization': ['r1i1p1f2'], 'mip': ['CMIP', 'RFMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1']}
 
           >>> # Let us further select by setting experiment=piControl
-          >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon", variable="rsut", period="1980-1981")
+          >>> mrst=ds(project="CMIP6", model='*', experiment="piControl", realization="r1i1p1f*", table="Amon",
+          ...         variable="rsut", period="1980-1981")
           >>> mrst.explore('choices')
-          {'institute': ['CNRM-CERFACS'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], 'grid': ['gr'], 'realization': ['r1i1p1f2']}
+          {'institute': ['CNRM-CERFACS'], 'mip': ['CMIP'], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], 'grid': ['gr'],
+           'realization': ['r1i1p1f2']}
           >>> small_ensemble=mrst.explore('ensemble')
           >>> small_ensemble
           cens({
-                'CNRM-ESM2-1':ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-ESM2-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest'),
-                'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%r1i1p1f2%gr%latest')
+                'CNRM-ESM2-1':ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-ESM2-1%CNRM-CERFACS%CMIP%Amon%piControl%'
+                                 'r1i1p1f2%gr%latest'),
+                'CNRM-CM6-1' :ds('CMIP6%%rsut%1980-1981%global%/cnrm/cmip%CNRM-CM6-1%CNRM-CERFACS%CMIP%Amon%piControl%'
+                                 'r1i1p1f2%gr%latest')
                })
 
         When option='choices' and period= '*', the period of all matching files will be either :
@@ -598,7 +603,8 @@ class cdataset(cobject):
           >>> so=ds(project="CMIP6", model='CNRM*', experiment="piControl", realization="r1i1p1f2",
           ... table="Omon", variable="so", period="*")
 
-          >>> # What is the overall period covered by the union of all datafiles (but not necessarily by a single model!)
+          >>> # What is the overall period covered by the union of all datafiles
+          >>> # (but not necessarily by a single model!)
           >>> so.explore('choices', operation='union')
           { 'period': [1850-2349], 'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'] .....}
 
@@ -804,16 +810,18 @@ class cdataset(cobject):
         >>> res2=ens.check()
 
         >>> # Define a new project for 'em' data with 3 hours frequency in particular
-        >>> cproject('em_3h','root','group','realm','frequency',separator='|')
+        >>> cproject('em_3h', 'root', 'group', 'realm', 'frequency', separator='|')
         >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc'
         >>> dataloc(project='em_3h', organization='generic', url=path)
 
         >>> # Dataset with 3h frequency for 'tas' variable (instant)
-        >>> tas_3h=ds(project='em_3h',variable='tas',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
+        >>> tas_3h=ds(project='em_3h', variable='tas', group='AR4', realm='Atmos', frequency='3Hourly',
+        ...           simulation='A1B', period='2050-2100')
         >>> res3=tas_3h.check()
 
         >>> # Dataset with 3h frequency for 'pr' variable (time mean)
-        >>> pr_3h=ds(project='em_3h',variable='pr',group='AR4',realm='Atmos',frequency='3Hourly', simulation='A1B',period='2050-2100')
+        >>> pr_3h=ds(project='em_3h', variable='pr', group='AR4', realm='Atmos', frequency='3Hourly', simulation='A1B',
+        ...          period='2050-2100')
         >>> res4=pr_3h.check()
 
         """
@@ -1128,9 +1136,10 @@ class cens(cobject, dict):
     def buildcrs(self, crsrewrite=None, period=None):
         if crsrewrite is None and period is None:
             # A useful optimization, for multi-model studies
-            rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].crs) for m in self.order])
+            rep = "cens({%s})" % ",".join(["'%s':%s" % (m, self[m].crs) for m in self.order])
         else:
-            rep = "cens({%s})" % ",".join(["'%s':%s"% (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period)) for m in self.order])
+            rep = "cens({%s})" % ",".join(["'%s':%s" % (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period))
+                                           for m in self.order])
         return rep
 
     def check(self):
@@ -1222,11 +1231,11 @@ def eds(first=None, **kwargs):
             newcomb = []
             for c in comb:
                 for v in attval[att]:
-                    l = [e for e in c]
-                    l.append((att, v))
-                    newcomb.append(l)
+                    lst = [e for e in c]
+                    lst.append((att, v))
+                    newcomb.append(lst)
             comb = newcomb
-        orderl = []
+        orderl = list()
         for c in comb:
             attval2 = attval.copy()
             label = ""
@@ -1842,7 +1851,7 @@ class cpage(cobject):
                 self.heights = heights
 
                 self.fig_lines = []
-                for l in heights:
+                for height in heights:
                     line = []
                     for c in widths:
                         if len(figs) > 0:
@@ -1879,7 +1888,7 @@ class cpage(cobject):
             nx, ny = 5, 7
         elif n in range(36, 49):
             nx, ny = 6, 8
-        elif n >= 49 :
+        elif n >= 49:
             raise Climaf_Classes_Error("Too many figures in page")
         lines = []
         for i in range(len(figs)):
@@ -1899,7 +1908,7 @@ class cpage(cobject):
         for line in self.fig_lines:
             if crsrewrite is not None:
                 rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
-                                           for f in line]))
+                                              for f in line]))
             else:
                 rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
             param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
@@ -2046,7 +2055,7 @@ class cpage_pdf(cobject):
             self.heights = heights
 
             self.fig_lines = []
-            for l in heights:
+            for height in heights:
                 line = []
                 for c in widths:
                     if len(figs) > 0:
@@ -2063,7 +2072,7 @@ class cpage_pdf(cobject):
         for line in self.fig_lines:
             if crsrewrite is not None :
                 rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
-                                           for f in line]))
+                                              for f in line]))
             else:
                 rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
 
@@ -2195,7 +2204,7 @@ def attributeOf(cobject, attrib):
         return attributeOf(list(cobject.values())[0], attrib)
     elif getattr(cobject, attrib, None):
         value = getattr(cobject, attrib)
-        clogger.debug("Find value for object's %s... %s" % (attrib,value))
+        clogger.debug("Find value for object's %s... %s" % (attrib, value))
         return value
     elif isinstance(cobject, ctree):
         clogger.debug("for now, varOf logic is basic (1st operand) - TBD")

@@ -9,10 +9,10 @@ No unit conversion nor variable is renaming performed, yet
 
 Example for a CMIP3 dataset declaration ::
 
- >>> ps=ds(project='CMIP3', model='ncar_ccsm3', experiment='sresa1b', variable='ps', realm='atm', realization='run1', period='*')
-
->>> d=ds(project="CMIP3",variable="*",model="*")
->>> d.explore('choices')
+ >>> ps = ds(project='CMIP3', model='ncar_ccsm3', experiment='sresa1b', variable='ps', realm='atm', realization='run1',
+ ...         period='*')
+ >>> d = ds(project="CMIP3",variable="*",model="*")
+ >>> d.explore('choices')
 
 """
 

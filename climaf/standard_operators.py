@@ -412,8 +412,9 @@ def load_cdftools_operators():
             canSelectVar=True)
     #
     cscript('ccdfmxlheatcm',
-            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc '
-            '$tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file',
+            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; '
+            'cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; '
+            'rm -f mxlheatc.nc $tmp_file',
             _var="somxlheatc", canSelectVar=True)
 
     #
@@ -449,5 +450,5 @@ def load_cdftools_operators():
             _var="zo%s_${basin}", canSelectVar=True)
     #
     # rmse_xyt
-    cscript('rmse_xyt','cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+    cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
 

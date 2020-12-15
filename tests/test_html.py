@@ -103,12 +103,12 @@ class OpenTableTests(unittest.TestCase):
                                                   COLUMNS=template_columns.safe_substitute(LABEL="a column")))
         self.assertEqual(open_table(columns=["a column", "an other one"]),
                          template.safe_substitute(SPACING=5, TITLE="",
-                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=l) for l in
-                                                                   ["a column", "an other one"]])))
+                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=lab)
+                                                                   for lab in ["a column", "an other one"]])))
         self.assertEqual(open_table(columns=["a column", "an other one"], title="A title", spacing=9),
                          template.safe_substitute(SPACING=9, TITLE="A title",
-                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=l) for l in
-                                                                   ["a column", "an other one"]])))
+                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=lab)
+                                                                   for lab in ["a column", "an other one"]])))
 
 
 class CloseTableTests(unittest.TestCase):

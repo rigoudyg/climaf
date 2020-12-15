@@ -279,8 +279,7 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
-        for c in [f for f in crs2filename if crs2filename[f] == filename or
-                                             crs2filename[f] == alternate_filename(filename)]:
+        for c in [f for f in crs2filename if crs2filename[f] in [filename, alternate_filename(filename)]]:
             crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs)
@@ -677,7 +676,8 @@ def list_cache():
     for dir_cache in cachedirs:
         rep = os.path.expanduser(dir_cache)
         find_return += os.popen(
-            "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep).read()
+            r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep
+        ).read()
     files_in_cache = find_return.split('\n')
     files_in_cache.pop(-1)
     return files_in_cache
@@ -773,7 +773,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find = False
     if size or age or access != 0:
         var_find = True
-        command = "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
+        command = r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
                   (rep, opt_find)
         clogger.debug("Find command is :" + command)
 
