@@ -58,9 +58,9 @@ class cperiod(object):
         start_other = getattr(other, "start", None)
         if test and start_self != start_other:
             test = False
-        stop_self = getattr(self, "end", None)
-        stop_other = getattr(other, "end", None)
-        if test and stop_self != stop_other:
+        end_self = getattr(self, "end", None)
+        end_other = getattr(other, "end", None)
+        if test and end_self != end_other:
             test = False
         return test
 
