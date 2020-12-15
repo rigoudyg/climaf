@@ -15,7 +15,6 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
-import env.environment
 
 version = "2.0.0"
 

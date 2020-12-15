@@ -11,9 +11,7 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import sys
 import six
-import os
 import os.path
 import re
 import time
@@ -26,8 +24,8 @@ from operator import itemgetter
 from env.environment import *
 from climaf import version
 from climaf.utils import Climaf_Cache_Error
-from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
-from .cmacro import crewrite
+from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds
+from climaf.cmacro import crewrite
 from env.clogging import clogger
 
 currentCache = None

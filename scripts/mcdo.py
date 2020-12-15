@@ -14,10 +14,8 @@ import re
 import os
 import subprocess
 import time
-import glob
 import shutil
 import six
-import copy
 
 from env.site_settings import onCiclad
 from env.clogging import clogger, clog

@@ -16,7 +16,6 @@ import copy
 import os.path
 from functools import reduce, partial
 import six
-from decimal import Decimal
 
 from env.environment import *
 from climaf.utils import Climaf_Classes_Error
@@ -490,10 +489,11 @@ class cdataset(cobject):
         return False
 
     def missingIsOK(self):
-        if alias is None:
+        if self.alias is None:
             return True
-        _, _, _, _, _, missing, _ = self.alias
-        return missing is None
+        else:
+            _, _, _, _, _, missing, _ = self.alias
+            return missing is None
 
     def matches_conditions(self, conditions):
         """
@@ -650,12 +650,12 @@ class cdataset(cobject):
         # else : periods=None
         if periods:
             # print "periods=",periods
-            if option != 'choices':
+            if option not in ['choices', ]:
                 if group_periods_on:
                     raise Climaf_Classes_Error("Can use 'group_periods_on' only with option='choices'")
                 if operation != 'intersection':
                     raise Climaf_Classes_Error("Can use operation %s only with option='choices'" % operation)
-            if operation == 'intersection':
+            if operation in ['intersection', ]:
                 if group_periods_on:
                     # print "periods=",periods
                     merged_periods = [merge_periods(p) for p in list(periods.values())]
@@ -665,7 +665,7 @@ class cdataset(cobject):
                 else:
                     inter = merge_periods(periods[None])
                 wildcards['period'] = inter
-            elif operation == 'union':
+            elif operation in ['union', ]:
                 to_merge = []
                 for plist in list(periods.values()):
                     to_merge.extend(plist)
@@ -680,13 +680,13 @@ class cdataset(cobject):
                 raise Climaf_Classes_Error("Operation %s is not kown " % operation)
         #
         wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
-        if option == 'resolve':
+        if option in ['resolve', ]:
             clogger.debug("Trying to resolve on attributes %s" % wildcard_attributes_list)
             for kw in wildcards:
                 val = wildcards[kw]
                 if isinstance(val, list):
                     if len(val) > 1:
-                        if kw == 'period':
+                        if kw in ['period', ]:
                             raise Climaf_Classes_Error("Periods with holes are not handled %s" % val)
                         else:
                             raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s" % (kw, val))
@@ -694,7 +694,7 @@ class cdataset(cobject):
                         val = val[0]
                         dic[kw] = val
                 else:
-                    if kw == 'variable':  # Should take care of aliasing to fileVar
+                    if kw in ['variable', ]:  # Should take care of aliasing to fileVar
                         matching_vars = set()
                         paliases = aliases.get(self.project, [])
                         for variable in paliases:
@@ -713,21 +713,20 @@ class cdataset(cobject):
                         dic[kw] = val
             #
             return ds(**dic)
-        elif option == 'choices':
+        elif option in ['choices', ]:
             clogger.debug("Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
             self.files = files
             return wildcards
-        elif option == 'ensemble':
+        elif option in ['ensemble', ]:
             clogger.debug("Trying to create an ensemble on attributes %s" % wildcard_attributes_list)
             is_ensemble = False
             for kw in wildcards:
                 entry = wildcards[kw]
                 # print "entry=",entry, 'type=',type(entry), 'ensemble_kw=',ensemble_kw
-                if kw == 'period' and isinstance(entry, list):
+                if kw in ['period', ] and isinstance(entry, list):
                     if len(wildcards['period']) > 1:
-                        raise \
-                            Climaf_Classes_Error(
-                                "Cannot create an ensemble with holes in period (%s)" % wildcards['period'])
+                        raise Climaf_Classes_Error("Cannot create an ensemble with holes in period (%s)" %
+                                                   wildcards['period'])
                     entry = entry[0]
                 if isinstance(entry, list):
                     is_ensemble = (len(entry) > 1)
@@ -738,7 +737,7 @@ class cdataset(cobject):
                 clogger.warning("Creating an ensemble with a single member")
             self.files = files
             return eds(first=first, **dic)
-        elif option == 'check_and_store':
+        elif option in ['check_and_store', ]:
             for kw in wildcards:
                 entry = wildcards[kw]
                 if isinstance(entry, list) and len(entry) > 1:
@@ -1056,7 +1055,7 @@ class cens(cobject, dict):
         #
         keylist = list(self)
         try:
-            from natsort import natsorted
+            from natsort.natsort import natsorted
             keylist = natsorted(keylist)
         except:
             keylist.sort()
