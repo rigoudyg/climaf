@@ -1073,10 +1073,14 @@ def sync_cvalues():
         ccache="%s/cvalues.json"%(currentCache)
         tmp="%s/cvalues_tmp.json"%(currentCache)
         #
-        with open(ccache,"r") as f :
-            onfile=json.load(f)
-        onfile.update(cvalues)
-        cvalues=onfile
+        try  :
+            # Try to get pre-existing on-disk content
+            with open(ccache,"r") as f :
+                onfile=json.load(f)
+            onfile.update(cvalues)
+            cvalues=onfile
+        except :
+            pass
         with open(tmp,"w") as f :
             json.dump(cvalues,f,separators=(',', ': '),indent=3,ensure_ascii=True)
         os.rename(tmp,ccache)

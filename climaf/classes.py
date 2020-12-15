@@ -744,8 +744,8 @@ class cdataset(cobject):
                 if isinstance(entry, list) and len(entry) > 1:
                     raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among :"
                                                " %s or use either 'ensure_dataset=False' (with method baseFiles or "
-                                               "listfiles) or 'option=\'choices\' (with method explore)" %
-                                               (kw, dic[kw], entry))
+                                               "listfiles) or 'option=\'choices\' (with method explore). Context is %s" %
+                                               (kw, dic[kw], entry, self.kvp))
             self.files = files
         else:
             raise Climaf_Classes_Error("Unknown option %s" % option)
