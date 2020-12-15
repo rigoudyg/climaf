@@ -58,15 +58,15 @@ class cperiod(object):
         start_other = getattr(other, "start", None)
         if test and start_self != start_other:
             test = False
-        stop_self = getattr(self, "stop", None)
-        stop_other = getattr(other, "stop", None)
+        stop_self = getattr(self, "end", None)
+        stop_other = getattr(other, "end", None)
         if test and stop_self != stop_other:
             test = False
         return test
 
     #
     def __hash__(self):
-        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "stop", None)))
+        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "end", None)))
 
     #
     def __repr__(self):
@@ -338,13 +338,24 @@ def merge_periods(remain_to_merge, already_merged=[],handle_360_days_year=True):
     usually be provided
 
     Argument 'handle_360_days_year' allows to merge consecutive periods which miss 
-    only a 31st december,such as in the case with 360-days calendars. It defauklt is True 
+    only a 31st december,such as in the case with 360-days calendars. It defaults to True 
+
+    For dealing with very long list of periods, which do not allow for recursion, we 
+    proceed with batches of N elements
     """
+    N=300
     if already_merged == []:
         if len(remain_to_merge) < 2:
             return remain_to_merge
-        sorted = sort_periods_list(remain_to_merge)
-        return merge_periods(sorted[1:], [sorted[0]],handle_360_days_year)
+        sorted_remain=sorted(remain_to_merge,key=(lambda x : x.start))
+        #sorted = sort_periods_list(remain_to_merge)
+        if len(sorted_remain) <= N :
+            return merge_periods(sorted_remain[1:], [sorted_remain[0]],handle_360_days_year)
+        else:
+            # Avoid too much recursion
+            first_batch=merge_periods(sorted_remain[0:N])
+            return merge_periods(sorted_remain[N:], first_batch,handle_360_days_year)
+        
     if len(remain_to_merge) > 0:
         last = already_merged[-1]
         next_one = remain_to_merge.pop(0)
