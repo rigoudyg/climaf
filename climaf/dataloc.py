@@ -463,7 +463,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     rep = []
     #
     periods = None  # a list of periods available
-    periods_dict = dict()
+    if return_wildcards is not None :
+        periods_dict = return_wildcards.get("period",{})
+        for val in periods_dict:
+            periods_dict[val] = set(periods_dict[val])
+    else:
+        periods_dict = dict()
+        
     #
     period = kwargs['period']
     if period == "*":
