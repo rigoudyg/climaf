@@ -362,11 +362,9 @@ def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=T
         # print "last.end=",last.end,"next.start=",next_one.start
         # if (last.end == next_one.start) :
         #    already_merged[-1]=cperiod(last.start,next_one.end)
-        if next_one.start <= last.end or \
-           (handle_360_days_year and
-            last.end.month == 12 and last.end.day == 31 and
-            next_one.start.month == 1 and next_one.start.day == 1 and
-            next_one.start.year == last.end.year + 1):
+        if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and last.end.day == 31 and
+                                          next_one.start.month == 1 and next_one.start.day == 1
+                                          and next_one.start.year == last.end.year + 1):
             if next_one.end > last.end:
                 # the next period is not entirely included in the
                 # last merged one

@@ -3,6 +3,7 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from climaf.utils import Climaf_Error
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue, cfile
@@ -93,10 +94,10 @@ def fmul(dat1, dat2):
                 res_dict[mem] = multiply(dat1[mem], dat2[mem])
             return cens(res_dict, order=dat1.order)
         else:
-            raise climaf.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
-                                      "Members of dat1 =%s ; Members of dat2 =%s\n"
-                                      "use ensemble_intersection(dat1,dat2) to get two ensembles "
-                                      "with only their common members" % (dat1.order, dat2.order))
+            raise Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                               "Members of dat1 =%s ; Members of dat2 =%s\n"
+                               "use ensemble_intersection(dat1,dat2) to get two ensembles "
+                               "with only their common members" % (dat1.order, dat2.order))
     elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)

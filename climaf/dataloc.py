@@ -23,7 +23,7 @@ import netrc
 from functools import partial
 
 from env.environment import *
-from climaf.utils import Climaf_Error, Climaf_Classes_Error
+from climaf.utils import Climaf_Error, Climaf_Classes_Error, Climaf_Data_Error
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
@@ -642,7 +642,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     # print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start = re.sub(date_regexp0, r'\1', f)
                     if start == f:
-                        raise Climaf_Data_Error("Start period not found in %s using regexp %s" % (f, regexp0))  # ?
+                        raise Climaf_Data_Error("Start period not found in %s using regexp %s" % (f, date_regexp0))  # ?
                     if hasEnd:
                         end = re.sub(date_regexp0, r'\2', f)
                         fperiod = init_period("%s-%s" % (start, end))
@@ -809,65 +809,65 @@ def ftpmatch(connect, url):
     return lpath_match
 
 
-def glob_remote_data(remote, pattern):
-    """
-    Returns a list of path names that match pattern, for remote data
-    located atremote
-    """
+# def glob_remote_data(remote, pattern):
+#     """
+#     Returns a list of path names that match pattern, for remote data
+#     located atremote
+#     """
+#
+#     if len(remote.split(":")) == 3:
+#         k = 1
+#     else:
+#         k = 0
+#     k = 0
+#
+#     if re.findall("@", remote.split(":")[k]):
+#         username = remote.split(":")[k].split("@")[0]
+#         host = remote.split(":")[k].split("@")[-1]
+#     else:
+#         username = ''
+#         host = remote.split(":")[k]
+#
+#     secrets = netrc.netrc()
+#
+#     if username:
+#         if host in secrets.hosts:
+#             login, account, password = secrets.authenticators(host)
+#             if login != username:
+#                 password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#         else:
+#             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#     else:
+#         if host in secrets.hosts:
+#             username, account, password = secrets.authenticators(host)
+#         else:
+#             username = eval(input("Enter login for host '%s': " % host))
+#             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#
+#     try:
+#         connect = ftp.FTP(host, username, password)
+#         listfiles = ftpmatch(connect, pattern)
+#         connect.quit()
+#         return listfiles
+#     except ftp.all_errors as err_ftp:
+#         print(err_ftp)
+#         raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
 
-    if len(remote.split(":")) == 3:
-        k = 1
-    else:
-        k = 0
-    k = 0
 
-    if re.findall("@", remote.split(":")[k]):
-        username = remote.split(":")[k].split("@")[0]
-        host = remote.split(":")[k].split("@")[-1]
-    else:
-        username = ''
-        host = remote.split(":")[k]
-
-    secrets = netrc.netrc()
-
-    if username:
-        if host in secrets.hosts:
-            login, account, password = secrets.authenticators(host)
-            if login != username:
-                password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-        else:
-            password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-    else:
-        if host in secrets.hosts:
-            username, account, password = secrets.authenticators(host)
-        else:
-            username = eval(input("Enter login for host '%s': " % host))
-            password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-
-    try:
-        connect = ftp.FTP(host, username, password)
-        listfiles = ftpmatch(connect, pattern)
-        connect.quit()
-        return listfiles
-    except ftp.all_errors as err_ftp:
-        print(err_ftp)
-        raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
-
-
-def remote_to_local_filename(url):
-    """
-    url: an url of remote data
-
-    Return local filename of remote file
-    """
-    from climaf import remote_cachedir
-
-    if len(url.split(":")) == 3:
-        k = 1
-    else:
-        k = 0
-
-    return rep
+# def remote_to_local_filename(url):
+#     """
+#     url: an url of remote data
+#
+#     Return local filename of remote file
+#     """
+#     from climaf import remote_cachedir
+#
+#     if len(url.split(":")) == 3:
+#         k = 1
+#     else:
+#         k = 0
+#
+#     return rep
 
 
 def glob_remote_data(url, pattern):

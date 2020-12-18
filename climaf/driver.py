@@ -84,16 +84,6 @@ def capply(climaf_operator, *operands, **parameters):
     return res
 
 
-def capply_operator(climaf_operator, *operands, **parameters):
-    """
-    Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
-    TODO: To be implemented
-    """
-    clogger.error("Not yet developped - TBD")
-    raise NotImplementedError("Could not yet apply an operator.")
-    return None
-
-
 def capply_script(script_name, *operands, **parameters):
     """
     Create object for application of a script to OPERANDS with keyword PARAMETERS.
@@ -405,7 +395,15 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         else:
             return obj
     else:
-        raise Climaf_Driver_Error("operator %s is not a script nor known operator %s" % str(cobject.operator))
+        raise Climaf_Driver_Error("operator %s is not a script nor known operator" % str(cobject.operator))
+
+
+def ceval_operator(cobject, deep, *args, **kwargs):
+    raise NotImplementedError()
+
+
+def cstore(cobject, *args, **kwargs):
+    raise NotImplementedError()
 
 
 def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -530,7 +528,7 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
         down_deep = None
     file = cfilePage(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
-    if format == 'file':
+    if format in ['file', ]:
         return file
     else:
         return cread(file)  # !! Does it make sense ?
@@ -1033,7 +1031,7 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             raise Climaf_Driver_Error("")
         if period is not None:
-            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
+            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
         from .anynetcdf import ncf
         fileobj = ncf(datafile)
         # Note taken from the CDOpy developper : .data is not backwards

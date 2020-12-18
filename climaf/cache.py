@@ -445,9 +445,8 @@ def cdrop(obj, rm=True, force=False):
                 dropped_crs.append(crs)
                 try:
                     os.rmdir(path_file)
-                except OSError as ex:
+                except OSError:
                     pass
-                    # clogger.warning(ex)
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache" % crs)
@@ -671,7 +670,6 @@ def list_cache():
     Return the list of files in cache directories, using `find`
 
     """
-    files_in_cache = []
     find_return = ""
     for dir_cache in cachedirs:
         rep = os.path.expanduser(dir_cache)
@@ -758,7 +756,6 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     rep = os.path.expanduser(cachedirs[0])
 
     # command for research on size/age/access
-    command = ""
     opt_find = ""
     if size:
         if re.search('[kMG]', size) is None:
@@ -779,8 +776,6 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
         # construction of the new dictionary after research on size/age/access
         new_dict = dict()
-        find_return = ""
-        list_search_files_after_find = []
 
         find_return = os.popen(command).read()
         list_search_files_after_find = find_return.split('\n')
@@ -906,9 +901,10 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     elif remove is True and len_new_dict != 0:
         print("Removed files:")
-        list_tmp_crs = []
-        list_tmp_crs = list(new_dict) if (var_find or pattern is not "" or not_pattern is not "")\
-            else list(crs2filename)
+        if var_find or pattern is not "" or not_pattern is not "":
+            list_tmp_crs = list(new_dict)
+        else:
+            list_tmp_crs = list(crs2filename)
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
         return list(map(crewrite, list_tmp_crs))
@@ -1058,11 +1054,11 @@ def load_cvalues() :
         if os.path.exists(cache_file) :
             with open(cache_file,"r") as f :
                 cvalues=json.load(f)
-    
+
 
 def sync_cvalues():
     """
-    Read the on-disk of 'cvalue' scalars, update it with the in-memory one and 
+    Read the on-disk of 'cvalue' scalars, update it with the in-memory one and
     write it in json file cvalues.json
     """
     global cvalues
@@ -1090,5 +1086,5 @@ def raz_cvalues():
     if handle_cvalues is not False :
         cvalues={}
         sync_cvalues()
-    
+
 

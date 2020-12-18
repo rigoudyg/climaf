@@ -193,7 +193,7 @@ def cmatch(macro, cobj):
                 argsub += cmatch(mop, op)
         return argsub
     elif isinstance(cobj, scriptChild) and isinstance(macro, scriptChild) and macro.varname == cobj.varname:
-        return cmatch(macro.father, cobj.father, argslist)
+        return cmatch(macro.father, cobj.father)  # , argslist)
     elif isinstance(cobj, cpage) and isinstance(macro, cpage):
         argsub = []
         if cobj.heights == macro.heights and cobj.widths == macro.widths and cobj.orientation == macro.orientation:

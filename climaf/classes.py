@@ -644,7 +644,6 @@ class cdataset(cobject):
             if filenameVar:
                 dic["filenameVar"] = filenameVar
         clogger.debug("Looking with dic=%s" % repr(dic))
-        wildcards = None
         # if option != 'check_and_store' :
         wildcards = dict()
         files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
@@ -1533,7 +1532,6 @@ def ds(*args, **kwargs):
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
-        match = None
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
             match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)(y|Y)$", kwargs['period'])
             if match is not None:
@@ -1691,7 +1689,8 @@ def cmissing(project, missing, *kwargs):
     Such a declaration must follow all ``calias`` declarations for the
     same project
     """
-    pass  # TBD
+    pass
+    # raise NotImplementedError()
 
 
 class cpage(cobject):
@@ -1810,18 +1809,15 @@ class cpage(cobject):
                 "of lists (each representing a line of figures)")
         if isinstance(fig_lines, list):
             if not widths:
-                widths = []
+                widths = list()
                 for line in fig_lines:
                     if len(line) != len(fig_lines[0]):
                         raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
-                for column in fig_lines[0]:
-                    widths.append(round(1. / len(fig_lines[0]), 2))
+                widths.extend([round(1. / len(fig_lines[0]), 2) for column in fig_lines[0]])
             self.widths = widths
 
             if not heights:
-                heights = []
-                for line in fig_lines:
-                    heights.append(round(1. / len(fig_lines), 2))
+                heights = [round(1. / len(fig_lines), 2) for line in fig_lines]
             self.heights = heights
 
             if len(fig_lines) != len(self.heights):
@@ -1842,17 +1838,15 @@ class cpage(cobject):
             else:
                 figs = [fig for fig in fig_lines.order]
                 if not widths:
-                    widths = [1.]
+                    widths = [1., ]
                 self.widths = widths
                 if not heights:
-                    heights = []
-                    for memb in figs:
-                        heights.append(round(1. / len(figs), 2))
+                    heights = [round(1. / len(figs), 2) for mb in figs]
                 self.heights = heights
 
-                self.fig_lines = []
+                self.fig_lines = list()
                 for height in heights:
-                    line = []
+                    line = list()
                     for c in widths:
                         if len(figs) > 0:
                             line.append(fig_lines[figs.pop(0)])
@@ -1897,8 +1891,7 @@ class cpage(cobject):
                 lines.append(line)
             line.append(figs[i])
         j = len(line)
-        for i in range(j, nx):
-            line.append(None)
+        line.extend([None for i in range(j, nx)])
         self.fig_lines = lines
         self.widths = [round(1. / nx, 2) for i in range(nx)]
         self.heights = [round(1. / ny, 2) for i in range(ny)]
@@ -2016,18 +2009,15 @@ class cpage_pdf(cobject):
                 "of lists (each representing a line of figures)")
         if isinstance(fig_lines, list):
             if not widths:
-                widths = []
+                widths = list()
                 for line in fig_lines:
                     if len(line) != len(fig_lines[0]):
                         raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
-                for column in fig_lines[0]:
-                    widths.append(round(1. / len(fig_lines[0]), 2))
+                widths.extend([round(1. / len(fig_lines[0]), 2) for column in fig_lines[0]])
             self.widths = widths
 
             if not heights:
-                heights = []
-                for line in fig_lines:
-                    heights.append(round(1. / len(fig_lines), 2))
+                heights = [round(1. / len(fig_lines), 2) for line in fig_lines]
             self.heights = heights
 
             if len(fig_lines) != len(self.heights):
@@ -2046,17 +2036,15 @@ class cpage_pdf(cobject):
             figs = [fig for fig in fig_lines.order]
 
             if not widths:
-                widths = [1.]
+                widths = [1., ]
             self.widths = widths
             if not heights:
-                heights = []
-                for memb in figs:
-                    heights.append(round(1. / len(figs), 2))
+                heights = [round(1. / len(figs), 2) for memb in figs]
             self.heights = heights
 
-            self.fig_lines = []
+            self.fig_lines = list()
             for height in heights:
-                line = []
+                line = list()
                 for c in widths:
                     if len(figs) > 0:
                         line.append(fig_lines[figs.pop(0)])
@@ -2260,6 +2248,7 @@ def test():
     #
     tos = cdataset(experiment="rcp85", variable="tos", period="19790101-19790102")
     tr = ctree("operator", tos, para1="val1", para2="val2")
+    print(tr)
     # tos.pr()
     #
     # ds1=Dataset(period="1850-2012")
