@@ -84,17 +84,11 @@ class CobjectTests(unittest.TestCase):
     def test_cobject_init(self):
         self.assertEqual(self.my_object.crs, "void")
 
-    #@unittest.expectedFailure
     def test_cobject_str(self):
-        # TODO: Modify CliMAF to raise an exception
-        with self.assertRaises(NotImplementedError):
-            str(self.my_object)
+        self.assertEqual(str(self.my_object), "void")
 
-    #@unittest.expectedFailure
     def test_cobject_repr(self):
-        # TODO: Modify CliMAF to raise an exception
-        with self.assertRaises(NotImplementedError):
-            str(self.my_object)
+        self.assertEqual(repr(self.my_object), "void")
 
     @unittest.expectedFailure
     def test_cobject_register(self):

@@ -226,7 +226,7 @@ class cdummy(cobject):
         """
         cdummy class represents dummy arguments in the CRS
         """
-        pass
+        self.crs = self.buildcrs()
 
     def buildcrs(self, period=None, crsrewrite=None):
         return 'ARG'
@@ -1353,7 +1353,7 @@ class ctree(cobject):
         rep = list()
         #
         for op in [o for o in self.operands if o]:
-            if crsrewrite is None and period is None:
+            if crsrewrite is None and period is None and "crs" in dir(op):
                 opcrs = op.crs
             else:
                 opcrs = op.buildcrs(crsrewrite=crsrewrite, period=period)

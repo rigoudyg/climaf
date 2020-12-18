@@ -225,6 +225,15 @@ def apply_cdo_command_on_slice(init_cdo_command, cdo_command, files_to_treat, ou
         return apply_cdo_command_on_slice(init_cdo_command, cdo_command, tmp_output_file, output_file)
 
 
+def find_tmp_filename(filename, tmp):
+    tmp_file_name = os.path.basename(filename)
+    tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+    while os.path.exists(tmp_file_path):
+        tmp_file_name = "_".join(["tmp", tmp_file_name])
+        tmp_file_path = os.path.sep.join([tmp, tmp_file_name])
+    return tmp_file_path
+
+
 def change_to_tmp_dir(func):
     def change_dir(**kwargs):
         clog("debug")

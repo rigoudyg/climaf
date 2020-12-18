@@ -93,8 +93,8 @@ def macro(name, cobj, lobjects=[]):
         return cdummy()
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
-                    *cobj.operands, **cobj.parameters)
-        rep.operands = list(map(macro, [None for o in rep.operands], rep.operands))
+                    *list(map(macro, [None for o in cobj.operands], cobj.operands)),
+                    **cobj.parameters)
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
