@@ -41,7 +41,8 @@ class McdoTests(unittest.TestCase):
         ref_output_file = os.path.sep.join([self.ref_dir, output_file])
         mcdo_main(input_files=[self.input_file_1], output_file=test_output_file,
                   variable="ta", alias=["taC", "ta", "1", "-273.15"], region=None, units=None, vm=None,
-                  period=None, operator="sellevel,85000", apply_operator_after_merge=False, test=test_log)
+                  period=None, operator="sellevel,85000", apply_operator_after_merge=False, test=test_log,
+                  running_climaf_tests=True)
         compare_text_files(test_log, ref_log, _CLIMAF_PATH_=rootpath[0], _TEST_PATH_=tmp_directory)
         compare_netcdf_files(test_output_file, ref_output_file)
 
@@ -55,7 +56,7 @@ class McdoTests(unittest.TestCase):
         mcdo_main(input_files=[self.input_file_2, self.input_file_3, self.input_file_4], output_file=test_output_file,
                   variable="tas", alias=None, region=["-20", "60", "10", "350"], units=None, vm=None,
                   period="1850-06-01T00:00:00,1852-04-03T00:00:00", operator="ymonavg", apply_operator_after_merge=True,
-                  test=test_log)
+                  test=test_log, running_climaf_tests=True)
         compare_text_files(test_log, ref_log, _CLIMAF_PATH_=rootpath[0], _TEST_PATH_=tmp_directory)
         compare_netcdf_files(test_output_file, ref_output_file)
 

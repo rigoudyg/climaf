@@ -16,7 +16,7 @@ from climaf.cache import setNewUniqueCache
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias
 from climaf.period import Climaf_Period_Error, init_period
 from env.environment import *
-from env.site_settings import atCNRM
+from env.site_settings import atCNRM, onCiclad
 
 
 class CprojectTests(unittest.TestCase):
@@ -140,6 +140,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip")
+        elif onCiclad:
+            self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -166,6 +168,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
+        if onCiclad:
+            self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -236,6 +240,8 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         if atCNRM:
             self.root = "/cnrm/cmip/cnrm/ESG"
+        if onCiclad:
+            self.root = "/bdd"
         else:
             self.root = ""
         self.my_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',

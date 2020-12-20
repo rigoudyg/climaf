@@ -65,11 +65,14 @@ def parse_args():
     parser.add_argument("--units", type=correct_args_type, help="Units of the variable")
     parser.add_argument("--vm", type=correct_args_type, help="")
     parser.add_argument("--test", help="Test the script, provide output file")
+    parser.add_argument("--running_climaf_tests", type=bool, default=False,
+                        help="If True, apply settings common to all sites, when needed")
 
     args = parser.parse_args()
     return dict(input_files=args.input_files, operator=args.operator, output_file=args.output_file,
                 variable=args.variable, period=args.period, region=args.region, alias=args.alias, units=args.units,
-                vm=args.vm,  apply_operator_after_merge=args.apply_operator_after_merge)
+                vm=args.vm,  apply_operator_after_merge=args.apply_operator_after_merge,
+                running_climaf_tests=args.running_climaf_tests)
 
 
 # Define several auxiliary functions
@@ -257,7 +260,8 @@ def change_to_tmp_dir(func):
 
 @change_to_tmp_dir
 def main(input_files, output_file, tmp, original_directory, variable=None, alias=None, region=None, units=None, vm=None,
-         period=None, operator=None, apply_operator_after_merge=None, test=None):
+         period=None, operator=None, apply_operator_after_merge=None, test=None,
+         running_climaf_tests=False):
     # Initialize cdo commands
     cdo_commands_before_merge = list()
     cdo_commands_for_selvar = list()
@@ -267,7 +271,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Find out which command must be used for cdo
     # For the time being, at most sites, must use NetCDF3 file format chained CDO
     # operations because NetCDF4 is not threadsafe there
-    if onCiclad:
+    if onCiclad and not running_climaf_tests:
         init_cdo_command = "cdo -O"
     else:
         init_cdo_command = "cdo -O -f nc"
