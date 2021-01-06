@@ -168,7 +168,7 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
-        if onCiclad:
+        elif onCiclad:
             self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
@@ -240,7 +240,7 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         if atCNRM:
             self.root = "/cnrm/cmip/cnrm/ESG"
-        if onCiclad:
+        elif onCiclad:
             self.root = "/bdd"
         else:
             self.root = ""
