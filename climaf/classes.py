@@ -748,8 +748,8 @@ class cdataset(cobject):
                 if isinstance(entry, list) and len(entry) > 1:
                     raise Climaf_Classes_Error("This dataset is ambiguous on attribute %s='%s'; please choose among :"
                                                " %s or use either 'ensure_dataset=False' (with method baseFiles or "
-                                               "listfiles) or 'option=\'choices\' (with method explore). Context is %s" %
-                                               (kw, dic[kw], entry, self.kvp))
+                                               "listfiles) or 'option=\'choices\' (with method explore). "
+                                               "Context is %s" % (kw, dic[kw], entry, self.kvp))
             self.files = files
         else:
             raise Climaf_Classes_Error("Unknown option %s" % option)
@@ -1297,8 +1297,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     fperiod = timeLimits(filename)
     if period is None:
         if fperiod is None:
-            period="fx"
-            #raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
+            period = "fx"
+            # raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
     else:
@@ -1407,7 +1407,7 @@ class scriptChild(cobject):
         self.register()
 
     def buildcrs(self, period=None, crsrewrite=None):
-        if period is None :
+        if period is None:
             tmp = self.father.crs
         else:
             tmp = self.father.buildcrs(period=period)
@@ -2058,7 +2058,7 @@ class cpage_pdf(cobject):
     def buildcrs(self, crsrewrite=None, period=None):
         rep = list()
         for line in self.fig_lines:
-            if crsrewrite is not None :
+            if crsrewrite is not None:
                 rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
                                               for f in line]))
             else:

@@ -12,7 +12,7 @@ complain to climaf at cnrm dot fr if this does not fit the needs
 
 Example of a 'ceres' project dataset declaration ::
 
- >>> d=ds('project='ceres, variable='rlds',period='198001',domain=[40.,60.,-10.,+20.])
+ >>> d = ds(project='ceres', variable='rlds', period='198001', domain=[40.,60.,-10.,+20.])
 
 """
 

@@ -237,7 +237,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 set_variable(derived_value, ds.variable, format=format)
             cdedent()
             return derived_value
-        elif noselect(userflags, ds, format) and format=="file" :
+        elif noselect(userflags, ds, format) and format in ["file", ]:
             # The caller is assumed to be able to select the needed sub-period or variable
             # and to select the variable
             clogger.debug("Delivering file set or sets is OK for the target use")

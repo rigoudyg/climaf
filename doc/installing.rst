@@ -227,13 +227,13 @@ Using CliMAF as a library
 If you wish to have the same facilities (shortcuts) than in interactive
 sessions, then insert ::
 
->>> from climaf.api import *
+    >>> from climaf.api import *
 
 in each module making use of CliMAF functions. 
 
 But you may prefer to make only explicit imports, and then use::
 
->>> import climaf
+    >>> import climaf
 
 In that case: 
 

@@ -30,8 +30,8 @@ from env.clogging import clogger
 
 currentCache = None
 cachedirs = None
-handle_cvalues='by_hash' # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
-cvalues={}
+handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
+cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
 fileNameLength = 60
 #: Define whether we try to have safe naming of cache objects using adaptative filename length
@@ -44,7 +44,7 @@ crs2filename = dict()
 crs2eval = dict()
 #: The list of crs which file has been dropped since last synchronisation between in-memory index and file index
 #  (or at least since the beginning of the session)
-dropped_crs = []
+dropped_crs = list()
 
 #: A dict containing cache index entries (as listed in index file), which
 # were up to now not interpretable, given the set of defined projects
@@ -1022,38 +1022,40 @@ def rebuild():
     return crs2filename
 
 
-def store_cvalue(crs,index,value):
+def store_cvalue(crs, index, value):
     """
     Stores a scalar, as computed by cvalue, in a scalars cache
     """
-    if handle_cvalues is not False :
-        if handle_cvalues=="by_crs" :
-            key=hashlib.sha224((crs+"%d"%index).encode("utf-8")).hexdigest()
-        else :
-            key=crs+"[%d]"%index
-        cvalues[key]=value
+    if handle_cvalues is not False:
+        if handle_cvalues in ["by_crs", ]:
+            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+        else:
+            key = crs + "[%d]" % index
+        cvalues[key] = value
 
-def has_cvalue(crs,index):
+
+def has_cvalue(crs, index):
     """
     Returns a scalar, as computed by cvalue, from the scalars cache (or None if not cached)
     """
-    if handle_cvalues is not False :
-        if handle_cvalues=="by_crs" :
-            key=hashlib.sha224((crs+"%d"%index).encode("utf-8")).hexdigest()
-        else :
-            key=crs+"[%d]"%index
-        return cvalues.get(key,None)
+    if handle_cvalues is not False:
+        if handle_cvalues in ["by_crs", ]:
+            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+        else:
+            key = crs + "[%d]" % index
+        return cvalues.get(key, None)
 
-def load_cvalues() :
+
+def load_cvalues():
     """
     Load in memory the cache of 'cvalue' scalars, from json file cvalues.json
     """
     global cvalues
-    if handle_cvalues is not False :
-        cache_file="%s/cvalues.json"%(currentCache)
-        if os.path.exists(cache_file) :
-            with open(cache_file,"r") as f :
-                cvalues=json.load(f)
+    if handle_cvalues is not False:
+        cache_file = "%s/cvalues.json" % currentCache
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                cvalues = json.load(f)
 
 
 def sync_cvalues():
@@ -1063,28 +1065,29 @@ def sync_cvalues():
     """
     global cvalues
 
-    if handle_cvalues is not False :
-        ccache="%s/cvalues.json"%(currentCache)
-        tmp="%s/cvalues_tmp.json"%(currentCache)
+    if handle_cvalues is not False:
+        ccache = "%s/cvalues.json" % currentCache
+        tmp = "%s/cvalues_tmp.json" % currentCache
         #
-        try  :
+        try:
             # Try to get pre-existing on-disk content
-            with open(ccache,"r") as f :
-                onfile=json.load(f)
+            with open(ccache, "r") as f:
+                onfile = json.load(f)
             onfile.update(cvalues)
-            cvalues=onfile
-        except :
+            cvalues = onfile
+        except:
             pass
-        with open(tmp,"w") as f :
-            json.dump(cvalues,f,separators=(',', ': '),indent=3,ensure_ascii=True)
-        os.rename(tmp,ccache)
+        with open(tmp, "w") as f:
+            json.dump(cvalues, f, separators=(',', ': '), indent=3, ensure_ascii=True)
+        os.rename(tmp, ccache)
+
 
 def raz_cvalues():
     """
     Clear in-memory and on-disk cache of 'cvalue' scalars
     """
-    if handle_cvalues is not False :
-        cvalues={}
+    if handle_cvalues is not False:
+        cvalues = dict()
         sync_cvalues()
 
 

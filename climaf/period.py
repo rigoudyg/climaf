@@ -39,7 +39,8 @@ class cperiod(object):
                     start = start._to_real_datetime()
                     end = end._to_real_datetime()
                 except:
-                    raise Climaf_Period_Error("issue with start or end, %s : %s,\n%s : %s" % (type(start), str(start), type(end), str(end)))
+                    raise Climaf_Period_Error("issue with start or end, %s : %s,\n%s : %s" %
+                                              (type(start), str(start), type(end), str(end)))
             self.start = start
             self.end = end
             if pattern is None:
@@ -344,17 +345,17 @@ def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=T
     For dealing with very long list of periods, which do not allow for recursion, we
     proceed with batches of N elements
     """
-    N=300
+    N = 300
     if isinstance(already_merged, list) and len(already_merged) == 0:
         if len(remain_to_merge) < 2:
             return remain_to_merge
-        sorted_remain=sorted(remain_to_merge, key=(lambda x : x.start))
-        if len(sorted_remain) <= N :
+        sorted_remain = sorted(remain_to_merge, key=(lambda x: x.start))
+        if len(sorted_remain) <= N:
             return merge_periods(sorted_remain[1:], [sorted_remain[0]], handle_360_days_year)
         else:
             # Avoid too much recursion
-            first_batch=merge_periods(sorted_remain[0:N])
-            return merge_periods(sorted_remain[N:], first_batch,handle_360_days_year)
+            first_batch = merge_periods(sorted_remain[0:N])
+            return merge_periods(sorted_remain[N:], first_batch, handle_360_days_year)
 
     if len(remain_to_merge) > 0:
         last = already_merged[-1]
