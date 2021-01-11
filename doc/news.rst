@@ -14,19 +14,6 @@ Changes, newest first:
       It has been tested with python 2.7 and python 3.7.
       Tests with other versions will come soon.
 
-    - To avoid cycling import, the module :py:mod:`climaf.operator` has been split into three modules:
-      :py:mod:`climaf.operator` (still here), :py:mod:`climaf.operator_derive` and :py:mod:`climaf.operator_scripts`,
-
-    - :py:func:`~climaf.operator.ceval` has been modified to call functions specific to CliMAF types
-      (:py:func:`~climaf.operator.ceval_for_cdataset`, :py:func:`~climaf.operator.ceval_for_ctree`,
-      :py:func:`~climaf.operator.ceval_for_ScriptChild`, :py:func:`~climaf.operator.ceval_for_cpage`,
-      :py:func:`~climaf.operator.ceval_for_cpage_pdf`, :py:func:`~climaf.operator.ceval_for_cens`,
-      :py:func:`~climaf.operator.ceval_for_string`)
-
-    - Variables used everywhere in CliMAF and available for everyone have been moved to module :py:mod:`env.environment`
-      (``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``, ``derived_variables``,
-      ``cmacros``, ``known_formats``, ``graphic_formats``, ``none_formats``, ``locs``).
-
   - **Scalar values computed using** :py:func:`~climaf.driver.cvalue` **are now cached**; users can reset the
     corresponding in-memory and disk caches (both together) using :py:func:`~climaf.cache.raz_cvalues`.
     Variable :py:data:`cache.handle_cvalues` allows (when set to False) to de-activate this cache.
@@ -56,6 +43,21 @@ Changes, newest first:
 
     - Function :py:func:`~climaf.period.merge_periods` will merge consecutive periods even if they
       miss a 31st december (such as in 360-days calendars)
+
+  - Structure:
+
+    - To avoid cycling import, the module :py:mod:`climaf.operator` has been split into three modules:
+      :py:mod:`climaf.operator` (still here), :py:mod:`climaf.operator_derive` and :py:mod:`climaf.operator_scripts`,
+
+    - :py:func:`~climaf.operator.ceval` has been modified to call functions specific to CliMAF types
+      (:py:func:`~climaf.operator.ceval_for_cdataset`, :py:func:`~climaf.operator.ceval_for_ctree`,
+      :py:func:`~climaf.operator.ceval_for_ScriptChild`, :py:func:`~climaf.operator.ceval_for_cpage`,
+      :py:func:`~climaf.operator.ceval_for_cpage_pdf`, :py:func:`~climaf.operator.ceval_for_cens`,
+      :py:func:`~climaf.operator.ceval_for_string`)
+
+    - Variables used everywhere in CliMAF and available for everyone have been moved to module :py:mod:`env.environment`
+      (``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``, ``derived_variables``,
+      ``cmacros``, ``known_formats``, ``graphic_formats``, ``none_formats``, ``locs``).
 
 - V1.2.13:
 
