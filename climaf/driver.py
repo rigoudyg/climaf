@@ -851,10 +851,10 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
-    if cache.hasExactObject(scriptCall.operands[0]) :
+    if cache.hasExactObject(scriptCall.operands[0]):
         # for key in ["period","period_iso","var","domain","missing","alias","units"]:
         for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
-            if key in subdict :
+            if key in subdict and not key in scriptCall.parameters:
                 subdict.pop(key)
     #
     # print("subdict="+`subdict`)
@@ -871,17 +871,20 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict.pop('member_label')
     #
     # Substitute all args
+    clogger.debug("Final dictionary to fill template:\n%s" % str(subdict))
     template = template.safe_substitute(subdict)
+    clogger.debug("Template obtained:\n%s" % template)
     #
     # Allowing for some formal parameters to be missing in the actual call:
     #
     # Discard remaining substrings looking like :
     #  some_word='"${some_keyword}"' , or simply : '"${some_keyword}"'
-    template = re.sub(r'(\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
+    template = re.sub(r'((--)?\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
     #
     # Discard remaining substrings looking like :
     #  some_word=${some_keyword}  or  simply : ${some_keyword}
-    template = re.sub(r"(\w*=)?\$\{\w*\}", r"", template)
+    template = re.sub(r"((--)?\w*=)?\$\{\w*\}", r"", template)
+    clogger.debug("Final template obtained:\n%s" % template)
     #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None:

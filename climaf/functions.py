@@ -103,6 +103,37 @@ def fmul(dat1, dat2):
         return ccdo2(dat1, dat2, operator='mul')
 
 
+def xfmul(*dats, **kwargs):
+    """
+    Multiplication of several CliMAF objects using xarray.
+    :param dats: CliMAF objects to be multiplied
+    :param constant: Constant with which the field should be multiplied
+    :param mask: Mask to be used
+    :param mask_variable: The mask's variable
+    :return: the CliMAF object which contains the result of the operation.
+    """
+    if len(dats) > 5:
+        raise ValueError("Could not multiply more than five datasets")
+    kwargs["var"] = dats[0].variable
+    is_cens = [isinstance(dat, climaf.classes.cens) for dat in dats]
+    if any(is_cens):
+        cens_index = is_cens.index(True)
+        cens_order = [dats[i].getattr("order") for i in cens_index]
+        if all([od == cens_order[0] for od in cens_order]):
+            res_dict = dict()
+            for (subdats) in zip(*dats):
+                res_dict[subdats[cens_index[0]]] = xmul(*subdats, **kwargs)
+            return cens(res_dict, order=cens_order[0])
+        else:
+            cens_err = ["%s:%s" % (index, order) for (index, order) in enumerate(cens_index, cens_order)]
+            raise climaf.Climaf_Error("Your CliMAF ensembles do not have the same members: %s \n"
+                                      "use ensemble_intersection to get ensembles with only their common members"
+                                      % (" ; ".join(cens_err)))
+    else:
+        return xmul(*dats, **kwargs)
+
+
+
 def fdiv(dat1, dat2):
     """
     Division of two CliMAF object, or multiplication of the CliMAF object given as first argument

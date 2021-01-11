@@ -69,6 +69,11 @@ def load_standard_operators():
     cscript('multiply', 'cdo mul ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
+    cscript("xmul", scriptpath + "xmul.py ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} --field_variable=${var} "
+                                 "--constant=${constant} --mask_file=${mask_file} --mask_variable=${mask_variable} "
+                                 "--output_file=${out}",
+            commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
+    #
     cscript('divide', 'cdo div ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
