@@ -7,13 +7,11 @@ Management of CliMAF standard operators
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import os
-import subprocess
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
 from env.clogging import clogger
-from env.site_settings import onCiclad
+from env.site_settings import *
 from env.environment import *
 
 
@@ -414,8 +412,9 @@ def load_cdftools_operators():
             canSelectVar=True)
     #
     cscript('ccdfmxlheatcm',
-            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc '
-            '$tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file',
+            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; '
+            'cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; '
+            'rm -f mxlheatc.nc $tmp_file',
             _var="somxlheatc", canSelectVar=True)
 
     #
@@ -451,5 +450,5 @@ def load_cdftools_operators():
             _var="zo%s_${basin}", canSelectVar=True)
     #
     # rmse_xyt
-    cscript('rmse_xyt','cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+    cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
 

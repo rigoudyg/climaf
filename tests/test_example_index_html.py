@@ -48,6 +48,9 @@ class HtmlIndexCreation(unittest.TestCase):
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_index_html"])
         self.reference_index_1 = os.sep.join([self.reference_directory, "index_1.html"])
         self.reference_index_2 = os.sep.join([self.reference_directory, "index_2.html"])
+        # Need to overwrite IPSL's very extensive variables definitions, at leat for "rst"
+        # This in order to run the tests also at IPSL
+        derived_variables["*"].pop("rst", None)
 
     def test_html_index_1(self):
         # Start the index

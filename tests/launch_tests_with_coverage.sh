@@ -33,6 +33,7 @@ if [ $run_coverage -eq 0 ] ; then
     ${run_command_line} "test_import.py"
 fi
 for module in $run_modules; do
+    echo -e "\nTesting module : $module\n"
     echo $PWD
     if [ $run_coverage -eq 0 ] ; then
         ${run_command_line} "test_${module}.py"

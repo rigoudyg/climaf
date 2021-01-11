@@ -66,6 +66,7 @@ class DerivedVariableTest(unittest.TestCase):
         self.assertEqual(derived_variable("rscre", "erai"), ("minus", "rscre", ["rs", "rscs"], {}))
         self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
 
+
 if __name__ == '__main__':
     # Jump into the test directory
     tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_operators"])

@@ -84,16 +84,6 @@ def capply(climaf_operator, *operands, **parameters):
     return res
 
 
-def capply_operator(climaf_operator, *operands, **parameters):
-    """
-    Create object for application of an internal OPERATOR to OPERANDS with keywords PARAMETERS.
-    TODO: To be implemented
-    """
-    clogger.error("Not yet developped - TBD")
-    raise NotImplementedError("Could not yet apply an operator.")
-    return None
-
-
 def capply_script(script_name, *operands, **parameters):
     """
     Create object for application of a script to OPERANDS with keyword PARAMETERS.
@@ -113,10 +103,10 @@ def capply_script(script_name, *operands, **parameters):
     # Check that all parameters to the call are expected by the script
     command = script.command
     for para in parameters:
-        if not(r"{%s}" % para in command) and not(r"{%s_iso}" % para in command) and para != 'member_label' \
+        if not(r"{%s}" % para in command) and not(r"{%s_iso}" % para in command) and para not in ['member_label', ] \
                 and not para.startswith("add_"):
-                    raise Climaf_Driver_Error("parameter '%s' is not expected by script %s (which command is : %s)" %
-                                              (para, script_name, command))
+            raise Climaf_Driver_Error("parameter '%s' is not expected by script %s (which command is : %s)" %
+                                      (para, script_name, command))
     #
     # Check that only first operand can be an ensemble
     opscopy = list(operands)
@@ -212,13 +202,16 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     :return:
     """
     recurse_list.append(cobject.crs)
-    clogger.debug("Evaluating dataset operand " + cobject.crs + "having kvp=" + repr(cobject.kvp))
+    clogger.debug("Evaluating dataset operand " + cobject.crs + " having kvp= " + repr(cobject.kvp))
     ds = cobject
     cache_value = cache.hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
         cdedent()
-        return cache_value
+        if format == 'file':
+            return cache_value
+        else:
+            return cread(cache_value, classes.varOf(ds))
     if ds.isLocal() or ds.isCached():
         clogger.debug("Dataset %s is local or cached " % ds)
         #  if the data is local, then
@@ -244,7 +237,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 set_variable(derived_value, ds.variable, format=format)
             cdedent()
             return derived_value
-        elif noselect(userflags, ds, format):
+        elif noselect(userflags, ds, format) and format in ["file", ]:
             # The caller is assumed to be able to select the needed sub-period or variable
             # and to select the variable
             clogger.debug("Delivering file set or sets is OK for the target use")
@@ -314,7 +307,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -374,9 +367,9 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     #
     #  Only deep=True can propagate downward !
     if deep:
-        down_deep= True
-    else :
-        down_deep= None
+        down_deep = True
+    else:
+        down_deep = None
     #
     # the cache doesn't have a similar tree, let us recursively eval subtrees
     ##########################################################################
@@ -402,7 +395,15 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         else:
             return obj
     else:
-        raise Climaf_Driver_Error("operator %s is not a script nor known operator %s" % str(cobject.operator))
+        raise Climaf_Driver_Error("operator %s is not a script nor known operator" % str(cobject.operator))
+
+
+def ceval_operator(cobject, deep, *args, **kwargs):
+    raise NotImplementedError()
+
+
+def cstore(cobject, *args, **kwargs):
+    raise NotImplementedError()
 
 
 def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -417,7 +418,7 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -476,10 +477,10 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
     #  Only deep=True can propagate downward !
-    if deep :
-        down_deep= True
-    else :
-        down_deep= None
+    if deep:
+        down_deep = True
+    else:
+        down_deep = None
     # Force evaluation of 'father' script
     if ceval_script(cobject.father, down_deep, recurse_list=recurse_list) is not None:
         # Re-evaluate, which should succeed using cache
@@ -502,7 +503,7 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -522,12 +523,12 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
     #
     #  Only deep=True can propagate downward !
     if deep:
-        down_deep= True
-    else :
-        down_deep= None
+        down_deep = True
+    else:
+        down_deep = None
     file = cfilePage(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
-    if format == 'file':
+    if format in ['file', ]:
         return file
     else:
         return cread(file)  # !! Does it make sense ?
@@ -545,7 +546,7 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -565,9 +566,9 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     #
     #  Only deep=True can propagate downward !
     if deep:
-        down_deep= True
-    else :
-        down_deep= None
+        down_deep = True
+    else:
+        down_deep = None
     #
     file = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
@@ -589,7 +590,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     :param recurse_list:
     :return:
     """
-    recurse_list.append(cobject.buildcrs())
+    recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
@@ -733,8 +734,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         infile = invalues[0]
         if (scriptCall.operator != 'remote_select') and \
                 not all(map(os.path.exists, infile.split(" "))):
-            raise Climaf_Driver_Error("Internal error : for script %s and 1st operand %s, some input file does not exist among %s:" % \
-                                      (scriptCall.operator,op,infile))
+            raise Climaf_Driver_Error("Internal error : for script %s and 1st operand %s, "
+                                      "some input file does not exist among %s:" % (scriptCall.operator, op, infile))
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
         subdict["var"] = classes.varOf(op)
@@ -851,10 +852,10 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
-    if cache.hasExactObject(scriptCall.operands[0]) :
+    if cache.hasExactObject(scriptCall.operands[0]):
         # for key in ["period","period_iso","var","domain","missing","alias","units"]:
         for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
-            if key in subdict :
+            if key in subdict:
                 subdict.pop(key)
     #
     # print("subdict="+`subdict`)
@@ -1030,7 +1031,7 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             raise Climaf_Driver_Error("")
         if period is not None:
-            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, files))
+            clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
         from .anynetcdf import ncf
         fileobj = ncf(datafile)
         # Note taken from the CDOpy developper : .data is not backwards
@@ -1070,17 +1071,17 @@ def derive_variable(ds):
     if not is_derived_variable(ds.variable, ds.project):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
     op, outname, inVarNames, params = derived_variable(ds.variable, ds.project)
-    inVars = []
-    first=True
+    inVars = list()
+    first = True
     for varname in inVarNames:
         dic = copy.deepcopy(ds.kvp)
         dic['variable'] = varname
         # If the dataset has a version attribute, it should be inherited only
         # by the first input variable, an be set to "latest" for the next ones
         # (it would be tricky to do something smarter TBD)
-        if not first and "version" in dic :
+        if not first and "version" in dic:
             dic['version'] = "latest"
-        first=False
+        first = False
         inVars.append(classes.cdataset(**dic))
     params["add_variable"] = ds.variable
     # TODO: force the output variable to be well defined
@@ -1241,7 +1242,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
                         os.link(source, target)
             else:
                 if not os.path.exists(target_dir):
-                            os.makedirs(target_dir)
+                    os.makedirs(target_dir)
                 shutil.copyfile(result, target)
         if not os.path.exists(target):
             raise Climaf_Driver_Error("Issue during the creation of the target file %s" % target)
@@ -1275,11 +1276,11 @@ def cMA(obj, deep=None):
       a Masked Array containing the object's value
 
     """
-    clogger.debug("cMA called with arguments" + str(obj))
+    clogger.debug("cMA called with arguments : " + str(obj))
     return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
 
 
-def cvalue(obj, index=0,deep=None):
+def cvalue(obj, index=0, deep=None):
     """
     Return the value of the array for an object, after MV flattening, at a given index
 
@@ -1292,7 +1293,14 @@ def cvalue(obj, index=0,deep=None):
 
     Does use the file representation of the object
     """
-    return cMA(obj,deep=deep).data.flat[index]
+    if deep is None:
+        rep = cache.has_cvalue(obj.crs, index)
+    else:
+        rep = None
+    if rep is None:
+        rep = float(cMA(obj, deep=deep).data.flat[index])
+        cache.store_cvalue(obj.crs, index, rep)
+    return rep
 
 
 def cexport(*args, **kwargs):
@@ -1329,7 +1337,7 @@ def get_fig_sizes(figfile):
     # On some sites, getoutput first lines have warning messages
     # Furthermore, in case of missing file, last line could be an error -> only consider lines beginning with figfile
     output_figsize = getoutput(" ".join(args_figsize)).split("\n")
-    output_figsize = [l for l in output_figsize if l.startswith(figfile)][-1]
+    output_figsize = [line for line in output_figsize if line.startswith(figfile)][-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)
@@ -1428,7 +1436,7 @@ def cfilePage(cobj, deep, recurse_list=None):
         args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
                      (insert_height, (cobj.page_width - cobj.insert_width) / 2, y), "-composite"])
 
-    out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format=cobj.format)
+    out_fig = cache.generateUniqueFileName(cobj.crs, format=cobj.format)
     if cobj.page_trim:
         args.append("-trim")
     if cobj.title != "":
@@ -1517,7 +1525,7 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
 
     #
     # launch process and registering output in cache
-    out_fig = cache.generateUniqueFileName(cobj.buildcrs(), format='pdf')
+    out_fig = cache.generateUniqueFileName(cobj.crs, format='pdf')
 
     args.extend(["--outfile", out_fig])
 

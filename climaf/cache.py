@@ -11,26 +11,27 @@ CliMAF cache module : store, retrieve and manage CliMAF objects from their CRS e
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import sys
 import six
-import os
 import os.path
 import re
 import time
 import pickle
 import uuid
 import hashlib
+import json
 from operator import itemgetter
 
 from env.environment import *
 from climaf import version
 from climaf.utils import Climaf_Cache_Error
-from .classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds
-from .cmacro import crewrite
+from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds
+from climaf.cmacro import crewrite
 from env.clogging import clogger
 
 currentCache = None
 cachedirs = None
+handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
+cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
 fileNameLength = 60
 #: Define whether we try to have safe naming of cache objects using adaptative filename length
@@ -43,7 +44,7 @@ crs2filename = dict()
 crs2eval = dict()
 #: The list of crs which file has been dropped since last synchronisation between in-memory index and file index
 #  (or at least since the beginning of the session)
-dropped_crs = []
+dropped_crs = list()
 
 #: A dict containing cache index entries (as listed in index file), which
 # were up to now not interpretable, given the set of defined projects
@@ -91,7 +92,7 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
         return rep
 
 
-def hash_to_path(vhash, format, option, prefix=""):
+def hash_to_path(vhash, format, option="new", prefix=""):
     if option == "new":
         rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
@@ -278,8 +279,7 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
-        for c in [f for f in crs2filename if crs2filename[f] == filename or
-                                             crs2filename[f] == alternate_filename(filename)]:
+        for c in [f for f in crs2filename if crs2filename[f] in [filename, alternate_filename(filename)]]:
             crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs)
@@ -445,9 +445,8 @@ def cdrop(obj, rm=True, force=False):
                 dropped_crs.append(crs)
                 try:
                     os.rmdir(path_file)
-                except OSError as ex:
+                except OSError:
                     pass
-                    # clogger.warning(ex)
                 return True
             except:
                 clogger.warning("When trying to remove %s : file does not exist in cache" % crs)
@@ -671,12 +670,12 @@ def list_cache():
     Return the list of files in cache directories, using `find`
 
     """
-    files_in_cache = []
     find_return = ""
     for dir_cache in cachedirs:
         rep = os.path.expanduser(dir_cache)
         find_return += os.popen(
-            "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep).read()
+            r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep
+        ).read()
     files_in_cache = find_return.split('\n')
     files_in_cache.pop(-1)
     return files_in_cache
@@ -757,7 +756,6 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     rep = os.path.expanduser(cachedirs[0])
 
     # command for research on size/age/access
-    command = ""
     opt_find = ""
     if size:
         if re.search('[kMG]', size) is None:
@@ -772,14 +770,12 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     var_find = False
     if size or age or access != 0:
         var_find = True
-        command = "find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
+        command = r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) %s -print" % \
                   (rep, opt_find)
         clogger.debug("Find command is :" + command)
 
         # construction of the new dictionary after research on size/age/access
         new_dict = dict()
-        find_return = ""
-        list_search_files_after_find = []
 
         find_return = os.popen(command).read()
         list_search_files_after_find = find_return.split('\n')
@@ -905,9 +901,10 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     elif remove is True and len_new_dict != 0:
         print("Removed files:")
-        list_tmp_crs = []
-        list_tmp_crs = list(new_dict) if (var_find or pattern is not "" or not_pattern is not "")\
-            else list(crs2filename)
+        if var_find or pattern is not "" or not_pattern is not "":
+            list_tmp_crs = list(new_dict)
+        else:
+            list_tmp_crs = list(crs2filename)
         for crs in list_tmp_crs:
             cdrop(crs, rm=True)
         return list(map(crewrite, list_tmp_crs))
@@ -1023,5 +1020,74 @@ def rebuild():
             os.system('rm -f ' + files)
             clogger.warning("File %s is removed" % files)
     return crs2filename
+
+
+def store_cvalue(crs, index, value):
+    """
+    Stores a scalar, as computed by cvalue, in a scalars cache
+    """
+    if handle_cvalues is not False:
+        if handle_cvalues in ["by_crs", ]:
+            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+        else:
+            key = crs + "[%d]" % index
+        cvalues[key] = value
+
+
+def has_cvalue(crs, index):
+    """
+    Returns a scalar, as computed by cvalue, from the scalars cache (or None if not cached)
+    """
+    if handle_cvalues is not False:
+        if handle_cvalues in ["by_crs", ]:
+            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+        else:
+            key = crs + "[%d]" % index
+        return cvalues.get(key, None)
+
+
+def load_cvalues():
+    """
+    Load in memory the cache of 'cvalue' scalars, from json file cvalues.json
+    """
+    global cvalues
+    if handle_cvalues is not False:
+        cache_file = "%s/cvalues.json" % currentCache
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                cvalues = json.load(f)
+
+
+def sync_cvalues():
+    """
+    Read the on-disk of 'cvalue' scalars, update it with the in-memory one and
+    write it in json file cvalues.json
+    """
+    global cvalues
+
+    if handle_cvalues is not False:
+        ccache = "%s/cvalues.json" % currentCache
+        tmp = "%s/cvalues_tmp.json" % currentCache
+        #
+        try:
+            # Try to get pre-existing on-disk content
+            with open(ccache, "r") as f:
+                onfile = json.load(f)
+            onfile.update(cvalues)
+            cvalues = onfile
+        except:
+            pass
+        with open(tmp, "w") as f:
+            json.dump(cvalues, f, separators=(',', ': '), indent=3, ensure_ascii=True)
+        os.rename(tmp, ccache)
+
+
+def raz_cvalues():
+    """
+    Clear in-memory and on-disk cache of 'cvalue' scalars
+    """
+    if handle_cvalues is not False:
+        cvalues = dict()
+        sync_cvalues()
 
 

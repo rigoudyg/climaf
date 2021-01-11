@@ -93,8 +93,8 @@ def macro(name, cobj, lobjects=[]):
         return cdummy()
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
-                    *cobj.operands, **cobj.parameters)
-        rep.operands = list(map(macro, [None for o in rep.operands], rep.operands))
+                    *list(map(macro, [None for o in cobj.operands], cobj.operands)),
+                    **cobj.parameters)
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
@@ -193,7 +193,7 @@ def cmatch(macro, cobj):
                 argsub += cmatch(mop, op)
         return argsub
     elif isinstance(cobj, scriptChild) and isinstance(macro, scriptChild) and macro.varname == cobj.varname:
-        return cmatch(macro.father, cobj.father, argslist)
+        return cmatch(macro.father, cobj.father)  # , argslist)
     elif isinstance(cobj, cpage) and isinstance(macro, cpage):
         argsub = []
         if cobj.heights == macro.heights and cobj.widths == macro.widths and cobj.orientation == macro.orientation:

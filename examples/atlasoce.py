@@ -4,7 +4,6 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 from optparse import OptionParser
 
 from climaf.api import *
@@ -197,3 +196,4 @@ def spare_code():
             url="${root}/${simulation}/${simulation}_1m_YYYYMMDD_YYYYMMDD_grid_${variable}.nc")
     calias("dmc", 'tos', filenameVar='T')
     tos = ds(project='dmc', simulation='O1IAF01', variable='tos', period='1980')
+    print(tos)

@@ -3,7 +3,7 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-# Computig and plotting an annual cycle
+# Computing and plotting an annual cycle
 
 # Load Climaf functions
 from climaf.api import *

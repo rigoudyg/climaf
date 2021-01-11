@@ -15,7 +15,6 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
-import env.environment
 
 version = "2.0.0"
 
@@ -114,6 +113,10 @@ if not already_inited and not onrtd:
         exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
+    # Load cache scalar values 
+    cache.load_cvalues()
+    tim("cload_values")
+    #
     # Init and load macros
     macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
@@ -125,8 +128,8 @@ if not already_inited and not onrtd:
     cache.cload()
     tim("cload")
     #
+    atexit.register(cache.sync_cvalues)
     atexit.register(cmacro.write, macroFilename)
-    atexit.register(cache.csync)
     tim("atexit")
     if cache.stamping:
         # Check if exiv2 is installed

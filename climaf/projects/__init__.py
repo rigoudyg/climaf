@@ -18,16 +18,18 @@ accumulation. In that case, the conversion to rates assumes a fixed
 month length of 30.3 days (for ensuring minimal bias at year scale)
 
 For listing the declared projects and their specifics, if you are under
-the Python prompt, type e.g. ::
+the Python prompt, type e.g. :
 
+  >>> import climaf
   >>> dir(climaf.projects)
   >>> help(climaf.projects.cmip5)
 
-For knowing the specifics of variables for a given project (as e.g. re-scaling), type ::
+For knowing the specifics of variables for a given project (as e.g. re-scaling), type :
 
+  >>> from climaf.api import *
   >>> aliases["erai"]
 
-and interpret a result such as::
+and interpret a result such as:
 
   'erai': {'clt': ('tcc', 1.0, 0.0, None, 'TCC', None),
            'das': ('d2m', 1.0, 0.0, None, '2D', None),

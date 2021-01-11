@@ -3,6 +3,7 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from climaf.utils import Climaf_Error
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue, cfile
@@ -12,6 +13,7 @@ from env.environment import *
 from six import string_types
 
 import numpy as np
+
 
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
@@ -92,11 +94,11 @@ def fmul(dat1, dat2):
                 res_dict[mem] = multiply(dat1[mem], dat2[mem])
             return cens(res_dict, order=dat1.order)
         else:
-            raise climaf.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
-                                      "Members of dat1 =%s ; Members of dat2 =%s\n"
-                                      "use ensemble_intersection(dat1,dat2) to get two ensembles "
-                                      "with only their common members" % (dat1.order, dat2.order))
-    elif isinstance(dat2, string_types + (int, float, np.float32) ):
+            raise Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                               "Members of dat1 =%s ; Members of dat2 =%s\n"
+                               "use ensemble_intersection(dat1,dat2) to get two ensembles "
+                               "with only their common members" % (dat1.order, dat2.order))
+    elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='mulc,' + c)
     else:
@@ -564,7 +566,6 @@ def summary(dat):
                 print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
-                    #for f in str.split(files, ' '):
                     for f in files.split():
                         print(f)
             else:
@@ -583,7 +584,6 @@ def summary(dat):
                           , tmpkvp[key])
                     print('Specify one of them (within ds() or with cdef())')
             if not keytest:
-                #for f in str.split(dat.baseFiles(ensure_dataset=False), ' '):
                 for f in dat.baseFiles(ensure_dataset=False).split():
                     print(f)
         return dat.kvp
@@ -623,7 +623,9 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
        >>> zonmean_ref = zonmean(time_average(ref))
 
        >>> dat_interpolated_on_ref = lonlatvert_interpolation(zonmean_dat,zonmean_ref)
-       >>> dat_interpolated_on_list_of_levels = lonlatvert_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+       >>> dat_interpolated_on_list_of_levels = lonlatvert_interpolation(zonmean_dat,
+       ...                                                               vertical_levels='100000,85000,50000,20000,'
+       ...                                                                               '10000,5000,2000,1000')
 
     """
 
@@ -736,7 +738,9 @@ def zonmean_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizontal_
        >>> zonmean_ref = zonmean(time_average(ref))
 
        >>> dat_interpolated_on_ref = zonmean_interpolation(zonmean_dat,zonmean_ref)
-       >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,vertical_levels='100000,85000,50000,20000,10000,5000,2000,1000')
+       >>> dat_interpolated_on_list_of_levels = zonmean_interpolation(zonmean_dat,
+       ...                                                            vertical_levels='100000,85000,50000,20000,10000,'
+       ...                                                                            '5000,2000,1000')
 
     """
 
@@ -762,7 +766,8 @@ def diff_zonmean(dat1, dat2):
     Returns the zonal mean bias of dat1 against dat2
 
     The function first computes the zonal means of dat1 and dat2.
-    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function lonlatvert_interpolation.
+    Then, it interpolates the zonal mean field of dat1 on the zonal mean field of dat2 with the function
+    lonlatvert_interpolation.
     It finally returns the bias field.
 
       >>> ds1= ....   # some dataset, with whatever variable
@@ -826,18 +831,25 @@ def ts_plot(ts, **kwargs):
 
     Examples:
 
-       >>> ds= ....   # some dataset, with whatever variable
-       >>> ts_ds = space_avarege(ds) # Compute the space average
-       >>> p1 = ts_plot(ts_ds) # -- Simply provide the CliMAF object
-       >>> p2 = ts_plot({'my_dataset':ts_ds}) # -- Same as above but specify the name associated with the time series in the plot
+       >>> # some dataset, with whatever variable
+       >>> ds= ....
+       >>> # Compute the space average
+       >>> ts_ds = space_avarege(ds)
+       >>> # -- Simply provide the CliMAF object
+       >>> p1 = ts_plot(ts_ds)
+       >>> # -- Same as above but specify the name associated with the time series in the plot
+       >>> p2 = ts_plot({'my_dataset':ts_ds})
        >>> p3 = ts_plot([ts_ds1,ts_ds2,ts_ds3])
-       >>> p4 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ]) # -- provide multiple time series in a given order with names
-       >>> p5 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ], title='Three Time series', colors=['black','blue','red']) # -- Same as above with lines colors and title
+       >>> # -- provide multiple time series in a given order with names
+       >>> p4 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ])
+       >>> # -- Same as above with lines colors and title
+       >>> p5 = ts_plot([ {'ts_ds1':ts_ds1}, {'ts_ds2':ts_ds2}, {'ts_ds3':ts_ds3} ], title='Three Time series',
+       ...               colors=['black','blue','red'])
 
        >>> ens_ts = cens({'ts_ds1':ts_ds1, 'ts_ds2':ts_ds2, 'ts_ds3':ts_ds3}, order=['ts_ds1','ts_ds2','ts_ds3'])
        >>> ens_ts.set_order(['ts_ds1','ts_ds2','ts_ds3'])
-       >>> p4bis = ts_plot(ens_ts) # -- Same result as p4 above but providing a CliMAF ensemble with specified order
-
+       >>> # -- Same result as p4 above but providing a CliMAF ensemble with specified order
+       >>> p4bis = ts_plot(ens_ts)
 
     """
     # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot

@@ -7,7 +7,7 @@ from __future__ import print_function, division, absolute_import  # , unicode_li
 # __all__= [ "atmosphere_derived_variables", "ocean_derived_variables" ]
 __all__ = ["ocean_derived_variables", ]
 
-from env.site_settings import atIPSL, atCerfacs, atCNRM
+from env.site_settings import *
 from env.environment import *
 
 # -- Load only the ipsl derived variables if we are at IPSL

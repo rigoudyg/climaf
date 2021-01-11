@@ -10,7 +10,8 @@ Syntax for these attributes is described in `the CMIP6 DRS document <https://goo
 
 Example for a CMIP6 dataset declaration ::
 
- >>> tas1pc=ds(project='CMIP6', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon', realization='r3i1p1f2', period='1860-1861')
+ >>> tas1pc=ds(project='CMIP6', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon',
+ ...           realization='r3i1p1f2', period='1860-1861')
 
 
 
@@ -82,7 +83,7 @@ if True:
     cdef('extent_experiment', 'ssp585', project='CMIP6_extent')
     #
     # -- IPSL-CM6 special historical-EXT experiment
-    project='IPSL-CM6_historical-EXT'
+    project = 'IPSL-CM6_historical-EXT'
     cdef('root',        root,                       project=project)
     cdef('institute',   'IPSL',                     project=project)
     cdef('model',       'IPSL-CM6A-LR',             project=project)
