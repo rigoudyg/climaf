@@ -6,31 +6,9 @@ What's new
 
 Changes, newest first:
 
-- running:
-
-  - **Scalar values computed using :py:func:`~climaf.driver.cvalue` are now cached**; users can reset the
-    corresponding in-memory and disk caches (both together) using :py:func:`~climaf.cache.raz_cvalues`.
-    Variable cache.handle_cvalues allows (when set to False) to de-activate this cache.
-
-        - Note : function cvalue now returns a Python float (instead of a numpy.float64)
-
-	- Internals :
-	   - this uses an in-memory dict (cache.cvalues) and a Json file (cvalues.json);
-	   - by default, the dict key is the hashed CRS of cvalue's object argument (with cvalue's index argument as suffix)
-	   - variable cache.handle_cvalues can be set to
-	       - False, for de-activating the cache
-               - 'by_crs', for using the objects CRS has dict key value (but some CRS are very long)
-
-  - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable 
-    available as output of those CDO operators which use an ancilary field as first
-    argument (as e.g. 'ifthen' and 'ifthenelse' ).
-
-  - Function :py:func:`~climaf.period.merge_periods` will merge consecutive periods even if they
-    miss a 31st december (such as in 360-days calendars)
-
 - V2.0.0:
 
-  - Python 3 compatibility:
+  - **Python 3 compatibility**:
     - This new version is fully compatible with both python2 and python3.
       It has been tested with python 2.7 and python 3.7.
       Tests with other versions will come soon.
@@ -48,11 +26,31 @@ Changes, newest first:
       (``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``, ``derived_variables``,
       ``cmacros``, ``known_formats``, ``graphic_formats``, ``none_formats``, ``locs``).
 
+  - **Scalar values computed using :py:func:`~climaf.driver.cvalue` are now cached**; users can reset the
+    corresponding in-memory and disk caches (both together) using :py:func:`climaf.cache.raz_cvalues`.
+    Variable cache.handle_cvalues allows (when set to False) to de-activate this cache.
+
+        - Note : function cvalue now returns a Python float (instead of a numpy.float64)
+
+	- Internals :
+	   - this uses an in-memory dict (cache.cvalues) and a Json file (cvalues.json);
+	   - by default, the dict key is the hashed CRS of cvalue's object argument (with cvalue's index argument as suffix)
+	   - variable cache.handle_cvalues can be set to
+	       - False, for de-activating the cache
+               - 'by_crs', for using the objects CRS has dict key value (but some CRS are very long)
+
   - Project definition:
     - Data location can now depends on table, realm in addition to experiment, project... via py:func:`climaf.dataloc.dataloc`
 
   - Operator:
     - Standard operator ``slice`` has been renamed into ``cslice_average`` and ``cslice_select`` has been created.
+    - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
+      available as output of those CDO operators which use an ancilary field as first
+      argument (as e.g. 'ifthen' and 'ifthenelse').
+
+  - Functions:
+    - Function :py:func:`climaf.period.merge_periods` will merge consecutive periods even if they
+      miss a 31st december (such as in 360-days calendars)
 
 - V1.2.13:
 

@@ -7,9 +7,7 @@ Those variables are used everywhere ; hence, they are grouped here for easing im
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-# Variables
 
-#: Dictionary of declared projects (type is cproject)
 import os
 import sys
 import subprocess
@@ -21,7 +19,9 @@ except ImportError:
 
 from env.site_settings import atTGCC, atIPSL, onCiclad
 
+# Variables
 
+#: Dictionary of declared projects (type is cproject)
 cprojects = dict()
 
 #: Dictionary of aliases dictionaries

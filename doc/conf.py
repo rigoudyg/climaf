@@ -18,7 +18,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys
 import os
 
-from climaf import version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -26,6 +25,9 @@ from climaf import version
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0, os.path.abspath('../climaf'))
 sys.path.insert(0, os.path.abspath('..'))
+
+
+from climaf import version
 
 # -- General configuration ------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
