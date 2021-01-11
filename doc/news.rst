@@ -9,47 +9,52 @@ Changes, newest first:
 - V2.0.0:
 
   - **Python 3 compatibility**:
+
     - This new version is fully compatible with both python2 and python3.
       It has been tested with python 2.7 and python 3.7.
       Tests with other versions will come soon.
 
-    - To avoid cycling import, the module ``climaf.operator`` has been split into three modules:
-      ``climaf.operator`` (still here), ``climaf.operator_derive`` and ``climaf.operator_scripts``.
+    - To avoid cycling import, the module :py:mod:`climaf.operator` has been split into three modules:
+      :py:mod:`climaf.operator` (still here), :py:mod:`climaf.operator_derive` and :py:mod:`climaf.operator_scripts`,
 
-    - :py:func:`climaf.operator.ceval` has been modified to call functions specific to CliMAF types
-      (:py:func:`climaf.operator.ceval_for_cdataset`, :py:func:`climaf.operator.ceval_for_ctree`,
-      :py:func:`climaf.operator.ceval_for_ScriptChild`, :py:func:`climaf.operator.ceval_for_cpage`,
-      :py:func:`climaf.operator.ceval_for_cpage_pdf`, :py:func:`climaf.operator.ceval_for_cens`,
-      :py:func:`climaf.operator.ceval_for_string`)
+    - :py:func:`~climaf.operator.ceval` has been modified to call functions specific to CliMAF types
+      (:py:func:`~climaf.operator.ceval_for_cdataset`, :py:func:`~climaf.operator.ceval_for_ctree`,
+      :py:func:`~climaf.operator.ceval_for_ScriptChild`, :py:func:`~climaf.operator.ceval_for_cpage`,
+      :py:func:`~climaf.operator.ceval_for_cpage_pdf`, :py:func:`~climaf.operator.ceval_for_cens`,
+      :py:func:`~climaf.operator.ceval_for_string`)
 
-    - Variables used everywhere in CliMAF and available for everyone have been moved to ``env.environment``
+    - Variables used everywhere in CliMAF and available for everyone have been moved to module :py:mod:`env.environment`
       (``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``, ``derived_variables``,
       ``cmacros``, ``known_formats``, ``graphic_formats``, ``none_formats``, ``locs``).
 
-  - **Scalar values computed using :py:func:`~climaf.driver.cvalue` are now cached**; users can reset the
-    corresponding in-memory and disk caches (both together) using :py:func:`climaf.cache.raz_cvalues`.
-    Variable cache.handle_cvalues allows (when set to False) to de-activate this cache.
+  - **Scalar values computed using** :py:func:`~climaf.driver.cvalue` **are now cached**; users can reset the
+    corresponding in-memory and disk caches (both together) using :py:func:`~climaf.cache.raz_cvalues`.
+    Variable :py:data:`cache.handle_cvalues` allows (when set to False) to de-activate this cache.
 
-        - Note : function cvalue now returns a Python float (instead of a numpy.float64)
+        - Note : function :py:func:`~climaf.driver.cvalue` now returns a Python float (instead of a numpy.float64)
 
 	- Internals :
-	   - this uses an in-memory dict (cache.cvalues) and a Json file (cvalues.json);
+
+	   - this uses an in-memory dict (:py:data:`~climaf.cache.cvalues`) and a Json file (cvalues.json);
 	   - by default, the dict key is the hashed CRS of cvalue's object argument (with cvalue's index argument as suffix)
-	   - variable cache.handle_cvalues can be set to
+	   - variable :py:data:`~climaf.cache.handle_cvalues` can be set to
 	       - False, for de-activating the cache
                - 'by_crs', for using the objects CRS has dict key value (but some CRS are very long)
 
   - Project definition:
-    - Data location can now depends on table, realm in addition to experiment, project... via py:func:`climaf.dataloc.dataloc`
+
+    - Data location can now depends on table, realm in addition to experiment, project... via :py:func:`~climaf.dataloc.dataloc`
 
   - Operator:
+
     - Standard operator ``slice`` has been renamed into ``cslice_average`` and ``cslice_select`` has been created.
     - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
       available as output of those CDO operators which use an ancilary field as first
       argument (as e.g. 'ifthen' and 'ifthenelse').
 
   - Functions:
-    - Function :py:func:`climaf.period.merge_periods` will merge consecutive periods even if they
+
+    - Function :py:func:`~climaf.period.merge_periods` will merge consecutive periods even if they
       miss a 31st december (such as in 360-days calendars)
 
 - V1.2.13:
@@ -204,7 +209,7 @@ Changes, newest first:
   - add an example for declaring :download:`a script which has multiple output files
     <../examples/myscript_has_two_outputs.py>`
 
-  - dataset's method :py:meth:`~climaf.classes.cdataset.explore` is improved:
+  - dataset's method :py:func:`~climaf.classes.cdataset.explore` is improved:
   
     - option ``resolve`` handle variable aliasing correctly 
 
@@ -212,7 +217,7 @@ Changes, newest first:
 
     - option ``ensemble`` allow for single-member ensembles
 
-  - function :py:meth:`~climaf.classes.dataloc.dataloc` can use keyword ``${period}`` in filename patterns
+  - function :py:func:`~climaf.classes.dataloc.dataloc` can use keyword ``${period}`` in filename patterns
   
   - fixes:
 
