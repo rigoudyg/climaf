@@ -15,7 +15,11 @@ Attributes are :
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import os
+
+from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
@@ -39,14 +43,14 @@ if root:
                '${variable}_${CORDEX_domain}_${driving_model}_${extent_experiment}_${realization}_${model}_' \
                '${model_version}_${frequency}_${PERIOD}.nc'
     patternfx = '${root}/CORDEX/output/${CORDEX_domain}/${institute}/${driving_model}/${experiment}/${realization}/' \
-               '${model}/${model_version}/${frequency}/${variable}/${version}/' \
-               '${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_' \
-               'fx.nc'
+                '${model}/${model_version}/${frequency}/${variable}/${version}/' \
+                '${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_'\
+                'fx.nc'
     # -- CORDEX
     cproject('CORDEX', 'root', 'model', 'CORDEX_domain', 'model_version', 'frequency', 'driving_model',
              'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'],
              separator='%')
-    dataloc(project='CORDEX', url=[patternfx,pattern1])
+    dataloc(project='CORDEX', url=[patternfx, pattern1])
     cdef('experiment', '*', project='CORDEX')
     cdef('model_version', '*', project='CORDEX')
 

@@ -10,11 +10,13 @@ Syntax for these attributes is described in `the CMIP6 DRS document <https://goo
 
 Example for a CMIP6 dataset declaration ::
 
- >>> tas1pc=ds(project='CMIP6', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon', realization='r3i1p1f2', period='1860-1861')
+ >>> tas1pc=ds(project='CMIP6', model='CNRM-CM6-1', experiment='1pctCO2', variable='tas', table='Amon',
+ ...           realization='r3i1p1f2', period='1860-1861')
 
 
 
 """
+from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 

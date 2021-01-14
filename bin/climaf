@@ -17,9 +17,9 @@ fi
 
 if [ "$*" ] ; then 
     if [ -f "$1" ] ; then 
-	(echo 'from climaf.api import *'; cat $*) | python2 
+	(echo 'from climaf.api import *'; cat $*) | python
     else
-	echo -e 'from climaf.api import *\n'$*  | python2 2> climaf.stderr
+	echo -e 'from climaf.api import *\n'$*  | python 2> climaf.stderr
 	rep=$?
 	[ $rep -ne 0 ] && cat climaf.stderr >&2
 	rm climaf.stderr
@@ -32,7 +32,7 @@ else
 	ipython -i -c 'from climaf.api import *'
     else
 	# ipython at CNRM for now implies Python3, which is notcompatible with CliMAF
-	python2 -i -c 'from climaf.api import *'
+	python -i -c 'from climaf.api import *'
     fi
 fi
 

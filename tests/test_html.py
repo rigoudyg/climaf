@@ -4,6 +4,8 @@
 """
 Test the html module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -18,6 +20,7 @@ from climaf.driver import cfile
 from climaf.html import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
+from env.environment import *
 
 
 class HeaderTests(unittest.TestCase):
@@ -100,12 +103,12 @@ class OpenTableTests(unittest.TestCase):
                                                   COLUMNS=template_columns.safe_substitute(LABEL="a column")))
         self.assertEqual(open_table(columns=["a column", "an other one"]),
                          template.safe_substitute(SPACING=5, TITLE="",
-                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=l) for l in
-                                                                   ["a column", "an other one"]])))
+                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=lab)
+                                                                   for lab in ["a column", "an other one"]])))
         self.assertEqual(open_table(columns=["a column", "an other one"], title="A title", spacing=9),
                          template.safe_substitute(SPACING=9, TITLE="A title",
-                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=l) for l in
-                                                                   ["a column", "an other one"]])))
+                                                  COLUMNS="".join([template_columns.safe_substitute(LABEL=lab)
+                                                                   for lab in ["a column", "an other one"]])))
 
 
 class CloseTableTests(unittest.TestCase):
@@ -327,7 +330,7 @@ class SafeModeCfilePlotTests(unittest.TestCase):
 
 if __name__ == '__main__':
     # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_macro"])
+    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_html"])
     remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)

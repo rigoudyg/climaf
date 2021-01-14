@@ -10,16 +10,16 @@ CliMAF macros module :
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import sys
 import os
+import types
+import six
 
-from classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
+from .classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 from env.clogging import clogger, dedent
-
-#: Dictionary of macros
-cmacros = dict()
+from env.environment import *
 
 
 def macro(name, cobj, lobjects=[]):
@@ -74,10 +74,10 @@ def macro(name, cobj, lobjects=[]):
 
     See also much more explanations in the example at :download:`macro.py <../examples/macro.py>`
     """
-    if isinstance(cobj, str):
+    if isinstance(cobj, six.string_types):
         s = cobj
         # Next line used for interpreting macros's CRS
-        exec ("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
+        exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
         try:
             cobj = eval(cobj, sys.modules['__main__'].__dict__)
         except:
@@ -93,15 +93,16 @@ def macro(name, cobj, lobjects=[]):
         return cdummy()
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
-                    *cobj.operands, **cobj.parameters)
-        rep.operands = map(macro, [None for o in rep.operands], rep.operands)
+                    *list(map(macro, [None for o in cobj.operands], cobj.operands)),
+                    **cobj.parameters)
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
-        rep = cpage([map(macro, [None for fig in line], line) for line in cobj.fig_lines], cobj.widths, cobj.heights)
+        rep = cpage([list(map(macro, [None for fig in line], line)) for line in cobj.fig_lines],
+                    cobj.widths, cobj.heights)
     elif isinstance(cobj, cens):
         d = dict()
-        for k, v in zip(cobj.keys(), map(macro, [None for o in cobj.values()], cobj.values())):
+        for k, v in zip(list(cobj), map(macro, [None for o in cobj.values()], cobj.values())):
             d[k] = v
         rep = cens(d)
     elif cobj is None:
@@ -114,10 +115,23 @@ def macro(name, cobj, lobjects=[]):
         doc = "A CliMAF macro, which text is " + repr(rep)
         defs = 'def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n' \
                % (name, doc, name)
-        exec defs in globals()
-        exec "from climaf.cmacro import %s" % name in sys.modules['__main__'].__dict__
+        exec(defs, globals())
+        exec("from climaf.cmacro import %s" % name, sys.modules['__main__'].__dict__)
         clogger.debug("Macro %s has been declared" % name)
 
+    return rep
+
+
+def define_new_macro(name, doc):
+    # Define the new macro code
+    codestring = compile('def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"], args)\n'
+                         % (name, doc, name), name, "exec")
+    code = types.CodeType(codestring.co_argcount, codestring.co_kwonlyargcount, codestring.co_nlocals,
+                          codestring.co_stacksize, codestring.co_flags, codestring, codestring.co_consts,
+                          codestring.co_names, codestring.co_varnames, codestring.co_filename, codestring.co_name,
+                          codestring.co_firstlineno, codestring.co_lnotab, codestring.co_freevars,
+                          codestring.co_cellvars)
+    rep = types.FunctionType(code=code, globals=globals(), name=name)
     return rep
 
 
@@ -131,7 +145,7 @@ def crewrite(crs, alsoAtTop=True):
     to second subtreesecond
     """
     # Next line used for interpreting macros's CRS
-    exec ("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
+    exec("ARG=climaf.cmacro.cdummy()", sys.modules['__main__'].__dict__)
     #
     allow_error_on_ds()
     try:
@@ -140,6 +154,7 @@ def crewrite(crs, alsoAtTop=True):
         clogger.debug("Issue when rewriting %s" % crs)
         return crs
     allow_error_on_ds(False)
+    rep = None
     if isinstance(co, ctree) or isinstance(co, scriptChild) or isinstance(co, cpage):
         if alsoAtTop:
             for m in cmacros:
@@ -147,17 +162,14 @@ def crewrite(crs, alsoAtTop=True):
                               repr(macro(None, co)))
                 argl = cmatch(cmacros[m], co)
                 if len(argl) > 0:
-                    rep = m + "("
-                    for arg in argl:
-                        rep += crewrite(arg.buildcrs(crsrewrite=crewrite)) + ","
-                    rep += ")"
-                    rep = rep.replace(",)", ")")
-                    return rep
+                    rep = m + "({})".format(",".join([crewrite(arg.buildcrs(crsrewrite=crewrite)) for arg in argl]))
         # No macro matches at top level, or top level not wished.
         # Let us dig a bit
-        return co.buildcrs(crsrewrite=crewrite)
+        if rep is None:
+            rep = co.buildcrs(crsrewrite=crewrite)
     else:
-        return crs
+        rep = crs
+    return rep
 
 
 def cmatch(macro, cobj):
@@ -166,12 +178,10 @@ def cmatch(macro, cobj):
     matching macro arguments, ordered by depth-first traversal
     """
     clogger.debug("matching " + repr(macro) + " and " + repr(cobj))
-    if isinstance(cobj, ctree) and isinstance(macro, ctree) and \
-            macro.operator == cobj.operator:
+    if isinstance(cobj, ctree) and isinstance(macro, ctree) and macro.operator == cobj.operator:
         nok = False
-        for mpara, para in zip(macro.parameters, cobj.parameters):
-            if mpara != para or \
-                    macro.parameters[para] != cobj.parameters[para]:
+        for mpara, para in zip(sorted(list(macro.parameters)), sorted(list(cobj.parameters))):
+            if mpara != para or macro.parameters[para] != cobj.parameters[para]:
                 nok = True
         if nok:
             return []
@@ -182,14 +192,11 @@ def cmatch(macro, cobj):
             else:
                 argsub += cmatch(mop, op)
         return argsub
-    elif isinstance(cobj, scriptChild) and isinstance(macro, scriptChild) and \
-            macro.varname == cobj.varname:
-        return cmatch(macro.father, cobj.father, argslist)
+    elif isinstance(cobj, scriptChild) and isinstance(macro, scriptChild) and macro.varname == cobj.varname:
+        return cmatch(macro.father, cobj.father)  # , argslist)
     elif isinstance(cobj, cpage) and isinstance(macro, cpage):
         argsub = []
-        if cobj.heights == macro.heights and \
-                cobj.widths == macro.widths and \
-                cobj.orientation == macro.orientation:
+        if cobj.heights == macro.heights and cobj.widths == macro.widths and cobj.orientation == macro.orientation:
             for mlines, lines in zip(macro.fig_lines, cobj.fig_lines):
                 for mfig, fig in zip(mlines, lines):
                     if isinstance(mfig, cdummy):
@@ -206,10 +213,9 @@ def read(filename):
     Read macro dictionary from filename, and add it to cmacros[]
     """
     import json
-    global cmacros
     macros_texts = None
     try:
-        macrofile = file(os.path.expanduser(filename), "r")
+        macrofile = open(os.path.expanduser(filename), "r")
         clogger.debug("Macrofile %s read" % macrofile)
         macros_texts = json.load(macrofile)
         clogger.debug("After reading file %s, macros=%s" % (macrofile, repr(macros_texts)))
@@ -233,7 +239,7 @@ def write(filename):
         os.remove(filen)
     except:
         pass
-    macrofile = file(filen, "w")
+    macrofile = open(filen, "w")
     dcrs = cmacros.copy()
     for m in dcrs:
         dcrs[m] = dcrs[m].buildcrs()

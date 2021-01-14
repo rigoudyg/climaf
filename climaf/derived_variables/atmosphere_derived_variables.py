@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from climaf.api import derive
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+from climaf.operators_derive import derive
+from env.environment import *
 
 # -- DTR
 derive('*', 'dtr', 'minus', 'tasmax', 'tasmin')

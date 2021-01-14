@@ -4,7 +4,7 @@
 Climaf is documented at ReadTheDocs : http://climaf.readthedocs.org/
 
 """
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import time
 import os
@@ -15,7 +15,8 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
            "projects", "derived_variables"]
 
-version = "1.2.13"
+
+version = "2.0.0"
 
 
 def tim(string=None):
@@ -42,7 +43,6 @@ onrtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not already_inited and not onrtd:
     import sys
-    from climaf.driver import logdir
 
     #
     already_inited = True
@@ -52,84 +52,20 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
-    import env.clogging as clogging
-    import env.site_settings as site_settings
-    import cache
-    import standard_operators
-    import cmacro
-    import operators
-    import subprocess
-    import commands
-
-
-    def my_which(soft):
-        p = subprocess.Popen(["which", soft], stdout=subprocess.PIPE)
-        return str.replace(p.stdout.readlines()[0], '\n', '')
-
-
-    def bash_command_to_str(cmd):
-        return str.replace(subprocess.Popen(str.split(cmd, ' '), stdout=subprocess.PIPE).stdout.readlines()[0], '\n',
-                           '')
-
-
-    tim("imports")
     print("CliMAF version = " + version, file=sys.stderr)
     print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
-    if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") == "yes" :
-        print("python => " + my_which('python'))
-        print("---")
-        print("Required softwares to run CliMAF => you are using the following versions/installations:")
-        try:
-            print("ncl " + commands.getoutput(my_which('ncl') + ' -V') + " => " + my_which('ncl'))
-        except:
-            print("Warning: ncl not found -> can't use CliMAF plotting scripts")
-        try:
-            tmp = str.split(commands.getstatusoutput(my_which('cdo') + ' -V')[1], ' ')
-            print("cdo " + tmp[tmp.index('version') + 1] + " => " + my_which('cdo'))
-        except:
-            print("Error: cdo not found -> CDO is mandatory to run CliMAF")
-        try:
-            tmp = str.split(commands.getstatusoutput(my_which('ncks') + ' --version')[1], ' ')
-            print("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + my_which('ncks'))
-        except:
-            print("Warning: nco not found -> can't use nco from CliMAF")
-        try:
-            if site_settings.atTGCC or site_settings.atIPSL or site_settings.onCiclad:
-                ncdump_ret = commands.getstatusoutput('/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump')
-                print("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + my_which('ncdump'))
-            else:
-                binary_info = commands.getstatusoutput(my_which("ncdump") + " --version")[-1].split("\n")[-1]
-                binary_info = binary_info.split("version")[-1].split("of")[0].strip()
-                print("ncdump " + binary_info + " => " + my_which('ncdump'))
-        except:
-            print("Warning: ncdump not found -> can't use ncdump from CliMAF")
-        # Check that tools for stamping are available or enforce stamping to None
-        print("Check stamping requirements")
-        do_stamping = True
-        try:
-            print("nco (ncatted) found -> " + my_which("ncatted"))
-        except:
-            print("nco (ncatted) not available, can not stamp netcdf files")
-            do_stamping = False
-        try:
-            print("convert found -> " + my_which("convert"))
-        except:
-            print("convert not available, can not stamp png files")
-            do_stamping = False
-        try:
-            print("pdftk found -> " + my_which("pdftk"))
-        except:
-            print("pdftk not available, can not stamp pdf files")
-            do_stamping = False
-        try:
-            print("exiv2 found -> " + my_which("exiv2"))
-        except:
-            print("exiv2 not available, can not stamp eps files")
-            do_stamping = False
-        if not do_stamping and cache.stamping is True:
-            print("At least one stamping requirement is not fulfilled, turn it to None.")
-            cache.stamping = None
-        print("---")
+    from env.environment import *
+
+    tim("softwares")
+    #
+    import env.clogging as clogging
+    import env.site_settings as site_settings
+    from . import cache
+    from . import standard_operators
+    from . import cmacro
+    from . import operators
+
+    tim("imports")
     #
     # Check that the variable TMPDIR, if defined, points to an existing directory
     if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
@@ -162,24 +98,29 @@ if not already_inited and not onrtd:
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     tim("execs_projects")
-    exec "from climaf.classes   import ds, eds, cens, fds" in sys.modules['__main__'].__dict__
+    exec("from climaf.classes   import ds, eds, cens, fds", sys.modules['__main__'].__dict__)
     tim("execs_classes")
-    exec "from climaf.operators import cscript" in sys.modules['__main__'].__dict__
+    exec("from climaf.operators import cscript", sys.modules['__main__'].__dict__)
     tim("execs_cscript")
     standard_operators.load_standard_operators()
     tim("load_ops")
-    exec "from climaf.projects  import *" in sys.modules['__main__'].__dict__
+    from . import projects
+    exec("from climaf.projects  import %s" % ",".join(projects.__all__), sys.modules['__main__'].__dict__)
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")
     if os.path.isfile(conf_file):
-        execfile(conf_file, sys.modules['__main__'].__dict__)
+        exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
+    # Load cache scalar values 
+    cache.load_cvalues()
+    tim("cload_values")
+    #
     # Init and load macros
-    macroFilename = "~/.climaf.macros"
+    macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")
     cmacro.read(macroFilename)
-    print("Available macros read from %s are : %s" % (macroFilename, repr(cmacro.cmacros.keys())),
+    print("Available macros read from %s are : %s" % (macroFilename, repr(list(cmacros))),
           file=sys.stderr)
     tim("macros")
     #
@@ -187,12 +128,13 @@ if not already_inited and not onrtd:
     cache.cload()
     tim("cload")
     #
+    atexit.register(cache.sync_cvalues)
     atexit.register(cmacro.write, macroFilename)
-    atexit.register(cache.csync)
     tim("atexit")
     if cache.stamping:
         # Check if exiv2 is installed
         #
-        if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in operators.graphic_formats:
-            operators.graphic_formats.remove('eps')
+        # graphic_formats = environment.get_variable("climaf_graphic_formats")
+        if (os.system("type exiv2 >/dev/null 2>&1") != 0) and 'eps' in graphic_formats:
+            graphic_formats.remove('eps')
             print("exiv2 is not installed so you can not use 'eps' output format")

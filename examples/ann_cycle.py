@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Computig and plotting an annual cycle
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+# Computing and plotting an annual cycle
 
 # Load Climaf functions
 from climaf.api import *

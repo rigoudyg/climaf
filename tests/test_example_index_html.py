@@ -4,6 +4,8 @@
 """
 Test based on examples/index_html.py
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import shutil
@@ -17,6 +19,8 @@ from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
 from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
 from climaf import cachedir
+from collections import OrderedDict
+from env.environment import *
 
 
 if not isinstance(cpath, list):
@@ -44,6 +48,9 @@ class HtmlIndexCreation(unittest.TestCase):
         self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_index_html"])
         self.reference_index_1 = os.sep.join([self.reference_directory, "index_1.html"])
         self.reference_index_2 = os.sep.join([self.reference_directory, "index_2.html"])
+        # Need to overwrite IPSL's very extensive variables definitions, at leat for "rst"
+        # This in order to run the tests also at IPSL
+        derived_variables["*"].pop("rst", None)
 
     def test_html_index_1(self):
         # Start the index
@@ -90,7 +97,9 @@ class HtmlIndexCreation(unittest.TestCase):
         # over lines changing values of first arg to the function (here: the variable name),
         # use function 'flines', which loops on the list provided as second arg (it can also be a
         # dict with similar keys and which values are line titles)
-        seasons = {'Year': 'ANN', 'Winter': 'DJF'}
+        seasons = OrderedDict()
+        seasons["Year"] = "ANN"
+        seasons["Winter"] = "DJF"
         index += open_table(title='variable/season', columns=seasons.keys(), spacing=5)
         lvars = {
             "rst": "short wave at top ",
@@ -108,7 +117,7 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        self.assertTrue(compare_html_files(absout, self.reference_index_1))
+        compare_html_files(absout, self.reference_index_1)
 
     def test_html_index_2(self):
         ###################################################################################
@@ -130,7 +139,7 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        self.assertTrue(compare_html_files(out, self.reference_index_2))
+        compare_html_files(out, self.reference_index_2)
 
     def tearDown(self):
         craz()

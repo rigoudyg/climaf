@@ -4,6 +4,8 @@
 # Example of ensemble definition and handling in CliMAF
 # S.Senesi - 05/2015
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # Basic example : superimpose annual time series of tas for various periods of same simulation

@@ -3,6 +3,11 @@
 # Created : S.Sénési - nov 2015
 # Adapter : J.Servonnat - april 2016
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+from env.environment import *
+
+
 dict_plot_params = {
     # -- Energy Budget
     'fluxsens': {
@@ -23,6 +28,7 @@ dict_plot_params = {
         'bias': {'color': 'BlueWhiteOrangeRed', 'min': -0.8, 'max': 0.8, 'delta': 0.1},
         'model_model': {'color': 'BlueWhiteOrangeRed', 'min': -0.2, 'max': 0.2, 'delta': 0.02},
     },
+    # Delete duplicate key in dictionnary
     'albnir': {
         'default': {'color': 'precip3_16lev', 'units': ''},
         'full_field': {'colors': '0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9'},

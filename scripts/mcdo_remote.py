@@ -7,7 +7,7 @@
 #
 # Created : L.Vignon - 2017
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 import sys
@@ -19,7 +19,11 @@ import ftplib as ftp
 import getpass
 import netrc
 from dateutil import tz
-from Tkinter import *
+import future
+try:
+    import tkinter
+except ImportError:
+    import Tkinter as tkinter
 import argparse
 from collections import defaultdict
 import mcdo
@@ -108,34 +112,35 @@ def input_user_pass(host):
 
     Return login and password given by user
     """
-    Mafenetre = Tk()
+    Mafenetre = tkinter.Tk()
     Mafenetre.title('Enter login and password for host %s:' % host)
 
-    Login = StringVar()
-    Motdepasse = StringVar()
+    Login = tkinter.StringVar()
+    Motdepasse = tkinter.StringVar()
 
-    Label(Mafenetre, text="Enter login and pass:", fg='red', bg='white').pack(padx=5, pady=5)
+    tkinter.Label(Mafenetre, text="Enter login and pass:", fg='red', bg='white').pack(padx=5, pady=5)
 
-    Frame1 = Frame(Mafenetre, borderwidth=2, relief=GROOVE)
-    Frame1.pack(side=TOP, padx=10, pady=10)
+    Frame1 = tkinter.Frame(Mafenetre, borderwidth=2, relief=tkinter.GROOVE)
+    Frame1.pack(side=tkinter.TOP, padx=10, pady=10)
 
-    Frame11 = Frame(Frame1, borderwidth=2, relief=GROOVE, bg='white')
-    Frame11.pack(side=LEFT, padx=15, pady=15)
-    Label(Frame11, text="Enter login:", fg="navy").pack(side=TOP, padx=10, pady=10)
-    Label(Frame11, text="Enter pass:", fg="navy").pack(side=BOTTOM, padx=10, pady=10)
+    Frame11 = tkinter.Frame(Frame1, borderwidth=2, relief=tkinter.GROOVE, bg='white')
+    Frame11.pack(side=tkinter.LEFT, padx=15, pady=15)
+    tkinter.Label(Frame11, text="Enter login:", fg="navy").pack(side=tkinter.TOP, padx=10, pady=10)
+    tkinter.Label(Frame11, text="Enter pass:", fg="navy").pack(side=tkinter.BOTTOM, padx=10, pady=10)
 
-    Frame12 = Frame(Frame1, borderwidth=2, relief=GROOVE)
-    Frame12.pack(side=RIGHT, padx=15, pady=15)
-    Champ1 = Entry(Frame12, textvariable=Login, bg='bisque', fg='maroon')
-    Champ2 = Entry(Frame12, textvariable=Motdepasse, show='*', bg='bisque', fg='maroon')
+    Frame12 = tkinter.Frame(Frame1, borderwidth=2, relief=tkinter.GROOVE)
+    Frame12.pack(side=tkinter.RIGHT, padx=15, pady=15)
+    Champ1 = tkinter.Entry(Frame12, textvariable=Login, bg='bisque', fg='maroon')
+    Champ2 = tkinter.Entry(Frame12, textvariable=Motdepasse, show='*', bg='bisque', fg='maroon')
     Champ1.focus_set()
     Champ2.focus_set()
-    Champ1.pack(side=TOP, padx=5, pady=5)
-    Champ2.pack(side=BOTTOM, padx=5, pady=5)
+    Champ1.pack(side=tkinter.TOP, padx=5, pady=5)
+    Champ2.pack(side=tkinter.BOTTOM, padx=5, pady=5)
 
-    Frame3 = Frame(Mafenetre, borderwidth=2, relief=GROOVE)
-    Frame3.pack(side=BOTTOM, padx=15, pady=15)
-    Button(Frame3, text='Valider', fg='navy', command=Mafenetre.destroy).pack(side=BOTTOM, padx=5, pady=5)
+    Frame3 = tkinter.Frame(Mafenetre, borderwidth=2, relief=tkinter.GROOVE)
+    Frame3.pack(side=tkinter.BOTTOM, padx=15, pady=15)
+    tkinter.Button(Frame3, text='Valider', fg='navy', command=Mafenetre.destroy).pack(side=tkinter.BOTTOM, padx=5,
+                                                                                      pady=5)
 
     Mafenetre.mainloop()
 

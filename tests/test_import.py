@@ -4,6 +4,8 @@
 """
 Test the import of all modules.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -13,12 +15,14 @@ from tests.tools_for_tests import remove_dir_and_content
 
 
 testmodules = [
+    "env.clogging",
+    "env.environment",
+    "env.site_settings",
     "climaf",
     "climaf.api",
     "climaf.anynetcdf",
     "climaf.cache",
     "climaf.classes",
-    "env.clogging",
     "climaf.cmacro",
     "climaf.dataloc",
     "climaf.driver",
@@ -27,9 +31,11 @@ testmodules = [
     "climaf.html",
     "climaf.netcdfbasics",
     "climaf.operators",
+    "climaf.operators_derive",
+    "climaf.operators_scripts",
     "climaf.period",
-    "env.site_settings",
-    "climaf.standard_operators"
+    "climaf.standard_operators",
+    "climaf.utils",
 ]
 
 

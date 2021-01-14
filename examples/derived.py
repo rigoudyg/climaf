@@ -9,6 +9,8 @@ It can be used to define a CliMAF dataset
 
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # S.Senesi - sept 2014
 
 from __future__ import print_function
@@ -18,6 +20,8 @@ from __future__ import print_function
 from climaf.api import *
 
 # Set some default values
+from climaf.operators_derive import derive
+
 cdef("project", "example")
 cdef("simulation", "AMIPV6ALB2G")
 # cdef("period","1980-1981") # Cannto , because datafiles don't have same number of variables for these two years

@@ -4,6 +4,8 @@
 """
 Test the cmacro module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -14,6 +16,7 @@ from climaf.cache import setNewUniqueCache
 from climaf.api import *
 from climaf.classes import ctree, cdummy, scriptChild
 from climaf.cmacro import macro, crewrite, cmatch, read, write, show, instantiate, Climaf_Macro_Error
+from env.environment import *
 
 
 class MacroTests(unittest.TestCase):
@@ -31,7 +34,6 @@ class MacroTests(unittest.TestCase):
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm)
         my_macro = macro('eu_cross_section', fig_ezm)
-        from climaf.cmacro import cmacros
         self.assertEqual(cmacros["eu_cross_section"].buildcrs(),
                          "plot(ccdo(llbox(ARG,latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")
         self.assertEqual(cmacros["eu_cross_section"].buildcrs().replace("ARG", january_ta.buildcrs()),
@@ -222,19 +224,14 @@ class ReadWriteTests(unittest.TestCase):
         my_macro = macro("my_bias", my_bias, [mean_january_ta, ])
         self.my_macro_file = os.path.sep.join([tmp_directory, "my_macro_test.json"])
         write(self.my_macro_file)
-        from climaf.cmacro import cmacros
-        for a_macro in list(cmacros):
-            del cmacros[a_macro]
+        del cmacros["my_bias"]
         self.assertNotIn("my_bias", cmacros)
 
     def test_read(self):
-        from climaf.cmacro import cmacros
         self.assertNotIn("my_bias", cmacros)
         read("my_macro.txt")
-        from climaf.cmacro import cmacros
         self.assertNotIn("my_bias", cmacros)
         read(self.my_macro_file)
-        from climaf.cmacro import cmacros
         self.assertIn("my_bias", cmacros)
 
     def test_write(self):

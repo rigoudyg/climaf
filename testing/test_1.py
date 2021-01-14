@@ -8,7 +8,7 @@ Call it as : python -m unittest -b -v -f test_1
 S.Senesi - dec 2014
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import unittest
 import os.path
@@ -130,7 +130,7 @@ class B_CMIP5_DRS_Ciclad(unittest.TestCase):
 
     def test_selecting_files(self):
         my_file = cfile(self.ds)
-        expected = climaf.cache.currentCache +'/fe/e23d2f2ebb886d6582e6e0f3e7b3867294a5237cc5b0d32b9c537c.nc'
+        expected = climaf.cache.currentCache + '/fe/e23d2f2ebb886d6582e6e0f3e7b3867294a5237cc5b0d32b9c537c.nc'
         print("actual=" + my_file)
         print("expected=" + expected)
         self.assertEqual(my_file, expected, 'Issue extracting 1pctCO2 data files')

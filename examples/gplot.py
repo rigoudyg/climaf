@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 # Example for general-purpose plot using NCL
 # Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/plot.html
 
@@ -199,9 +201,10 @@ if atCNRM:
     # -----------------------------------------------------------
     # A Map of two fields and vectors, with value selection of time step and/or level step for all fields which have
     # this dimension : case where (t,y,x) are not degenerated
+    # uo(time_counter, depthu, y, x)
     # -----------------------------------------------------------
     duo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="uo",
-             period="1998")  # uo(time_counter, depthu, y, x)
+             period="1998")
     dvo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="vo", period="1998")
     # tos(time_counter, y, x)
     tos = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="tos", period="1998")

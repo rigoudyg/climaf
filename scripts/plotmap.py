@@ -14,7 +14,6 @@ import json
 from netCDF4 import Dataset
 
 import matplotlib.pyplot as plt
-import numpy as np
 import cartopy.crs as ccrs
 
 

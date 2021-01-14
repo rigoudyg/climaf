@@ -12,6 +12,9 @@ merged in a single file, for efficiency purpose.
 from __future__ import print_function
 
 # Load Climaf functions and site settings
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 # Reset CliMAF cache content

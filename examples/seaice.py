@@ -6,7 +6,7 @@ Example of CliMAF session with SeaIce data (here organized 'a la EM')
 """
 # S.Senesi - may 2015
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 from climaf.api import *
 

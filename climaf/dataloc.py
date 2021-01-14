@@ -8,31 +8,28 @@ Handles a database of attributes for describing organization and location of dat
 
 # Created : S.Senesi - 2014
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 import six
 import os.path
 import re
-import string
 import glob
 import subprocess
 from string import Template
-
-import classes
-from climaf.period import init_period, sort_periods_list
-from climaf.netcdfbasics import fileHasVar
-from env.clogging import clogger, dedent
-from operator import itemgetter
 import ftplib as ftp
 import getpass
 import netrc
 from functools import partial
 
-locs = []
+from env.environment import *
+from climaf.utils import Climaf_Error, Climaf_Classes_Error, Climaf_Data_Error
+from climaf.period import init_period, sort_periods_list
+from climaf.netcdfbasics import fileHasVar
+from env.clogging import clogger
 
 
-class dataloc():
+class dataloc(object):
     def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*",
                  realm="*", table="*", frequency="*"):
         """
@@ -131,15 +128,18 @@ class dataloc():
          - and declaring an exception for one simulation (here, both location and organization are supposed to be
            different)::
 
-            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM', url=['~/tmp/my_exp_data'])
+            >>> dataloc(project='PRE_CMIP6', model='IPSLCM-Z-HR', simulation='my_exp', organization='EM',
+            ...         url=['~/tmp/my_exp_data'])
 
          - and declaring a project to access remote data (on multiple servers)::
 
             >>> cproject('MY_REMOTE_DATA', ('frequency', 'monthly'), separator='|')
-            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFX${PERIOD}.nc',
-            ... 'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_${PERIOD}_${model}.nc']),
+            >>> dataloc(project='MY_REMOTE_DATA', organization='generic',
+            ...         url=['beaufix:/home/gmgec/mrgu/vignonl/*/${simulation}SFX${PERIOD}.nc',
+            ...              'ftp:vignonl@hendrix:/home/vignonl/${model}/${variable}_1m_${PERIOD}_${model}.nc']),
             >>> calias('MY_REMOTE_DATA','tas','tas',filenameVar='2T')
-            >>> tas=ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='198101')
+            >>> tas = ds(project='MY_REMOTE_DATA', simulation='AMIPV6ALB2G', variable='tas', frequency='monthly',
+            ...          period='198101')
 
          Please refer to the :ref:`example section <examples>` of the documentation for an example with each
          organization scheme
@@ -151,15 +151,17 @@ class dataloc():
         self.simulation = simulation
         self.frequency = frequency
         self.organization = organization
+        self.realm = realm
+        self.table = table
         if organization not in ['EM', 'CMIP5_DRS', 'generic']:
-            raise classes.Climaf_Error("Cannot process organization " + organization)
+            raise Climaf_Error("Cannot process organization " + organization)
         if isinstance(url, list):
             self.urls = url
         else:
             if re.findall("^esgf://.*", url):
                 self.organization = "ESGF"
             self.urls = [url]
-        self.urls = map(os.path.expanduser, self.urls)
+        self.urls = list(map(os.path.expanduser, self.urls))
         alt = []
         for u in self.urls:
             # if u[0] != '$' : alt.append(os.path.abspath(u)) #lv
@@ -191,15 +193,17 @@ class dataloc():
         return not self.__eq__(other)
 
     def __str__(self):
-        return self.model + self.project + self.simulation + self.frequency + self.organization + repr(self.urls)
+        return self.model + self.project + self.simulation + self.frequency + self.realm + self.table + \
+               self.organization + repr(self.urls)
 
     def pr(self):
         print("For model " + self.model + " of project " + self.project +
               " for simulation " + self.simulation + " and freq " + self.frequency +
-              " locations are : " + repr(self.urls) + " and org is :" + self.organization)
+              " locations are : " + repr(self.urls) + " and org is :" + self.organization +
+              " and table is :" + self.table + " and realm is :" + self.realm)
 
 
-def getlocs(project="*", model="*", simulation="*", frequency="*"):
+def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", table="*"):
     """ Returns the list of org,freq,url triples which may match the
     list of given attributes values (allowing for wildcards '*') and which have
     the lowest number of wildcards (*) in attributes
@@ -207,22 +211,11 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     """
     rep = []
     for loc in locs:
-        stars = 0
-        # loc.pr()
-        if loc.project == "*" or project == loc.project:
-            if loc.project == "*" or project == "*":
-                stars += 1
-            if loc.model == "*" or model == loc.model:
-                if loc.model == "*" or model == "*":
-                    stars += 1
-                if loc.simulation == "*" or simulation == loc.simulation:
-                    if loc.simulation == "*" or simulation == "*":
-                        stars += 1
-                    if loc.frequency == "*" or frequency == loc.frequency:
-                        if loc.frequency == "*" or frequency == "*":
-                            stars += 1
-                        rep.append((loc.organization, loc.frequency, loc.urls, stars))
-                        # print("appended")
+        list_loc = [(loc.project, project), (loc.model, model), (loc.simulation, simulation),
+                    (loc.frequency, frequency), (loc.realm, realm), (loc.table, table)]
+        if all([f[0] in ["*", f[1]] or f[1] == "*" for f in list_loc]):
+            stars = [f[0] == "*" or f[1] == "*" for f in list_loc].count(True)
+            rep.append((loc.organization, loc.frequency, loc.urls, stars))
     # Must mimimize the number of '*' ? (allows wildcards in dir names, avoid too generic cases)
     # When multiple answers with wildcards, return the ones with the lowest number
     filtered = []
@@ -237,10 +230,10 @@ def getlocs(project="*", model="*", simulation="*", frequency="*"):
     return filtered
 
 
-def isLocal(project, model, simulation, frequency):
+def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     if project == 'file':
         return True
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
+    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
     if len(ofu) == 0:
         return False
     rep = True
@@ -275,34 +268,30 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     rep = []
     project = kwargs['project']
     simulation = kwargs['simulation']
+    model = kwargs.get("model", "*")
+    frequency = kwargs.get("frequency", "*")
+    realm = kwargs.get("realm", "*")
+    table = kwargs.get("table", "*")
 
-    if 'model' in kwargs:
-        model = kwargs['model']
-    else:
-        model = "*"
-    if 'frequency' in kwargs:
-        frequency = kwargs['frequency']
-    else:
-        frequency = "*"
-
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency)
+    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
     clogger.debug("locs=" + repr(ofu))
     if len(ofu) == 0:
-        clogger.warning("no datalocation found for %s %s %s %s " % (project, model, simulation, frequency))
+        clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
+                                                                           table))
     for org, freq, urls in ofu:
-        if return_wildcards is not None and len(return_wildcards) > 0 and org is not "generic":
-            raise classes.Climaf_Error("Can handle multiple facet query only for organization=generic ")
+        if return_wildcards is not None and len(return_wildcards) > 0 and org != "generic":
+            raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
-        if "frequency" in kwargs and project in classes.frequencies:
+        if "frequency" in kwargs and project in frequencies:
             normfreq = kwargs2['frequency']
-            if normfreq in classes.frequencies[project]:
-                kwargs2['frequency'] = classes.frequencies[project][normfreq]
+            if normfreq in frequencies[project]:
+                kwargs2['frequency'] = frequencies[project][normfreq]
         # JS # Convert normalized realm to project-specific realm if applicable
-        if "realm" in kwargs and project in classes.realms:
+        if "realm" in kwargs and project in realms:
             normrealm = kwargs2['realm']
-            if normrealm in classes.realms[project]:
-                kwargs2['realm'] = classes.realms[project][normrealm]
+            if normrealm in realms[project]:
+                kwargs2['realm'] = realms[project][normrealm]
         #
         # Call organization-specific routine
         if org == "EM":
@@ -313,9 +302,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
             rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
                                           merge_periods_on=merge_periods_on, **kwargs2))
         else:
-            raise classes.Climaf_Error("Cannot process organization " + org +
-                                       " for simulation " + simulation + " and model " + model +
-                                       " of project " + project)
+            raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
+                               model + " of project " + project)
     if not ofu:
         return None
     else:
@@ -328,7 +316,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, **kwargs):
     # Discard duplicates (assumes that sorting is harmless for later processing)
     rep = sorted(list(set([f.strip() for f in rep])))
     # Assemble filenames in one single string
-    return string.join(rep)
+    return ' '.join(rep)
 
 
 def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwargs):
@@ -350,7 +338,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
     Example :
 
-    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980', urls=['~/DATA/${project}/${model}/*${variable}*${PERIOD}*.nc)']
+    >>> selectGenericFiles(project='my_projet',model='my_model', simulation='lastexp', variable='tas', period='1980',
+    ...                    urls=['~/DATA/${project}/${model}/*${variable}*${PERIOD}*.nc)']
+
     /home/stephane/DATA/my_project/my_model/somefilewith_tas_Y1980.nc
 
     In the pattern strings, the keywords that can be used in addition to the argument
@@ -378,13 +368,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         - on fait glob.glob
 
         - on affine : on ne retient que les valeurs qui matchent avec la regexp de périodes (sous
-            réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
-            avec filenameVar; d'où une liste de fichiers lfiles
+          réserve que le pattern contienne $PERIOD) si on n'a rien, on essaie aussi
+          avec filenameVar; d'où une liste de fichiers lfiles
 
-    - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
-        une expression régulière (avec groupes) qui capture les valeurs de facettes
-        (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
-        nécessaire ???)
+        - on cherche a connaitre les valeurs rencontrées pour chaque facette : on construit
+          une expression régulière (avec groupes) qui capture les valeurs de facettes
+          (y/c PERIOD) et une autre pour capturer la date seulement (est-ce bien encore
+          nécessaire ???)
 
         - Boucle sur les fichiers de lfiles:
 
@@ -398,14 +388,15 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
 
                 - on extrait la periode
 
-            - si elle convient (divers cas ...)
+                - si elle convient (divers cas ...)
 
-            - si on a pu filtrer sur la variable,
-                ou que variable="*" ou variable multiple,
-                ou que le fichier contient la bonne variable, eventuellement après renommage
-                on retient le fichier
+                - si on a pu filtrer sur la variable,
+                    ou que variable="*" ou variable multiple,
+                    ou que le fichier contient la bonne variable, eventuellement après renommage
+                    on retient le fichier
 
-        - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les attributs
+            - A chaque fois qu'on retient un fichier , on ajoute au dict wildcard_facets les valeurs recontrées pour les
+              attributs
 
         - Dès qu'un pattern de la  liste url a eu des fichiers qui collent, on abandonne l'examen des patterns suivants
 
@@ -436,7 +427,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     facet_value = oc.group(kw)
                 except:
                     continue
-                valid_values = classes.cvalid(kw, None, project)
+                valid_values = cvalid(kw, None, project)
                 if isinstance(valid_values, list) and (facet_value not in valid_values):
                     clogger.debug("Facet value %s for %s is not allowed" % (facet_value, kw))
                     return False
@@ -478,12 +469,18 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
     rep = []
     #
     periods = None  # a list of periods available
-    periods_dict = dict()
+    if return_wildcards is not None:
+        periods_dict = return_wildcards.get("period", dict())
+        for val in periods_dict:
+            periods_dict[val] = set(periods_dict[val])
+    else:
+        periods_dict = dict()
+        
     #
     period = kwargs['period']
     if period == "*":
         periods = []  # Init an empty list of all periods
-    elif type(period) is str:
+    elif isinstance(period, six.string_types):
         period = init_period(period)
     #
     variable = kwargs['variable']
@@ -593,7 +590,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
             else:
                 return thestring
         for kw in kwargs:
-            if type(kwargs[kw]) is str:  # This excludes period attribute, which has a type
+            if isinstance(kwargs[kw], six.string_types):  # This excludes period attribute, which has a type
                 alt_kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
                 alt_basename = rreplace(alt_basename, r"${%s}" % kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]))
         facets_regexp = Template(alt_basename).safe_substitute(**alt_kwargs)
@@ -607,7 +604,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
         #
         # Construct regexp for extracting dates from filename
         date_regexp = None
-        template_toreg = template.replace("*", ".*").replace("?", r".").replace(r"+", r"\+")
+        template_toreg = template.replace(r"*", r".*").replace(r"?", r".").replace(r"+", r"\+")
         # print "template before searching dates : "+template_toreg
         for key in date_regexp_keywords:
             # print "searchin "+key+" in "+template
@@ -638,14 +635,14 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                     # print "period=",re.sub(date_regexp,r'\g<period>',f)
                     tperiod = re.sub(date_regexp, r'\g<period>', f)
                     if tperiod == f:
-                        raise classes.Climaf_Error("Cannot find a period in %s with regexp %s" % (f, date_regexp))
+                        raise Climaf_Error("Cannot find a period in %s with regexp %s" % (f, date_regexp))
                     fperiod = init_period(tperiod)
                 else:
                     date_regexp0 = date_regexp
                     # print "date_regexp for extracting dates : "+date_regexp0, "file="+f
                     start = re.sub(date_regexp0, r'\1', f)
                     if start == f:
-                        raise Climaf_Data_Error("Start period not found in %s using regexp %s" % (f, regexp0))  # ?
+                        raise Climaf_Data_Error("Start period not found in %s using regexp %s" % (f, date_regexp0))  # ?
                     if hasEnd:
                         end = re.sub(date_regexp0, r'\2', f)
                         fperiod = init_period("%s-%s" % (start, end))
@@ -673,9 +670,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                                 clogger.debug("adding fixed field :" + remote_prefix + f)
                                 rep.append(remote_prefix + f)
                         else:
-                            raise classes.Climaf_Error(
-                                "For remote files, filename pattern (%s) should include ${varname} " +
-                                "(which is instanciated by variable name or filenameVar)" % f)
+                            raise Climaf_Error("For remote files, filename pattern (%s) should include ${varname} " +
+                                               "(which is instanciated by variable name or filenameVar)" % f)
                 else:
                     clogger.info("Cannot yet filter files re. time using only file content.")
                     # if store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_periods_on) :
@@ -724,7 +720,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         else:
                             mess = "For remote files, filename pattern (%s) should include" % (remote_prefix + f)
                             mess += " ${varname} (which is instanciated by variable name or filenameVar)"
-                            raise classes.Climaf_Error(mess)
+                            raise Climaf_Error(mess)
             else:
                 if not fperiod:
                     clogger.debug('not appending %s because period is None ' % f)
@@ -813,65 +809,65 @@ def ftpmatch(connect, url):
     return lpath_match
 
 
-def glob_remote_data(remote, pattern):
-    """
-    Returns a list of path names that match pattern, for remote data
-    located atremote
-    """
+# def glob_remote_data(remote, pattern):
+#     """
+#     Returns a list of path names that match pattern, for remote data
+#     located atremote
+#     """
+#
+#     if len(remote.split(":")) == 3:
+#         k = 1
+#     else:
+#         k = 0
+#     k = 0
+#
+#     if re.findall("@", remote.split(":")[k]):
+#         username = remote.split(":")[k].split("@")[0]
+#         host = remote.split(":")[k].split("@")[-1]
+#     else:
+#         username = ''
+#         host = remote.split(":")[k]
+#
+#     secrets = netrc.netrc()
+#
+#     if username:
+#         if host in secrets.hosts:
+#             login, account, password = secrets.authenticators(host)
+#             if login != username:
+#                 password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#         else:
+#             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#     else:
+#         if host in secrets.hosts:
+#             username, account, password = secrets.authenticators(host)
+#         else:
+#             username = eval(input("Enter login for host '%s': " % host))
+#             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
+#
+#     try:
+#         connect = ftp.FTP(host, username, password)
+#         listfiles = ftpmatch(connect, pattern)
+#         connect.quit()
+#         return listfiles
+#     except ftp.all_errors as err_ftp:
+#         print(err_ftp)
+#         raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
 
-    if len(remote.split(":")) == 3:
-        k = 1
-    else:
-        k = 0
-    k = 0
 
-    if re.findall("@", remote.split(":")[k]):
-        username = remote.split(":")[k].split("@")[0]
-        host = remote.split(":")[k].split("@")[-1]
-    else:
-        username = ''
-        host = remote.split(":")[k]
-
-    secrets = netrc.netrc()
-
-    if username:
-        if host in secrets.hosts:
-            login, account, password = secrets.authenticators(host)
-            if login != username:
-                password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-        else:
-            password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-    else:
-        if host in secrets.hosts:
-            username, account, password = secrets.authenticators(host)
-        else:
-            username = raw_input("Enter login for host '%s': " % host)
-            password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
-
-    try:
-        connect = ftp.FTP(host, username, password)
-        listfiles = ftpmatch(connect, pattern)
-        connect.quit()
-        return listfiles
-    except ftp.all_errors as err_ftp:
-        print(err_ftp)
-        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (pattern, host, username))
-
-
-def remote_to_local_filename(url):
-    """
-    url: an url of remote data
-
-    Return local filename of remote file
-    """
-    from climaf import remote_cachedir
-
-    if len(url.split(":")) == 3:
-        k = 1
-    else:
-        k = 0
-
-    return rep
+# def remote_to_local_filename(url):
+#     """
+#     url: an url of remote data
+#
+#     Return local filename of remote file
+#     """
+#     from climaf import remote_cachedir
+#
+#     if len(url.split(":")) == 3:
+#         k = 1
+#     else:
+#         k = 0
+#
+#     return rep
 
 
 def glob_remote_data(url, pattern):
@@ -905,7 +901,7 @@ def glob_remote_data(url, pattern):
         if host in secrets.hosts:
             username, account, password = secrets.authenticators(host)
         else:
-            username = raw_input("Enter login for host '%s': " % host)
+            username = eval(input("Enter login for host '%s': " % host))
             password = getpass.getpass("Password for host '%s' and user '%s': " % (host, username))
 
     try:
@@ -915,7 +911,7 @@ def glob_remote_data(url, pattern):
         return listfiles
     except ftp.all_errors as err_ftp:
         print(err_ftp)
-        raise classes.Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
+        raise Climaf_Error("Access problem for data %s on host '%s' and user '%s'" % (url, host, username))
 
 
 def remote_to_local_filename(url):
@@ -1005,14 +1001,14 @@ def periodOfEmFile(filename, realm, freq):
                 speriod = "%s01-%s12" % (year, year)
                 return init_period(speriod)
         else:
-            raise classes.Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
+            raise Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
     elif realm == 'O' or realm == 'I':
         if freq == 'monthly' or freq == 'mon' or freq == '':
             altfreq = 'm'
         elif freq[0:2] == 'da':
             altfreq = 'd'
         else:
-            raise classes.Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
+            raise Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt = r'^.*_1' + altfreq + r'_([0-9]{8})_*([0-9]{8}).*nc'
         beg = re.sub(patt, r'\1', filename)
         end = re.sub(patt, r'\2', filename)
@@ -1021,7 +1017,7 @@ def periodOfEmFile(filename, realm, freq):
             return None
         return init_period("%s-%s" % (beg, end))
     else:
-        raise classes.Climaf_Error("unexpected realm " + realm)
+        raise Climaf_Error("unexpected realm " + realm)
 
 
 def selectExampleFiles(urls, **kwargs):
@@ -1126,3 +1122,32 @@ def test2():
 
 if __name__ == "__main__":
     test2()
+
+
+def cvalid(attribute, value=None, project=None):
+    """
+    Set or get the list of valid values for a CliMAF dataset attribute
+    or facet (such as e.g. 'model', 'simulation' ...). Useful for constraining
+    those data files which match a dataset definition
+
+    Argument 'project' allows to restrict the use/query
+    to the context of the given 'project'.
+
+    Example::
+
+    >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ] , project="CMIP6")
+    """
+    if project not in cprojects:
+        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+    if attribute == 'project':
+        project = None
+    #
+    if project and attribute not in cprojects[project].facets:
+        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+    if value is None:
+        rep = cprojects[project].facet_authorized_values.get(attribute, None)
+        if not rep:
+            rep = cprojects[None].facet_authorized_values.get(attribute, "")
+        return rep
+    else:
+        cprojects[project].facet_authorized_values[attribute] = value

@@ -5,6 +5,9 @@
 Test the cache module.
 """
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+
 import os
 import shutil
 import unittest
@@ -13,6 +16,7 @@ from tests.tools_for_tests import remove_dir_and_content
 
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
     searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \

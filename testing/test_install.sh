@@ -2,8 +2,8 @@
 # Created - S.Senesi - Feb 2015
 export PYTHONPATH=$(cd $(dirname $0)/..; pwd):$PYTHONPATH
 
-if ! [[ $(python -V 2>&1) == *2.7* ]]; then
-    echo "Python 2.7 is required"
+if ! [[ $(python -V 2>&1) == *2.7* ]] && ! [[ $(python -V 2>&1) == *3.* ]]; then
+    echo "Python 2.7 or 3.* is required"
     exit 1
 fi
 

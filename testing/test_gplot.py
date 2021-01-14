@@ -4,6 +4,8 @@
 # Example for general-purpose plot using NCL
 # Usage and interfacing : see CliMAF doc http://climaf.readthedocs.org/en/latest/scripts/gplot.html
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 craz()

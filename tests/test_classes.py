@@ -4,6 +4,8 @@
 """
 Test the classes module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -13,7 +15,8 @@ from tests.tools_for_tests import remove_dir_and_content
 from climaf.cache import setNewUniqueCache
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias
 from climaf.period import Climaf_Period_Error, init_period
-from env.site_settings import atCNRM
+from env.environment import *
+from env.site_settings import atCNRM, onCiclad
 
 
 class CprojectTests(unittest.TestCase):
@@ -21,7 +24,6 @@ class CprojectTests(unittest.TestCase):
     def test_cproject_init(self):
         cproject("my_project", ("my_arg", "my_default"), "my_other_arg", separator="-",
                  ensemble=["my_first_ensemble_arg", "my_other_ensemble_arg"])
-        from climaf.classes import cprojects
         self.assertIn("my_project", cprojects)
         a_project = cprojects["my_project"]
         self.assertEqual(a_project.project, "my_project")
@@ -34,7 +36,6 @@ class CprojectTests(unittest.TestCase):
         self.assertEqual(a_project.attributes_for_ensemble,
                          ["simulation", "my_first_ensemble_arg", "my_other_ensemble_arg"])
         cproject("my_project", "my_other_arg", separator="-", sep=".")
-        from climaf.classes import cprojects
         self.assertIn("my_project", cprojects)
         a_project = cprojects["my_project"]
         self.assertEqual(a_project.project, "my_project")
@@ -49,7 +50,6 @@ class CprojectTests(unittest.TestCase):
 
     def test_cproject_repr(self):
         cproject("my_project", "my_other_arg", sep=".")
-        from climaf.classes import cprojects
         self.assertEqual(repr(cprojects["my_project"]),
                          "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
 
@@ -67,7 +67,6 @@ class CdefTests(unittest.TestCase):
         a = cdef("model", project="CMIP6")
         self.assertEqual(a, "*")
         cdef("model", value="CNRM-CM6-1", project="CMIP6")
-        from climaf.classes import cprojects
         self.assertEqual(cprojects["CMIP6"].facet_defaults["model"], "CNRM-CM6-1")
         with self.assertRaises(Climaf_Classes_Error):
             cdef("my_attribute", project="CMIP6")
@@ -85,17 +84,11 @@ class CobjectTests(unittest.TestCase):
     def test_cobject_init(self):
         self.assertEqual(self.my_object.crs, "void")
 
-    @unittest.expectedFailure
     def test_cobject_str(self):
-        # TODO: Modify CliMAF to raise an exception
-        with self.assertRaises(NotImplementedError):
-            str(self.my_object)
+        self.assertEqual(str(self.my_object), "void")
 
-    @unittest.expectedFailure
     def test_cobject_repr(self):
-        # TODO: Modify CliMAF to raise an exception
-        with self.assertRaises(NotImplementedError):
-            str(self.my_object)
+        self.assertEqual(repr(self.my_object), "void")
 
     @unittest.expectedFailure
     def test_cobject_register(self):
@@ -147,6 +140,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip")
+        elif onCiclad:
+            self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -173,6 +168,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
+        elif onCiclad:
+            self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -243,6 +240,8 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         if atCNRM:
             self.root = "/cnrm/cmip/cnrm/ESG"
+        elif onCiclad:
+            self.root = "/bdd"
         else:
             self.root = ""
         self.my_dataset = cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',

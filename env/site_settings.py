@@ -5,9 +5,10 @@ Standard site settings for working with CliMAF.
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
+
 
 atCNRM = False
 atCerfacs = False

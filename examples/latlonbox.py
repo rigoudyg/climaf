@@ -6,6 +6,8 @@
 #  2- applying a further, explicit extraction of a sub box
 
 # Load Climaf functions and site settings
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from climaf.api import *
 
 cdef("frequency", "monthly")

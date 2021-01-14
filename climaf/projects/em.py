@@ -22,7 +22,7 @@ Specific facets are :
 Examples for defining an EM dataset::
 
  >>> tas= ds(project='em', simulation='GSAGNS1', variable='tas', period='1975-1976', realm="(A|Atmos)")
- >>> pr = ds(project='em', simulation="C1P60", group="SC, variable="pr"   , period="1850", realm="(O|Ocean)"))
+ >>> pr = ds(project='em', simulation="C1P60", group="SC", variable="pr", period="1850", realm="(O|Ocean)"))
 
 See other examples in :download:`examples/data_em.py <../examples/data_em.py>`
 
@@ -45,7 +45,10 @@ value (which is ill described in data files); see code for details
 """
 # S.Senesi - april 2016
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 from env.site_settings import atCNRM
+from env.environment import *
 
 if atCNRM:
     from climaf.dataloc import dataloc

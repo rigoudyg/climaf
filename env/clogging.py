@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import logging
+import six
 
 logdir = "."
 
@@ -46,7 +49,7 @@ def clog(level=None):
         clogger.setLevel(transl(level))
     exist_stream_handler = False
     for h in clogger.handlers:
-        if type(h) is logging.StreamHandler:
+        if isinstance(h, logging.StreamHandler):
             # print "il existe deja un StreamHandler => on change le niveau d informations et on formatte le msg ", h
             # clogger.setLevel(arg)
             h.setFormatter(formatter)
@@ -72,7 +75,7 @@ def clog_file(level=None):
     """
     exist_file_handler = False
     for h in clogger.handlers:
-        if type(h) is logging.FileHandler:
+        if isinstance(h, logging.FileHandler):
             # print "il existe deja un FileHandler => on change le niveau d informations", h
             if level:
                 h.setLevel(transl(level))
@@ -111,7 +114,7 @@ def dedent(n=1):
 
 
 def transl(level):
-    if type(level) is str:
+    if isinstance(level, six.string_types):
         if level.lower() == 'debug':
             return logging.DEBUG
         elif level.lower() == 'critical':

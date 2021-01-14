@@ -4,6 +4,8 @@
 """
 Test the period module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -15,6 +17,7 @@ from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_period
     intersect_periods_list, lastyears, firstyears
 
 from climaf.cache import setNewUniqueCache
+from env.environment import *
 
 
 class CreatePeriodDefinedTests(unittest.TestCase):
@@ -141,9 +144,10 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertEqual(self.my_period.end, self.my_date_2)
 
     def test_eq(self):
-        self.assertTrue(self.my_period == self.my_period_1)
-        self.assertFalse(cperiod("fx") == self.my_period)
-        self.assertTrue(self.my_period_3 != self.my_period_4)
+        self.assertEqual(self.my_period, self.my_period_1)
+        self.assertNotEqual(cperiod("fx"), self.my_period)
+        self.assertNotEqual(self.my_period_3, self.my_period_4)
+        self.assertNotEqual(self.my_period_3, self.my_period_6)
 
     @unittest.expectedFailure
     def test_repr(self):
@@ -193,7 +197,7 @@ class InitPeriodTests(unittest.TestCase):
             init_period(1850)
         with self.assertRaises(TypeError):
             init_period(1850, 1950)
-        init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
+        init_period(cperiod(datetime(1850, 1, 2), datetime(1950, 5, 23)))
         init_period("1850")
         init_period("1500-2000")
         init_period("1500_2000")
@@ -288,9 +292,9 @@ class InitPeriodTests(unittest.TestCase):
         my_period = init_period("174512251324-184705131659")
         self.assertEqual(my_period.start, datetime(1745, 12, 25, 13, 24))
         self.assertEqual(my_period.end, datetime(1847, 5, 13, 17))
-        my_period = init_period(cperiod(datetime(1850, 01, 02), datetime(1950, 05, 23)))
-        self.assertEqual(my_period.start, datetime(1850, 01, 02))
-        self.assertEqual(my_period.end, datetime(1950, 05, 23))
+        my_period = init_period(cperiod(datetime(1850, 1, 2), datetime(1950, 5, 23)))
+        self.assertEqual(my_period.start, datetime(1850, 1, 2))
+        self.assertEqual(my_period.end, datetime(1950, 5, 23))
 
 
 class SortPeriodsListTests(unittest.TestCase):
@@ -319,9 +323,7 @@ class MergePeriodsTests(unittest.TestCase):
         # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
         pass
 
-    @unittest.expectedFailure
     def test_merge(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))

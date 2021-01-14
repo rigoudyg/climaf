@@ -8,7 +8,7 @@ Run it as : python -m unittest -v test_req
 S.Senesi - jan 2015
 """
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import unittest
 import os
@@ -46,12 +46,10 @@ class A_externals(unittest.TestCase):
         bin = "cdo"
         self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "Cannot execute %s" % bin)
 
-    @unittest.expectedFailure
     def test_9_cdo(self):
         bin = "ncview"
         self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "You may have troubles without %s" % bin)
 
-    @unittest.expectedFailure
     def test_ncl(self):
         bin = "ncl"
         self.assertEqual(os.system("type %s > /dev/null 2>&1" % bin), 0, "You may have troubles without %s" % bin)

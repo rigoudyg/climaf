@@ -15,6 +15,8 @@
 
 # -- For this, we use the python library argparse
 # --------------------------------------------------------------------------------------------------
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import argparse
 
 import matplotlib
@@ -48,35 +50,48 @@ parser = argparse.ArgumentParser(description='Plot script for CliMAF that handle
 # -- Describe the arguments you need
 # --------------------------------------------------------------------------------------------------
 # --> filenames = ${ins} in cscript
-parser.add_argument('--filenames', action='store', help='Netcdf files provided by CliMAF')
+parser.add_argument('--filenames', action='store',
+                    help='Netcdf files provided by CliMAF')
 # --> labels = ${labels} (automatically provided by CliMAF in cscript)
-parser.add_argument('--labels', action='store', default=None, help='Labels (automatically provided by CliMAF) with ${labels} in cscript')
+parser.add_argument('--labels', action='store', default=None,
+                    help='Labels (automatically provided by CliMAF) with ${labels} in cscript')
 # --> outfig = ${out}
 parser.add_argument('--outfig', action='store', default='fig.png',
                     help='path/filename of the output figure (png)')
-parser.add_argument('--variable', action='store', default=None, help='variable')
+parser.add_argument('--variable', action='store', default=None,
+                    help='variable')
 # --> colors = ${colors}
-parser.add_argument('--colors', action='store', default=None, help='colors separated by commas')
-parser.add_argument('--lw', action='store', default=None, help='lines thicknesses (commas separated)')
-parser.add_argument('--alphas', action='store', default=None, help='lines opacity (commas separated, 0 = transparent, 1=opac)')
-parser.add_argument('--linestyles', action='store', default=None, help='lines styles (https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html)')
+parser.add_argument('--colors', action='store', default=None,
+                    help='colors separated by commas')
+parser.add_argument('--lw', action='store', default=None,
+                    help='lines thicknesses (commas separated)')
+parser.add_argument('--alphas', action='store', default=None,
+                    help='lines opacity (commas separated, 0 = transparent, 1=opac)')
+parser.add_argument('--linestyles', action='store', default=None,
+                    help='lines styles (https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html)')
 parser.add_argument('--highlight_period', action='store', default=None,
                     help='Highlight a period on a time series (thicker line) ; provide the periods yearstart_yearend '
                          'separated by commas (Ex: 1980_2005,1990_2000 to highlight the first period on the first '
                          'dataset, and the second period on the second dataset)')
 parser.add_argument('--highlight_period_lw', action='store', default=None,
                     help='Thickness of the highlighted period')
-parser.add_argument('--min', action='store', default=None, help='minimum value')
-parser.add_argument('--max', action='store', default=None, help='maximum value')
-parser.add_argument('--offset', action='store', default="", help='Offset')
-parser.add_argument('--scale', action='store', default="", help='Scale')
+parser.add_argument('--min', action='store', default=None,
+                    help='minimum value')
+parser.add_argument('--max', action='store', default=None,
+                    help='maximum value')
+parser.add_argument('--offset', action='store', default="",
+                    help='Offset')
+parser.add_argument('--scale', action='store', default="",
+                    help='Scale')
 parser.add_argument('--x_axis', action='store', default='Real',
                     help='Use either real x axis, or force align')
 parser.add_argument('--xlim', action='store', default='',
                     help='Provide the start date and end date to force the X axis. Ex: 1950-01-01,2005-12-31')
-parser.add_argument('--ylim', action='store', default='', help='Provide the interval for the Y axis')
+parser.add_argument('--ylim', action='store', default='',
+                    help='Provide the interval for the Y axis')
 
-parser.add_argument('--time_offset', action='store', default=None, help='Add a time offset to the beginning of the time series')
+parser.add_argument('--time_offset', action='store', default=None,
+                    help='Add a time offset to the beginning of the time series')
 
 parser.add_argument('--text', action='store', default="",
                     help='add some text in the plot; the user provides a triplet separared with commas x,y,text;'
@@ -91,53 +106,87 @@ parser.add_argument('--text_verticalalignment', action='store', default="",
 parser.add_argument('--text_horizontalalignment', action='store', default="",
                     help='Horizontal alignment of the text (separate with commas if provide several')
 
-parser.add_argument('--xlabel', action='store', default=None, help='X axis label')
-parser.add_argument('--ylabel', action='store', default=None, help='Y axis label')
-parser.add_argument('--xlabel_fontsize', action='store', default="", help='X axis label size')
-parser.add_argument('--ylabel_fontsize', action='store', default="", help='Y axis label size')
-parser.add_argument('--tick_size', action='store', default="", help='Ticks size')
+parser.add_argument('--xlabel', action='store', default=None,
+                    help='X axis label')
+parser.add_argument('--ylabel', action='store', default=None,
+                    help='Y axis label')
+parser.add_argument('--xlabel_fontsize', action='store', default="",
+                    help='X axis label size')
+parser.add_argument('--ylabel_fontsize', action='store', default="",
+                    help='Y axis label size')
+parser.add_argument('--tick_size', action='store', default="",
+                    help='Ticks size')
 
-parser.add_argument('--fig_size', action='store', default="", help='Size of the figure in inches => width*height Ex: 15*5')
+parser.add_argument('--fig_size', action='store', default="",
+                    help='Size of the figure in inches => width*height Ex: 15*5')
 
-parser.add_argument('--title', action='store', default=None, help='Title')
-parser.add_argument('--left_string', action='store', default=None, help='Left string')
-parser.add_argument('--right_string', action='store', default=None, help='Right string')
-parser.add_argument('--center_string', action='store', default=None, help='Center string')
-parser.add_argument('--title_fontsize', action='store', default="", help='Title size')
-parser.add_argument('--left_string_fontsize', action='store', default="", help='Left string size')
-parser.add_argument('--right_string_fontsize', action='store', default="", help='Right string size')
-parser.add_argument('--center_string_fontsize', action='store', default="", help='Center string size')
+parser.add_argument('--title', action='store', default=None,
+                    help='Title')
+parser.add_argument('--left_string', action='store', default=None,
+                    help='Left string')
+parser.add_argument('--right_string', action='store', default=None,
+                    help='Right string')
+parser.add_argument('--center_string', action='store', default=None,
+                    help='Center string')
+parser.add_argument('--title_fontsize', action='store', default="",
+                    help='Title size')
+parser.add_argument('--left_string_fontsize', action='store', default="",
+                    help='Left string size')
+parser.add_argument('--right_string_fontsize', action='store', default="",
+                    help='Right string size')
+parser.add_argument('--center_string_fontsize', action='store', default="",
+                    help='Center string size')
 
-parser.add_argument('--legend_colors', action='store', default='black', help='leg_colors separated by commas')
-parser.add_argument('--legend_labels', action='store', default=None, help='Labels of the legend')
+parser.add_argument('--legend_colors', action='store', default='black',
+                    help='leg_colors separated by commas')
+parser.add_argument('--legend_labels', action='store', default=None,
+                    help='Labels of the legend')
 parser.add_argument('--legend_xy_pos', action='store', default=None,
                     help='x,y Position of the corner of the box (by default = upper left corner). Example= "1.02,1"')
 parser.add_argument('--legend_loc', action='store', default=None,
                     help='Choose the corner of the legend box to specify the position of the legend box;'
                          ' by default 2 (upper left corner), take values 1, 2, 3 or 4'
                          ' (see resource loc of pyplot legend)')
-parser.add_argument('--legend_fontsize', action='store', default=None, help='Font size in the legend')
-parser.add_argument('--legend_ncol', action='store', default=None, help='Number of columns in the legend')
-parser.add_argument('--legend_frame', action='store', default="False", help='Draw the box around the legend? True/False')
-parser.add_argument('--legend_lw', action='store', default=None, help='Line widths (provide either one for all, or one by time series separated by commas')
-parser.add_argument('--draw_legend', action='store', default='True', help='Draw the legend? True/False')
-parser.add_argument('--append_custom_legend_to_default', action='store', default='False', help='Append the custom legend to the default one? True/False')
+parser.add_argument('--legend_fontsize', action='store', default=None,
+                    help='Font size in the legend')
+parser.add_argument('--legend_ncol', action='store', default=None,
+                    help='Number of columns in the legend')
+parser.add_argument('--legend_frame', action='store', default="False",
+                    help='Draw the box around the legend? True/False')
+parser.add_argument('--legend_lw', action='store', default=None,
+                    help='Line widths (provide either one for all, or one by time series separated by commas')
+parser.add_argument('--draw_legend', action='store', default='True',
+                    help='Draw the legend? True/False')
+parser.add_argument('--append_custom_legend_to_default', action='store', default='False',
+                    help='Append the custom legend to the default one? True/False')
 
 # -- Control margins
-parser.add_argument('--left_margin', action='store', default=None, help='Position of the left border of the figure in the plot')
-parser.add_argument('--right_margin', action='store', default=None, help='Position of the right border of the figure in the plot')
-parser.add_argument('--bottom_margin', action='store', default=None, help='Position of the bottom border of the figure in the plot')
-parser.add_argument('--top_margin', action='store', default=None, help='Position of the top border of the figure in the plot')
+parser.add_argument('--left_margin', action='store', default=None,
+                    help='Position of the left border of the figure in the plot')
+parser.add_argument('--right_margin', action='store', default=None,
+                    help='Position of the right border of the figure in the plot')
+parser.add_argument('--bottom_margin', action='store', default=None,
+                    help='Position of the bottom border of the figure in the plot')
+parser.add_argument('--top_margin', action='store', default=None,
+                    help='Position of the top border of the figure in the plot')
 
 
-parser.add_argument('--horizontal_lines_values', action='store', default=None, help='Y values for horizontal lines')
-parser.add_argument('--horizontal_lines_styles', action='store', default=None, help='Horizontal lines styles')
-parser.add_argument('--horizontal_lines_lw', action='store', default=None, help='Horizontal lines thickness')
-parser.add_argument('--horizontal_lines_colors', action='store', default=None, help='Horizontal lines colors')
-parser.add_argument('--vertical_lines_values', action='store', default=None, help='Y values for vertical lines')
-parser.add_argument('--vertical_lines_styles', action='store', default=None, help='vertical lines styles')
-parser.add_argument('--vertical_lines_lw', action='store', default=None, help='vertical lines thickness')
-parser.add_argument('--vertical_lines_colors', action='store', default=None, help='vertical lines colors')
+parser.add_argument('--horizontal_lines_values', action='store', default=None,
+                    help='Y values for horizontal lines')
+parser.add_argument('--horizontal_lines_styles', action='store', default=None,
+                    help='Horizontal lines styles')
+parser.add_argument('--horizontal_lines_lw', action='store', default=None,
+                    help='Horizontal lines thickness')
+parser.add_argument('--horizontal_lines_colors', action='store', default=None,
+                    help='Horizontal lines colors')
+parser.add_argument('--vertical_lines_values', action='store', default=None,
+                    help='Y values for vertical lines')
+parser.add_argument('--vertical_lines_styles', action='store', default=None,
+                    help='vertical lines styles')
+parser.add_argument('--vertical_lines_lw', action='store', default=None,
+                    help='vertical lines thickness')
+parser.add_argument('--vertical_lines_colors', action='store', default=None,
+                    help='vertical lines colors')
 
 # -- Default values
 default_left_string_fontsize = 30.
@@ -215,24 +264,24 @@ else:
 
 # -- alphas
 if args.alphas:
-    alphas_list = str.split(args.alphas,',')
-    if len(alphas_list)==1:
+    alphas_list = str.split(args.alphas, ',')
+    if len(alphas_list) == 1:
         alphas_list = alphas_list * len(filenames_list)
 else:
     alphas_list = [1] * len(filenames_list)
 
 # -- line styles
 if args.linestyles:
-    linestyles_list = str.split(args.linestyles,',')
-    if len(linestyles_list)==1:
+    linestyles_list = str.split(args.linestyles, ',')
+    if len(linestyles_list) == 1:
         linestyles_list = linestyles_list * len(filenames_list)
 else:
     linestyles_list = ['solid'] * len(filenames_list)
 for elt in linestyles_list:
     if '-' in elt:
         dumsplit = elt.split('-')
-        print((0, tuple( map(int, dumsplit[1:len(dumsplit)]) )))
-        linestyles_list[linestyles_list.index(elt)] = (0,  tuple( map(int, dumsplit[1:len(dumsplit)]) ) ) 
+        print((0, tuple(map(int, dumsplit[1:len(dumsplit)]))))
+        linestyles_list[linestyles_list.index(elt)] = (0, tuple(map(int, dumsplit[1:len(dumsplit)])))
 
 if args.highlight_period_lw:
     highlight_period_lw_list = args.highlight_period_lw.split(',')
@@ -252,7 +301,7 @@ else:
 
 # -- Plot the horizontal lines
 if args.horizontal_lines_values:
-    horizontal_lines_values_list = args.horizontal_lines_values.split( ',')
+    horizontal_lines_values_list = args.horizontal_lines_values.split(',')
     if args.horizontal_lines_lw:
         horizontal_lines_lw_list = args.horizontal_lines_lw.split(',')
     else:
@@ -260,7 +309,7 @@ if args.horizontal_lines_values:
     if len(horizontal_lines_lw_list) == 1 and len(horizontal_lines_values_list) > 1:
         horizontal_lines_lw_list = horizontal_lines_lw_list * len(horizontal_lines_values_list)
     if args.horizontal_lines_colors:
-        horizontal_lines_colors_list =  args.horizontal_lines_colors.split(',')
+        horizontal_lines_colors_list = args.horizontal_lines_colors.split(',')
     else:
         horizontal_lines_colors_list = ['black'] * len(horizontal_lines_values_list)
     if len(horizontal_lines_colors_list) == 1 and len(horizontal_lines_values_list) > 1:
@@ -292,10 +341,10 @@ for pathfilename in filenames_list:
             x = np.array(range(1, 13))
             datevar = []
         else:
-            orig_date  = str(t_unit).split(' ')[2]
-            orig_year  = int(orig_date.split('-')[0])
+            orig_date = str(t_unit).split(' ')[2]
+            orig_year = int(orig_date.split('-')[0])
             orig_month = int(orig_date.split('-')[1])
-            orig_day   = int(orig_date.split('-')[2][0:2])
+            orig_day = int(orig_date.split('-')[2][0:2])
             tvalue = [cdatetime(orig_year, orig_month, orig_day) +
                       timedelta(seconds=365.25 / 12 * 24.0 * 3600.0 * float(val)) for val in nctime]
             x = np.array(tvalue)
@@ -306,13 +355,13 @@ for pathfilename in filenames_list:
             t_cal = u"gregorian"  # or standard
         #
         #
-        tvalue = num2date(nctime, units = t_unit, calendar = t_cal)
+        tvalue = num2date(nctime, units=t_unit, calendar=t_cal)
         datevar = []
         for elt in tvalue:
             if not isinstance(elt, cdatetime):
                 if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
                                     cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
-                    strdate =  elt.strftime().split(' ')[0]
+                    strdate = elt.strftime().split(' ')[0]
                     year = int(strdate.split('-')[0])
                     month = int(strdate.split('-')[1])
                     day = int(strdate.split('-')[2])
@@ -336,10 +385,10 @@ for pathfilename in filenames_list:
     y = np.squeeze(test_dat)
     if len(y.shape) > 1:
         print("input data is not 1D")
-    print('lw_list[dataset_number]',lw_list[dataset_number])
-    print('colors[dataset_number]',colors[dataset_number])
-    print('linestyles_list[dataset_number]',linestyles_list[dataset_number])
-    print('alphas_list[dataset_number]',alphas_list[dataset_number])
+    print('lw_list[dataset_number]', lw_list[dataset_number])
+    print('colors[dataset_number]', colors[dataset_number])
+    print('linestyles_list[dataset_number]', linestyles_list[dataset_number])
+    print('alphas_list[dataset_number]', alphas_list[dataset_number])
 
     handles_for_legend.append(
         # plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],

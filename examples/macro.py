@@ -9,7 +9,7 @@
 # 'cmacro()'; the macros can be saved and edited, and they simplify
 # the display of CliMAF cache content
 
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 

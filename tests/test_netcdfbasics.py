@@ -4,6 +4,8 @@
 """
 Test the netcdfbasics module.
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -15,6 +17,7 @@ from climaf.netcdfbasics import varOfFile, varsOfFile, fileHasVar, fileHasDim, d
 from climaf.period import init_period
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as rootpath
+from env.environment import *
 
 
 class VarsOfFileTests(unittest.TestCase):

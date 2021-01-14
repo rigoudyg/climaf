@@ -14,19 +14,26 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 
 
 """
-from __future__ import print_function
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 import re
-import glob
+import pickle
+import shutil
+from collections import OrderedDict
+try:
+    from collections.abc import KeysView, ValuesView
+except ImportError:
+    from _abcoll import KeysView, ValuesView
+from env.clogging import clogger, dedent
+from functools import reduce
+import six
+
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
 from climaf import cachedir
 from climaf.driver import cfile
-import pickle
-import shutil
-from collections import OrderedDict
-from env.clogging import clogger, dedent
+from env.environment import *
 
 
 def header(title, style_file=None):
@@ -128,12 +135,16 @@ def link(label, filename, thumbnail=None, hover=True):
         set as 3 times that of thumbnail width and height
       - if thumbnail is None, size is '200*200'
     """
+    if filename is not None and not isinstance(filename, six.string_types):
+        raise TypeError("The filename provided should be None or a string, not %s" % filename)
+    if label is not None and not isinstance(label, six.string_types):
+        raise TypeError("The label provided should be None or a string, not %s" % label)
     if filename:
         regex = re.compile('(?P<width>[0-9]+)[x*](?P<height>[0-9]+)')
         if thumbnail is not None:
             thumbnail_width = None
             thumbnail_height = None
-            if isinstance(thumbnail, basestring):
+            if isinstance(thumbnail, six.string_types):
                 thumbnail_regex_match = regex.match(thumbnail)
                 if thumbnail_regex_match:
                     thumbnail_width = thumbnail_regex_match.groupdict()["width"]
@@ -147,7 +158,7 @@ def link(label, filename, thumbnail=None, hover=True):
                 thumbnail_height = int(thumbnail_height)
 
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, six.string_types):
                     hover_regex_match = regex.match(hover)
                     if hover_regex_match:
                         hover_width = hover_regex_match.groupdict()["width"]
@@ -170,19 +181,18 @@ def link(label, filename, thumbnail=None, hover=True):
                 if hover_width is not None and not isinstance(hover_width, int):
                     hover_width = int(hover_width)
 
-                rep = '<A class="info" HREF="' + filename + '"><IMG HEIGHT=' + repr(thumbnail_height) + \
-                      ' WIDTH=' + repr(thumbnail_width) + ' SRC="' + filename + '"><span><IMG HEIGHT=' + \
-                      repr(hover_height) + ' WIDTH=' + repr(hover_width) + ' SRC="' + \
+                rep = '<A class="info" HREF="' + str(filename) + '"><IMG HEIGHT=' + str(thumbnail_height) + \
+                      ' WIDTH=' + str(thumbnail_width) + ' SRC="' + str(filename) + '"><span><IMG HEIGHT=' + \
+                      str(hover_height) + ' WIDTH=' + str(hover_width) + ' SRC="' + \
                       filename + '"/></span></a>'
 
             else:
-                rep = '<A HREF="' + filename + '"><IMG HEIGHT=' + repr(thumbnail_height) + \
-                      ' WIDTH=' + repr(thumbnail_width) + ' SRC="' + filename + '"></a>'
+                rep = '<A HREF="' + str(filename) + '"><IMG HEIGHT=' + str(thumbnail_height) + \
+                      ' WIDTH=' + str(thumbnail_width) + ' SRC="' + str(filename) + '"></a>'
 
         else:
-
             if hover:
-                if isinstance(hover, basestring):
+                if isinstance(hover, six.string_types):
                     hover_regex_match = regex.match(hover)
                     if hover_regex_match:
                         hover_width = hover_regex_match.groupdict()["width"]
@@ -205,11 +215,11 @@ def link(label, filename, thumbnail=None, hover=True):
                 if hover_width is not None and not isinstance(hover_width, int):
                     hover_width = int(hover_width)
 
-                rep = '<A class="info" HREF="' + filename + '">' + label + '<span><IMG HEIGHT=' + \
-                      repr(hover_height) + ' WIDTH=' + repr(hover_width) + ' SRC="' + \
-                      filename + '"/></span></a>'
+                rep = '<A class="info" HREF="' + str(filename) + '">' + str(label) + '<span><IMG HEIGHT=' + \
+                      str(hover_height) + ' WIDTH=' + str(hover_width) + ' SRC="' + \
+                      str(filename) + '"/></span></a>'
             else:
-                rep = '<A HREF="' + filename + '">' + label + '</a>'
+                rep = '<A HREF="' + str(filename) + '">' + str(label) + '</a>'
 
     else:
         rep = label
@@ -263,7 +273,10 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
             while nb in nbs:
                 nb = randrange(1, 10000000000)
             nbs.append(nb)
-            os.link(filename, dirname + "/climaf_atlas" + str(nb) + filextension)
+            try:
+                os.link(filename, dirname + "/climaf_atlas" + str(nb) + filextension)
+            except:
+                shutil.copy(filename, dirname + "/climaf_atlas" + str(nb) + filextension)
             # -- Create/append the index file in the output directory that will provide
             # -- the CRS with the new png file (climaf_atlas...png)
             index_atlas = dirname + "/index_atlas"
@@ -277,17 +290,15 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 # -- Read the content of the index
                 print('index_atlas in html.py = ', index_atlas)
                 try:
-                    atlas_index_r = file(os.path.expanduser(index_atlas), "r")
-                    tt = pickle.load(atlas_index_r)
-                    atlas_index_r.close()
+                    with open(os.path.expanduser(index_atlas), "rb") as atlas_index_r:
+                        tt = pickle.load(atlas_index_r)
                 except:
                     tt = index_dict
                 # -- Append the file
                 tt.update(index_dict)
             # -- Save the file
-            atlas_index_w = file(os.path.expanduser(index_atlas), "w")
-            pickle.dump(tt, atlas_index_w)
-            atlas_index_w.close()
+            with open(os.path.expanduser(index_atlas), "wb") as atlas_index_w:
+                pickle.dump(tt, atlas_index_w, protocol=2)  # Used for python 2 compatibility
 
             return '<TD ALIGN=RIGHT>' + \
                    link(label, "climaf_atlas" + str(nb) + filextension, thumbnail, hover) + \
@@ -320,8 +331,8 @@ def line(list_of_pairs, title="", thumbnail=None, hover=True, dirname=None, altd
     as 'climaf_atlas'([0-9]+).ext (where 'ext' is 'png', 'pdf' or 'eps').
     This allows to generate a portable atlas in dirname
     """
-    labels = []
-    figures = []
+    labels = list()
+    figures = list()
 
     for e in list_of_pairs:
         if isinstance(e, tuple):
@@ -363,16 +374,17 @@ def flines(func, fargs, sargs, common_args=[],
 
     """
     rep = ""
-    for farg in fargs:
-        args = [farg, sargs] + common_args
+    for farg in list(fargs):
         if other_fargs:
-            args = args + other_fargs.get(farg, None)
-        args = args + other_sargs
+            other_args = other_fargs.get(farg, None)
+        else:
+            other_args = list()
         if isinstance(fargs, list):
             title = repr(farg)
         else:
             title = fargs.get(farg, repr(farg))
-        rep += fline(func, *args, title=title, thumbnail=thumbnail, hover=hover, dirname=dirname, **kwargs)
+        rep += fline(func, farg=farg, sargs=sargs, common_args=common_args, other_args=other_args, title=title,
+                     thumbnail=thumbnail, hover=hover, dirname=dirname, **kwargs)
     return rep
 
 
@@ -454,13 +466,13 @@ def fline(func, farg, sargs, title=None,
     if not title:
         title = repr(farg)
     imposed_labels = True
-    if not isinstance(sargs, dict):
+    if not isinstance(sargs, (dict, OrderedDict)):
         imposed_labels = False
-        if not isinstance(sargs, list):
-            print("Issue with second args : not a dict nor a list (got `sargs`) ")
+        if not isinstance(sargs, (list, KeysView, ValuesView)):
+            print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:
-            sargs = OrderedDict(zip(sargs, sargs))
+            sargs = OrderedDict(list(zip(sargs, sargs)))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
@@ -502,7 +514,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         if should_exec:
             # print "Executing %s"%expression
             # try :
-            exec expression in globals()
+            exec(expression, globals())
             # except :
             #    print "Issue executing %s"%expression
         return ""
@@ -516,7 +528,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
         # except :
         #    print "Issue evaluating %s"%expression
         # print "rep="+`rep`
-        return rep if isinstance(rep, str) or isinstance(rep, str) else repr(rep)
+        return rep if isinstance(rep, six.string_types) else repr(rep)
 
     #
     import re
@@ -524,7 +536,7 @@ def cinstantiate(objin, filout=None, should_exec=True):
     if os.path.exists(objin):
         with open(objin) as filin:
             flux = filin.read()
-    elif isinstance(objin, str) or isinstance(objin, unicode):
+    elif isinstance(objin, six.string_types):
         flux = objin[:]
     else:
         print("Input is not a file nor a string" + repr(flux))

@@ -66,7 +66,7 @@ cproject : declare a new project and its non-standard attributes/facets
 cprojects : dictionary of known projects
 --------------------------------------------------------------------------
 
-.. autodata:: climaf.classes.cprojects
+.. autodata:: env.environment.cprojects
 
 dataloc : describe data locations for a series of simulations
 --------------------------------------------------------------------------
@@ -81,7 +81,7 @@ cdefault: set or get a default value for some data attribute/facet
 derive : define a variable as computed from other variables
 --------------------------------------------------------------------------
 
-.. autofunction:: climaf.operators.derive 
+.. autofunction:: climaf.operators_derive.derive
 
 calias : define a variable as computed, in a project,  from another, single, variable
 ----------------------------------------------------------------------------------------

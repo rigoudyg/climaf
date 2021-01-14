@@ -4,13 +4,16 @@
 Management of CliMAF standard operators
 
 """
-import os
-import subprocess
+
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
 from env.clogging import clogger
-from env.site_settings import onCiclad
+from env.site_settings import *
+from env.environment import *
+
 
 scriptpath = cpath[0] + "/../scripts/"
 binpath = cpath[0] + "/../bin/"
@@ -46,6 +49,12 @@ def load_standard_operators():
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
+    #
+    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF 
+    # do not loose track of variable name for the output of some CDO operators
+    # because it takes it from operand ${in_1}, while some CDO operators impose to have it second
+    cscript('ccdo2_flip', 'cdo ${operator} ${in_2} ${in_1} ${out}')
+    cscript('ccdo3_flip', 'cdo ${operator} ${in_3} ${in_1} ${in_2} ${out}')
     #
     cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
     #
@@ -199,9 +208,12 @@ def load_standard_operators():
     #
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
     #
-    cscript('slice',
+    cscript('cslice_average',
             "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} tmp.nc ; "
             "ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
+    #
+    cscript('cslice_select',
+            "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} ${out}")
     #
     cscript("mask", "cdo setctomiss,${miss} ${in} ${out}")
     #
@@ -226,6 +238,8 @@ def load_standard_operators():
                                      '--labels=\'\"${labels}\"\' '
                                      '--variable=${Var} '
                                      '--colors="${colors}" '
+                                     '--alphas="${alphas}" '
+                                     '--linestyles="${linestyles}" '
                                      '--min="${min}" '
                                      '--max="${max}" '
                                      '--lw="${lw}" '
@@ -398,8 +412,9 @@ def load_cdftools_operators():
             canSelectVar=True)
     #
     cscript('ccdfmxlheatcm',
-            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc '
-            '$tmp_file ${opt}; mv mxlheatc.nc ${out}; rm -f mxlheatc.nc $tmp_file',
+            'echo ""; tmp_file=`echo $(mktemp $TMPDIR/tmp_file.XXXXXX)`; '
+            'cdo merge ${in_1} ${in_2} $tmp_file; cdfmxlheatc $tmp_file ${opt}; mv mxlheatc.nc ${out}; '
+            'rm -f mxlheatc.nc $tmp_file',
             _var="somxlheatc", canSelectVar=True)
 
     #
@@ -435,5 +450,5 @@ def load_cdftools_operators():
             _var="zo%s_${basin}", canSelectVar=True)
     #
     # rmse_xyt
-    cscript('rmse_xyt','cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+    cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
 

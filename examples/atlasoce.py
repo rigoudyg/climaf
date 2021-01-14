@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+from __future__ import print_function, division, unicode_literals, absolute_import
+
+
 from optparse import OptionParser
 
 from climaf.api import *
@@ -46,7 +48,7 @@ calias("CMIP5", "msftmyz", scale=1.e-3)
 
 # Obs de MOC RAPID (Il a fallu bricoler les données d'origine pour la dimension time au début et unlim)
 dataloc(project="ref_pcmdi", organization="generic",
-        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
+        url=['/home/esanchez/data_climaf/${variable}_vertical_unlim.nc', ])
 calias('ref_pcmdi', 'moc', 'stream_function_mar', filenameVar='moc')
 
 model = dict(project='CMIP5', model='CNRM-CM5', frequency="mon",
@@ -194,3 +196,4 @@ def spare_code():
             url="${root}/${simulation}/${simulation}_1m_YYYYMMDD_YYYYMMDD_grid_${variable}.nc")
     calias("dmc", 'tos', filenameVar='T')
     tos = ds(project='dmc', simulation='O1IAF01', variable='tos', period='1980')
+    print(tos)

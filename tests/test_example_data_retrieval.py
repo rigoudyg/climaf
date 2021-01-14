@@ -4,6 +4,8 @@
 """
 Test based on examples/index_html.py
 """
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 
 import os
 import unittest
@@ -14,6 +16,7 @@ from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
 from climaf.api import *
 from climaf.period import init_period
+from env.environment import *
 
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)

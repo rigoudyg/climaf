@@ -6,14 +6,18 @@
 
 # S.Senesi 08/2014 : created
 
+from __future__ import print_function, division, unicode_literals, absolute_import
+
 import re
 import datetime
-import copy
-from env.clogging import clogger, dedent
 import six
+import copy
+
+from env.clogging import clogger, dedent
+from env.environment import *
 
 
-class cperiod():
+class cperiod(object):
     """
     A class for handling a pair of datetime objects defining a period.
 
@@ -27,9 +31,16 @@ class cperiod():
         if isinstance(start, six.string_types) and start == 'fx':
             self.fx = True
             self.pattern = 'fx'
-        elif not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
-            raise Climaf_Period_Error("issue with start or end, types=%s, %s" % (type(start), type(end)))
         else:
+            if not isinstance(start, datetime.datetime) or not isinstance(end, datetime.datetime):
+                try:
+                    # Assuming start and end use Netcdf advanced calendars (e.g. noleap or 360-day)
+                    # and trying to carry on anyway with dumb python datetime package
+                    start = start._to_real_datetime()
+                    end = end._to_real_datetime()
+                except:
+                    raise Climaf_Period_Error("issue with start or end, %s : %s,\n%s : %s" %
+                                              (type(start), str(start), type(end), str(end)))
             self.start = start
             self.end = end
             if pattern is None:
@@ -48,15 +59,15 @@ class cperiod():
         start_other = getattr(other, "start", None)
         if test and start_self != start_other:
             test = False
-        stop_self = getattr(self, "stop", None)
-        stop_other = getattr(other, "stop", None)
-        if test and stop_self != stop_other:
+        end_self = getattr(self, "end", None)
+        end_other = getattr(other, "end", None)
+        if test and end_self != end_other:
             test = False
         return test
 
     #
     def __hash__(self):
-        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "stop", None)))
+        return hash((self.fx, self.pattern, getattr(self, "start", None), getattr(self, "end", None)))
 
     #
     def __repr__(self):
@@ -175,7 +186,7 @@ def init_period(dates):
     Init a CliMAF 'period' object
 
     Args:
-      dates (str): must match YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]] , or
+      dates (str): must match r'YYYY[MM[DD[HH[MM]]]][(-\|_)YYYY[MM[DD[HH[MM]]]]]' , or
         be 'fx' for fixed fields
 
     Returns:
@@ -283,7 +294,7 @@ def init_period(dates):
 
 def sort_periods_list(periods_list):
     #
-    class SortTree():
+    class SortTree(object):
         def __init__(self, el):
             self.pivot = el
             self.smaller = None
@@ -320,19 +331,41 @@ def sort_periods_list(periods_list):
     return walk(sorted_tree)
 
 
-def merge_periods(remain_to_merge, already_merged=[]):
-    if already_merged == []:
+def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=True):
+    """
+    Provided with a list of periods (even un-sorted), returns a list of periods 
+    where all consecutive periods have been merged.
+
+    Argument 'already_merged' is used only in the underlying recursion, and shouldn't 
+    usually be provided
+
+    Argument 'handle_360_days_year' allows to merge consecutive periods which miss 
+    only a 31st december,such as in the case with 360-days calendars. It defaults to True
+
+    For dealing with very long list of periods, which do not allow for recursion, we
+    proceed with batches of N elements
+    """
+    N = 300
+    if isinstance(already_merged, list) and len(already_merged) == 0:
         if len(remain_to_merge) < 2:
             return remain_to_merge
-        sorted = sort_periods_list(remain_to_merge)
-        return merge_periods(sorted[1:], [sorted[0]])
+        sorted_remain = sorted(remain_to_merge, key=(lambda x: x.start))
+        if len(sorted_remain) <= N:
+            return merge_periods(sorted_remain[1:], [sorted_remain[0]], handle_360_days_year)
+        else:
+            # Avoid too much recursion
+            first_batch = merge_periods(sorted_remain[0:N])
+            return merge_periods(sorted_remain[N:], first_batch, handle_360_days_year)
+
     if len(remain_to_merge) > 0:
         last = already_merged[-1]
         next_one = remain_to_merge.pop(0)
         # print "last.end=",last.end,"next.start=",next_one.start
         # if (last.end == next_one.start) :
         #    already_merged[-1]=cperiod(last.start,next_one.end)
-        if next_one.start <= last.end:
+        if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and last.end.day == 31 and
+                                          next_one.start.month == 1 and next_one.start.day == 1
+                                          and next_one.start.year == last.end.year + 1):
             if next_one.end > last.end:
                 # the next period is not entirely included in the
                 # last merged one
@@ -342,7 +375,7 @@ def merge_periods(remain_to_merge, already_merged=[]):
             already_merged.append(next_one)
     #
     if len(remain_to_merge) > 0:
-        return merge_periods(remain_to_merge, already_merged)
+        return merge_periods(remain_to_merge, already_merged, handle_360_days_year)
     else:
         return already_merged
 

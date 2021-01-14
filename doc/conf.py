@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function, division, unicode_literals, absolute_import
 #
 # CliMAF documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov  6 23:20:27 2014.
@@ -16,12 +18,16 @@
 import sys
 import os
 
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0, os.path.abspath('../climaf'))
 sys.path.insert(0, os.path.abspath('..'))
+
+
+from climaf import version
 
 # -- General configuration ------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -42,12 +48,13 @@ extensions = [
     , 'sphinx.ext.viewcode'
 ]
 
-# from climaf.site_settings import atCNRM,onCiclad
-# if atCNRM or onCiclad :
-# This one works at CNRM , Ciclad and RTD
-extensions.append('sphinxcontrib.napoleon')
-# else:
-# extensions.append('sphinx.ext.napoleon') #this one works at RTD
+from env.site_settings import atCNRM,onCiclad
+if atCNRM or onCiclad :
+    # This one works at CNRM , Ciclad and RTD
+    extensions.append('sphinxcontrib.napoleon')
+else:
+    # this one works at RTD
+    extensions.append('sphinx.ext.napoleon')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -70,8 +77,6 @@ copyright = u'2014, Météo-France / IPSL / CNRS - Under a (GNU GPL-compatible) 
 # built documents.
 #
 # The short X.Y version.
-from climaf import version
-
 # version = '0.10'
 # The full version, including alpha/beta/rc tags.
 release = version
