@@ -1051,8 +1051,9 @@ def load_cvalues():
     Load in memory the cache of 'cvalue' scalars, from json file cvalues.json
     """
     global cvalues
+
     if handle_cvalues is not False:
-        cache_file = "%s/cvalues.json" % currentCache
+        cache_file = os.sep.join([currentCache, "cvalues.json"])
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
                 cvalues = json.load(f)
@@ -1086,6 +1087,8 @@ def raz_cvalues():
     """
     Clear in-memory and on-disk cache of 'cvalue' scalars
     """
+    global cvalues
+
     if handle_cvalues is not False:
         cvalues = dict()
         sync_cvalues()
