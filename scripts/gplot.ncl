@@ -25,11 +25,11 @@ begin
     else
 
       if ismissing(str_match(str,".")) then ; integer or string
-        val=stringtoint(str)
-        if ismissing(val) then 
+        a=str_match_regex(str,"^[0-9]*$")
+        if ismissing(a) then 
           return(str)
         else
-          return(val)
+          return(stringtoint(str))
         end if
       else                                  ; float (or string)
         valf=stringtofloat(str)
@@ -804,7 +804,7 @@ begin
           status_exit(1)
         end if
         print("---------------------")
-        print("   STIPPLING FIELD   ")
+        print("   Shade2 FIELD      ")
         print("---------------------")
         useLatDim2=False
         useXY_dummy=False
@@ -817,6 +817,12 @@ begin
         array_shade2=field_reduce(shade2_file, shade2_var, "lin", useXY_dummy, horizontal_dummy, \
         useLatDim2, vprofile_dummy, shade2_field_select, lat_exist2, lon_exist2, proj_data_dummy)
         fld_shade2=array_shade2[0]
+        ; If field min = field max, set some field values in order to force some contours
+        ; (otherwise, no shading occurs)
+        if (min(fld_shade2) .eq. max(fld_shade2)) then
+          fld_shade2(0,0) = str_convert(shade2_below)
+          fld_shade2(0,1) = str_convert(shade2_above)
+        end if
       end if
     end if
   end if
@@ -1294,6 +1300,7 @@ begin
       
       res2@cnFillOn=False 
       res2@cnLineLabelsOn = False
+      res2@cnNoDataLabelOn = False
       res2@cnLineLabelBackgroundColor = -1
       res2@cnInfoLabelString = ""
       res2@cnInfoLabelOn = False
@@ -1330,8 +1337,8 @@ begin
         res2@lbLabelBarOn = False
         res2@cnFillOn=True
         ;res2@cnFillColor    = "black"   ; foreground by default
-        opt = True
-        opt@gsnShadeFillType = "pattern" ; "color" or "pattern"
+        opt_shade = True
+        opt_shade@gsnShadeFillType = "pattern" ; "color" or "pattern"
       end if
       
     end if ; NOT AUX_FIELD
@@ -1699,9 +1706,26 @@ begin
           plot1=gsn_csm_contour(wks,fld,res2)
         end if
       else
-        if isvar("aux_options") then res_list(aux_options, res2) end if
-        plot1=gsn_csm_contour(wks,fld2,res2)
-        if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+        if isvar("aux_options") then
+          res_list(aux_options, res2)
+        end if
+        
+        fmin=min(fld2)
+        fmax=max(fld2)
+        contour=True
+        if (ismissing(fmin) .and. ismissing(fmax)) then
+          contour=False
+        else
+          if (fmin .eq. fmax) then
+            contour=False
+          end if
+        end if
+        if (contour) then
+          plot1=gsn_csm_contour(wks,fld2,res2)
+          if ( isvar("shade_below") .or. isvar("shade_above") ) then
+            plot1 = shading(plot1,fld2,opt_shade)
+          end if
+        end if
       end if
 
       if isvar("fld_shade2") then
@@ -1716,6 +1740,7 @@ begin
 
         res_shade2@cnFillOn=True
         res_shade2@cnLineLabelsOn = False
+        res_shade2@cnNoDataLabelOn = False
         res_shade2@cnLineLabelBackgroundColor = -1
         res_shade2@cnInfoLabelString = ""
         res_shade2@cnInfoLabelOn = False
@@ -1819,14 +1844,16 @@ begin
         else
           if (y .eq. "log") then plot1=gsn_csm_pres_hgt(wks,fld2,res2) end if
         end if
-        if ( isvar("shade_below") .or. isvar("shade_above") ) then plot1 = shading(plot1,fld2,opt) end if
+        if ( isvar("shade_below") .or. isvar("shade_above") ) then
+          plot1 = shading(plot1,fld2,opt_shade)
+        end if
       end if
 
     end if ; cross-section or (t,z) profile
     
   end if
 
-  if LEVELS_CONTOURS .or. AUX_FIELD then
+  if (LEVELS_CONTOURS .or. AUX_FIELD) .and. isvar("plot1") then
     overlay(plot0,plot1)   
   end if
 

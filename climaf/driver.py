@@ -115,8 +115,9 @@ def capply_script(script_name, *operands, **parameters):
         opscopy = opscopy[1:]
     else:
         opscopy = list()
-    if True in [isinstance(op, classes.cens) for op in opscopy]:
-        raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
+    # Next watch dog disabled for tests !!!!!
+    #if True in [isinstance(op, classes.cens) for op in opscopy]:
+    #    raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
     #
     # If first operand is an ensemble, and the script is not ensemble-capable,
     # result is the ensemble of applying the script ot each member of first operand
@@ -311,7 +312,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject.crs)
+        cache.cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
@@ -422,7 +423,7 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject.crs)
+        cache.cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
@@ -507,7 +508,7 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject.crs)
+        cache.cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
@@ -550,7 +551,7 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject.crs)
+        cache.cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
@@ -594,7 +595,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject.crs)
+        cache.cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
@@ -1210,7 +1211,9 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
         target_dir = os.path.dirname(target)
         if isinstance(object, climaf.classes.cens):
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
-        if result is not None:
+        if result is None:
+            raise Climaf_Driver_Error("Issue when evaluating %s"%object)        
+        else:
             if ln or hard:
                 if ln and hard:
                     Climaf_Driver_Error("flags ln and hard are mutually exclusive")
@@ -1337,7 +1340,10 @@ def get_fig_sizes(figfile):
     # On some sites, getoutput first lines have warning messages
     # Furthermore, in case of missing file, last line could be an error -> only consider lines beginning with figfile
     output_figsize = getoutput(" ".join(args_figsize)).split("\n")
-    output_figsize = [line for line in output_figsize if line.startswith(figfile)][-1]
+    with_figfile = [l for l in output_figsize if l.startswith(figfile)]
+    if len(with_figfile) == 0 :
+        raise ValueError("No relevant line for fig size in command (%s) output %s"%(args_figsize,output_figsize))
+    output_figsize = with_figfile[-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
     figsize = str(output_figsize).split(" ").pop(2)
@@ -1446,17 +1452,24 @@ def cfilePage(cobj, deep, recurse_list=None):
                      "-pointsize", "%d" % cobj.pt, "-annotate", annotate, '"%s"' % cobj.title])
 
     args.append(out_fig)
-    clogger.debug("Compositing figures : %s" % repr(args))
 
+    command=" ".join(args)
+    clogger.debug("Compositing figures : %s" % command)
+    
     try:
         with open("tmp.err", "w") as fic:
-            out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
+            out = subprocess.check_output(command, shell=True, stderr=fic)
     except subprocess.CalledProcessError:
         with open("tmp.err") as fic:
             err = fic.read()
-        raise Climaf_Driver_Error("Compositing failed : %s" % err)
-    finally:
-        os.remove("tmp.err")
+        raise Climaf_Driver_Error("Compositing failed : %s for %s" % (err,command))
+
+    # There are cases where subprocess doesn't raise an Error, while compositing failed
+    if not os.path.exists(out_fig) :
+        with open("tmp.err") as fic:
+            err = fic.readlines()
+        raise Climaf_Driver_Error("Compositing failed %s for %s" % (err,command))
+    os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
