@@ -8,6 +8,8 @@ by IPSL, in the context of the `CONVERGENCE project
 French 'Agence Nationale de la Recherche' under grant #
 ANR‐13‐MONU‐0008‐01
 
+CliMAF was designed by Stéphane Sénési, who also developped most of the code before version 2
+
 This software is governed by the CeCILL-C license under French law and
 biding by the rules of distribution of free software. The CeCILL-C
 licence is a free software license,explicitly compatible with the GNU

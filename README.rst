@@ -9,3 +9,4 @@ The aim of CliMAF is to allow for an actual, **easy, collaborative development o
 It is basically a scriptable way to process NetCDF `CF compliant
 <http://cfconventions.org/>`_ climate model outputs 
 
+CliMAF was designed by Stéphane Sénési, who also developped most of the code before version 2.
