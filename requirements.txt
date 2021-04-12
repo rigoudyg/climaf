@@ -1,10 +1,10 @@
+Cython
 netCDF4
 numpy
 sphinx==1.8.5
 netcdftime
 cftime
 matplotlib
-Cython
 cartopy
 python-dateutil
 natsort
