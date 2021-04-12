@@ -80,8 +80,6 @@ class CscriptTest(unittest.TestCase):
 
     def test_errors(self):
         with self.assertRaises(Climaf_Operator_Error):
-            cscript('mycdo2', '(cdo ${operator} ${in_1} ${mmin_2} ${out})')
-        with self.assertRaises(Climaf_Operator_Error):
             cscript('mycdo2', '(cdo ${operator} ${in_1} ${mmins_2} ${out})')
         with self.assertRaises(Climaf_Operator_Error):
             cscript('mycdo2', '(cdo ${operator} ${out})')

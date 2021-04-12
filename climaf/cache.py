@@ -193,7 +193,9 @@ def register(filename, crs, outfilename=None):
         time.sleep(0.1)
         waited += 1
     # time.sleep(0.5)
-    if os.path.exists(filename):
+    if not os.path.exists(filename):
+        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough)" % (filename))
+    else :
         if stamping is False:
             clogger.debug('No stamping')
             return do_move(crs, filename, outfilename)
@@ -242,8 +244,6 @@ def register(filename, crs, outfilename=None):
                     elif stamping is None:
                         clogger.critical("Cannot stamp by %s" % command)
                         return True
-    else:
-        clogger.error("file %s does not exist (for crs %s)" % (filename, crs))
 
 
 def getCRS(filename):
@@ -427,11 +427,18 @@ def cdrop(obj, rm=True, force=False):
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
+    fil=None
     if crs in crs2filename:
         clogger.info("Discarding cached value for %s (except if protected)" % crs)
         fil = crs2filename[crs]
         if not os.path.exists(fil):
             fil = alternate_filename(fil)
+    else:
+        # In case the cache index is not up-to-date
+        fil=hasExactObject(obj)
+        if fil :
+            crs2filename[crs]=fil
+    if fil:
         if rm:
             try:
                 if force:

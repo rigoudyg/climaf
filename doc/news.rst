@@ -6,6 +6,15 @@ What's new
 
 Changes, newest first:
 
+- V2.0.1:
+
+  - **Scripts can now process multiple ensembles, and ensembles which are not the first argument**:
+
+    - Each ensemble argument will be replaced by the list of files corresponding to the ensemble,
+      each list being ordered by the ensemble order (see :py:func:`~climaf.classes.cens`);
+      unless intentionnaly, the order is the same among all ensembles (if they are indexed by
+      the same list of member labels) 
+
 - V2.0.0:
 
   - **Python 3 compatibility**:
