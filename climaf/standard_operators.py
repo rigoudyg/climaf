@@ -30,21 +30,21 @@ def load_standard_operators():
     # Compute scripts
     #
     cscript('select',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins} ',
+            'python ' + scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                                     ' --period="${period_iso}" --region="${domain}" --alias="${alias}"'
+                                     ' --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('remote_select',
-            scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --domain="${domain}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
+            'python ' + scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                                     ' --period="${period_iso}" --domain="${domain}" '
+                                     '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins}')
+            'python ' + scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+                                     ' --period="${period_iso}" --region="${domain}" --alias="${alias}"'
+                                     ' --units="${units}" --vm="${missing}" ${ins}')
     #
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
@@ -74,28 +74,31 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('space_average',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}"'
+                                     ' --period="${period_iso}" --region="${domain}" --alias="${alias}"'
+                                     ' --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True)
     cscript('space_average_fast',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}"'
+                                     ' --period="${period_iso}" --region="${domain}" --alias="${alias}"'
+                                     ' --units="${units}" --vm="${missing}" ${ins}',
             commuteWithSpaceConcatenation=True)
     cscript('time_average_fast',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox',
-            scriptpath + 'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
+                                     ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
+                                     '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     cscript('llbox_fast',
-            scriptpath + 'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
+            'python ' + scriptpath + 'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}"'
+                                     ' ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
 
     #
