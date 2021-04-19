@@ -58,27 +58,27 @@ Example 1:
 - On Curie, access to a 'time series' dataset of the variable tas, providing values to all facets:
 
  >>> dat1 = ds(project='NEMO',
-               root='/ccc/store/cont003/dsm',
-               login ='p86mart',
-               model='IPSLCM6',
-               experiment='piControl',
-               status='DEVT',
-               simulation='O1T09V04',
-               DIR='ATM',
-               OUT='Analyse',
-               frequency='monthly',
-               ave_length='MO',
-               period='1850-1900',
-               variable='tas'
-               )
+ ...           root='/ccc/store/cont003/dsm',
+ ...           login ='p86mart',
+ ...           model='IPSLCM6',
+ ...           experiment='piControl',
+ ...           status='DEVT',
+ ...           simulation='O1T09V04',
+ ...           DIR='ATM',
+ ...           OUT='Analyse',
+ ...           frequency='monthly',
+ ...           ave_length='MO',
+ ...           period='1850-1900',
+ ...           variable='tas'
+ ...           )
 
 Note that the following request returns the same files (but takes more time):
  >>> dat1 = ds(project='NEMO',
-               model='IPSLCM6',
-               simulation='O1T09V04',
-               period='1850-1900',
-               variable='tas'
-               )
+ ...           model='IPSLCM6',
+ ...           simulation='O1T09V04',
+ ...           period='1850-1900',
+ ...           variable='tas'
+ ...           )
 
 
 Example 2:
@@ -87,29 +87,29 @@ Note that we set frequency to 'seasonal' (or 'annual_cycle'), specify clim_perio
 either _50Y or _100Y)
 
  >>> dat2 = ds(project='NEMO',
-               login ='p86mart',
-               model='IPSLCM6',
-               experiment='piControl',
-               status='DEVT',
-               simulation='O1T09V04',
-               DIR='ATM',
-               OUT='Analyse',
-               frequency='seasonal',
-               clim_period='1850_1899',
-               clim_period_length='_50Y',
-               variable='tas'
-               )
+ ...           login ='p86mart',
+ ...           model='IPSLCM6',
+ ...           experiment='piControl',
+ ...           status='DEVT',
+ ...           simulation='O1T09V04',
+ ...           DIR='ATM',
+ ...           OUT='Analyse',
+ ...           frequency='seasonal',
+ ...           clim_period='1850_1899',
+ ...           clim_period_length='_50Y',
+ ...           variable='tas'
+ ...           )
 
 The attributes 'model', 'simulation' and 'clim_period' can be used to define ensembles with eds().
 Example 3:
 - On Curie, define an ensemble with simulations 'O1T09V01','O1T09V02','O1T09V03':
 
  >>> dat_ens = eds(project='NEMO',
-                   model='IPSLCM6',
-                   simulation=['O1T09V01','O1T09V02','O1T09V03'],
-                   clim_period='1850_1859',
-                   variable='tas'
-                   )
+ ...               model='IPSLCM6',
+ ...               simulation=['O1T09V01','O1T09V02','O1T09V03'],
+ ...               clim_period='1850_1859',
+ ...               variable='tas'
+ ...               )
 
 
 

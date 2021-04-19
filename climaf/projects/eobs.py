@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 
-This module declares the project E-OBS :
+This module declares the project E-OBS.
 This archive is available on Ciclad (IPSL)
 
 The specific attributes are:
-- grid : '*'
+- grid: '*'
 
 
 """

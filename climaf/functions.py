@@ -251,12 +251,12 @@ def getLevs(dat, zmin=0, zmax=100000, convertPressureUnit=None):
     for lev in levValues:
         if min_lev <= lev <= max_lev:
             if convertPressureUnit:
-                if convertPressureUnit == 'hPaToPa':
+                if convertPressureUnit in ['hPaToPa', ]:
                     lev = lev * 100
-                if convertPressureUnit == 'PaTohPa':
+                if convertPressureUnit in ['PaTohPa', ]:
                     lev = lev / 100
             if my_levs:
-                my_levs = my_levs + ',' + str(lev)
+                my_levs = ",".join([my_levs, str(lev)])
             else:
                 my_levs = str(lev)
     return my_levs
@@ -324,7 +324,8 @@ def tableau(n_lin=1, n_col=1):
     """
     Generates a table as used by cpage with n_lin rows and n_col columns.
     """
-    view = [[None for i in range(n_col)] for j in range(n_lin)]
+    view_tmp = [None] * n_col
+    view = [view_tmp] * n_lin
     return view
 
 

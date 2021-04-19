@@ -93,16 +93,16 @@ def macro(name, cobj, lobjects=[]):
         return cdummy()
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
-                    *list(map(macro, [None for o in cobj.operands], cobj.operands)),
+                    *list(map(macro, [None] * len(cobj.operands), cobj.operands)),
                     **cobj.parameters)
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
     elif isinstance(cobj, cpage):
-        rep = cpage([list(map(macro, [None for fig in line], line)) for line in cobj.fig_lines],
+        rep = cpage([list(map(macro, [None] * len(line), line)) for line in cobj.fig_lines],
                     cobj.widths, cobj.heights)
     elif isinstance(cobj, cens):
         d = dict()
-        for k, v in zip(list(cobj), map(macro, [None for o in cobj.values()], cobj.values())):
+        for k, v in zip(list(cobj), map(macro, [None] * len(cobj.values()), cobj.values())):
             d[k] = v
         rep = cens(d)
     elif cobj is None:

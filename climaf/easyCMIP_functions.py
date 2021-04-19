@@ -115,7 +115,6 @@ def ensemble_request(req_dict):
     if 'period' in keys or 'variable' in keys:
         for period in periods:
             for variable in variables:
-                period_variable_name = ''
                 if 'variable' in keys:
                     period_variable_name = variable
                     if 'period' in keys:

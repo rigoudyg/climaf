@@ -4,7 +4,7 @@
 This module declares locations for searching data for CMIP6 outputs produced by 
 libIGCM or Eclis for all frequencies.
 
-Attributes for CMIP6 datasets are : model, experiment, table, realization, grid, version, institute, mip, root
+Attributes for CMIP6 datasets are: model, experiment, table, realization, grid, version, institute, mip, root
 
 Syntax for these attributes is described in `the CMIP6 DRS document <https://goo.gl/v1drZl>`_
 

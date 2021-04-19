@@ -11,7 +11,7 @@ Simulation names (or 'EXPIDs') are assumed to be unique in the
 namespace defined by the user's configuration file, which may include
 shared simulation
 
-Specific facets are :
+Specific facets are:
   - root : root directory for private data files as declared to EM
   - group : group of the simualtion (as declared to ECLIS)
   - frequency

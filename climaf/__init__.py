@@ -30,7 +30,8 @@ def tim(string=None):
         delta = time.time() - tim.last
         tim.last = time.time()
         # if ("dotiming" in vars() and dotiming) :
-        if False:
+        print_delta = False
+        if print_delta:
             print("Duration %.1f for step %s" % (delta, string), file=sys.stderr)
 
 

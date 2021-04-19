@@ -4,7 +4,7 @@
 This module declares locations for searching data for project OBS4MIP at CNRM (VDR),  for
 all frequencies; see file:///cnrm/amacs/DATA/Obs4MIPs/doc/
 
-Additional attribute for OBS4MIPS datasets  : 'frequency'
+Additional attribute for OBS4MIPS datasets : 'frequency'
 
 Example for an OBS4MIPS CMIP5 dataset declaration ::
 

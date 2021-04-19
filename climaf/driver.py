@@ -116,7 +116,7 @@ def capply_script(script_name, *operands, **parameters):
     else:
         opscopy = list()
     # Next watch dog disabled for tests !!!!!
-    #if True in [isinstance(op, classes.cens) for op in opscopy]:
+    # if True in [isinstance(op, classes.cens) for op in opscopy]:
     #    raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
     #
     # If first operand is an ensemble, and the script is not ensemble-capable,
@@ -1212,7 +1212,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
         if isinstance(object, climaf.classes.cens):
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is None:
-            raise Climaf_Driver_Error("Issue when evaluating %s"%object)        
+            raise Climaf_Driver_Error("Issue when evaluating %s" % object)
         else:
             if ln or hard:
                 if ln and hard:
@@ -1340,9 +1340,9 @@ def get_fig_sizes(figfile):
     # On some sites, getoutput first lines have warning messages
     # Furthermore, in case of missing file, last line could be an error -> only consider lines beginning with figfile
     output_figsize = getoutput(" ".join(args_figsize)).split("\n")
-    with_figfile = [l for l in output_figsize if l.startswith(figfile)]
-    if len(with_figfile) == 0 :
-        raise ValueError("No relevant line for fig size in command (%s) output %s"%(args_figsize,output_figsize))
+    with_figfile = [line for line in output_figsize if line.startswith(figfile)]
+    if len(with_figfile) == 0:
+        raise ValueError("No relevant line for fig size in command (%s) output %s" % (args_figsize, output_figsize))
     output_figsize = with_figfile[-1]
     # comm_figsize = subprocess.Popen(args_figsize, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # output_figsize = comm_figsize.stdout.read()
@@ -1453,7 +1453,7 @@ def cfilePage(cobj, deep, recurse_list=None):
 
     args.append(out_fig)
 
-    command=" ".join(args)
+    command = " ".join(args)
     clogger.debug("Compositing figures : %s" % command)
     
     try:
@@ -1462,13 +1462,13 @@ def cfilePage(cobj, deep, recurse_list=None):
     except subprocess.CalledProcessError:
         with open("tmp.err") as fic:
             err = fic.read()
-        raise Climaf_Driver_Error("Compositing failed : %s for %s" % (err,command))
+        raise Climaf_Driver_Error("Compositing failed : %s for %s" % (err, command))
 
     # There are cases where subprocess doesn't raise an Error, while compositing failed
-    if not os.path.exists(out_fig) :
+    if not os.path.exists(out_fig):
         with open("tmp.err") as fic:
             err = fic.readlines()
-        raise Climaf_Driver_Error("Compositing failed %s for %s" % (err,command))
+        raise Climaf_Driver_Error("Compositing failed %s for %s" % (err, command))
     os.remove("tmp.err")
 
     if cache.register(out_fig, cobj.crs):

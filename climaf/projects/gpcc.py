@@ -9,7 +9,7 @@ see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 Attributes are 'grid'
 
-Various grids are available. Grids write e.g. as : grid='05d', grid ='1d' and grid ='T127'
+Various grids are available. Grids write e.g. as: grid='05d', grid ='1d' and grid ='T127'
 
 Example of an 'gpcc' project dataset declaration ::
 

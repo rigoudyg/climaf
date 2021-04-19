@@ -30,6 +30,8 @@ from env.clogging import clogger
 
 currentCache = None
 cachedirs = None
+#: The place to write the index
+cacheIndexFileName = None
 handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
 cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
@@ -49,16 +51,18 @@ dropped_crs = list()
 #: A dict containing cache index entries (as listed in index file), which
 # were up to now not interpretable, given the set of defined projects
 crs_not_yet_evaluable = dict()
+dic_special = dict()
 
 
 def setNewUniqueCache(path, raz=True):
-    """ Define PATH as the sole cache to use from now. And clear it
-
+    """
+    Define PATH as the sole cache to use from now. And clear it
     """
     global currentCache
     global cachedirs
     global cacheIndexFileName
 
+    path = os.path.expanduser(path)
     cachedirs = [path]  # The list of cache directories
     cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
     currentCache = cachedirs[0]
@@ -194,8 +198,8 @@ def register(filename, crs, outfilename=None):
         waited += 1
     # time.sleep(0.5)
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough)" % (filename))
-    else :
+        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough)" % filename)
+    else:
         if stamping is False:
             clogger.debug('No stamping')
             return do_move(crs, filename, outfilename)
@@ -427,7 +431,6 @@ def cdrop(obj, rm=True, force=False):
     else:
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
-    fil=None
     if crs in crs2filename:
         clogger.info("Discarding cached value for %s (except if protected)" % crs)
         fil = crs2filename[crs]
@@ -435,9 +438,9 @@ def cdrop(obj, rm=True, force=False):
             fil = alternate_filename(fil)
     else:
         # In case the cache index is not up-to-date
-        fil=hasExactObject(obj)
-        if fil :
-            crs2filename[crs]=fil
+        fil = hasExactObject(obj)
+        if fil:
+            crs2filename[crs] = fil
     if fil:
         if rm:
             try:
@@ -545,7 +548,7 @@ def csync(update=False):
     try:
         with open(fn, "w") as cacheIndexFile:
             pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
-        dropped_crs = []
+        dropped_crs = list()
     except:
         if update:
             if os.path.isfile(fn) and len(files_in_cache > 0):
@@ -1074,8 +1077,10 @@ def sync_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        ccache = "%s/cvalues.json" % currentCache
-        tmp = "%s/cvalues_tmp.json" % currentCache
+        if not os.path.isdir(currentCache):
+            os.makedirs(currentCache)
+        ccache = os.path.sep.join([currentCache, "cvalues.json"])
+        tmp = os.path.sep.join([currentCache, "cvalues_tmp.json"])
         #
         try:
             # Try to get pre-existing on-disk content

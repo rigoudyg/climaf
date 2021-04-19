@@ -368,12 +368,7 @@ class cscript(object):
 
         """
         args = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
-        ls = []
-        old = None
-        for e in args:
-            if e != old:
-                ls.append(e)
-            old = e
+        ls = sorted(list(set(args)))
         return len(ls)
 
 
