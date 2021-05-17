@@ -254,7 +254,7 @@ dict_plot_params = {
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},
         'model_model': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50'},
     },
-    # TODO: Delete useless duplicated keys in dictionnary
+    # TODO: Delete useless duplicated keys in dictionary
     'crest': {
         'full_field': {'colors': '-100 -90 -80 -70 -60 -50 -40 -30 -20 -10 0 10 20 30 40 50 60 70 80 90 100'},
         'bias': {'colors': '-50 -40 -30 -20 -10 -5 -2 2 5 10 20 30 40 50', 'color': 'BlueWhiteOrangeRed'},

@@ -106,7 +106,6 @@ def dimsOfFile(filename):
     """
     returns the list of dimensions of the netcdf file filename
     """
-    rep = False
     clogger.debug("opening " + filename + " for checking the dimensions")
     fileobj = ncf(filename)
     dims = fileobj.dimensions

@@ -9,9 +9,9 @@ see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 Attributes are 'grid', and 'frequency'.
 
-Various grids are available. Grids write e.g. as : grid='1d', grid ='2.5d', grid ='T42' and grid ='T127'
+Various grids are available. Grids write e.g. as: grid='1d', grid ='2.5d', grid ='T42' and grid ='T127'
 
-Only two variables are available : the original 'precip' (mm/day) and pr (kg m-2 s-1)
+Only two variables are available: the original 'precip' (mm/day) and pr (kg m-2 s-1)
 
 Example of an 'gpcp' project dataset declaration ::
 

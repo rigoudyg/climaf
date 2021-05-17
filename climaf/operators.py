@@ -118,9 +118,8 @@ class cscript(object):
              a single string (surrounded with double quotes) will carry
              multiple URLs
 
-          - **mmin** stands for the case where the script accepts an
-            ensemble of datasets (only for first input stream
-            yet). CliMAF will replace the keyword by a string
+          - **mmin** stands for the case where the script accepts as argument 
+            an ensemble of datasets. CliMAF will replace the keyword by a string
             composed of the corresponding input filenames (not surrounded
             by quotes - please add them yourself in declaration); see also
             ``labels`` below
@@ -257,9 +256,6 @@ class cscript(object):
                     serie = (oc.group("serie") is not None)
                     multiple = (oc.group("mult") is not None)
                     if multiple:
-                        if rank != 0:
-                            raise Climaf_Operator_Error(
-                                "Only first operand may accept members")
                         if serie:
                             raise Climaf_Operator_Error(
                                 "Operand %s cannot both accept"
@@ -372,12 +368,7 @@ class cscript(object):
 
         """
         args = re.findall(r"\$\{(mm)?ins?(_\d*)?\}", self.command)
-        ls = []
-        old = None
-        for e in args:
-            if e != old:
-                ls.append(e)
-            old = e
+        ls = sorted(list(set(args)))
         return len(ls)
 
 

@@ -85,7 +85,7 @@ def section(title, level=1, key="None"):
     """ Returns text for a section header in an html document
     with given title. Style depends on level value. Arg key is not yet used
     """
-    return '<h' + repr(level) + '><a name="' + key + '"></a>' + title + '</h4>' + '\n'
+    return '<h' + repr(level) + '><a name="' + key + '"></a>' + title + '</h' + repr(level) + '>' + '\n'
 
 
 def open_table(title="", columns=[], spacing=5):
@@ -263,7 +263,6 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
         if filename:
             tmpfilename, filextension = os.path.splitext(os.path.basename(filename))
 
-            regex = re.compile(r'([a-z]+)\_([a-z]+)([0-9]+)')
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
             from datetime import datetime
@@ -281,7 +280,6 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
             # -- the CRS with the new png file (climaf_atlas...png)
             index_atlas = dirname + "/index_atlas"
             index_dict = {getCRS(filename): "climaf_atlas" + str(nb) + filextension}
-            CRS_of_file = getCRS(filename)
             #
             if not os.path.isfile(index_atlas):
                 # -- Create the dictionary
@@ -337,12 +335,11 @@ def line(list_of_pairs, title="", thumbnail=None, hover=True, dirname=None, altd
     for e in list_of_pairs:
         if isinstance(e, tuple):
             label = e[0]
-            labels.append(label)
             figures.append(e[1])
         else:
             label = e
-            labels.append(e)
             figures.append(None)
+        labels.append(label)
     rep = open_line() + title
     for lab, fig in zip(labels, figures):
         rep += cell(lab, fig, thumbnail, hover, dirname, altdir)
@@ -531,8 +528,6 @@ def cinstantiate(objin, filout=None, should_exec=True):
         return rep if isinstance(rep, six.string_types) else repr(rep)
 
     #
-    import re
-    import os.path
     if os.path.exists(objin):
         with open(objin) as filin:
             flux = filin.read()

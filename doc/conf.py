@@ -48,8 +48,8 @@ extensions = [
     , 'sphinx.ext.viewcode'
 ]
 
-from env.site_settings import atCNRM,onCiclad
-if atCNRM or onCiclad :
+from env.site_settings import atCNRM, onCiclad
+if atCNRM or onCiclad:
     # This one works at CNRM , Ciclad and RTD
     extensions.append('sphinxcontrib.napoleon')
 else:

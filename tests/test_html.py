@@ -75,7 +75,7 @@ class VspaceTests(unittest.TestCase):
 class SectionTests(unittest.TestCase):
 
     def test_section(self):
-        template = "<h$LEVEL><a name=$KEY></a>$TITLE</h4>\n"
+        template = "<h$LEVEL><a name=$KEY></a>$TITLE</h$LEVEL>\n"
         template = string.Template(template)
         with self.assertRaises(TypeError):
             section()

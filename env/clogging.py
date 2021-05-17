@@ -7,6 +7,7 @@ import logging
 import six
 
 logdir = "."
+formatter = None
 
 
 class MyFormatter(logging.Formatter):

@@ -9,7 +9,7 @@ see file:///cnrm/amacs/DATA/OBS/netcdf/
 
 Attributes are 'grid', and 'frequency'
 
-Various grids are available. Original grid writes as : grid='_'. Other grids write e.g. as : grid ='T42' or grid ='T127'
+Various grids are available. Original grid writes as: grid='_'. Other grids write e.g. as : grid ='T42' or grid ='T127'
 
 Example of an 'erai' project dataset declaration ::
 

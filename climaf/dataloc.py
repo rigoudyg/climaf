@@ -758,7 +758,6 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, **kwa
                         clogger.info(message)
                     else:
                         clogger.error(message)
-                s = return_wildcards[facet]
         else:
             clogger.debug("return_wildcards is None")
     return rep

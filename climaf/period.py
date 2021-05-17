@@ -417,7 +417,7 @@ def firstyears(period, nyears):
     Returns a period beginning at PERIOD's begin and which duration is at most NYEARS
     """
     if isinstance(period, six.string_types):
-        period = cperiod(period)
+        period = init_period(period)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year
     ystart = rep.start.year

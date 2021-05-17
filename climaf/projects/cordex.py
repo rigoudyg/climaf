@@ -3,7 +3,7 @@
 """
 This module declares locations for searching data for CORDEX, CORDEX_extent and CORDEX-Adjust outputs on Ciclad-CLIMERI
 
-Attributes are :
+Attributes are:
 - CORDEX: 'model','CORDEX_domain', 'model_version', 'frequency', 'driving_model',
          'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization']
 - CORDEX_extent: 'model','CORDEX_domain', 'model_version', 'frequency', 'driving_model',

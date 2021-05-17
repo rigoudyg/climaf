@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 
-This module declares two 'projects' :
+This module declares two 'projects':
 
   - 'ref_climatos', for the climatological annual cycles and
   - 'ref_ts', for the 'time series' (one variable evolving with time)
@@ -16,7 +16,7 @@ The specific attributes are:
   - for climatologies only : **clim_period** : a character string; there is no mechanism of
     period selection (like with 'period')
 
-Default values of the attributes for climatologies (**ref_climato**) :
+Default values of the attributes for climatologies (**ref_climato**):
 
 - product : '*'
 - variable : '*'
@@ -29,7 +29,7 @@ climatologies with eds() as in:
  >>> dat_ens = eds(project='ref_climatos', product=['ERAI','NCEP'],...)
 
 
-Default values of the attributes for time_series (**ref_ts**) :
+Default values of the attributes for time_series (**ref_ts**):
 
 - product : '*'
 - period : '1900-2050'

@@ -161,10 +161,10 @@ General:
     ones. Each field has its own options argument, e.g. :
 
     - ``options`` for main field and vectors, e.g. :
-      'options="tiMainString=lv|gsnContourLineThicknessesScale=2|vcLineArrowColor=yellow"'      
+      'options="tiMainString=lv\|gsnContourLineThicknessesScale=2\|vcLineArrowColor=yellow"'
     - ``aux_options`` for auxiliary field, e.g. :
-      'aux_options="gsnContourPosLineDashPattern=1|gsnContourLineThicknessesScale=2"'
-    - ``shading_options`` for auxiliary field shading, e.g.: 'shading_options="gsnShadeHigh=3|gsnShadeLow=5"'
+      'aux_options="gsnContourPosLineDashPattern=1\|gsnContourLineThicknessesScale=2"'
+    - ``shading_options`` for auxiliary field shading, e.g.: 'shading_options="gsnShadeHigh=3\|gsnShadeLow=5"'
     - ``polyline_options`` for adding a polyline to the plot, e.g. :
       'polyline_options="gsLineColor=blue|gsLineThicknessF=2.0"'
 

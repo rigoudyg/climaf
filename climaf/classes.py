@@ -1533,7 +1533,7 @@ def ds(*args, **kwargs):
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
-            match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)(y|Y)$", kwargs['period'])
+            match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
             if match is not None:
                 return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
                                                    option=match.group('option').lower())
@@ -1693,7 +1693,72 @@ def cmissing(project, missing, *kwargs):
     # raise NotImplementedError()
 
 
-class cpage(cobject):
+class cpage_all(cobject):
+    def __init__(self, fig_lines=None, orientation=None, page_width=1000., page_height=1500., title="", x=0, y=2):
+        """
+        Common tools for classes cpage and cpage_pdf.
+        """
+        if fig_lines is None:
+            raise Climaf_Classes_Error("fig_lines must be provided")
+        if orientation is not None:
+            if orientation in ['portrait', ]:
+                page_width = 1000.
+                page_height = 1500.
+            elif orientation in ['landscape', ]:
+                page_width = 1500.
+                page_height = 1000.
+            else:
+                raise Climaf_Classes_Error("if set, orientation must be 'portrait' or 'landscape' (not %s)" %
+                                           orientation)
+        self.page_width = page_width
+        self.page_height = page_height
+        self.title = title
+        self.x = x
+        self.y = y
+
+    def check_figs_list(self, fig_lines, widths, heights):
+        if not widths:
+            widths = [round(1. / len(fig_lines[0]), 2)] * len(fig_lines[0])
+        self.widths = widths
+
+        if not heights:
+            heights = [round(1. / len(fig_lines), 2)] * len(fig_lines)
+        self.heights = heights
+
+        if not all(isinstance(fig_line, list) for fig_line in fig_lines):
+            raise Climaf_Classes_Error("each element in fig_lines must be a list of figures")
+        if not all([len(fig_lines[i]) == len(self.widths) for i in range(1, len(fig_lines))]):
+            raise Climaf_Classes_Error("each line in fig_lines must have same dimension as widths %d" %
+                                       len(self.widths))
+        if len(fig_lines) != len(self.heights):
+            raise Climaf_Classes_Error("fig_lines must have same size than heights")
+        self.fig_lines = fig_lines
+
+    def check_figs_cens(self, fig_lines, widths, heights):
+        figs = [fig_lines[fig] for fig in fig_lines.order]
+        if not widths:
+            widths = [1., ]
+        self.widths = widths
+        if not heights:
+            heights = [round(1. / len(figs), 2)] * len(figs)
+        self.heights = heights
+
+        if len(figs) < len(heights) * len(widths):
+            figs.extend([None] * (len(heights) * len(widths) - len(figs) + 1))
+        self.fig_lines = [figs[x: x + len(widths)] for x in range(0, len(heights) * len(widths), len(widths))]
+
+    def buildcrs(self, crsrewrite=None, period=None):
+        rep = list()
+        for line in self.fig_lines:
+            if crsrewrite is not None:
+                rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
+                                              for f in line]))
+            else:
+                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
+        return rep
+
+
+class cpage(cpage_all):
     def __init__(self, fig_lines=None, widths=None, heights=None,
                  fig_trim=True, page_trim=True, format="png",
                  orientation=None,
@@ -1773,27 +1838,11 @@ class cpage(cobject):
           ... pt=20, font='Utopia', gravity='South', background='grey90',
           ... page_width=1600., page_height=2400.)
         """
-        if fig_lines is None:
-            raise Climaf_Classes_Error("fig_lines must be provided")
+        super(cpage, self).__init__(fig_lines=fig_lines, orientation=orientation, page_width=page_width,
+                                    page_height=page_height, title=title, x=x, y=y)
         self.fig_trim = fig_trim
         self.page_trim = page_trim
         self.format = format
-        if orientation is not None:
-            if orientation == 'portrait':
-                page_width = 1000.
-                page_height = 1500.
-            else:
-                if orientation == 'landscape':
-                    page_width = 1500.
-                    page_height = 1000.
-                else:
-                    raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape' (not %s)" % orientation)
-        self.page_width = page_width
-        self.page_height = page_height
-        self.title = title
-        self.x = x
-        self.y = y
         self.ybox = ybox
         self.pt = pt
         self.font = font
@@ -1803,57 +1852,15 @@ class cpage(cobject):
         self.insert_width = insert_width
         if self.ybox < (self.y + self.pt):
             raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
-        if not isinstance(fig_lines, list) and not isinstance(fig_lines, cens):
-            raise Climaf_Classes_Error(
-                "fig_lines must be a CliMAF ensemble or a list "
-                "of lists (each representing a line of figures)")
-        if isinstance(fig_lines, list):
-            if not widths:
-                widths = list()
-                for line in fig_lines:
-                    if len(line) != len(fig_lines[0]):
-                        raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
-                widths.extend([round(1. / len(fig_lines[0]), 2) for column in fig_lines[0]])
-            self.widths = widths
-
-            if not heights:
-                heights = [round(1. / len(fig_lines), 2) for line in fig_lines]
-            self.heights = heights
-
-            if len(fig_lines) != len(self.heights):
-                raise Climaf_Classes_Error(
-                    "fig_lines must have same size than heights")
-            for line in fig_lines:
-                if not isinstance(line, list):
-                    raise Climaf_Classes_Error(
-                        "each element in fig_lines must be a list of figures")
-                if len(line) != len(self.widths):
-                    raise Climaf_Classes_Error(
-                        "each line in fig_lines must have same dimension as "
-                        "widths; pb for sublist " + repr(line))
-            self.fig_lines = fig_lines
-        else:  # case of an ensemble (cens)
-            if not widths and not heights:
-                self.scatter_on_page([fig_lines[label] for label in fig_lines.order])
-            else:
-                figs = [fig for fig in fig_lines.order]
-                if not widths:
-                    widths = [1., ]
-                self.widths = widths
-                if not heights:
-                    heights = [round(1. / len(figs), 2) for mb in figs]
-                self.heights = heights
-
-                self.fig_lines = list()
-                for height in heights:
-                    line = list()
-                    for c in widths:
-                        if len(figs) > 0:
-                            line.append(fig_lines[figs.pop(0)])
-                        else:
-                            line.append(None)
-
-                    self.fig_lines.append(line)
+        if not isinstance(fig_lines, (list, cens)):
+            raise Climaf_Classes_Error("fig_lines must be a CliMAF ensemble or a list "
+                                       "of lists (each representing a line of figures)")
+        elif isinstance(fig_lines, list):
+            self.check_figs_list(fig_lines=fig_lines, widths=widths, heights=heights)
+        elif not widths and not heights:  # case of an ensemble (cens) if heights and widths are not provided
+            self.scatter_on_page([fig_lines[label] for label in fig_lines.order])
+        else:  # case of an ensemble (cens) with heights or widths provided
+            self.check_figs_cens(fig_lines=fig_lines, widths=widths, heights=heights)
         #
         self.crs = self.buildcrs()
 
@@ -1882,31 +1889,19 @@ class cpage(cobject):
             nx, ny = 5, 7
         elif n in range(36, 49):
             nx, ny = 6, 8
-        elif n >= 49:
+        else:
             raise Climaf_Classes_Error("Too many figures in page")
-        lines = []
-        for i in range(len(figs)):
-            if i % nx == 0:
-                line = []
-                lines.append(line)
-            line.append(figs[i])
-        j = len(line)
-        line.extend([None for i in range(j, nx)])
+        figs.extend([None] * (nx * ny - len(figs) + 1))
+        lines = [figs[x: x + nx] for x in range(0, nx * ny, nx)]
         self.fig_lines = lines
-        self.widths = [round(1. / nx, 2) for i in range(nx)]
-        self.heights = [round(1. / ny, 2) for i in range(ny)]
+        self.widths = [round(1. / nx, 2)] * nx
+        self.heights = [round(1. / ny, 2)] * ny
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = list()
-        for line in self.fig_lines:
-            if crsrewrite is not None:
-                rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
-                                              for f in line]))
-            else:
-                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
-            param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
-                (repr(self.widths), repr(self.heights), self.fig_trim, self.page_trim, self.format, self.page_width,
-                 self.page_height)
+        rep = super(cpage, self).buildcrs(crsrewrite=crsrewrite, period=period)
+        param = "%s,%s, fig_trim='%s', page_trim='%s', format='%s', page_width=%d, page_height=%d" % \
+            (repr(self.widths), repr(self.heights), self.fig_trim, self.page_trim, self.format, self.page_width,
+             self.page_height)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, ybox=%d, pt=%d, font='%s', gravity='%s', backgroud='%s', " \
                     "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
@@ -1916,7 +1911,7 @@ class cpage(cobject):
         return rep
 
 
-class cpage_pdf(cobject):
+class cpage_pdf(cpage_all):
     def __init__(self, fig_lines=None, widths=None, heights=None,
                  orientation=None, page_width=1000., page_height=1500.,
                  scale=1., openright=False,
@@ -1979,91 +1974,26 @@ class cpage_pdf(cobject):
           ... scale=0.95, openright=True, title='Page title', x=-5, y=10, titlebox=True,
           ... pt='huge', font='ptm', background='yellow') # Font name is 'Times'
         """
-        if fig_lines is None:
-            raise Climaf_Classes_Error("fig_lines must be provided")
-        if orientation is not None:
-            if orientation == 'portrait':
-                page_width = 1000.
-                page_height = 1500.
-            else:
-                if orientation == 'landscape':
-                    page_width = 1500.
-                    page_height = 1000.
-                else:
-                    raise Climaf_Classes_Error(
-                        "if set, orientation must be 'portrait' or 'landscape'")
-        self.page_width = page_width
-        self.page_height = page_height
+        super(cpage_pdf, self).__init__(fig_lines=fig_lines, orientation=orientation, page_width=page_width,
+                                        page_height=page_height, title=title, x=x, y=y)
         self.scale = scale
         self.openright = openright
-        self.title = title
-        self.x = x
-        self.y = y
         self.titlebox = titlebox
         self.pt = pt
         self.font = font
         self.background = background
-        if not isinstance(fig_lines, list) and not isinstance(fig_lines, cens):
-            raise Climaf_Classes_Error(
-                "fig_lines must be a CliMAF ensemble or a list "
-                "of lists (each representing a line of figures)")
-        if isinstance(fig_lines, list):
-            if not widths:
-                widths = list()
-                for line in fig_lines:
-                    if len(line) != len(fig_lines[0]):
-                        raise Climaf_Classes_Error("each line in fig_lines must have same dimension")
-                widths.extend([round(1. / len(fig_lines[0]), 2) for column in fig_lines[0]])
-            self.widths = widths
-
-            if not heights:
-                heights = [round(1. / len(fig_lines), 2) for line in fig_lines]
-            self.heights = heights
-
-            if len(fig_lines) != len(self.heights):
-                raise Climaf_Classes_Error(
-                    "fig_lines must have same size than heights")
-            for line in fig_lines:
-                if not isinstance(line, list):
-                    raise Climaf_Classes_Error(
-                        "each element in fig_lines must be a list of figures")
-                if len(line) != len(self.widths):
-                    raise Climaf_Classes_Error(
-                        "each line in fig_lines must have same dimension as "
-                        "widths; pb for sublist " + repr(line))
-            self.fig_lines = fig_lines
+        if not isinstance(fig_lines, (list, cens)):
+            raise Climaf_Classes_Error("fig_lines must be a CliMAF ensemble or a list "
+                                       "of lists (each representing a line of figures)")
+        elif isinstance(fig_lines, list):
+            self.check_figs_list(fig_lines=fig_lines, widths=widths, heights=heights)
         else:  # case of an ensemble (cens)
-            figs = [fig for fig in fig_lines.order]
-
-            if not widths:
-                widths = [1., ]
-            self.widths = widths
-            if not heights:
-                heights = [round(1. / len(figs), 2) for memb in figs]
-            self.heights = heights
-
-            self.fig_lines = list()
-            for height in heights:
-                line = list()
-                for c in widths:
-                    if len(figs) > 0:
-                        line.append(fig_lines[figs.pop(0)])
-                    else:
-                        line.append(None)
-
-                self.fig_lines.append(line)
+            self.check_figs_cens(fig_lines=fig_lines, widths=widths, heights=heights)
         #
         self.crs = self.buildcrs()
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = list()
-        for line in self.fig_lines:
-            if crsrewrite is not None:
-                rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
-                                              for f in line]))
-            else:
-                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
-
+        rep = super(cpage_pdf, self).buildcrs(crsrewrite=crsrewrite, period=period)
         param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
                 (repr(self.widths), repr(self.heights), self.page_width, self.page_height, self.scale, self.openright)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:

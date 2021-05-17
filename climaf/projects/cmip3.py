@@ -3,7 +3,7 @@
 """
 This module declares locations for searching data for CMIP3 outputs on e.g. Ciclad
 
-Attributes for CMIP3 datasets are : model, experiment, realm, frequency, realization, root
+Attributes for CMIP3 datasets are: model, experiment, realm, frequency, realization, root
 
 No unit conversion nor variable is renaming performed, yet
 

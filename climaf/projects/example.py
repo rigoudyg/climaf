@@ -3,7 +3,7 @@
 """
 This module declares project example and its data location for the standard CliMAF distro
 
-Only one additionnal attribute : frequency (but data sample actually includes only frequency= 'monthly')
+Only one additionnal attribute: frequency (but data sample actually includes only frequency= 'monthly')
 
 Example of an 'example' dataset definition ::
 
