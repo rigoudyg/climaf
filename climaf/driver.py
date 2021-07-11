@@ -1035,6 +1035,9 @@ def cread(datafile, varname=None, period=None):
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
         from .anynetcdf import ncf
         fileobj = ncf(datafile)
+        if varname not in fileobj.variables :
+            clogger.error("File %s doesn't have requested variable %s, only %s"%\
+                          (datafile,varname,fileobj.variables) )
         # Note taken from the CDOpy developper : .data is not backwards
         # compatible to old scipy versions, [:] is
         data = fileobj.variables[varname][:]
