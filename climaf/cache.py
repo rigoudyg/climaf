@@ -79,6 +79,9 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
     Generated names drive a structure where each directory name
     has dirNameLength characters
+
+    If the filename already exists and is a symbolic link, check that the target 
+    actually exists, otherwise delete the link
     """
     #
     if format is None:
@@ -91,7 +94,16 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
         if create_dirs:
             dirn = os.path.dirname(rep)
             if not os.path.exists(dirn):
-                os.makedirs(dirn)
+                try : os.makedirs(dirn)
+                except OSError :
+                    if os.path.exists(dirn) :
+                        # Happens when two concurrent CliMAF are
+                        # creating numerous cache files
+                        pass
+                    else :
+                        raise Climaf_Cache_Error("Cannot create dir "% dirn)
+        if os.path.islink(rep) and not os.path.exists(os.path.realpath(rep)):
+            os.remove(rep)
         clogger.debug("returning %s" % rep)
         return rep
 
