@@ -43,7 +43,7 @@ if True:
     # ------------------------------------ >
     cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment', 'extent_experiment', 'realization', 'frequency',
              'realm',
-             'version', ensemble=['model', 'realization'], separator='%')
+             'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
 
     # -- Define the pattern for CMIP5
     if atCNRM:
@@ -65,7 +65,7 @@ if True:
 
     # -- And the additionnal pattern for extent
     pattern2 = '${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/' \
-               '${version}/${variable}/'
+               '${extent_version}/${variable}/'
     pattern2 += '${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
 
     # -- call the dataloc CliMAF function
