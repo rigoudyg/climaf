@@ -868,7 +868,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     len_new_dict = len(new_dict)
 
     # request on new dictionary through usage, count and remove
-    work_dic = new_dict if (var_find or pattern is not "" or not_pattern is not "") else crs2filename
+    work_dic = new_dict if (var_find or pattern  != "" or not_pattern  != "") else crs2filename
 
     if usage is True and len_new_dict != 0:
         # construction of a dictionary containing crs and disk-usage associated
@@ -923,7 +923,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     elif remove is True and len_new_dict != 0:
         print("Removed files:")
-        if var_find or pattern is not "" or not_pattern is not "":
+        if var_find or pattern  != "" or not_pattern  != "":
             list_tmp_crs = list(new_dict)
         else:
             list_tmp_crs = list(crs2filename)
@@ -932,7 +932,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         return list(map(crewrite, list_tmp_crs))
 
     else:  # usage, count and remove are False
-        if var_find or pattern is not "" or not_pattern is not "":
+        if var_find or pattern  != "" or not_pattern  != "":
             if len(new_dict) != 0:
                 if new_dict != crs2filename:
                     print("Filtered objects :")
@@ -948,7 +948,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if special is True:
         global dic_special
         dic_special = dict()
-        if var_find is True or pattern is not "" or not_pattern is not "":
+        if var_find is True or pattern  != "" or not_pattern  != "":
             dic_special = new_dict.copy()
         else:
             dic_special = crs2filename.copy()

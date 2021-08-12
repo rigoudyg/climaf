@@ -712,7 +712,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 inValue = ceval(op, userflags=scriptCall.flags, format='file', deep=deep,
                                 recurse_list=recurse_list)
             clogger.debug("evaluating %s operand %s as %s" % (scriptCall.operator, op, inValue))
-            if inValue is None or inValue is "":
+            if inValue is None or inValue  == "":
                 raise Climaf_Driver_Error("When evaluating %s : value for %s is None" % (scriptCall.script, repr(op)))
             if isinstance(inValue, list):
                 size = len(inValue)
@@ -774,7 +774,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             opscrs += op.crs + " - "
         # print("processing %s, i=%d"%(`op`,i))
         infile = invalues[i]
-        if (scriptCall.operator != 'remote_select') and infile is not '' and \
+        if (scriptCall.operator != 'remote_select') and infile != '' and \
                 not all(map(os.path.exists, infile.split(" "))):
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:" % infile)
         i += 1
@@ -1381,9 +1381,9 @@ def cfilePage(cobj, deep, recurse_list=None):
     ymargin = 30.  # Vertical shift between figures
     #
     usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
-    if cobj.title is not "":
+    if cobj.title != "":
         usable_height -= cobj.ybox
-    if cobj.insert is not "":
+    if cobj.insert != "":
         ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
         insert_height = int((float(ins_base_height) * cobj.insert_width) / float(ins_base_width))
         usable_height -= insert_height

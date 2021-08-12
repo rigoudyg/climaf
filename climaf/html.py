@@ -202,7 +202,7 @@ def link(label, filename, thumbnail=None, hover=True):
                             int(hover)
                         except:
                             raise Climaf_Html_Error("If hover is a not empty string, it must "
-                                                    "contain width and/or height, separaed by 'x' or '*'")
+                                                    "contain width and/or height, separated by 'x' or '*'")
 
                         hover_width = hover
                         hover_height = hover
@@ -496,6 +496,16 @@ def fline(func, farg, sargs, title=None,
 # cinstantiate("index.html","inst.html")
 
 
+def exec_and_discard_test(m, should_exec):
+        expression = m.group(1)
+        if should_exec:
+            # print "Executing %s"%expression
+            # try :
+            exec(expression, globals())
+            # except :
+            #    print "Issue executing %s"%expression
+        return ""
+
 def cinstantiate(objin, filout=None, should_exec=True):
     """ Read file or string 'objin', extract parts of text surrounded by 'Â£',
     evaluate them as Python assignments or expressions, replaces
@@ -506,15 +516,6 @@ def cinstantiate(objin, filout=None, should_exec=True):
      If assign is False, assignements will not be executed
     """
 
-    def exec_and_discard_test(m):
-        expression = m.group(1)
-        if should_exec:
-            # print "Executing %s"%expression
-            # try :
-            exec(expression, globals())
-            # except :
-            #    print "Issue executing %s"%expression
-        return ""
 
     #
     def replace_text_with_evaluation(m):
