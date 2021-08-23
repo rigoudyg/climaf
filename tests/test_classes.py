@@ -80,6 +80,7 @@ class CobjectTests(unittest.TestCase):
 
     def setUp(self):
         self.my_object = cobject()
+        self.my_other_object = cobject()
 
     def test_cobject_init(self):
         self.assertEqual(self.my_object.crs, "void")
@@ -89,6 +90,11 @@ class CobjectTests(unittest.TestCase):
 
     def test_cobject_repr(self):
         self.assertEqual(repr(self.my_object), "void")
+
+    def test_cobject_equal(self):
+        self.assertEqual(self.my_object, self.my_other_object)
+        self.assertNotEqual(self.my_object, "test")
+        self.assertNotEqual(self.my_object, cdummy())
 
     @unittest.expectedFailure
     def test_cobject_register(self):
@@ -111,6 +117,13 @@ class CdummyTests(unittest.TestCase):
     def test_cdummy_buildcrs(self):
         my_dummy = cdummy()
         self.assertEqual(my_dummy.buildcrs(), "ARG")
+
+    def test_cdummy_equal(self):
+        my_dummy = cdummy()
+        my_other_dummy = cdummy()
+        self.assertEqual(my_dummy, my_other_dummy)
+        self.assertNotEqual(my_dummy, cobject())
+        self.assertNotEqual(my_dummy, "test")
 
 
 class ProcessDatasetArgsTests(unittest.TestCase):
@@ -315,6 +328,12 @@ class CdatasetTests(unittest.TestCase):
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_other_dataset.buildcrs(crsrewrite=None), "")
 
+    def test_cdataset_equal(self):
+        self.assertNotEqual(self.my_dataset, "test")
+        self.assertNotEqual(self.my_dataset, cobject())
+        my_dataset = self.my_dataset.explore("resolve")
+        self.assertEqual(self.my_dataset, my_dataset)
+
     @unittest.skipUnless(False, "Test not yet written")
     def test_cdataset_errata(self):
         # TODO: Write the test
@@ -395,6 +414,11 @@ class CensTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not yet written")
     def test_cens_init(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cens_equal(self):
         # TODO: Write the test
         pass
 

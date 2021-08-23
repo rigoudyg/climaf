@@ -219,6 +219,14 @@ class cobject(object):
     def buildcrs(self):
         raise NotImplementedError
 
+    def __eq__(self, other):
+        """
+        Check the equality of two CliMAF objects.
+        :param other: CliMAF object to be compared
+        :return: boolean indicating whether the CliMAF objects are the same or not
+        """
+        return isinstance(other, type(self)) and self.crs == other.crs
+
 
 class cdummy(cobject):
     def __init__(self):
@@ -407,6 +415,20 @@ class cdataset(cobject):
         self.files = None
         self.local_copies_of_remote_files = None
         self.register()
+
+    def __eq__(self, other):
+        res = super(cdataset, self).__eq__(other)
+        if res:
+            self_kvp = copy.deepcopy(self.kvp)
+            self_kvp["model"] = self.model
+            self_kvp["frequency"] = self.frequency
+            self_kvp["alias"] = self.alias
+            other_kvp = copy.deepcopy(other.kvp)
+            other_kvp["model"] = other.model
+            other_kvp["frequency"] = other.frequency
+            other_kvp["alias"] = other.alias
+            res = res and all([self_kvp[p] == other_kvp[p] for p in self_kvp])
+        return res
 
     def setperiod(self, period):
         if isinstance(period, six.string_types):
@@ -1075,6 +1097,12 @@ class cens(cobject, dict):
         #
         self.crs = self.buildcrs()
         self.register()
+
+    def __eq__(self, other):
+        res = super(cens, self).__eq__(other)
+        if res:
+            res = res and self.order == other.order and all([self.__dict__[m] == other.__dict[m] for m in self.order])
+        return res
 
     def set_order(self, order, ordered_keylist=None):
         ordered_list = [o for o in order]
