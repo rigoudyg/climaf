@@ -43,7 +43,7 @@ if True:
     # ------------------------------------ >
     cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment', 'extent_experiment', 'realization', 'frequency',
              'realm',
-             'version', ensemble=['model', 'realization'], separator='%')
+             'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
 
     # -- Define the pattern for CMIP5
     if atCNRM:
@@ -54,20 +54,25 @@ if True:
                    '${realization}/${version}/${variable}/'
 
     # a pattern for fixed fields
-    patternf = pattern1 + '${variable}_${table}_${model}_${experiment}_${realization}.nc'
+    patternf = pattern1 + '${variable}_${table}_${model}_${experiment}_r0i0p0.nc'
+    patternf = patternf.replace("/${realization}", "/r0i0p0").replace("/${version}", "/latest")
+    patternf = patternf.replace("/${frequency}", "/fx").replace("/${table}", "/fx")
+    # On Ciclad, some fixed fields don't have the last (per-variable) directories level
+    patternf2 = patternf.replace("/${variable}/", "/")
 
     # The pattern for fields with a period
     pattern1 += '${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
 
     # -- And the additionnal pattern for extent
     pattern2 = '${root}/CMIP5/output*/*/${model}/${extent_experiment}/${frequency}/${realm}/${table}/${realization}/' \
-               '${version}/${variable}/'
+               '${extent_version}/${variable}/'
     pattern2 += '${variable}_${table}_${model}_${extent_experiment}_${realization}_${PERIOD}.nc'
 
     # -- call the dataloc CliMAF function
     # -- CMIP5
     dataloc(project='CMIP5', organization='generic', url=pattern1)
     dataloc(project='CMIP5', organization='generic', url=patternf)
+    dataloc(project='CMIP5', organization='generic', url=patternf2)
     # -- CMIP5_extent
     dataloc(project='CMIP5_extent', organization='generic', url=pattern1)
     dataloc(project='CMIP5_extent', organization='generic', url=pattern2)
