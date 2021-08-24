@@ -712,7 +712,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 inValue = ceval(op, userflags=scriptCall.flags, format='file', deep=deep,
                                 recurse_list=recurse_list)
             clogger.debug("evaluating %s operand %s as %s" % (scriptCall.operator, op, inValue))
-            if inValue is None or inValue  == "":
+            if inValue in [None, ""]:
                 raise Climaf_Driver_Error("When evaluating %s : value for %s is None" % (scriptCall.script, repr(op)))
             if isinstance(inValue, list):
                 size = len(inValue)
@@ -1035,9 +1035,9 @@ def cread(datafile, varname=None, period=None):
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
         from .anynetcdf import ncf
         fileobj = ncf(datafile)
-        if varname not in fileobj.variables :
-            clogger.error("File %s doesn't have requested variable %s, only %s"%\
-                          (datafile,varname,fileobj.variables) )
+        if varname not in fileobj.variables:
+            clogger.error("File %s doesn't have requested variable %s, only %s" %
+                          (datafile, varname, fileobj.variables))
         # Note taken from the CDOpy developper : .data is not backwards
         # compatible to old scipy versions, [:] is
         data = fileobj.variables[varname][:]

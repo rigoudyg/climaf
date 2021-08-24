@@ -497,14 +497,15 @@ def fline(func, farg, sargs, title=None,
 
 
 def exec_and_discard_test(m, should_exec):
-        expression = m.group(1)
-        if should_exec:
-            # print "Executing %s"%expression
-            # try :
-            exec(expression, globals())
-            # except :
-            #    print "Issue executing %s"%expression
-        return ""
+    expression = m.group(1)
+    if should_exec:
+        # print "Executing %s"%expression
+        # try :
+        exec(expression, globals())
+        # except :
+        #    print "Issue executing %s"%expression
+    return ""
+
 
 def cinstantiate(objin, filout=None, should_exec=True):
     """ Read file or string 'objin', extract parts of text surrounded by 'Â£',
@@ -515,8 +516,6 @@ def cinstantiate(objin, filout=None, should_exec=True):
 
      If assign is False, assignements will not be executed
     """
-
-
     #
     def replace_text_with_evaluation(m):
         expression = m.group(1)
