@@ -704,7 +704,7 @@ class cdataset(cobject):
                         periods[key] = merge_periods(periods[key])
                 wildcards['period'] = periods
             else:
-                raise Climaf_Classes_Error("Operation %s is not kown " % operation)
+                raise Climaf_Classes_Error("Operation %s is not known " % operation)
         #
         wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
         if option in ['resolve', ]:

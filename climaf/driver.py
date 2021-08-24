@@ -25,6 +25,8 @@ from datetime import datetime
 from functools import reduce
 from six import string_types
 
+from climaf.utils import Climaf_Classes_Error
+
 try:
     from commands import getoutput, getstatusoutput
 except ImportError:
@@ -205,11 +207,21 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating dataset operand " + cobject.crs + " having kvp= " + repr(cobject.kvp))
     ds = cobject
+    # If the dataset was not defined by its path, check that it is completely defined
+    if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
+        ds_ambiguous_args = ds.explore("choices")
+        if len(ds_ambiguous_args) != 0:
+            clogger.warning("Before doing a cfile on the dataset %s, check that it is completely defined with "
+                            "'explore'." % cobject.crs)
+            try:
+                ds = ds.explore("resolve")
+            except Climaf_Classes_Error:
+                clogger.error("Could not resolve the dataset %s" % cobject.crs)
     cache_value = cache.hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
         cdedent()
-        if format == 'file':
+        if format in ['file', ]:
             return cache_value
         else:
             return cread(cache_value, classes.varOf(ds))
@@ -251,7 +263,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         else:
             clogger.debug("Must subset and/or aggregate and/or select " +
                           "var from data files and/or get data, or provide object result")
-            if format == 'file' or format == "MaskedArray":
+            if format in ['file', "MaskedArray"]:
                 if ds.hasOneMember():
                     clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                     extract = capply('select', ds)
@@ -380,7 +392,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         file = ceval_script(cobject, down_deep,
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
-        if format == 'file':
+        if format in ['file', ]:
             return file
         else:
             return cread(file, classes.varOf(cobject))
@@ -691,7 +703,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
 def ceval_script(scriptCall, deep, recurse_list=[]):
     """ Actually applies a CliMAF-declared script on a script_call object
 
-    Prepare operands as fiels and build command from operands and parameters list
+    Prepare operands as fields and build command from operands and parameters list
     Assumes that scripts are described in dictionary 'scripts'  by templates as
     documented in operators.cscript
 
