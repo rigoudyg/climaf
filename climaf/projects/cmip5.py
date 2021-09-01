@@ -55,10 +55,10 @@ if True:
 
     # a pattern for fixed fields
     patternf = pattern1 + '${variable}_${table}_${model}_${experiment}_r0i0p0.nc'
-    patternf=patternf.replace("/${realization}","/r0i0p0").replace("/${version}","/latest")
-    patternf=patternf.replace("/${frequency}","/fx").replace("/${table}","/fx")
+    patternf = patternf.replace("/${realization}", "/r0i0p0").replace("/${version}", "/latest")
+    patternf = patternf.replace("/${frequency}", "/fx").replace("/${table}", "/fx")
     # On Ciclad, some fixed fields don't have the last (per-variable) directories level
-    patternf2=patternf.replace("/${variable}/","/")
+    patternf2 = patternf.replace("/${variable}/", "/")
 
     # The pattern for fields with a period
     pattern1 += '${variable}_${table}_${model}_${experiment}_${realization}_${PERIOD}.nc'
