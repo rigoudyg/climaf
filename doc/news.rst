@@ -8,6 +8,8 @@ Changes, newest first:
 
 - V2.0.2:
 
+  - CliMAF can **call ESMValTool diagnostic scripts**, feeding them with data accessed and pre-processed by CliMAF calls. See :doc:`esmvaltool`
+
   - **The computation cost for all objects is now handled**, and can
     be queried, using function :py:func:`~climaf.cache.ccost`. Cost is
     expressed as elapsed time. For getting the cost of a scalar, call
@@ -25,11 +27,11 @@ Changes, newest first:
     for ambiguous cases
 
   - **Finding CMIP6 datasets is optimized when facets/attributes have shell-like wildcards** ( * or ?):
-    
+
     - This relies on building tables that allows to derive wildcard
       facet's list of values by using other facet's value. Building
       the table may take a while, but the table is saved for further
-      sessions (in the cache). 
+      sessions (in the cache).
     - Also, an incremental testing of all possible data paths (built
       with possible facet values) allows to avoid costly glob.glob
       operations.
@@ -39,7 +41,7 @@ Changes, newest first:
       all periods takes 20 minutes, instead of 37 minutes.
     - This is yet limited to CMIP6 data, and active unless you set
       env.optimize_cmip6_wildcards to False
-    - See module documentation for :py:mod:`~climaf.projects.optimize` 
+    - See module documentation for :py:mod:`~climaf.projects.optimize`
 
   - **New dataset's method glob is proposed as a replacement for
     method explore**. It may be of simpler use, as it can return a list

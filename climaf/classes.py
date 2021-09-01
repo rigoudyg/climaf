@@ -1458,10 +1458,15 @@ class ctree(cobject):
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
+        if len(operands) == 0 :
+            raise Climaf_Classes_Error("Cannot apply an operator to no operand")
         self.operator = climaf_operator
         self.script = script
         import copy
-        self.flags = copy.copy(script.flags)
+        if script is None :
+            self.flags = False
+        else:
+            self.flags = copy.copy(script.flags)
         self.operands = operands
         if "period" in parameters:
             p = parameters["period"]
@@ -2241,6 +2246,12 @@ def modelOf(cobject): return attributeOf(cobject, "model")
 def simulationOf(cobject): return attributeOf(cobject, "simulation")
 
 
+def experimentOf(cobject): return attributeOf(cobject, "experiment")
+
+
+def realizationOf(cobject): return attributeOf(cobject, "realization")
+
+
 def projectOf(cobject): return attributeOf(cobject, "project")
 
 
@@ -2285,6 +2296,36 @@ def attributeOf(cobject, attrib):
         return ''
     else:
         raise Climaf_Classes_Error("Unknown class for argument " + repr(cobject))
+
+
+def timePeriod(cobject):
+    """ Returns a time period for a CliMAF object : if object is a dataset, returns
+    its time period, otherwise analyze complex case and reurns something sensible
+    """
+    if isinstance(cobject, cdataset):
+        return cobject.period
+    elif isinstance(cobject, ctree):
+        clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
+        if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
+            clogger.debug("Building composite period for results of %s" % cobject.operator)
+            periods = [timePeriod(op) for op in cobject.operands]
+            merged_period = merge_periods(periods)
+            if len(merged_period) > 1:
+                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s" %
+                                          (cobject.operator, merged_period))
+            return merged_period[0]
+        else:
+            clogger.debug("timePeriod logic for script is 'choose 1st operand' %s" % cobject.script)
+            return timePeriod(cobject.operands[0])
+    elif isinstance(cobject, scriptChild):
+        clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
+        return timePeriod(cobject.father)
+    elif isinstance(cobject, cens):
+        clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
+        return timePeriod(list(cobject.values())[0])
+    else:
+        return None  # clogger.error("unkown class for argument "+`cobject`)
+
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):
