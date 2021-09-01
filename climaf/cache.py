@@ -210,7 +210,7 @@ def register(filename, crs, outfilename=None):
         waited += 1
     # time.sleep(0.5)
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough)" % filename)
+        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" % (filename, crs))
     else:
         if stamping is False:
             clogger.debug('No stamping')

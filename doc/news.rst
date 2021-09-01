@@ -6,6 +6,10 @@ What's new
 
 Changes, newest first:
 
+- V2.0.2:
+
+  - CliMAF can **call ESMValTool diagnostic scripts**, feeding them with data accessed and pre-processed by CliMAF calls. See :doc:`esmvaltool`
+
 - V2.0.1:
 
   - **Scripts can now process multiple ensembles, and ensembles which are not the first argument**:

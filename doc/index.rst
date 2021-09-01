@@ -166,6 +166,7 @@ See the full, extended table at :ref:`contents`
    std_operators
    known_data
    API
+   esmvaltool
    howto
    experts_corner
    contributing
