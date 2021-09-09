@@ -1,11 +1,10 @@
-netCDF4==1.4.2
-numpy==1.16.0
+Cython
+netCDF4
+numpy
 sphinx==1.8.5
-# netcdftime
-# netCDF4
-cftime==1.0.3.4
-# matplotlib
-# Cython>0.15.1
-# cartopy==0.17
-# python-dateutil
+netcdftime
+cftime
+matplotlib
+cartopy
+python-dateutil
 natsort

@@ -16,7 +16,7 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "projects", "derived_variables"]
 
 
-version = "2.0.0"
+version = "2.0.0.3"
 
 
 def tim(string=None):
@@ -54,7 +54,7 @@ if not already_inited and not onrtd:
     tim("atexit")
     #
     print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
+    print("CliMAF install => " + __path__[0])
     from env.environment import *
 
     tim("softwares")

@@ -3,6 +3,11 @@
 
 from setuptools import find_packages
 from setuptools import setup
+import sys
+import os
+
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 version = __import__('climaf').version
 description = 'CliMAF: a Climate Model Assessment Framework.'
@@ -36,6 +41,11 @@ setup(name='climaf',
       packages=find_packages(),
       include_package_data=True,
       install_requires=requires,
+      data_files=[
+          "tools/angle.ncl",
+          "tools/angle_data_CNRM.nc",
+          'scripts/ml2pl',
+      ],
       scripts=[
           'bin/climaf',
           'bin/exiv2',
@@ -58,7 +68,6 @@ setup(name='climaf',
           'scripts/mcdo.py',
           'scripts/mean_and_std.sh',
           'scripts/ml2pl.sh',
-          'scripts/ml2pl',
           'scripts/mtimavg.sh',
           'scripts/plot_cross_section.ncl',
           'scripts/plotmap.ncl',
