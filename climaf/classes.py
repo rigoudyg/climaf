@@ -18,9 +18,10 @@ from functools import reduce, partial
 import six
 
 from env.environment import *
-from climaf.utils import Climaf_Classes_Error
+from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
-from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
+from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
+    lastyears, firstyears, group_periods
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
@@ -149,6 +150,26 @@ class cproject(object):
                 for i, f in enumerate(self.facets):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
+            
+
+    def cvalid(self, attribute, value=None):
+        """Set or get the list of valid values for a CliMAF dataset attribute
+        or facet (such as e.g. 'model', 'simulation' ...). Useful
+        e.g. for constraining those data files which match a dataset
+        definition
+    
+        Example::
+    
+        >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ])
+
+        """
+        #
+        if attribute not in self.facets:
+            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+        if value is None:
+            return self.facet_authorized_values.get(attribute, None)
+        else:
+            self.facet_authorized_values[attribute] = value
 
 
 def cdef(attribute, value=None, project=None):
@@ -535,6 +556,81 @@ class cdataset(cobject):
                 return False
         return True
 
+    def glob(self, what = None , periods = None, split = None):
+        """Datafile exploration for a dataset which possibly has
+        wildcards (* and ?) in attributes/facets.
+
+        Returns info regarding matching datafile or directories: 
+        
+          - if WHAT = 'files' , returns a string of all data filenames 
+        
+          - otherwise, returns a list of facet/value dictionnaries for
+            matching data (or a pair, see below)
+
+        In last case, data file periods are not returned if arg
+        PERIODS is None and data search is optimized for the project.
+        In that case, the globbing is done on data directories and not
+        on data files, which is much faster.
+
+        If PERIODS is not None, individual data files periods are
+        merged among cases with same facets values
+        
+        if SPLIT is not None, a pair is returned intead of the dicts list : 
+
+           - first element is a dict with facets which values are the
+             same among all cases
+
+           - second element is the dicts list as above, but in which
+             facets with common values are discarded
+
+        Example : 
+
+        >>> tos_data = ds(project='CMIP6', variable='tos', period='*',
+               table='Omon', model='CNRM*', realization='r1i1p1f*' )
+
+        >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
+
+        >>> common_keys
+        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical', 
+        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos', 
+        'version': 'latest', 'period': [1850-2014], 'root': '/bdd'}
+
+        >>> varied_keys
+        [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' }, 
+         {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'}, 
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gn' }, 
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gr1'}, 
+         {'model': 'CNRM-CM6-1-HR', 'grid': 'gn' } ]
+
+        """
+        dic = self.kvp.copy()
+        if self.alias:
+            filevar, _, _, _, filenameVar, _, conditions = self.alias
+            req_var = dic["variable"]
+            dic["variable"] = string.Template(filevar).safe_substitute(dic)
+            if filenameVar:
+                dic["filenameVar"] = filenameVar
+        clogger.debug("glob() with dic=%s" % repr(dic))
+        cases = []
+        files = selectFiles(with_periods = (periods is not None) or (what == 'files'),
+                            return_combinations = cases, **dic)
+        if what == 'files' :
+            return files
+        else :
+            if periods is not None :
+                cases = group_periods(cases)
+            else :
+                # For non-optimized cases, select_files returns periods,
+                # but we want an even behaviour
+                for case in cases :
+                    case.pop('period',None)
+            if split is not None :
+                keys = remove_keys_with_same_values(cases)
+                return keys, cases
+            else: 
+                return cases
+
+        
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in

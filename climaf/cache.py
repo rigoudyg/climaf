@@ -21,6 +21,7 @@ import hashlib
 import json
 from operator import itemgetter
 
+import env
 from env.environment import *
 from climaf import version
 from climaf.utils import Climaf_Cache_Error
@@ -28,7 +29,6 @@ from climaf.classes import compare_trees, cobject, cdataset, guess_projects, all
 from climaf.cmacro import crewrite
 from env.clogging import clogger
 
-currentCache = None
 cachedirs = None
 #: The place to write the index
 cacheIndexFileName = None
@@ -58,14 +58,13 @@ def setNewUniqueCache(path, raz=True):
     """
     Define PATH as the sole cache to use from now. And clear it
     """
-    global currentCache
     global cachedirs
     global cacheIndexFileName
 
     path = os.path.expanduser(path)
     cachedirs = [path]  # The list of cache directories
     cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
-    currentCache = cachedirs[0]
+    env.environment.currentCache = cachedirs[0]
     if raz:
         craz(hideError=True)
 
@@ -111,9 +110,9 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
 def hash_to_path(vhash, format, option="new", prefix=""):
     if option == "new":
-        rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
+        rep = os.sep.join([env.environment.currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
-        rep = os.sep.join([currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
+        rep = os.sep.join([env.environment.currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
     rep = ".".join([rep, format])
     rep = os.path.expanduser(rep)
     return rep
@@ -129,7 +128,7 @@ def alternate_filename(fpath):
     # Get file format
     format = fpath.split(".")[-1]
     # Remove cache root location prefix
-    relative_fpath = fpath[len(currentCache)+1:]
+    relative_fpath = fpath[len(env.environment.currentCache)+1:]
     # Get name without slashes nor extension
     vhash = relative_fpath.replace("/", "").split(".")[0]
     #
@@ -655,8 +654,8 @@ def craz(force=False, hideError=False):
 
     """
     global crs2filename
-    cc = os.path.expanduser(currentCache)
-    if os.path.exists(currentCache) or hideError is False:
+    cc = os.path.expanduser(env.environment.currentCache)
+    if os.path.exists(env.environment.currentCache) or hideError is False:
         if force:
             os.system("chmod -R +w  " + cc)
             os.system("rm -fR " + cc + "/*")
@@ -1076,7 +1075,7 @@ def load_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        cache_file = os.sep.join([currentCache, "cvalues.json"])
+        cache_file = os.sep.join([env.environment.currentCache, "cvalues.json"])
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
                 cvalues = json.load(f)
@@ -1090,10 +1089,10 @@ def sync_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        if not os.path.isdir(currentCache):
-            os.makedirs(currentCache)
-        ccache = os.path.sep.join([currentCache, "cvalues.json"])
-        tmp = os.path.sep.join([currentCache, "cvalues_tmp.json"])
+        if not os.path.isdir(env.environment.currentCache):
+            os.makedirs(env.environment.currentCache)
+        ccache = os.path.sep.join([env.environment.currentCache, "cvalues.json"])
+        tmp = os.path.sep.join([env.environment.currentCache, "cvalues_tmp.json"])
         #
         try:
             # Try to get pre-existing on-disk content
