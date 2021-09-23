@@ -174,19 +174,21 @@ def cmip6_optimize_wildcards(kwargs):
     ###########
     new_paths = []
     for path in paths:
-        grids = [ grid ]
-        if wild(grid):
-            # TBD : build a list of possible grids based on model and table
-            ###############################################################
-            grids = ["gr", "gn", "gr1", "gr2"]
-            clogger.debug("Attribute grid = %s can have value only among %s"%(grid,grids))
+        #grids = [ grid ]
+        model, table, variable = cmip6_facets(path, root, 3, 6, 7)
+        grids = possible_values("CMIP6","model_table_variable2grid",\
+                                       root, "%s_%s_%s_"%(model,table,variable), grid)
+        if grids == []:
+            #grids = ["gr", "gn", "gr1", "gr2"]
+            grids = [ grid ] # This better matches user's request
+            clogger.info("Attribute grid has no registered set of values for %s / %s / %s"%(model,variable,table))
         for gr in grids:
             new_paths.extend(listdirs(path, gr))
     paths = new_paths
 
     # Version : no try at registering version per model+experiment+real+table+variable+grid
     # -> use glob() to find version
-    # ANd also : at that final stage, test that directories exist
+    # And also : at that final stage, test that directories exist
     ################################
     new_paths = []
     clogger.info('cmip6_optimize : before ensuring paths exists, there are %d paths'%len(paths))
@@ -316,7 +318,7 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                 dirnames[case_name][key] = []
             value  = case.split("/")[split_index]
             dirnames[case_name][key].append(value)
-            clogger.info('Adding value %s to entry %s of case %s '%(value, key, case_name))
+            clogger.debug('Adding value %s to entry %s of case %s '%(value, key, case_name))
         #if len(dirnames[case_name][case_value]) == 0:
         #    raise ValueError(f"No matching value for {case_value} using {glob_pattern}")
         for v in dirnames[case_name]:
@@ -526,6 +528,7 @@ def possible_values(project, tag, root, key, value_pattern):
             "mip2experiment"       : { "glob_pattern": "/*/*/*/*", "split_index": -1, "key_index": -4},
             "mip_model2experiment" : { "glob_pattern": "/*/*/*/*", "split_index": -1, "key_index": [-4,-2]},
             "mip_model_experiment2realization" : { "glob_pattern": "/*/*/*/*/*", "split_index": -1, "key_index": [-5,-3,-2]},
+            "model_table_variable2grid" : { "glob_pattern": "/CMIP/*/*/historical/r1i*/*/*/*", "split_index": -1, "key_index": [-6,-3,-2]},
         }}
     broot = root.encode('utf-8')
     root_tag = hashlib.sha1(broot).hexdigest()[0:8]
