@@ -16,7 +16,7 @@ Script inputs
 -------------
 - when using this feature, it is the user's responsibility to understand which data pre-processing is needed upstream of the diagnostic script and to reproduce that pre-processing using CliMAF, in order to feed the diagnostic consistently. The recipe describes that pre-processing;
 
-- according to ESMValTool's principles, each script input of type fields must be an ensemble of fields, composed of fields representing the same geophyiscal variable
+- according to ESMValTool's principles, each script input of type ``field`` must be an ensemble of fields, composed of fields representing the same geophysical variable
 
 - these ensembles must be provided as arguments to the ``nickname`` function in the same order than used in ESMValTool recipe's list of variables; 
 

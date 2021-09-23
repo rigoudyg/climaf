@@ -22,6 +22,17 @@ Discover CliMAF: essentials of the documentation to get started
 - :download:`A notebook for CMIP6 with CliMAF at CLIMERI <../examples/CMIP6_analysis_with_CliMAF.html>`
 - `Subscribe to CliMAF users mailing list <https://climaf.readthedocs.io/en/master/community.html>`_ to stay in the loop!
 
+Breaking news: launch ESMValTool diags with CliMAF
+==================================================
+
+The development of a standard interface for diagnostic scripts within
+the IS-ENES3 European project has led to the development of an
+interface between CliMAF and ESMValTool diagnostic scripts that works
+even with the current ESMValTool interface.
+
+Hence, it is now possible to use ESMValTool diagnostic scripts and
+to reproduce its recipes from CliMAF; see the :doc:`documentation page
+here<esmvaltool>`
 
 
 CliMAF - a Climate Model Assessment Framework
