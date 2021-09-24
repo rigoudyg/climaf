@@ -13,7 +13,7 @@ Changes, newest first:
     - This relies on building tables that allows to derive wildcard
       facet's list of values by using other facet's value. Building
       the table may take a while, but the table is saved for further
-      sessions (in the cache).
+      sessions (in the cache). 
     - Also, an incremental testing of all possible data paths (built
       with possible facet values) allows to avoid costly glob.glob
       operations.
@@ -21,7 +21,8 @@ Changes, newest first:
       historical and all models, realizations, and grids (and not for
       peridos) takes 77 seconds on Ciclad;  searching also for
       all periods takes 20 minutes, instead of 37 minutes.
-    - This is yet limited to CMIP6 data
+    - This is yet limited to CMIP6 data, and active unless you set
+      env.optimize_cmip6_wildcards to False
     - See module documentation for :py:mod:`~climaf.projects.optimize` 
 
   - **New dataset's method glob is proposed as a replacement for
