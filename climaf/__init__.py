@@ -54,7 +54,7 @@ if not already_inited and not onrtd:
     tim("atexit")
     #
     print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
+    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
     from env.environment import *
 
     tim("softwares")
@@ -75,12 +75,6 @@ if not already_inited and not onrtd:
             os.remove(os.environ["TMPDIR"])
         os.makedirs(os.environ["TMPDIR"])
 
-    logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
-    #
-    # Set default logging levels
-    clogging.logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
-    clogging.clog(os.getenv("CLIMAF_LOG_LEVEL", "warning"))
-    clogging.clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
     tim("loggings")
     #
     # Decide for cache location

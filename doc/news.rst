@@ -6,6 +6,14 @@ What's new
 
 Changes, newest first:
 
+- V2.0.2:
+
+  - CliMAF check for external softwares version at init stage can be
+    silent, using :py:func:`~env.clogging.clog`, with a log level of
+    'critical'
+
+  - Other messages at init stage can be discarded by redirecting stderr
+
 - V2.0.1:
 
   - **Scripts can now process multiple ensembles, and ensembles which are not the first argument**:
@@ -912,7 +920,7 @@ Changes, newest first:
   - Running CliMAF - messages, cache, errors:
 
     - Verbosity, and cache directory, can be set using environment variables. See :ref:`configuring`
-    - Simplify use of function :py:func:`~climaf.clogging.clog`
+    - Simplify use of function :py:func:`~env.clogging.clog`
     - Log messages are indented to show recursive calls of ceval()
     - Quite extended use of Python exceptions for error handling
 
