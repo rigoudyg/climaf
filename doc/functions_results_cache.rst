@@ -1,3 +1,6 @@
+Functions for handling the cache
+==================================
+
 clist : tell what's in cache, and much more
 -------------------------------------------
 

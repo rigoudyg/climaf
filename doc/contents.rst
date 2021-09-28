@@ -13,7 +13,7 @@ Contents
    examples
    operators
    std_operators
-   API
+   API 
    howto
    experts_corner
    contributing
