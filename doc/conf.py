@@ -49,7 +49,7 @@ extensions = [
 ]
 
 from env.site_settings import atCNRM, onCiclad
-if atCNRM or onCiclad:
+if atCNRM :#or onCiclad:
     # This one works at CNRM , Ciclad and RTD
     extensions.append('sphinxcontrib.napoleon')
 else:
