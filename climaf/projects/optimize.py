@@ -212,15 +212,26 @@ def cmip6_optimize_wildcards(kwargs):
 
 
 def cmip6_path2dict(path, root):
+    """Returns a dict of facet/value pairs derived from PATH after
+    removing prefix ROOT and assuming that the path matches CMIP6
+    DRS"""
     path = path[len(root)+1:].split("/")
-    rep = dict(mip = 0, institute = 1 , model = 2, experiment =  3, realization = 4, table = 5, variable = 6, grid = 7, version = 8 )
+    rep = dict(mip = 0, institute = 1 , model = 2, experiment = 3,
+               realization = 4, table = 5, variable = 6, grid = 7, version = 8 )
     for k in rep:
         rep[k] = path[rep[k]]
     return rep
     
 
 def cmip6_facets(path, root, *fields):
-    #institute, model, experiment, realization, table, variable = cmip6_facets(path, root, 2, 3, 4, 5, 6, 7)
+    """Returns a tuple of facets values for the ranks in FIELDS, derived
+    from PATH after removing prefix ROOT and assuming that the path
+    matches CMIP6 DRS, at least up to the max depth in FIELDS
+
+    Example :
+    >>> institute, model, experiment, realization, table, variable = cmip6_facets(path, root, 2, 3, 4, 5, 6, 7)
+
+    """
     rep = []
     l = len(root)
     path = path[l+1:].split("/")
@@ -230,21 +241,33 @@ def cmip6_facets(path, root, *fields):
 
 
 def listdirs(parent, pattern, test_exists = False):
+    """List directories which may actually exists, by complementing path
+    PARENT with a single level of sub-directories, which match PATTERN
+
+    If the pattern includes no wildcard, simply complement with
+    PATTERN, and test existence only if TEST_EXITS is True
+
+    Otherwise, use glob.glob to find existing sub-directories
+
+    """
     #clogger.debug('listdirs with %s and %s'%(parent,pattern))
 
     if not wild(pattern):
         path = parent + "/" + pattern
         if not test_exists or os.path.exists(path):
             return [ path ]
+        else:
+            return []
     else:
         # Is it cost-effective to test that a path exists before
         # globing on (some of) its subdirs?  According to various
         # tests, it is not
         rep = glob.glob(parent + "/" + pattern)
         return rep
-    return []
 
+    
 def cmip6_optimize_check_paths(paths):
+
     """Check that paths patterns in PATHS fit (at least some of) the
     requirements for optimizing data search
     """
@@ -255,6 +278,7 @@ def cmip6_optimize_check_paths(paths):
             clogger.debug("Path %s does not fit requirements for optimization"%path)
             return False
     return True
+
 
 def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                           key_index =-1, reset = False, value_pattern = None, root=None):
@@ -274,8 +298,6 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
     See examples of use in :py:func:`~climaf.projects.cmip6.cmip6_optimize_wildcards`
 
     """
-    # TBD : optimize : glob only for required experiment
-    
     global dirnames
     #print("begin:",dirnames)
     
@@ -306,7 +328,8 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
         t = time.time()
         cases = glob.glob(root + glob_pattern)
         clogger.warning("Globbing duration was %g"%(time.time() - t))
-        clogger.info("Globbing duration was %g for %s and returned %d enties"%((time.time() - t),glob_pattern, len(cases)))
+        clogger.info("Globbing duration was %g for %s and returned %d enties"%\
+                     ((time.time() - t),glob_pattern, len(cases)))
         for case in cases:
             if not isinstance(key_index,list):
                 key = case.split("/")[key_index]
@@ -319,8 +342,6 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
             value  = case.split("/")[split_index]
             dirnames[case_name][key].append(value)
             clogger.debug('Adding value %s to entry %s of case %s '%(value, key, case_name))
-        #if len(dirnames[case_name][case_value]) == 0:
-        #    raise ValueError(f"No matching value for {case_value} using {glob_pattern}")
         for v in dirnames[case_name]:
                dirnames[case_name][v] = list(set(dirnames[case_name][v]))
     #
@@ -333,7 +354,6 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
         #clogger.debug('Looking for entry %s in table %s'%(case_value,case_name))
         try:
             ret = dirnames[case_name][case_value]
-            #clogger.debug('Got %s'%(ret))
         except:
             clogger.debug('No  %s in %s'%(case_value,case_name))
             ret = []
@@ -381,140 +401,31 @@ def _build_filename(case_name):
     return env.environment.currentCache + "/" + case_name +".json"
     
 
-def cmip6_optimize_wildcards_by_subsets(kwargs):
-    """Analyze CMIP6 keyword values in KWARGS in order to replace some
-    patterns using * or ?  by the list of their possible values when
-    other wildcards allow to restrict such a list. This in order to
-    save on file system globing.
-
-    Returns a version of dict KWARGS where, for such facets, values
-    are lists with first element being the pattern, the rest being the
-    possible values
-
-    This applies e.g. to deriving the MIP value when the experiment
-    value is known, and to the insitute values when the model value is known 
-
-    This relies on auxilliary function
-    :py:func:`~climaf.projects.optimize.dirnames_for_one_case` which
-    builds relevant tables (by globbing once for all) and stores it of file
-
-    Variable :py:data:`env.environment.optimize_cmip6_wildcards` can be
-    set to False for de-activating the feature
-
-    IMPORTANT Note : at time of writing, this routine is no more
-    used. Some of the complexity in routine
-    find_files.selectGenericFiles is only devoted to handling the kind
-    of KWARGS returned by this routine and could be removed once decided 
-    that no project will be optimized that way
-
-    """
-    
-    kw = kwargs.copy()
-    if not env.environment.optimize_cmip6_wildcards :
-        return kw
-    #
-    root = kwargs['root']  + "/CMIP6"
-    broot = root.encode('utf-8')
-    root_tag = hashlib.sha1(broot).hexdigest()[0:8]
-    #
-    mip         = kwargs.get('mip')
-    experiment  = kwargs.get('experiment')
-    institute   = kwargs.get('institute')
-    model       = kwargs.get('model')
-    realization = kwargs.get('realization')
-    
-    if not(wild(experiment)) and wild(mip):
-        tag ="CMIP6_experiment2mip_" + root_tag
-        #pattern = root+"/%s/*/*/*"%mip
-        pattern = root+"/*/*/*/*"
-        kw['mip'] = list(mip)
-        kw['mip'].extend(dirnames_for_one_case(tag, pattern, -4, experiment))
-        clogger.info("Based on experiment = %s, attribute mip = %s can have value only among %s"%\
-                     (experiment,mip,kw['mip'][1:]))
-    #
-    if  not(wild(model)) and wild(institute):
-        tag ="CMIP6_model2institute_" + root_tag
-        #pattern = root+"/*/%s/*"%institute
-        pattern = root+"/*/*/*"
-        kw['institute'] = list(institute)
-        kw['institute'].extend(dirnames_for_one_case(tag, pattern, -2, model))
-        clogger.info("Based on model =%s, attribute institute = %s can have value only among %s"%\
-                     (model,institute,kw['institute'][1:]))
-    #
-    # Derive list of models for one experiment
-    # !! This is not efficient (up to 50% more costly when realization is known) !!
-    if not(wild(experiment)) and wild(model):
-        if wild(mip):
-            mip = kw['mip'][1]
-        tag ="CMIP6_%s_experiment_2model_"%mip + root_tag
-        #pattern = root+"/%s/*/%s/*"%(mip,model)
-        pattern = root+"/%s/*/*/*"%mip
-        kw['model'] = list(model)
-        kw['model'].extend(dirnames_for_one_case(tag, pattern, -2, experiment))
-        clogger.info("Based on experiment =%s, attribute model = %s can have value only among %s"%\
-                     (experiment, model,kw['model'][1:]))
-
-    # Derive list of experiment from mip
-    if not(wild(mip)) and wild(experiment):
-        tag ="CMIP6_mip2experiment_" + root_tag
-        pattern = root+"/*/*/*/*"
-        kw['experiment'] = list(experiment)
-        kw['experiment'].extend(dirnames_for_one_case(tag, pattern, -1, mip, key_index =-4))
-        clogger.info("Based on mip =%s, attribute experiment = %s can have value only among %s"%\
-                     (mip, experiment, kw['experiment'][1:]))
-
-    
-    # Derive list of realizations from model and experiment
-    # Next case has a longer setup yime, but is more comprehensive
-    if False and not(wild(experiment)) and not(wild(model)) and wild(realization):
-        if wild(mip):
-            mip = kw['mip'][1]
-        tag ="CMIP6_%s_experiment_model2realization"%mip + root_tag
-        pattern = root + "/%s/*/*/*/*"%mip
-        kw['realization'] = list(realization)
-        kw['realization'].extend(dirnames_for_one_case(tag, pattern, -1,
-                                        "%s_%s_"%(model,experiment), key_index =[-3,-2]))
-        clogger.info("Attribute realization = %s can have value only among %s"%\
-                     (realization,kw['realization'][1:]))
-
-    realtag ="CMIP6_mip_experiment_model2realization" + root_tag
-    # Derive list of realizations from experiment , and possibly from model
-    if not(wild(experiment)) and wild(realization):
-        if wild(mip):
-            mip = kw['mip'][1]
-        pattern = root + "/*/*/*/*/*"
-        kw['realization'] = list(realization)
-        kw['realization'].extend(dirnames_for_one_case(realtag, pattern, -1,
-                                        "%s_%s_%s_"%(mip,model,experiment) , key_index =[-5,-3,-2]))
-        clogger.info("Based on experiment =%s and model =%s, attribute realization = %s can have value only among %s"%\
-                     (experiment, realization, model, kw['realization'][1:]))
-    #
-    # Finally, replace any remaining wildcard keyword with the list of
-    # possible values (when it exists).  This assumes that, downstream,
-    # there will be a test that leaf directories exist before any
-    # glob.glob (as, otherwise, glob.glob will be quicker at selecting
-    # remaining wildcards)
-    cmip6 = cprojects['CMIP6']
-    for facet in cmip6.facets:
-        fv = kw[facet]
-        if isinstance(fv,six.string_types) and wild(fv):
-            values = cmip6.cvalid(facet)
-            if values is not None:
-                kw[facet] = [ fv ]
-                for v in values:
-                    patt = v.replace("*",".*").replace("?",".")
-                    if re.search(patt,v):
-                        kw[facet].append(v)  
-                clogger.info(f"In CMIP6, attribute {facet} = {fv} "+\
-                             f"match possible values {kw[facet][1:]}")
-    return kw
 
 
 def possible_values(project, tag, root, key, value_pattern):
+    """For a given PROJECT, returns the list of possible values for a
+    facet (here called the value facet) given the value (KEY) of
+    another facet (here called the key facet). Returns only values
+    that match VALUE_PATTERN. Return [] if None found
+
+    Values are searched based on additional information TAG, which
+    carries two pieces of information : which is facet which value
+    (KEY) is provided, and which is the facet which values are
+    searched
+
+    Current implementation is based on globing and uses TAG to derive
+    three items :
+
+    - pattern to use for globing the filesystem
+    - index of the value facet in the file hierarchy matching the pattern
+    - index (or indices) of the key facet(s) in the file hierarchy 
+      matching the pattern
+
+    It then calls function dirnames_for_one_case which implements the
+    globbing, and which caches its results in a json file.
+
     """
-    """
-    # if not wild(value_pattern) or wild(key):
-    #     return [ value_pattern ]
     if not wild(value_pattern) :
         return [ value_pattern ]
     #
