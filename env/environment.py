@@ -80,8 +80,12 @@ def bash_command_to_str(cmd):
 
 #
 # Set default logging levels
-env.clogging.logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
 clog(os.getenv("CLIMAF_LOG_LEVEL", "warning"))
+
+env.clogging.logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+if not os.access(env.clogging.logdir, mode=os.W_OK):
+    print("Cannot write logfile in non-writeable directory : " + os.path.abspath(env.clogging.logdir))
+    exit()
 clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
 
 if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") != "no":
