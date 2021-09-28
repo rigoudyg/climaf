@@ -334,6 +334,10 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
                             "data locations %s " % (repr(kwargs), repr(urls)))
             clogger.warning("i.e. at " + str([url.replace("${PERIOD}", "$PERIOD").replace("$", "").format(**kwargs)
                                               for url in urls]))
+            if env.environment.optimize_cmip6_wildcards:
+                clogger.warning("If you think this may be due to fresh data ingest, "
+                                "you may wish to reset some of the tables used in "
+                                "optimizing CMIP6 data search. See help(climaf.projects.optimize.clear_tables)")
             #if any([kwargs[k] == '' for k in kwargs):
             #    clogger.warning("Please check these empty attributes %s" % [k for k in kwargs if kwargs[k] == ''])
             return None
