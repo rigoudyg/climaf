@@ -352,7 +352,10 @@ class cdataset(cobject):
 
         Some attributes have a special format or processing :
 
-        - period : see :py:func:`~climaf.period.init_period`
+        - period : see :py:func:`~climaf.period.init_period`. See also  
+          function :py:func:`climaf.classes.ds` for added
+          flexibility in defining periods as last of first set of years 
+          among available data
 
         - domain : allowed values are either 'global' or a list for
           latlon corners ordered as in : [ latmin, latmax, lonmin,
