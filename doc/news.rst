@@ -6,6 +6,11 @@ What's new
 
 Changes, newest first:
 
+- V2.0.2:
+
+  - Fix `issue 193<https://github.com/rigoudyg/climaf/issues/193>` regarding behaviour of listfiles
+    for ambiguous cases
+
 - V2.0.1:
 
   - **Scripts can now process multiple ensembles, and ensembles which are not the first argument**:
