@@ -6,6 +6,13 @@ What's new
 
 Changes, newest first:
 
+- V2.0.2:
+
+  - two bugs related ot cache were fixed : cache content was not
+    updated on exit, and with Python 3, it was not read at
+    startup. Errors related to reading / writing cache are no more
+    hidden.
+
 - V2.0.1:
 
   - **Scripts can now process multiple ensembles, and ensembles which are not the first argument**:

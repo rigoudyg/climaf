@@ -79,25 +79,30 @@ import climaf
 # Declare standard projects and standard data locations
 from .projects import *
 
-#####################################################################################################################
-# All CliMAF functions we want to provide as top-level functions when this module is loaded as "from ... import *"
-#####################################################################################################################
+#############################################################################################
+# All CliMAF functions we want to provide as top-level functions when
+# this module is loaded as "from ... import *"
+#############################################################################################
 #
-from climaf.classes import cdef, cdataset, ds, cproject, cpage, cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms
+from climaf.classes import cdef, cdataset, ds, cproject, cpage, \
+    cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms
 from climaf.cmacro import macro
 from climaf.driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from climaf.dataloc import dataloc
 from climaf.operators import cscript, fixed_fields
 from climaf.operators_derive import derive
-from climaf.cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, cwc, cprotect, raz_cvalues
-from env.clogging import clogger, clog, clog_file, logdir
-from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
+from climaf.cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, \
+    cwc, cprotect, raz_cvalues, ccost
 from climaf.plot.plot_params import plot_params, hovm_params
 from climaf.plot.varlongname import varlongname
+#
 from climaf.derived_variables import *
 from climaf.functions import *
 from climaf.easyCMIP_functions import *
+#
 from env.environment import *
+from env.clogging import clogger, clog, clog_file, logdir
+from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not

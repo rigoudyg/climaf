@@ -528,6 +528,7 @@ def csync(update=False):
     import pickle
     global cacheIndexFileName
     global dropped_crs
+    global crs2filename
 
     # Merge index on file and index in memory
     file_index = cload(True)
@@ -547,7 +548,8 @@ def csync(update=False):
                 clogger.info("Rebuilding cache index from file content")
                 rebuild()
             else:
-                clogger.warning('In no stamp mode, there is no way to seriously identify CRS from files in cache  !')
+                clogger.warning('In no stamp mode, there is no way to seriously '
+                                'identify CRS from files in cache  !')
                 # clogger.warning('Removing cache files which content is not known.
                 # This is an issue in concurrent mode !')
                 # for fil in files_in_cache :
@@ -558,14 +560,9 @@ def csync(update=False):
                 # file creation will be atomic enough
     # Save index to disk
     fn = os.path.expanduser(cacheIndexFileName)
-    try:
-        with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
-        dropped_crs = list()
-    except:
-        if update:
-            if os.path.isfile(fn) and len(files_in_cache > 0):
-                clogger.error("Issue when writing cache index %s" % fn)
+    cacheIndexFile = open(fn,"wb")
+    pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
+    dropped_crs = list()
 
 
 def cload(alt=None):
@@ -574,22 +571,25 @@ def cload(alt=None):
     rep = dict()
 
     if len(crs2filename) != 0 and not alt:
-        Climaf_Cache_Error(
-            "attempt to reset file index - would lead to inconsistency !")
-    try:
-        cacheIndexFile = open(os.path.expanduser(cacheIndexFileName), "r")
-        if alt:
-            rep = pickle.load(cacheIndexFile)
-        else:
-            crs2filename = pickle.load(cacheIndexFile)
-            for c in crs2filename:
-                f = crs2filename[c]
-                if len(f.split("/")[-2] == directoryNameLength):
-                    crs2filename[c] = alternate_filename(f)
-        cacheIndexFile.close()
-    except:
-        pass
-        # clogger.debug("no index file yet")
+        raise Climaf_Cache_Error(
+            "attempt to reset cache index - would lead to inconsistency !")
+    cacheFilen = os.path.expanduser(cacheIndexFileName)
+    if not os.path.exists(cacheFilen) :
+        clogger.debug("no index file yet")
+        return {}
+    cacheIndexFile = open(cacheFilen, "rb")
+    try : 
+        rep = pickle.load(cacheIndexFile)
+    except :
+        clogger.warning("Cache index %s is empty or ill-formed. Going on without empty index"%cacheFilen)
+        rep={}
+    cacheIndexFile.close()
+    if not alt:
+        crs2filename = rep
+        for c in crs2filename:
+            f = crs2filename[c]
+            if len(f.split("/")[-2]) == directoryNameLength:
+                crs2filename[c] = alternate_filename(f)
     #
     must_check_index_entries = False
     if must_check_index_entries:
@@ -1093,16 +1093,14 @@ def sync_cvalues():
         if not os.path.isdir(currentCache):
             os.makedirs(currentCache)
         ccache = os.path.sep.join([currentCache, "cvalues.json"])
-        tmp = os.path.sep.join([currentCache, "cvalues_tmp.json"])
         #
-        try:
-            # Try to get pre-existing on-disk content
+        if os.path.exists(ccache) :
+            # get pre-existing on-disk content
             with open(ccache, "r") as f:
                 onfile = json.load(f)
             onfile.update(cvalues)
             cvalues = onfile
-        except:
-            pass
+        tmp = os.path.sep.join([currentCache, "cvalues_tmp.json"])
         with open(tmp, "w") as f:
             json.dump(cvalues, f, separators=(',', ': '), indent=3, ensure_ascii=True)
         os.rename(tmp, ccache)
