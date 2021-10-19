@@ -92,7 +92,7 @@ from climaf.dataloc import dataloc
 from climaf.operators import cscript, fixed_fields
 from climaf.operators_derive import derive
 from climaf.cache import craz, csync, cdump, cdrop, clist, cls, crm, cdu, \
-    cwc, cprotect, raz_cvalues, ccost
+    cwc, cprotect, raz_cvalues
 from climaf.plot.plot_params import plot_params, hovm_params
 from climaf.plot.varlongname import varlongname
 #
