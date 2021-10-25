@@ -326,16 +326,15 @@ def hasMatchingObject(cobject, ds_func):
     for crs in crs2filename:
         # First, basic, screening
         if crs.split("(")[0] != cobject.crs.split("(")[0]:
-            return None, None
+            continue
         co = crs2eval.get(crs, None)
         if co is None:
             try:
                 co = eval(crs, sys.modules['__main__'].__dict__)
-                if co:
-                    crs2eval[crs] = co
             except:
-                pass  # usually case of a CRS which project is not currently defined
+                continue  # usually case of a CRS which project is not currently defined
         if co:
+            crs2eval[crs] = co
             clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
