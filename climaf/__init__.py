@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Climaf is documented at ReadTheDocs : http://climaf.readthedocs.org/

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver

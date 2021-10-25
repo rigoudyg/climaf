@@ -2,7 +2,7 @@
 
 report_ensemble=${1:-1}
 echo $report_ensemble
-python_version=${2:-2}
+python_version=${2:-3}
 echo $python_version
 run_modules=${3:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro driver dataloc find_files html example_data_plot example_data_retrieval example_index_html mcdo"}
 echo $run_modules

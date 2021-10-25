@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IGCM outputs produced by libIGCM for all frequencies,

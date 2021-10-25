@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Management of CliMAF standard operators
@@ -231,7 +231,7 @@ def load_standard_operators():
     #
     # ensemble_ts_plot
     cscript('ensemble_ts_plot',
-            'python ' + scriptpath + 'ensemble_time_series_plot.py '
+            'python3 ' + scriptpath + 'ensemble_time_series_plot.py '
                                      '--filenames="${mmin}" '
                                      '--outfig=${out} '
                                      '--labels=\'\"${labels}\"\' '
@@ -294,7 +294,7 @@ def load_standard_operators():
     #
     # cLinearRegression
     cscript('cLinearRegression',
-            'python ' + scriptpath + 'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
+            'python3 ' + scriptpath + 'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
                                      '--yvariable ${var_2} --outfile ${out}',
             _var='slope')
     #
