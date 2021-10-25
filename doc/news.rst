@@ -8,6 +8,11 @@ Changes, newest first:
 
 - V2.0.2:
 
+  - **The computation cost for all objects is now handled**, and can
+    be queried, using function :py:func:`~climaf.cache.ccost`. Cost is
+    expressed as elapsed time. For getting the cost of a scalar, call
+    :py:func:`~climaf.driver.cvalue` with argument``cost=True``
+
   - two bugs related ot cache were fixed : cache content was not
     updated on exit, and with Python 3, it was not read at
     startup. Errors related to reading / writing cache are no more
@@ -66,11 +71,11 @@ Changes, newest first:
     - To avoid cycling import, the module :py:mod:`climaf.operator` has been split into three modules:
       :py:mod:`climaf.operator` (still here), :py:mod:`climaf.operator_derive` and :py:mod:`climaf.operator_scripts`.
 
-    - :py:func:`~climaf.operator.ceval` has been modified to call functions specific to CliMAF types:
-      :py:func:`~climaf.operator.ceval_for_cdataset`, :py:func:`~climaf.operator.ceval_for_ctree`,
-      :py:func:`~climaf.operator.ceval_for_ScriptChild`, :py:func:`~climaf.operator.ceval_for_cpage`,
-      :py:func:`~climaf.operator.ceval_for_cpage_pdf`, :py:func:`~climaf.operator.ceval_for_cens`,
-      :py:func:`~climaf.operator.ceval_for_string`.
+    - :py:func:`~climaf.driver.ceval` has been modified to call functions specific to CliMAF types:
+      :py:func:`~climaf.driver.ceval_for_cdataset`, :py:func:`~climaf.driver.ceval_for_ctree`,
+      :py:func:`~climaf.driver.ceval_for_ScriptChild`, :py:func:`~climaf.driver.ceval_for_cpage`,
+      :py:func:`~climaf.driver.ceval_for_cpage_pdf`, :py:func:`~climaf.driver.ceval_for_cens`,
+      :py:func:`~climaf.driver.ceval_for_string`.
 
     - Variables used everywhere in CliMAF and available for everyone have been moved to module
       :py:mod:`env.environment`: ``cprojects``, ``aliases``, ``frequencies``, ``realms``, ``cscripts``, ``operators``,
