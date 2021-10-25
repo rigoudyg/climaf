@@ -21,7 +21,8 @@ from env.environment import *
 from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
     searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \
     complement, cdrop, cprotect, csync, cload, cload_for_project, craz, cdump, list_cache, clist, cls, crm, cdu, cwc, \
-    rebuild, Climaf_Cache_Error
+    rebuild, ccost, Climaf_Cache_Error
+from climaf.driver import cfile
 
 
 class SetNewUniqueCacheTests(unittest.TestCase):
@@ -319,6 +320,14 @@ class RebuildTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+
+class CCostTest(unittest.TestCase):
+    def test_ccost(self) :
+        rst = ds(project="example", simulation="AMIPV6ALB2G",
+                 variable="rstcs", period="1980")
+        cdrop(rst)
+        cfile(rst)
+        ccost(rst)
 
 if __name__ == '__main__':
     # Jump into the test directory
