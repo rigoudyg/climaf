@@ -6,17 +6,17 @@ Test the driver module.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-
 import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 
 from climaf.cache import setNewUniqueCache
+from climaf.api import cproject, dataloc
 from climaf.driver import capply, capply_script, maketree, capply_operator, ceval_for_cdataset, ceval_for_ctree, \
 	ceval_operator, cstore, ceval_for_scriptChild, ceval_for_cpage, ceval_for_cpage_pdf, ceval_for_cens, \
 	ceval_for_string, ceval, ceval_script, timePeriod, ceval_select, cread, cview, derive_variable, set_variable, \
-	noselect, cfile, cshow, cMA, cvalue, cexport, cimport, get_fig_sizes, cfilePage, cfilePage_pdf, calias, CFlongname,\
+	noselect, cfile, cshow, cMA, cvalue, cexport, cimport, get_fig_sizes, cfilePage, cfilePage_pdf, calias, CFlongname, \
 	efile, Climaf_Driver_Error
 from climaf.classes import ds
 from climaf.period import Climaf_Period_Error, init_period
@@ -280,10 +280,29 @@ class CfilePagePdfTests(unittest.TestCase):
 
 class CaliasTests(unittest.TestCase):
 
-	@unittest.skipUnless(False, "Test not yet written")
+	def setUp(self):
+		cproject('data_CNRM')
+		root = "/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
+		suffix = "${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
+		data_url = root + suffix
+		dataloc(project='data_CNRM', organization='generic', url=data_url)
+
 	def test_calias(self):
 		# TODO: Write the test
-		pass
+		if "data_CNRM" in aliases or "data_CNRM" in derived_variables:
+			raise KeyError("Should not have aliases for 'data_CNRM' at this stage")
+		calias("data_CNRM", "tos,thetao", filenameVar="grid_T_table2.2")
+		calias("data_CNRM", "uo", filenameVar="grid_U_table2.3")
+		self.assertDictEqual(aliases["data_CNRM"],
+		                     {'tos,thetao': ('tos,thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'tos': ('tos', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'thetao': ('thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'uo': ('uo', 1.0, 0.0, None, 'grid_U_table2.3', None, None)
+		                      })
+		self.assertDictEqual(derived_variables["data_CNRM"],
+		                     {'tos': ('ccdo', 'tos', ['tos,thetao'], {'operator': 'selname,tos'}),
+		                      'thetao': ('ccdo', 'thetao', ['tos,thetao'], {'operator': 'selname,thetao'})
+		                      })
 
 
 class CFlongnameTests(unittest.TestCase):
@@ -303,12 +322,12 @@ class EfileTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
-    remove_dir_and_content(tmp_directory)
-    if not os.path.isdir(tmp_directory):
-        os.makedirs(tmp_directory)
-    setNewUniqueCache(tmp_directory)
-    os.chdir(tmp_directory)
-    unittest.main()
-    remove_dir_and_content(tmp_directory)
+	# Jump into the test directory
+	tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
+	remove_dir_and_content(tmp_directory)
+	if not os.path.isdir(tmp_directory):
+		os.makedirs(tmp_directory)
+	setNewUniqueCache(tmp_directory)
+	os.chdir(tmp_directory)
+	unittest.main()
+	remove_dir_and_content(tmp_directory)
