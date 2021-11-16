@@ -627,7 +627,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
                                          copy.copy(userflags), format, deep, recurse_list=recurse_list)
 
     cdedent()
-    if format == "file":
+    if format in ["file", ]:
         files = reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
         total_cost = cache.compute_cost()
         for m in cobject.order:
@@ -951,6 +951,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         except subprocess.CalledProcessError:
             raise Climaf_Driver_Error("Something went wrong when computing %s. See file ./last.out for details" %
                                       scriptCall.crs)
+
     #
     duration = time.time() - tim1
     total_costs.increment(duration)
