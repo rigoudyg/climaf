@@ -400,7 +400,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
                             recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
         if format in ['file', ]:
-            return file
+            return filen
         else:
             return cread(filen, classes.varOf(cobject))
     elif cobject.operator in operators:
