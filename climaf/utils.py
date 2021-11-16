@@ -45,7 +45,7 @@ def remove_keys_with_same_values(diclist):
         return values
 
 
-def cartesian_product_substitute(input_string, **kwargs):
+def cartesian_product_substitute(input_string, skip_keys=list(), **kwargs):
 
     """Iterate Template.safe_substitute on a list of strings, subtituting
     for those keys in kwargs which have a value of type list, by
@@ -70,8 +70,8 @@ def cartesian_product_substitute(input_string, **kwargs):
     { 'x':'*', 'y':'?' },
 
     """
-    set_kw = [kw for kw in kwargs if isinstance(kwargs[kw], list)]
-    single_kw = list(set(list(kwargs)) - set(set_kw))
+    set_kw = [kw for kw in kwargs if isinstance(kwargs[kw], list) and kw not in skip_keys]
+    single_kw = list(set(list(kwargs)) - set(set_kw) - set(skip_keys))
     # Deal with substitutions for which there is one possible value
     for kw in single_kw:
         input_string = Template(input_string).safe_substitute({kw: kwargs[kw]})

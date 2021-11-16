@@ -162,7 +162,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
     for one_url in urls:
         # Some keywords in kwargs can have values of type 'set', which must then be
         # expanded by cartesian product
-        expanded_urls, simple_kwargs, kwargs = cartesian_product_substitute(one_url, **save_kwargs)
+        expanded_urls, simple_kwargs, kwargs = cartesian_product_substitute(one_url, skip_keys=["variable", ],
+                                                                            **save_kwargs)
         for url in expanded_urls:
             # First discard protocol prefix in url element
             remote_prefix, basename = mysplit(url)
