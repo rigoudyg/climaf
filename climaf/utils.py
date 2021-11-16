@@ -37,8 +37,9 @@ def remove_keys_with_same_values(diclist) :
         for k in keys_with_common_values:
             common_values_dict[k] = dic.pop(k)
     return common_values_dict
-    
-def cartesian_product_substitute(string,**kwargs):
+
+
+def cartesian_product_substitute(string, skip_keys=list(), **kwargs):
 
     """Iterate Template.safe_substitute on a list of strings, subtituting
     for those keys in kwargs which have a value of type list, by
@@ -63,20 +64,20 @@ def cartesian_product_substitute(string,**kwargs):
     { 'x':'*', 'y':'?' },
 
     """
-    set_kw = [ kw for kw in kwargs if type(kwargs[kw]) is list ]
+    set_kw = [ kw for kw in kwargs if isinstance(kw, list)]
     new_strings = set([string])
-    for kw in kwargs :
+    for kw in [kw for kw in kwargs if kw not in skip_keys]:
         for s in new_strings.copy() :
             new_strings.remove(s)
-            if kw in set_kw :
+            if kw in set_kw:
                 for value in set(kwargs[kw][1:]):
                     new_strings.add(Template(s).safe_substitute({kw:value}))
-            else :
+            else:
                 value = kwargs[kw]
                 new_strings.add(Template(s).safe_substitute({kw:value}))
                 
     #
-    simple_kwargs   = kwargs.copy()
+    simple_kwargs = kwargs.copy()
     for k in set_kw :
         simple_kwargs.pop(k)
     #
@@ -85,6 +86,7 @@ def cartesian_product_substitute(string,**kwargs):
         kwargs_with_patterns[k] = kwargs[k][0]
     #
     return(list(new_strings), simple_kwargs, kwargs_with_patterns)
+
 
 class Climaf_Classes_Error(Exception):
     def __init__(self, valeur):

@@ -14,7 +14,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 import six
-import os.path
 import re
 import glob
 from string import Template
@@ -29,6 +28,7 @@ from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_s
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
 from env.clogging import clogger
+
 
 def selectGenericFiles(urls, return_wildcards =None, merge_periods_on = None, \
                        return_combinations = None, **kwargs):
@@ -121,9 +121,7 @@ def selectGenericFiles(urls, return_wildcards =None, merge_periods_on = None, \
     - A la fin , on formatte le dictionnaire de valeurs de facettes qui est rendu
 
     """
-
-
-    rep = []
+    rep = list()
     #
     periods = None  # a list of periods available
     if return_wildcards is not None:
@@ -164,7 +162,8 @@ def selectGenericFiles(urls, return_wildcards =None, merge_periods_on = None, \
     for one_url in urls:
         # Some keywords in kwargs can have values of type 'set', which must then be
         # expanded by cartesian product
-        expanded_urls, simple_kwargs, kwargs = cartesian_product_substitute(one_url, **save_kwargs)
+        expanded_urls, simple_kwargs, kwargs = cartesian_product_substitute(one_url, skip_keys=["variable", ],
+                                                                            **save_kwargs)
         for url in expanded_urls :
             # First discard protocol prefix in url element
             remote_prefix, basename = mysplit(url)
