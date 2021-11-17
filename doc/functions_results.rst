@@ -23,8 +23,8 @@ cMA : get the Masked Array value of a CliMAF object
 
 .. autofunction:: climaf.driver.cMA
 
-cvalue : get the scalar value of a CliMAF scalar object 
---------------------------------------------------------
+cvalue : get the scalar value of a CliMAF object (at a given index)
+-------------------------------------------------------------------
 
 .. autofunction:: climaf.driver.cvalue
 
@@ -132,3 +132,7 @@ cprotect : protect a result's file against cdrop and craz
 
 .. autofunction:: climaf.cache.cprotect
 
+ccost : provide compute cost for an object
+-------------------------------------------
+
+.. autofunction:: climaf.cache.ccost

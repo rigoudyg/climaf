@@ -77,7 +77,8 @@ def bash_command_to_str(cmd):
     return str.replace(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).stdout.readlines()[0], '\n', '')
 
 
-if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") == "yes":
+if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") == "yes" and\
+   os.environ.get('IN_SPHINX', "no") == "no":
     print("python => " + sys.version)
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")
