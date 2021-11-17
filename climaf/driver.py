@@ -257,7 +257,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
             rep = ds.baseFiles()
             if not rep:
                 raise Climaf_Driver_Error("No file found for %s" % repr(ds))
-            return (rep, cache.compute_cost())  # first element is a single string with all filenames,
+            return rep, cache.compute_cost()  # first element is a single string with all filenames,
             # or a list of such strings in case of ensembles
         else:
             clogger.debug("Must subset and/or aggregate and/or select " +
@@ -287,7 +287,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         if userflags.canOpendap and format == 'file':
             clogger.debug("But user can OpenDAP ")
             cdedent()
-            return (ds.adressOf(), cache.compute_cost())
+            return ds.adressOf(), cache.compute_cost()
         else:
             if noselect(userflags, ds, format):
                 # ce cas-ci n'a jamais été activé !
@@ -296,7 +296,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 rep = ds.baseFiles()
                 if not rep:
                     raise Climaf_Driver_Error("No file found for %s" % repr(ds))
-                return (rep, cache.compute_cost())
+                return rep, cache.compute_cost()
             else:
                 # This matches reaching data using e.g. ftp
                 clogger.debug("Must remote read and cache ")
@@ -304,7 +304,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 ds.files = rep
                 userflags.unset_selectors()
                 cdedent()
-                return (rep, costs)
+                return rep, costs
 
 
 def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -333,7 +333,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return (filename, costs)
+            return filename, costs
         else:
             return cread(filename, classes.varOf(cobject)), costs
     if dig_hard_into_cache:
@@ -444,7 +444,7 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return (filename, costs)
+            return filename, costs
         else:
             return cread(filename, classes.varOf(cobject)), costs
     if dig_hard_into_cache:
@@ -499,7 +499,7 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
         # Re-evaluate, which should succeed using cache
         rep, costs = ceval(cobject, userflags, format, None, recurse_list=recurse_list)
         cdedent()
-        return (rep, costs)
+        return rep, costs
     else:
         raise Climaf_Driver_Error("generating script aborted for " + cobject.father.crs)
 
@@ -530,7 +530,7 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return (filename, costs)
+            return filename, costs
         else:
             return cread(filename, classes.varOf(cobject)), costs
     #
@@ -586,7 +586,7 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     file, costs = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format == 'file':
-        return (file, costs)
+        return file, costs
     else:
         return cread(file)  # !! Does it make sense ?
 
@@ -617,7 +617,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return (filename, costs)
+            return filename, costs
         else:
             return cread(filename, classes.varOf(cobject)), costs
     d = dict()
@@ -964,7 +964,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             for line in f.readlines():
                 sys.stdout.write(line)
     if script.outputFormat in none_formats:
-        return (None, (0.0))
+        return None, 0.0
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
     ok = cache.register(main_output_filename, scriptCall.crs, total_costs, subdict["out_final"])
@@ -1035,7 +1035,7 @@ def ceval_select(includer, included, userflags, format, deep, derived_list, recu
             exit()
     else:
         clogger.error("Can yet process only files - TBD")
-        return (None, cache.compute_cost())
+        return None, cache.compute_cost()
 
 
 def cread(datafile, varname=None, period=None):

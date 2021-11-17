@@ -394,7 +394,7 @@ def hasExactObject(cobject):
         if cobject.crs in crs2filename:
             clogger.debug("Dropping cobject.crs from cache index, because file is missing")
             crs2filename.pop(cobject.crs)
-        return (None, compute_cost())
+        return None, compute_cost()
 
 
 def complement(crsb, crse, crs):
@@ -1143,7 +1143,7 @@ def raz_cvalues():
         sync_cvalues()
 
 
-class compute_cost():
+class compute_cost(object):
     """
     Handling compute costs for objects : 
     - tc : a cost for all compute operations involved in object's genesis
