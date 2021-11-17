@@ -89,69 +89,69 @@ if not os.access(env.clogging.logdir, mode=os.W_OK):
 clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
 
 if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") != "no":
-    clogger.warning("python => " + sys.version)
-    clogger.warning("---")
-    clogger.warning("Required softwares to run CliMAF => you are using the following versions/installations:")
+    clogger.info("python => " + sys.version)
+    clogger.info("---")
+    clogger.info("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
         ncl_software = my_which("ncl")
-        clogger.warning("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)
+        clogger.info("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)
     except:
         ncl_software = None
-        clogger.warning("Warning: ncl not found -> can't use CliMAF plotting scripts")
+        clogger.warning("ncl not found -> can't use CliMAF plotting scripts")
     try:
         cdo_software = my_which("cdo")
         tmp = str.split(getstatusoutput(cdo_software + ' -V')[1], ' ')
-        clogger.warning("cdo " + tmp[tmp.index('version') + 1] + " => " + cdo_software)
+        clogger.info("cdo " + tmp[tmp.index('version') + 1] + " => " + cdo_software)
     except:
         cdo_software = None
-        clogger.warning("Error: cdo not found -> CDO is mandatory to run CliMAF")
+        clogger.error("cdo not found -> CDO is mandatory to run CliMAF")
     try:
         ncks_sofware = my_which("ncks")
         tmp = str.split(getstatusoutput(ncks_sofware + ' --version')[1], ' ')
-        clogger.warning("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + ncks_sofware)
+        clogger.info("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + ncks_sofware)
     except:
         ncks_sofware = None
-        clogger.warning("Warning: nco not found -> can't use nco from CliMAF")
+        clogger.warning("nco not found -> can't use nco from CliMAF")
     try:
         if atTGCC or atIPSL or onCiclad:
             ncdump_software = '/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump'
             ncdump_ret = getstatusoutput(ncdump_software)
-            clogger.warning("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + ncdump_software)
+            clogger.info("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + ncdump_software)
         else:
             ncdump_software = my_which("ncdump")
             binary_info = getstatusoutput(ncdump_software + " --version")[-1].split("\n")[-1]
             binary_info = binary_info.split("version")[-1].split("of")[0].strip()
-            clogger.warning("ncdump " + binary_info + " => " + ncdump_software)
+            clogger.info("ncdump " + binary_info + " => " + ncdump_software)
     except:
         ncdump_software = None
-        clogger.warning("Warning: ncdump not found -> can't use ncdump from CliMAF")
+        clogger.warning("ncdump not found -> can't use ncdump from CliMAF")
     # Check that tools for stamping are available or enforce stamping to None
-    clogger.warning("Check stamping requirements")
+    clogger.info("Check stamping requirements")
     do_stamping = True
     try:
         ncatted_software = my_which("ncatted")
-        clogger.warning("nco (ncatted) found -> " + ncatted_software)
+        clogger.info("nco (ncatted) found -> " + ncatted_software)
     except:
         ncatted_software = None
         clogger.warning("nco (ncatted) not available, can not stamp netcdf files")
         do_stamping = False
     try:
         convert_software = my_which("convert")
-        clogger.warning("convert found -> " + convert_software)
+        clogger.info("convert found -> " + convert_software)
     except:
         convert_software = None
         clogger.warning("convert not available, can not stamp png files")
         do_stamping = False
     try:
         pdftk_software = my_which("pdftk")
-        clogger.warning("pdftk found -> " + pdftk_software)
+        clogger.info("pdftk found -> " + pdftk_software)
     except:
         pdftk_software = None
         clogger.warning("pdftk not available, can not stamp pdf files")
         do_stamping = False
     try:
         exiv2_software = my_which("exiv2")
-        clogger.warning("exiv2 found -> " + exiv2_software)
+        clogger.info("exiv2 found -> " + exiv2_software)
     except:
         exiv2_software = None
         clogger.warning("exiv2 not available, can not stamp eps files")
@@ -159,4 +159,4 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") != "no":
     if not do_stamping and stamping is True:
         clogger.warning("At least one stamping requirement is not fulfilled, turn it to None.")
         stamping = None
-    clogger.warning("---")
+    clogger.info("---")
