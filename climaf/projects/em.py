@@ -65,9 +65,9 @@ if atCNRM:
 
     # User simulations
     pathg = "${root}/${group}/${simulation}/"
-    pathA = pathg + "${realm}/${simulation}PLYYYY.nc"  # GSAG
-    pathL = pathg + "${realm}/${simulation}SFXYYYY.nc"
-    pathI = pathg + "${realm}/${variable}_O1_YYYY-YYYY.nc"  # HISTNATr8
+    pathA = pathg + "${realm}/${simulation}PL${PERIOD}.nc"  # GSAG
+    pathL = pathg + "${realm}/${simulation}SFX${PERIOD}.nc"
+    pathI = pathg + "${realm}/${variable}_O1_${PERIOD}-${PERIOD}.nc"  # HISTNATr8
     pathO = pathg + "${realm}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc"  # var:T_table2.2
     pathO2 = pathg + "${realm}/${simulation}_1${frequency}_${PERIOD}_scalar_table2.2.nc"  # PICTLWS2, PRE6CPLCr2alb
 
@@ -75,8 +75,8 @@ if atCNRM:
 
     # Shared simulations - example : group=SC
     pathg = "/cnrm/cmip/cnrm/simulations/${group}/"
-    pathgA = pathg + "${realm}/Regu/${frequency}/${simulation}/${simulation}PLYYYY.nc"  # C1P60
-    pathgL = pathg + "${realm}/Regu/${frequency}/${simulation}/${simulation}SFXYYYY.nc"  # C1P60
+    pathgA = pathg + "${realm}/Regu/${frequency}/${simulation}/${simulation}PL${PERIOD}.nc"  # C1P60
+    pathgL = pathg + "${realm}/Regu/${frequency}/${simulation}/${simulation}SFX${PERIOD}.nc"  # C1P60
     pathgI = pathg + "${realm}/Origin/Monthly/${simulation}/${variable}_O1_${PERIOD}.nc"  # HISTNATr8
     pathgO = pathg + "${realm}/Origin/Monthly/${simulation}/${simulation}_1${frequency}_${PERIOD}_grid_${variable}.nc"
 

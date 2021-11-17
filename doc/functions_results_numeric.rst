@@ -1,3 +1,6 @@
+Functions for managing numerical results
+========================================
+
 cfile : get the file value of a CliMAF object 
 ----------------------------------------------
 

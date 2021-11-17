@@ -12,6 +12,9 @@ Changes, newest first:
     updated on exit, and with Python 3, it was not read at
     startup. Errors related to reading / writing cache are no more
     hidden.
+  - Fix `issue 193<https://github.com/rigoudyg/climaf/issues/193>` regarding behaviour of listfiles
+    for ambiguous cases
+
 
 - V2.0.1:
 
