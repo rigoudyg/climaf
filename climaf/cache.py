@@ -416,7 +416,7 @@ def complement(crsb, crse, crs):
     tim1 = time.time()
     command = "ncrcat -O %s %s %s" % (fileb, filee, filet)
     duration = time.time() - tim1
-    total_costs.increment(duration)
+    costs.increment(duration)
     if os.system(command) != 0:
         clogger.error("Issue when merging %s and %s in %s (using command:%s)" % (crsb, crse, crs, command))
         return None, costs
