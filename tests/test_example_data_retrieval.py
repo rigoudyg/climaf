@@ -10,6 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import unittest
 
+import env
 from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
 
 from climaf.cache import setNewUniqueCache
@@ -43,6 +44,7 @@ class DataRetrieval_1(unittest.TestCase):
 
     @skipUnless_CNRM_Lustre()
     def test_retrieval_subperiod_1(self):
+        env.environment.optimize_cmip6_wildcards = False
         derive('*', 'rls', 'minus', 'rlds', 'rlus')
         g = ds(project='CMIP6', period='1850-1854', variable='rls', model='CNRM-CM6-1')
         climaf_ds = ccdo(ccdo(g, operator='fldmean'), operator='yearavg')
@@ -56,6 +58,20 @@ class DataRetrieval_1(unittest.TestCase):
         self.assertEqual(str(climaf_ds),
                          "ccdo(ccdo(ds('CMIP6%%rls%1852-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%g*%"
                          "latest'),operator='fldmean'),operator='yearavg')")
+        cMA(climaf_ds)
+        env.environment.optimize_cmip6_wildcards = True
+        g = ds(project='CMIP6', period='1850-1852', variable='rls', model='CNRM-CM6-1')
+        climaf_ds = ccdo(ccdo(g, operator='fldmean'), operator='yearavg')
+        self.assertEqual(str(climaf_ds),
+                         "ccdo(ccdo(ds('CMIP6%%rls%1850-1852%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%g*%"
+                         "latest'),operator='fldmean'),operator='yearavg')")
+        with self.assertRaises(ValueError):
+            cMA(climaf_ds)
+        g = ds(project='CMIP6', period='1850-1852', variable='rls', model='CNRM-CM6-1', table="Amon")
+        climaf_ds = ccdo(ccdo(g, operator='fldmean'), operator='yearavg')
+        self.assertEqual(str(climaf_ds),
+                         "ccdo(ccdo(ds('CMIP6%%rls%1850-1852%global%/cnrm/cmip%CNRM-CM6-1%*%*%Amon%historical%r1i1p1f*%"
+                         "g*%latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
 
 

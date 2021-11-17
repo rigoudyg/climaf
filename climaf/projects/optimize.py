@@ -27,6 +27,7 @@ import env
 
 dirnames = dict()
 
+
 def wild(c):
     return "?" in c or "*" in c
 
@@ -394,8 +395,6 @@ def clear_tables(pattern = None):
 
 def _build_filename(case_name):
     return env.environment.currentCache + "/" + case_name +".json"
-    
-
 
 
 def possible_values(project, tag, root, key, value_pattern):
