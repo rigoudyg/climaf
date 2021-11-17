@@ -792,9 +792,9 @@ class cdataset(cobject):
                 self.explore()
             else:
                 cases = self.explore(option='choices')
-                list_keys = [ k for k in cases if type(cases[k]) is list and k != 'period' ]
+                list_keys = [k for k in cases if type(cases[k]) is list and k != 'period']
                 if len(list_keys) > 0:
-                    clogger.error("The dataset is ambiguous on %s; its CRS is %s"%(cases,self))
+                    clogger.error("The dataset is ambiguous on %s; its CRS is %s" % (cases, self))
                     return None
         return self.files
 

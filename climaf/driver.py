@@ -242,10 +242,8 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
             # and return it
             derived = derive_variable(ds)
             clogger.debug("evaluating derived variable %s as %s" % (ds.variable, repr(derived)))
-            derived_value, costs = ceval(derived, format=format, deep=deep,
-                                  userflags=userflags,
-                                  derived_list=derived_list + [ds.variable],
-                                  recurse_list=recurse_list)
+            derived_value, costs = ceval(derived, format=format, deep=deep, userflags=userflags,
+                                         derived_list=derived_list + [ds.variable], recurse_list=recurse_list)
             if derived_value:
                 clogger.debug("succeeded in evaluating derived variable %s as %s" % (ds.variable, repr(derived)))
                 set_variable(derived_value, ds.variable, format=format)
@@ -306,7 +304,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 ds.files = rep
                 userflags.unset_selectors()
                 cdedent()
-                return (rep,costs)
+                return (rep, costs)
 
 
 def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -391,7 +389,7 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     if cobject.operator in cscripts:
         clogger.debug("Script %s found" % cobject.operator)
         file, costs = ceval_script(cobject, down_deep,
-                            recurse_list=recurse_list)  # Does return a filename, or list of filenames
+                                   recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
         if format in ['file', ]:
             return file, costs
@@ -633,7 +631,7 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     if format == "file":
         files = reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
         total_cost = cache.compute_cost()
-        for m in cobject.order :
+        for m in cobject.order:
             total_cost.add(costs[m])
         return files, total_cost
     else:
@@ -729,10 +727,10 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             if scriptCall.operator != 'remote_select' and \
                     isinstance(op, classes.cdataset) and \
                     not (op.isLocal() or op.isCached()):
-                inValue , costs = ceval(op, format='file', deep=deep)
+                inValue, costs = ceval(op, format='file', deep=deep)
             else:
-                inValue , costs = ceval(op, userflags=scriptCall.flags, format='file', deep=deep,
-                                recurse_list=recurse_list)
+                inValue, costs = ceval(op, userflags=scriptCall.flags, format='file', deep=deep,
+                                       recurse_list=recurse_list)
             clogger.debug("evaluating %s operand %s as %s" % (scriptCall.operator, op, inValue))
             if inValue in [None, ""]:
                 raise Climaf_Driver_Error("When evaluating %s : value for %s is None" % (scriptCall.script, repr(op)))
@@ -1234,7 +1232,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
     if target is None:
         return result
     else:
-        if type(object) is classes.cens :
+        if type(object) is classes.cens:
             clogger.error("Cannot create a single file hosting an ensemble. See function efile()")
             return None
         target = os.path.abspath(os.path.expanduser(target))
@@ -1290,7 +1288,7 @@ def cshow(obj):
     ( launch computation if needed. )
     """
     clogger.debug("cshow called on " + str(obj))
-    value, costs= climaf.driver.ceval(obj, format='MaskedArray')
+    value, costs = climaf.driver.ceval(obj, format='MaskedArray')
     return value
 
 
@@ -1311,7 +1309,7 @@ def cMA(obj, deep=None):
 
     """
     clogger.debug("cMA called with arguments : " + str(obj))
-    value, costs= climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
+    value, costs = climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
     return value
 
 
@@ -1338,13 +1336,14 @@ def cvalue(obj, index=0, deep=None, cost=None):
     else:
         rep = None
     if rep is None:
-        value, costs= ceval(obj, format='MaskedArray', deep=deep)
+        value, costs = ceval(obj, format='MaskedArray', deep=deep)
         rep = float(value.data.flat[index])
         cache.store_cvalue(obj.crs, index, rep, costs)
     if cost: 
         return rep, costs.tc
     else:
         return rep    
+
 
 def cexport(*args, **kwargs):
     """ Alias for climaf.driver.ceval. Create synonyms for arg 'format'
@@ -1520,7 +1519,7 @@ def cfilePage(cobj, deep, recurse_list=None):
     if cache.register(out_fig, cobj.crs, total_costs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
         return out_fig, total_costs
-    else :
+    else:
         return None, cache.compute_cost()
 
 
@@ -1613,7 +1612,7 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     if cache.register(out_fig, cobj.crs, total_costs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
         return out_fig, total_costs
-    else :
+    else:
         return None, cache.compute_cost()
 
 

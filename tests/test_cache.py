@@ -322,12 +322,13 @@ class RebuildTests(unittest.TestCase):
 
 
 class CCostTest(unittest.TestCase):
-    def test_ccost(self) :
+    def test_ccost(self):
         rst = ds(project="example", simulation="AMIPV6ALB2G",
                  variable="rstcs", period="1980")
         cdrop(rst)
         cfile(rst)
         ccost(rst)
+
 
 if __name__ == '__main__':
     # Jump into the test directory

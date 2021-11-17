@@ -303,12 +303,12 @@ class EfileTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
-    remove_dir_and_content(tmp_directory)
-    if not os.path.isdir(tmp_directory):
-        os.makedirs(tmp_directory)
-    setNewUniqueCache(tmp_directory)
-    os.chdir(tmp_directory)
-    unittest.main()
-    remove_dir_and_content(tmp_directory)
+	# Jump into the test directory
+	tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
+	remove_dir_and_content(tmp_directory)
+	if not os.path.isdir(tmp_directory):
+		os.makedirs(tmp_directory)
+	setNewUniqueCache(tmp_directory)
+	os.chdir(tmp_directory)
+	unittest.main()
+	remove_dir_and_content(tmp_directory)
