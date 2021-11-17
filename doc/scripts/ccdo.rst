@@ -5,7 +5,7 @@ ccdo : |sk| invoke CDO with a unary operator
 
 Apply CDO on a single dataset or object, with a CDO operator as argument 
 
-**References** : https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html
+**References** : https://code.zmaw.de/projects/cdo/embedded/index.html
 
 **Provider / contact** : climaf at meteo dot fr
 

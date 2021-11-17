@@ -352,7 +352,10 @@ class cdataset(cobject):
 
         Some attributes have a special format or processing :
 
-        - period : see :py:func:`~climaf.period.init_period`
+        - period : see :py:func:`~climaf.period.init_period`. See also  
+          function :py:func:`climaf.classes.ds` for added
+          flexibility in defining periods as last of first set of years 
+          among available data
 
         - domain : allowed values are either 'global' or a list for
           latlon corners ordered as in : [ latmin, latmax, lonmin,
@@ -781,13 +784,18 @@ class cdataset(cobject):
         for the dataset
 
         Use cached value (i.e. attribute 'files') unless called with arg force=True
+
         If ensure_dataset is True, forbid ambiguous datasets
         """
         if (force and self.project != 'file') or self.files is None:
             if ensure_dataset:
                 self.explore()
             else:
-                self.explore(option='choices')
+                cases = self.explore(option='choices')
+                list_keys = [ k for k in cases if type(cases[k]) is list and k != 'period' ]
+                if len(list_keys) > 0:
+                    clogger.error("The dataset is ambiguous on %s; its CRS is %s"%(cases,self))
+                    return None
         return self.files
 
     def listfiles(self, force=False, ensure_dataset=True):
@@ -795,6 +803,7 @@ class cdataset(cobject):
         for the dataset
 
         Use cached value unless called with arg force=True
+
         If ensure_dataset is True, forbid ambiguous datasets
         """
         return self.baseFiles(force=force, ensure_dataset=ensure_dataset)

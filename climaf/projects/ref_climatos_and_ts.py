@@ -101,6 +101,5 @@ cdef('table', '*', project='ref_ts')
 calias(project='ref_ts', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
 
 if root:
-    # pattern1=root+"ts/*/${frequency}/${variable}/${variable}_*mon_${product}*_YYYYMM-YYYYMM.nc"
     pattern1 = root + "ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
     dataloc(project='ref_ts', organization='generic', url=[pattern1])

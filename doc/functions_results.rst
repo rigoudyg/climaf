@@ -47,36 +47,50 @@ html : create an html index, with tables of links to figures
 ------------------------------------------------------------
 
 .. automodule:: climaf.html
+   :noindex:
 
 .. autofunction:: climaf.html.header
+   :noindex:
 
 .. autofunction:: climaf.html.trailer
+   :noindex:
 
 .. autofunction:: climaf.html.section
+   :noindex:
 
 .. autofunction:: climaf.html.open_table
+   :noindex:
 
 .. autofunction:: climaf.html.close_table
+   :noindex:
 
 .. autofunction:: climaf.html.open_line
+   :noindex:
 
 .. autofunction:: climaf.html.close_line
+   :noindex:
 
 .. autofunction:: climaf.html.line
+   :noindex:
 
 .. autofunction:: climaf.html.link
+   :noindex:
 
 .. autofunction:: climaf.html.link_on_its_own_line
+   :noindex:
 
 .. autofunction:: climaf.html.cell
+   :noindex:
 
 .. autofunction:: climaf.html.fline
+   :noindex:
 
 .. autofunction:: climaf.html.flines
+   :noindex:
 
 .. autofunction:: climaf.html.vspace
-
-
+   :noindex:
+   
 
 clist : tell what's in cache, and much more
 -------------------------------------------
@@ -118,13 +132,7 @@ cprotect : protect a result's file against cdrop and craz
 
 .. autofunction:: climaf.cache.cprotect
 
-
 ccost : provide compute cost for an object
 -------------------------------------------
 
 .. autofunction:: climaf.cache.ccost
-
-		  
-
-
-

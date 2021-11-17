@@ -1,6 +1,5 @@
-
-functions for inspecting data
-====================================================================================================
+Functions for inspecting data
+===============================================================================
 
 summary : describe files associated with a dataset
 ---------------------------------------------------
@@ -17,8 +16,8 @@ cshow : dump an object
    :noindex:
 
 
-functions to create images, and to display datasets and images
-====================================================================================================
+Functions to create images, and to display datasets and images
+================================================================================
 
 Warning
 ------------
@@ -65,8 +64,8 @@ cshow : display a figure using 'display'
 .. autofunction:: climaf.driver.cshow
    :noindex:
 
-functions for assembling figures in pages 
-====================================================================================================
+Functions for assembling figures in pages 
+==============================================================
 
 For choosing between next two fuctnions, see the :ref:`Note on figure pages <note_on_figure_pages>`
 
@@ -82,51 +81,37 @@ cpage_pdf : create an array of figures (output: 'pdf' figure)
 .. autoclass:: climaf.classes.cpage_pdf
    :noindex:
 
+
 html : package for creating an html index, with tables of links to figures
-====================================================================================================
+--------------------------------------------------------------------------
 
 .. automodule:: climaf.html
-   :noindex:
 
 .. autofunction:: climaf.html.header
-   :noindex:
 
 .. autofunction:: climaf.html.trailer
-   :noindex:
 
 .. autofunction:: climaf.html.section
-   :noindex:
 
 .. autofunction:: climaf.html.open_table
-   :noindex:
 
 .. autofunction:: climaf.html.close_table
-   :noindex:
 
 .. autofunction:: climaf.html.open_line
-   :noindex:
 
 .. autofunction:: climaf.html.close_line
-   :noindex:
 
 .. autofunction:: climaf.html.line
-   :noindex:
 
 .. autofunction:: climaf.html.link
-   :noindex:
 
 .. autofunction:: climaf.html.link_on_its_own_line
-   :noindex:
 
 .. autofunction:: climaf.html.cell
-   :noindex:
 
 .. autofunction:: climaf.html.fline
-   :noindex:
 
 .. autofunction:: climaf.html.flines
-   :noindex:
 
 .. autofunction:: climaf.html.vspace
-   :noindex:
-   
+
