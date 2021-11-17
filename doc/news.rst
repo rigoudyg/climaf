@@ -8,8 +8,13 @@ Changes, newest first:
 
 - V2.0.2:
 
+  - two bugs related ot cache were fixed : cache content was not
+    updated on exit, and with Python 3, it was not read at
+    startup. Errors related to reading / writing cache are no more
+    hidden.
   - Fix `issue 193<https://github.com/rigoudyg/climaf/issues/193>` regarding behaviour of listfiles
     for ambiguous cases
+
 
 - V2.0.1:
 

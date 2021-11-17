@@ -129,6 +129,7 @@ if not already_inited and not onrtd:
     cache.cload()
     tim("cload")
     #
+    atexit.register(cache.csync)
     atexit.register(cache.sync_cvalues)
     atexit.register(cmacro.write, macroFilename)
     tim("atexit")
