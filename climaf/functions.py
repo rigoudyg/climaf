@@ -176,7 +176,7 @@ def fadd(dat1, dat2):
 
 def fsub(dat1, dat2):
     """
-    Substraction of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    Substraction of two CliMAF object, or substraction of the CliMAF object given as first argument
     and a constant as second argument (string, float or integer)
 
     Shortcut to ccdo(dat,operator='subc,'+str(c)) and ccdo2(dat1,dat2,operator='sub')

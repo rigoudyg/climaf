@@ -27,8 +27,8 @@ cpath = os.path.abspath(cpath[0])
 cproject("example", ("frequency", "monthly"), separator='|')
 cfreqs('example', {'monthly': 'mon'})
 
-data_pattern_L = cpath + "/../examples/data/${simulation}/L/${simulation}SFXYYYY.nc"
-data_pattern_A = cpath + "/../examples/data/${simulation}/A/${simulation}PLYYYY.nc"
+data_pattern_L = cpath + "/../examples/data/${simulation}/L/${simulation}SFX${PERIOD}.nc"
+data_pattern_A = cpath + "/../examples/data/${simulation}/A/${simulation}PL${PERIOD}.nc"
 data_pattern_histmth = cpath + "/../examples/data/${simulation}_SE_1982_1991_1M_ua_pres.nc"
 dataloc(project="example", organization="generic", url=[data_pattern_A, data_pattern_L, data_pattern_histmth])
 
