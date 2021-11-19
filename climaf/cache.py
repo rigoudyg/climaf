@@ -20,7 +20,6 @@ import uuid
 import hashlib
 import json
 from operator import itemgetter
-import functools
 
 from env.environment import *
 from climaf import version

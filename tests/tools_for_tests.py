@@ -142,8 +142,8 @@ def compare_picture_files(object_test, fic_ref, display=False, display_error=Tru
             files_format = files_format[0]
         if files_format not in ["png", "eps", "jpeg", "pdf"]:
             raise ValueError("Unknown format found %s" % files_format)
-        if xdg_bin and files_format in ["eps", "pdf"]:
-            display_cmd = "xdg-open {}"
+        if xdg_bin is not None and files_format in ["eps", "pdf"]:
+            display_cmd = "%s {}" % xdg_bin
         else:
             display_cmd = "display {}"
         diff_file = file_test + "_diff.{}".format(files_format)

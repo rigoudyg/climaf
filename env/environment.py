@@ -77,6 +77,14 @@ def bash_command_to_str(cmd):
     return str.replace(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).stdout.readlines()[0], '\n', '')
 
 
+# Check if xdg-open is available
+try:
+    xdg_bin = my_which("xdg-open")
+    print("xdg-open is available")
+except:
+    xdg_bin = None
+    print("Warning: could not find xdg-open")
+
 if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") == "yes" and\
    os.environ.get('IN_SPHINX', "no") == "no":
     print("python => " + sys.version)

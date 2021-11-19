@@ -16,7 +16,7 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "projects", "derived_variables"]
 
 
-version = "2.0.0"
+version = "2.0.2"
 
 
 def tim(string=None):
@@ -35,12 +35,8 @@ def tim(string=None):
             print("Duration %.1f for step %s" % (delta, string), file=sys.stderr)
 
 
-xdg_bin = False
-if os.system("type xdg-open >/dev/null 2>&1") == 0:
-    xdg_bin = True
-
 already_inited = False
-onrtd = os.environ.get('READTHEDOCS', None) == 'True'
+onrtd = os.environ.get('READTHEDOCS', None) in ['True', ]
 
 if not already_inited and not onrtd:
     import sys
@@ -75,10 +71,10 @@ if not already_inited and not onrtd:
             os.remove(os.environ["TMPDIR"])
         os.makedirs(os.environ["TMPDIR"])
 
-    logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+    logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", logdir))
     #
     # Set default logging levels
-    clogging.logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+    clogging.logdir = logdir
     clogging.clog(os.getenv("CLIMAF_LOG_LEVEL", "warning"))
     clogging.clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
     tim("loggings")
@@ -116,7 +112,7 @@ if not already_inited and not onrtd:
     #
     # Load cache scalar values 
     cache.load_cvalues()
-    tim("cload_values")
+    tim("load_cvalues")
     #
     # Init and load macros
     macroFilename = os.environ.get("CLIMAF_MACROS", "~/.climaf.macros")

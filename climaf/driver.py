@@ -14,7 +14,6 @@ import sys
 import os
 import os.path
 import re
-import posixpath
 import subprocess
 import time
 import shutil
@@ -34,6 +33,7 @@ except ImportError:
 
 
 # Climaf modules
+from env.environment import *
 import climaf
 from climaf.operators_scripts import scriptFlags
 from climaf.operators_derive import is_derived_variable, derived_variable, derive
@@ -42,10 +42,7 @@ from climaf import cache
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import init_period, cperiod, merge_periods
-from climaf import xdg_bin
-from climaf.classes import allow_errors_on_ds_call
-from env.environment import *
+from climaf.period import init_period, merge_periods
 
 
 # When evaluating an object, default behaviour is to search cache for including or begin objects
@@ -1042,11 +1039,13 @@ def cread(datafile, varname=None, period=None):
     import re
     if not datafile:
         return None
-    if re.findall(".png$", datafile) or \
-            ((re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and (not xdg_bin)):
+    if re.findall(".png$", datafile):
         subprocess.Popen(["display", datafile, "&"])
-    elif (re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and xdg_bin:
-        subprocess.Popen(["xdg-open", datafile])
+    elif re.findall(".pdf$", datafile) or re.findall(".eps$", datafile):
+        if xdg_bin is None:
+            subprocess.Popen(["display", datafile, "&"])
+        else:
+            subprocess.Popen([xdg_bin, datafile])
     elif re.findall(".nc$", datafile):
         clogger.debug("reading NetCDF file %s" % datafile)
         if varname is None:
@@ -1077,11 +1076,13 @@ def cread(datafile, varname=None, period=None):
 
 
 def cview(datafile):
-    if re.findall(".png$", datafile) or \
-            ((re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and (not xdg_bin)):
+    if re.findall(".png$", datafile):
         subprocess.Popen(["display", datafile, "&"])
-    elif (re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and xdg_bin:
-        subprocess.Popen(["xdg-open", datafile])
+    elif re.findall(".pdf$", datafile) or re.findall(".eps$", datafile):
+        if xdg_bin is None:
+            subprocess.Popen(["display", datafile, "&"])
+        else:
+            subprocess.Popen([xdg_bin, datafile])
     else:
         clogger.error("cannot yet handle %s" % datafile)
         return None
