@@ -10,7 +10,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 # Created : S.Senesi - 2014
 
-import os
 import re
 import time
 import shutil
