@@ -10,12 +10,10 @@ Handles a database of attributes for describing organization and location of dat
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import os
 import six
 import os.path
 import re
 import glob
-import subprocess
 from string import Template
 import ftplib as ftp
 import getpass
@@ -116,7 +114,7 @@ class dataloc(object):
 
         For the sake of brievity, each attribute can have the '*'
         wildcard value; when using the dictionary, the most specific
-        entries will be used (whic means : the entry (or entries) with the lowest number of wildcards)
+        entries will be used (which means : the entry (or entries) with the lowest number of wildcards)
 
         Example :
 

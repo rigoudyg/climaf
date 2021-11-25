@@ -15,10 +15,9 @@ Example for an OBS4MIPS CMIP5 dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import os.path
 
-from env.environment import *
 from env.site_settings import atCNRM
+from env.environment import *
 
 
 if atCNRM:

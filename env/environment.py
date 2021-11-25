@@ -58,7 +58,24 @@ none_formats = [None, 'txt']
 locs = list()
 
 #: Log directory
-logdir = "."
+logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+
+#: Log level
+loglevel = os.getenv("CLIMAF_LOG_LEVEL", "warning")
+
+#: Log file level
+logfilelevel = os.getenv("CLIMAF_LOGFILE_LEVEL", "info")
+
+#: Default cache directory
+if onCiclad:
+    default_cache = "/data/{}/climaf_cache".format(os.getenv("USER"))
+else:
+    default_cache = "~/tmp/climaf_cache"
+default_cache = os.getenv("CLIMAF_CACHE", default_cache)
+
+#: Default remote cache directory
+default_remote_cache = os.getenv("CLIMAF_REMOTE_CACHE", os.sep.join([default_cache, "remote_data"]))
+
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
@@ -73,11 +90,16 @@ def my_which(soft):
     return rep
 
 
-def bash_command_to_str(cmd):
-    return str.replace(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).stdout.readlines()[0], '\n', '')
+# Ensure that the variable TMPDIR, if defined, points to an existing directory
+if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
+    # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
+    tmpdir = os.environ["TMPDIR"]
+    if os.path.exists(tmpdir):
+        os.remove(tmpdir)
+    os.makedirs(tmpdir)
 
 
-# Check if xdg-open is available
+# Check dependencies
 try:
     xdg_bin = my_which("xdg-open")
     print("xdg-open is available")

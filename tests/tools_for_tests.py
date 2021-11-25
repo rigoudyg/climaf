@@ -7,16 +7,12 @@ Tools to deal with tests.
 
 from __future__ import unicode_literals, absolute_import, print_function, division
 
-import os
-import subprocess
 import unittest
 import re
-import sys
 import six
 
-from climaf.api import cshow, ncview, cfile
-from climaf import xdg_bin
 from env.environment import *
+from climaf.api import cshow, ncview, cfile
 
 
 def skipUnless_CNRM_Lustre():

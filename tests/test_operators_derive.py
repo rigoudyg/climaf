@@ -11,11 +11,11 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator
 from climaf.operators_derive import derive, is_derived_variable, derived_variable, Climaf_Operator_Error
-from env.environment import *
 
 
 class DeriveTest(unittest.TestCase):

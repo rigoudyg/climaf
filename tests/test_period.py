@@ -12,12 +12,12 @@ import unittest
 from datetime import datetime, timedelta
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_periods_list, merge_periods, \
     intersect_periods_list, lastyears, firstyears
 
 from climaf.cache import setNewUniqueCache
-from env.environment import *
 
 
 class CreatePeriodDefinedTests(unittest.TestCase):

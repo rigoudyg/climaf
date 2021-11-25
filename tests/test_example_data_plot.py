@@ -11,12 +11,12 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as cpath
 from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
     cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
-from env.environment import *
 
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)

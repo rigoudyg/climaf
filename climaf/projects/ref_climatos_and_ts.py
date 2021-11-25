@@ -46,10 +46,10 @@ Example of a 'ref_ts' project dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
 
 root = None
 

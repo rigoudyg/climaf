@@ -22,11 +22,11 @@ import json
 from operator import itemgetter
 
 from env.environment import *
+from env.clogging import clogger
 from climaf import version
 from climaf.utils import Climaf_Cache_Error, Climaf_Error
 from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
 from climaf.cmacro import crewrite
-from env.clogging import clogger
 
 currentCache = None
 cachedirs = None
@@ -839,7 +839,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     # filter on pattern
     find_pattern = False
     if pattern:
-        list_crs_to_rm = []
+        list_crs_to_rm = list()
         for crs in new_dict:
             if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs]):
                 clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs]))

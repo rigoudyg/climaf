@@ -7,11 +7,10 @@ Test the classes module.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
-
+from env.environment import *
 from climaf.cache import setNewUniqueCache
 from climaf.driver import cfile
 from climaf.classes import ds
@@ -19,7 +18,7 @@ from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub
     implot, diff_regrid, diff_regridn, tableau, annual_cycle, clim_average, clim_average_fast, summary, projects, \
     lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
     ts_plot, iplot_members
-from env.environment import *
+
 
 
 class CscalarTests(unittest.TestCase):

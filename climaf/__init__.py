@@ -64,33 +64,19 @@ if not already_inited and not onrtd:
 
     tim("imports")
     #
-    # Check that the variable TMPDIR, if defined, points to an existing directory
-    if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
-        # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
-        if os.path.exists(os.environ["TMPDIR"]):
-            os.remove(os.environ["TMPDIR"])
-        os.makedirs(os.environ["TMPDIR"])
-
-    logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", logdir))
-    #
     # Set default logging levels
     clogging.logdir = logdir
-    clogging.clog(os.getenv("CLIMAF_LOG_LEVEL", "warning"))
-    clogging.clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
+    clogging.clog(loglevel)
+    clogging.clog_file(logfilelevel)
     tim("loggings")
     #
     # Decide for cache location
-    if site_settings.onCiclad:
-        default_cache = "/data/" + os.getenv("USER") + "/climaf_cache"
-    else:
-        default_cache = "~/tmp/climaf_cache"
-    cachedir = os.getenv("CLIMAF_CACHE", default_cache)
-    cache.setNewUniqueCache(cachedir, raz=False)
-    print("Cache directory set to : " + cachedir + " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
+    cachedir = default_cache # TODO: For compatibility, delete ones useless
+    cache.setNewUniqueCache(default_cache, raz=False)
+    print("Cache directory set to : " + default_cache + " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
     tim("set cache")
     # Decide for cache location for remote data
-    remote_cachedir = os.getenv("CLIMAF_REMOTE_CACHE", cachedir + "/remote_data")
-    print("Cache directory for remote data set to : " + remote_cachedir + " (use $CLIMAF_REMOTE_CACHE if set) ",
+    print("Cache directory for remote data set to : " + default_remote_cache + " (use $CLIMAF_REMOTE_CACHE if set) ",
           file=sys.stderr)
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main

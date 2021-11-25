@@ -8,15 +8,14 @@ Test the cache module.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import shutil
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 
+from env.environment import *
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
-from env.environment import *
 
 from climaf.cache import setNewUniqueCache, generateUniqueFileName, hash_to_path, alternate_filename, stringToPath, \
     searchFile, register, getCRS, rename, hasMatchingObject, hasIncludingObject, hasBeginObject, hasExactObject, \
@@ -203,13 +202,12 @@ class CdumpTests(unittest.TestCase):
 class ListCacheTests(unittest.TestCase):
 
     def test_list_cache(self):
-        import os
         from climaf.cache import cachedirs
         list_ref = list()
         for cachedir in cachedirs:
             for (d, subd, files) in os.walk(cachedir):
                 for f in files:
-                    if True in [f.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]]:
+                    if any([f.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]]):
                         list_ref.append(os.path.sep.join([d, f]))
         self.assertEqual(list_cache(), list_ref)
 
@@ -219,7 +217,6 @@ class ClistTests(unittest.TestCase):
     @unittest.skipUnless(False, "The test is not written")
     def test_clist(self):
         # TODO: Implement the tests for this function
-        import os
         from climaf.cache import cachedirs
         # TODO: Once implemented, deal with several cachedirs
         cachedir = cachedirs[0]

@@ -11,12 +11,11 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
-
+from env.environment import *
 from climaf.cache import setNewUniqueCache
 from climaf.api import *
 from climaf.classes import ctree, cdummy, scriptChild
 from climaf.cmacro import macro, crewrite, cmatch, read, write, show, instantiate, Climaf_Macro_Error
-from env.environment import *
 
 
 class MacroTests(unittest.TestCase):

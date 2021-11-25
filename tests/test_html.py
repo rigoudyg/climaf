@@ -7,11 +7,11 @@ Test the html module.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import unittest
 import string
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache
 from climaf import __file__ as climaf_based_file
@@ -20,7 +20,6 @@ from climaf.driver import cfile
 from climaf.html import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
-from env.environment import *
 
 
 class HeaderTests(unittest.TestCase):

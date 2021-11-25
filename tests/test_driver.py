@@ -11,7 +11,8 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
-
+from env.environment import *
+from env.site_settings import atCNRM, onCiclad
 from climaf.cache import setNewUniqueCache
 from climaf.driver import capply, capply_script, maketree, capply_operator, ceval_for_cdataset, ceval_for_ctree, \
 	ceval_operator, cstore, ceval_for_scriptChild, ceval_for_cpage, ceval_for_cpage_pdf, ceval_for_cens, \
@@ -20,8 +21,6 @@ from climaf.driver import capply, capply_script, maketree, capply_operator, ceva
 	efile, Climaf_Driver_Error
 from climaf.classes import ds
 from climaf.period import Climaf_Period_Error, init_period
-from env.environment import *
-from env.site_settings import atCNRM, onCiclad
 
 
 class CapplyTests(unittest.TestCase):

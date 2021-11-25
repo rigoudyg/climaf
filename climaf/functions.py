@@ -3,16 +3,17 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from six import string_types
+import numpy as np
+
+from env.clogging import clogger
+from env.environment import *
 from climaf.utils import Climaf_Error
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue, cfile
 from climaf import classes
-from env.clogging import clogger
-from env.environment import *
-from six import string_types
 
-import numpy as np
 
 
 def cscalar(dat):

@@ -12,6 +12,7 @@ import unittest
 
 from tests.tools_for_tests import remove_dir_and_content, compare_netcdf_files, compare_text_files
 
+from env.environment import *
 from climaf.cache import setNewUniqueCache
 from climaf import __path__ as rootpath
 

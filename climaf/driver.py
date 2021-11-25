@@ -10,11 +10,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 # Created : S.Senesi - 2014
 
-import sys
 import os
-import os.path
 import re
-import subprocess
 import time
 import shutil
 import copy
@@ -24,7 +21,6 @@ from datetime import datetime
 from functools import reduce
 from six import string_types
 
-from climaf.utils import Climaf_Classes_Error
 
 try:
     from commands import getoutput, getstatusoutput
@@ -210,11 +206,9 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         if len(ds_ambiguous_args) != 0:
             clogger.warning("Before doing a cfile on the dataset %s, check that it "
                             "is completely defined with 'explore'." % cobject.crs)
-            # try:
-            #     ds = ds.explore("resolve")
-            # except Climaf_Classes_Error:
-            #     clogger.error("Could not resolve the dataset %s" % cobject.crs)
-            return None, None
+            ds = ds.explore("resolve")
+            clogger.warning("Update dataset %s with the following arguments: %s" % (cobject.crs,
+                                                                                    str(ds_ambiguous_args)))
     cache_value, costs = cache.hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)

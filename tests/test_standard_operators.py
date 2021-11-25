@@ -11,10 +11,10 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache
 from climaf.standard_operators import load_standard_operators
-from env.environment import *
 
 
 class StandardOperatorsTests(unittest.TestCase):

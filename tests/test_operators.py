@@ -11,10 +11,10 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.cache import setNewUniqueCache
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator, Climaf_Operator_Error
-from env.environment import *
 
 
 class CscriptTest(unittest.TestCase):

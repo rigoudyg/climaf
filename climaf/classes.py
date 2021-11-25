@@ -538,6 +538,33 @@ class cdataset(cobject):
                 return False
         return True
 
+    def check_if_dict_ambiguous(self, input_dict):
+        ambiguous_dict = dict()
+        non_ambigous_dict = dict()
+        for (kw, val) in input_dict.items():
+            if isinstance(val, list):
+                if len(val) > 1:
+                    ambiguous_dict[kw] = val
+                else:
+                    non_ambigous_dict[kw] = val[0]
+            elif kw in ['variable', ]:  # Should take care of aliasing to fileVar
+                matching_vars = set()
+                paliases = aliases.get(self.project, [])
+                for variable in paliases:
+                    if val == paliases[variable][0]:
+                        matching_vars.add(variable)
+                if len(matching_vars) == 0:
+                    # No filename variable in aliases matches actual filename
+                    non_ambigous_dict[kw] = val
+                elif len(matching_vars) == 1:
+                    # One variable has a filename variable which matches the retrieved filename
+                    non_ambigous_dict[kw] = matching_vars[0]
+                else:
+                    ambiguous_dict[kw] = (val, matching_vars)
+            else:
+                non_ambigous_dict[kw] = val
+        return non_ambigous_dict, ambiguous_dict
+
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in
@@ -712,37 +739,21 @@ class cdataset(cobject):
         wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
         if option in ['resolve', ]:
             clogger.debug("Trying to resolve on attributes %s" % wildcard_attributes_list)
-            for kw in wildcards:
-                val = wildcards[kw]
-                if isinstance(val, list):
-                    if len(val) > 1:
-                        if kw in ['period', ]:
-                            raise Climaf_Classes_Error("Periods with holes are not handled %s" % val)
-                        else:
-                            raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s" % (kw, val))
+            non_ambiguous_dict, ambiguous_dict = self.check_if_dict_ambiguous(wildcards)
+            if len(ambiguous_dict) != 0:
+                error_msg = list()
+                for kw in sorted(list(ambiguous_dict)):
+                    if kw in ["variable", ]:
+                        error_msg.append("Filename variable %s is matched by multiple variables %s" %
+                                                       (ambiguous_dict[kw][0], repr(ambiguous_dict[kw][1])))
+                    elif kw in ["period", ]:
+                        error_msg.append("Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
                     else:
-                        val = val[0]
-                        dic[kw] = val
-                else:
-                    if kw in ['variable', ]:  # Should take care of aliasing to fileVar
-                        matching_vars = set()
-                        paliases = aliases.get(self.project, [])
-                        for variable in paliases:
-                            if val == paliases[variable][0]:
-                                matching_vars.add(variable)
-                        if len(matching_vars) == 0:
-                            # No filename variable in aliases matches actual filename
-                            dic[kw] = val
-                        elif len(matching_vars) == 1:
-                            # One variable has a filename variable whih matches the retrieved filename
-                            dic[kw] = matching_vars.pop()
-                        else:
-                            raise Climaf_Classes_Error("Filename variable %s is matched by multiple variables %s" %
-                                                       (val, repr(matching_vars)))
-                    else:
-                        dic[kw] = val
-            #
-            return ds(**dic)
+                        error_msg.append("Wildcard attribute %s is ambiguous %s" % (kw, str(ambiguous_dict[kw])))
+                raise Climaf_Classes_Error(" ".join(error_msg))
+            else:
+                dic.update(**non_ambiguous_dict)
+                return ds(**dic)
         elif option in ['choices', ]:
             clogger.debug("Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
             self.files = files

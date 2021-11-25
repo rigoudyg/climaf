@@ -76,6 +76,10 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 #
+from env.environment import *
+from env.clogging import clogger, clog, clog_file, logdir
+from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
+#
 import climaf
 
 # Declare standard projects and standard data locations
@@ -101,10 +105,6 @@ from climaf.plot.varlongname import varlongname
 from climaf.derived_variables import *
 from climaf.functions import *
 from climaf.easyCMIP_functions import *
-#
-from env.environment import *
-from env.clogging import clogger, clog, clog_file, logdir
-from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not
