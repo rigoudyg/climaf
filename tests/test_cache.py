@@ -31,12 +31,10 @@ class SetNewUniqueCacheTests(unittest.TestCase):
         #       call to craz works
         new_tmp_directory = tmp_directory + "/tmp"
         setNewUniqueCache(new_tmp_directory)
-        from climaf.cache import cachedirs, currentCache, cacheIndexFileName
         self.assertEqual(cachedirs, [new_tmp_directory])
         self.assertEqual(currentCache, new_tmp_directory)
         self.assertEqual(cacheIndexFileName, new_tmp_directory + "/index")
         setNewUniqueCache(tmp_directory, raz=False)
-        from climaf.cache import cachedirs, currentCache, cacheIndexFileName
         self.assertEqual(cachedirs, [tmp_directory])
         self.assertEqual(currentCache, tmp_directory)
         self.assertEqual(cacheIndexFileName, tmp_directory + "/index")

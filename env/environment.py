@@ -76,6 +76,15 @@ default_cache = os.getenv("CLIMAF_CACHE", default_cache)
 #: Default remote cache directory
 default_remote_cache = os.getenv("CLIMAF_REMOTE_CACHE", os.sep.join([default_cache, "remote_data"]))
 
+#: Current cache directory
+currentCache = None
+
+#: Cache directories list
+cachedirs = None
+
+#: The place to write the index
+cacheIndexFileName = None
+
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try

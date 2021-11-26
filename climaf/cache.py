@@ -28,10 +28,6 @@ from climaf.utils import Climaf_Cache_Error, Climaf_Error
 from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
 from climaf.cmacro import crewrite
 
-currentCache = None
-cachedirs = None
-#: The place to write the index
-cacheIndexFileName = None
 handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
 cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
@@ -66,6 +62,9 @@ def setNewUniqueCache(path, raz=True):
     cachedirs = [path]  # The list of cache directories
     cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
     currentCache = cachedirs[0]
+    exec("cachedirs = %s" % cachedirs, sys.modules["__main__"].__dict__)
+    exec("cacheIndexFileName = '%s'" % cacheIndexFileName, sys.modules["__main__"].__dict__)
+    exec("currentCache = '%s'" % currentCache, sys.modules["__main__"].__dict__)
     if raz:
         craz(hideError=True)
 
