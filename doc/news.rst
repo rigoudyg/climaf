@@ -13,10 +13,14 @@ Changes, newest first:
     expressed as elapsed time. For getting the cost of a scalar, call
     :py:func:`~climaf.driver.cvalue` with argument``cost=True``
 
-  - two bugs related ot cache were fixed : cache content was not
-    updated on exit, and with Python 3, it was not read at
-    startup. Errors related to reading / writing cache are no more
-    hidden.
+  - cache:
+
+    - Two bugs related ot cache were fixed : cache content was not
+      updated on exit, and with Python 3, it was not read at
+      startup. Errors related to reading / writing cache are no more
+      hidden.
+    - The following cache variables are now handled in env.environment module: currentCache, cachedirs, indexFileName
+
   - Fix `issue 193<https://github.com/rigoudyg/climaf/issues/193>` regarding behaviour of listfiles
     for ambiguous cases
 
