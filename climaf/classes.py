@@ -150,16 +150,15 @@ class cproject(object):
                 for i, f in enumerate(self.facets):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
-            
 
     def cvalid(self, attribute, value=None):
         """Set or get the list of valid values for a CliMAF dataset attribute
         or facet (such as e.g. 'model', 'simulation' ...). Useful
         e.g. for constraining those data files which match a dataset
         definition
-    
+
         Example::
-    
+
         >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ])
 
         """
@@ -373,9 +372,9 @@ class cdataset(cobject):
 
         Some attributes have a special format or processing :
 
-        - period : see :py:func:`~climaf.period.init_period`. See also  
+        - period : see :py:func:`~climaf.period.init_period`. See also
           function :py:func:`climaf.classes.ds` for added
-          flexibility in defining periods as last of first set of years 
+          flexibility in defining periods as last of first set of years
           among available data
 
         - domain : allowed values are either 'global' or a list for
@@ -591,10 +590,10 @@ class cdataset(cobject):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
-        Returns info regarding matching datafile or directories: 
-        
-          - if WHAT = 'files' , returns a string of all data filenames 
-        
+        Returns info regarding matching datafile or directories:
+
+          - if WHAT = 'files' , returns a string of all data filenames
+
           - otherwise, returns a list of facet/value dictionnaries for
             matching data (or a pair, see below)
 
@@ -605,8 +604,8 @@ class cdataset(cobject):
 
         If PERIODS is not None, individual data files periods are
         merged among cases with same facets values
-        
-        if SPLIT is not None, a pair is returned intead of the dicts list : 
+
+        if SPLIT is not None, a pair is returned intead of the dicts list :
 
            - first element is a dict with facets which values are the
              same among all cases
@@ -614,7 +613,7 @@ class cdataset(cobject):
            - second element is the dicts list as above, but in which
              facets with common values are discarded
 
-        Example : 
+        Example :
 
         >>> tos_data = ds(project='CMIP6', variable='tos', period='*',
                table='Omon', model='CNRM*', realization='r1i1p1f*' )
@@ -622,15 +621,15 @@ class cdataset(cobject):
         >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
 
         >>> common_keys
-        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical', 
-        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos', 
+        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical',
+        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos',
         'version': 'latest', 'period': [1850-2014], 'root': '/bdd'}
 
         >>> varied_keys
-        [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' }, 
-         {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'}, 
-         {'model': 'CNRM-CM6-1'   , 'grid': 'gn' }, 
-         {'model': 'CNRM-CM6-1'   , 'grid': 'gr1'}, 
+        [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' },
+         {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'},
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gn' },
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gr1'},
          {'model': 'CNRM-CM6-1-HR', 'grid': 'gn' } ]
 
         """
@@ -658,10 +657,36 @@ class cdataset(cobject):
             if split is not None :
                 keys = remove_keys_with_same_values(cases)
                 return keys, cases
-            else: 
+            else:
                 return cases
 
-        
+    def check_if_dict_ambiguous(self, input_dict):
+        ambiguous_dict = dict()
+        non_ambigous_dict = dict()
+        for (kw, val) in input_dict.items():
+            if isinstance(val, list):
+                if len(val) > 1:
+                    ambiguous_dict[kw] = val
+                else:
+                    non_ambigous_dict[kw] = val[0]
+            elif kw in ['variable', ]:  # Should take care of aliasing to fileVar
+                matching_vars = set()
+                paliases = aliases.get(self.project, [])
+                for variable in paliases:
+                    if val == paliases[variable][0]:
+                        matching_vars.add(variable)
+                if len(matching_vars) == 0:
+                    # No filename variable in aliases matches actual filename
+                    non_ambigous_dict[kw] = val
+                elif len(matching_vars) == 1:
+                    # One variable has a filename variable which matches the retrieved filename
+                    non_ambigous_dict[kw] = matching_vars[0]
+                else:
+                    ambiguous_dict[kw] = (val, matching_vars)
+            else:
+                non_ambigous_dict[kw] = val
+        return non_ambigous_dict, ambiguous_dict
+
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
         Versatile datafile exploration for a dataset which possibly has wildcards (* and ? ) in
