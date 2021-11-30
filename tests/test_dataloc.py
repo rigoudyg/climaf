@@ -11,12 +11,11 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import shutil
 import unittest
 
-from tests.tools_for_tests import remove_dir_and_content
-
 from env.environment import *
+from tests.tools_for_tests import remove_dir_and_content
 from climaf.cache import setNewUniqueCache
-from climaf.dataloc import dataloc, getlocs, isLocal, selectFiles, selectGenericFiles, ftpmatch, glob_remote_data, \
-	remote_to_local_filename, selectEmFiles, periodOfEmFile, selectExampleFiles, selectCmip5DrsFiles, cvalid
+from climaf.dataloc import dataloc, getlocs, isLocal, selectFiles, \
+	remote_to_local_filename, selectEmFiles, periodOfEmFile, selectExampleFiles, selectCmip5DrsFiles
 
 
 class DatalocTest(unittest.TestCase):
@@ -67,27 +66,6 @@ class selectFilesTest(unittest.TestCase):
 		pass
 
 
-class selectGenericFilesTest(unittest.TestCase):
-	@unittest.skipUnless(False, "The test is not written")
-	def test_selectGenericFiles(self):
-		# TODO: Implement the tests
-		pass
-
-
-class ftpmatchTest(unittest.TestCase):
-	@unittest.skipUnless(False, "The test is not written")
-	def test_ftpmatch(self):
-		# TODO: Implement the tests
-		pass
-
-
-class glob_remote_dataTest(unittest.TestCase):
-	@unittest.skipUnless(False, "The test is not written")
-	def test_glob_remote_data(self):
-		# TODO: Implement the tests
-		pass
-
-
 class remote_to_local_filenameTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_remote_to_local_filename(self):
@@ -119,13 +97,6 @@ class selectExampleFilesTest(unittest.TestCase):
 class selectCmip5DrsFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectCmip5DrsFiles(self):
-		# TODO: Implement the tests
-		pass
-
-
-class cvalidTest(unittest.TestCase):
-	@unittest.skipUnless(False, "The test is not written")
-	def test_cvalid(self):
 		# TODO: Implement the tests
 		pass
 

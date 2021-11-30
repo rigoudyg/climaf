@@ -201,7 +201,7 @@ class CdumpTests(unittest.TestCase):
 class ListCacheTests(unittest.TestCase):
 
     def test_list_cache(self):
-        #from climaf.cache import cachedirs
+        from climaf.cache import cachedirs
         list_ref = list()
         for cachedir in env.environment.cachedirs:
             for (d, subd, files) in os.walk(cachedir):

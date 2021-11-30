@@ -558,7 +558,6 @@ class cdataset(cobject):
                 return False
         return True
 
-    
     def check_if_dict_ambiguous(self, input_dict):
         ambiguous_dict = dict()
         non_ambigous_dict = dict()
@@ -585,7 +584,7 @@ class cdataset(cobject):
             else:
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
-    
+
     def glob(self, what = None , periods = None, split = None):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.

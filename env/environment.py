@@ -122,7 +122,7 @@ except:
     xdg_bin = None
     print("Warning: could not find xdg-open")
 
-# Check if xdg-open is available
+# Check dependencies
 try:
     xdg_bin = my_which("xdg-open")
     print("xdg-open is available")
