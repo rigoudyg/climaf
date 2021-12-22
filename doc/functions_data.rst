@@ -22,10 +22,15 @@ cdataset : define a dataset object
 
 .. autoclass:: climaf.classes.cdataset
 
-:py:meth:`cdataset.explore: explore data and periods, and match joker attributes <climaf.classes.cdataset.explore>`
-====================================================================================================================
+:py:meth:`cdataset.explore: explore data and periods, and match wildcard attributes <climaf.classes.cdataset.explore>`
+======================================================================================================================
 
 .. automethod:: climaf.classes.cdataset.explore
+
+:py:meth:`cdataset.glob: explore data and/or periods, and match wildcard attributes <climaf.classes.cdataset.explore>`
+======================================================================================================================
+
+.. automethod:: climaf.classes.cdataset.glob
 
 :py:meth:`cdataset.check: check time consistency of a dataset <climaf.classes.cdataset.check>`
 ====================================================================================================

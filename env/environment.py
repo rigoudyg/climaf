@@ -86,6 +86,12 @@ cachedirs = None
 cacheIndexFileName = None
 
 
+#: Current cache directory
+currentCache = None
+
+#: Should the search for CMI6 files be optimized by building tables
+optimize_cmip6_wildcards = True
+
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
 stamping = True

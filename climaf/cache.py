@@ -21,6 +21,7 @@ import hashlib
 import json
 from operator import itemgetter
 
+import env
 from env.environment import *
 from env.clogging import clogger
 from climaf import version
@@ -54,17 +55,11 @@ def setNewUniqueCache(path, raz=True):
     """
     Define PATH as the sole cache to use from now. And clear it
     """
-    global currentCache
-    global cachedirs
-    global cacheIndexFileName
 
     path = os.path.expanduser(path)
-    cachedirs = [path]  # The list of cache directories
-    cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
-    currentCache = cachedirs[0]
-    exec("cachedirs = %s" % cachedirs, sys.modules["__main__"].__dict__)
-    exec("cacheIndexFileName = '%s'" % cacheIndexFileName, sys.modules["__main__"].__dict__)
-    exec("currentCache = '%s'" % currentCache, sys.modules["__main__"].__dict__)
+    env.environment.cachedirs = [path]  # The list of cache directories
+    env.environment.cacheIndexFileName = path + "/index"  # The place to write the index
+    env.environment.currentCache = path
     if raz:
         craz(hideError=True)
 
@@ -110,9 +105,9 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
 def hash_to_path(vhash, format, option="new", prefix=""):
     if option == "new":
-        rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
+        rep = os.sep.join([env.environment.currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
-        rep = os.sep.join([currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
+        rep = os.sep.join([env.environment.currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
     rep = ".".join([rep, format])
     rep = os.path.expanduser(rep)
     return rep
@@ -128,7 +123,7 @@ def alternate_filename(fpath):
     # Get file format
     format = fpath.split(".")[-1]
     # Remove cache root location prefix
-    relative_fpath = fpath[len(currentCache)+1:]
+    relative_fpath = fpath[len(env.environment.currentCache)+1:]
     # Get name without slashes nor extension
     vhash = relative_fpath.replace("/", "").split(".")[0]
     #
@@ -157,7 +152,7 @@ def searchFile(path):
     """ Search for first occurrence of PATH as a path in all
     directories listed in CACHEDIRS
     """
-    for cdir in cachedirs:
+    for cdir in env.environment.cachedirs:
         candidate = os.path.expanduser(cdir + "/" + path)
         if os.path.lexists(candidate):
             # If this is a broken link, delete it ~ silently and return None
@@ -572,7 +567,7 @@ def csync(update=False):
                 # Should also remove empty files, as soon as
                 # file creation will be atomic enough
     # Save index to disk
-    fn = os.path.expanduser(cacheIndexFileName)
+    fn = os.path.expanduser(env.environment.cacheIndexFileName)
     cacheIndexFile = open(fn, "wb")
     pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
     dropped_crs = list()
@@ -586,7 +581,7 @@ def cload(alt=None):
     if len(crs2filename) != 0 and not alt:
         raise Climaf_Cache_Error(
             "attempt to reset cache index - would lead to inconsistency !")
-    cacheFilen = os.path.expanduser(cacheIndexFileName)
+    cacheFilen = os.path.expanduser(env.environment.cacheIndexFileName)
     if not os.path.exists(cacheFilen):
         clogger.debug("no index file yet")
         return {}
@@ -666,8 +661,8 @@ def craz(force=False, hideError=False):
 
     """
     global crs2filename
-    cc = os.path.expanduser(currentCache)
-    if os.path.exists(currentCache) or hideError is False:
+    cc = os.path.expanduser(env.environment.currentCache)
+    if os.path.exists(env.environment.currentCache) or hideError is False:
         if force:
             os.system("chmod -R +w  " + cc)
             os.system("rm -fR " + cc + "/*")
@@ -705,7 +700,7 @@ def list_cache():
 
     """
     find_return = ""
-    for dir_cache in cachedirs:
+    for dir_cache in env.environment.cachedirs:
         rep = os.path.expanduser(dir_cache)
         filter = r" \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) "
         with os.popen(r"find %s -type f " % rep + filter + " -print") as fil:
@@ -1093,7 +1088,7 @@ def load_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        cache_file = os.sep.join([currentCache, "cvalues.json"])
+        cache_file = os.sep.join([env.environment.currentCache, "cvalues.json"])
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
                 tmp = json.load(f)
@@ -1109,6 +1104,7 @@ def sync_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
+        currentCache = env.environment.currentCache
         if not os.path.isdir(currentCache):
             os.makedirs(currentCache)
         ccache = os.path.sep.join([currentCache, "cvalues.json"])

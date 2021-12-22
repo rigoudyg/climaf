@@ -13,6 +13,7 @@ import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 
+import env
 from env.environment import *
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
@@ -31,13 +32,13 @@ class SetNewUniqueCacheTests(unittest.TestCase):
         #       call to craz works
         new_tmp_directory = tmp_directory + "/tmp"
         setNewUniqueCache(new_tmp_directory)
-        self.assertEqual(cachedirs, [new_tmp_directory])
-        self.assertEqual(currentCache, new_tmp_directory)
-        self.assertEqual(cacheIndexFileName, new_tmp_directory + "/index")
+        self.assertEqual(env.environment.cachedirs, [new_tmp_directory])
+        self.assertEqual(env.environment.currentCache, new_tmp_directory)
+        self.assertEqual(env.environment.cacheIndexFileName, new_tmp_directory + "/index")
         setNewUniqueCache(tmp_directory, raz=False)
-        self.assertEqual(cachedirs, [tmp_directory])
-        self.assertEqual(currentCache, tmp_directory)
-        self.assertEqual(cacheIndexFileName, tmp_directory + "/index")
+        self.assertEqual(env.environment.cachedirs, [tmp_directory])
+        self.assertEqual(env.environment.currentCache, tmp_directory)
+        self.assertEqual(env.environment.cacheIndexFileName, tmp_directory + "/index")
 
 
 class GenerateUniqueFileNameTests(unittest.TestCase):
@@ -200,9 +201,9 @@ class CdumpTests(unittest.TestCase):
 class ListCacheTests(unittest.TestCase):
 
     def test_list_cache(self):
-        from climaf.cache import cachedirs
+        #from climaf.cache import cachedirs
         list_ref = list()
-        for cachedir in cachedirs:
+        for cachedir in env.environment.cachedirs:
             for (d, subd, files) in os.walk(cachedir):
                 for f in files:
                     if any([f.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]]):
