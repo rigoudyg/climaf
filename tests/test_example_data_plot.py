@@ -618,6 +618,6 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     craz()
-    unittest.main()
+    unittest.main(exit=False)
     craz()
     remove_dir_and_content(tmp_directory)

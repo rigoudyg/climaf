@@ -10,6 +10,7 @@ from __future__ import unicode_literals, absolute_import, print_function, divisi
 import unittest
 import re
 import six
+import shutil
 
 from env.environment import *
 from climaf.api import cshow, ncview, cfile
@@ -29,19 +30,10 @@ def skipUnless_Ciclad():
 
 def remove_dir_and_content(dirname):
     if os.path.isdir(dirname):
-        # Deal with files
-        listfiles = list()
-        listdirs = list()
-        for (d, subdirs, files) in os.walk(dirname):
-            for name in files:
-                listfiles.append(os.path.sep.join([d, name]))
-            for subd in subdirs:
-                listdirs.append(os.path.sep.join([d, subd]))
-        for f in listfiles:
-            os.remove(f)
-        # Deal with subdirectories
-        for d in sorted(listdirs, reverse=True):
-            os.rmdir(d)
+        shutil.rmtree(dirname)
+        print("Remove directory: %s" % dirname)
+    else:
+        print("Try to remove a non existing directory: %s" % dirname)
 
 
 def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=list()):
