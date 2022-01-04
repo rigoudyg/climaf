@@ -71,7 +71,7 @@ if not already_inited and not onrtd:
     tim("loggings")
     #
     # Decide for cache location
-    cachedir = default_cache # TODO: For compatibility, delete ones useless
+    cachedir = default_cache  # TODO: For compatibility, delete ones useless
     cache.setNewUniqueCache(default_cache, raz=False)
     print("Cache directory set to : " + default_cache + " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
     tim("set cache")

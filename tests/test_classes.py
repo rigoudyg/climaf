@@ -15,8 +15,8 @@ from tests.tools_for_tests import remove_dir_and_content
 from env.environment import *
 from env.site_settings import atCNRM, onCiclad
 from climaf.cache import setNewUniqueCache
-from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias, \
-    crealms
+from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
+    calias, crealms
 from climaf.period import Climaf_Period_Error, init_period
 
 
@@ -564,10 +564,10 @@ class CfreqsTests(unittest.TestCase):
 class CrealmsTests(unittest.TestCase):
 
     def test_crealms(self):
-        crealms('my_project', {'atmos':"ATM", 'ocean':"OCE"})
+        crealms('my_project', {'atmos': "ATM", 'ocean': "OCE"})
         self.assertIn("my_project", realms)
         a_realm = realms["my_project"]
-        self.assertDictEqual(a_realm, {'atmos':"ATM", 'ocean':"OCE"})
+        self.assertDictEqual(a_realm, {'atmos': "ATM", 'ocean': "OCE"})
         del realms["my_project"]
 
 

@@ -585,7 +585,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what = None , periods = None, split = None):
+    def glob(self, what=None, periods=None, split=None):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -640,51 +640,24 @@ class cdataset(cobject):
             if filenameVar:
                 dic["filenameVar"] = filenameVar
         clogger.debug("glob() with dic=%s" % repr(dic))
-        cases = []
-        files = selectFiles(with_periods = (periods is not None) or (what == 'files'),
-                            return_combinations = cases, **dic)
-        if what == 'files' :
+        cases = list()
+        files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
+                            return_combinations=cases, **dic)
+        if what in ['files', ]:
             return files
-        else :
-            if periods is not None :
+        else:
+            if periods is not None:
                 cases = group_periods(cases)
-            else :
+            else:
                 # For non-optimized cases, select_files returns periods,
                 # but we want an even behaviour
-                for case in cases :
-                    case.pop('period',None)
-            if split is not None :
+                for case in cases:
+                    case.pop('period', None)
+            if split is not None:
                 keys = remove_keys_with_same_values(cases)
                 return keys, cases
             else:
                 return cases
-
-    def check_if_dict_ambiguous(self, input_dict):
-        ambiguous_dict = dict()
-        non_ambigous_dict = dict()
-        for (kw, val) in input_dict.items():
-            if isinstance(val, list):
-                if len(val) > 1:
-                    ambiguous_dict[kw] = val
-                else:
-                    non_ambigous_dict[kw] = val[0]
-            elif kw in ['variable', ]:  # Should take care of aliasing to fileVar
-                matching_vars = set()
-                paliases = aliases.get(self.project, [])
-                for variable in paliases:
-                    if val == paliases[variable][0]:
-                        matching_vars.add(variable)
-                if len(matching_vars) == 0:
-                    # No filename variable in aliases matches actual filename
-                    non_ambigous_dict[kw] = val
-                elif len(matching_vars) == 1:
-                    # One variable has a filename variable which matches the retrieved filename
-                    non_ambigous_dict[kw] = matching_vars[0]
-                else:
-                    ambiguous_dict[kw] = (val, matching_vars)
-            else:
-                non_ambigous_dict[kw] = val
-        return non_ambigous_dict, ambiguous_dict
 
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
@@ -866,7 +839,7 @@ class cdataset(cobject):
                 for kw in sorted(list(ambiguous_dict)):
                     if kw in ["variable", ]:
                         error_msg.append("Filename variable %s is matched by multiple variables %s" %
-                                                       (ambiguous_dict[kw][0], repr(ambiguous_dict[kw][1])))
+                                         (ambiguous_dict[kw][0], repr(ambiguous_dict[kw][1])))
                     elif kw in ["period", ]:
                         error_msg.append("Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
                     else:

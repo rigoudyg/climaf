@@ -19,7 +19,6 @@ from climaf.html import header, section, vspace, link_on_its_own_line, line, ope
     close_line, cell, fline, flines, trailer
 
 
-
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)
 

@@ -20,7 +20,6 @@ from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub
     ts_plot, iplot_members
 
 
-
 class CscalarTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not implemented")

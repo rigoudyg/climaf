@@ -104,10 +104,11 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
 
 def hash_to_path(vhash, format, option="new", prefix=""):
-    if option == "new":
+    if option in ["new", ]:
         rep = os.sep.join([env.environment.currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
-        rep = os.sep.join([env.environment.currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
+        rep = os.sep.join([env.environment.currentCache,
+                           prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
     rep = ".".join([rep, format])
     rep = os.path.expanduser(rep)
     return rep

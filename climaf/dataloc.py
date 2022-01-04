@@ -25,6 +25,7 @@ from env.clogging import clogger
 from climaf.projects.optimize import cmip6_optimize_check_paths, cmip6_optimize_wildcards
 from climaf.find_files import selectGenericFiles
 
+
 class dataloc(object):
     def __init__(self, project="*", organization='generic', url=None, model="*", simulation="*",
                  realm="*", table="*", frequency="*"):
@@ -240,8 +241,7 @@ def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     return rep
 
 
-def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, \
-                with_periods = None, **kwargs):
+def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None, **kwargs):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
@@ -275,9 +275,9 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
     if len(ofu) == 0:
         clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
                                                                            table))
-    for org, _ , urls in ofu:
-        if org != 'generic' :
-            clogger.warning("Organisation = %s will be deprecated quite soon."%org+\
+    for org, _, urls in ofu:
+        if org not in ['generic', ]:
+            clogger.warning("Organisation = %s will be deprecated quite soon." % org +
                             "Please refer to you CliMAF wizard for removing its use")
         if return_wildcards is not None and len(return_wildcards) > 0 and org != "generic":
             raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
@@ -296,56 +296,54 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
                 kwargs2['realm'] = realms[project][normrealm]
         #
         # Call organization-specific routine
-        if org == "EM":
+        if org in ["EM", ]:
             rep.extend(selectEmFiles(**kwargs2))
-        elif org == "CMIP5_DRS":
+        elif org in ["CMIP5_DRS", ]:
             rep.extend(selectCmip5DrsFiles(urls, **kwargs2))
-        elif org == "generic":
-            if project == "CMIP6" and env.environment.optimize_cmip6_wildcards and \
-               cmip6_optimize_check_paths(urls) :
+        elif org in ["generic", ]:
+            if project in ["CMIP6", ] and env.environment.optimize_cmip6_wildcards and \
+               cmip6_optimize_check_paths(urls):
                 kwargs_list = cmip6_optimize_wildcards(kwargs2)
-                if not with_periods and return_combinations is not None :
+                if not with_periods and return_combinations is not None:
                     # Just return the list of dicts with facet values combinations
                     return_combinations.extend(kwargs_list)
                     rep.append('dummy')
                 else:
-                    if return_combinations is None :
+                    if return_combinations is None:
                         # Also for glob, but must get periods
-                        clogger.warning("cdataset.explore doesn't anymore return choices with  "+\
-                                        "optimized CMIP6 search. Use cdataset.glob() or set "+\
+                        clogger.warning("cdataset.explore doesn't anymore return choices with  "
+                                        "optimized CMIP6 search. Use cdataset.glob() or set "
                                         "env.environment.optimize_cmip6_wildcards to False")
-                    for kwa in kwargs_list :
-                        rep.extend(selectGenericFiles(urls, return_combinations = return_combinations, **kwa))
+                    for kwa in kwargs_list:
+                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations, **kwa))
             else:
-                rep.extend(selectGenericFiles(urls, return_wildcards = return_wildcards,
-                                              return_combinations = return_combinations,
-                                              merge_periods_on = merge_periods_on,
+                rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
+                                              return_combinations=return_combinations,
+                                              merge_periods_on=merge_periods_on,
                                               **kwargs2))
         else:
             raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
                                model + " of project " + project)
     if not ofu:
         return None
+    elif len(rep) == 0:
+        clogger.warning("no file found for %s, at these "
+                        "data locations %s " % (repr(kwargs), repr(urls)))
+        clogger.warning("i.e. at " + str([url.replace("${PERIOD}", "$PERIOD").replace("$", "").format(**kwargs)
+                                          for url in urls]))
+        if env.environment.optimize_cmip6_wildcards:
+            clogger.warning("If you think this may be due to fresh data ingest, "
+                            "you may wish to reset some of the tables used in "
+                            "optimizing CMIP6 data search. See help(climaf.projects.optimize.clear_tables)")
+        return None
     else:
-        if len(rep) == 0:
-            clogger.warning("no file found for %s, at these "
-                            "data locations %s " % (repr(kwargs), repr(urls)))
-            clogger.warning("i.e. at " + str([url.replace("${PERIOD}", "$PERIOD").replace("$", "").format(**kwargs)
-                                              for url in urls]))
-            if env.environment.optimize_cmip6_wildcards:
-                clogger.warning("If you think this may be due to fresh data ingest, "
-                                "you may wish to reset some of the tables used in "
-                                "optimizing CMIP6 data search. See help(climaf.projects.optimize.clear_tables)")
-            #if any([kwargs[k] == '' for k in kwargs):
-            #    clogger.warning("Please check these empty attributes %s" % [k for k in kwargs if kwargs[k] == ''])
-            return None
-    # When returning strings (actually filenames), join them in a single string
-    if len(rep) > 0 and isinstance((rep[0]),six.string_types) :
-        # Discard duplicates (assumes that sorting is harmless for later processing)
-        rep = sorted(list(set([f.strip() for f in rep])))
-        # Assemble filenames in one single string
-        rep = ' '.join(rep)
-    return rep
+        # When returning strings (actually filenames), join them in a single string
+        if len(rep) > 0 and isinstance((rep[0]), six.string_types):
+            # Discard duplicates (assumes that sorting is harmless for later processing)
+            rep = sorted(list(set([f.strip() for f in rep])))
+            # Assemble filenames in one single string
+            rep = ' '.join(rep)
+        return rep
 
 
 def selectEmFiles(**kwargs):
@@ -527,13 +525,14 @@ def selectCmip5DrsFiles(urls, **kwargs):
 
     return rep
 
+
 def remote_to_local_filename(url):
     """
     url: an url of remote data
 
     Return local filename of remote file
     """
-    from climaf import remote_cachedir
+    from env.environment import default_remote_cache
 
     if len(url.split(":")) == 3:
         k = 1
@@ -545,7 +544,7 @@ def remote_to_local_filename(url):
     else:
         hostname = url.split(":")[k]
 
-    local_filename = os.path.expanduser(remote_cachedir) + '/' + hostname + os.path.abspath(url.split(":")[-1])
+    local_filename = os.path.expanduser(default_remote_cache) + '/' + hostname + os.path.abspath(url.split(":")[-1])
     return local_filename
 
 

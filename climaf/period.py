@@ -438,33 +438,29 @@ def group_periods(diclist):
     Used e.g. on 'return_combinations' output of a series of selectGenericFiles
     """
     tempo = dict()
-    for dic in diclist :
+    for dic in diclist:
         aperiod = dic['period']
-        if not isinstance(aperiod, cperiod) :
+        if not isinstance(aperiod, cperiod):
             aperiod = init_period(aperiod)
         #
         keys = list(dic.keys())
         keys.remove('period')
         keys.sort()
-        tuple_key = tuple([ dic[k] for k in keys ])
+        tuple_key = tuple([dic[k] for k in keys])
         #
-        if tuple_key not in tempo :
+        if tuple_key not in tempo:
             tempo[tuple_key] = dic.copy()
-            tempo[tuple_key]['period' ] = [ ]
+            tempo[tuple_key]['period'] = list()
         tempo[tuple_key]['period'].append(aperiod)
     #
-    output = []
-    for key in tempo :
+    output = list()
+    for key in tempo:
         dic = tempo[key]
         dic['period'] = merge_periods(dic['period'])
         output.append(dic)
     #
     return output
         
-        
-            
-    
-
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
