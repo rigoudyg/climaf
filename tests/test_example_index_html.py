@@ -12,7 +12,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content, compare_html_files
 from collections import OrderedDict
 from env.environment import *
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
 from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
@@ -149,5 +149,4 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    unittest.main(exit=False)
-    remove_dir_and_content(tmp_directory)
+    unittest.main()

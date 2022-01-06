@@ -12,7 +12,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 from env.environment import *
 from env.site_settings import atCNRM, onCiclad
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf.api import cproject, dataloc
 from climaf.driver import capply, capply_script, maketree, capply_operator, ceval_for_cdataset, ceval_for_ctree, \
 	ceval_operator, cstore, ceval_for_scriptChild, ceval_for_cpage, ceval_for_cpage_pdf, ceval_for_cens, \
@@ -30,6 +30,9 @@ class CapplyTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CapplyScriptTests(unittest.TestCase):
 
@@ -37,6 +40,9 @@ class CapplyScriptTests(unittest.TestCase):
 	def test_capply_script(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class MaketreeTests(unittest.TestCase):
@@ -46,6 +52,9 @@ class MaketreeTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CapplyOperatorTests(unittest.TestCase):
 
@@ -53,6 +62,9 @@ class CapplyOperatorTests(unittest.TestCase):
 	def test_capply_operator(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForCdatasetTests(unittest.TestCase):
@@ -62,6 +74,9 @@ class CevalForCdatasetTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCtreeTests(unittest.TestCase):
 
@@ -69,6 +84,9 @@ class CevalForCtreeTests(unittest.TestCase):
 	def test_ceval_for_ctree(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalOperatorTests(unittest.TestCase):
@@ -78,6 +96,9 @@ class CevalOperatorTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CstoreTests(unittest.TestCase):
 
@@ -85,6 +106,9 @@ class CstoreTests(unittest.TestCase):
 	def test_cstore(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForScriptChildTests(unittest.TestCase):
@@ -94,6 +118,9 @@ class CevalForScriptChildTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCpageTests(unittest.TestCase):
 
@@ -101,6 +128,9 @@ class CevalForCpageTests(unittest.TestCase):
 	def test_ceval_for_cpage(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForCpagePdfTests(unittest.TestCase):
@@ -110,6 +140,9 @@ class CevalForCpagePdfTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCensTests(unittest.TestCase):
 
@@ -117,6 +150,9 @@ class CevalForCensTests(unittest.TestCase):
 	def test_ceval_for_cens(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForStringTests(unittest.TestCase):
@@ -126,6 +162,9 @@ class CevalForStringTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalTests(unittest.TestCase):
 
@@ -133,6 +172,9 @@ class CevalTests(unittest.TestCase):
 	def test_ceval(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalScriptTests(unittest.TestCase):
@@ -142,6 +184,9 @@ class CevalScriptTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class TimePeriodTests(unittest.TestCase):
 
@@ -149,6 +194,9 @@ class TimePeriodTests(unittest.TestCase):
 	def test_timePeriod(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalSelectTests(unittest.TestCase):
@@ -158,6 +206,9 @@ class CevalSelectTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CreadTests(unittest.TestCase):
 
@@ -165,6 +216,9 @@ class CreadTests(unittest.TestCase):
 	def test_cread(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CviewTests(unittest.TestCase):
@@ -174,6 +228,9 @@ class CviewTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class DeriveVariableTests(unittest.TestCase):
 
@@ -181,6 +238,9 @@ class DeriveVariableTests(unittest.TestCase):
 	def test_derive_variable(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class SetVariableTests(unittest.TestCase):
@@ -190,6 +250,9 @@ class SetVariableTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class NoselectTests(unittest.TestCase):
 
@@ -197,6 +260,9 @@ class NoselectTests(unittest.TestCase):
 	def test_noselect(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CfileTests(unittest.TestCase):
@@ -212,6 +278,9 @@ class CfileTests(unittest.TestCase):
 		self.assertDictEqual(dict_choices, {'period': [init_period("1980-1981")]})
 		cfile(my_data_test)
 
+	def tearDown(self):
+		craz()
+
 
 class CshowTests(unittest.TestCase):
 
@@ -219,6 +288,9 @@ class CshowTests(unittest.TestCase):
 	def test_cshow(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CMATests(unittest.TestCase):
@@ -228,6 +300,9 @@ class CMATests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CvalueTests(unittest.TestCase):
 
@@ -235,6 +310,9 @@ class CvalueTests(unittest.TestCase):
 	def test_cvalue(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CexportTests(unittest.TestCase):
@@ -244,6 +322,9 @@ class CexportTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CimportTests(unittest.TestCase):
 
@@ -251,6 +332,9 @@ class CimportTests(unittest.TestCase):
 	def test_cimport(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class GetFigSizesTests(unittest.TestCase):
@@ -260,6 +344,9 @@ class GetFigSizesTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CfilePageTests(unittest.TestCase):
 
@@ -268,6 +355,9 @@ class CfilePageTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CfilePagePdfTests(unittest.TestCase):
 
@@ -275,6 +365,9 @@ class CfilePagePdfTests(unittest.TestCase):
 	def test_cfilePage_pdf(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CaliasTests(unittest.TestCase):
@@ -303,6 +396,9 @@ class CaliasTests(unittest.TestCase):
 		                      'thetao': ('ccdo', 'thetao', ['tos,thetao'], {'operator': 'selname,thetao'})
 		                      })
 
+	def tearDown(self):
+		craz()
+
 
 class CFlongnameTests(unittest.TestCase):
 
@@ -311,6 +407,9 @@ class CFlongnameTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class EfileTests(unittest.TestCase):
 
@@ -318,6 +417,9 @@ class EfileTests(unittest.TestCase):
 	def test_efile(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 if __name__ == '__main__':
@@ -328,5 +430,4 @@ if __name__ == '__main__':
 		os.makedirs(tmp_directory)
 	setNewUniqueCache(tmp_directory)
 	os.chdir(tmp_directory)
-	unittest.main(exit=False)
-	remove_dir_and_content(tmp_directory)
+	unittest.main()

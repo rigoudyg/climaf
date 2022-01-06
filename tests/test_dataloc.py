@@ -13,7 +13,7 @@ import unittest
 
 from env.environment import *
 from tests.tools_for_tests import remove_dir_and_content
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf.dataloc import dataloc, getlocs, isLocal, selectFiles, \
 	remote_to_local_filename, selectEmFiles, periodOfEmFile, selectExampleFiles, selectCmip5DrsFiles
 
@@ -44,12 +44,18 @@ class DatalocTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class getlocsTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_getlocs(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class isLocalTest(unittest.TestCase):
@@ -58,12 +64,18 @@ class isLocalTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class selectFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectFiles(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class remote_to_local_filenameTest(unittest.TestCase):
@@ -72,12 +84,18 @@ class remote_to_local_filenameTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class selectEmFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectEmFiles(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class periodOfEmFileTest(unittest.TestCase):
@@ -87,6 +105,9 @@ class periodOfEmFileTest(unittest.TestCase):
 		pass
 
 
+	def tearDown(self):
+		craz()
+
 class selectExampleFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectExampleFiles(self):
@@ -94,12 +115,18 @@ class selectExampleFilesTest(unittest.TestCase):
 		pass
 
 
+	def tearDown(self):
+		craz()
+
 class selectCmip5DrsFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectCmip5DrsFiles(self):
 		# TODO: Implement the tests
 		pass
 
+
+def tearDown(self):
+	craz()
 
 if __name__ == '__main__':
 	# Jump into the test directory
@@ -109,5 +136,4 @@ if __name__ == '__main__':
 		os.makedirs(tmp_directory)
 	setNewUniqueCache(tmp_directory)
 	os.chdir(tmp_directory)
-	unittest.main(exit=False)
-	remove_dir_and_content(tmp_directory)
+	unittest.main()

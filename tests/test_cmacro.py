@@ -131,6 +131,9 @@ class MacroTests(unittest.TestCase):
         self.assertTrue(isinstance(my_macro, cens))
         self.assertEqual(my_macro.buildcrs(), "cens({'1980':ARG,'1981':ARG})")
 
+    def tearDown(self):
+        craz()
+
 
 class CrewriteTests(unittest.TestCase):
 
@@ -163,6 +166,9 @@ class CrewriteTests(unittest.TestCase):
         self.assertEqual(my_crewrite,
                          "eu_cross_section(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),"
                          "ds('example|AMIPV6ALB2G|ta|19800101|global|monthly'))")
+
+    def tearDown(self):
+        craz()
 
 
 class CmatchTests(unittest.TestCase):
@@ -212,6 +218,9 @@ class CmatchTests(unittest.TestCase):
         cmatch_result = cmatch(my_macro, my_page)
         self.assertEqual(cmatch_result, [])
 
+    def tearDown(self):
+        craz()
+
 
 class ReadWriteTests(unittest.TestCase):
 
@@ -237,6 +246,9 @@ class ReadWriteTests(unittest.TestCase):
         write(self.my_macro_file)
         self.assertTrue(os.path.exists(self.my_macro_file))
 
+    def tearDown(self):
+        craz()
+
 
 class ShowTests(unittest.TestCase):
 
@@ -250,12 +262,18 @@ class ShowTests(unittest.TestCase):
         show(interp=False)
         sys.stdout = old_stdout
 
+    def tearDown(self):
+        craz()
+
 
 class InstantiateTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Not implemented")
     def test_instantiate(self):
         pass
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -266,5 +284,4 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    unittest.main(exit=False)
-    remove_dir_and_content(tmp_directory)
+    unittest.main()

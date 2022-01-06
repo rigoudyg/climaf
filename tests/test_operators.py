@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator, Climaf_Operator_Error
 
 
@@ -94,6 +94,9 @@ class CscriptTest(unittest.TestCase):
         my_script = cscript('mycdo', '(cdo ${operator} ${in} ${out})')
         self.assertEqual(repr(my_script), "CliMAF operator : mycdo")
 
+    def tearDown(self):
+        craz()
+
 
 class FixedFieldsTest(unittest.TestCase):
 
@@ -110,6 +113,9 @@ class FixedFieldsTest(unittest.TestCase):
                          (('coordinates.nc',
                            '/cnrm/ioga/Users/chevallier/chevalli/Partage/NEMO/eORCA_R025_coordinates_v1.0.nc'), ))
 
+    def tearDown(self):
+        craz()
+
 
 class CoperatorTest(unittest.TestCase):
 
@@ -117,6 +123,9 @@ class CoperatorTest(unittest.TestCase):
     def test_coperator(self):
         # TODO: Implement this test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -127,5 +136,4 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
-    unittest.main(exit=False)
-    remove_dir_and_content(tmp_directory)
+    unittest.main()

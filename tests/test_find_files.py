@@ -12,7 +12,7 @@ import unittest
 import os
 
 from env.environment import *
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from tests.tools_for_tests import remove_dir_and_content
 from climaf.find_files import selectGenericFiles, mysplit, build_facets_regexp, rreplace, store_wildcard_facet_values, \
 	my_glob, extract_period, glob_remote_data, post_process_wildcard_facets_values
@@ -24,12 +24,18 @@ class selectGenericFilesTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class mysplitTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_mysplit(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class build_facets_regexpTest(unittest.TestCase):
@@ -38,12 +44,18 @@ class build_facets_regexpTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class rreplaceTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_rreplace(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class store_wildcard_facet_valuesTest(unittest.TestCase):
@@ -52,12 +64,18 @@ class store_wildcard_facet_valuesTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class myglobTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_myglob(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class extract_periodTest(unittest.TestCase):
@@ -66,6 +84,9 @@ class extract_periodTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class glob_remote_dataTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
@@ -73,12 +94,18 @@ class glob_remote_dataTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class post_process_wildcard_facets_valuesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_post_process_wildcard_facets_values(self):
 		# TODO: Implement the tests
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 if __name__ == '__main__':
@@ -89,5 +116,4 @@ if __name__ == '__main__':
 		os.makedirs(tmp_directory)
 	setNewUniqueCache(tmp_directory)
 	os.chdir(tmp_directory)
-	unittest.main(exit=False)
-	remove_dir_and_content(tmp_directory)
+	unittest.main()

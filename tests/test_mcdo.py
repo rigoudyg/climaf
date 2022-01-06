@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content, compare_netcdf_files, compare_text_files
 
 from env.environment import *
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as rootpath
 
 from scripts.mcdo import main as mcdo_main
@@ -61,6 +61,9 @@ class McdoTests(unittest.TestCase):
         compare_text_files(test_log, ref_log, _CLIMAF_PATH_=rootpath[0], _TEST_PATH_=tmp_directory)
         compare_netcdf_files(test_output_file, ref_output_file)
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -70,5 +73,4 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
-    unittest.main(exit=False)
-    remove_dir_and_content(tmp_directory)
+    unittest.main()

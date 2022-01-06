@@ -55,5 +55,4 @@ if __name__ == '__main__':
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
-    unittest.main(exit=False)
-    remove_dir_and_content(tmp_directory)
+    unittest.main()

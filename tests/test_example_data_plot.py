@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
 from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
     cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
@@ -201,6 +201,9 @@ class DataGplotMaps(unittest.TestCase):
         ref_plotmap_bis = os.sep.join([self.reference_directory, "test_A.10.png"])
         compare_picture_files(plot_map_bis, ref_plotmap_bis)
 
+    def tearDown(self):
+        craz()
+
 
 @skipUnless_CNRM_Lustre()
 class DataGplotMapsRotation(unittest.TestCase):
@@ -347,6 +350,9 @@ class DataGplotMapsRotation(unittest.TestCase):
         ref_plotmap = os.sep.join([self.reference_directory, "test_B.6.png"])
         compare_picture_files(plot_map, ref_plotmap)
 
+    def tearDown(self):
+        craz()
+
 
 class DataGplotCrossSections(unittest.TestCase):
 
@@ -465,6 +471,9 @@ class DataGplotCrossSections(unittest.TestCase):
         ref_plotcross_bis = os.sep.join([self.reference_directory, "test_C.8.png"])
         compare_picture_files(plot_cross_bis, ref_plotcross_bis)
 
+    def tearDown(self):
+        craz()
+
 
 class DataGplotProfiles(unittest.TestCase):
 
@@ -520,6 +529,10 @@ class DataGplotProfiles(unittest.TestCase):
                          "title='Profiles (t,z)',y='log')")
         ref_plotprofile = os.sep.join([self.reference_directory, "test_D.3.png"])
         compare_picture_files(plot_profile, ref_plotprofile)
+
+    def tearDown(self):
+        craz()
+
 
 
 class DataPlot(unittest.TestCase):
@@ -608,6 +621,9 @@ class DataPlot(unittest.TestCase):
         ref_my_plot_2 = os.sep.join([self.reference_directory, "test4.2.png"])
         compare_picture_files(my_plot_2, ref_my_plot_2)
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -618,6 +634,4 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     craz()
-    unittest.main(exit=False)
-    craz()
-    remove_dir_and_content(tmp_directory)
+    unittest.main()
