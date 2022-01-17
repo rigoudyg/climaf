@@ -7,19 +7,17 @@ Test the classes module.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
-
-from climaf.cache import setNewUniqueCache
+from env.environment import *
+from climaf.cache import setNewUniqueCache, craz
 from climaf.driver import cfile
 from climaf.classes import ds
 from climaf.functions import cscalar, apply_scale_offset, fmul, fdiv, fadd, fsub, iplot, getLevs, vertical_average, \
     implot, diff_regrid, diff_regridn, tableau, annual_cycle, clim_average, clim_average_fast, summary, projects, \
     lonlatvert_interpolation, zonmean_interpolation, zonmean, diff_zonmean, convert_list_to_string,\
     ts_plot, iplot_members
-from env.environment import *
 
 
 class CscalarTests(unittest.TestCase):
@@ -27,6 +25,9 @@ class CscalarTests(unittest.TestCase):
     @unittest.skipUnless(False, "Test not implemented")
     def test_cscalar(self):
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ApplyScaleOffsetTests(unittest.TestCase):
@@ -36,6 +37,9 @@ class ApplyScaleOffsetTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class FmulTests(unittest.TestCase):
 
@@ -43,6 +47,9 @@ class FmulTests(unittest.TestCase):
     def test_fmul(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class FdivTests(unittest.TestCase):
@@ -52,6 +59,9 @@ class FdivTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class FaddTests(unittest.TestCase):
 
@@ -59,6 +69,9 @@ class FaddTests(unittest.TestCase):
     def test_fadd(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class FsubTests(unittest.TestCase):
@@ -68,6 +81,9 @@ class FsubTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class IplotTests(unittest.TestCase):
 
@@ -75,6 +91,9 @@ class IplotTests(unittest.TestCase):
     def test_iplot(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class GetLevsTests(unittest.TestCase):
@@ -84,6 +103,9 @@ class GetLevsTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class VerticalAverageTests(unittest.TestCase):
 
@@ -91,6 +113,9 @@ class VerticalAverageTests(unittest.TestCase):
     def test_vertical_average(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ImplotTests(unittest.TestCase):
@@ -100,6 +125,9 @@ class ImplotTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class DiffRegridTests(unittest.TestCase):
 
@@ -108,6 +136,9 @@ class DiffRegridTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class DiffRegridnTests(unittest.TestCase):
 
@@ -115,6 +146,9 @@ class DiffRegridnTests(unittest.TestCase):
     def test_diff_regridn(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class TableauTests(unittest.TestCase):
@@ -143,6 +177,9 @@ class TableauTests(unittest.TestCase):
         my_table = tableau(8, 2)
         self.assertTrue(self.my_table_test_function(my_table, 2, 8))
 
+    def tearDown(self):
+        craz()
+
 
 class AnnualCycleTests(unittest.TestCase):
 
@@ -150,6 +187,9 @@ class AnnualCycleTests(unittest.TestCase):
     def test_annual_cycle(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ClimAverageTests(unittest.TestCase):
@@ -159,6 +199,9 @@ class ClimAverageTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ClimAverageFastTests(unittest.TestCase):
 
@@ -166,6 +209,9 @@ class ClimAverageFastTests(unittest.TestCase):
     def test_clim_average_fast(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class SummaryTests(unittest.TestCase):
@@ -175,6 +221,9 @@ class SummaryTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ProjectsTests(unittest.TestCase):
 
@@ -182,6 +231,9 @@ class ProjectsTests(unittest.TestCase):
     def test_projects(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class lonlatvertInterpolationTests(unittest.TestCase):
@@ -191,6 +243,9 @@ class lonlatvertInterpolationTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ZonmeanInterpolationTests(unittest.TestCase):
 
@@ -198,6 +253,9 @@ class ZonmeanInterpolationTests(unittest.TestCase):
     def test_zonmean_interpolation(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ZonmeanTests(unittest.TestCase):
@@ -207,6 +265,9 @@ class ZonmeanTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class DiffZonmeanTests(unittest.TestCase):
 
@@ -214,6 +275,9 @@ class DiffZonmeanTests(unittest.TestCase):
     def test_diff_zonmean(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ConvertListToStringTests(unittest.TestCase):
@@ -242,6 +306,9 @@ class ConvertListToStringTests(unittest.TestCase):
         my_list = ["toto", 1, dict(a_key="a_value", an_other_key=8), [("8", 6), "an_other_value"]]
         self.assertEqual(convert_list_to_string(my_list), self.my_conversion_function(my_list))
 
+    def tearDown(self):
+        craz()
+
 
 class TsPlotTests(unittest.TestCase):
 
@@ -250,6 +317,9 @@ class TsPlotTests(unittest.TestCase):
         # TODO: Implement the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class IplotMembersTests(unittest.TestCase):
 
@@ -257,6 +327,9 @@ class IplotMembersTests(unittest.TestCase):
     def test_iplot_members(self):
         # TODO: Implement the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -268,4 +341,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

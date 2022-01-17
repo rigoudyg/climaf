@@ -10,15 +10,13 @@ CliMAF handling of external scripts and binaries , and of internal operators (Py
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import os
 import re
-import sys
-import subprocess
 
-from climaf.operators_scripts import scriptFlags
-from climaf.utils import Climaf_Operator_Error
+
 from env.clogging import clogger
 from env.environment import *
+from climaf.operators_scripts import scriptFlags
+from climaf.utils import Climaf_Operator_Error
 from climaf.driver import capply
 
 # Next definition can be splitted in a set managed by an administrator, and
@@ -240,7 +238,7 @@ class cscript(object):
                 clogger.debug("Found %s" % executable)
                 #
                 # Analyze inputs field keywords and populate dict
-                # attribute 'inputs' with some properties
+                # attribute 'inputs' with some properties (key is rank)
                 self.inputs = dict()
                 commuteWithEnsemble = True
                 it = re.finditer(

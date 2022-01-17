@@ -10,12 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 # Created : S.Senesi - 2014
 
-import sys
-import os
-import os.path
 import re
-import posixpath
-import subprocess
 import time
 import shutil
 import copy
@@ -25,6 +20,9 @@ from datetime import datetime
 from functools import reduce
 from six import string_types
 
+from climaf.dataloc import remote_to_local_filename
+from climaf.utils import Climaf_Driver_Error
+
 try:
     from commands import getoutput, getstatusoutput
 except ImportError:
@@ -32,18 +30,19 @@ except ImportError:
 
 
 # Climaf modules
-import climaf
+from env.environment import *
 from climaf.operators_scripts import scriptFlags
 from climaf.operators_derive import is_derived_variable, derived_variable, derive
 from climaf import classes
-from climaf import cache
+from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject, hasBeginObject, complement, \
+    generateUniqueFileName, register, rename, has_cvalue, store_cvalue
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import init_period, cperiod, merge_periods
-from climaf import xdg_bin
-from climaf.classes import allow_errors_on_ds_call
-from env.environment import *
+from climaf.period import init_period, merge_periods
+from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
+    domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
+from climaf.ESMValTool_diags import call_evt_script
 
 
 # When evaluating an object, default behaviour is to search cache for including or begin objects
@@ -53,17 +52,18 @@ dig_hard_into_cache = True
 
 def capply(climaf_operator, *operands, **parameters):
     """
-    Builds the object representing applying a CliMAF operator (script, function or macro) by calling the dedicated
-    function.
+    Builds the object representing applying a CliMAF operator (script, function or macro) by
+    calling the dedicated function.
     :param climaf_operator: a CliMAF operator (either a declared script, macro or operator)
     :param operands: operands to be passed to the climaf operator
     :param parameters: parameters to be passed to the climaf operator (not available for macros)
-    :return: a list of CliMAF objects (stored if auto-store is on)
+    :return: a list of CliMAF objects
     """
     res = None
-    if operands is None or operands[0] is None and not classes.allow_errors_on_ds_call:
+    if operands is None or operands[0] is None and not allow_errors_on_ds_call:
         raise Climaf_Driver_Error("Operands is None for operator %s" % climaf_operator)
     opds = list(map(str, operands))
+
     if climaf_operator in cscripts:
         # clogger.debug("applying script %s to"%climaf_operator + `opds` + `parameters`)
         res = capply_script(climaf_operator, *operands, **parameters)
@@ -71,16 +71,20 @@ def capply(climaf_operator, *operands, **parameters):
         op = cscripts[climaf_operator]
         if op.outputFormat in none_formats:
             ceval(res, userflags=copy.copy(op.flags))
+
     elif climaf_operator in cmacros:
         if len(parameters) > 0:
             raise Climaf_Driver_Error("Macros cannot be called with keyword args")
         clogger.debug("applying macro %s to" % climaf_operator + repr(opds))
         res = instantiate(cmacros[climaf_operator], *operands)
+
     elif climaf_operator in operators:
         clogger.debug("applying operator %s to" % climaf_operator + repr(opds) + repr(parameters))
         res = capply_operator(climaf_operator, *operands, **parameters)
+
     else:
         clogger.error("%s is not a known operator nor script" % climaf_operator)
+
     return res
 
 
@@ -116,13 +120,13 @@ def capply_script(script_name, *operands, **parameters):
     else:
         opscopy = list()
     # Next watch dog disabled for tests !!!!!
-    # if True in [isinstance(op, classes.cens) for op in opscopy]:
+    # if True in [isinstance(op, cens) for op in opscopy]:
     #    raise Climaf_Driver_Error("Cannot yet have an ensemble as operand except as first one")
     #
     # If first operand is an ensemble, and the script is not ensemble-capable,
     # result is the ensemble of applying the script ot each member of first operand
     # Otherwise, just call maketree
-    if isinstance(first, classes.cens) and script.flags.commuteWithEnsemble:
+    if isinstance(first, cens) and script.flags.commuteWithEnsemble:
         # Must iterate on members
         reps = []
         order = first.order
@@ -132,7 +136,7 @@ def capply_script(script_name, *operands, **parameters):
             params = parameters.copy()
             params["member_label"] = label
             reps.append(maketree(script_name, script, member, *opscopy, **params))
-        return classes.cens(dict(list(zip(order, reps))), order)
+        return cens(dict(list(zip(order, reps))), order)
     else:
         return maketree(script_name, script, *operands, **parameters)
 
@@ -150,8 +154,8 @@ def maketree(script_name, script, *operands, **parameters):
         defaultVariable = add_dict["add_variable"]
         parameters["add_variable"] = defaultVariable
     else:
-        defaultVariable = classes.varOf(operands[0])
-    rep = classes.ctree(script_name, script, *operands, **parameters)
+        defaultVariable = varOf(operands[0])
+    rep = ctree(script_name, script, *operands, **parameters)
     # TBD Analyze script inputs cardinality vs actual arguments
     # Create one child for each output
     # defaultPeriod=operands[0].period
@@ -166,7 +170,7 @@ def maketree(script_name, script, *operands, **parameters):
             rep.variable = template.substitute(parameters)
         else:
             # This is a secondary output
-            son = classes.scriptChild(rep, outname)
+            son = scriptChild(rep, outname)
             if "%s" in script.outputs[outname]:
                 son.variable = script.outputs[outname] % defaultVariable
             else:
@@ -200,19 +204,28 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: a pair : either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating dataset operand " + cobject.crs + " having kvp= " + repr(cobject.kvp))
     ds = cobject
-    cache_value = cache.hasExactObject(ds)
+    # If the dataset was not defined by its path, check that it is completely defined
+    if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
+        ds_ambiguous_args = ds.explore("choices")
+        if len(ds_ambiguous_args) != 0:
+            clogger.warning("Before doing a cfile on the dataset %s, check that it "
+                            "is completely defined with 'explore'." % cobject.crs)
+            ds = ds.explore("resolve")
+            clogger.warning("Update dataset %s with the following arguments: %s" % (cobject.crs,
+                                                                                    str(ds_ambiguous_args)))
+    cache_value, costs = hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
         cdedent()
-        if format == 'file':
-            return cache_value
+        if format in ['file', ]:
+            return cache_value, costs
         else:
-            return cread(cache_value, classes.varOf(ds))
+            return cread(cache_value, varOf(ds)), costs
     if ds.isLocal() or ds.isCached():
         clogger.debug("Dataset %s is local or cached " % ds)
         #  if the data is local, then
@@ -229,15 +242,13 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
             # and return it
             derived = derive_variable(ds)
             clogger.debug("evaluating derived variable %s as %s" % (ds.variable, repr(derived)))
-            derived_value = ceval(derived, format=format, deep=deep,
-                                  userflags=userflags,
-                                  derived_list=derived_list + [ds.variable],
-                                  recurse_list=recurse_list)
+            derived_value, costs = ceval(derived, format=format, deep=deep, userflags=userflags,
+                                         derived_list=derived_list + [ds.variable], recurse_list=recurse_list)
             if derived_value:
                 clogger.debug("succeeded in evaluating derived variable %s as %s" % (ds.variable, repr(derived)))
                 set_variable(derived_value, ds.variable, format=format)
             cdedent()
-            return derived_value
+            return derived_value, costs
         elif noselect(userflags, ds, format) and format in ["file", ]:
             # The caller is assumed to be able to select the needed sub-period or variable
             # and to select the variable
@@ -246,12 +257,12 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
             rep = ds.baseFiles()
             if not rep:
                 raise Climaf_Driver_Error("No file found for %s" % repr(ds))
-            return rep  # a single string with all filenames,
+            return rep, compute_cost()  # first element is a single string with all filenames,
             # or a list of such strings in case of ensembles
         else:
             clogger.debug("Must subset and/or aggregate and/or select " +
                           "var from data files and/or get data, or provide object result")
-            if format == 'file' or format == "MaskedArray":
+            if format in ['file', "MaskedArray"]:
                 if ds.hasOneMember():
                     clogger.debug("Fetching/selection/aggregation is done using an external script for now - TBD")
                     extract = capply('select', ds)
@@ -261,12 +272,13 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                     extract = capply('select_member', ds)
                 if extract is None:
                     raise Climaf_Driver_Error("Cannot access dataset" + repr(ds))
-                rep = ceval(extract, userflags=userflags, format=format)
+                rep, costs = ceval(extract, userflags=userflags, format=format)
             else:
                 raise Climaf_Driver_Error("Untractable output format %s" % format)
-            userflags.unset_selectors()
+            if userflags :
+                userflags.unset_selectors()
             cdedent()
-            return rep
+            return rep, costs
     else:
         # Non-local and non-cached dataset
         #   if the user can access the dataset by one of the dataset-specific protocols
@@ -276,7 +288,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         if userflags.canOpendap and format == 'file':
             clogger.debug("But user can OpenDAP ")
             cdedent()
-            return ds.adressOf()
+            return ds.adressOf(), compute_cost()
         else:
             if noselect(userflags, ds, format):
                 # ce cas-ci n'a jamais été activé !
@@ -285,15 +297,15 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 rep = ds.baseFiles()
                 if not rep:
                     raise Climaf_Driver_Error("No file found for %s" % repr(ds))
-                return rep
+                return rep, compute_cost()
             else:
                 # This matches reaching data using e.g. ftp
                 clogger.debug("Must remote read and cache ")
-                rep = ceval(capply('remote_select', ds), userflags=userflags, format=format)
+                rep, costs = ceval(capply('remote_select', ds), userflags=userflags, format=format)
                 ds.files = rep
                 userflags.unset_selectors()
                 cdedent()
-                return rep
+                return rep, costs
 
 
 def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -306,29 +318,29 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject)
+        cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
-    filename = cache.hasExactObject(cobject)
+    filename, costs = hasExactObject(cobject)
     # filename=None
     if filename:
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return filename
+            return filename, costs
         else:
-            return cread(filename, classes.varOf(cobject))
+            return cread(filename, varOf(cobject)), costs
     if dig_hard_into_cache:
         clogger.debug("Searching cache for including object for : " + repr(cobject))
         ########################################################################
-        it, altperiod = cache.hasIncludingObject(cobject)
+        it, altperiod = hasIncludingObject(cobject)
         # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
         # it=None
         if it:
@@ -336,16 +348,16 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
             if format == 'file':
                 clogger.info("Selecting " + repr(cobject) + " out of it")
                 # Just select (if necessary for the user) the portion relevant to the request
-                rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
+                rep, costs = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
                 cdedent()
-                return rep
+                return rep, costs
             else:
                 clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
                               "including object found for : " % format + repr(cobject))
             #
         clogger.debug("Searching cache for begin  object for : " + repr(cobject))
         ########################################################################
-        it, comp_period = cache.hasBeginObject(cobject)
+        it, comp_period = hasBeginObject(cobject)
         clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
         # it=None
         if it:
@@ -355,14 +367,14 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
             # Build complement object for end, and eval it
             comp = copy.deepcopy(it)
             comp.setperiod(comp_period)
-            evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
+            evalcomp, _ = ceval(comp, userflags, format, deep, derived_list, recurse_list)
             set_variable(evalcomp, cobject.variable, format=format)
-            rep = cache.complement(begcrs, comp.crs, cobject.crs)
+            rep, costs = complement(begcrs, comp.crs, cobject.crs)
             cdedent()
             if format == 'file':
-                return rep
+                return rep, costs
             else:
-                return ceval(cobject)
+                return ceval(cobject), costs
         #
     clogger.info("nothing relevant found in cache for %s" % cobject.crs)
     #
@@ -377,24 +389,24 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
     if cobject.operator in cscripts:
         clogger.debug("Script %s found" % cobject.operator)
-        file = ceval_script(cobject, down_deep,
-                            recurse_list=recurse_list)  # Does return a filename, or list of filenames
+        filen, costs = ceval_script(cobject, down_deep,
+                                   recurse_list=recurse_list)  # Does return a filename, or list of filenames
         cdedent()
-        if format == 'file':
-            return file
+        if format in ['file', ]:
+            return filen, costs
         else:
-            return cread(file, classes.varOf(cobject))
+            return cread(filen, varOf(cobject)), costs
     elif cobject.operator in operators:
         clogger.debug("Operator %s found" % cobject.operator)
-        # TODO: Implement ceval_operator
+        # TODO: Implement ceval_operator (and handle costs)
         obj = ceval_operator(cobject, deep)
         cdedent()
-        if format == 'file':
+        if format in ['file', ]:
             # TODO: Implement cstore
             rep = cstore(obj)
-            return rep
+            return rep, compute_cost()
         else:
-            return obj
+            return obj, compute_cost()
     else:
         raise Climaf_Driver_Error("operator %s is not a script nor known operator" % str(cobject.operator))
 
@@ -417,29 +429,29 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject)
+        cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
-    filename = cache.hasExactObject(cobject)
+    filename, costs = hasExactObject(cobject)
     # filename=None
     if filename:
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return filename
+            return filename, costs
         else:
-            return cread(filename, classes.varOf(cobject))
+            return cread(filename, varOf(cobject)), costs
     if dig_hard_into_cache:
         clogger.debug("Searching cache for including object for : " + repr(cobject))
         ########################################################################
-        it, altperiod = cache.hasIncludingObject(cobject)
+        it, altperiod = hasIncludingObject(cobject)
         # clogger.debug("Finished with searching cache for including object for : " + `cobject`)
         # it=None
         if it:
@@ -447,16 +459,16 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
             if format == 'file':
                 clogger.info("Selecting " + repr(cobject) + " out of it")
                 # Just select (if necessary for the user) the portion relevant to the request
-                rep = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
+                rep, costs = ceval_select(it, cobject, userflags, format, deep, derived_list, recurse_list)
                 cdedent()
-                return rep
+                return rep, costs
             else:
                 clogger.debug("Because out format %s is not (yet, TBD) supported by ceval_select, cannot use "
                               "including object found for : " % format + repr(cobject))
             #
         clogger.debug("Searching cache for begin  object for : " + repr(cobject))
         ########################################################################
-        it, comp_period = cache.hasBeginObject(cobject)
+        it, comp_period = hasBeginObject(cobject)
         clogger.debug("Finished with searching cache for begin  object for : " + repr(cobject))
         # it=None
         if it:
@@ -466,12 +478,12 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
             # Build complement object for end, and eval it
             comp = copy.deepcopy(it)
             comp.setperiod(comp_period)
-            evalcomp = ceval(comp, userflags, format, deep, derived_list, recurse_list)
+            evalcomp, _ = ceval(comp, userflags, format, deep, derived_list, recurse_list)
             set_variable(evalcomp, cobject.variable, format=format)
-            rep = cache.complement(begcrs, comp.crs, cobject.crs)
+            rep, costs = complement(begcrs, comp.crs, cobject.crs)
             cdedent()
-            if format == 'file':
-                return rep
+            if format in ['file', ]:
+                return rep, costs
             else:
                 return ceval(cobject)
         #
@@ -483,11 +495,12 @@ def ceval_for_scriptChild(cobject, userflags=None, format="MaskedArray", deep=No
     else:
         down_deep = None
     # Force evaluation of 'father' script
-    if ceval_script(cobject.father, down_deep, recurse_list=recurse_list) is not None:
+    script_eval, _ = ceval_script(cobject.father, down_deep, recurse_list=recurse_list)
+    if script_eval is not None:
         # Re-evaluate, which should succeed using cache
-        rep = ceval(cobject, userflags, format, None, recurse_list=recurse_list)
+        rep, costs = ceval(cobject, userflags, format, None, recurse_list=recurse_list)
         cdedent()
-        return rep
+        return rep, costs
     else:
         raise Climaf_Driver_Error("generating script aborted for " + cobject.father.crs)
 
@@ -502,37 +515,37 @@ def ceval_for_cpage(cobject, userflags=None, format="MaskedArray", deep=None, de
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject)
+        cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
-    filename = cache.hasExactObject(cobject)
+    filename, costs = hasExactObject(cobject)
     # filename=None
     if filename:
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
-        if format == 'file':
-            return filename
+        if format in ['file', ]:
+            return filename, costs
         else:
-            return cread(filename, classes.varOf(cobject))
+            return cread(filename, varOf(cobject)), costs
     #
     #  Only deep=True can propagate downward !
     if deep:
         down_deep = True
     else:
         down_deep = None
-    file = cfilePage(cobject, down_deep, recurse_list=recurse_list)
+    filen, costs = cfilePage(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
     if format in ['file', ]:
-        return file
+        return filen, costs
     else:
-        return cread(file)  # !! Does it make sense ?
+        return cread(filen), costs  # !! Does it make sense ?
 
 
 def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -545,25 +558,25 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject)
+        cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
-    filename = cache.hasExactObject(cobject)
+    filename, costs = hasExactObject(cobject)
     # filename=None
     if filename:
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
-        if format == 'file':
-            return filename
+        if format in ['file', ]:
+            return filename, costs
         else:
-            return cread(filename, classes.varOf(cobject))
+            return cread(filename, varOf(cobject)), costs
     #
     #  Only deep=True can propagate downward !
     if deep:
@@ -571,12 +584,12 @@ def ceval_for_cpage_pdf(cobject, userflags=None, format="MaskedArray", deep=None
     else:
         down_deep = None
     #
-    file = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
+    filen, costs = cfilePage_pdf(cobject, down_deep, recurse_list=recurse_list)
     cdedent()
-    if format == 'file':
-        return file
+    if format in ['file', ]:
+        return filen, costs
     else:
-        return cread(file)  # !! Does it make sense ?
+        return cread(filen)  # !! Does it make sense ?
 
 
 def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -589,34 +602,41 @@ def ceval_for_cens(cobject, userflags=None, format="MaskedArray", deep=None, der
     :param deep:
     :param derived_list:
     :param recurse_list:
-    :return:
+    :return: either a filename string or MaskedArray, and a cost object
     """
     recurse_list.append(cobject.crs)
     clogger.debug("Evaluating compound object : " + repr(cobject))
     #################################################################
     if deep is not None:
-        cache.cdrop(cobject)
+        cdrop(cobject)
     #
     clogger.debug("Searching cache for exact object : " + repr(cobject))
     #################################################################
-    filename = cache.hasExactObject(cobject)
+    filename, costs = hasExactObject(cobject)
     # filename=None
     if filename:
         clogger.info("Object found in cache: %s is at %s:  " % (cobject.crs, filename))
         cdedent()
         if format == 'file':
-            return filename
+            return filename, costs
         else:
-            return cread(filename, classes.varOf(cobject))
+            return cread(filename, varOf(cobject)), costs
     d = dict()
+    costs = dict()
     for member in cobject.order:
         # print ("evaluating member %s"%member)
-        d[member] = ceval(cobject[member], copy.copy(userflags), format, deep, recurse_list=recurse_list)
+        d[member], costs[member] = ceval(cobject[member],
+                                         copy.copy(userflags), format, deep, recurse_list=recurse_list)
+
     cdedent()
-    if format == "file":
-        return reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
+    if format in ["file", ]:
+        files = reduce(lambda x, y: x + " " + y, [d[m] for m in cobject.order])
+        total_cost = compute_cost()
+        for m in cobject.order:
+            total_cost.add(costs[m])
+        return files, total_cost
     else:
-        return d
+        return d, costs
 
 
 def ceval_for_string(cobject, userflags=None, format="MaskedArray", deep=None, derived_list=list(),
@@ -636,12 +656,42 @@ def ceval_for_string(cobject, userflags=None, format="MaskedArray", deep=None, d
     raise NotImplementedError("Evaluation from CRS is not yet implemented ( %s )" % cobject)
 
 
+def evaluate_inputs(call, deep = False ,recurse_list = []):
+    # Evaluate input data for a script call , either a CliMAF-tye one or an ESMValTool one
+    invalues = []
+    sizes = []
+    total_costs = compute_cost()
+    for op in call.operands:
+        if op:
+            if call.operator != 'remote_select' and \
+                    isinstance(op, cdataset) and \
+                    not (op.isLocal() or op.isCached()):
+                inValue, costs = ceval(op, format='file', deep=deep)
+            else:
+                inValue, costs = ceval(op, format='file', deep=deep,
+                                       userflags=call.flags, recurse_list=recurse_list)
+            clogger.debug("evaluating %s operand %s as %s" % (call.operator, op, inValue))
+            if inValue in [None, ""]:
+                raise Climaf_Driver_Error("When evaluating %s : value for %s is None" % (call.script, repr(op)))
+            if isinstance(inValue, list):
+                size = len(inValue)
+            else:
+                size = 1
+            total_costs.add(costs)
+        else:
+            inValue = ''
+            size = 0
+        sizes.append(size)
+        invalues.append(inValue)
+    return invalues, sizes, total_costs
+
+
 def ceval(cobject, userflags=None, format="MaskedArray",
           deep=None, derived_list=[], recurse_list=[]):
     """
     Actually evaluates a CliMAF object, either as an in-memory data structure or
     as a string of filenames (which either represent a superset or exactly includes
-    the desired data)
+    the desired data). Returns it in pair with a cost object
 
     - with arg deep=True , re-evaluates all components
     - with arg deep=False, re-evaluates top level operation
@@ -662,23 +712,23 @@ def ceval(cobject, userflags=None, format="MaskedArray",
     #    clogger.critical("INTERNAL ERROR : infinite loop on object: "+cobject.crs)
     #    return None
     cindent()
-    if isinstance(cobject, classes.cdataset):
+    if isinstance(cobject, cdataset):
         return ceval_for_cdataset(cobject=cobject, userflags=userflags, format=format, deep=deep,
                                   derived_list=derived_list, recurse_list=recurse_list)
     #
-    elif isinstance(cobject, classes.ctree):
+    elif isinstance(cobject, ctree):
         return ceval_for_ctree(cobject=cobject, userflags=userflags, format=format, deep=deep,
                                derived_list=derived_list, recurse_list=recurse_list)
-    elif isinstance(cobject, classes.scriptChild):
+    elif isinstance(cobject, scriptChild):
         return ceval_for_scriptChild(cobject=cobject, userflags=userflags, format=format, deep=deep,
                                      derived_list=derived_list, recurse_list=recurse_list)
-    elif isinstance(cobject, classes.cpage):
+    elif isinstance(cobject, cpage):
         return ceval_for_cpage(cobject=cobject, userflags=userflags, format=format, deep=deep,
                                derived_list=derived_list, recurse_list=recurse_list)
-    elif isinstance(cobject, classes.cpage_pdf):
+    elif isinstance(cobject, cpage_pdf):
         return ceval_for_cpage_pdf(cobject=cobject, userflags=userflags, format=format, deep=deep,
                                    derived_list=derived_list, recurse_list=recurse_list)
-    elif isinstance(cobject, classes.cens):
+    elif isinstance(cobject, cens):
         return ceval_for_cens(cobject=cobject, userflags=userflags, format=format, deep=deep,
                               derived_list=derived_list, recurse_list=recurse_list)
     elif isinstance(cobject, str):
@@ -691,7 +741,7 @@ def ceval(cobject, userflags=None, format="MaskedArray",
 def ceval_script(scriptCall, deep, recurse_list=[]):
     """ Actually applies a CliMAF-declared script on a script_call object
 
-    Prepare operands as fiels and build command from operands and parameters list
+    Prepare operands as fields and build command from operands and parameters list
     Assumes that scripts are described in dictionary 'scripts'  by templates as
     documented in operators.cscript
 
@@ -699,30 +749,10 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     """
     script = cscripts[scriptCall.operator]
     template = Template(script.command)
+    total_costs = compute_cost()
     # Evaluate input data
-    invalues = []
-    sizes = []
-    for op in scriptCall.operands:
-        if op:
-            if scriptCall.operator != 'remote_select' and \
-                    isinstance(op, classes.cdataset) and \
-                    not (op.isLocal() or op.isCached()):
-                inValue = ceval(op, format='file', deep=deep)
-            else:
-                inValue = ceval(op, userflags=scriptCall.flags, format='file', deep=deep,
-                                recurse_list=recurse_list)
-            clogger.debug("evaluating %s operand %s as %s" % (scriptCall.operator, op, inValue))
-            if inValue is None or inValue is "":
-                raise Climaf_Driver_Error("When evaluating %s : value for %s is None" % (scriptCall.script, repr(op)))
-            if isinstance(inValue, list):
-                size = len(inValue)
-            else:
-                size = 1
-        else:
-            inValue = ''
-            size = 0
-        sizes.append(size)
-        invalues.append(inValue)
+    invalues, sizes, partial_cost =evaluate_inputs(scriptCall, deep, recurse_list)
+    total_costs.add(partial_cost)
     # print("len(invalues)=%d"%len(invalues))
     #
     # Replace input data placeholders with filenames
@@ -739,20 +769,20 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                                       "some input file does not exist among %s:" % (scriptCall.operator, op, infile))
         subdict[label] = infile
         # if scriptCall.flags.canSelectVar :
-        subdict["var"] = classes.varOf(op)
-        subdict["Var"] = classes.varOf(op)
-        if isinstance(op, classes.cdataset) and op.alias:
+        subdict["var"] = varOf(op)
+        subdict["Var"] = varOf(op)
+        if isinstance(op, cdataset) and op.alias:
             filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
             if op.matches_conditions(conditions):
-                if scriptCall.flags.canAlias and "," not in classes.varOf(op):
-                    # if script=="select" and ((classes.varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
+                if scriptCall.flags.canAlias and "," not in varOf(op):
+                    # if script=="select" and ((varOf(op) != filevar) or scale != 1.0 or offset != 0.) :
                     subdict["var"] = Template(filevar).safe_substitute(op.kvp)
-                    subdict["alias"] = "%s,%s,%.4g,%.4g" % (classes.varOf(op), subdict["var"], scale, offset)
+                    subdict["alias"] = "%s,%s,%.4g,%.4g" % (varOf(op), subdict["var"], scale, offset)
                 if units:
                     subdict["units"] = units
                 if scriptCall.flags.canMissing and missing:
                     subdict["missing"] = missing
-        if isinstance(op, classes.cens):
+        if isinstance(op, cens):
             if not multiple:
                 raise Climaf_Driver_Error(
                     "Script %s 's input #%s cannot accept ensemble %s" % (scriptCall.script, 0, repr(op)))
@@ -764,17 +794,18 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 subdict["period"] = str(per)
                 subdict["period_iso"] = per.iso()
         if scriptCall.flags.canSelectDomain:
-            subdict["domain"] = classes.domainOf(op)
+            subdict["domain"] = domainOf(op)
     else:
-        subdict["var"] = classes.varOf(scriptCall)
-        subdict["Var"] = classes.varOf(scriptCall)
+        subdict["var"] = varOf(scriptCall)
+        subdict["Var"] = varOf(scriptCall)
+
     i = 0
     for op in scriptCall.operands:
         if op:
             opscrs += op.crs + " - "
         # print("processing %s, i=%d"%(`op`,i))
         infile = invalues[i]
-        if (scriptCall.operator != 'remote_select') and infile is not '' and \
+        if (scriptCall.operator != 'remote_select') and infile != '' and \
                 not all(map(os.path.exists, infile.split(" "))):
             raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:" % infile)
         i += 1
@@ -782,15 +813,15 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             label, multiple, serie = script.inputs[i]
             subdict[label] = infile
             # Provide the name of the variable in input file if script allows for
-            if isinstance(op, classes.cobject):
-                subdict["var_%d" % i] = classes.varOf(op)
-            if isinstance(op, classes.cdataset) and op.alias:
+            if isinstance(op, cobject):
+                subdict["var_%d" % i] = varOf(op)
+            if isinstance(op, cdataset) and op.alias:
                 filevar, scale, offset, units, filenameVar, missing, conditions = op.alias
                 if op.matches_conditions(conditions):
-                    if ((classes.varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
-                            "," not in classes.varOf(op):
+                    if ((varOf(op) != filevar) or (scale != 1.0) or (offset != 0.)) and \
+                            "," not in varOf(op):
                         subdict["var_%d" % i] = Template(filevar).safe_substitute(op.kvp)
-                        subdict["alias_%d" % i] = "%s %s %f %f" % (classes.varOf(op),
+                        subdict["alias_%d" % i] = "%s %s %f %f" % (varOf(op),
                                                                    subdict["var_%d" % i], scale, offset)
                     if units:
                         subdict["units_%d" % i] = units
@@ -802,7 +833,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 if not per.fx and per != "":
                     subdict["period_%d" % i] = str(per)
                     subdict["period_iso_%d" % i] = per.iso()
-            subdict["domain_%d" % i] = classes.domainOf(op)
+            subdict["domain_%d" % i] = domainOf(op)
     clogger.debug("subdict for operands is " + repr(subdict))
     # substitution is deffered after scriptcall parameters evaluation, which may
     # redefine e.g period
@@ -823,24 +854,24 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         # Compute a filename for each ouptut
         # Un-named main output
         # main_output_filename=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
-        # #cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
-        tmpfile, tmpfile_fmt = os.path.splitext(cache.generateUniqueFileName(scriptCall.crs, format=output_fmt))
+        # #generateUniqueFileName(scriptCall.crs, format=output_fmt)
+        tmpfile, tmpfile_fmt = os.path.splitext(generateUniqueFileName(scriptCall.crs, format=output_fmt))
         main_output_filename = "%s_%i%s" % (tmpfile, os.getpid(), tmpfile_fmt)
 
         subdict["out"] = main_output_filename
-        subdict["out_" + classes.varOf(scriptCall)] = main_output_filename
+        subdict["out_" + varOf(scriptCall)] = main_output_filename
 
-        subdict["out_final"] = cache.generateUniqueFileName(scriptCall.crs, format=output_fmt)
-        subdict["out_final_" + classes.varOf(scriptCall)] = cache.generateUniqueFileName(scriptCall.crs,
+        subdict["out_final"] = generateUniqueFileName(scriptCall.crs, format=output_fmt)
+        subdict["out_final_" + varOf(scriptCall)] = generateUniqueFileName(scriptCall.crs,
                                                                                          format=output_fmt)
 
         # Named outputs
         for output in scriptCall.outputs:
             # subdict["out_"+output]=tempfile.NamedTemporaryFile(suffix="."+output_fmt).name
             tmpfile, tmpfile_fmt = os.path.splitext(
-                cache.generateUniqueFileName(scriptCall.crs + "." + output, format=output_fmt))
+                generateUniqueFileName(scriptCall.crs + "." + output, format=output_fmt))
             subdict["out_" + output] = "%s_%i%s" % (tmpfile, os.getpid(), tmpfile_fmt)
-            subdict["out_final_" + output] = cache.generateUniqueFileName(scriptCall.crs + "." + output,
+            subdict["out_final_" + output] = generateUniqueFileName(scriptCall.crs + "." + output,
                                                                           format=output_fmt)
 
     # Account for script call parameters
@@ -853,7 +884,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
-    if cache.hasExactObject(scriptCall.operands[0]):
+    exact, _ = hasExactObject(scriptCall.operands[0])
+    if exact:
         # for key in ["period","period_iso","var","domain","missing","alias","units"]:
         for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
             if key in subdict:
@@ -889,11 +921,11 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     if script.fixedfields is not None:
         # subdict_ff=dict()
         subdict_ff = scriptCall.parameters.copy()
-        subdict_ff["model"] = classes.modelOf(scriptCall.operands[0])
-        subdict_ff["simulation"] = classes.simulationOf(scriptCall.operands[0])
-        subdict_ff["project"] = classes.projectOf(scriptCall.operands[0])
-        subdict_ff["realm"] = classes.realmOf(scriptCall.operands[0])
-        subdict_ff["grid"] = classes.gridOf(scriptCall.operands[0])
+        subdict_ff["model"] = modelOf(scriptCall.operands[0])
+        subdict_ff["simulation"] = simulationOf(scriptCall.operands[0])
+        subdict_ff["project"] = projectOf(scriptCall.operands[0])
+        subdict_ff["realm"] = realmOf(scriptCall.operands[0])
+        subdict_ff["grid"] = gridOf(scriptCall.operands[0])
         scr_fixed_fields = script.fixedfields  # return paths: (linkname, targetname)
         files_exist = dict()
         for ll, lt in scr_fixed_fields:
@@ -922,12 +954,14 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                                       scriptCall.crs)
 
     #
+    duration = time.time() - tim1
+    total_costs.increment(duration)
     # For remote files, we supply ds.local_copies_of_remote_files
     # for local filenames in order to can use ds.check()
     if scriptCall.operator == 'remote_select':
         local_filename = []
         for el in scriptCall.operands[0].baseFiles().split(" "):
-            local_filename.append(climaf.dataloc.remote_to_local_filename(el))
+            local_filename.append(remote_to_local_filename(el))
         scriptCall.operands[0].local_copies_of_remote_files = ' '.join(local_filename)
     #
     # Clean fixed fields symbolic links (linkname, targetname)
@@ -935,38 +969,48 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         for ll, lt in script.fixedfields:
             if not files_exist[ll]:
                 os.system("rm -f " + ll)
+
     # Handle outputs
     if script.outputFormat in ["txt", ]:
         with open(logdir + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
     if script.outputFormat in none_formats:
-        return None
+        return None, 0.0
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
-    ok = cache.register(main_output_filename, scriptCall.crs, subdict["out_final"])
+    ok = register(main_output_filename, scriptCall.crs, total_costs, subdict["out_final"])
     # 2 - Named outputs
     for output in scriptCall.outputs:
-        ok = ok and cache.register(subdict["out_" + output], scriptCall.crs + "." + output,
-                                   subdict["out_final_" + output])
+        ok = ok and register(subdict["out_" + output], scriptCall.crs + "." + output,
+                                   total_costs, subdict["out_final_" + output])
     if ok:
-        duration = time.time() - tim1
-        # print(...file=sys.stderr)
         clogger.info("Done in %.1f s with script computation for "
                      "%s (command was :%s )" % (duration, repr(scriptCall), template))
-        return subdict["out_final"]  # main_output_filename
+        return subdict["out_final"], total_costs  # main_output_filename
     else:
         raise Climaf_Driver_Error("Some output missing when executing "
                                   ": %s. \n See %s/last.out" % (template, logdir))
+
+
+def ceval_evt(climaf_name, script, *operands, **parameters):
+    """
+    Evaluates OPERANDS and forward them to function
+    :py:func:`~climaf.ESMValTool_diags.call_evt_script` together with all arguments.
+
+    This function is NOT supposed to be called directly except by CliMAF driver, see doc.
+    """
+    invalues, _, _ = evaluate_inputs(ctree(script, None, *operands, **parameters))
+    return call_evt_script(climaf_name, script, invalues, *operands, **parameters)
 
 
 def timePeriod(cobject):
     """ Returns a time period for a CliMAF object : if object is a dataset, returns
     its time period, otherwise returns time period of first operand
     """
-    if isinstance(cobject, classes.cdataset):
+    if isinstance(cobject, cdataset):
         return cobject.period
-    elif isinstance(cobject, classes.ctree):
+    elif isinstance(cobject, ctree):
         clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
         if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
             clogger.debug("Building composite period for results of %s" % cobject.operator)
@@ -979,10 +1023,10 @@ def timePeriod(cobject):
         else:
             clogger.debug("timePeriod logic for script is 'choose 1st operand' %s" % cobject.script)
             return timePeriod(cobject.operands[0])
-    elif isinstance(cobject, classes.scriptChild):
+    elif isinstance(cobject, scriptChild):
         clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
         return timePeriod(cobject.father)
-    elif isinstance(cobject, classes.cens):
+    elif isinstance(cobject, cens):
         clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(list(cobject.values())[0])
     else:
@@ -1005,26 +1049,29 @@ def ceval_select(includer, included, userflags, format, deep, derived_list, recu
         extract = capply('select', includer, period=repr(incperiod))
         clogger.debug("Variable considered in extract: %s" % extract.variable)
         clogger.debug("Extract crs found: %s" % extract)
-        objfile = ceval(extract, userflags, 'file', deep, derived_list, recurse_list)
+        objfile, costs = ceval(extract, userflags, 'file', deep, derived_list, recurse_list)
         if objfile:
             crs = includer.buildcrs(period=incperiod)
-            return cache.rename(objfile, crs)
+            return rename(objfile, crs), costs
         else:
             clogger.critical("Cannot evaluate " + repr(extract))
             exit()
     else:
         clogger.error("Can yet process only files - TBD")
+        return None, compute_cost()
 
 
 def cread(datafile, varname=None, period=None):
     import re
     if not datafile:
         return None
-    if re.findall(".png$", datafile) or \
-            ((re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and (not xdg_bin)):
+    if re.findall(".png$", datafile):
         subprocess.Popen(["display", datafile, "&"])
-    elif (re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and xdg_bin:
-        subprocess.Popen(["xdg-open", datafile])
+    elif re.findall(".pdf$", datafile) or re.findall(".eps$", datafile):
+        if xdg_bin is None:
+            subprocess.Popen(["display", datafile, "&"])
+        else:
+            subprocess.Popen([xdg_bin, datafile])
     elif re.findall(".nc$", datafile):
         clogger.debug("reading NetCDF file %s" % datafile)
         if varname is None:
@@ -1035,6 +1082,9 @@ def cread(datafile, varname=None, period=None):
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
         from .anynetcdf import ncf
         fileobj = ncf(datafile)
+        if varname not in fileobj.variables:
+            clogger.error("File %s doesn't have requested variable %s, only %s" %
+                          (datafile, varname, fileobj.variables))
         # Note taken from the CDOpy developper : .data is not backwards
         # compatible to old scipy versions, [:] is
         data = fileobj.variables[varname][:]
@@ -1052,11 +1102,13 @@ def cread(datafile, varname=None, period=None):
 
 
 def cview(datafile):
-    if re.findall(".png$", datafile) or \
-            ((re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and (not xdg_bin)):
+    if re.findall(".png$", datafile):
         subprocess.Popen(["display", datafile, "&"])
-    elif (re.findall(".pdf$", datafile) or re.findall(".eps$", datafile)) and xdg_bin:
-        subprocess.Popen(["xdg-open", datafile])
+    elif re.findall(".pdf$", datafile) or re.findall(".eps$", datafile):
+        if xdg_bin is None:
+            subprocess.Popen(["display", datafile, "&"])
+        else:
+            subprocess.Popen([xdg_bin, datafile])
     else:
         clogger.error("cannot yet handle %s" % datafile)
         return None
@@ -1067,7 +1119,7 @@ def derive_variable(ds):
     representing the operation needed to compute it (using information in dict
     operators_derive.derived_variable
     """
-    if not isinstance(ds, classes.cdataset):
+    if not isinstance(ds, cdataset):
         raise Climaf_Driver_Error("arg is not a dataset")
     if not is_derived_variable(ds.variable, ds.project):
         raise Climaf_Driver_Error("%s is not a derived variable" % ds.variable)
@@ -1083,7 +1135,7 @@ def derive_variable(ds):
         if not first and "version" in dic:
             dic['version'] = "latest"
         first = False
-        inVars.append(classes.cdataset(**dic))
+        inVars.append(cdataset(**dic))
     params["add_variable"] = ds.variable
     # TODO: force the output variable to be well defined
     father = capply(op, *inVars, **params)
@@ -1091,7 +1143,7 @@ def derive_variable(ds):
     if outname == "out" or outname == ds.variable:
         rep = father
     else:
-        rep = classes.scriptChild(father, outname)
+        rep = scriptChild(father, outname)
     clogger.debug("DEBUG variable>>> %s" % rep.variable)
     # TODO: check the type of the outputs
     rep.variable = ds.variable
@@ -1139,14 +1191,15 @@ def noselect(userflags, ds, format):
 
     can_select = False
 
-    if ((userflags.canSelectVar or ds.oneVarPerFile()) and
-            (userflags.canSelectTime or ds.periodIsFine()) and
-            (userflags.canSelectDomain or ds.domainIsFine()) and
-            (userflags.canAggregateTime or ds.periodHasOneFile()) and
-            (userflags.canAlias or ds.hasExactVariable()) and
-            (userflags.canMissing or ds.missingIsOK()) and
-            (ds.hasOneMember()) and
-            (format == 'file')):
+    if (userflags and
+        (userflags.canSelectVar or ds.oneVarPerFile()) and
+        (userflags.canSelectTime or ds.periodIsFine()) and
+        (userflags.canSelectDomain or ds.domainIsFine()) and
+        (userflags.canAggregateTime or ds.periodHasOneFile()) and
+        (userflags.canAlias or ds.hasExactVariable()) and
+        (userflags.canMissing or ds.missingIsOK()) and
+        (ds.hasOneMember()) and
+        (format in ['file', ])):
         can_select = True
 
     return can_select
@@ -1198,7 +1251,7 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
     clogger.debug("Starting cfile at: " + start_time.strftime("%Y-%m-%d %H:%M:%S"))
     #
     # -- Evaluate the CliMAF object
-    result = ceval(object, format='file', deep=deep)
+    result, costs = ceval(object, format='file', deep=deep)
     #
     end_time = datetime.now()
     duration = end_time - start_time
@@ -1207,9 +1260,12 @@ def cfile(object, target=None, ln=None, hard=None, deep=None):
     if target is None:
         return result
     else:
+        if isinstance(object, cens):
+            clogger.error("Cannot create a single file hosting an ensemble. See function efile()")
+            return None
         target = os.path.abspath(os.path.expanduser(target))
         target_dir = os.path.dirname(target)
-        if isinstance(object, climaf.classes.cens):
+        if isinstance(object, cens):
             raise Climaf_Driver_Error("Cannot yet copy or link result files for an ensemble")
         if result is None:
             raise Climaf_Driver_Error("Issue when evaluating %s" % object)
@@ -1260,7 +1316,8 @@ def cshow(obj):
     ( launch computation if needed. )
     """
     clogger.debug("cshow called on " + str(obj))
-    return climaf.driver.ceval(obj, format='MaskedArray')
+    value, costs = ceval(obj, format='MaskedArray')
+    return value
 
 
 def cMA(obj, deep=None):
@@ -1280,14 +1337,20 @@ def cMA(obj, deep=None):
 
     """
     clogger.debug("cMA called with arguments : " + str(obj))
-    return climaf.driver.ceval(obj, format='MaskedArray', deep=deep)
+    value, costs = ceval(obj, format='MaskedArray', deep=deep)
+    return value
 
 
-def cvalue(obj, index=0, deep=None):
+def cvalue(obj, index=0, deep=None, cost=None):
     """
-    Return the value of the array for an object, after MV flattening, at a given index
+    Return the value of the array for an object, at a given index, after MV flattening
 
-    Example:
+    Arg DEEP is used as for :py:func:`climaf.driver.cfile()`
+
+    If arg COST is True, a tuple is returned, which second element is the total
+    compute cost for the value
+
+    Example, where the target object is a scalar (0d) field:
 
      >>> data=ds(project='mine',variable='tas', ...)
      >>> data1=time_average(data)
@@ -1297,13 +1360,17 @@ def cvalue(obj, index=0, deep=None):
     Does use the file representation of the object
     """
     if deep is None:
-        rep = cache.has_cvalue(obj.crs, index)
+        rep, costs = has_cvalue(obj.crs, index)
     else:
         rep = None
     if rep is None:
-        rep = float(cMA(obj, deep=deep).data.flat[index])
-        cache.store_cvalue(obj.crs, index, rep)
-    return rep
+        value, costs = ceval(obj, format='MaskedArray', deep=deep)
+        rep = float(value.data.flat[index])
+        store_cvalue(obj.crs, index, rep, costs)
+    if cost:
+        return rep, costs.tc
+    else:
+        return rep
 
 
 def cexport(*args, **kwargs):
@@ -1312,25 +1379,23 @@ def cexport(*args, **kwargs):
     """
     clogger.debug("cexport called with arguments" + str(args))
     if "format" in kwargs:
-        if (kwargs['format'] == "NetCDF" or kwargs['format'] == "netcdf" or kwargs['format'] == "nc"
-                or kwargs['format'] == "png" or kwargs['format'] == "pdf" or kwargs['format'] == "eps"):
+        if kwargs['format'] in ["NetCDF", "netcdf", "nc", "png", "pdf", "eps"]:
             kwargs['format'] = "file"
         if kwargs['format'] == "MA":
             kwargs['format'] = "MaskedArray"
-    return climaf.driver.ceval(*args, **kwargs)
+    return ceval(*args, **kwargs)
 
 
 def cimport(cobject, crs):
     clogger.debug("cimport called with argument", cobject)
     clogger.debug("should check syntax of arg 'crs' -TBD")
     clogger.warning("cimport is not for the dummies - Playing at your own risks !")
-    import numpy
     import numpy.ma
     if isinstance(cobject, numpy.ma.MaskedArray):
         clogger.debug("for now, use a file for importing - should revisit - TBD")
         clogger.error("not yet implemented fro Masked Arrays - TBD")
     elif isinstance(cobject, string_types):
-        cache.register(cobject, crs)
+        register(cobject, crs, compute_cost())
     else:
         clogger.error("argument is not a Masked Array nor a filename", cobject)
 
@@ -1361,7 +1426,7 @@ def cfilePage(cobj, deep, recurse_list=None):
     Returns : the filename in CliMAF cache, which contains the result (and None if failure)
 
     """
-    if not isinstance(cobj, classes.cpage):
+    if not isinstance(cobj, cpage):
         raise Climaf_Driver_Error("cobj is not a cpage object")
     clogger.debug("Computing figure array for cpage %s" % cobj.crs)
     #
@@ -1378,9 +1443,9 @@ def cfilePage(cobj, deep, recurse_list=None):
     ymargin = 30.  # Vertical shift between figures
     #
     usable_height = cobj.page_height - ymargin * (len(cobj.heights) - 1.) - y_top_margin - y_bot_margin
-    if cobj.title is not "":
+    if cobj.title != "":
         usable_height -= cobj.ybox
-    if cobj.insert is not "":
+    if cobj.insert != "":
         ins_base_width, ins_base_height = get_fig_sizes(cobj.insert)
         insert_height = int((float(ins_base_height) * cobj.insert_width) / float(ins_base_width))
         usable_height -= insert_height
@@ -1389,6 +1454,7 @@ def cfilePage(cobj, deep, recurse_list=None):
     #
     # page composition
     y = y_top_margin
+    total_costs = compute_cost()
     for line, rheight in zip(cobj.fig_lines, cobj.heights):
         # Line height in pixels
         height = usable_height * rheight
@@ -1399,9 +1465,11 @@ def cfilePage(cobj, deep, recurse_list=None):
             width = usable_width * rwidth
             scaling = "%dx%d+%d+%d" % (width, height, x, y)
             if fig:
-                figfile = ceval(fig, format="file", deep=deep, recurse_list=recurse_list)
+                figfile, costs = ceval(fig, format="file", deep=deep, recurse_list=recurse_list)
             else:
                 figfile = 'xc:None'
+                costs = compute_cost()
+            total_costs.add(costs)
             clogger.debug("Compositing figure %s", fig.crs if fig else 'None')
 
             args.extend([figfile, "-geometry", scaling, "-composite"])
@@ -1410,7 +1478,7 @@ def cfilePage(cobj, deep, recurse_list=None):
             try:
                 fig_width, fig_height = get_fig_sizes(figfile)
             except:
-                raise Climaf_Driver_Error("Issue with figure "+str(fig))
+                raise Climaf_Driver_Error("Issue with figure " + str(fig))
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1442,7 +1510,7 @@ def cfilePage(cobj, deep, recurse_list=None):
         args.extend([cobj.insert, "-geometry", "x%d+%d+%d" %
                      (insert_height, (cobj.page_width - cobj.insert_width) / 2, y), "-composite"])
 
-    out_fig = cache.generateUniqueFileName(cobj.crs, format=cobj.format)
+    out_fig = generateUniqueFileName(cobj.crs, format=cobj.format)
     if cobj.page_trim:
         args.append("-trim")
     if cobj.title != "":
@@ -1455,7 +1523,8 @@ def cfilePage(cobj, deep, recurse_list=None):
 
     command = " ".join(args)
     clogger.debug("Compositing figures : %s" % command)
-    
+    tim1 = time.time()
+    #
     try:
         with open("tmp.err", "w") as fic:
             out = subprocess.check_output(command, shell=True, stderr=fic)
@@ -1463,7 +1532,10 @@ def cfilePage(cobj, deep, recurse_list=None):
         with open("tmp.err") as fic:
             err = fic.read()
         raise Climaf_Driver_Error("Compositing failed : %s for %s" % (err, command))
-
+    #
+    duration = time.time() - tim1
+    total_costs.increment(duration)
+    #
     # There are cases where subprocess doesn't raise an Error, while compositing failed
     if not os.path.exists(out_fig):
         with open("tmp.err") as fic:
@@ -1471,9 +1543,11 @@ def cfilePage(cobj, deep, recurse_list=None):
         raise Climaf_Driver_Error("Compositing failed %s for %s" % (err, command))
     os.remove("tmp.err")
 
-    if cache.register(out_fig, cobj.crs):
+    if register(out_fig, cobj.crs, total_costs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
-        return out_fig
+        return out_fig, total_costs
+    else:
+        return None, compute_cost()
 
 
 def cfilePage_pdf(cobj, deep, recurse_list=None):
@@ -1486,7 +1560,7 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     Returns : the filename in CliMAF cache, which contains the result (and None if failure)
 
     """
-    if not isinstance(cobj, classes.cpage_pdf):
+    if not isinstance(cobj, cpage_pdf):
         raise Climaf_Driver_Error("cobj is not a cpage_pdf object")
     clogger.debug("Computing figure array for cpage %s" % cobj.crs)
     #
@@ -1505,15 +1579,18 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
             fig_nb]  # "%s"%preamb
     #
     # page composition
+    total_costs = compute_cost()
     for line in cobj.fig_lines:
         for fig in line:
             if fig:
-                figfile = ceval(fig, format="file", deep=deep, recurse_list=recurse_list)
+                figfile, costs = ceval(fig, format="file", deep=deep, recurse_list=recurse_list)
                 clogger.debug("Compositing figure %s", fig.crs)
+                total_costs.add(costs)
             else:
                 raise Climaf_Driver_Error("Each figure must exist ('None' figure is not accepted)")
             args.extend([figfile])
     #
+
     # more optional options
     if cobj.openright is True:
         args.extend(["--openright", "True"])
@@ -1538,11 +1615,13 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
 
     #
     # launch process and registering output in cache
-    out_fig = cache.generateUniqueFileName(cobj.crs, format='pdf')
+    out_fig = generateUniqueFileName(cobj.crs, format='pdf')
 
     args.extend(["--outfile", out_fig])
 
     clogger.debug("Compositing figures : %s" % repr(args))
+    tim1 = time.time()
+    #
     try:
         with open("tmp.err", "w") as fic:
             out = subprocess.check_output(" ".join(args), shell=True, stderr=fic)
@@ -1553,9 +1632,15 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     finally:
         os.remove("tmp.err")
 
-    if cache.register(out_fig, cobj.crs):
+    #
+    duration = time.time() - tim1
+    total_costs.increment(duration)
+    #
+    if register(out_fig, cobj.crs, total_costs):
         clogger.debug("Registering file %s for cpage %s" % (out_fig, cobj.crs))
-    return out_fig
+        return out_fig, total_costs
+    else:
+        return None, compute_cost()
 
 
 def calias(project, variable, fileVariable=None, **kwargs):
@@ -1604,7 +1689,7 @@ def efile(obj, filename, force=False):
          'filename' if it already exists
 
     """
-    if isinstance(obj, classes.cens):
+    if isinstance(obj, cens):
 
         if os.path.isfile(filename):
             if force:
@@ -1618,7 +1703,7 @@ def efile(obj, filename, force=False):
             ffile = cfile(memb)
 
             f = tempfile.NamedTemporaryFile(suffix=".nc")
-            command = "ncrename -O -v %s,%s_%s %s %s" % (classes.varOf(memb), classes.varOf(memb), lab, ffile, f.name)
+            command = "ncrename -O -v %s,%s_%s %s %s" % (varOf(memb), varOf(memb), lab, ffile, f.name)
             if os.system(command) != 0:
                 raise Climaf_Driver_Error("ncrename failed : %s" % command)
 
@@ -1627,16 +1712,6 @@ def efile(obj, filename, force=False):
                 raise Climaf_Driver_Error(
                     "Issue when merging %s and %s (using command: %s)" % (f.name, filename, command2))
             f.close()
-
+            return True
     else:
         clogger.warning("objet is not a 'cens' objet")
-
-
-class Climaf_Driver_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        cdedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)

@@ -25,15 +25,15 @@ try:
     from collections.abc import KeysView, ValuesView
 except ImportError:
     from _abcoll import KeysView, ValuesView
-from env.clogging import clogger, dedent
 from functools import reduce
 import six
 
+from env.environment import *
+from env.clogging import clogger, dedent
+
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
-from climaf import cachedir
 from climaf.driver import cfile
-from env.environment import *
 
 
 def header(title, style_file=None):
@@ -202,7 +202,7 @@ def link(label, filename, thumbnail=None, hover=True):
                             int(hover)
                         except:
                             raise Climaf_Html_Error("If hover is a not empty string, it must "
-                                                    "contain width and/or height, separaed by 'x' or '*'")
+                                                    "contain width and/or height, separated by 'x' or '*'")
 
                         hover_width = hover
                         hover_height = hover
@@ -309,8 +309,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
     else:
         fn = filename
         if altdir and fn:  # lv
-            from climaf import cachedir
-            fn = filename.replace(cachedir, altdir)
+            fn = filename.replace(default_cache, altdir)
         return '<TD ALIGN=RIGHT>' + \
                link(label, fn, thumbnail, hover) + \
                '</TD>\n'
@@ -496,6 +495,17 @@ def fline(func, farg, sargs, title=None,
 # cinstantiate("index.html","inst.html")
 
 
+def exec_and_discard_test(m, should_exec):
+    expression = m.group(1)
+    if should_exec:
+        # print "Executing %s"%expression
+        # try :
+        exec(expression, globals())
+        # except :
+        #    print "Issue executing %s"%expression
+    return ""
+
+
 def cinstantiate(objin, filout=None, should_exec=True):
     """ Read file or string 'objin', extract parts of text surrounded by 'Â£',
     evaluate them as Python assignments or expressions, replaces
@@ -505,17 +515,6 @@ def cinstantiate(objin, filout=None, should_exec=True):
 
      If assign is False, assignements will not be executed
     """
-
-    def exec_and_discard_test(m):
-        expression = m.group(1)
-        if should_exec:
-            # print "Executing %s"%expression
-            # try :
-            exec(expression, globals())
-            # except :
-            #    print "Issue executing %s"%expression
-        return ""
-
     #
     def replace_text_with_evaluation(m):
         expression = m.group(1)
@@ -570,15 +569,15 @@ def start_line(title):
     return tmpindex
 
 
-blank_cell = cachedir + '/Empty.png'
+blank_cell = default_cache + '/Empty.png'
 
 
 def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
-    # Need to create cachedir if it does not exist yet
-    if not os.path.isdir(cachedir):
-        os.makedirs(cachedir)
+    # Need to create default cache directory if it does not exist yet
+    if not os.path.isdir(default_cache):
+        os.makedirs(default_cache)
     if not os.path.isfile(blank_cell):
-        shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
+        shutil.copy(cpath[0] + '/plot/Empty.png', default_cache)
 
     if not do_cfile:
         return myplot

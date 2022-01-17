@@ -20,12 +20,11 @@ Example ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import os
 
+from env.site_settings import onCiclad
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
-from env.site_settings import onCiclad
 
 if onCiclad:
     cproject("OCMIP5", "model", "simulation", ("frequency", "monthly"), ensemble=["model"])

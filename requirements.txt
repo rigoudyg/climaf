@@ -9,3 +9,4 @@ cftime==1.0.3.4
 # cartopy==0.17
 # python-dateutil
 natsort
+pyyaml

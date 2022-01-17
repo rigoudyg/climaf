@@ -12,11 +12,12 @@ import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 
-from climaf.cache import setNewUniqueCache
-from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, calias
-from climaf.period import Climaf_Period_Error, init_period
 from env.environment import *
 from env.site_settings import atCNRM, onCiclad
+from climaf.cache import setNewUniqueCache, craz
+from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
+    calias, crealms
+from climaf.period import Climaf_Period_Error, init_period
 
 
 class CprojectTests(unittest.TestCase):
@@ -58,6 +59,9 @@ class CprojectTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CdefTests(unittest.TestCase):
 
@@ -75,11 +79,15 @@ class CdefTests(unittest.TestCase):
         with self.assertRaises(Climaf_Classes_Error):
             cdef("my_attribute", value="my_value", project="my_project")
 
+    def tearDown(self):
+        craz()
+
 
 class CobjectTests(unittest.TestCase):
 
     def setUp(self):
         self.my_object = cobject()
+        self.my_other_object = cobject()
 
     def test_cobject_init(self):
         self.assertEqual(self.my_object.crs, "void")
@@ -89,6 +97,11 @@ class CobjectTests(unittest.TestCase):
 
     def test_cobject_repr(self):
         self.assertEqual(repr(self.my_object), "void")
+
+    def test_cobject_equal(self):
+        self.assertEqual(self.my_object, self.my_other_object)
+        self.assertNotEqual(self.my_object, "test")
+        self.assertNotEqual(self.my_object, cdummy())
 
     @unittest.expectedFailure
     def test_cobject_register(self):
@@ -102,6 +115,9 @@ class CobjectTests(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.my_object.erase()
 
+    def tearDown(self):
+        craz()
+
 
 class CdummyTests(unittest.TestCase):
 
@@ -111,6 +127,16 @@ class CdummyTests(unittest.TestCase):
     def test_cdummy_buildcrs(self):
         my_dummy = cdummy()
         self.assertEqual(my_dummy.buildcrs(), "ARG")
+
+    def test_cdummy_equal(self):
+        my_dummy = cdummy()
+        my_other_dummy = cdummy()
+        self.assertEqual(my_dummy, my_other_dummy)
+        self.assertNotEqual(my_dummy, cobject())
+        self.assertNotEqual(my_dummy, "test")
+
+    def tearDown(self):
+        craz()
 
 
 class ProcessDatasetArgsTests(unittest.TestCase):
@@ -233,6 +259,9 @@ class ProcessDatasetArgsTests(unittest.TestCase):
             processDatasetArgs()
         # TODO: Try to find a project in which after facets retrieval, the value is None to pass in the exception
 
+    def tearDown(self):
+        craz()
+
 
 class CdatasetTests(unittest.TestCase):
 
@@ -315,6 +344,12 @@ class CdatasetTests(unittest.TestCase):
         # TODO: When this option will be implemented, write the associated test
         # self.assertEqual(self.my_other_dataset.buildcrs(crsrewrite=None), "")
 
+    def test_cdataset_equal(self):
+        self.assertNotEqual(self.my_dataset, "test")
+        self.assertNotEqual(self.my_dataset, cobject())
+        my_dataset = self.my_dataset.explore("resolve")
+        self.assertEqual(self.my_dataset, my_dataset)
+
     @unittest.skipUnless(False, "Test not yet written")
     def test_cdataset_errata(self):
         # TODO: Write the test
@@ -390,11 +425,19 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CensTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not yet written")
     def test_cens_init(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cens_equal(self):
         # TODO: Write the test
         pass
 
@@ -443,6 +486,9 @@ class CensTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class EdsTests(unittest.TestCase):
 
@@ -451,6 +497,9 @@ class EdsTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class FdsTests(unittest.TestCase):
 
@@ -458,6 +507,9 @@ class FdsTests(unittest.TestCase):
     def test_fds(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CtreeTests(unittest.TestCase):
@@ -477,6 +529,9 @@ class CtreeTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ScriptChildTests(unittest.TestCase):
 
@@ -495,6 +550,9 @@ class ScriptChildTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CompareTreesTests(unittest.TestCase):
 
@@ -502,6 +560,9 @@ class CompareTreesTests(unittest.TestCase):
     def test_compare_trees(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class AllowErrorOnDsTests(unittest.TestCase):
@@ -511,6 +572,9 @@ class AllowErrorOnDsTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class SelectProjectsTests(unittest.TestCase):
 
@@ -518,6 +582,9 @@ class SelectProjectsTests(unittest.TestCase):
     def test_select_projects(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class DsTests(unittest.TestCase):
@@ -527,6 +594,9 @@ class DsTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CfreqsTests(unittest.TestCase):
 
@@ -535,13 +605,21 @@ class CfreqsTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CrealmsTests(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Test not yet written")
     def test_crealms(self):
-        # TODO: Write the test
-        pass
+        crealms('my_project', {'atmos': "ATM", 'ocean': "OCE"})
+        self.assertIn("my_project", realms)
+        a_realm = realms["my_project"]
+        self.assertDictEqual(a_realm, {'atmos': "ATM", 'ocean': "OCE"})
+        del realms["my_project"]
+
+    def tearDown(self):
+        craz()
 
 
 class CaliasTests(unittest.TestCase):
@@ -551,6 +629,9 @@ class CaliasTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class VarIsAliasedTests(unittest.TestCase):
 
@@ -559,6 +640,9 @@ class VarIsAliasedTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CmissingTests(unittest.TestCase):
 
@@ -566,6 +650,9 @@ class CmissingTests(unittest.TestCase):
     def test_cmissing(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CpageTests(unittest.TestCase):
@@ -585,6 +672,9 @@ class CpageTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CpagePdfTests(unittest.TestCase):
 
@@ -597,6 +687,9 @@ class CpagePdfTests(unittest.TestCase):
     def test_cpage_pdf_buildcrs(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class GuessProjectsTests(unittest.TestCase):
@@ -611,6 +704,9 @@ class GuessProjectsTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class BrowseTreeTests(unittest.TestCase):
 
@@ -618,6 +714,9 @@ class BrowseTreeTests(unittest.TestCase):
     def test_browse_tree(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class DomainOfTests(unittest.TestCase):
@@ -627,6 +726,9 @@ class DomainOfTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class VarOfTests(unittest.TestCase):
 
@@ -634,6 +736,9 @@ class VarOfTests(unittest.TestCase):
     def test_varOf(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ModelOfTests(unittest.TestCase):
@@ -643,6 +748,9 @@ class ModelOfTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class SimulationOfTests(unittest.TestCase):
 
@@ -650,6 +758,9 @@ class SimulationOfTests(unittest.TestCase):
     def test_simulationOf(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ProjectOfTests(unittest.TestCase):
@@ -659,6 +770,9 @@ class ProjectOfTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class RealmOfTests(unittest.TestCase):
 
@@ -666,6 +780,9 @@ class RealmOfTests(unittest.TestCase):
     def test_realmOf(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class GridOfTests(unittest.TestCase):
@@ -675,6 +792,9 @@ class GridOfTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class AttributeOfTests(unittest.TestCase):
 
@@ -683,6 +803,9 @@ class AttributeOfTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ResolveFirstOrLastYearsTests(unittest.TestCase):
 
@@ -690,6 +813,9 @@ class ResolveFirstOrLastYearsTests(unittest.TestCase):
     def test_resolve_first_or_last_years(self):
         # TODO: Write the test
         pass
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -701,4 +827,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

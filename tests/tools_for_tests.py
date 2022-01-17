@@ -7,16 +7,13 @@ Tools to deal with tests.
 
 from __future__ import unicode_literals, absolute_import, print_function, division
 
-import os
-import subprocess
 import unittest
 import re
-import sys
 import six
+import shutil
 
-from climaf.api import cshow, ncview, cfile
-from climaf import xdg_bin
 from env.environment import *
+from climaf.api import cshow, ncview, cfile
 
 
 def skipUnless_CNRM_Lustre():
@@ -33,19 +30,10 @@ def skipUnless_Ciclad():
 
 def remove_dir_and_content(dirname):
     if os.path.isdir(dirname):
-        # Deal with files
-        listfiles = list()
-        listdirs = list()
-        for (d, subdirs, files) in os.walk(dirname):
-            for name in files:
-                listfiles.append(os.path.sep.join([d, name]))
-            for subd in subdirs:
-                listdirs.append(os.path.sep.join([d, subd]))
-        for f in listfiles:
-            os.remove(f)
-        # Deal with subdirectories
-        for d in sorted(listdirs, reverse=True):
-            os.rmdir(d)
+        shutil.rmtree(dirname)
+        print("Remove directory: %s" % dirname)
+    else:
+        print("Try to remove a non existing directory: %s" % dirname)
 
 
 def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=list()):
@@ -142,8 +130,8 @@ def compare_picture_files(object_test, fic_ref, display=False, display_error=Tru
             files_format = files_format[0]
         if files_format not in ["png", "eps", "jpeg", "pdf"]:
             raise ValueError("Unknown format found %s" % files_format)
-        if xdg_bin and files_format in ["eps", "pdf"]:
-            display_cmd = "xdg-open {}"
+        if xdg_bin is not None and files_format in ["eps", "pdf"]:
+            display_cmd = "%s {}" % xdg_bin
         else:
             display_cmd = "display {}"
         diff_file = file_test + "_diff.{}".format(files_format)

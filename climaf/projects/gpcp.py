@@ -23,10 +23,10 @@ Example of an 'gpcp' project dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from env.site_settings import atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias
-from env.site_settings import atCNRM
 
 if atCNRM:
     cproject('gpcp', 'grid', ('frequency', 'monthly'), separator="_")  # grid writes as '1d', '2.5d', 'T42' or 'T127'

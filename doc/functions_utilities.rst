@@ -18,12 +18,12 @@ cpath : path for CliMAF installation directory
 clog : tune verbosity
 -----------------------
 
-.. autofunction:: climaf.clogging.clog 
+.. autofunction:: env.clogging.clog 
 
 clog_file  : tune verbosity for log file
 -------------------------------------------
 
-.. autofunction:: climaf.clogging.clog_file 
+.. autofunction:: env.clogging.clog_file 
 
 csync
 ---------------------

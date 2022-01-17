@@ -18,9 +18,10 @@ from functools import reduce, partial
 import six
 
 from env.environment import *
-from climaf.utils import Climaf_Classes_Error
+from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
-from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list, lastyears, firstyears
+from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
+    lastyears, firstyears, group_periods
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
 
@@ -150,6 +151,25 @@ class cproject(object):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
 
+    def cvalid(self, attribute, value=None):
+        """Set or get the list of valid values for a CliMAF dataset attribute
+        or facet (such as e.g. 'model', 'simulation' ...). Useful
+        e.g. for constraining those data files which match a dataset
+        definition
+
+        Example::
+
+        >>> cvalid('grid' , [ "gr", "gn", "gr1", "gr2" ])
+
+        """
+        #
+        if attribute not in self.facets:
+            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+        if value is None:
+            return self.facet_authorized_values.get(attribute, None)
+        else:
+            self.facet_authorized_values[attribute] = value
+
 
 def cdef(attribute, value=None, project=None):
     """
@@ -218,6 +238,14 @@ class cobject(object):
 
     def buildcrs(self):
         raise NotImplementedError
+
+    def __eq__(self, other):
+        """
+        Check the equality of two CliMAF objects.
+        :param other: CliMAF object to be compared
+        :return: boolean indicating whether the CliMAF objects are the same or not
+        """
+        return isinstance(other, type(self)) and self.crs == other.crs
 
 
 class cdummy(cobject):
@@ -344,7 +372,10 @@ class cdataset(cobject):
 
         Some attributes have a special format or processing :
 
-        - period : see :py:func:`~climaf.period.init_period`
+        - period : see :py:func:`~climaf.period.init_period`. See also
+          function :py:func:`climaf.classes.ds` for added
+          flexibility in defining periods as last of first set of years
+          among available data
 
         - domain : allowed values are either 'global' or a list for
           latlon corners ordered as in : [ latmin, latmax, lonmin,
@@ -407,6 +438,20 @@ class cdataset(cobject):
         self.files = None
         self.local_copies_of_remote_files = None
         self.register()
+
+    def __eq__(self, other):
+        res = super(cdataset, self).__eq__(other)
+        if res:
+            self_kvp = copy.deepcopy(self.kvp)
+            self_kvp["model"] = self.model
+            self_kvp["frequency"] = self.frequency
+            self_kvp["alias"] = self.alias
+            other_kvp = copy.deepcopy(other.kvp)
+            other_kvp["model"] = other.model
+            other_kvp["frequency"] = other.frequency
+            other_kvp["alias"] = other.alias
+            res = res and all([self_kvp[p] == other_kvp[p] for p in self_kvp])
+        return res
 
     def setperiod(self, period):
         if isinstance(period, six.string_types):
@@ -512,6 +557,107 @@ class cdataset(cobject):
             if self.kvp[key] not in values:
                 return False
         return True
+
+    def check_if_dict_ambiguous(self, input_dict):
+        ambiguous_dict = dict()
+        non_ambigous_dict = dict()
+        for (kw, val) in input_dict.items():
+            if isinstance(val, list):
+                if len(val) > 1:
+                    ambiguous_dict[kw] = val
+                else:
+                    non_ambigous_dict[kw] = val[0]
+            elif kw in ['variable', ]:  # Should take care of aliasing to fileVar
+                matching_vars = set()
+                paliases = aliases.get(self.project, [])
+                for variable in paliases:
+                    if val == paliases[variable][0]:
+                        matching_vars.add(variable)
+                if len(matching_vars) == 0:
+                    # No filename variable in aliases matches actual filename
+                    non_ambigous_dict[kw] = val
+                elif len(matching_vars) == 1:
+                    # One variable has a filename variable which matches the retrieved filename
+                    non_ambigous_dict[kw] = matching_vars[0]
+                else:
+                    ambiguous_dict[kw] = (val, matching_vars)
+            else:
+                non_ambigous_dict[kw] = val
+        return non_ambigous_dict, ambiguous_dict
+
+    def glob(self, what=None, periods=None, split=None):
+        """Datafile exploration for a dataset which possibly has
+        wildcards (* and ?) in attributes/facets.
+
+        Returns info regarding matching datafile or directories:
+
+          - if WHAT = 'files' , returns a string of all data filenames
+
+          - otherwise, returns a list of facet/value dictionnaries for
+            matching data (or a pair, see below)
+
+        In last case, data file periods are not returned if arg
+        PERIODS is None and data search is optimized for the project.
+        In that case, the globbing is done on data directories and not
+        on data files, which is much faster.
+
+        If PERIODS is not None, individual data files periods are
+        merged among cases with same facets values
+
+        if SPLIT is not None, a pair is returned intead of the dicts list :
+
+           - first element is a dict with facets which values are the
+             same among all cases
+
+           - second element is the dicts list as above, but in which
+             facets with common values are discarded
+
+        Example :
+
+        >>> tos_data = ds(project='CMIP6', variable='tos', period='*',
+               table='Omon', model='CNRM*', realization='r1i1p1f*' )
+
+        >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
+
+        >>> common_keys
+        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical',
+        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos',
+        'version': 'latest', 'period': [1850-2014], 'root': '/bdd'}
+
+        >>> varied_keys
+        [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' },
+         {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'},
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gn' },
+         {'model': 'CNRM-CM6-1'   , 'grid': 'gr1'},
+         {'model': 'CNRM-CM6-1-HR', 'grid': 'gn' } ]
+
+        """
+        dic = self.kvp.copy()
+        if self.alias:
+            filevar, _, _, _, filenameVar, _, conditions = self.alias
+            req_var = dic["variable"]
+            dic["variable"] = string.Template(filevar).safe_substitute(dic)
+            if filenameVar:
+                dic["filenameVar"] = filenameVar
+        clogger.debug("glob() with dic=%s" % repr(dic))
+        cases = list()
+        files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
+                            return_combinations=cases, **dic)
+        if what in ['files', ]:
+            return files
+        else:
+            if periods is not None:
+                cases = group_periods(cases)
+            else:
+                # For non-optimized cases, select_files returns periods,
+                # but we want an even behaviour
+                for case in cases:
+                    case.pop('period', None)
+            if split is not None:
+                keys = remove_keys_with_same_values(cases)
+                return keys, cases
+            else:
+                return cases
 
     def explore(self, option='check_and_store', group_periods_on=None, operation='intersection', first=None):
         """
@@ -682,42 +828,26 @@ class cdataset(cobject):
                         periods[key] = merge_periods(periods[key])
                 wildcards['period'] = periods
             else:
-                raise Climaf_Classes_Error("Operation %s is not kown " % operation)
+                raise Climaf_Classes_Error("Operation %s is not known " % operation)
         #
         wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
         if option in ['resolve', ]:
             clogger.debug("Trying to resolve on attributes %s" % wildcard_attributes_list)
-            for kw in wildcards:
-                val = wildcards[kw]
-                if isinstance(val, list):
-                    if len(val) > 1:
-                        if kw in ['period', ]:
-                            raise Climaf_Classes_Error("Periods with holes are not handled %s" % val)
-                        else:
-                            raise Climaf_Classes_Error("Wildcard attribute %s is ambiguous %s" % (kw, val))
+            non_ambiguous_dict, ambiguous_dict = self.check_if_dict_ambiguous(wildcards)
+            if len(ambiguous_dict) != 0:
+                error_msg = list()
+                for kw in sorted(list(ambiguous_dict)):
+                    if kw in ["variable", ]:
+                        error_msg.append("Filename variable %s is matched by multiple variables %s" %
+                                         (ambiguous_dict[kw][0], repr(ambiguous_dict[kw][1])))
+                    elif kw in ["period", ]:
+                        error_msg.append("Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
                     else:
-                        val = val[0]
-                        dic[kw] = val
-                else:
-                    if kw in ['variable', ]:  # Should take care of aliasing to fileVar
-                        matching_vars = set()
-                        paliases = aliases.get(self.project, [])
-                        for variable in paliases:
-                            if val == paliases[variable][0]:
-                                matching_vars.add(variable)
-                        if len(matching_vars) == 0:
-                            # No filename variable in aliases matches actual filename
-                            dic[kw] = val
-                        elif len(matching_vars) == 1:
-                            # One variable has a filename variable whih matches the retrieved filename
-                            dic[kw] = matching_vars.pop()
-                        else:
-                            raise Climaf_Classes_Error("Filename variable %s is matched by multiple variables %s" %
-                                                       (val, repr(matching_vars)))
-                    else:
-                        dic[kw] = val
-            #
-            return ds(**dic)
+                        error_msg.append("Wildcard attribute %s is ambiguous %s" % (kw, str(ambiguous_dict[kw])))
+                raise Climaf_Classes_Error(" ".join(error_msg))
+            else:
+                dic.update(**non_ambiguous_dict)
+                return ds(**dic)
         elif option in ['choices', ]:
             clogger.debug("Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
             self.files = files
@@ -759,13 +889,18 @@ class cdataset(cobject):
         for the dataset
 
         Use cached value (i.e. attribute 'files') unless called with arg force=True
+
         If ensure_dataset is True, forbid ambiguous datasets
         """
         if (force and self.project != 'file') or self.files is None:
             if ensure_dataset:
                 self.explore()
             else:
-                self.explore(option='choices')
+                cases = self.explore(option='choices')
+                list_keys = [k for k in cases if type(cases[k]) is list and k != 'period']
+                if len(list_keys) > 0:
+                    clogger.error("The dataset is ambiguous on %s; its CRS is %s" % (cases, self))
+                    return None
         return self.files
 
     def listfiles(self, force=False, ensure_dataset=True):
@@ -773,6 +908,7 @@ class cdataset(cobject):
         for the dataset
 
         Use cached value unless called with arg force=True
+
         If ensure_dataset is True, forbid ambiguous datasets
         """
         return self.baseFiles(force=force, ensure_dataset=ensure_dataset)
@@ -1076,6 +1212,12 @@ class cens(cobject, dict):
         self.crs = self.buildcrs()
         self.register()
 
+    def __eq__(self, other):
+        res = super(cens, self).__eq__(other)
+        if res:
+            res = res and self.order == other.order and all([self.__dict__[m] == other.__dict[m] for m in self.order])
+        return res
+
     def set_order(self, order, ordered_keylist=None):
         ordered_list = [o for o in order]
         ordered_list.sort()
@@ -1316,10 +1458,15 @@ class ctree(cobject):
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
+        if len(operands) == 0 :
+            raise Climaf_Classes_Error("Cannot apply an operator to no operand")
         self.operator = climaf_operator
         self.script = script
         import copy
-        self.flags = copy.copy(script.flags)
+        if script is None :
+            self.flags = False
+        else:
+            self.flags = copy.copy(script.flags)
         self.operands = operands
         if "period" in parameters:
             p = parameters["period"]
@@ -1764,7 +1911,7 @@ class cpage(cpage_all):
                  orientation=None,
                  page_width=1000., page_height=1500., title="", x=0, y=26, ybox=50, pt=24,
                  font="Times-New-Roman", gravity="North", background="white",
-                 insert="", insert_width=0):
+                 insert="", insert_width=200):
         """
         Builds a CliMAF cpage object, which represents an array of figures (output:
         'png' or 'pdf' figure)
@@ -2099,6 +2246,12 @@ def modelOf(cobject): return attributeOf(cobject, "model")
 def simulationOf(cobject): return attributeOf(cobject, "simulation")
 
 
+def experimentOf(cobject): return attributeOf(cobject, "experiment")
+
+
+def realizationOf(cobject): return attributeOf(cobject, "realization")
+
+
 def projectOf(cobject): return attributeOf(cobject, "project")
 
 
@@ -2143,6 +2296,36 @@ def attributeOf(cobject, attrib):
         return ''
     else:
         raise Climaf_Classes_Error("Unknown class for argument " + repr(cobject))
+
+
+def timePeriod(cobject):
+    """ Returns a time period for a CliMAF object : if object is a dataset, returns
+    its time period, otherwise analyze complex case and reurns something sensible
+    """
+    if isinstance(cobject, cdataset):
+        return cobject.period
+    elif isinstance(cobject, ctree):
+        clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
+        if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
+            clogger.debug("Building composite period for results of %s" % cobject.operator)
+            periods = [timePeriod(op) for op in cobject.operands]
+            merged_period = merge_periods(periods)
+            if len(merged_period) > 1:
+                raise Climaf_Driver_Error("Issue when time assembling with %s, periods are not consecutive : %s" %
+                                          (cobject.operator, merged_period))
+            return merged_period[0]
+        else:
+            clogger.debug("timePeriod logic for script is 'choose 1st operand' %s" % cobject.script)
+            return timePeriod(cobject.operands[0])
+    elif isinstance(cobject, scriptChild):
+        clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
+        return timePeriod(cobject.father)
+    elif isinstance(cobject, cens):
+        clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
+        return timePeriod(list(cobject.values())[0])
+    else:
+        return None  # clogger.error("unkown class for argument "+`cobject`)
+
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):

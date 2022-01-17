@@ -21,10 +21,11 @@ Example of an 'erai' project dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from climaf.dataloc import dataloc
-from climaf.classes import cproject, calias
 from env.site_settings import atCNRM
 from env.environment import *
+from climaf.dataloc import dataloc
+from climaf.classes import cproject, calias
+
 
 if atCNRM:
     cproject('erai', ('grid', '_'),

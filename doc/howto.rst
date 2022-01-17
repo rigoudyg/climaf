@@ -115,9 +115,9 @@ You may know how the operator interfaces with Climaf by ::
 CliMAF uses the Python logging package :py:mod:`logging` for informing
 about work done, at varied verbosity levels. There are two logging
 streams : one going to screen (or stderr), the other going to file
-``climaf.log`` . See function :py:func:`~climaf.clogging.clog` for
+``climaf.log`` . See function :py:func:`~env.clogging.clog` for
 setting the severity level for the former and function
-:py:func:`~climaf.clogging.clog_file` for the latter 
+:py:func:`~env.clogging.clog_file` for the latter 
 
 Note : at CliMAF startup, the severity level is set to the value of environment
 variable $CLIMAF_LOG (resp. $CLIMAF_FILE_LOG)
