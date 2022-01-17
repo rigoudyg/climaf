@@ -38,7 +38,7 @@ setup(name='climaf',
       install_requires=requires,
       test_suite="tests",
       data_files=[
-          ("scripts", ["ml2pl", ])
+          ("scripts", ["scripts/ml2pl", ])
       ],
       scripts=[
           'bin/climaf',
