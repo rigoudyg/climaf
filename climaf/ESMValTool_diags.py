@@ -23,10 +23,9 @@ from env.clogging import clogger, dedent as cdedent
 from env.site_settings import atIPSL
 #
 import climaf
-from climaf import classes
-from climaf.utils import Climaf_Error
+from climaf.utils import Climaf_Error, Climaf_Driver_Error
 from climaf.anynetcdf import ncf
-from climaf.classes import timePeriod
+from climaf.classes import timePeriod, cens, varOf, projectOf, experimentOf, realizationOf
 
 #: Path for the wrapper script for setting ESMValTool's diag scripts environment and launching them
 wrapper = None
@@ -195,36 +194,36 @@ def _create_metadata_file(script, ensemble, value, preproc_dir, metadatas) :
     filename, the key being the ensemble variable
 
     """
-    if not isinstance(ensemble, classes.cens):
+    if not isinstance(ensemble, cens):
         raise Climaf_Error("EVT scripts like %s only accepts ensembles , which is not the case for %s:"\
                                   % (script,ensemble))
     files=value.split(" ")
     if value != '' and not all(map(os.path.exists, files)):
         raise Climaf_Driver_Error("Internal error : some input file does not exist among %s:" % infile)
 
-    variable = classes.varOf(ensemble[ensemble.order[0]])
+    variable = varOf(ensemble[ensemble.order[0]])
     data_dir = preproc_dir + "/" + variable
     os.makedirs(data_dir)
     #
     i=0
     metadata = dict()
     for member in ensemble.order :
-        if variable != classes.varOf(ensemble[member]) :
+        if variable != varOf(ensemble[member]) :
             raise Climaf_Driver_Error("A member has wrong variable (%s rather than %s)"\
-                                  % (classes.varOf(ensemble[member]),variable))
+                                  % (varOf(ensemble[member]),variable))
         d=dict()
         d['alias']                = member
         d['dataset']              = member
         # recipe_dataset_index : ? numero d'ordre dans la liste des datasets de la recipe ?
         d['recipe_dataset_index'] = i + 1
-        d['project']              = classes.projectOf(ensemble[member])
-        d['exp']                  = classes.experimentOf(ensemble[member])
+        d['project']              = projectOf(ensemble[member])
+        d['exp']                  = experimentOf(ensemble[member])
         # We assume that the dataset period has complete years
         d['start_year']           = int(timePeriod(ensemble[member]).pr().split("-")[0])
         d['end_year']             = int(timePeriod(ensemble[member]).pr().split("-")[1])
-        d['short_name']           = classes.varOf(ensemble[member])
-        d['variable_group']       = classes.varOf(ensemble[member])
-        d['ensemble']             = classes.realizationOf(ensemble[member])
+        d['short_name']           = varOf(ensemble[member])
+        d['variable_group']       = varOf(ensemble[member])
+        d['ensemble']             = realizationOf(ensemble[member])
         d['diagnostic']           = script
         d['preprocessor']         = 'default'
 

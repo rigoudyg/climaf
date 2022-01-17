@@ -10,7 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from string import Template
 from collections import defaultdict
 
-from env.clogging import clogger, dedent
+from env.clogging import clogger, dedent, dedent as cdedent
 from env.environment import *
 
 
@@ -141,6 +141,16 @@ class Climaf_Data_Error(Exception):
         self.valeur = valeur
         clogger.error(self.__str__())
         # clogging.dedent(100)
+
+    def __str__(self):
+        return repr(self.valeur)
+
+
+class Climaf_Driver_Error(Exception):
+    def __init__(self, valeur):
+        self.valeur = valeur
+        clogger.error(self.__str__())
+        cdedent(100)
 
     def __str__(self):
         return repr(self.valeur)

@@ -4,7 +4,7 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from env.environment import *
-from climaf.api import calias
+from climaf.driver import calias
 from climaf.operators_derive import derive
 
 # -- Potential Temperature and salinity @ 200m, 1000m and 2000m in depth

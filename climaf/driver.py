@@ -21,6 +21,7 @@ from functools import reduce
 from six import string_types
 
 from climaf.dataloc import remote_to_local_filename
+from climaf.utils import Climaf_Driver_Error
 
 try:
     from commands import getoutput, getstatusoutput
@@ -38,7 +39,7 @@ from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile
-from climaf.period import init_period, cperiod, merge_periods
+from climaf.period import init_period, merge_periods
 from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
 from climaf.ESMValTool_diags import call_evt_script
@@ -1389,7 +1390,6 @@ def cimport(cobject, crs):
     clogger.debug("cimport called with argument", cobject)
     clogger.debug("should check syntax of arg 'crs' -TBD")
     clogger.warning("cimport is not for the dummies - Playing at your own risks !")
-    import numpy
     import numpy.ma
     if isinstance(cobject, numpy.ma.MaskedArray):
         clogger.debug("for now, use a file for importing - should revisit - TBD")
@@ -1478,7 +1478,7 @@ def cfilePage(cobj, deep, recurse_list=None):
             try:
                 fig_width, fig_height = get_fig_sizes(figfile)
             except:
-                raise Climaf_Driver_Error("Issue with figure "+str(fig))
+                raise Climaf_Driver_Error("Issue with figure " + str(fig))
             # Scaling and max height
             if float(fig_width) != 1. and float(fig_height) != 1.:
                 if ((float(fig_width) / float(fig_height)) * float(height)) < width:
@@ -1715,13 +1715,3 @@ def efile(obj, filename, force=False):
             return True
     else:
         clogger.warning("objet is not a 'cens' objet")
-
-
-class Climaf_Driver_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        cdedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)

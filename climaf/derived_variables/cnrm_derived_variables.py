@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from env.environment import *
-from climaf.api import derive
+from climaf.operators_derive import derive
 
 for variable in ["ua", "va", "ta", "hur", "hus", "zg"]:
     for level in [850, 500, 200]:

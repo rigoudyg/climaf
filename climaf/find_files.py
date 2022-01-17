@@ -24,11 +24,11 @@ import netrc
 import copy
 
 from env.environment import *
+from env.clogging import clogger
 import env
 from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_substitute
 from climaf.period import init_period, sort_periods_list
 from climaf.netcdfbasics import fileHasVar
-from env.clogging import clogger
 
 
 def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, **kwargs):

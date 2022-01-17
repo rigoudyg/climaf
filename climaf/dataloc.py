@@ -18,10 +18,11 @@ from string import Template
 
 import env
 from env.environment import *
+from env.clogging import clogger
+
 from climaf.utils import Climaf_Error
 from climaf.period import init_period
 from climaf.netcdfbasics import fileHasVar
-from env.clogging import clogger
 from climaf.projects.optimize import cmip6_optimize_check_paths, cmip6_optimize_wildcards
 from climaf.find_files import selectGenericFiles
 

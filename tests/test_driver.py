@@ -18,7 +18,8 @@ from climaf.driver import capply, capply_script, maketree, capply_operator, ceva
 	ceval_operator, cstore, ceval_for_scriptChild, ceval_for_cpage, ceval_for_cpage_pdf, ceval_for_cens, \
 	ceval_for_string, ceval, ceval_script, timePeriod, ceval_select, cread, cview, derive_variable, set_variable, \
 	noselect, cfile, cshow, cMA, cvalue, cexport, cimport, get_fig_sizes, cfilePage, cfilePage_pdf, calias, CFlongname, \
-	efile, Climaf_Driver_Error
+	efile
+from climaf.utils import Climaf_Driver_Error
 from climaf.classes import ds
 from climaf.period import Climaf_Period_Error, init_period
 
