@@ -50,7 +50,7 @@ if not already_inited and not onrtd:
     tim("atexit")
     #
     print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
+    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
     from env.environment import *
 
     tim("softwares")

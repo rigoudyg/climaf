@@ -15,6 +15,14 @@ Changes, newest first:
     expressed as elapsed time. For getting the cost of a scalar, call
     :py:func:`~climaf.driver.cvalue` with argument``cost=True``
 
+  - log:
+
+    - CliMAF check for external softwares version at init stage can be
+    silent, using :py:func:`~env.clogging.clog`, with a log level of
+    'critical'
+
+    - Other messages at init stage can be discarded by redirecting stderr
+
   - cache:
 
     - Two bugs related to cache were fixed : cache content was not
@@ -954,7 +962,7 @@ Changes, newest first:
   - Running CliMAF - messages, cache, errors:
 
     - Verbosity, and cache directory, can be set using environment variables. See :ref:`configuring`
-    - Simplify use of function :py:func:`~climaf.clogging.clog`
+    - Simplify use of function :py:func:`~env.clogging.clog`
     - Log messages are indented to show recursive calls of ceval()
     - Quite extended use of Python exceptions for error handling
 
