@@ -6,22 +6,21 @@ Test the driver module.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-
 import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
-
-from climaf.cache import setNewUniqueCache
+from env.environment import *
+from env.site_settings import atCNRM, onCiclad
+from climaf.cache import setNewUniqueCache, craz
+from climaf.api import cproject, dataloc
 from climaf.driver import capply, capply_script, maketree, capply_operator, ceval_for_cdataset, ceval_for_ctree, \
 	ceval_operator, cstore, ceval_for_scriptChild, ceval_for_cpage, ceval_for_cpage_pdf, ceval_for_cens, \
 	ceval_for_string, ceval, ceval_script, timePeriod, ceval_select, cread, cview, derive_variable, set_variable, \
-	noselect, cfile, cshow, cMA, cvalue, cexport, cimport, get_fig_sizes, cfilePage, cfilePage_pdf, calias, CFlongname,\
+	noselect, cfile, cshow, cMA, cvalue, cexport, cimport, get_fig_sizes, cfilePage, cfilePage_pdf, calias, CFlongname, \
 	efile, Climaf_Driver_Error
 from climaf.classes import ds
 from climaf.period import Climaf_Period_Error, init_period
-from env.environment import *
-from env.site_settings import atCNRM, onCiclad
 
 
 class CapplyTests(unittest.TestCase):
@@ -31,6 +30,9 @@ class CapplyTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CapplyScriptTests(unittest.TestCase):
 
@@ -38,6 +40,9 @@ class CapplyScriptTests(unittest.TestCase):
 	def test_capply_script(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class MaketreeTests(unittest.TestCase):
@@ -47,6 +52,9 @@ class MaketreeTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CapplyOperatorTests(unittest.TestCase):
 
@@ -54,6 +62,9 @@ class CapplyOperatorTests(unittest.TestCase):
 	def test_capply_operator(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForCdatasetTests(unittest.TestCase):
@@ -63,6 +74,9 @@ class CevalForCdatasetTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCtreeTests(unittest.TestCase):
 
@@ -70,6 +84,9 @@ class CevalForCtreeTests(unittest.TestCase):
 	def test_ceval_for_ctree(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalOperatorTests(unittest.TestCase):
@@ -79,6 +96,9 @@ class CevalOperatorTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CstoreTests(unittest.TestCase):
 
@@ -86,6 +106,9 @@ class CstoreTests(unittest.TestCase):
 	def test_cstore(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForScriptChildTests(unittest.TestCase):
@@ -95,6 +118,9 @@ class CevalForScriptChildTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCpageTests(unittest.TestCase):
 
@@ -102,6 +128,9 @@ class CevalForCpageTests(unittest.TestCase):
 	def test_ceval_for_cpage(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForCpagePdfTests(unittest.TestCase):
@@ -111,6 +140,9 @@ class CevalForCpagePdfTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalForCensTests(unittest.TestCase):
 
@@ -118,6 +150,9 @@ class CevalForCensTests(unittest.TestCase):
 	def test_ceval_for_cens(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalForStringTests(unittest.TestCase):
@@ -127,6 +162,9 @@ class CevalForStringTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CevalTests(unittest.TestCase):
 
@@ -134,6 +172,9 @@ class CevalTests(unittest.TestCase):
 	def test_ceval(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalScriptTests(unittest.TestCase):
@@ -143,6 +184,9 @@ class CevalScriptTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class TimePeriodTests(unittest.TestCase):
 
@@ -150,6 +194,9 @@ class TimePeriodTests(unittest.TestCase):
 	def test_timePeriod(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CevalSelectTests(unittest.TestCase):
@@ -159,6 +206,9 @@ class CevalSelectTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CreadTests(unittest.TestCase):
 
@@ -166,6 +216,9 @@ class CreadTests(unittest.TestCase):
 	def test_cread(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CviewTests(unittest.TestCase):
@@ -175,6 +228,9 @@ class CviewTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class DeriveVariableTests(unittest.TestCase):
 
@@ -182,6 +238,9 @@ class DeriveVariableTests(unittest.TestCase):
 	def test_derive_variable(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class SetVariableTests(unittest.TestCase):
@@ -191,6 +250,9 @@ class SetVariableTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class NoselectTests(unittest.TestCase):
 
@@ -198,6 +260,9 @@ class NoselectTests(unittest.TestCase):
 	def test_noselect(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CfileTests(unittest.TestCase):
@@ -213,6 +278,9 @@ class CfileTests(unittest.TestCase):
 		self.assertDictEqual(dict_choices, {'period': [init_period("1980-1981")]})
 		cfile(my_data_test)
 
+	def tearDown(self):
+		craz()
+
 
 class CshowTests(unittest.TestCase):
 
@@ -220,6 +288,9 @@ class CshowTests(unittest.TestCase):
 	def test_cshow(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CMATests(unittest.TestCase):
@@ -229,6 +300,9 @@ class CMATests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CvalueTests(unittest.TestCase):
 
@@ -236,6 +310,9 @@ class CvalueTests(unittest.TestCase):
 	def test_cvalue(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CexportTests(unittest.TestCase):
@@ -245,6 +322,9 @@ class CexportTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CimportTests(unittest.TestCase):
 
@@ -252,6 +332,9 @@ class CimportTests(unittest.TestCase):
 	def test_cimport(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class GetFigSizesTests(unittest.TestCase):
@@ -261,6 +344,9 @@ class GetFigSizesTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CfilePageTests(unittest.TestCase):
 
@@ -268,6 +354,9 @@ class CfilePageTests(unittest.TestCase):
 	def test_cfilePage(self):
 		# TODO: Write the test
 		pass
+
+	def tearDown(self):
+		craz()
 
 
 class CfilePagePdfTests(unittest.TestCase):
@@ -277,13 +366,38 @@ class CfilePagePdfTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class CaliasTests(unittest.TestCase):
 
-	@unittest.skipUnless(False, "Test not yet written")
+	def setUp(self):
+		cproject('data_CNRM')
+		root = "/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
+		suffix = "${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
+		data_url = root + suffix
+		dataloc(project='data_CNRM', organization='generic', url=data_url)
+
 	def test_calias(self):
 		# TODO: Write the test
-		pass
+		if "data_CNRM" in aliases or "data_CNRM" in derived_variables:
+			raise KeyError("Should not have aliases for 'data_CNRM' at this stage")
+		calias("data_CNRM", "tos,thetao", filenameVar="grid_T_table2.2")
+		calias("data_CNRM", "uo", filenameVar="grid_U_table2.3")
+		self.assertDictEqual(aliases["data_CNRM"],
+		                     {'tos,thetao': ('tos,thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'tos': ('tos', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'thetao': ('thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+		                      'uo': ('uo', 1.0, 0.0, None, 'grid_U_table2.3', None, None)
+		                      })
+		self.assertDictEqual(derived_variables["data_CNRM"],
+		                     {'tos': ('ccdo', 'tos', ['tos,thetao'], {'operator': 'selname,tos'}),
+		                      'thetao': ('ccdo', 'thetao', ['tos,thetao'], {'operator': 'selname,thetao'})
+		                      })
+
+	def tearDown(self):
+		craz()
 
 
 class CFlongnameTests(unittest.TestCase):
@@ -293,6 +407,9 @@ class CFlongnameTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 class EfileTests(unittest.TestCase):
 
@@ -301,14 +418,16 @@ class EfileTests(unittest.TestCase):
 		# TODO: Write the test
 		pass
 
+	def tearDown(self):
+		craz()
+
 
 if __name__ == '__main__':
-    # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
-    remove_dir_and_content(tmp_directory)
-    if not os.path.isdir(tmp_directory):
-        os.makedirs(tmp_directory)
-    setNewUniqueCache(tmp_directory)
-    os.chdir(tmp_directory)
-    unittest.main()
-    remove_dir_and_content(tmp_directory)
+	# Jump into the test directory
+	tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_driver"])
+	remove_dir_and_content(tmp_directory)
+	if not os.path.isdir(tmp_directory):
+		os.makedirs(tmp_directory)
+	setNewUniqueCache(tmp_directory)
+	os.chdir(tmp_directory)
+	unittest.main()

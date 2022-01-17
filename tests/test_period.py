@@ -12,12 +12,12 @@ import unittest
 from datetime import datetime, timedelta
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
 from climaf.period import cperiod, Climaf_Period_Error, init_period, sort_periods_list, merge_periods, \
     intersect_periods_list, lastyears, firstyears
 
-from climaf.cache import setNewUniqueCache
-from env.environment import *
+from climaf.cache import setNewUniqueCache, craz
 
 
 class CreatePeriodDefinedTests(unittest.TestCase):
@@ -60,6 +60,8 @@ class CreatePeriodDefinedTests(unittest.TestCase):
         with self.assertRaises(Climaf_Period_Error):
             cperiod(date_2, date_1)
 
+    def tearDown(self):
+        craz()
 
 class CreatePeriodFixedTests(unittest.TestCase):
 
@@ -106,6 +108,8 @@ class CreatePeriodFixedTests(unittest.TestCase):
         with self.assertRaises(Climaf_Period_Error):
             self.my_period.intersects(self.my_test_period)
 
+    def tearDown(self):
+        craz()
 
 class CreatePeriodGenericTests(unittest.TestCase):
 
@@ -189,6 +193,8 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertEqual(self.my_period_6.intersects(self.my_period), self.my_period)
         self.assertEqual(self.my_period_2.intersects(self.my_period), self.my_period_5)
 
+    def tearDown(self):
+        craz()
 
 class InitPeriodTests(unittest.TestCase):
 
@@ -296,6 +302,8 @@ class InitPeriodTests(unittest.TestCase):
         self.assertEqual(my_period.start, datetime(1850, 1, 2))
         self.assertEqual(my_period.end, datetime(1950, 5, 23))
 
+    def tearDown(self):
+        craz()
 
 class SortPeriodsListTests(unittest.TestCase):
 
@@ -315,6 +323,8 @@ class SortPeriodsListTests(unittest.TestCase):
         unordered_list = [my_period_1, my_period_4, my_period_3, my_period_2]
         self.assertEqual(sort_periods_list(unordered_list), ordered_list)
 
+    def tearDown(self):
+        craz()
 
 class MergePeriodsTests(unittest.TestCase):
 
@@ -333,6 +343,8 @@ class MergePeriodsTests(unittest.TestCase):
                        cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))]
         self.assertEqual(merge_periods(unordered_list), result_list)
 
+    def tearDown(self):
+        craz()
 
 class IntersectPeriodsListsTests(unittest.TestCase):
 
@@ -353,6 +365,8 @@ class IntersectPeriodsListsTests(unittest.TestCase):
         result_list = []
         self.assertEqual(intersect_periods_list(my_list_1, my_list_2), result_list)
 
+    def tearDown(self):
+        craz()
 
 class LastYearsTest(unittest.TestCase):
 
@@ -368,6 +382,8 @@ class LastYearsTest(unittest.TestCase):
         self.assertEqual(lastyears(my_period, 1), repr(init_period("18580526-18590525")))
         self.assertEqual(lastyears(my_period, 15), repr(my_period))
 
+    def tearDown(self):
+        craz()
 
 class FirstYearsTest(unittest.TestCase):
 
@@ -383,6 +399,9 @@ class FirstYearsTest(unittest.TestCase):
         self.assertEqual(firstyears(my_period, 1), repr(init_period("18500623-18510622")))
         self.assertEqual(firstyears(my_period, 15), repr(my_period))
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -393,4 +412,3 @@ if __name__ == '__main__':
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

@@ -7,20 +7,16 @@ Test based on examples/index_html.py
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
-import shutil
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content, compare_html_files
-
-from climaf.cache import setNewUniqueCache
+from collections import OrderedDict
+from env.environment import *
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
 from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
-from climaf import cachedir
-from collections import OrderedDict
-from env.environment import *
 
 
 if not isinstance(cpath, list):
@@ -127,7 +123,7 @@ class HtmlIndexCreation(unittest.TestCase):
         # optional argument 'dirname'. The programmer must also take care of
         # writing the index in the same directory An example shows below
         ###################################################################################
-        atlas_dir = os.path.expanduser(cachedir + '/../atlas')
+        atlas_dir = os.path.expanduser(default_cache + '/../atlas')
         index = header("CliMAF ATLAS of " + exp + " for " + period)
         index += open_table(title='variable/season', columns=['DJF', 'MAM', 'JJA'], spacing=5)
         index += fline(my_slice, 'tas', ['DJF', 'MAM', 'JJA'], title="Surface temperature",
@@ -154,4 +150,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

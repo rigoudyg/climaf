@@ -59,7 +59,39 @@ none_formats = [None, 'txt']
 locs = list()
 
 #: Log directory
-logdir = "."
+logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+
+#: Log level
+loglevel = os.getenv("CLIMAF_LOG_LEVEL", "warning")
+
+#: Log file level
+logfilelevel = os.getenv("CLIMAF_LOGFILE_LEVEL", "info")
+
+#: Default cache directory
+if onCiclad:
+    default_cache = "/data/{}/climaf_cache".format(os.getenv("USER"))
+else:
+    default_cache = "~/tmp/climaf_cache"
+default_cache = os.getenv("CLIMAF_CACHE", default_cache)
+
+#: Default remote cache directory
+default_remote_cache = os.getenv("CLIMAF_REMOTE_CACHE", os.sep.join([default_cache, "remote_data"]))
+
+#: Current cache directory
+currentCache = None
+
+#: Cache directories list
+cachedirs = None
+
+#: The place to write the index
+cacheIndexFileName = None
+
+
+#: Current cache directory
+currentCache = None
+
+#: Should the search for CMI6 files be optimized by building tables
+optimize_cmip6_wildcards = True
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
@@ -73,25 +105,45 @@ def my_which(soft):
         rep = rep.replace("\n", "")
     return rep
 
-
-def bash_command_to_str(cmd):
-    return str.replace(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).stdout.readlines()[0], '\n', '')
-
-
 #
 # Set default logging levels
-clog(os.getenv("CLIMAF_LOG_LEVEL", "warning"))
+clog(loglevel)
 
-env.clogging.logdir = os.path.expanduser(os.getenv("CLIMAF_LOG_DIR", "."))
+env.clogging.logdir = logdir
 if not os.access(env.clogging.logdir, mode=os.W_OK):
     print("Cannot write logfile in non-writeable directory : " + os.path.abspath(env.clogging.logdir))
     exit()
-clog_file(os.getenv("CLIMAF_LOGFILE_LEVEL", "info"))
+clog_file(logfilelevel)
 
-if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") != "no":
-    clogger.info("python => " + sys.version)
-    clogger.info("---")
-    clogger.info("Required softwares to run CliMAF => you are using the following versions/installations:")
+# Ensure that the variable TMPDIR, if defined, points to an existing directory
+if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
+    # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
+    tmpdir = os.environ["TMPDIR"]
+    if os.path.exists(tmpdir):
+        os.remove(tmpdir)
+    os.makedirs(tmpdir)
+
+# Check dependencies
+try:
+    xdg_bin = my_which("xdg-open")
+    print("xdg-open is available")
+except:
+    xdg_bin = None
+    print("Warning: could not find xdg-open")
+
+# Check dependencies
+try:
+    xdg_bin = my_which("xdg-open")
+    print("xdg-open is available")
+except:
+    xdg_bin = None
+    print("Warning: could not find xdg-open")
+
+if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
+        os.environ.get('IN_SPHINX', "no") in ["no", ]:
+    print("python => " + sys.version)
+    print("---")
+    print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
         ncl_software = my_which("ncl")
         clogger.info("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)

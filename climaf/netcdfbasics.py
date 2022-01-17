@@ -5,9 +5,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import re
 
+from env.environment import *
 from env.clogging import clogger, dedent
 from climaf.period import cperiod
-from env.environment import *
 from climaf.anynetcdf import ncf
 
 

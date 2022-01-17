@@ -7,20 +7,19 @@ Test the html module.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import unittest
 import string
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __file__ as climaf_based_file
 from climaf.classes import ds
 from climaf.driver import cfile
 from climaf.html import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
-from env.environment import *
 
 
 class HeaderTests(unittest.TestCase):
@@ -57,11 +56,17 @@ class HeaderTests(unittest.TestCase):
         self.assertEqual(header("A header", style_file=cesmep_css_file),
                          template.safe_substitute(STYLE=cesmep_css_style, TITLE="A header"))
 
+    def tearDown(self):
+        craz()
+
 
 class TrailerTests(unittest.TestCase):
 
     def test_trailer(self):
         self.assertEqual(trailer(), "</body>\n")
+
+    def tearDown(self):
+        craz()
 
 
 class VspaceTests(unittest.TestCase):
@@ -70,6 +75,9 @@ class VspaceTests(unittest.TestCase):
         self.assertEqual(vspace(), "<br>\n")
         self.assertEqual(vspace(1), "<br>\n")
         self.assertEqual(vspace(5), "<br>\n<br>\n<br>\n<br>\n<br>\n")
+
+    def tearDown(self):
+        craz()
 
 
 class SectionTests(unittest.TestCase):
@@ -86,6 +94,9 @@ class SectionTests(unittest.TestCase):
                          template.safe_substitute(TITLE="A title", LEVEL=1, KEY='"a key"'))
         self.assertEqual(section("A title", level=5, key="a key"),
                          template.safe_substitute(TITLE="A title", LEVEL=5, KEY='"a key"'))
+
+    def tearDown(self):
+        craz()
 
 
 class OpenTableTests(unittest.TestCase):
@@ -110,11 +121,17 @@ class OpenTableTests(unittest.TestCase):
                                                   COLUMNS="".join([template_columns.safe_substitute(LABEL=lab)
                                                                    for lab in ["a column", "an other one"]])))
 
+    def tearDown(self):
+        craz()
+
 
 class CloseTableTests(unittest.TestCase):
 
     def test_close_table(self):
         self.assertEqual(close_table(), "</TABLE>\n")
+
+    def tearDown(self):
+        craz()
 
 
 class OpenLineTests(unittest.TestCase):
@@ -125,11 +142,17 @@ class OpenLineTests(unittest.TestCase):
         self.assertEqual(open_line(), template.safe_substitute(TITLE=""))
         self.assertEqual(open_line("A title"), template.safe_substitute(TITLE="A title"))
 
+    def tearDown(self):
+        craz()
+
 
 class CloseLineTests(unittest.TestCase):
 
     def test_close_line(self):
         self.assertEqual(close_line(), ' </TR>\n')
+
+    def tearDown(self):
+        craz()
 
 
 class LinkTests(unittest.TestCase):
@@ -211,6 +234,9 @@ class LinkTests(unittest.TestCase):
         with self.assertRaises(Climaf_Html_Error):
             link(label="A label", filename="A filename", thumbnail=None, hover="200m300")
 
+    def tearDown(self):
+        craz()
+
 
 class LinkOnItsOwnLineTests(unittest.TestCase):
 
@@ -223,6 +249,9 @@ class LinkOnItsOwnLineTests(unittest.TestCase):
                          open_line() + link("A label", "A filename", thumbnail=None, hover=200) + close_line())
         self.assertEqual(link_on_its_own_line("A label", "A filename", thumbnail=150, hover=80),
                          open_line() + link("A label", "A filename", thumbnail=150, hover=80) + close_line())
+
+    def tearDown(self):
+        craz()
 
 
 class CellTests(unittest.TestCase):
@@ -263,6 +292,9 @@ class CellTests(unittest.TestCase):
                          self.test_template.safe_substitute(LINK=""))
         self.assertTrue(os.path.exists(self.test_dirname) and os.path.isdir(self.test_dirname))
 
+    def tearDown(self):
+        craz()
+
 
 class LineTests(unittest.TestCase):
 
@@ -276,6 +308,9 @@ class LineTests(unittest.TestCase):
               cell("some value", "with figure") + close_line()
         self.assertEqual(line(list_of_pairs, "A title"), rep)
 
+    def tearDown(self):
+        craz()
+
 
 class FlineTests(unittest.TestCase):
 
@@ -283,6 +318,9 @@ class FlineTests(unittest.TestCase):
     def test_fline(self):
         # TODO: Implement the tests
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class FlinesTests(unittest.TestCase):
@@ -292,6 +330,9 @@ class FlinesTests(unittest.TestCase):
         # TODO: Implement the tests
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CinstantiateTests(unittest.TestCase):
 
@@ -299,6 +340,9 @@ class CinstantiateTests(unittest.TestCase):
     def test_cinstantiate(self):
         # TODO: Implement the tests
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CompareCompanionTests(unittest.TestCase):
@@ -310,6 +354,9 @@ class CompareCompanionTests(unittest.TestCase):
               'src="https://cdn.rawgit.com/PBrockmann/compareCompanion/master/compareCompanion.js"></script> \n'
         self.assertEqual(compareCompanion(), rep)
 
+    def tearDown(self):
+        craz()
+
 
 class StartLineTests(unittest.TestCase):
 
@@ -319,6 +366,9 @@ class StartLineTests(unittest.TestCase):
         self.assertEqual(start_line("A title"), open_table() + open_line("A title") + close_line() + close_table() +
                          open_table() + open_line())
 
+    def tearDown(self):
+        craz()
+
 
 class SafeModeCfilePlotTests(unittest.TestCase):
 
@@ -326,6 +376,9 @@ class SafeModeCfilePlotTests(unittest.TestCase):
     def test_safe_mode_cfile_plot(self):
         # TODO: Implement the tests
         pass
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -337,4 +390,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

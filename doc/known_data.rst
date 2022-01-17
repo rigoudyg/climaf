@@ -86,3 +86,12 @@ cami
 -----------------------------------------------------------
 
 .. automodule:: climaf.projects.cami
+
+
+optimize
+--------
+
+.. automodule:: climaf.projects.optimize
+   :members: 
+
+

@@ -25,15 +25,15 @@ try:
     from collections.abc import KeysView, ValuesView
 except ImportError:
     from _abcoll import KeysView, ValuesView
-from env.clogging import clogger, dedent
 from functools import reduce
 import six
 
+from env.environment import *
+from env.clogging import clogger, dedent
+
 from climaf import __path__ as cpath
 from climaf.cache import getCRS
-from climaf import cachedir
 from climaf.driver import cfile
-from env.environment import *
 
 
 def header(title, style_file=None):
@@ -309,8 +309,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
     else:
         fn = filename
         if altdir and fn:  # lv
-            from climaf import cachedir
-            fn = filename.replace(cachedir, altdir)
+            fn = filename.replace(default_cache, altdir)
         return '<TD ALIGN=RIGHT>' + \
                link(label, fn, thumbnail, hover) + \
                '</TD>\n'
@@ -570,15 +569,15 @@ def start_line(title):
     return tmpindex
 
 
-blank_cell = cachedir + '/Empty.png'
+blank_cell = default_cache + '/Empty.png'
 
 
 def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
-    # Need to create cachedir if it does not exist yet
-    if not os.path.isdir(cachedir):
-        os.makedirs(cachedir)
+    # Need to create default cache directory if it does not exist yet
+    if not os.path.isdir(default_cache):
+        os.makedirs(default_cache)
     if not os.path.isfile(blank_cell):
-        shutil.copy(cpath[0] + '/plot/Empty.png', cachedir)
+        shutil.copy(cpath[0] + '/plot/Empty.png', default_cache)
 
     if not do_cfile:
         return myplot

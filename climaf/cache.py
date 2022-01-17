@@ -21,17 +21,14 @@ import hashlib
 import json
 from operator import itemgetter
 
+import env
 from env.environment import *
-from climaf import version
-from climaf.utils import Climaf_Cache_Error
-from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds
-from climaf.cmacro import crewrite
 from env.clogging import clogger
+from climaf import version
+from climaf.utils import Climaf_Cache_Error, Climaf_Error
+from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
+from climaf.cmacro import crewrite
 
-currentCache = None
-cachedirs = None
-#: The place to write the index
-cacheIndexFileName = None
 handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
 cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
@@ -58,14 +55,11 @@ def setNewUniqueCache(path, raz=True):
     """
     Define PATH as the sole cache to use from now. And clear it
     """
-    global currentCache
-    global cachedirs
-    global cacheIndexFileName
 
     path = os.path.expanduser(path)
-    cachedirs = [path]  # The list of cache directories
-    cacheIndexFileName = cachedirs[0] + "/index"  # The place to write the index
-    currentCache = cachedirs[0]
+    env.environment.cachedirs = [path]  # The list of cache directories
+    env.environment.cacheIndexFileName = path + "/index"  # The place to write the index
+    env.environment.currentCache = path
     if raz:
         craz(hideError=True)
 
@@ -110,10 +104,11 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
 
 def hash_to_path(vhash, format, option="new", prefix=""):
-    if option == "new":
-        rep = os.sep.join([currentCache, prefix + vhash[0:2], vhash[2:]])
+    if option in ["new", ]:
+        rep = os.sep.join([env.environment.currentCache, prefix + vhash[0:2], vhash[2:]])
     else:
-        rep = os.sep.join([currentCache, prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
+        rep = os.sep.join([env.environment.currentCache,
+                           prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
     rep = ".".join([rep, format])
     rep = os.path.expanduser(rep)
     return rep
@@ -129,7 +124,7 @@ def alternate_filename(fpath):
     # Get file format
     format = fpath.split(".")[-1]
     # Remove cache root location prefix
-    relative_fpath = fpath[len(currentCache)+1:]
+    relative_fpath = fpath[len(env.environment.currentCache)+1:]
     # Get name without slashes nor extension
     vhash = relative_fpath.replace("/", "").split(".")[0]
     #
@@ -158,7 +153,7 @@ def searchFile(path):
     """ Search for first occurrence of PATH as a path in all
     directories listed in CACHEDIRS
     """
-    for cdir in cachedirs:
+    for cdir in env.environment.cachedirs:
         candidate = os.path.expanduser(cdir + "/" + path)
         if os.path.lexists(candidate):
             # If this is a broken link, delete it ~ silently and return None
@@ -169,7 +164,7 @@ def searchFile(path):
             return candidate
 
 
-def register(filename, crs, outfilename=None):
+def register(filename, crs, costs, outfilename=None):
     """
     Adds in FILE a metadata named 'CRS_def' and with value CRS, and a
     metadata 'CLiMAF' with CliMAF version and ref URL
@@ -181,13 +176,10 @@ def register(filename, crs, outfilename=None):
 
     Silently skip non-existing files
     """
-    # First read index from file if it is yet empty - No : done at startup
-    # if len(crs2filename.keys()) == 0 : cload()
-    # It appears that we have to let some time to the file system  for updating its inode tables
     def do_move(crs, filename, outfilename):
         if outfilename is None:
             clogger.info("%s registered as %s" % (crs, filename))
-            crs2filename[crs] = filename
+            crs2filename[crs] = (filename, costs)
             if crs in dropped_crs:
                 dropped_crs.remove(crs)
             return True
@@ -196,7 +188,7 @@ def register(filename, crs, outfilename=None):
             if os.system(cmd) == 0:
                 clogger.info("moved %s as %s " % (filename, outfilename))
                 clogger.info("%s registered as %s" % (crs, outfilename))
-                crs2filename[crs] = outfilename
+                crs2filename[crs] = (outfilename, costs)
                 if crs in dropped_crs:
                     dropped_crs.remove(crs)
                 return True
@@ -205,13 +197,14 @@ def register(filename, crs, outfilename=None):
                 raise Climaf_Cache_Error("cannot move (possibly after stamping) by %s" % cmd)
 
     global dropped_crs
+    #
+    # It appears that we have to let some time to the file system  for updating its inode tables
     waited = 0
     while waited < 50 and not os.path.exists(filename):
         time.sleep(0.1)
         waited += 1
-    # time.sleep(0.5)
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough)" % filename)
+        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" % (filename, crs))
     else:
         if stamping is False:
             clogger.debug('No stamping')
@@ -296,10 +289,10 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
-        for c in [f for f in crs2filename if crs2filename[f] in [filename, alternate_filename(filename)]]:
-            crs2filename.pop(c)
+        for c in [f for f in crs2filename if crs2filename[f][0] in [filename, alternate_filename(filename)]]:
+            fn, costs = crs2filename.pop(c)
         os.rename(filename, newfile)
-        register(newfile, crs)
+        register(newfile, crs, costs)
         return newfile
 
 
@@ -326,20 +319,19 @@ def hasMatchingObject(cobject, ds_func):
     for crs in crs2filename:
         # First, basic, screening
         if crs.split("(")[0] != cobject.crs.split("(")[0]:
-            return None, None
+            continue
         co = crs2eval.get(crs, None)
         if co is None:
             try:
                 co = eval(crs, sys.modules['__main__'].__dict__)
-                if co:
-                    crs2eval[crs] = co
             except:
-                pass  # usually case of a CRS which project is not currently defined
+                continue  # usually case of a CRS which project is not currently defined
         if co:
+            crs2eval[crs] = co
             clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
-                f = crs2filename[crs]
+                f, costs = crs2filename[crs]
                 if os.path.exists(f) or os.path.exists(alternate_filename(f)):
                     return co, altperiod
                 else:
@@ -382,10 +374,21 @@ def hasExactObject(cobject):
             else:
                 i += 1
     if found:
-        return f
-    elif cobject.crs in crs2filename:
-        clogger.debug("Dropping cobject.crs from cache index, because file is missing")
-        crs2filename.pop(cobject.crs)
+        crs = cobject.crs
+        # if isinstance(cobject, cdataset):
+        #    crs = "select(" + crs + ")"
+        if crs not in crs2filename:
+            clogger.warning("Next object exists in cache but was not "
+                            "registered in index. Assuming its compute cost is zero. "
+                            "Use cdrop if this is inadequate. Object %s" % crs)
+            crs2filename[crs] = (f, compute_cost())
+        return crs2filename[crs]
+        # return f
+    else:
+        if cobject.crs in crs2filename:
+            clogger.debug("Dropping cobject.crs from cache index, because file is missing")
+            crs2filename.pop(cobject.crs)
+        return None, compute_cost()
 
 
 def complement(crsb, crse, crs):
@@ -394,22 +397,28 @@ def complement(crsb, crse, crs):
     CRS. Assumes that everything is OK with args compatibility and
     file contents
     """
-    fileb = crs2filename[crsb]
+    fileb, costsb = crs2filename[crsb]
     if not os.path.exists(fileb):
         fileb = alternate_filename(fileb)
-    filee = crs2filename[crse]
+    filee, costse = crs2filename[crse]
     if not os.path.exists(filee):
         filee = alternate_filename(filee)
     filet = generateUniqueFileName(crs)
+    costs = compute_cost()
+    costs.add(costsb)
+    costs.add(costse)
+    tim1 = time.time()
     command = "ncrcat -O %s %s %s" % (fileb, filee, filet)
+    duration = time.time() - tim1
+    costs.increment(duration)
     if os.system(command) != 0:
         clogger.error("Issue when merging %s and %s in %s (using command:%s)" % (crsb, crse, crs, command))
-        return None
+        return None, costs
     else:
         cdrop(crsb)
         cdrop(crse)
-        register(filet, crs)
-        return filet
+        register(filet, crs, costs)
+        return filet, costs
 
 
 def cdrop(obj, rm=True, force=False):
@@ -446,14 +455,14 @@ def cdrop(obj, rm=True, force=False):
         return
     if crs in crs2filename:
         clogger.info("Discarding cached value for %s (except if protected)" % crs)
-        fil = crs2filename[crs]
+        fil, _ = crs2filename[crs]
         if not os.path.exists(fil):
             fil = alternate_filename(fil)
     else:
         # In case the cache index is not up-to-date
-        fil = hasExactObject(obj)
+        fil, cost = hasExactObject(obj)
         if fil:
-            crs2filename[crs] = fil
+            crs2filename[crs] = (fil, compute_cost())
     if fil:
         if rm:
             try:
@@ -497,7 +506,7 @@ def cprotect(obj, stop=False):
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
     if crs in crs2filename:
-        f = crs2filename[crs]
+        f, _ = crs2filename[crs]
         if not os.path.exists(f):
             f = alternate_filename(f)
         if stop is False:
@@ -528,6 +537,7 @@ def csync(update=False):
     import pickle
     global cacheIndexFileName
     global dropped_crs
+    global crs2filename
 
     # Merge index on file and index in memory
     file_index = cload(True)
@@ -547,7 +557,8 @@ def csync(update=False):
                 clogger.info("Rebuilding cache index from file content")
                 rebuild()
             else:
-                clogger.warning('In no stamp mode, there is no way to seriously identify CRS from files in cache  !')
+                clogger.warning('In no stamp mode, there is no way to seriously '
+                                'identify CRS from files in cache  !')
                 # clogger.warning('Removing cache files which content is not known.
                 # This is an issue in concurrent mode !')
                 # for fil in files_in_cache :
@@ -557,15 +568,10 @@ def csync(update=False):
                 # Should also remove empty files, as soon as
                 # file creation will be atomic enough
     # Save index to disk
-    fn = os.path.expanduser(cacheIndexFileName)
-    try:
-        with open(fn, "w") as cacheIndexFile:
-            pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
-        dropped_crs = list()
-    except:
-        if update:
-            if os.path.isfile(fn) and len(files_in_cache > 0):
-                clogger.error("Issue when writing cache index %s" % fn)
+    fn = os.path.expanduser(env.environment.cacheIndexFileName)
+    cacheIndexFile = open(fn, "wb")
+    pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
+    dropped_crs = list()
 
 
 def cload(alt=None):
@@ -574,22 +580,29 @@ def cload(alt=None):
     rep = dict()
 
     if len(crs2filename) != 0 and not alt:
-        Climaf_Cache_Error(
-            "attempt to reset file index - would lead to inconsistency !")
-    try:
-        cacheIndexFile = open(os.path.expanduser(cacheIndexFileName), "r")
-        if alt:
-            rep = pickle.load(cacheIndexFile)
+        raise Climaf_Cache_Error(
+            "attempt to reset cache index - would lead to inconsistency !")
+    cacheFilen = os.path.expanduser(env.environment.cacheIndexFileName)
+    if not os.path.exists(cacheFilen):
+        clogger.debug("no index file yet")
+        return {}
+    cacheIndexFile = open(cacheFilen, "rb")
+    rep = pickle.load(cacheIndexFile)
+    for c in rep:
+        f = rep[c]
+        if type(f) is tuple:
+            f, costs = f
         else:
-            crs2filename = pickle.load(cacheIndexFile)
-            for c in crs2filename:
-                f = crs2filename[c]
-                if len(f.split("/")[-2] == directoryNameLength):
-                    crs2filename[c] = alternate_filename(f)
-        cacheIndexFile.close()
-    except:
-        pass
-        # clogger.debug("no index file yet")
+            costs = compute_cost()
+        if len(f.split("/")[-2]) == directoryNameLength:
+            f = alternate_filename(f)
+        rep[c] = (f, costs)
+    #
+    if alt:
+        return rep
+    else:
+        crs2filename = rep
+    cacheIndexFile.close()
     #
     must_check_index_entries = False
     if must_check_index_entries:
@@ -598,7 +611,7 @@ def cload(alt=None):
         # undeclared
         crs_not_yet_evaluable = dict()
         allow_error_on_ds()
-        for crs in crs2filename.copy():
+        for crs in list(crs2filename.keys()):
             try:
                 # print "evaluating crs="+crs
                 eval(crs, sys.modules['__main__'].__dict__)
@@ -621,12 +634,6 @@ def cload(alt=None):
                         "Or you can erase corresponding data by 'crm(pattern=...project name...)'" %
                         (len(crs_not_yet_evaluable), repr(list(projects))))
         allow_error_on_ds(False)
-    if alt:
-        for c in rep:
-            f = rep[c]
-            if len(f.split("/")[-2]) == directoryNameLength:
-                rep[c] = alternate_filename(f)
-        return rep
 
 
 def cload_for_project(project):
@@ -655,8 +662,8 @@ def craz(force=False, hideError=False):
 
     """
     global crs2filename
-    cc = os.path.expanduser(currentCache)
-    if os.path.exists(currentCache) or hideError is False:
+    cc = os.path.expanduser(env.environment.currentCache)
+    if os.path.exists(env.environment.currentCache) or hideError is False:
         if force:
             os.system("chmod -R +w  " + cc)
             os.system("rm -fR " + cc + "/*")
@@ -694,11 +701,11 @@ def list_cache():
 
     """
     find_return = ""
-    for dir_cache in cachedirs:
+    for dir_cache in env.environment.cachedirs:
         rep = os.path.expanduser(dir_cache)
-        find_return += os.popen(
-            r"find %s -type f \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) -print" % rep
-        ).read()
+        filter = r" \( -name '*.png' -o -name '*.nc' -o -name '*.pdf' -o -name '*.eps' \) "
+        with os.popen(r"find %s -type f " % rep + filter + " -print") as fil:
+            find_return += fil.read()
     files_in_cache = find_return.split('\n')
     files_in_cache.pop(-1)
     return files_in_cache
@@ -808,8 +815,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         # Search CRS for each found file
         for filen in list_search_files_after_find:
             for crs in crs2filename:
-                if crs2filename[crs] == filen:
-                    new_dict[crs] = filen
+                if crs2filename[crs][0] == filen:
+                    new_dict[crs] = crs2filename[crs]
 
         if len(new_dict) != 0:
             if new_dict != crs2filename:
@@ -827,7 +834,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     # filter on pattern
     find_pattern = False
     if pattern:
-        list_crs_to_rm = []
+        list_crs_to_rm = list()
         for crs in new_dict:
             if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs]):
                 clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs]))
@@ -1038,14 +1045,14 @@ def rebuild():
     for files in files_in_cache:
         filecrs = getCRS(files)
         if filecrs:
-            crs2filename[filecrs] = files
+            crs2filename[filecrs] = (files, compute_cost())
         else:
             os.system('rm -f ' + files)
             clogger.warning("File %s is removed" % files)
     return crs2filename
 
 
-def store_cvalue(crs, index, value):
+def store_cvalue(crs, index, value, costs):
     """
     Stores a scalar, as computed by cvalue, in a scalars cache
     """
@@ -1054,7 +1061,7 @@ def store_cvalue(crs, index, value):
             key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
         else:
             key = crs + "[%d]" % index
-        cvalues[key] = value
+        cvalues[key] = value, costs
 
 
 def has_cvalue(crs, index):
@@ -1066,7 +1073,13 @@ def has_cvalue(crs, index):
             key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
         else:
             key = crs + "[%d]" % index
-        return cvalues.get(key, None)
+        value = cvalues.get(key, None)
+        if value is not None:
+            if not type(value) is tuple:
+                return value, compute_cost()
+            else:
+                return value
+    return None, compute_cost()
 
 
 def load_cvalues():
@@ -1076,10 +1089,12 @@ def load_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        cache_file = os.sep.join([currentCache, "cvalues.json"])
+        cache_file = os.sep.join([env.environment.currentCache, "cvalues.json"])
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
-                cvalues = json.load(f)
+                tmp = json.load(f)
+            cvalues = decode_index(tmp)
+            del tmp
 
 
 def sync_cvalues():
@@ -1090,21 +1105,25 @@ def sync_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
+        currentCache = env.environment.currentCache
         if not os.path.isdir(currentCache):
             os.makedirs(currentCache)
         ccache = os.path.sep.join([currentCache, "cvalues.json"])
-        tmp = os.path.sep.join([currentCache, "cvalues_tmp.json"])
         #
-        try:
-            # Try to get pre-existing on-disk content
+        if os.path.exists(ccache):
+            # get pre-existing on-disk content
             with open(ccache, "r") as f:
-                onfile = json.load(f)
+                encoded = json.load(f)
+            onfile = decode_index(encoded)
+            del encoded
             onfile.update(cvalues)
+            del cvalues
             cvalues = onfile
-        except:
-            pass
+        tmp = ccache.replace(".json", ".tmp")
         with open(tmp, "w") as f:
-            json.dump(cvalues, f, separators=(',', ': '), indent=3, ensure_ascii=True)
+            tofile = encode_index(cvalues)
+            json.dump(tofile, f, separators=(',', ': '), indent=3, ensure_ascii=True)
+            del tofile
         os.rename(tmp, ccache)
 
 
@@ -1119,3 +1138,99 @@ def raz_cvalues():
         sync_cvalues()
 
 
+class compute_cost(object):
+    """
+    Handling compute costs for objects : 
+    - tc : a cost for all compute operations involved in object's genesis
+    - lc : another cost, for the last( top-level) operation
+    """
+    def __init__(self, cost=0., total_cost=None):
+        """
+        Create a compute_cost object. 
+        COST -> last_operation_cost 
+        TOTAL_COST -> total cost, defaukts to COST
+        """
+        # Attribute names are kept compact for saving on index size
+        # through pickle.dump
+        self.lc = cost
+        if total_cost is None:
+            total_cost = cost
+        self.tc = total_cost
+        
+    def __repr__(self):
+        return "total cost : %.1f s, last operation : %.1f s" % (self.tc, self.lc)
+
+    def add(self, other):
+        """Just sum up total costs with another cost object. Also sum up last
+        operation costs, but this is questionnable, as you could
+        consider that summing up costs implies there is some new 'last
+        operation' around
+        """
+        self.tc = self.tc + other.tc
+        self.lc = self.lc + other.lc
+
+    def increment(self, cost):
+        """Assuming that COST is the cost of a new 'last operation', updates 
+        object for representing that"""
+        self.tc = self.tc + cost
+        self.lc = cost
+        
+
+def ccost(cobject):
+    """Provide the compute costs (elapsed time) for an object 
+
+    Returned value is of class cost, which has fields tc (for
+    total_cost) and lc (for last_op_cost):
+
+    - tc is the sum of all compute operations that lead to the object
+    - lc is the cost for the last operation (top level)
+
+    When a single operation provides multiple outputs, all outputs are
+    charged with the cost of that operation (cost is not shared). This
+    may lead to an overestimated cost when such outputs are re-used
+    together in further operations
+
+    """
+    if cobject.crs in crs2filename:
+        return crs2filename[cobject.crs][1]
+    else:
+        if type(cobject) is cens:
+            cost = compute_cost()
+            for member in cobject:
+                if cobject[member].crs in crs2filename:
+                    cost.add(crs2filename[cobject[member].crs][1])
+                else:
+                    raise Climaf_Error("At least one ensemble member is not cached (%s)" % member)
+            return cost
+        else: 
+            clogger.warning("Object is not (yet) cached; try cfile()")
+            return None
+    
+
+def encode_index(values):
+    """ Encode a dict like crs2filename, i.e. a dict of crs : (filename, cost)
+    in a structure compatible with Json encoding"""
+    ret = dict()
+    for crs in values:
+        if type(values[crs]) is tuple:
+            fn, cost = values[crs]
+        else:
+            fn = values[crs]
+            cost = 0.
+        ret[crs] = (fn, cost.lc, cost.tc)
+    return ret
+
+
+def decode_index(values):
+    """Decode a dict of triplets in a a dict like crs2filename, i.e. a
+    dict of crs : (filename, cost)
+    """
+    ret = dict()
+    for crs in values:
+        if type(values[crs]) is list:
+            fn, last_op_cost, total_cost = values[crs]
+        else:
+            fn = values[crs]
+            last_op_cost, total_cost = 0., 0.
+        ret[crs] = (fn, compute_cost(last_op_cost, total_cost))
+    return ret

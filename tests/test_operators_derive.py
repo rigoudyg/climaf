@@ -11,11 +11,11 @@ import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
+from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator
 from climaf.operators_derive import derive, is_derived_variable, derived_variable, Climaf_Operator_Error
-from env.environment import *
 
 
 class DeriveTest(unittest.TestCase):
@@ -40,6 +40,9 @@ class DeriveTest(unittest.TestCase):
         # TODO: Implement this test and modify CliMAF in this scope
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class IsDerivedVariableTest(unittest.TestCase):
 
@@ -51,6 +54,9 @@ class IsDerivedVariableTest(unittest.TestCase):
         self.assertTrue(is_derived_variable("ta", "erai"))
         self.assertTrue(is_derived_variable("rscre", "erai"))
         self.assertFalse(is_derived_variable("ta", "CMIP6"))
+
+    def tearDown(self):
+        craz()
 
 
 class DerivedVariableTest(unittest.TestCase):
@@ -66,6 +72,9 @@ class DerivedVariableTest(unittest.TestCase):
         self.assertEqual(derived_variable("rscre", "erai"), ("minus", "rscre", ["rs", "rscs"], {}))
         self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -76,4 +85,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

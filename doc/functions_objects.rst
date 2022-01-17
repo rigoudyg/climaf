@@ -1,5 +1,5 @@
 -------------------------------------------------------------
-Functions returning ClimAF objects 
+Functions returning CliMAF objects 
 -------------------------------------------------------------
 
 .. default-domain:: python

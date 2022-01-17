@@ -1,3 +1,6 @@
+Functions for handling the cache
+==================================
+
 clist : tell what's in cache, and much more
 -------------------------------------------
 
@@ -46,4 +49,10 @@ cprotect : protect a result's file against cdrop and craz
 .. autofunction:: climaf.cache.cprotect
    :noindex:
 
+
+ccost : provide compute cost for an object
+-------------------------------------------
+
+.. autofunction:: climaf.cache.ccost
+   :noindex:
 

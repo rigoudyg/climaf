@@ -7,16 +7,15 @@ Test based on examples/index_html.py
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-import os
 import unittest
 
 from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
+from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import *
 from climaf.period import init_period
-from env.environment import *
 
 if not isinstance(cpath, list):
     cpath = cpath.split(os.sep)
@@ -58,6 +57,9 @@ class DataRetrieval_1(unittest.TestCase):
                          "latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
 
+    def tearDown(self):
+        craz()
+
 
 class DataRetrieval_2(unittest.TestCase):
 
@@ -95,6 +97,9 @@ class DataRetrieval_2(unittest.TestCase):
         self.assertEqual(str(f), "ds('test_data%historical%tas3%185004-185104%global%monthly%CNRM-CM5%Amon%r1i1p1')")
         cfile(f)
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -105,4 +110,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

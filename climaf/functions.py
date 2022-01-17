@@ -3,16 +3,16 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+from six import string_types
+import numpy as np
+
+from env.clogging import clogger
+from env.environment import *
 from climaf.utils import Climaf_Error
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue, cfile
 from climaf import classes
-from env.clogging import clogger
-from env.environment import *
-from six import string_types
-
-import numpy as np
 
 
 def cscalar(dat):
@@ -176,7 +176,7 @@ def fadd(dat1, dat2):
 
 def fsub(dat1, dat2):
     """
-    Substraction of two CliMAF object, or multiplication of the CliMAF object given as first argument
+    Substraction of two CliMAF object, or substraction of the CliMAF object given as first argument
     and a constant as second argument (string, float or integer)
 
     Shortcut to ccdo(dat,operator='subc,'+str(c)) and ccdo2(dat1,dat2,operator='sub')

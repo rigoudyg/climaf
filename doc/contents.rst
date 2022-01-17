@@ -14,6 +14,7 @@ Contents
    operators
    std_operators
    API
+   esmvaltool
    howto
    experts_corner
    contributing

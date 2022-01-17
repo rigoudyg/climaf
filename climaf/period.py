@@ -429,6 +429,39 @@ def firstyears(period, nyears):
     return repr(rep)
 
 
+def group_periods(diclist):
+    """Assuming DICLIST is a list of dictionnaries which include key
+    'period', identifies all dicts which have the same content for the
+    other keys, merge the periosd for those dicts and returns the list of 
+    dicts with this merge periods
+
+    Used e.g. on 'return_combinations' output of a series of selectGenericFiles
+    """
+    tempo = dict()
+    for dic in diclist:
+        aperiod = dic['period']
+        if not isinstance(aperiod, cperiod):
+            aperiod = init_period(aperiod)
+        #
+        keys = list(dic.keys())
+        keys.remove('period')
+        keys.sort()
+        tuple_key = tuple([dic[k] for k in keys])
+        #
+        if tuple_key not in tempo:
+            tempo[tuple_key] = dic.copy()
+            tempo[tuple_key]['period'] = list()
+        tempo[tuple_key]['period'].append(aperiod)
+    #
+    output = list()
+    for key in tempo:
+        dic = tempo[key]
+        dic['period'] = merge_periods(dic['period'])
+        output.append(dic)
+    #
+    return output
+        
+
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur
