@@ -1,5 +1,5 @@
 netCDF4==1.4.2
-numpy==1.16.0
+numpy==1.21.0
 sphinx==1.8.5
 # netcdftime
 # netCDF4
