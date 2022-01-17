@@ -15,7 +15,7 @@ from env.environment import *
 from climaf.netcdfbasics import varOfFile, varsOfFile, fileHasVar, fileHasDim, dimsOfFile, \
     model_id, timeLimits
 from climaf.period import init_period
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as rootpath
 
 
@@ -28,6 +28,9 @@ class VarsOfFileTests(unittest.TestCase):
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(varsOfFile(my_file), ["tas", ])
 
+    def tearDown(self):
+        craz()
+
 
 class VarOfFileTests(unittest.TestCase):
 
@@ -37,6 +40,9 @@ class VarOfFileTests(unittest.TestCase):
         my_file = "/".join(
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(varOfFile(my_file), "tas")
+
+    def tearDown(self):
+        craz()
 
 
 class FileHasVarTests(unittest.TestCase):
@@ -50,6 +56,9 @@ class FileHasVarTests(unittest.TestCase):
         self.assertFalse(fileHasVar(my_file, "ua"))
         self.assertTrue(fileHasVar(my_file, "tas"))
 
+    def tearDown(self):
+        craz()
+
 
 class DimsOfFileTests(unittest.TestCase):
 
@@ -59,6 +68,9 @@ class DimsOfFileTests(unittest.TestCase):
         my_file = "/".join(
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(sorted(dimsOfFile(my_file)), ["lat", "lon", "nb2", "time"])
+
+    def tearDown(self):
+        craz()
 
 
 class FileHasDimTests(unittest.TestCase):
@@ -72,6 +84,9 @@ class FileHasDimTests(unittest.TestCase):
         self.assertFalse(fileHasDim(my_file, "time_bounds"))
         self.assertTrue(fileHasDim(my_file, "lon"))
 
+    def tearDown(self):
+        craz()
+
 
 class ModelIdTests(unittest.TestCase):
 
@@ -81,6 +96,9 @@ class ModelIdTests(unittest.TestCase):
         my_file = "/".join(
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(model_id(my_file), "CNRM-CM5")
+
+    def tearDown(self):
+        craz()
 
 
 class TimeLimitesTests(unittest.TestCase):
@@ -92,6 +110,9 @@ class TimeLimitesTests(unittest.TestCase):
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(repr(timeLimits(my_file)), repr(init_period("1850-1852")))
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -102,4 +123,3 @@ if __name__ == '__main__':
     os.chdir(tmp_directory)
     setNewUniqueCache(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

@@ -19,7 +19,7 @@ string:
 
 For that, type :
 
->>> climaf.clogging.clogger=climaf.clogging.log_e()
+>>> env.clogging.clogger=env.clogging.log_e()
 
 And reset the verbosity level for CliMAF log messages on stderr
 and/or for log file; e.g.
@@ -32,7 +32,7 @@ and/or for log file; e.g.
 If you want to return back to the standard format, you have to proceed in
 the same way but with the function 'climaf.clogging.log_l()', i.e. : 
 
->>> climaf.clogging.clogger=climaf.clogging.log_l()
+>>> env.clogging.clogger=env.clogging.log_l()
 >>> clog(level="info")  
 >>> clog_file(level="info")
 >>> csync() # For an example

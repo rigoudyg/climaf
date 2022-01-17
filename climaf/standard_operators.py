@@ -7,11 +7,11 @@ Management of CliMAF standard operators
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import *
 from env.environment import *
+from env.site_settings import *
+from env.clogging import clogger
 from climaf import __path__ as cpath
 from climaf.operators import cscript, fixed_fields
-from env.clogging import clogger
 
 
 scriptpath = cpath[0] + "/../scripts/"

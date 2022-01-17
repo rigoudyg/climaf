@@ -238,7 +238,7 @@ class cscript(object):
                 clogger.debug("Found %s" % executable)
                 #
                 # Analyze inputs field keywords and populate dict
-                # attribute 'inputs' with some properties
+                # attribute 'inputs' with some properties (key is rank)
                 self.inputs = dict()
                 commuteWithEnsemble = True
                 it = re.finditer(

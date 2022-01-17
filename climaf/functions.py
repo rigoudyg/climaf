@@ -15,7 +15,6 @@ from climaf.driver import cvalue, cfile
 from climaf import classes
 
 
-
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).
@@ -51,9 +50,9 @@ def ensemble_intersection(ensembles):
     if not isinstance(ensembles, list):
         ensembles = [ensembles]
     for tmpens in ensembles:
-        if not isinstance(tmpens, climaf.classes.cens):
-            raise classes.Climaf_Error("Argument number %s is not a CliMAF ensemble = %s" %
-                                       (str(ensembles.index(tmpens) + 1), tmpens))
+        if not isinstance(tmpens, cens):
+            raise Climaf_Error("Argument number %s is not a CliMAF ensemble = %s" %
+                               (str(ensembles.index(tmpens) + 1), tmpens))
     #
     members = ensembles[0].order
     for tmpens in ensembles:
@@ -68,8 +67,8 @@ def ensemble_intersection(ensembles):
         return ens_list
 
     else:
-        raise classes.Climaf_Error("Your CliMAF ensembles have no member in common among all them; "
-                                   "check them manually with .order")
+        raise classes("Your CliMAF ensembles have no member in common among all them; "
+                      "check them manually with .order")
 
 
 def fmul(dat1, dat2):
@@ -88,7 +87,7 @@ def fmul(dat1, dat2):
       >>> ds1_times_c = fmul(ds1,c) # ds1 * c
     """
     #
-    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+    if isinstance(dat1, cens) and isinstance(dat2, cens):
         if dat1.order == dat2.order:
             res_dict = dict()
             for mem in dat1:
@@ -122,17 +121,17 @@ def fdiv(dat1, dat2):
       >>> ds1_times_c = fdiv(ds1,c) # ds1 * c
 
     """
-    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+    if isinstance(dat1, cens) and isinstance(dat2, cens):
         if dat1.order == dat2.order:
             res_dict = dict()
             for mem in dat1:
                 res_dict[mem] = divide(dat1[mem], dat2[mem])
             return cens(res_dict, order=dat1.order)
         else:
-            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
-                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
-                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only "
-                                       "their common members" % (dat1.order, dat2.order))
+            raise Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                               "Members of dat1 =%s ; Members of dat2 =%s\n"
+                               "use ensemble_intersection(dat1,dat2) to get two ensembles with only "
+                               "their common members" % (dat1.order, dat2.order))
     elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='divc,' + c)
@@ -156,17 +155,17 @@ def fadd(dat1, dat2):
       >>> ds1_plus_c = fadd(ds1,c) # ds1 + c
 
     """
-    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+    if isinstance(dat1, cens) and isinstance(dat2, cens):
         if dat1.order == dat2.order:
             res_dict = dict()
             for mem in dat1:
                 res_dict[mem] = plus(dat1[mem], dat2[mem])
             return cens(res_dict, order=dat1.order)
         else:
-            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
-                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
-                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only"
-                                       " their common members" % (dat1.order, dat2.order))
+            raise Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                               "Members of dat1 =%s ; Members of dat2 =%s\n"
+                               "use ensemble_intersection(dat1,dat2) to get two ensembles with only"
+                               " their common members" % (dat1.order, dat2.order))
     elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='addc,' + c)
@@ -191,17 +190,17 @@ def fsub(dat1, dat2):
       >>> ds1_minus_c = fsub(ds1,c) # ds1 - c
       >>> just to check
     """
-    if isinstance(dat1, climaf.classes.cens) and isinstance(dat2, climaf.classes.cens):
+    if isinstance(dat1, cens) and isinstance(dat2, cens):
         if dat1.order == dat2.order:
             res_dict = dict()
             for mem in dat1:
                 res_dict[mem] = minus(dat1[mem], dat2[mem])
             return cens(res_dict, order=dat1.order)
         else:
-            raise classes.Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
-                                       "Members of dat1 =%s ; Members of dat2 =%s\n"
-                                       "use ensemble_intersection(dat1,dat2) to get two ensembles with only their"
-                                       " common members" % (dat1.order, dat2.order))
+            raise Climaf_Error("Your CliMAF ensembles (dat1 and dat2) do not have the same members "
+                               "Members of dat1 =%s ; Members of dat2 =%s\n"
+                               "use ensemble_intersection(dat1,dat2) to get two ensembles with only their"
+                               " common members" % (dat1.order, dat2.order))
     elif isinstance(dat2, string_types + (int, float, np.float32)):
         c = str(float(dat2))
         return ccdo(dat1, operator='subc,' + c)
@@ -555,7 +554,7 @@ def summary(dat):
       >>> dat= ds(....)   # some dataset, with whatever variable
       >>> summary(dat) #
     """
-    if isinstance(dat, classes.cens):
+    if isinstance(dat, cens):
         if len(list(dat)) > 0:
             kvp = getattr(dat[list(dat)[0]], 'kvp', None)
             if kvp:
@@ -564,7 +563,7 @@ def summary(dat):
             print('-- Ensemble members:')
         for m in dat.order:
             obj = dat[m]
-            if isinstance(obj, climaf.classes.cdataset):
+            if isinstance(obj, cdataset):
                 print(m)
                 files = dat[m].baseFiles(ensure_dataset=False)
                 if files:
@@ -573,7 +572,7 @@ def summary(dat):
             else:
                 print(m + " : " + repr(obj))
             print('--')
-    elif isinstance(dat, classes.cdataset):
+    elif isinstance(dat, cdataset):
         if not dat.baseFiles(ensure_dataset=False):
             print('-- No file found for:')
         else:
@@ -855,7 +854,7 @@ def ts_plot(ts, **kwargs):
 
     """
     # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot
-    if not isinstance(ts, climaf.classes.cens):
+    if not isinstance(ts, cens):
         # -- Case 1: it's a single CliMAF dataset
         if not isinstance(ts, list):
             if not isinstance(ts, dict):

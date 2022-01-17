@@ -12,6 +12,7 @@ import unittest
 import importlib
 
 from tests.tools_for_tests import remove_dir_and_content
+from climaf.cache import setNewUniqueCache
 
 
 testmodules = [
@@ -53,5 +54,5 @@ if __name__ == '__main__':
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)
     os.chdir(tmp_directory)
+    setNewUniqueCache(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

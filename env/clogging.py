@@ -43,7 +43,7 @@ def clog(level=None):
     Args:
      level(str) : among : \"debug\", \"info\", \"warning\", \"critical\"
 
-    Note : at CliMAF startup, the level is set to the value of envrionment variable $CLIMAF_LOG_LEVEL
+    Note : at CliMAF startup, the level is set to the value of environment variable $CLIMAF_LOG_LEVEL
 
     """
     if level:

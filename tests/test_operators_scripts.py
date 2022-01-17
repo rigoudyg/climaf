@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 from env.environment import *
 
-from climaf.cache import setNewUniqueCache
+from climaf.cache import setNewUniqueCache, craz
 from climaf.operators import scriptFlags
 
 
@@ -60,6 +60,9 @@ class ScriptFlagsTests(unittest.TestCase):
         self.assertTrue(scriptFlags() == scriptFlags(canOpendap=False))
         self.assertFalse(scriptFlags() == scriptFlags(commuteWithEnsemble=False))
 
+    def tearDown(self):
+        craz()
+
 
 if __name__ == '__main__':
     # Jump into the test directory
@@ -70,4 +73,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

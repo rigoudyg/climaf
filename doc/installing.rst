@@ -107,8 +107,15 @@ Configuring CliMAF
 
  - CLIMAF_LOG_LEVEL and CLIMAF_LOGFILE_LEVEL : for setting the
    verbosity level on stderr (resp. on file climaf.log); defaults to
-   'error' (resp. 'info'). See :py:func:`~climaf.clogging.clog`
-   (resp. :py:func:`~climaf.clogging.clog_file`) for details
+   'error' (resp. 'info'). See :py:func:`~env.clogging.clog`
+   (resp. :py:func:`~env.clogging.clog_file`) for details
+
+.. _check_deps:
+
+ - CLIMAF_CHECK_DEPENDENCIES : if set to 'no', this will avoid that
+   CLiMAF checks external tools version at startup; this speeds up the
+   init stage but should be used only when you are sure these
+   dependencies are satisfied on your system and environment.
 
  - CLIMAF_FIX_NEMO_TIME : if set to anything but 'no', this will
    automatic fix CNRM’s Nemo old data time_axis issues. This adresses
@@ -119,9 +126,6 @@ Configuring CliMAF
    automatic fix Aladin outputs attribute 'coordinates' issues. This
    adresses the wrong variable attribute 'coordinates' with 'lat lon'
    to 'latitude longitude'.
-
- - CLIMAF_CHECK_DEPENDENCIES : if set to anything but 'yes', this will
-   avoid that CLiMAF checks and prints external tools version at startup
 
 - Configuration file : you may put in file ``~/.climaf`` any python code using CliMAF
   functions; this will be executed at the end of climaf import; the code 

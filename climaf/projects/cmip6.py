@@ -21,8 +21,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
 from env.environment import *
-from climaf.dataloc import dataloc, cvalid
+from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
+from climaf.projects.cmip6_valid import set_CMIP6_valid_values
 
 root = None
 if atTGCC:
@@ -36,7 +37,6 @@ if atCNRM:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/cnrm/cmip"
 
-# if root:
 if True:
     # -- Declare a 'CMIP6 CliMAF project
     # ------------------------------------ >
@@ -62,11 +62,11 @@ if True:
         cdef('model',       '*',                        project=project)
         cdef('mip',         '*',                        project=project)
         cdef('grid',        'g*',                       project=project)
-        cvalid('grid',      ["gr", "gn", "gr1", "gr2"], project=project)
         cdef('realization', 'r1i1p1f*',                 project=project)
         cdef('experiment',  'historical',               project=project)
         cdef('version',     'latest',                   project=project)
         cdef('table',       '*',                        project=project)
+        set_CMIP6_valid_values(project)
         #
         calias(project, 'tos', offset=273.15)
         calias(project, 'thetao', offset=273.15)
@@ -87,11 +87,11 @@ if True:
     cdef('model',       'IPSL-CM6A-LR',             project=project)
     cdef('mip',         'CMIP',                     project=project)
     cdef('grid',        'g*',                       project=project)
-    cvalid('grid',      ["gr", "gn", "gr1", "gr2"], project=project)
     cdef('realization', 'r1i1p1f*',                 project=project)
     cdef('experiment',  'historical',               project=project)
     cdef('version',     'latest',                   project=project)
     cdef('table',       '*',                        project=project)
+    set_CMIP6_valid_values(project)
 
     # -------------
     # -- Define the patterns
@@ -119,5 +119,6 @@ if True:
     patterns3 = [base_pattern3 + "_${PERIOD}" + ".nc", base_pattern3 + ".nc"]
 
     dataloc(project='IPSL-CM6_historical-EXT', url=patterns3)
+
 
 

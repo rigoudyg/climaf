@@ -13,7 +13,8 @@ Contents
    examples
    operators
    std_operators
-   API 
+   API
+   esmvaltool
    howto
    experts_corner
    contributing

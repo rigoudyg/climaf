@@ -13,6 +13,7 @@ import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 
+import env
 from env.environment import *
 from climaf import __path__ as rootpath
 from climaf.cmacro import crewrite
@@ -31,13 +32,16 @@ class SetNewUniqueCacheTests(unittest.TestCase):
         #       call to craz works
         new_tmp_directory = tmp_directory + "/tmp"
         setNewUniqueCache(new_tmp_directory)
-        self.assertEqual(cachedirs, [new_tmp_directory])
-        self.assertEqual(currentCache, new_tmp_directory)
-        self.assertEqual(cacheIndexFileName, new_tmp_directory + "/index")
+        self.assertEqual(env.environment.cachedirs, [new_tmp_directory])
+        self.assertEqual(env.environment.currentCache, new_tmp_directory)
+        self.assertEqual(env.environment.cacheIndexFileName, new_tmp_directory + "/index")
         setNewUniqueCache(tmp_directory, raz=False)
-        self.assertEqual(cachedirs, [tmp_directory])
-        self.assertEqual(currentCache, tmp_directory)
-        self.assertEqual(cacheIndexFileName, tmp_directory + "/index")
+        self.assertEqual(env.environment.cachedirs, [tmp_directory])
+        self.assertEqual(env.environment.currentCache, tmp_directory)
+        self.assertEqual(env.environment.cacheIndexFileName, tmp_directory + "/index")
+
+    def tearDown(self):
+        craz()
 
 
 class GenerateUniqueFileNameTests(unittest.TestCase):
@@ -56,6 +60,9 @@ class GenerateUniqueFileNameTests(unittest.TestCase):
                     os.sep.join(['7f/19fc8b622fd648549cfe53a9a57875a0b86e35ae4ae118212c6251.nc']))
         # TODO: Go on to test the usecases of the generateUniqueFileName function
 
+    def tearDown(self):
+        craz()
+
 
 class StringToPathTests(unittest.TestCase):
 
@@ -64,6 +71,9 @@ class StringToPathTests(unittest.TestCase):
         length = 5
         self.assertEqual(stringToPath(name, length),
                          "7f19f/c8b62/2fd64/8549c/fe53a/9a578/75a0b/86e35/ae4ae/11821/2c625/1")
+
+    def tearDown(self):
+        craz()
 
 
 class SearchFileTests(unittest.TestCase):
@@ -76,6 +86,9 @@ class SearchFileTests(unittest.TestCase):
         self.assertEqual(searchFile(my_path_1), "/".join([tmp_directory, my_path_1]))
         self.assertEqual(searchFile(my_path_3), None)
 
+    def tearDown(self):
+        craz()
+
 
 class RegisterTests(unittest.TestCase):
 
@@ -83,6 +96,9 @@ class RegisterTests(unittest.TestCase):
     def test_register(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class GetCRSTests(unittest.TestCase):
@@ -92,6 +108,9 @@ class GetCRSTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class RenameTests(unittest.TestCase):
 
@@ -99,6 +118,9 @@ class RenameTests(unittest.TestCase):
     def test_rename(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class HasMatchingObjectTests(unittest.TestCase):
@@ -108,6 +130,9 @@ class HasMatchingObjectTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class HasIncludingObjectTests(unittest.TestCase):
 
@@ -115,6 +140,9 @@ class HasIncludingObjectTests(unittest.TestCase):
     def test_hasIncludingObject(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class HasBeginObjectTests(unittest.TestCase):
@@ -124,6 +152,9 @@ class HasBeginObjectTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class HasExactObjectTests(unittest.TestCase):
 
@@ -131,6 +162,9 @@ class HasExactObjectTests(unittest.TestCase):
     def test_hasExactObject(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class ComplementTests(unittest.TestCase):
@@ -140,6 +174,9 @@ class ComplementTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CdropTests(unittest.TestCase):
 
@@ -147,6 +184,9 @@ class CdropTests(unittest.TestCase):
     def test_cdrop(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CprotectTests(unittest.TestCase):
@@ -156,6 +196,9 @@ class CprotectTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CsyncTests(unittest.TestCase):
 
@@ -163,6 +206,9 @@ class CsyncTests(unittest.TestCase):
     def test_csync(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CloadTests(unittest.TestCase):
@@ -172,6 +218,9 @@ class CloadTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CloadForProjectTests(unittest.TestCase):
 
@@ -179,6 +228,9 @@ class CloadForProjectTests(unittest.TestCase):
     def test_cload_for_project(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CrazTests(unittest.TestCase):
@@ -188,6 +240,9 @@ class CrazTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CdumpTests(unittest.TestCase):
 
@@ -196,18 +251,23 @@ class CdumpTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class ListCacheTests(unittest.TestCase):
 
     def test_list_cache(self):
-        from climaf.cache import cachedirs
         list_ref = list()
-        for cachedir in cachedirs:
+        for cachedir in env.environment.cachedirs:
             for (d, subd, files) in os.walk(cachedir):
                 for f in files:
                     if any([f.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]]):
                         list_ref.append(os.path.sep.join([d, f]))
         self.assertEqual(list_cache(), list_ref)
+
+    def tearDown(self):
+        craz()
 
 
 class ClistTests(unittest.TestCase):
@@ -275,6 +335,9 @@ class ClistTests(unittest.TestCase):
                         i += 1
                     du_list_sort[n] = (du_list_sort[n][0], "%6.1f%s" % (flt, unit[i]))
 
+    def tearDown(self):
+        craz()
+
 
 class ClsTests(unittest.TestCase):
 
@@ -282,6 +345,9 @@ class ClsTests(unittest.TestCase):
     def test_cls(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CrmTests(unittest.TestCase):
@@ -291,6 +357,9 @@ class CrmTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class CduTests(unittest.TestCase):
 
@@ -298,6 +367,9 @@ class CduTests(unittest.TestCase):
     def test_cdu(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CwcTests(unittest.TestCase):
@@ -307,6 +379,9 @@ class CwcTests(unittest.TestCase):
         # TODO: Implement the tests for this function
         pass
 
+    def tearDown(self):
+        craz()
+
 
 class RebuildTests(unittest.TestCase):
 
@@ -314,6 +389,9 @@ class RebuildTests(unittest.TestCase):
     def test_rebuild(self):
         # TODO: Implement the tests for this function
         pass
+
+    def tearDown(self):
+        craz()
 
 
 class CCostTest(unittest.TestCase):
@@ -323,6 +401,9 @@ class CCostTest(unittest.TestCase):
         cdrop(rst)
         cfile(rst)
         ccost(rst)
+
+    def tearDown(self):
+        craz()
 
 
 if __name__ == '__main__':
@@ -334,4 +415,3 @@ if __name__ == '__main__':
     setNewUniqueCache(tmp_directory)
     os.chdir(tmp_directory)
     unittest.main()
-    remove_dir_and_content(tmp_directory)

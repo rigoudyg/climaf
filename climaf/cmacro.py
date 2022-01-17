@@ -19,7 +19,7 @@ import six
 
 from env.clogging import clogger, dedent
 from env.environment import *
-from .classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
+from climaf.classes import cobject, cdataset, ctree, scriptChild, cpage, allow_error_on_ds, cens, cdummy
 
 
 def macro(name, cobj, lobjects=[]):

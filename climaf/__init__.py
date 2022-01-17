@@ -13,7 +13,7 @@ import os
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
-           "projects", "derived_variables"]
+           "projects", "derived_variables","ESMValTool_diags"]
 
 
 version = "2.0.2"
@@ -50,7 +50,7 @@ if not already_inited and not onrtd:
     tim("atexit")
     #
     print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]))
+    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
     from env.environment import *
 
     tim("softwares")
@@ -71,7 +71,7 @@ if not already_inited and not onrtd:
     tim("loggings")
     #
     # Decide for cache location
-    cachedir = default_cache # TODO: For compatibility, delete ones useless
+    cachedir = default_cache  # TODO: For compatibility, delete ones useless
     cache.setNewUniqueCache(default_cache, raz=False)
     print("Cache directory set to : " + default_cache + " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
     tim("set cache")
