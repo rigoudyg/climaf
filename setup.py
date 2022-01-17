@@ -38,12 +38,12 @@ setup(name='climaf',
       install_requires=requires,
       test_suite="tests",
       data_files=[
-          ("bin", ["exiv2", ]),
           ("scripts", ["ml2pl", ])
       ],
       scripts=[
           'bin/climaf',
           'bin/pdfcrop',
+          'bin/exiv2',
           'scripts/cdfsectionsm.sh',
           'scripts/cdfsections.sh',
           'scripts/cdftransport.sh',
