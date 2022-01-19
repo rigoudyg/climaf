@@ -19,7 +19,7 @@ source $base/etc/profile.d/conda.sh
 
 # Init ESMValTool with conda just for the sake of initing some environment
 # variables such as NCARG_ROOT for Ncl
-CENV=/modfs/modtools/miniconda3/envs/esmvaltool_dev
+CENV=/net/nfs/tools/Users/SU/jservon/mambaforge/envs/esmvaltool_2.4
 conda activate $CENV
 
 # Using python from ESMValTool env is necessary for accessing ESMValTool modules,
