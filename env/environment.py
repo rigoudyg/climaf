@@ -97,6 +97,8 @@ optimize_cmip6_wildcards = True
 # True means mandatory. None means : please try. False means : don't try
 stamping = True
 
+bypass_valid_check_for_project = []
+
 
 # Check commands available
 def my_which(soft):

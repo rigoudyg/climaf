@@ -57,6 +57,18 @@ class DataRetrieval_1(unittest.TestCase):
                          "latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
 
+    @skipUnless_CNRM_Lustre()
+    def test_retrieval_cmip6_data(self):
+        g = ds(project='CMIP6', period='2000-2001', variable='tos', table='Omon', grid='gn', model='CNRM-CM6-1',
+               experiment='hist-nat', realization='r1i1p1f2')
+        climaf_ds = ccdo(g, operator='fldmean')
+        print(cfile(climaf_ds))
+
+        g = ds(project='CMIP6', period='2000-2001', variable='tos', table='Omon', grid='gn', model='CNRM-CM6-1',
+               experiment='omip2', realization='r1i1p1f2')
+        climaf_ds = ccdo(g, operator='fldmean')
+        print(cfile(climaf_ds))
+
     def tearDown(self):
         craz()
 

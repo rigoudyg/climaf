@@ -364,8 +364,11 @@ def store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_perio
                 continue
             valid_values = proj.cvalid(kw, None)
             if isinstance(valid_values, list) and (facet_value not in valid_values):
-                clogger.info("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
-                return False
+                if project in env.environment.bypass_valid_check_for_project:
+                    clogger.warning("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
+                else:
+                    clogger.error("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
+                    return False
     #
     combination = dict()
     if fperiod is not None and periods is not None:
