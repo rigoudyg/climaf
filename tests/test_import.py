@@ -21,7 +21,6 @@ testmodules = [
     "env.site_settings",
     "climaf",
     "climaf.api",
-    "climaf.anynetcdf",
     "climaf.cache",
     "climaf.classes",
     "climaf.cmacro",

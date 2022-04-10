@@ -613,7 +613,7 @@ class DataPlot(unittest.TestCase):
     def test_data_plot_4(self):
         my_ds = fds(os.sep.join(cpath + ["..", "tests", "test_data",
                                          "cdnc_AERmon_CNRM-CM6-1_piControl_r1i1p1f2_1850.nc"]),
-                    variable="cdnc", period="1850")
+                    variable="cdnc", period="185001-185003")
         my_plot_1 = plot(my_ds)
         ref_my_plot_1 = os.sep.join([self.reference_directory, "test4.1.png"])
         compare_picture_files(my_plot_1, ref_my_plot_1)

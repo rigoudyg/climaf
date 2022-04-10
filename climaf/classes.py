@@ -16,14 +16,16 @@ import copy
 import os.path
 from functools import reduce, partial
 import six
+import xarray as xr
+from datetime import timedelta
 
 from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
 from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
-    lastyears, firstyears, group_periods
+    lastyears, firstyears, group_periods, freq_to_minutes
 from env.clogging import clogger
-from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
+from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
 
 
 class cproject(object):
@@ -923,210 +925,90 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self):
+    def check(self, frequency = True, gap = True, period = True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
-        - check if first data time interval is consistent with dataset frequency
-        - check if file data have a gap
-        - check if period covered by data files actually includes the whole of dataset period
+        - if frequency is True : check if data frequency is consistent with dataset frequency
+        - if gap is True : check if file data have a gap
+        - if period is True : check if period covered by data actually includes the 
+          whole of dataset period
 
-        Returns: True if period of data files included dataset period, False otherwise.
-
-        Examples:
-
-        >>> # Dataset with monthly frequency
-        >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas',period='1980-1981')
-        >>> res1=tas.check()
-        >>>
-        >>> # Ensemble with monthly frequency
-        >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
-        >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
-        >>> ens=cens({'1980':j0, '1981':j1})
-        >>> res2=ens.check()
-
-        >>> # Define a new project for 'em' data with 3 hours frequency in particular
-        >>> cproject('em_3h', 'root', 'group', 'realm', 'frequency', separator='|')
-        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc'
-        >>> dataloc(project='em_3h', organization='generic', url=path)
-
-        >>> # Dataset with 3h frequency for 'tas' variable (instant)
-        >>> tas_3h=ds(project='em_3h', variable='tas', group='AR4', realm='Atmos', frequency='3Hourly',
-        ...           simulation='A1B', period='2050-2100')
-        >>> res3=tas_3h.check()
-
-        >>> # Dataset with 3h frequency for 'pr' variable (time mean)
-        >>> pr_3h=ds(project='em_3h', variable='pr', group='AR4', realm='Atmos', frequency='3Hourly', simulation='A1B',
-        ...          period='2050-2100')
-        >>> res4=pr_3h.check()
-
+        Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
         """
-        from .anynetcdf import ncf
-        from datetime import timedelta
-        from netCDF4 import num2date
-        import numpy as np
-
-        # Returns the list of files which include the data for the dataset
-        # or for each member of the ensemble
-        if isinstance(self, cdataset):
-            if self.isLocal() or self.isCached():
-                files = self.baseFiles()
-            else:
-                files = self.local_copies_of_remote_files
-            if not files:
-                clogger.error('No file found for: %s' % self)
-                if not (self.isLocal() or self.isCached()):
-                    clogger.warning('For remote data, you have to do at first "cfile(%s)"' % self)
-                return False
-        else:
-            clogger.error("Cannot handle %s" % self)
-            return
+        if gap : 
+            frequency = True
         #
-        if files:
-            filedate = []
-            clogger.debug("List of selected files: %s" % files)
-
-            var = varOf(self).split(',')[0]
-            # Concatenate all data files
-            for filename in files.split():
-                fileobj = ncf(filename)
-                #
-                if self.project in aliases and var in aliases[self.project]:
-                    var = aliases[self.project][var][0]
-                #
-                dimname = ''
-                for dim in fileobj.variables[var].dimensions:
-                    if 'time' in dim:
-                        dimname = dim
-                if not dimname:
-                    clogger.error('No time dimension for variable %s' % var)
-                time_obj = fileobj.variables[dimname]
-                filedate = np.concatenate((filedate, num2date(time_obj.getValue(), units=time_obj.units,
-                                                              calendar=time_obj.calendar)))
-
-            clogger.debug('Time data of selected files: %s' % filedate)
-
-            # Check if first data time interval is consistent with dataset frequency
-            if len(filedate) > 1:
-                filedate_delta = (filedate[1] - filedate[0]).total_seconds()
-            else:
-                clogger.error('Time dimension is degenerated.')
-                return
-
-            if ((self.frequency == 'monthly' or not self.frequency)
-                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.)) \
-                    or (self.frequency == 'yearly' and
-                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.)) \
-                    or (self.frequency == 'decadal' and
-                        (filedate_delta > 3653. * 24. * 3600. or filedate_delta < 3651. * 24. * 3600.)):
-
-                clogger.warning(
-                    'First data time interval (= %.1f days) is not consistent with dataset frequency (i.e. %s)'
-                    % (filedate_delta / (24. * 3600.), self.frequency))
-
-            elif self.frequency == 'daily' and filedate_delta != 86400.:
-                clogger.warning(
-                    'First data time interval (= %.2f hours) is not consistent with dataset frequency (i.e. %s)'
-                    % (filedate_delta / 3600., self.frequency))
-
-            elif (self.frequency == '6h' or self.frequency == '3h' or self.frequency == '1h'
-                  or self.frequency == '3Hourly' or self.frequency == '6Hourly') \
-                    and filedate_delta != float(self.frequency[0]) * 3600.:
-                clogger.warning('First data time interval (= %.2f hours) is different to dataset frequency (i.e. %.2f)'
-                                % (filedate_delta / 3600., float(self.frequency[0])))
-
-            # Check if file data have a gap
-            i = 0
-            cpt = 0
-            while i < len(filedate) - 2:
-                i += 1
-                if (filedate[i + 1] - filedate[i]).total_seconds() != filedate_delta:
-                    cpt += 1
-                    if cpt < 5:
-                        if self.frequency == 'monthly' or not self.frequency or \
-                                self.frequency == 'yearly' or self.frequency == 'decadal':
-                            clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days '
-                                          % (i, i + 1, (filedate[i + 1] - filedate[i]).total_seconds() / (24. * 3600.))
-                                          + 'instead of %.0f days (<=> 1st data interval)'
-                                          % (filedate_delta / (24. * 3600.)))
-                        elif self.frequency == 'daily' or self.frequency == '6h' or \
-                                self.frequency == '3h' or self.frequency == '1h' or \
-                                self.frequency == '3Hourly' or self.frequency == '6Hourly':
-                            clogger.error('File data have a gap between indexes %i and %i: ' % (i, i + 1) +
-                                          'delta = %.0f hours instead of %.0f hours (<=> 1st data interval)'
-                                          % ((filedate[i + 1] - filedate[i]).total_seconds() / 3600.,
-                                             filedate_delta / 3600.))
-            #
-            # Compute period covered by data files
-            if self.frequency == 'monthly' or not self.frequency:
-                filedate[0] = filedate[0].replace(day=0o1)
-                if filedate[-1].month > 11:
-                    filedate[-1] = filedate[-1].replace(year=filedate[-1].year + 1)
-                    filedate[-1] = filedate[-1].replace(month=0o1)
-                    filedate[-1] = filedate[-1].replace(day=0o1)
-                else:
-                    filedate[-1] = filedate[-1].replace(month=filedate[-1].month + 1)
-                    filedate[-1] = filedate[-1].replace(day=0o1)
-
-            elif self.frequency == 'daily':
-                filedate[0] = filedate[0].replace(hour=00)
-                filedate[-1] = filedate[-1].replace(hour=00)
-                filedate[-1] = filedate[-1] + timedelta(days=1)
-
-            elif self.frequency == '6h' or self.frequency == '3h' or self.frequency == '1h' \
-                    or self.frequency == '3Hourly' or self.frequency == '6Hourly':
-
-                if 'cell_methods' in fileobj.variables[var].__dict__:  # time mean
-
-                    regex = re.compile(r'.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
-                    cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
-                    if cell_meth_att:
-                        if cell_meth_att.group(2) == 'hours':
-                            freq = float(cell_meth_att.group(1))
-                        elif cell_meth_att.group(2) == 'minutes':
-                            freq = float(cell_meth_att.group(1)) / 60.
-                    else:  # 'cell_methods' attribute defined with the value 'time: mean'
-                        freq = filedate_delta / 3600.
-
-                    filedate[0] = filedate[0] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                  ((filedate[0].hour * 60 + filedate[0].minute) -
-                                                                   (freq / 2.) * 60) % (freq * 60))
-                    filedate[-1] = filedate[-1] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                    ((filedate[-1].hour * 60 + filedate[-1].minute) -
-                                                                     (freq / 2.) * 60) % (freq * 60) - freq * 60)
-
-                else:  # assume it is instant data
-                    freq = filedate_delta / 3600.
-                    filedate[-1] = filedate[-1] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                    ((filedate[-1].hour * 60 + filedate[-1].minute) -
-                                                                     (freq / 2.) * 60) % (freq * 60) - 2 * freq * 60)
-
-            elif self.frequency == 'yearly' or self.frequency == 'decadal':
-                filedate[0] = filedate[0].replace(month=0o1)
-                filedate[0] = filedate[0].replace(day=0o1)
-                filedate[-1] = filedate[-1].replace(month=0o1)
-                filedate[-1] = filedate[-1].replace(day=0o1)
-                filedate[-1] = filedate[-1] + timedelta(years=1)
-
-            elif self.frequency == 'fx' or self.frequency == 'annual_cycle':
-                clogger.error('Check time consistency with a frequency equal to %s has no sense' % self.frequency)
-
-            else:
-                clogger.error('Dataset frequency is non-standard: frequency = %s. ' % self.frequency +
-                              'Normalized frequency values are: decadal, yearly, monthly, ' +
-                              'daily, 6h, 3h, fx and annual_cycle')
-            #
-            # Check period of datafiles vs dataset period
-            clogger.debug('Period covered by selected files: %s' % filedate)
-            file_period = cperiod(start=filedate[0], end=filedate[-1])
-            #
-            if file_period.includes(self.period):
-                clogger.info("Time data in datafiles (i.e. %s) includes time data of " % file_period +
-                             "dataset (i.e. %s) => dataset are consistent." % self.period)
-                return True
-            else:
-                clogger.info("Time data in datafiles (i.e. %s) don't include time data of " % file_period +
-                             "dataset (i.e. %s) => dataset are not consistent." % self.period)
+        files = self.baseFiles()
+        if not files:
+            return False
+        files = files.split()
+        clogger.debug("List of selected files: %s" % files)
+        #
+        rep = True
+        dsets = [ xr.open_dataset(f,use_cftime=True) for f in files ]
+        all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
+        #
+        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
+            clogger.info("No check for fixed data for %s",self)
+            return True
+        if self.frequency == "monthly" and frequency:
+            clogger.error("Check cannot yet process monthly data due to" +
+                          "to a shortcoming in analyzing monthly data frequency")
+            return None
+        if not getattr(dsets[0],"frequency",False) and frequency :
+            clogger.warning("No frequency in file(s) for %s",self)
+            return False
+        if "time" not in all_dsets :
+            clogger.warning("Cannot yet chek a dataset which time dimension" +
+                            "is not named 'time' (%s)"%self)
+            return False
+        #
+        times = all_dsets.time
+        clogger.debug('Time data of selected files: %s' % times)
+        #
+        if frequency:
+            # Check if data time interval is consistent with dataset frequency
+            data_freq = xr.infer_freq(times)
+            if data_freq is None :
+                clogger.error("Time interval detected by xr.infer_freq is None %s"%str(times))
                 return False
+            table = { "monthly" : "MS", "daily" : "D", "day" : "D", "6h" : "6H", "3h" : "3H", 
+                     "1h" : "1H", "6Hourly" : "6H", "3Hourly" : "3H"}
+            if self.frequency not in table :
+                clogger.error("Check cannot yet handle frequency %s"%self.frequency)
+                return None
+            if ( data_freq != table[self.frequency] ): 
+                message = 'Data time interval %s is not consistent with dataset frequency %s'
+                clogger.warning(message%(data_freq,self.frequency))
+                rep = False
+
+        if gap:
+            # Check if file data have a gap
+            time_values = times.values.flatten()
+            delta = freq_to_minutes(data_freq)
+            cpt = 0
+            for ptim,tim in zip(time_values[:-1],time_values[1:]):
+                if ptim + timedelta(minutes=delta) != tim :
+                    rep = False
+                    cpt += 1
+                    if cpt > 3 : 
+                        break
+                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s"%\
+                                (ptim,tim,delta))
+        
+        if period:
+            # Compare period covered by data files with dataset's period
+            cell_methods = getattr(dsets[0][varOf(self)],"cell_methods",None)
+            file_period = timeLimits(times, use_frequency = True, cell_methods = cell_methods,
+                                 strict_on_time_dim_name = False)
+            clogger.debug('Period covered by selected files: %s' % file_period)
+            consist = ""
+            if not file_period.includes(self.period):
+                consist = "not "
+                rep = False
+            clogger.info("Datafile time period (%s) includes dataset time period (%s)" % \
+                         (file_period,self.period) + "=> time periods are %sconsistent." % (consist))
+        return rep
 
 
 class cens(cobject, dict):
@@ -1402,6 +1284,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     - period : the period actually covered by the data file (if it has time_bnds)
     - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
     - project  : 'file' (with separator = '|')
+    - frequency : the value of global attribute fequency in datafile, if it exists
 
     The following restriction apply to such datasets :
 
@@ -1450,6 +1333,9 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     d = ds(project='file', model=model, simulation=simulation,
            variable=variable, period=period, path=filename)
     d.files = filename
+
+    d.frequency = attrOfFile(filename,"frequency","*")
+        
     return d
 
 

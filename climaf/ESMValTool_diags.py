@@ -18,13 +18,14 @@ import time
 import datetime
 import logging
 #
+import xarray as xr
+#
 from env.environment import *
 from env.clogging import clogger, dedent as cdedent
 from env.site_settings import atIPSL
 #
 import climaf
 from climaf.utils import Climaf_Error, Climaf_Driver_Error
-from climaf.anynetcdf import ncf
 from climaf.classes import timePeriod, cens, varOf, projectOf, experimentOf, realizationOf
 
 #: Path for the wrapper script for setting ESMValTool's diag scripts environment and launching them
@@ -257,37 +258,16 @@ def _create_metadata_file(script, ensemble, value, preproc_dir, metadatas) :
 
 
 def _read_attr_from_file(afile,variable) :
-    with ncf(afile,'r') as fileobject:
-        try :
-            freq = fileobject.frequency
-        except :
-            freq = "N/A"
-        try :
-            inst = fileobject.institution_id
-        except :
-            inst = "N/A"
-        try :
-            table = fileobject.table_id
-        except :
-            table = "N/A"
-        try :
-            realm = fileobject.realm
-        except :
-            realm = "N/A"
-            
-        var = fileobject.variables[variable]
-        try :
-            lname = var.long_name
-        except :
-            lname = "N/A"
-        try :
-            stdname = var.standard_name
-        except :
-            stdname = "N/A"
-        try :
-            units = var.units
-        except :
-            units = "N/A"
+    with xr.open_dataset(afile) as ds:
+        freq  = getattr(ds,"frequency","N/A")
+        inst  = getattr(ds,"institution_id","N/A")
+        table = getattr(ds,"table_id","N/A")
+        realm = getattr(ds,"realm","N/A")
+        #
+        var     = ds.variables[variable]
+        lname   = getattr(ds,"long_name","N/A")
+        stdname = getattr(ds,"standard_name","N/A")
+        units   = getattr(ds,"standard_name","N/A")
     return (freq, inst, lname, table, realm, stdname, units)
 
 
