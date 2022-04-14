@@ -14,8 +14,12 @@ import re
 import string
 import copy
 import os.path
+from collections import defaultdict
 from functools import reduce, partial
 import six
+import json
+import shutil
+import glob
 
 from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
@@ -151,6 +155,112 @@ class cproject(object):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
 
+    def build_cvalid_from_tree_of_files(self, project_name=None):
+        if project_name is None:
+            project_name = self.project
+        # Find out the directory paths to be checked (other keys can be considered by hand)
+        project_locs = [os.path.dirname(loc) for loc in locs if loc.project in [project_name, ]]
+        # Do not consider root
+        project_locs = [loc.replace("${root}", self.facet_defaults["root"]) for loc in project_locs]
+        facets_regexp = re.compile(r"\$\{(?P<facet>[^\{^\}]+)\}")
+        list_facets = list()
+        for loc in project_locs:
+            list_facets.append([m.groupdict()["facet"] for m in facets_regexp.finditer(loc)])
+        dict_facets = defaultdict(list)
+        for (loc, facets) in zip(project_locs, list_facets):
+            loc_list = [loc, ]
+            tmp_loc_list = list()
+            for facet in facets:
+                facet_reg = r"\$\{%s\}" % facet
+                facet_regexp = re.compile(facet_reg)
+                for tmp_loc in loc_list:
+                    match = facet_regexp.match(tmp_loc)
+                    if match is not None:
+                        begin_tmp_loc = tmp_loc[:tmp_loc.find(os.sep, match.end())]
+                        begin_tmp_loc = begin_tmp_loc.replace(facet_reg, "*")
+                        list_values = glob.glob(begin_tmp_loc)
+                        list_values = [val.replace(tmp_loc[:match.start()], "")[:len(tmp_loc) - match.end()]
+                                       for val in list_values]
+                        dict_facets[facet].extend(list_values)
+                        tmp_loc_list.extend([tmp_loc.replace(facet_reg, val) for val in list_values])
+                    else:
+                        tmp_loc_list.append(tmp_loc)
+                loc_list, tmp_loc_list = tmp_loc_list, list()
+        for key in dict_facets:
+            dict_facets[key] = sorted(list(set(dict_facets[key])))
+        return dict_facets
+
+    def build_cvalid_conf_file_name(self, project_name=None, choice="both"):
+        """
+        Build cvalid conf file name from project name.
+        :param project_name: name of the default project to be used
+        :param choice: where to look for the conf file, either "user" (in $HOME/.climaf), "default" (in climaf/projects)
+                       or "both"
+        :return: a list of possible conf file names
+        """
+        if project_name is None:
+            project_name = self.project
+        cvalid_user_conf_file = os.sep.join([os.environ["HOME"], ".climaf", "cvalid_{}.json".format(project_name)])
+        cvalid_default_conf_file = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "project",
+                                                "cvalid_{}.json".format(project_name)])
+        if choice in ["both", ]:
+            return [cvalid_user_conf_file, cvalid_default_conf_file]
+        elif choice in ["user", ]:
+            return [cvalid_user_conf_file, ]
+        elif choice in ["default", ]:
+            return [cvalid_default_conf_file, ]
+        else:
+            raise ValueError("Unknown value for choice: %s" % choice)
+
+    def initialize_cvalid_values(self, project_name=None):
+        """
+        Initialize cvalid values for the current project with values defined in a json file, either in the CliMAF'
+        project directory or in the climaf conf directory.
+        :param project_name: name of the project to build the conf file name
+        """
+        cvalid_conf_files = self.build_cvalid_conf_file_name(project_name=project_name, choice="both")
+        cvalid_conf_files = [f for f in cvalid_conf_files if os.path.isfile(f)]
+        if len(cvalid_conf_files) > 0:
+            cvalid_conf_file = cvalid_conf_files[0]
+            content = json.load(cvalid_conf_file)
+            for key in content:
+                self.cvalid(key, content[key])
+
+    def initialize_user_cvalid_values(self, project_name=None, from_tree_of_files=False, force=False):
+        """
+        Initialize the user's configuration file for project project_name.
+        If the configuration file already exists, do nothing except if force=True.
+        If from_tree_of_file=True, read the tree of files to find out the possible values (not implemented yet).
+        :param project_name: name of the default project
+        :param from_tree_of_files: boolean, should the tree of file be read?
+        :param force: boolean, should an existing user conf file be bypassed?
+        """
+        cvalid_user_conf_file = self.build_cvalid_conf_file_name(project_name=project_name, choice="user")[0]
+        cvalid_default_conf_file = self.build_cvalid_conf_file_name(project_name=project_name, choice="default")[0]
+        if os.path.isfile(cvalid_user_conf_file):
+            if force:
+                clogger.warning("User's cvalid configuration file %s already exists and force=True, replace it" %
+                                cvalid_user_conf_file)
+                os.remove(cvalid_user_conf_file)
+                if from_tree_of_files:
+                    content = self.build_cvalid_from_tree_of_files(project_name)
+                    json.dump(content, cvalid_user_conf_file)
+                elif os.path.isfile(cvalid_default_conf_file):
+                    if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                        os.makedirs(os.path.dirname(cvalid_user_conf_file))
+                    shutil.copyfile(cvalid_default_conf_file, cvalid_user_conf_file)
+                else:
+                    clogger.error("Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+            else:
+                clogger.warning("User's cvalid configuration file %s already exists and force=False, do nothing." %
+                                cvalid_user_conf_file)
+        elif cvalid_default_conf_file:
+            if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                os.makedirs(os.path.dirname(cvalid_user_conf_file))
+            shutil.copyfile(cvalid_default_conf_file, cvalid_user_conf_file)
+        else:
+            clogger.error("Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+
     def cvalid(self, attribute, value=None):
         """Set or get the list of valid values for a CliMAF dataset attribute
         or facet (such as e.g. 'model', 'simulation' ...). Useful
@@ -164,7 +274,7 @@ class cproject(object):
         """
         #
         if attribute not in self.facets:
-            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (self.project, attribute))
         if value is None:
             return self.facet_authorized_values.get(attribute, None)
         else:

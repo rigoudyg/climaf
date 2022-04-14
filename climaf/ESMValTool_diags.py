@@ -80,7 +80,7 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters) :
     settings = {
         'recipe'             : 'CliMAF',
         'script'             : script,
-        'version'            : climaf.version,
+        'version'            : version,
         
         # User may wish to change next attributes for each call
         'auxiliary_data_dir' : None,

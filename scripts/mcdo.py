@@ -37,6 +37,8 @@ def correct_list_args(value):
     if len(value) == 0:
         return None
     else:
+        if value.startswith("[") and value.endswith("]"):
+            value = value.lstrip("[").rstrip("]")
         return [v.strip() for v in value.split(",")]
 
 

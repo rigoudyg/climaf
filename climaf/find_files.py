@@ -26,8 +26,8 @@ import copy
 from env.environment import *
 from env.clogging import clogger
 import env
-from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_substitute
-from climaf.period import init_period, sort_periods_list
+from climaf.utils import Climaf_Error, cartesian_product_substitute
+from climaf.period import init_period, sort_periods_list, cperiod
 from climaf.netcdfbasics import fileHasVar
 
 
@@ -201,8 +201,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 # Process fixed-fields case, or extract file time period 
                 #
                 fperiod = None
-                if kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or kwargs.get('period') in ['fx', ] \
-                        or kwargs.get('table') in ['fx', ]:
+                if kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or \
+                        kwargs.get('period') in [cperiod("fx"), ] or kwargs.get('table') in ['fx', ]:
                     store = False
                     # local data
                     if not remote_prefix and ((basename.find("${variable}") >= 0) or variable in ['*', ] or

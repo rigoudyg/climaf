@@ -24,7 +24,6 @@ from operator import itemgetter
 import env
 from env.environment import *
 from env.clogging import clogger
-from climaf import version
 from climaf.utils import Climaf_Cache_Error, Climaf_Error
 from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
 from climaf.cmacro import crewrite
@@ -783,7 +782,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     # cache directories
     # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
-    rep = os.path.expanduser(cachedirs[0])
+    rep = os.path.expanduser(env.environment.cachedirs[0])
 
     # command for research on size/age/access
     opt_find = ""

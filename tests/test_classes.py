@@ -59,6 +59,21 @@ class CprojectTests(unittest.TestCase):
         # TODO: Write the test
         pass
 
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_cvalid(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_cvalid_values(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_user_cvalid_values(self):
+        # TODO: Write the test
+        pass
+
     def tearDown(self):
         craz()
 

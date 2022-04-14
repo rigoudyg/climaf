@@ -131,7 +131,7 @@ def varlongname(variable):
         match_regexp = variable_regexp.match(variable)
         if match_regexp is not None:
             var = match_regexp.groupdict()["var"]
-            nb = match_regexp.groupdict()["nb"]
+            nb = int(match_regexp.groupdict()["nb"])
             meter = match_regexp.groupdict()["meter"] in ["m", ]
             longvarname, shortvarname = dict_std_name.get(var, ('', ''))
             if meter:
