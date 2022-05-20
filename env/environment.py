@@ -126,15 +126,7 @@ if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
 # Check dependencies
 try:
     xdg_bin = my_which("xdg-open")
-    print("xdg-open is available")
-except:
-    xdg_bin = None
-    print("Warning: could not find xdg-open")
-
-# Check dependencies
-try:
-    xdg_bin = my_which("xdg-open")
-    print("xdg-open is available")
+    #print("xdg-open is available")
 except:
     xdg_bin = None
     print("Warning: could not find xdg-open")

@@ -10,11 +10,6 @@ cdir=$(cd $(dirname $0)/..; pwd)
 
 export PYTHONPATH=$cdir:$PYTHONPATH 
 
-if [ ! "cesmep_env"="$CONDA_DEFAULT_ENV" ]
-then
-  source activate cesmep_env
-fi
-
 if [ "$*" ] ; then 
     if [ -f "$1" ] ; then 
 	(echo 'from climaf.api import *'; cat $*) | python
