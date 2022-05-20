@@ -15,7 +15,7 @@ from env.environment import *
 
 from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
-from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
+from climaf.api import plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
     cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
 
 if not isinstance(cpath, list):

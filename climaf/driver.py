@@ -39,7 +39,7 @@ from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject
     generateUniqueFileName, register, rename, has_cvalue, store_cvalue
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
-from climaf.netcdfbasics import varOfFile
+from climaf.netcdfbasics import varOfFile, varsOfFile
 from climaf.period import init_period, merge_periods
 from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf

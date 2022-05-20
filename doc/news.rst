@@ -11,6 +11,11 @@ Changes, newest first:
   - function :py:func:`~climaf.classes.fds` now sets the dataset's
     frequency using file's global attribute 'frequency'
 
+  - dataset's method :py:meth:`~climaf.classes.cdataset.check` has
+    been reworked, accepts flags for setting what to check, and
+    provides a consistent return value (which can be None if a
+    decision cannot be made)
+
   - technical :
 
     - clean-up of nectdf libraries use : xarray becomes the sole
