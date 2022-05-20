@@ -19,6 +19,9 @@ import tempfile
 from datetime import datetime
 from functools import reduce
 from six import string_types
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 from xarray import open_dataset as xr_open_dataset
 
 from climaf.dataloc import remote_to_local_filename

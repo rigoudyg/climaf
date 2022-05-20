@@ -4,7 +4,11 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import re
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 import xarray as xr
+
 import six
 from datetime import timedelta
 

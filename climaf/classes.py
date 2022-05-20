@@ -16,6 +16,8 @@ import copy
 import os.path
 from functools import reduce, partial
 import six
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 import xarray as xr
 from datetime import timedelta
 
