@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Standard site settings for working with CliMAF.
@@ -48,3 +48,12 @@ if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.
     VolumesDir = os.getenv('VolumesDir')
 if os.path.exists('/data/scratch/globc'):
     atCerfacs = True
+
+if atCNRM:
+    additional_packages = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "..", "add_packages", "lib"])
+    if os.path.isdir(additional_packages):
+        rep = os.listdir(additional_packages)
+        for d in [d for d in rep if "python" in d]:
+            sys.path.append(os.sep.join([additional_packages, d, "site-packages"]))
+    else:
+        print("Warning: additional packages not found, could cause issues.")

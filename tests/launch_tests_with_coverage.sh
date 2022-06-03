@@ -8,6 +8,8 @@ run_modules=${3:-"netcdfbasics period cache classes functions operators standard
 echo $run_modules
 run_coverage=${4:-0}
 echo $run_coverage
+plot_config=${5:-"default"}
+echo $plot_config
 
 if [ $run_coverage -eq 1 ] ; then
     coverage_binary="coverage${python_version}"
@@ -27,6 +29,8 @@ fi
 climaf_macros="$PWD/.climaf.macros_tests"
 rm -f ${climaf_macros}
 export CLIMAF_MACROS=${climaf_macros}
+
+export CLIMAF_TEST_PLOT_CONFIG=${plot_config}
 
 # Run coverage with different tests
 if [ $run_coverage -eq 0 ] ; then
