@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from env.environment import *
-from env.site_settings import atCNRM, onCiclad
+from env.site_settings import atCNRM, onCiclad, atTGCC
 from climaf.cache import setNewUniqueCache, craz
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
     calias, crealms
@@ -168,6 +168,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
             self.assertEqual(a["root"], "/cnrm/cmip")
         elif onCiclad:
             self.assertEqual(a["root"], "/bdd")
+        elif atTGCC:
+            root = "/ccc/work/cont003/cmip6/cmip6"
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
