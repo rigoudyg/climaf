@@ -112,7 +112,7 @@ clog(loglevel)
 env.clogging.logdir = logdir
 if not os.access(env.clogging.logdir, mode=os.W_OK):
     print("Cannot write logfile in non-writeable directory : " + os.path.abspath(env.clogging.logdir))
-    exit()
+    sys.exit()
 clog_file(logfilelevel)
 
 # Ensure that the variable TMPDIR, if defined, points to an existing directory
