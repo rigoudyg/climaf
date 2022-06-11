@@ -201,8 +201,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 # Process fixed-fields case, or extract file time period 
                 #
                 fperiod = None
-                if kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or kwargs.get('period') in ['fx', ] \
-                        or kwargs.get('table') in ['fx', ]:
+                if kwargs.get('frequency')   in ["fx", "seasonnal", "annual_cycle"] or \
+                   str(kwargs.get('period')) in ['fx', ] \
+                   or kwargs.get('table')    in ['fx', ]:
                     store = False
                     # local data
                     if not remote_prefix and ((basename.find("${variable}") >= 0) or variable in ['*', ] or
