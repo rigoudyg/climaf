@@ -119,7 +119,7 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, onCiclad, onSpip
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -129,7 +129,7 @@ login = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/store/cont003/thredds"
-if onCiclad:
+if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/store/cont003/thredds"
     login = "fabric"
@@ -169,7 +169,7 @@ if root:
     # Frequency alias
     cfreqs('IGCM_OUT', {'monthly': '1M', 'daily': '1D', 'seasonal': 'SE', 'annual_cycle': 'SE', 'yearly': '1Y'})
 
-    if onCiclad:
+    if onCiclad or onSpirit:
         urls_IGCM_OUT = [
             "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
             "${simulation}_${PERIOD}_${frequency}_${variable}.nc",

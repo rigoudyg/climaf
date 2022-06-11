@@ -44,7 +44,7 @@ Example of a 'era5cerfacs' project dataset declaration ::
 
 
 """
-from env.site_settings import onCiclad, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, atCerfacs, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -52,7 +52,7 @@ from climaf.classes import cproject, calias, cfreqs, cdef
 
 root = None
 
-if onCiclad:
+if onCiclad or onSpirit:
     root = "/data/jservon/Evaluation/ReferenceDatasets/"
 if atTGCC:
     root = "/ccc/work/cont003/igcmg/igcmg/IGCM/ReferenceDatasets/"

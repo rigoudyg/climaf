@@ -21,10 +21,10 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip, atCNRM
 
 root = None
-if onCiclad:
+if onCiclad or onSpirit:
     # Declare a root directory for CMIP3 data on IPSL's Ciclad file system
     root = "/bdd/CMIP3"
 

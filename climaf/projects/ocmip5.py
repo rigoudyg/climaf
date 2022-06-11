@@ -21,12 +21,12 @@ Example ::
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from env.site_settings import onCiclad
+from env.site_settings import onCiclad, onSpirit
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs
 
-if onCiclad:
+if onCiclad or onSpirit:
     cproject("OCMIP5", "model", "simulation", ("frequency", "monthly"), ensemble=["model"])
     #
     # Declare which facets can be used for defining an ensemble

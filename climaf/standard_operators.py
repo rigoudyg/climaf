@@ -299,7 +299,7 @@ def load_standard_operators():
             _var='slope')
     #
     # ml2pl (only on Ciclad)
-    if onCiclad:
+    if onCiclad or onSpirit:
         cscript("ml2pl", scriptpath + "ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
         fixed_fields("ml2pl", ("press_levels.txt", scriptpath + "press_levels.txt"))

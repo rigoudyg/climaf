@@ -11,7 +11,6 @@ import unittest
 
 from tests.tools_for_tests import remove_dir_and_content
 from env.environment import *
-from env.site_settings import atCNRM, onCiclad
 from climaf.cache import setNewUniqueCache, craz
 from climaf.api import cproject, dataloc
 from climaf.driver import capply, capply_script, maketree, capply_operator, ceval_for_cdataset, ceval_for_ctree, \
