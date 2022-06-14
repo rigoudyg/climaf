@@ -36,7 +36,7 @@ def varsOfFile(filename, all=False):
     only variable which are not dimensions nor scalar coordinates are returned
     """
     lvars = []
-    with xr.open_dataset(filename) as ds:
+    with xr.open_dataset(filename, decode_times=False) as ds:
         lvars = list(ds.variables.keys())
         if all is False:
             # remove dimensions
@@ -64,7 +64,7 @@ def fileHasVar(filename, varname):
     """
     rep = False
     clogger.debug("opening " + filename + " for checkin if has variable " + varname)
-    with xr.open_dataset(filename) as ds:
+    with xr.open_dataset(filename, decode_times=False) as ds:
         return varname in ds
 
 
@@ -80,7 +80,7 @@ def dimsOfFile(filename):
     returns the list of dimensions of the netcdf file filename
     """
     clogger.debug("opening " + filename + " for checking the dimensions")
-    with xr.open_dataset(filename) as ds:
+    with xr.open_dataset(filename, decode_times=False) as ds:
         return ds.dims
 
 
@@ -195,7 +195,7 @@ def isVerticalLevel(varname):
         or 'plev' in varname.lower()
 
 def verticalLevelName(filename):
-    with xr.open_dataset(filename) as ds:
+    with xr.open_dataset(filename, decode_times=False) as ds:
         for varname in ds.variables:
             if isVerticalLevel(varname):
                 return(varname)
@@ -204,16 +204,16 @@ def verticalLevelName(filename):
 def verticalLevelUnits(filename):
     lev = verticalLevelName(filename)
     if lev:
-        with xr.open_dataset(filename) as ds:
+        with xr.open_dataset(filename, decode_times=False) as ds:
             return ds[lev].units
 
 def verticalLevelValues(filename):
     lev = verticalLevelName(filename)
     if lev:
-        with xr.open_dataset(filename) as ds:
+        with xr.open_dataset(filename, decode_times=False) as ds:
             return list(ds[lev].values)
 
 def attrOfFile(filename, attribute, default=None):
-    with xr.open_dataset(filename) as ds:
+    with xr.open_dataset(filename, decode_times=False) as ds:
         return getattr(ds,attribute,default)
 
