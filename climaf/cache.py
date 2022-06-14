@@ -783,7 +783,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
     # cache directories
     # TBD: le cache ne contient qu un rep pr le moment => voir pour boucler sur tous les caches
-    rep = os.path.expanduser(cachedirs[0])
+    rep = os.path.expanduser(env.environment.cachedirs[0])
 
     # command for research on size/age/access
     opt_find = ""
