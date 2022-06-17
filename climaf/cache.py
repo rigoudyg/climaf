@@ -835,7 +835,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if pattern:
         list_crs_to_rm = list()
         for crs in new_dict:
-            if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs]):
+            if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs][0]):
                 clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs]))
                 find_pattern = True
             else:
