@@ -56,7 +56,7 @@ Upon invocation, the ``nickname`` function returns a pair of values :
 ESMValTool scripts wrapper
 --------------------------
 
-An helper script is needed in order to set the relevant environment for calling ESMValTool scripts before calling it. Such a wrapper script must be tuned for each ESMValTool install one wants to use, and to the specifics of the platform for handling software envroinments. Variable :py:func:`~climaf.ESMValTool_diags.wrapper` should be set to the path for such a wrapper script. If it is not set, CliMAF will try to use hard-coded values depending on the current platform. At the time of writing, hard-coded values are limited to the case of Ciclad,  and the corresponding wrapper is available in CliMAF distribution :download:`as scripts/ESMValTool_python_diags_wrapper_for_ciclad.sh <../scripts/ESMValTool_python_diags_wrapper_for_ciclad.sh>`
+An helper script is needed in order to set the relevant environment for calling ESMValTool scripts before calling it. Such a wrapper script must be tuned for each ESMValTool install one wants to use, and to the specifics of the platform for handling software envroinments. Variable :py:func:`~climaf.ESMValTool_diags.wrapper` should be set to the path for such a wrapper script. If it is not set, CliMAF will try to use hard-coded values depending on the current platform. At the time of writing, hard-coded values are limited to the case of Ciclad,  and the corresponding wrapper is available in CliMAF distribution :download:`as scripts/ESMValTool_python_diags_wrapper_for_ciclad.sh <../scripts/ESMValTool_python_diags_wrapper_for_ciclad.sh>`. However, this script may have to be updated for an alternate ESMValTool install location.
 
 Example
 --------
