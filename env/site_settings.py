@@ -51,6 +51,9 @@ if os.path.exists('/data/scratch/globc'):
 
 if atCNRM:
     additional_packages = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "..", "add_packages", "lib"])
-    rep = os.listdir(additional_packages)
-    for d in [d for d in rep if "python" in d]:
-        sys.path.append(os.sep.join([additional_packages, d, "site-packages"]))
+    if os.path.isdir(additional_packages):
+        rep = os.listdir(additional_packages)
+        for d in [d for d in rep if "python" in d]:
+            sys.path.append(os.sep.join([additional_packages, d, "site-packages"]))
+    else:
+        print("Warning: additional packages not found, could cause issues.")
