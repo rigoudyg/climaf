@@ -15,7 +15,7 @@ from env.environment import *
 
 from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
-from climaf.api import craz, plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
+from climaf.api import plot, cdef, cfile, time_average, ds, space_average, curves, cpage, cpage_pdf, cpdfcrop, \
     cens, llbox, cproject, dataloc, calias, fixed_fields, ccdo, fds
 
 if not isinstance(cpath, list):
@@ -626,7 +626,7 @@ class DataPlot(unittest.TestCase):
     def test_data_plot_4(self):
         my_ds = fds(os.sep.join(cpath + ["..", "tests", "test_data",
                                          "cdnc_AERmon_CNRM-CM6-1_piControl_r1i1p1f2_1850.nc"]),
-                    variable="cdnc", period="1850")
+                    variable="cdnc", period="185001-185003")
         my_plot_1 = plot(my_ds)
         compare_picture_files(my_plot_1, "test4.1.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)

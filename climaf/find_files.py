@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ 
@@ -26,7 +26,7 @@ import copy
 from env.environment import *
 from env.clogging import clogger
 import env
-from climaf.utils import Climaf_Error, cartesian_product_substitute
+from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_substitute
 from climaf.period import init_period, sort_periods_list, cperiod
 from climaf.netcdfbasics import fileHasVar
 

@@ -6,6 +6,24 @@ What's new
 
 Changes, newest first:
 
+- branch xarray4netcdf:
+
+  - function :py:func:`~climaf.classes.fds` now sets the dataset's
+    frequency using file's global attribute 'frequency'
+
+  - dataset's method :py:meth:`~climaf.classes.cdataset.check` has
+    been reworked, accepts flags for setting what to check, and
+    provides a consistent return value (which can be None if a
+    decision cannot be made)
+
+  - technical :
+
+    - clean-up of nectdf libraries use : xarray becomes the sole
+      package used; module anynetcdf is discarded and only functions
+      provided by module nectdfbasics are used throughout CliMAF code,
+      except for a very few calls to xarray (in driver.cread and
+      classes.cdatset.check)
+
 - V2.0.2:
 
   - CliMAF can **call ESMValTool diagnostic scripts**, feeding them with data accessed and pre-processed by CliMAF calls. See :doc:`esmvaltool`

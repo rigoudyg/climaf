@@ -19,6 +19,7 @@ import tempfile
 from datetime import datetime
 from functools import reduce
 from six import string_types
+from xarray import open_dataset as xr_open_dataset
 
 from climaf.dataloc import remote_to_local_filename
 from climaf.utils import Climaf_Driver_Error
@@ -38,7 +39,7 @@ from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject
     generateUniqueFileName, register, rename, has_cvalue, store_cvalue
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
-from climaf.netcdfbasics import varOfFile
+from climaf.netcdfbasics import varOfFile, varsOfFile
 from climaf.period import init_period, merge_periods
 from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
@@ -1062,7 +1063,6 @@ def ceval_select(includer, included, userflags, format, deep, derived_list, recu
 
 
 def cread(datafile, varname=None, period=None):
-    import re
     if not datafile:
         return None
     if re.findall(".png$", datafile):
@@ -1077,25 +1077,13 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             varname = varOfFile(datafile)
         if varname is None:
-            raise Climaf_Driver_Error("")
+            raise Climaf_Error("No varname provided")
+        if varname not in varsOfFile(datafile):
+            raise Climaf_Error("File %s doesn't have requested variable %s"%(datafile, varname))
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
-        from .anynetcdf import ncf
-        fileobj = ncf(datafile)
-        if varname not in fileobj.variables:
-            clogger.error("File %s doesn't have requested variable %s, only %s" %
-                          (datafile, varname, fileobj.variables))
-        # Note taken from the CDOpy developper : .data is not backwards
-        # compatible to old scipy versions, [:] is
-        data = fileobj.variables[varname][:]
-        import numpy.ma
-        if '_FillValue' in dir(fileobj.variables[varname]):
-            fillv = fileobj.variables[varname]._FillValue
-            rep = numpy.ma.array(data, mask=data == fillv)
-        else:
-            rep = numpy.ma.array(data)
-        fileobj.close()
-        return rep
+        with xr_open_dataset(datafile, use_cftime = True, mask_and_scale = True) as f :
+            return f[varname].to_masked_array(copy=False)
     else:
         clogger.error("cannot yet handle %s" % datafile)
         return None

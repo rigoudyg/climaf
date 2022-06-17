@@ -461,6 +461,23 @@ def group_periods(diclist):
     #
     return output
         
+def freq_to_minutes(data_freq):
+    """
+    Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
+    Returns duration in minutes (quite arbitrary for months)
+    """
+    number = re.findall("^[0-9]*",data_freq)
+    if number[0] == "" :
+        number = 1
+    else:
+        number=int(number[0])
+    units  = re.findall("[A-Z]*$",data_freq)[0]
+    scale = { "M" : 1, "H" : 60 , "D" : 60*24, "MS" : 30*60*24 }
+    if units in scale : 
+        return number * scale[units]
+    else :
+        raise Climaf_Error("Cannot interpret frequency %s, returning O minutes"%data_freq)
+        #return 0
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
