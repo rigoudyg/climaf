@@ -22,6 +22,9 @@ from env.site_settings import atTGCC, atIPSL, onCiclad
 
 # Variables
 
+#: Climaf version
+version = "2.0.2"
+
 #: Dictionary of declared projects (type is cproject)
 cprojects = dict()
 

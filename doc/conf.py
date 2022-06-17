@@ -27,7 +27,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 
 
-from climaf import version
+from env.environment import version
 
 # -- General configuration ------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

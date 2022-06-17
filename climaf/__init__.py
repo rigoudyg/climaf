@@ -16,9 +16,6 @@ __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "projects", "derived_variables","ESMValTool_diags"]
 
 
-version = "2.0.2"
-
-
 def tim(string=None):
     """
     Utility function : print duration since last call
@@ -49,9 +46,9 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
+    from env.environment import *
     print("CliMAF version = " + version, file=sys.stderr)
     print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
-    from env.environment import *
 
     tim("softwares")
     #
