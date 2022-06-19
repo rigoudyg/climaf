@@ -151,7 +151,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
     day = "([0-3][0-9])"
     hour = "(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
     minutes = "[0-5][0-9]"
-    date = "%s(%s(%s(%s(%s)?)?)?)?" % (year, month, day, hour, minutes)
+    seconds = minutes
+    date = "%s(%s(%s(%s(%s(%s)?)?)?)?)?" % (year, month, day, hour, minutes, seconds)
     rperiod = "(?P<period>(?P<start>%s)([_-](?P<end>%s))?)" % (date, date)
     date_regexp_patt = rperiod
     date_regexp_keyword = "${PERIOD}"

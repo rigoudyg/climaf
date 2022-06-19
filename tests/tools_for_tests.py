@@ -53,7 +53,7 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     return list_figures, content
 
 
-def compare_html_files(file_test, file_ref):
+def compare_html_files(file_test, file_ref, display_error=True, replace=None, by=None, allow_url_change=False):
     if not os.path.exists(file_test) or not os.path.exists(file_ref):
         raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
     if file_ref.split(".")[-1] != "html":
@@ -65,13 +65,19 @@ def compare_html_files(file_test, file_ref):
     patterns_to_exclude = ["Logo-CliMAF-compact.png", ]
     list_figures_test, content_test = get_figures_and_content_from_html(file_test, fig_regexp, patterns_to_exclude)
     list_figures_ref, content_ref = get_figures_and_content_from_html(file_ref, fig_regexp, patterns_to_exclude)
-    if content_test != content_ref:
+    if allow_url_change :
+        url_line_pattern="<a href=.*Back to C-ESM-EP frontpage.*</a>"
+        text=re.findall(url_line_pattern,content_ref)[0]
+        content_ref=content_ref.replace(text,"")
+        text=re.findall(url_line_pattern,content_test)[0]
+        content_test=content_test.replace(text,"")
+    if content_test != content_ref.replace(replace,by):
         raise ValueError("The content of files %s and %s are different\n%s\n!=\n%s" % (file_test, file_ref,
                                                                                        content_test, content_ref))
     if len(list_figures_ref) != len(list_figures_test):
         raise ValueError("The number of figures if different in %s and %s" % (file_test, file_ref))
     for (fig_ref, fig_test) in zip(list_figures_ref, list_figures_test):
-        compare_picture_files(fig_test, fig_ref)
+        compare_picture_files(fig_test, fig_ref, display_error=display_error)
 
 
 def compare_text_files(file_test, file_ref, **kwargs):
