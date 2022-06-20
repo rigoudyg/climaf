@@ -20,12 +20,10 @@ from datetime import datetime
 from functools import reduce
 from six import string_types
 from xarray import open_dataset as xr_open_dataset
+import subprocess
 
 from climaf.dataloc import remote_to_local_filename
 from climaf.utils import Climaf_Driver_Error, Climaf_Error
-
-from subprocess import getoutput, getstatusoutput
-
 
 # Climaf modules
 from env.environment import *

@@ -10,7 +10,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 import sys
-import subprocess
 from subprocess import getoutput, getstatusoutput
 
 from env.clogging import clogger, clog, clog_file
@@ -20,6 +19,8 @@ from env.site_settings import atTGCC, atIPSL, onCiclad
 # Variables
 
 #: Climaf version
+from env.utils import get_subprocess_output
+
 version = "2.0.2"
 
 #: Dictionary of declared projects (type is cproject)
@@ -102,10 +103,7 @@ bypass_valid_check_for_project = []
 
 # Check commands available
 def my_which(soft):
-    rep = subprocess.check_output("which {}".format(soft), shell=True).decode("utf-8")
-    if "\n" in rep:
-        rep = rep.replace("\n", "")
-    return rep
+    return get_subprocess_output("which {}".format(soft), to_replace=[("\n", "")])
 
 
 #

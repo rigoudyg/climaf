@@ -15,6 +15,7 @@ import re
 
 from env.clogging import clogger
 from env.environment import *
+from env.utils import get_subprocess_output
 from climaf.operators_scripts import scriptFlags
 from climaf.utils import Climaf_Operator_Error
 from climaf.driver import capply
@@ -233,8 +234,7 @@ class cscript(object):
             # Check now that script is executable
             scriptcommand = command.split(' ')[0].replace("(", "")
             try:
-                executable = str(subprocess.check_output("which {}".format(scriptcommand), shell=True))
-                executable = executable.replace("\n", "")
+                executable = get_subprocess_output("which {}".format(scriptcommand), to_replace=[("\n", "")])
                 clogger.debug("Found %s" % executable)
                 #
                 # Analyze inputs field keywords and populate dict

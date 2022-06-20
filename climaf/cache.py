@@ -24,6 +24,7 @@ from operator import itemgetter
 import env
 from env.environment import *
 from env.clogging import clogger
+from env.utils import get_subprocess_output
 from climaf.utils import Climaf_Cache_Error, Climaf_Error
 from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
 from climaf.cmacro import crewrite
@@ -258,7 +259,6 @@ def register(filename, crs, costs, outfilename=None):
 
 def getCRS(filename):
     """ Returns the CRS expression found in FILENAME's meta-data"""
-    import subprocess
     if re.findall(".nc$", filename):
         form = 'ncdump -h %s | grep -E "CRS_def *=" | ' + \
                'sed -r -e "s/.*:CRS_def *= *\\\"(.*)\\\" *;$/\\1/" '
@@ -273,7 +273,7 @@ def getCRS(filename):
         return None
     command = form % filename
     try:
-        rep = subprocess.check_output(command, shell=True).replace('\n', '')
+        rep = get_subprocess_output(command, to_replace=[("\n", "")])
         if (rep == "") and ('Empty.png' not in filename):
             clogger.error("file %s is not well formed (no CRS)" % filename)
         if re.findall(".nc$", filename):
@@ -571,8 +571,8 @@ def csync(update=False):
                 # file creation will be atomic enough
     # Save index to disk
     fn = os.path.expanduser(env.environment.cacheIndexFileName)
-    cacheIndexFile = open(fn, "wb")
-    pickle.dump(crs2filename, cacheIndexFile, protocol=2)  # Used for python 2 compatibility
+    with open(fn, "wb") as cacheIndexFile:
+        pickle.dump(crs2filename, cacheIndexFile)
     dropped_crs = list()
 
 
@@ -588,23 +588,22 @@ def cload(alt=None):
     if not os.path.exists(cacheFilen):
         clogger.debug("no index file yet")
         return {}
-    cacheIndexFile = open(cacheFilen, "rb")
-    rep = pickle.load(cacheIndexFile)
-    for c in rep:
-        f = rep[c]
-        if type(f) is tuple:
-            f, costs = f
+    with open(cacheFilen, "rb") as cacheIndexFile:
+        rep = pickle.load(cacheIndexFile)
+        for c in rep:
+            f = rep[c]
+            if type(f) is tuple:
+                f, costs = f
+            else:
+                costs = compute_cost()
+            if len(f.split("/")[-2]) == directoryNameLength:
+                f = alternate_filename(f)
+            rep[c] = (f, costs)
+        #
+        if alt:
+            return rep
         else:
-            costs = compute_cost()
-        if len(f.split("/")[-2]) == directoryNameLength:
-            f = alternate_filename(f)
-        rep[c] = (f, costs)
-    #
-    if alt:
-        return rep
-    else:
-        crs2filename = rep
-    cacheIndexFile.close()
+            crs2filename = rep
     #
     must_check_index_entries = False
     if must_check_index_entries:
