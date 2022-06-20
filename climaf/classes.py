@@ -1035,7 +1035,7 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self, frequency = True, gap = True, period = True):
+    def check(self, frequency=True, gap=True, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
         - if frequency is True : check if data frequency is consistent with dataset frequency
@@ -1045,7 +1045,7 @@ class cdataset(cobject):
 
         Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
         """
-        if gap :
+        if gap:
             frequency = True
         #
         files = self.baseFiles()
@@ -1055,22 +1055,22 @@ class cdataset(cobject):
         clogger.debug("List of selected files: %s" % files)
         #
         rep = True
-        dsets = [ xr.open_dataset(f,use_cftime=True) for f in files ]
+        dsets = [xr.open_dataset(f, use_cftime=True) for f in files]
         all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
         #
         if self.frequency == 'fx' or self.frequency == 'annual_cycle':
-            clogger.info("No check for fixed data for %s",self)
+            clogger.info("No check for fixed data for %s", self)
             return True
         if self.frequency == "monthly" and frequency:
             clogger.error("Check cannot yet process monthly data due to" +
                           "to a shortcoming in analyzing monthly data frequency")
             return None
-        if not getattr(dsets[0],"frequency",False) and frequency :
-            clogger.warning("No frequency in file(s) for %s",self)
+        if not getattr(dsets[0], "frequency", False) and frequency:
+            clogger.warning("No frequency in file(s) for %s", self)
             return False
-        if "time" not in all_dsets :
+        if "time" not in all_dsets:
             clogger.warning("Cannot yet chek a dataset which time dimension" +
-                            "is not named 'time' (%s)"%self)
+                            "is not named 'time' (%s)" % self)
             return False
         #
         times = all_dsets.time
@@ -1079,17 +1079,17 @@ class cdataset(cobject):
         if frequency:
             # Check if data time interval is consistent with dataset frequency
             data_freq = xr.infer_freq(times)
-            if data_freq is None :
-                clogger.error("Time interval detected by xr.infer_freq is None %s"%str(times))
+            if data_freq is None:
+                clogger.error("Time interval detected by xr.infer_freq is None %s" % str(times))
                 return False
-            table = { "monthly" : "MS", "daily" : "D", "day" : "D", "6h" : "6H", "3h" : "3H",
-                     "1h" : "1H", "6Hourly" : "6H", "3Hourly" : "3H"}
-            if self.frequency not in table :
-                clogger.error("Check cannot yet handle frequency %s"%self.frequency)
+            table = {"monthly": "MS", "daily": "D", "day": "D", "6h": "6H", "3h": "3H",
+                     "1h": "1H", "6Hourly": "6H", "3Hourly": "3H"}
+            if self.frequency not in table:
+                clogger.error("Check cannot yet handle frequency %s" % self.frequency)
                 return None
-            if ( data_freq != table[self.frequency] ):
+            if data_freq != table[self.frequency]:
                 message = 'Data time interval %s is not consistent with dataset frequency %s'
-                clogger.warning(message%(data_freq,self.frequency))
+                clogger.warning(message % (data_freq, self.frequency))
                 rep = False
 
         if gap:
@@ -1097,27 +1097,27 @@ class cdataset(cobject):
             time_values = times.values.flatten()
             delta = freq_to_minutes(data_freq)
             cpt = 0
-            for ptim,tim in zip(time_values[:-1],time_values[1:]):
-                if ptim + timedelta(minutes=delta) != tim :
+            for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                if ptim + timedelta(minutes=delta) != tim:
                     rep = False
                     cpt += 1
-                    if cpt > 3 :
+                    if cpt > 3:
                         break
-                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s"%\
-                                (ptim,tim,delta))
+                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
+                                  (ptim, tim, delta))
 
         if period:
             # Compare period covered by data files with dataset's period
-            cell_methods = getattr(dsets[0][varOf(self)],"cell_methods",None)
-            file_period = timeLimits(times, use_frequency = True, cell_methods = cell_methods,
-                                 strict_on_time_dim_name = False)
+            cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
+            file_period = timeLimits(times, use_frequency=True, cell_methods=cell_methods,
+                                     strict_on_time_dim_name=False)
             clogger.debug('Period covered by selected files: %s' % file_period)
             consist = ""
             if not file_period.includes(self.period):
                 consist = "not "
                 rep = False
-            clogger.info("Datafile time period (%s) includes dataset time period (%s)" % \
-                         (file_period,self.period) + "=> time periods are %sconsistent." % (consist))
+            clogger.info("Datafile time period (%s) includes dataset time period (%s)" %
+                         (file_period, self.period) + "=> time periods are %sconsistent." % consist)
         return rep
 
 
@@ -1444,7 +1444,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
            variable=variable, period=period, path=filename)
     d.files = filename
 
-    d.frequency = attrOfFile(filename,"frequency","*")
+    d.frequency = attrOfFile(filename, "frequency", "*")
 
     return d
 
@@ -1454,12 +1454,12 @@ class ctree(cobject):
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
-        if len(operands) == 0 :
+        if len(operands) == 0:
             raise Climaf_Classes_Error("Cannot apply an operator to no operand")
         self.operator = climaf_operator
         self.script = script
         import copy
-        if script is None :
+        if script is None:
             self.flags = False
         else:
             self.flags = copy.copy(script.flags)
@@ -2321,7 +2321,6 @@ def timePeriod(cobject):
         return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
-
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):

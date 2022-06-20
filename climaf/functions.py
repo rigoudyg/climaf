@@ -17,7 +17,6 @@ from climaf import classes
 from climaf import cachedir
 
 
-
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).

@@ -11,10 +11,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import sys
 import subprocess
-try:
-    from commands import getoutput, getstatusoutput
-except ImportError:
-    from subprocess import getoutput, getstatusoutput
+from subprocess import getoutput, getstatusoutput
 
 from env.clogging import clogger, clog, clog_file
 import env.clogging
@@ -109,6 +106,7 @@ def my_which(soft):
     if "\n" in rep:
         rep = rep.replace("\n", "")
     return rep
+
 
 #
 # Set default logging levels

@@ -203,7 +203,8 @@ def register(filename, crs, costs, outfilename=None):
         time.sleep(0.1)
         waited += 1
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" % (filename, crs))
+        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" %
+                                 (filename, crs))
     else:
         if stamping is False:
             clogger.debug('No stamping')
@@ -288,8 +289,9 @@ def rename(filename, crs):
     crs2filename """
     newfile = generateUniqueFileName(crs, format="nc")
     if newfile:
+        costs = 0.
         for c in [f for f in crs2filename if crs2filename[f][0] in [filename, alternate_filename(filename)]]:
-            fn, costs = crs2filename.pop(c)
+            _, costs = crs2filename.pop(c)
         os.rename(filename, newfile)
         register(newfile, crs, costs)
         return newfile
@@ -362,6 +364,7 @@ def hasExactObject(cobject):
     i = 0
     found = False
     formats_to_test = known_formats + graphic_formats
+    f = None
     while not found and i < len(formats_to_test):
         f = generateUniqueFileName(cobject.crs, format=formats_to_test[i], create_dirs=False)
         if os.path.exists(f):
@@ -372,7 +375,7 @@ def hasExactObject(cobject):
                 found = True
             else:
                 i += 1
-    if found:
+    if found and f is not None:
         crs = cobject.crs
         # if isinstance(cobject, cdataset):
         #    crs = "select(" + crs + ")"

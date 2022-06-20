@@ -21,10 +21,7 @@ import re
 import pickle
 import shutil
 from collections import OrderedDict
-try:
-    from collections.abc import KeysView, ValuesView
-except ImportError:
-    from _abcoll import KeysView, ValuesView
+from collections.abc import KeysView, ValuesView
 from functools import reduce
 import six
 
@@ -476,7 +473,7 @@ def fline(func, farg, sargs, title=None,
         if other_args:
             allargs = allargs + other_args.get(key, None)
         # print 'allargs=',allargs
-        funcrep = func(*allargs, **kwargs)
+        funcrep = func.__call__(*allargs, **kwargs)
         if isinstance(funcrep, tuple):
             # print "tuple case",lab,rfig
             lab, rfig = funcrep

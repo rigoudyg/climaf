@@ -107,6 +107,7 @@ class periodOfEmFileTest(unittest.TestCase):
 	def tearDown(self):
 		craz()
 
+
 class selectExampleFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
 	def test_selectExampleFiles(self):

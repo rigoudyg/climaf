@@ -22,12 +22,9 @@ from six import string_types
 from xarray import open_dataset as xr_open_dataset
 
 from climaf.dataloc import remote_to_local_filename
-from climaf.utils import Climaf_Driver_Error
+from climaf.utils import Climaf_Driver_Error, Climaf_Error
 
-try:
-    from commands import getoutput, getstatusoutput
-except ImportError:
-    from subprocess import getoutput, getstatusoutput
+from subprocess import getoutput, getstatusoutput
 
 
 # Climaf modules
@@ -98,7 +95,8 @@ def capply_script(script_name, *operands, **parameters):
     :return: an object that represents the application of the script
     """
     if script_name not in cscripts:
-        raise Climaf_Driver_Error("Script %s is not know. Consider declaring it with function 'cscript'", script_name)
+        raise Climaf_Driver_Error("Script %s is not know. Consider declaring it with function 'cscript' %s" %
+                                  script_name)
     script = cscripts[script_name]
     # if len(operands) != script.inputs_number() :
     #     raise Climaf_Driver_Error("Operator %s is "
@@ -276,7 +274,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                 rep, costs = ceval(extract, userflags=userflags, format=format)
             else:
                 raise Climaf_Driver_Error("Untractable output format %s" % format)
-            if userflags :
+            if userflags:
                 userflags.unset_selectors()
             cdedent()
             return rep, costs
@@ -390,8 +388,8 @@ def ceval_for_ctree(cobject, userflags=None, format="MaskedArray", deep=None, de
     # TBD  : analyze if the dataset is remote and the remote place 'offers' the operator
     if cobject.operator in cscripts:
         clogger.debug("Script %s found" % cobject.operator)
-        filen, costs = ceval_script(cobject, down_deep,
-                                   recurse_list=recurse_list)  # Does return a filename, or list of filenames
+        # Does return a filename, or list of filenames
+        filen, costs = ceval_script(cobject, down_deep, recurse_list=recurse_list)
         cdedent()
         if format in ['file', ]:
             return filen, costs
@@ -657,7 +655,7 @@ def ceval_for_string(cobject, userflags=None, format="MaskedArray", deep=None, d
     raise NotImplementedError("Evaluation from CRS is not yet implemented ( %s )" % cobject)
 
 
-def evaluate_inputs(call, deep = False ,recurse_list = []):
+def evaluate_inputs(call, deep=False, recurse_list=[]):
     # Evaluate input data for a script call , either a CliMAF-tye one or an ESMValTool one
     invalues = []
     sizes = []
@@ -752,7 +750,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     template = Template(script.command)
     total_costs = compute_cost()
     # Evaluate input data
-    invalues, sizes, partial_cost =evaluate_inputs(scriptCall, deep, recurse_list)
+    invalues, sizes, partial_cost = evaluate_inputs(scriptCall, deep, recurse_list)
     total_costs.add(partial_cost)
     # print("len(invalues)=%d"%len(invalues))
     #
@@ -863,8 +861,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         subdict["out_" + varOf(scriptCall)] = main_output_filename
 
         subdict["out_final"] = generateUniqueFileName(scriptCall.crs, format=output_fmt)
-        subdict["out_final_" + varOf(scriptCall)] = generateUniqueFileName(scriptCall.crs,
-                                                                                         format=output_fmt)
+        subdict["out_final_" + varOf(scriptCall)] = generateUniqueFileName(scriptCall.crs, format=output_fmt)
 
         # Named outputs
         for output in scriptCall.outputs:
@@ -872,8 +869,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             tmpfile, tmpfile_fmt = os.path.splitext(
                 generateUniqueFileName(scriptCall.crs + "." + output, format=output_fmt))
             subdict["out_" + output] = "%s_%i%s" % (tmpfile, os.getpid(), tmpfile_fmt)
-            subdict["out_final_" + output] = generateUniqueFileName(scriptCall.crs + "." + output,
-                                                                          format=output_fmt)
+            subdict["out_final_" + output] = generateUniqueFileName(scriptCall.crs + "." + output, format=output_fmt)
 
     # Account for script call parameters
     for p in scriptCall.parameters:
@@ -983,8 +979,8 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     ok = register(main_output_filename, scriptCall.crs, total_costs, subdict["out_final"])
     # 2 - Named outputs
     for output in scriptCall.outputs:
-        ok = ok and register(subdict["out_" + output], scriptCall.crs + "." + output,
-                                   total_costs, subdict["out_final_" + output])
+        ok = ok and register(subdict["out_" + output], scriptCall.crs + "." + output, total_costs,
+                             subdict["out_final_" + output])
     if ok:
         clogger.info("Done in %.1f s with script computation for "
                      "%s (command was :%s )" % (duration, repr(scriptCall), template))
@@ -1079,10 +1075,10 @@ def cread(datafile, varname=None, period=None):
         if varname is None:
             raise Climaf_Error("No varname provided")
         if varname not in varsOfFile(datafile):
-            raise Climaf_Error("File %s doesn't have requested variable %s"%(datafile, varname))
+            raise Climaf_Error("File %s doesn't have requested variable %s" % (datafile, varname))
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
-        with xr_open_dataset(datafile, use_cftime = True, mask_and_scale = True) as f :
+        with xr_open_dataset(datafile, use_cftime=True, mask_and_scale=True) as f:
             return f[varname].to_masked_array(copy=False)
     else:
         clogger.error("cannot yet handle %s" % datafile)
@@ -1180,14 +1176,14 @@ def noselect(userflags, ds, format):
     can_select = False
 
     if (userflags and
-        (userflags.canSelectVar or ds.oneVarPerFile()) and
-        (userflags.canSelectTime or ds.periodIsFine()) and
-        (userflags.canSelectDomain or ds.domainIsFine()) and
-        (userflags.canAggregateTime or ds.periodHasOneFile()) and
-        (userflags.canAlias or ds.hasExactVariable()) and
-        (userflags.canMissing or ds.missingIsOK()) and
-        (ds.hasOneMember()) and
-        (format in ['file', ])):
+            (userflags.canSelectVar or ds.oneVarPerFile()) and
+            (userflags.canSelectTime or ds.periodIsFine()) and
+            (userflags.canSelectDomain or ds.domainIsFine()) and
+            (userflags.canAggregateTime or ds.periodHasOneFile()) and
+            (userflags.canAlias or ds.hasExactVariable()) and
+            (userflags.canMissing or ds.missingIsOK()) and
+            (ds.hasOneMember()) and
+            (format in ['file', ])):
         can_select = True
 
     return can_select

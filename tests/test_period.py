@@ -63,6 +63,7 @@ class CreatePeriodDefinedTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class CreatePeriodFixedTests(unittest.TestCase):
 
     def setUp(self):
@@ -110,6 +111,7 @@ class CreatePeriodFixedTests(unittest.TestCase):
 
     def tearDown(self):
         craz()
+
 
 class CreatePeriodGenericTests(unittest.TestCase):
 
@@ -195,6 +197,7 @@ class CreatePeriodGenericTests(unittest.TestCase):
 
     def tearDown(self):
         craz()
+
 
 class InitPeriodTests(unittest.TestCase):
 
@@ -305,6 +308,7 @@ class InitPeriodTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class SortPeriodsListTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Changes in CliMAF needed")
@@ -326,6 +330,7 @@ class SortPeriodsListTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class MergePeriodsTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Changes in CliMAF needed")
@@ -345,6 +350,7 @@ class MergePeriodsTests(unittest.TestCase):
 
     def tearDown(self):
         craz()
+
 
 class IntersectPeriodsListsTests(unittest.TestCase):
 
@@ -368,6 +374,7 @@ class IntersectPeriodsListsTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class LastYearsTest(unittest.TestCase):
 
     @unittest.skipUnless(False, "Changes in CliMAF needed")
@@ -384,6 +391,7 @@ class LastYearsTest(unittest.TestCase):
 
     def tearDown(self):
         craz()
+
 
 class FirstYearsTest(unittest.TestCase):
 

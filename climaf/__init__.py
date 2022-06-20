@@ -13,7 +13,7 @@ import os
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
            "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
-           "projects", "derived_variables","ESMValTool_diags"]
+           "projects", "derived_variables", "ESMValTool_diags"]
 
 
 def tim(string=None):
