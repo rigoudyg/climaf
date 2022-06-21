@@ -21,7 +21,7 @@ from env.site_settings import atTGCC, atIPSL, onCiclad
 #: Climaf version
 from env.utils import get_subprocess_output
 
-version = "2.0.2"
+version = "3.0"
 
 #: Dictionary of declared projects (type is cproject)
 cprojects = dict()

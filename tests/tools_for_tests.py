@@ -11,6 +11,7 @@ import unittest
 import re
 import six
 import shutil
+import subprocess
 
 from env.environment import *
 from climaf.api import cshow, ncview, cfile
