@@ -178,9 +178,11 @@ if root:
         ]
     if atTGCC:
         urls_IGCM_OUT = [
-            "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
+            #"${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
+            "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
             "${simulation}_${PERIOD}_${frequency}_${variable}.nc",
-            "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/"
+            #"${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/"
+            "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/"
             "${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
         ]
 
