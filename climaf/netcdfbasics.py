@@ -35,27 +35,18 @@ def varsOfFile(filename, all=False):
     Returns the list of variable names in NetCDF file FILENAME. If ALL is False
     only variable which are not dimensions nor scalar coordinates are returned
     """
-    lvars = []
     with xr.open_dataset(filename, decode_times=False) as ds:
-        lvars = list(ds.variables.keys())
+        lvars = set(list(ds.variables))
         if all is False:
             # remove dimensions
-            for dim in ds.dims.keys():
-                if dim in lvars.copy():
-                    lvars.remove(dim)
+            lvars = lvars - set(list(ds.dims))
             # Remove scalar coordinates
-            for var in lvars.copy():
-                if hasattr(ds[var], "axis") or hasattr(ds[var], "bounds"):
-                    lvars.remove(var)
+            lvars = [elt for elt in lvars if not(hasattr(ds[elt], "axis") or hasattr(ds[elt], "bounds"))]
             # Remove variables which are related to dimensions (e.g. dim bounds....)
-            for var in lvars.copy():
-                if re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", var):
-                    lvars.remove(var)
+            lvars = [elt for elt in lvars if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", elt)]
         else:
-            for dim in ds.dims.keys():
-                if dim not in lvars:
-                    lvars.append(dim)
-    return lvars
+            lvars = lvars & set(list(ds.dim))
+    return sorted(list(lvars))
 
 
 def fileHasVar(filename, varname):
@@ -194,10 +185,11 @@ def isVerticalLevel(varname):
 
 def verticalLevelName(filename):
     with xr.open_dataset(filename, decode_times=False) as ds:
-        for varname in ds.variables:
-            if isVerticalLevel(varname):
-                return varname
-    raise Climaf_Error("No vertical level dimension identified in %s" % filename)
+        varname = [var for var in ds.variables if isVerticalLevel(var)]
+        if len(varname) > 0:
+            return varname[0]
+        else:
+            raise Climaf_Error("No vertical level dimension identified in %s" % filename)
 
 
 def verticalLevelUnits(filename):

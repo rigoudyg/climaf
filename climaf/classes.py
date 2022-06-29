@@ -1069,7 +1069,7 @@ class cdataset(cobject):
             clogger.warning("No frequency in file(s) for %s", self)
             return False
         if "time" not in all_dsets:
-            clogger.warning("Cannot yet chek a dataset which time dimension" +
+            clogger.warning("Cannot yet check a dataset which time dimension" +
                             "is not named 'time' (%s)" % self)
             return False
         #
