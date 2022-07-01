@@ -1158,7 +1158,7 @@ def set_variable(obj, varname, format):
     if format == 'file':
         oldvarname = varOfFile(obj)
         if not oldvarname:
-            raise Climaf_Driver_Error("Cannot set variable name for a multi-variable dataset: %s " % oldvarname)
+            raise Climaf_Driver_Error("Cannot change variable name in file : %s " % obj)
         if oldvarname != varname:
             command = "ncrename -v %s,%s %s >/dev/null 2>&1" % (oldvarname, varname, obj)
             if os.system(command) != 0:

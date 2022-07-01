@@ -21,14 +21,17 @@ from climaf.period import cperiod, freq_to_minutes
 def varOfFile(filename):
     lvars = varsOfFile(filename)
     if len(lvars) > 1:
-        if "aire" in lvars:
+        if "aire" in lvars :
             # Special case of IPSL-CM 'Analyse' outputs
             lvars.remove("aire")
+        if "area" in lvars:
+            # Special case of IPSL-CM CMIP6 NEMO published outputs
+            lvars.remove("area")
         for var in lvars.copy() :
             if re.findall("_b(ou)?nds$",var) :
                 lvars.remove(var)
     if len(lvars) > 1:
-        clogger.debug("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
+        clogger.error("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
         return None
     if len(lvars) == 1:
         return lvars[0]

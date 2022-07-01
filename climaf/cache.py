@@ -836,12 +836,15 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if pattern:
         list_crs_to_rm = list()
         for crs in new_dict:
-            if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs]):
-                clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs]))
-                find_pattern = True
-            else:
-                # Do not remove now from new_dict, because we loop on it
-                list_crs_to_rm.append(crs)
+            try : 
+                if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs][0]):
+                    clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs][0]))
+                    find_pattern = True
+                else:
+                    # Do not remove now from new_dict, because we loop on it
+                    list_crs_to_rm.append(crs)
+            except:
+                print("bad type for arguments to re.search : ",crewrite(crs),type(crewrite(crs)),  new_dict[crs][0], type(new_dict[crs][0]))
         for crs in list_crs_to_rm:
             del new_dict[crs]
 
@@ -859,8 +862,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         list_crs_to_rm = []
         for crs in new_dict:
             if re.search(not_pattern, crewrite(crs)) is None and \
-                    re.search(not_pattern, new_dict[crs]) is None:
-                clogger.debug("Pattern not found in %s: %s" % (crs, new_dict[crs]))
+                    re.search(not_pattern, new_dict[crs][0]) is None:
+                clogger.debug("Pattern not found in %s: %s" % (crs, new_dict[crs][0]))
                 find_not_pattern = True
             else:
                 list_crs_to_rm.append(crs)

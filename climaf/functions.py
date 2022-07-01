@@ -625,7 +625,7 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
     file1 = cfile(dat1)
 
     # -- First, we check the unit of the vertical dimension of file1
-    levname1 = verticalLevel(file1)
+    levname1 = verticalLevelName(file1)
     levunits1 = verticalLevelUnits(file1)
     if levunits1.lower() in ['hpa', 'millibar', 'mbar', 'hectopascal']:
         # -- Multiplier par 100
