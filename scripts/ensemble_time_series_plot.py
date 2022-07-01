@@ -30,17 +30,23 @@ except:
     import datetime as cdatetime
 import cftime
 import numpy as np
+
+# This use of netCDF4 should be changed to using xarray, for
+# homogeneity with CliMAF main code
 from netCDF4 import Dataset, num2date
 
-from env.site_settings import atCerfacs, onCiclad
 
-if atCerfacs or onCiclad:
-    import netcdftime
-else:
-    try:
-        from netCDF4 import netcdftime
-    except:
-        import netcdftime
+# SS : Try to bypass use of netcdftime, which is not included in conda's NetCDF4, and
+# which would like to avoid to add as a conda package
+#
+# from env.site_settings import atCerfacs, onCiclad
+# if atCerfacs or onCiclad:
+#     import netcdftime
+# else:
+#     try:
+#         from netCDF4 import netcdftime
+#     except:
+#         import netcdftime
 
 
 # -- Initialize the parser
@@ -359,8 +365,8 @@ for pathfilename in filenames_list:
         datevar = []
         for elt in tvalue:
             if not isinstance(elt, cdatetime):
-                if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
-                                    cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
+                #if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
+                if isinstance(elt, (cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
                     strdate = elt.strftime().split(' ')[0]
                     year = int(strdate.split('-')[0])
                     month = int(strdate.split('-')[1])
@@ -368,19 +374,11 @@ for pathfilename in filenames_list:
                     datevar.append(cdatetime(year, month, day))
             else:
                 datevar.append(elt)
-        # cdftime = netcdftime.utime(t_unit, calendar=t_cal)#
-        # , calendar=u"gregorian")
-        # -- Garde-fou calendar
-        # if not isinstance(cdftime.num2date(nctime)[0], cdatetime):
-        #   if isinstance(cdftime.num2date(nctime)[0], netcdftime._netcdftime.DatetimeNoLeap):
-        #
-        #   else:
-        #      cdftime = netcdftime.utime(t_unit, calendar=u"gregorian")
-        # datevar.append(cdftime.num2date(nctime))
         print('datevar = ', datevar)
         #
         x = np.array(datevar)
         # x = np.array(datevar)[0,:]
+        
     # y = test_dat[:,0,0]
     y = np.squeeze(test_dat)
     if len(y.shape) > 1:
@@ -400,18 +398,6 @@ for pathfilename in filenames_list:
                  alpha=float(alphas_list[dataset_number]),
                  label=labels_list[dataset_number])[0]
     )
-    # datevar = []
-    # cdftime = netcdftime.utime(t_unit)
-    # cdftime = netcdftime.utime(t_unit, calendar=t_cal)
-    # datevar.append(num2date(nctime, units=t_unit, calendar=t_cal))
-    # datevar.append(num2date(nctime, units=cdftime, calendar=t_cal))
-    # datevar.append(cdftime.num2date(nctime))
-    # datevar.append(cdftime.dates.num2date(nctime))
-    #
-    # x = np.array(datevar)[0,:]
-    # datevaro = datevar[0][:]
-    # x = list(datevaro)
-    # y = test_dat[:,0,0]
 
     print('dataset_numb :', dataset_number)
     print('lw_list :', int(lw_list[dataset_number]))
