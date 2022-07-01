@@ -77,7 +77,7 @@ def cmip6_optimize_wildcards(kwargs):
         return [kwargs.copy()]
     else:
         #
-        root = os.sep.join([kwargs["root", "CMIP6"]])
+        root = os.sep.join([kwargs["root"], "CMIP6"])
         broot = root.encode('utf-8')
         root_tag = hashlib.sha1(broot).hexdigest()[0:8]
         #
@@ -272,7 +272,7 @@ def cmip6_optimize_check_paths(paths):
     requirements for optimizing data search
     """
     start = os.sep.join(["${root}", "CMIP6"])
-    test = [path.startswith(start) for path in paths]
+    test = [ not path.startswith(start) for path in paths]
     if any(test):
         for path in [paths[i] for (i, t) in enumerate(test) if t]:
             clogger.debug("Path %s does not fit requirements for optimization" % path)

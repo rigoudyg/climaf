@@ -91,7 +91,7 @@ cacheIndexFileName = None
 currentCache = None
 
 #: Should the search for CMI6 files be optimized by building tables
-optimize_cmip6_wildcards = True
+optimize_cmip6_wildcards = False #(buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
