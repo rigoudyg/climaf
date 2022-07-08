@@ -128,7 +128,7 @@ root = None
 login = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
-    root = "/ccc/store/cont003/thredds"
+    root = "/ccc/store/cont003/gencmip6"
 if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/store/cont003/thredds"
