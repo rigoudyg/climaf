@@ -71,7 +71,9 @@ def compare_html_files(file_test, file_ref, display_error=True, replace=None, by
         content_ref=content_ref.replace(text,"")
         text=re.findall(url_line_pattern,content_test)[0]
         content_test=content_test.replace(text,"")
-    if content_test != content_ref.replace(replace,by):
+    if replace is not None :
+        content_ref=content_ref.replace(replace,by)
+    if content_test != content_ref:
         raise ValueError("The content of files %s and %s are different\n%s\n!=\n%s" % (file_test, file_ref,
                                                                                        content_test, content_ref))
     if len(list_figures_ref) != len(list_figures_test):
