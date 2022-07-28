@@ -550,7 +550,8 @@ def csync(update=False):
         clogger.info("Listing crs from files present in cache")
         files_in_cache = list_cache()
         files_in_cache.sort()
-        files_in_index = list(crs2filename.values())
+        files_costs = list(crs2filename.values())
+        files_in_index = [ f[0] for f in files_costs ]
         files_in_index.sort()
         if files_in_index != files_in_cache:
             if stamping:

@@ -455,7 +455,12 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt):
     if date_regexp:
         tperiod = re.sub(date_regexp, r'\g<period>', filename)
         if tperiod == filename:
-            raise Climaf_Error("Cannot find a period in %s with regexp %s" % (filename, date_regexp))
+            #raise Climaf_Error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
+            #                   " \n template=%s, kw=%s"%(template, date_regexp_keyword))
+            print("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
+                               " \n template=%s, kw=%s"%(template, date_regexp_keyword))
+
+            return None
         fperiod = init_period(tperiod)
         return fperiod
     else:
