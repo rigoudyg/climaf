@@ -156,7 +156,10 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             if use_frequency is False:
                 raise Climaf_Error("No time bounds variable in file or no time dimension provided, " +
                                    "and use_frequency is False (%s)" % filename_or_timedim)
-            data_freq = xr.infer_freq(timedim)
+            try:
+                data_freq = xr.infer_freq(timedim)
+            except:
+                data_freq = use_frequency
             if not data_freq:
                 raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
                                    timedim.name + os.linesep + str(timedim))

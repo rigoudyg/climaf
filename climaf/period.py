@@ -508,6 +508,7 @@ def freq_to_minutes(data_freq):
     Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
     Returns duration in minutes (quite arbitrary for months)
     """
+    data_freq = data_freq.replace("mon", "MS")
     number = re.findall("^[0-9]*", data_freq)
     if len(number[0]) == 0:
         number = 1

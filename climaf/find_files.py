@@ -121,6 +121,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
     - A la fin , on formatte le dictionnaire de valeurs de facettes qui est rendu
 
     """
+    print(use_frequency)
     rep = list()
     #
     periods = None  # a list of periods available
@@ -462,11 +463,11 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, us
         fperiod = init_period(tperiod)
         return fperiod
     else:
-        try:
+        # try:
             fperiod = timeLimits(filename, use_frequency=use_frequency)
             return fperiod
-        except:
-            clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
+        # except:
+        #     clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
 
         
 def glob_remote_data(url, pattern):

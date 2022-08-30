@@ -918,6 +918,14 @@ class cdataset(cobject):
 
         """
         use_frequency = cprojects[self.project].use_frequency
+        if use_frequency:
+            if "frequency" in self.kvp:
+                use_frequency = self.kvp["frequency"]
+            else:
+                use_frequency = cdef("frequency", project=self.project)
+                if not use_frequency:
+                    use_frequency = False
+        print(self.project, use_frequency)
         dic = self.kvp.copy()
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
