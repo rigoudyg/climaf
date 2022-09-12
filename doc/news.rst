@@ -6,7 +6,10 @@ What's new
 
 Changes, newest first:
 
-- branch xarray4netcdf:
+- branch run_cesemp_on_spirit_and_at_TGCC:
+
+  - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
+    at TGCC on machine 'irene' and 'irene-amd' (including tests suite)
 
   - function :py:func:`~climaf.classes.fds` now sets the dataset's
     frequency using file's global attribute 'frequency'
@@ -16,6 +19,9 @@ Changes, newest first:
     provides a consistent return value (which can be None if a
     decision cannot be made)
 
+  - default is now to deactivate optimization for CMIP6 data indexing,
+    which seems buggy
+
   - technical :
 
     - clean-up of nectdf libraries use : xarray becomes the sole
@@ -23,6 +29,12 @@ Changes, newest first:
       provided by module nectdfbasics are used throughout CliMAF code,
       except for a very few calls to xarray (in driver.cread and
       classes.cdatset.check)
+
+    - remove dependency to module 'cesemp_env' in bin/climaf
+
+    - ease installation by embarking epstopdf
+
+    - fix bugs in find_files (for case period = fx), in clist
 
 - V2.0.2:
 
