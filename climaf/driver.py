@@ -906,11 +906,11 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #
     # Discard remaining substrings looking like :
     #  some_word='"${some_keyword}"' , or simply : '"${some_keyword}"'
-    template = re.sub(r'(\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
+    template = re.sub(r'((--)?\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
     #
     # Discard remaining substrings looking like :
     #  some_word=${some_keyword}  or  simply : ${some_keyword}
-    template = re.sub(r"(\w*=)?\$\{\w*\}", r"", template)
+    template = re.sub(r"((--)?\w*=)?\$\{\w*\}", r"", template)
     #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None:

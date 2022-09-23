@@ -199,17 +199,28 @@ class cperiod(object):
         """
         Returns the intersection of period self and period 'other' if any
         """
-        if self.fx:
-            raise Climaf_Period_Error("Meaningless for period 'fx'")
         if other:
-            start = self.start
-            if other.start > start:
-                start = other.start
-            end = self.end
-            if other.end < end:
-                end = other.end
-            if start < end:
-                return cperiod(start, end)
+            if self.fx and other.fx:
+                clogger.warning("Meaningless for period 'fx'")
+                return cperiod("fx")
+            elif self.fx:
+                return cperiod(other.start, other.end)
+            elif other.fx:
+                return cperiod(self.start, self.start)
+            else:
+                start = self.start
+                if other.start > start:
+                    start = other.start
+                end = self.end
+                if other.end < end:
+                    end = other.end
+                if start < end:
+                    return cperiod(start, end)
+        else:
+            if self.fx:
+                return cperiod("fx")
+            else:
+                return cperiod(self.start, self.end)
 
 
 def init_period(dates):

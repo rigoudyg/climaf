@@ -69,8 +69,8 @@ if True:
         cdef('version',     'latest',                   project=project)
         cdef('table',       '*',                        project=project)
         #
-        calias(project, 'tos', offset=273.15)
-        calias(project, 'thetao', offset=273.15)
+        calias(project, 'tos', offset=273.15, units="K")
+        calias(project, 'thetao', offset=273.15, units="K")
         calias(project, 'sivolu', 'sivol')
         calias(project, 'sic', 'siconc')
         calias(project, 'sit', 'sithick')

@@ -121,7 +121,6 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
     - A la fin , on formatte le dictionnaire de valeurs de facettes qui est rendu
 
     """
-    print(use_frequency)
     rep = list()
     #
     periods = None  # a list of periods available
@@ -177,7 +176,10 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
             #
             # Construct a pattern for also globbing dates
             temp2 = template.replace(date_keyword, date_glob_patt)
-            temp3 = template.replace(date_keyword, date_regexp_patt_glob)
+            temp3 = template.replace(".", "\.")
+            temp3 = temp3.replace("?", ".")
+            temp3 = temp3.replace("*", ".*")
+            temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
             #
             # Do globbing with plain varname
             lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
@@ -189,6 +191,10 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 simple_kwargs['variable'] = simple_kwargs['filenameVar']
                 template = my_template.safe_substitute(**simple_kwargs)
                 temp2 = template.replace(date_keyword, date_glob_patt)
+                temp3 = template.replace(".", "\.")
+                temp3 = temp3.replace("?", ".")
+                temp3 = temp3.replace("*", ".*")
+                temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
                 #
                 # Do globbing with fileVarname
                 lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
@@ -433,11 +439,21 @@ def my_glob(remote_prefix, pattern, pattern2, url, date_regexp_keyword, date_reg
             # lfiles = sorted(leaf_glob(pattern))
         clogger.debug("Before regexp filtering : Globbing %d files for varname on %s : " % (len(lfiles), pattern))
     # Must filter with date_regexp, because * with glob for dates is too inclusive
-    ret = set()
-    for f in lfiles:
-        if re.search(date_regexp_patt, f) or date_regexp_keyword not in url:
-            ret.add(f)
-    return list(ret) 
+    if date_regexp_keyword not in url:
+        ret = set(lfiles)
+    else:
+        ret = set()
+        pattern_to_search = re.compile(pattern2)
+        patterns_to_fill = re.compile("^"+date_regexp_patt+"$")
+        for f in lfiles:
+            match = pattern_to_search.match(f)
+            if not match:
+                raise ValueError("Should not pass here")
+            else:
+                match = match.groupdict()["new_period"]
+                if patterns_to_fill.match(match):
+                    ret.add(f)
+    return list(ret)
     
 
 def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, use_frequency=False):
@@ -463,11 +479,11 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, us
         fperiod = init_period(tperiod)
         return fperiod
     else:
-        # try:
+        try:
             fperiod = timeLimits(filename, use_frequency=use_frequency)
             return fperiod
-        # except:
-        #     clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
+        except:
+            clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
 
         
 def glob_remote_data(url, pattern):

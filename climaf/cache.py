@@ -28,6 +28,7 @@ from env.utils import get_subprocess_output
 from climaf.utils import Climaf_Cache_Error, Climaf_Error
 from climaf.classes import compare_trees, cobject, cdataset, guess_projects, allow_error_on_ds, ds, cens
 from climaf.cmacro import crewrite
+from climaf import __path__ as cpath
 
 handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
 cvalues = dict()
@@ -860,7 +861,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         list_crs_to_rm = []
         for crs in new_dict:
             if re.search(not_pattern, crewrite(crs)) is None and \
-                    re.search(not_pattern, new_dict[crs]) is None:
+                    re.search(not_pattern, new_dict[crs][0]) is None:
                 clogger.debug("Pattern not found in %s: %s" % (crs, new_dict[crs]))
                 find_not_pattern = True
             else:

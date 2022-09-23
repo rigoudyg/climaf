@@ -3,6 +3,7 @@
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import datetime
 import re
 import xarray as xr
 import six
@@ -161,6 +162,8 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             except:
                 data_freq = use_frequency
             if not data_freq:
+                data_freq = use_frequency
+            if not data_freq:
                 raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
                                    timedim.name + os.linesep + str(timedim))
             delta = freq_to_minutes(data_freq) / 2
@@ -170,8 +173,12 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             if data_freq[-2:] == "MS" and start.days in [14, 15, 16] and end.days in [14, 15, 16]:
                 delta = "special_month"
         #
-        start = timedim[0].values.flatten()[0] 
+        start = timedim[0].values.flatten()[0]
+        if isinstance(start, float):
+            start = convert_date_string_to_datetime(str(int(start)))
         end = timedim[-1].values.flatten()[0]
+        if isinstance(end, float):
+            end = convert_date_string_to_datetime(str(int(end)))
         if delta == "special_month":
             start = start - timedelta(days=start.day - 1)
             end = end + timedelta(days=end.daysinmonth - end.day + 1)
@@ -179,6 +186,18 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             start = start - timedelta(minutes=delta)
             end = end + timedelta(minutes=delta)
         return cperiod(start, end)
+
+
+def convert_date_string_to_datetime(a_date):
+    date_formats = ["%Y", "%Y%m", "%Y%m%d", "%Y%m%d%H", "%Y%m%d%H%M", "%Y%m%d%H%M%S"]
+    length = len(a_date)
+    if length in [4, 6, 8, 10, 12, 14]:
+        # The index of the date format is 0 for 4-digits date, 1 for 6-digits date...
+        pattern = date_formats[(length - 4) // 2]
+    else:
+        clogger.error("The entry date has a length of %d, can not handle it" % len(a_date))
+        raise ValueError("The entry date has a length of %d, can not handle it" % len(a_date))
+    return datetime.datetime.strptime(a_date, pattern)
             
 
 def isVerticalLevel(varname):
