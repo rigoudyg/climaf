@@ -465,13 +465,13 @@ def fline(func, farg, sargs, title=None,
             print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:
-            sargs = OrderedDict(list(zip(sargs, sargs)))
+            sargs = OrderedDict(list(zip(repr(sargs), sargs)))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
         allargs = allargs + common_args
         if other_args:
-            allargs = allargs + other_args.get(key, None)
+            allargs = allargs + other_args.get(key, [None])
         # print 'allargs=',allargs
         funcrep = func.__call__(*allargs, **kwargs)
         if isinstance(funcrep, tuple):
