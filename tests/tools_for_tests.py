@@ -54,7 +54,8 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     return list_figures, content
 
 
-def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None, by=None, allow_url_change=False):
+def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None,
+                       by=None, allow_url_change=False):
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
     file_ref = os.path.sep.join([dir_ref, file_ref_name])
@@ -77,14 +78,14 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, 
     list_figures_test, content_test = get_figures_and_content_from_html(file_test, fig_regexp, patterns_to_exclude,
                                                                         add_dir=True)
     list_figures_ref, content_ref = get_figures_and_content_from_html(file_ref, fig_regexp, patterns_to_exclude)
-    if allow_url_change :
-        url_line_pattern="<a href=.*Back to C-ESM-EP frontpage.*</a>"
-        text=re.findall(url_line_pattern,content_ref)[0]
-        content_ref=content_ref.replace(text,"")
-        text=re.findall(url_line_pattern,content_test)[0]
-        content_test=content_test.replace(text,"")
-    if replace is not None :
-        content_ref=content_ref.replace(replace,by)
+    if allow_url_change:
+        url_line_pattern = "<a href=.*Back to C-ESM-EP frontpage.*</a>"
+        text = re.findall(url_line_pattern, content_ref)[0]
+        content_ref = content_ref.replace(text, "")
+        text = re.findall(url_line_pattern, content_test)[0]
+        content_test = content_test.replace(text, "")
+    if replace is not None:
+        content_ref = content_ref.replace(replace, by)
     if content_test != content_ref:
         raise ValueError("The content of files %s and %s are different\n%s\n!=\n%s" % (file_test, file_ref,
                                                                                        content_test, content_ref))

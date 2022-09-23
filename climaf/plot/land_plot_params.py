@@ -74,7 +74,7 @@ dict_plot_params = {
     },
     'subli': {
         'default': {'color': 'precip3_16lev', 'units': ''},
-        'full_field': {'colors':ranges_to_string(ranges=[0, 0.8, 0.1], add=[0.5, 0.15])},
+        'full_field': {'colors': ranges_to_string(ranges=[0, 0.8, 0.1], add=[0.5, 0.15])},
         'bias': {},
         'model_model': {'color': 'BlueWhiteOrangeRed', 'min': -0.05, 'max': 0.05, 'delta': 0.01},
     },

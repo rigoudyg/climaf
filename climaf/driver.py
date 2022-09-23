@@ -1083,8 +1083,8 @@ def cread(datafile, varname=None, period=None):
             with xr_open_dataset(datafile, use_cftime=True, mask_and_scale=True) as f:
                 return f[varname].to_masked_array(copy=False)
         except ValueError:
-            with xr_open_dataset(datafile, decode_times = False, mask_and_scale = True) as f:
-                clogger.error("Error (but going on anyway) : cannot use cftime when reading file %s : ",datafile)
+            with xr_open_dataset(datafile, decode_times=False, mask_and_scale=True) as f:
+                clogger.error("Error (but going on anyway) : cannot use cftime when reading file %s : ", datafile)
                 return f[varname].to_masked_array(copy=False)
     else:
         clogger.error("cannot yet handle %s" % datafile)

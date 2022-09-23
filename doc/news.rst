@@ -9,6 +9,7 @@ Changes, newest first:
 - V3.0:
 
   - Compatibility break:
+
     - Python2 compatibility is dropped in this version.
 
     - climaf module `html` has been renamed `chtml` to avoid conflicts with python

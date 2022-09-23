@@ -31,7 +31,8 @@ from climaf.period import init_period, sort_periods_list, cperiod
 from climaf.netcdfbasics import fileHasVar, timeLimits
 
 
-def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, use_frequency=False, **kwargs):
+def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None,
+                       use_frequency=False, **kwargs):
     """
     Allow to describe a ``generic`` file organization : the list of files returned
     by this function is composed of files which :
@@ -233,7 +234,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                     continue
                 else:
                     # Extract file period period from filename
-                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt, use_frequency=use_frequency)
+                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt,
+                                             use_frequency=use_frequency)
     
                 #
                 # For non-fixed fields, if file period matches requested period, check variable
@@ -476,10 +478,10 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, us
     if date_regexp:
         tperiod = re.sub(date_regexp, r'\g<period>', filename)
         if tperiod == filename:
-            #raise Climaf_Error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
-            #                   " \n template=%s, kw=%s"%(template, date_regexp_keyword))
+            # raise Climaf_Error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
+            #                    " \n template=%s, kw=%s"%(template, date_regexp_keyword))
             clogger.error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
-                          " \n template=%s, kw=%s"%(template, date_regexp_keyword))
+                          " \n template=%s, kw=%s" % (template, date_regexp_keyword))
 
             return None
         fperiod = init_period(tperiod)

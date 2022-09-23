@@ -554,7 +554,7 @@ def csync(update=False):
         files_in_cache = list_cache()
         files_in_cache.sort()
         files_costs = list(crs2filename.values())
-        files_in_index = [ f[0] for f in files_costs ]
+        files_in_index = [f[0] for f in files_costs]
         files_in_index.sort()
         if files_in_index != files_in_cache:
             if stamping:
@@ -839,7 +839,7 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     if pattern:
         list_crs_to_rm = list()
         for crs in new_dict:
-            try :
+            try:
                 if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs][0]):
                     clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs][0]))
                     find_pattern = True
@@ -847,7 +847,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
                     # Do not remove now from new_dict, because we loop on it
                     list_crs_to_rm.append(crs)
             except:
-                print("bad type for arguments to re.search : ",crewrite(crs),type(crewrite(crs)),  new_dict[crs][0], type(new_dict[crs][0]))
+                print("bad type for arguments to re.search : ", crewrite(crs), type(crewrite(crs)), new_dict[crs][0],
+                      type(new_dict[crs][0]))
         for crs in list_crs_to_rm:
             del new_dict[crs]
 
@@ -1162,7 +1163,7 @@ class compute_cost(object):
         if total_cost is None:
             total_cost = cost
         self.tc = total_cost
-        
+
     def __repr__(self):
         return "total cost : %.1f s, last operation : %.1f s" % (self.tc, self.lc)
 
@@ -1176,14 +1177,14 @@ class compute_cost(object):
         self.lc = self.lc + other.lc
 
     def increment(self, cost):
-        """Assuming that COST is the cost of a new 'last operation', updates 
+        """Assuming that COST is the cost of a new 'last operation', updates
         object for representing that"""
         self.tc = self.tc + cost
         self.lc = cost
-        
+
 
 def ccost(cobject):
-    """Provide the compute costs (elapsed time) for an object 
+    """Provide the compute costs (elapsed time) for an object
 
     Returned value is of class cost, which has fields tc (for
     total_cost) and lc (for last_op_cost):
@@ -1208,10 +1209,10 @@ def ccost(cobject):
                 else:
                     raise Climaf_Error("At least one ensemble member is not cached (%s)" % member)
             return cost
-        else: 
+        else:
             clogger.warning("Object is not (yet) cached; try cfile()")
             return None
-    
+
 
 def encode_index(values):
     """ Encode a dict like crs2filename, i.e. a dict of crs : (filename, cost)
