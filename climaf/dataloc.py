@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ CliMAF datasets location handling and data access module
@@ -181,6 +181,10 @@ class dataloc(object):
         if not (any([loc == self for loc in locs])):
             locs.append(self)
 
+    def derive(self, name):
+        return dataloc(project=name, organization=self.organization, url=self.urls, model=self.model,
+                       simulation=self.simulation, realm=self.realm, table=self.table, frequency=self.frequency)
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
@@ -242,7 +246,7 @@ def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     return rep
 
 
-def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None, **kwargs):
+def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None, use_frequency=False, **kwargs):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
@@ -316,11 +320,12 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
                                         "optimized CMIP6 search. Use cdataset.glob() or set "
                                         "env.environment.optimize_cmip6_wildcards to False")
                     for kwa in kwargs_list:
-                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations, **kwa))
+                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations,
+                                                      use_frequency=use_frequency, **kwa))
             else:
                 rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
                                               return_combinations=return_combinations,
-                                              merge_periods_on=merge_periods_on,
+                                              merge_periods_on=merge_periods_on, use_frequency=use_frequency,
                                               **kwargs2))
         else:
             raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +

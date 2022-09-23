@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -52,7 +52,6 @@ class CreatePeriodDefinedTests(unittest.TestCase):
         cperiod(date_1, date_2)
         cperiod(datetime(1850, 1, 1, 0, 0), datetime(1950, 12, 31, 23, 59), pattern="%4d")
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_order(self):
         # TODO: Modify CliMAF in order to check that the period is in a logic order
         date_1 = datetime(1850, 1, 1, 0, 0)
@@ -62,6 +61,7 @@ class CreatePeriodDefinedTests(unittest.TestCase):
 
     def tearDown(self):
         craz()
+
 
 class CreatePeriodFixedTests(unittest.TestCase):
 
@@ -111,6 +111,7 @@ class CreatePeriodFixedTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class CreatePeriodGenericTests(unittest.TestCase):
 
     def setUp(self):
@@ -153,22 +154,20 @@ class CreatePeriodGenericTests(unittest.TestCase):
         self.assertNotEqual(self.my_period_3, self.my_period_4)
         self.assertNotEqual(self.my_period_3, self.my_period_6)
 
-    @unittest.expectedFailure
     def test_repr(self):
         self.assertEqual(repr(self.my_period), "1850010100-1950123123")
         self.assertEqual(repr(self.my_period_1), "1850010100-1950123123")
-        # TODO: Understand why the following test fails... and what pattern can be used for and how
-        self.assertEqual(repr(self.my_period_2), "a test pattern")
+        self.assertEqual(repr(self.my_period_2), "17000526-19000901")
 
     def test_iso(self):
         self.assertEqual(self.my_period.iso(), ",".join([self.my_date_1.isoformat(), self.my_date_2_60.isoformat()]))
 
-    @unittest.expectedFailure
     def test_hasFullYear(self):
         self.assertTrue(self.my_period.hasFullYear(1900))
         self.assertFalse(self.my_period.hasFullYear("1700"))
         self.assertFalse(self.my_period.hasFullYear(2000))
-        # TODO: Understand why the following test fails...
+        self.assertFalse(self.my_period.hasFullYear(1950))
+        self.assertTrue(self.my_period.hasFullYear(1850))
         self.assertFalse(self.my_period_4.hasFullYear(1920))
 
     def test_start_with(self):
@@ -196,6 +195,7 @@ class CreatePeriodGenericTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class InitPeriodTests(unittest.TestCase):
 
     def test_arg_types(self):
@@ -208,17 +208,16 @@ class InitPeriodTests(unittest.TestCase):
         init_period("1500-2000")
         init_period("1500_2000")
         init_period("fx")
-        # TODO: Make the '0000' year working well
+        # TODO: Make the null and negative years working well
         with self.assertRaises(Climaf_Period_Error):
             init_period("0000")
-        # TODO: Make the before '0000' years working well
         with self.assertRaises(Climaf_Period_Error):
             init_period("-150")
         with self.assertRaises(Climaf_Period_Error):
             init_period("00toto")
-        # TODO: Deal with periods that do not have the same length
         with self.assertRaises(Climaf_Period_Error):
-            init_period("1950-18500201")
+            init_period("195001-185002")
+        init_period("1850-19500201")
         with self.assertRaises(Climaf_Period_Error):
             init_period("1950-1850")
 
@@ -301,37 +300,45 @@ class InitPeriodTests(unittest.TestCase):
         my_period = init_period(cperiod(datetime(1850, 1, 2), datetime(1950, 5, 23)))
         self.assertEqual(my_period.start, datetime(1850, 1, 2))
         self.assertEqual(my_period.end, datetime(1950, 5, 23))
+        my_period = init_period("174512251324-184705")
+        self.assertEqual(my_period.start, datetime(1745, 12, 25, 13, 24))
+        self.assertEqual(my_period.end, datetime(1847, 6, 1, 0, 0))
 
     def tearDown(self):
         craz()
 
+
 class SortPeriodsListTests(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_args(self):
-        # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
-        pass
+        sort_periods_list([cperiod(datetime(1850, 2, 1), datetime(1950, 6, 2)),
+                           init_period("1560-18421230")])
+        with self.assertRaises(Climaf_Period_Error):
+            sort_periods_list(["1850-1950", "1520-1420"])
+        with self.assertRaises(TypeError):
+            sort_periods_list("1850-1950", "1520-1420")
 
-    @unittest.expectedFailure
     def test_sort(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
         my_period_4 = cperiod(datetime(2000, 5, 6), datetime(2061, 4, 9))
-        ordered_list = [my_period_2, my_period_3, my_period_1, my_period_1, my_period_4]
-        unordered_list = [my_period_1, my_period_4, my_period_3, my_period_2]
+        self.assertEqual(sort_periods_list([my_period_1, my_period_2]), [my_period_2, my_period_1])
+        ordered_list = [my_period_2, my_period_3, my_period_1, my_period_4]
+        unordered_list = [my_period_1, my_period_4, my_period_1, my_period_3, my_period_2]
         self.assertEqual(sort_periods_list(unordered_list), ordered_list)
 
     def tearDown(self):
         craz()
 
+
 class MergePeriodsTests(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_args(self):
-        # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
-        pass
+        merge_periods([cperiod(datetime(1850, 2, 1), datetime(1950, 6, 2)),
+                       init_period("1560-18421230")])
+        with self.assertRaises(Climaf_Period_Error):
+            merge_periods(["1850-1950", "1520-1420"])
 
     def test_merge(self):
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
@@ -346,54 +353,62 @@ class MergePeriodsTests(unittest.TestCase):
     def tearDown(self):
         craz()
 
+
 class IntersectPeriodsListsTests(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_args(self):
-        # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
-        pass
+        intersect_periods_list(
+            [cperiod(datetime(1850, 2, 1), datetime(1950, 6, 2)), init_period("1560-18421230")],
+            [init_period("2050-2100"), init_period("1900-1960")]
+        )
+        with self.assertRaises(Climaf_Period_Error):
+            merge_periods(["1850-1950", "1520-1420"], ["1900-1980", "1450-1520"])
 
-    @unittest.expectedFailure
     def test_intersect(self):
-        # TODO: Check why it does not work...
         my_period_1 = cperiod(datetime(1850, 1, 2), datetime(1950, 3, 4))
         my_period_2 = cperiod(datetime(1740, 5, 6), datetime(1850, 1, 6, 14))
         my_period_3 = cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3))
         my_period_4 = cperiod(datetime(1900, 5, 6), datetime(2061, 4, 9))
         my_list_1 = [my_period_1, my_period_3]
         my_list_2 = [my_period_2, my_period_4]
-        result_list = []
+        result_list = [cperiod(datetime(1800, 5, 2), datetime(1847, 6, 3)),
+                       cperiod(datetime(1850, 1, 2), datetime(1850, 1, 6, 14)),
+                       cperiod(datetime(1900, 5, 6), datetime(1950, 3, 4))]
         self.assertEqual(intersect_periods_list(my_list_1, my_list_2), result_list)
 
     def tearDown(self):
         craz()
 
+
 class LastYearsTest(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_args(self):
-        # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
-        # TODO: Test string conversion, should not work...
-        pass
+        lastyears("1850-1950", 52)
+        lastyears(cperiod(datetime(1850, 1, 1), datetime(1950, 2, 3)), 4)
+        with self.assertRaises(Climaf_Period_Error):
+            lastyears(1850, 5)
+        with self.assertRaises(Climaf_Period_Error):
+            lastyears("1850-1870", "toto")
 
-    @unittest.expectedFailure
     def test_last_years(self):
         my_period = cperiod(datetime(1850, 1, 1), datetime(1859, 5, 25))
-        self.assertEqual(lastyears(my_period, 1), repr(init_period("18580526-18590525")))
+        self.assertEqual(lastyears(my_period, 1), repr(cperiod(datetime(1858, 5, 25), datetime(1859, 5, 25))))
         self.assertEqual(lastyears(my_period, 15), repr(my_period))
 
     def tearDown(self):
         craz()
 
+
 class FirstYearsTest(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Changes in CliMAF needed")
     def test_args(self):
-        # TODO: Check the type of arguments and that a list of periods if passed as an argument and nothing else
-        # TODO: Test string conversion, should not work...
-        pass
+        firstyears("1850-1950", 52)
+        firstyears(cperiod(datetime(1850, 1, 1), datetime(1950, 2, 3)), 4)
+        with self.assertRaises(Climaf_Period_Error):
+            firstyears(1850, 5)
+        with self.assertRaises(Climaf_Period_Error):
+            firstyears("1850-1870", "toto")
 
-    @unittest.expectedFailure
     def test_last_years(self):
         my_period = cperiod(datetime(1850, 6, 23), datetime(1859, 1, 1))
         self.assertEqual(firstyears(my_period, 1), repr(init_period("18500623-18510622")))

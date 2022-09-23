@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IPSL CMIP6 outputs produced by libIGCM for all frequencies,

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -56,6 +56,21 @@ class CprojectTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not yet written")
     def test_cproject_crs2ds(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_cvalid(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_cvalid_values(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_user_cvalid_values(self):
         # TODO: Write the test
         pass
 

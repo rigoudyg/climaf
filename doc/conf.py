@@ -27,7 +27,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 
 
-from climaf import version
+from env.environment import version
 
 # -- General configuration ------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -53,8 +53,8 @@ if atCNRM:
     # This one works at CNRM
     extensions.append('sphinxcontrib.napoleon')
 else:
-     # this one works at RTD and Ciclad
-     extensions.append('sphinx.ext.napoleon')
+    # this one works at RTD and Ciclad
+    extensions.append('sphinx.ext.napoleon')
 
 os.environ['IN_SPHINX'] = 'yes'
 

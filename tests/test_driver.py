@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -386,11 +386,11 @@ class CaliasTests(unittest.TestCase):
 		calias("data_CNRM", "tos,thetao", filenameVar="grid_T_table2.2")
 		calias("data_CNRM", "uo", filenameVar="grid_U_table2.3")
 		self.assertDictEqual(aliases["data_CNRM"],
-		                     {'tos,thetao': ('tos,thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
+							  {'tos,thetao': ('tos,thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
 		                      'tos': ('tos', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
 		                      'thetao': ('thetao', 1.0, 0.0, None, 'grid_T_table2.2', None, None),
 		                      'uo': ('uo', 1.0, 0.0, None, 'grid_U_table2.3', None, None)
-		                      })
+							   })
 		self.assertDictEqual(derived_variables["data_CNRM"],
 		                     {'tos': ('ccdo', 'tos', ['tos,thetao'], {'operator': 'selname,tos'}),
 		                      'thetao': ('ccdo', 'thetao', ['tos,thetao'], {'operator': 'selname,thetao'})

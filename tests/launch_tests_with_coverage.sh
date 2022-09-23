@@ -2,12 +2,14 @@
 
 report_ensemble=${1:-1}
 echo $report_ensemble
-python_version=${2:-2}
+python_version=${2:-3}
 echo $python_version
 run_modules=${3:-"netcdfbasics period cache classes functions operators standard_operators operators_derive operators_scripts cmacro driver dataloc find_files html example_data_plot example_data_retrieval example_index_html mcdo"}
 echo $run_modules
 run_coverage=${4:-0}
 echo $run_coverage
+plot_config=${5:-"default"}
+echo $plot_config
 
 if [ $run_coverage -eq 1 ] ; then
     coverage_binary="coverage${python_version}"
@@ -29,6 +31,8 @@ fi
 climaf_macros="$PWD/.climaf.macros_tests"
 rm -f ${climaf_macros}
 export CLIMAF_MACROS=${climaf_macros}
+
+export CLIMAF_TEST_PLOT_CONFIG=${plot_config}
 
 # Run coverage with different tests
 if [ $run_coverage -eq 0 ] ; then

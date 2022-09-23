@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -23,7 +23,7 @@ class VarsOfFileTests(unittest.TestCase):
 
     def test_vars(self):
         my_file = "/".join([rootpath[0], "..", "examples", "data", "NPv3.1ada_SE_1982_1991_1M_ua_pres.nc"])
-        self.assertEqual(varsOfFile(my_file), ["ua", "pres"])
+        self.assertEqual(varsOfFile(my_file), ["pres", "ua"])
         my_file = "/".join(
             [rootpath[0], "..", "examples", "data", "tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc"])
         self.assertEqual(varsOfFile(my_file), ["tas", ])

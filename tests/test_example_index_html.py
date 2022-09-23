@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -15,7 +15,7 @@ from env.environment import *
 from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
-from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
+from climaf.chtml import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
 
 
@@ -41,9 +41,10 @@ def my_slice(var, season):
 class HtmlIndexCreation(unittest.TestCase):
 
     def setUp(self):
-        self.reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_index_html"])
-        self.reference_index_1 = os.sep.join([self.reference_directory, "index_1.html"])
-        self.reference_index_2 = os.sep.join([self.reference_directory, "index_2.html"])
+        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_index_html"])
+        self.reference_directory = os.sep.join([reference_directory,
+                                                os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
+        self.default_reference_directory = os.sep.join([reference_directory, "default"])
         # Need to overwrite IPSL's very extensive variables definitions, at leat for "rst"
         # This in order to run the tests also at IPSL
         derived_variables["*"].pop("rst", None)
@@ -113,7 +114,8 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        compare_html_files(absout, self.reference_index_1)
+        compare_html_files(absout, "index_1.html", self.reference_directory,
+                           dir_ref_default=self.default_reference_directory)
 
     def test_html_index_2(self):
         ###################################################################################
@@ -135,10 +137,11 @@ class HtmlIndexCreation(unittest.TestCase):
             filout.write(index)
         # Check that the result corresponds to what is expected
         ########################################################
-        compare_html_files(out, self.reference_index_2)
+        compare_html_files(out, "index_2.html", self.reference_directory,
+                           dir_ref_default=self.default_reference_directory)
 
     def tearDown(self):
-        craz()
+        pass  # craz()
 
 
 if __name__ == '__main__':

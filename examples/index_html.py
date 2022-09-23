@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Generate an html index of figures using the filenames for figures computed by CliMAF
@@ -18,7 +18,7 @@ import os
 import os.path
 
 from climaf.api import *
-from climaf.html import *
+from climaf.chtml import *
 from climaf import cachedir
 
 # Some global variables

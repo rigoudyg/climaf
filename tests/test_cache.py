@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -288,26 +288,39 @@ class ClistTests(unittest.TestCase):
             for (d, subd, files) in os.walk(rep):
                 for f in files:
                     fname = os.path.sep.join([d, f])
-                    test = (True in [fname.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]])
                     fname_stats = os.stat(fname)
-                    size = size.strip()
+                    test = (True in [fname.endswith(term) for term in [".png", ".nc", ".pdf", ".eps"]])
                     if test and size:
-                        if size.endswith("k"):
-                            size = int(size[:-1])*1024
-                        elif size.endswith("M"):
-                            size = int(size[:-1])*1024*1024
-                        elif size.endswith("G"):
-                            size = int(size[:-1])*1024*1024*1024
-                        elif size.endswith("T"):
-                            size = int(size[:-1])*1024*1024*1024*1024
+                        size_regexp = re.compile(r"(?P<size>\d+)(?P<unit>[k|M|G|T])?")
+                        size_match = size_regexp.match(size.strip())
+                        if size_match is None:
+                            raise Exception("Could not deal with value %s as a size for a file")
                         else:
-                            try:
-                                size = int(size)
-                            except ValueError:
-                                raise Exception("Could not deal with value %s as a size for a file")
-                        test = fname_stats.st_size > size
+                            size = int(size_match.groupdict()["size"])
+                            unit = size_match.groupdict()["unit"]
+                            if unit in ["k", ]:
+                                size *= 1024
+                            elif unit in ["M", ]:
+                                size *= 1024**2
+                            elif unit in ["G", ]:
+                                size *= 1024**3
+                            elif unit in ["T", ]:
+                                size *= 1024**4
+                            test = fname_stats.st_size > size
                     if test and age:
-                        test = fname_stats.st_ctime > (age * 24 * 3600)
+                        age_regexp = re.compile(r"(?P<sign>[+|-])?(?P<age>\d+)")
+                        age_match = age_regexp.match(age.strip())
+                        if age_match is None:
+                            raise ValueError("Age format must follow the pattern '[+|-]?\d+'")
+                        else:
+                            age = int(age_match.groupdict()["age"])
+                            sign = age_match.groupdict()["sign"]
+                            if sign in ["+", ]:
+                                test = fname_stats.st_ctime > ((age + 1) * 24 * 3600)
+                            elif sign in ["-", ]:
+                                test = fname_stats.st_ctime < (age * 24 * 3600)
+                            else:
+                                test = (age * 24 * 3600) < fname_stats.st_ctime < ((age + 1) * 24 * 3600)
                     if test and access != 0:
                         test = fname_stats.st_atime > (access * 24 * 3600)
                     if test:

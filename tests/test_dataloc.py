@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -104,9 +104,9 @@ class periodOfEmFileTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
-
 	def tearDown(self):
 		craz()
+
 
 class selectExampleFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
@@ -114,9 +114,9 @@ class selectExampleFilesTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
-
 	def tearDown(self):
 		craz()
+
 
 class selectCmip5DrsFilesTest(unittest.TestCase):
 	@unittest.skipUnless(False, "The test is not written")
@@ -124,9 +124,9 @@ class selectCmip5DrsFilesTest(unittest.TestCase):
 		# TODO: Implement the tests
 		pass
 
+	def tearDown(self):
+		craz()
 
-def tearDown(self):
-	craz()
 
 if __name__ == '__main__':
 	# Jump into the test directory

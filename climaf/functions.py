@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
@@ -15,7 +15,6 @@ from climaf.driver import cvalue, cfile
 from climaf.netcdfbasics import varsOfFile, verticalLevelName, verticalLevelUnits, verticalLevelValues
 from climaf import classes
 from climaf import cachedir
-
 
 
 def cscalar(dat):

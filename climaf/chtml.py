@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 CliMAF module ``html`` defines functions for building some html index
@@ -21,10 +21,7 @@ import re
 import pickle
 import shutil
 from collections import OrderedDict
-try:
-    from collections.abc import KeysView, ValuesView
-except ImportError:
-    from _abcoll import KeysView, ValuesView
+from collections.abc import KeysView, ValuesView
 from functools import reduce
 import six
 
@@ -285,7 +282,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                print('index_atlas in html.py = ', index_atlas)
+                print('index_atlas in chtml.py = ', index_atlas)
                 try:
                     with open(os.path.expanduser(index_atlas), "rb") as atlas_index_r:
                         tt = pickle.load(atlas_index_r)
@@ -467,15 +464,15 @@ def fline(func, farg, sargs, title=None,
             print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:
-            sargs = OrderedDict(list(zip(sargs, sargs)))
+            sargs = OrderedDict(list([(repr(sarg), sarg) for sarg in sargs]))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
         allargs = allargs + common_args
         if other_args:
-            allargs = allargs + other_args.get(key, None)
+            allargs = allargs + other_args.get(key, [None])
         # print 'allargs=',allargs
-        funcrep = func(*allargs, **kwargs)
+        funcrep = func.__call__(*allargs, **kwargs)
         if isinstance(funcrep, tuple):
             # print "tuple case",lab,rfig
             lab, rfig = funcrep

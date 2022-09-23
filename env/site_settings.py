@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Standard site settings for working with CliMAF.
@@ -8,7 +8,7 @@ Standard site settings for working with CliMAF.
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
-
+import sys
 
 atCNRM = False
 atCerfacs = False

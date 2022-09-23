@@ -6,7 +6,13 @@ What's new
 
 Changes, newest first:
 
-- branch run_cesemp_on_spirit_and_at_TGCC:
+- V3.0:
+
+  - Compatibility break:
+    - Python2 compatibility is dropped in this version.
+
+    - climaf module `html` has been renamed `chtml` to avoid conflicts with python
+      standard package `html`
 
   - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
     at TGCC on machine 'irene' and 'irene-amd' (including tests suite)
@@ -21,6 +27,12 @@ Changes, newest first:
 
   - default is now to deactivate optimization for CMIP6 data indexing,
     which seems buggy
+
+  - when dealing with netcdf files without time bounds, it must be specified
+    when the project is defined using option 'use_frequency=True'. 'frequency'
+    must also be a facet of the project and it must be initialized using `cdef`
+
+  - A project can now be derived from an existing one (facets, dataloc).
 
   - technical :
 

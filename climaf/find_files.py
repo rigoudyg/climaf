@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ 
@@ -27,11 +27,11 @@ from env.environment import *
 from env.clogging import clogger
 import env
 from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_substitute
-from climaf.period import init_period, sort_periods_list
-from climaf.netcdfbasics import fileHasVar
+from climaf.period import init_period, sort_periods_list, cperiod
+from climaf.netcdfbasics import fileHasVar, timeLimits
 
 
-def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, **kwargs):
+def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, use_frequency=False, **kwargs):
     """
     Allow to describe a ``generic`` file organization : the list of files returned
     by this function is composed of files which :
@@ -142,6 +142,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
     #
     # a patterns for dates for globbing
     date_glob_patt = "*"
+    date_regexp_patt_glob = "(?P<new_period>.*)"
     date_keyword = "${PERIOD}"
     #
     # a pattern for dates for regexp
@@ -176,9 +177,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
             #
             # Construct a pattern for also globbing dates
             temp2 = template.replace(date_keyword, date_glob_patt)
+            temp3 = template.replace(".", "\.")
+            temp3 = temp3.replace("?", ".")
+            temp3 = temp3.replace("*", ".*")
+            temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
             #
             # Do globbing with plain varname
-            lfiles = my_glob(remote_prefix, temp2, url, date_regexp_keyword, date_regexp_patt, kwargs)
+            lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
             clogger.debug("Globbed %d files with plain varname on %s : " % (len(lfiles), temp2))
             #
             # If unsuccessful using varname, try with filenameVar
@@ -187,9 +192,13 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 simple_kwargs['variable'] = simple_kwargs['filenameVar']
                 template = my_template.safe_substitute(**simple_kwargs)
                 temp2 = template.replace(date_keyword, date_glob_patt)
+                temp3 = template.replace(".", "\.")
+                temp3 = temp3.replace("?", ".")
+                temp3 = temp3.replace("*", ".*")
+                temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
                 #
                 # Do globbing with fileVarname
-                lfiles = my_glob(remote_prefix, temp2, url, date_regexp_keyword, date_regexp_patt, kwargs)
+                lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
                 clogger.debug("Globbed %d files for filenamevar on %s: " % (len(lfiles), temp2))
             #
             # For registering encountered values for those facets which have a wildcard,
@@ -202,9 +211,8 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 # Process fixed-fields case, or extract file time period 
                 #
                 fperiod = None
-                if kwargs.get('frequency')   in ["fx", "seasonnal", "annual_cycle"] or \
-                   str(kwargs.get('period')) in ['fx', ] \
-                   or kwargs.get('table')    in ['fx', ]:
+                if kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or \
+                        kwargs.get('period') in [cperiod("fx"), ] or kwargs.get('table') in ['fx', ]:
                     store = False
                     # local data
                     if not remote_prefix and ((basename.find("${variable}") >= 0) or variable in ['*', ] or
@@ -225,7 +233,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                     continue
                 else:
                     # Extract file period period from filename
-                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt)
+                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt, use_frequency=use_frequency)
     
                 #
                 # For non-fixed fields, if file period matches requested period, check variable
@@ -366,8 +374,11 @@ def store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_perio
                 continue
             valid_values = proj.cvalid(kw, None)
             if isinstance(valid_values, list) and (facet_value not in valid_values):
-                clogger.info("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
-                return False
+                if project in env.environment.bypass_valid_check_for_project:
+                    clogger.warning("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
+                else:
+                    clogger.error("Facet value %s for %s is not allowed (in %s)" % (facet_value, kw, f))
+                    return False
     #
     combination = dict()
     if fperiod is not None and periods is not None:
@@ -414,7 +425,7 @@ def store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_perio
     return True
 
 
-def my_glob(remote_prefix, pattern, url, date_regexp_keyword, date_regexp_patt, kwargs):
+def my_glob(remote_prefix, pattern, pattern2, url, date_regexp_keyword, date_regexp_patt, kwargs):
     if remote_prefix:
         lfiles = sorted(glob_remote_data(remote_prefix, pattern))
         clogger.debug("Remote globbing %d files for varname on %s : " % (len(lfiles), remote_prefix + pattern))
@@ -429,14 +440,24 @@ def my_glob(remote_prefix, pattern, url, date_regexp_keyword, date_regexp_patt, 
             # lfiles = sorted(leaf_glob(pattern))
         clogger.debug("Before regexp filtering : Globbing %d files for varname on %s : " % (len(lfiles), pattern))
     # Must filter with date_regexp, because * with glob for dates is too inclusive
-    ret = set()
-    for f in lfiles:
-        if re.search(date_regexp_patt, f) or date_regexp_keyword not in url:
-            ret.add(f)
-    return list(ret) 
+    if date_regexp_keyword not in url:
+        ret = set(lfiles)
+    else:
+        ret = set()
+        pattern_to_search = re.compile(pattern2)
+        patterns_to_fill = re.compile("^"+date_regexp_patt+"$")
+        for f in lfiles:
+            match = pattern_to_search.match(f)
+            if not match:
+                raise ValueError("Should not pass here")
+            else:
+                match = match.groupdict()["new_period"]
+                if patterns_to_fill.match(match):
+                    ret.add(f)
+    return list(ret)
     
 
-def extract_period(filename, template, date_regexp_keyword, date_regexp_patt):
+def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, use_frequency=False):
     """Test if TEMPLATE includes a DATE_REGEXP_KEYWORD and if yes,
     replaces it with DATE_REGEXP_PATTERN, after having replaced
     globing wildcards (*,?) by regexp exquivalent wildcards (.*,.)
@@ -457,14 +478,18 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt):
         if tperiod == filename:
             #raise Climaf_Error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
             #                   " \n template=%s, kw=%s"%(template, date_regexp_keyword))
-            print("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
-                               " \n template=%s, kw=%s"%(template, date_regexp_keyword))
+            clogger.error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
+                          " \n template=%s, kw=%s"%(template, date_regexp_keyword))
 
             return None
         fperiod = init_period(tperiod)
         return fperiod
     else:
-        clogger.info("Cannot yet filter re. time using only file content (for %s)." % filename)
+        try:
+            fperiod = timeLimits(filename, use_frequency=use_frequency)
+            return fperiod
+        except:
+            clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
 
         
 def glob_remote_data(url, pattern):

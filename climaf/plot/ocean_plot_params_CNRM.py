@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Created : S.Sénési - nov 2015
 # Adapter : J.Servonnat - april 2016

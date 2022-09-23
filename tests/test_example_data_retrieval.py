@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -56,6 +56,35 @@ class DataRetrieval_1(unittest.TestCase):
                          "ccdo(ccdo(ds('CMIP6%%rls%1852-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%g*%"
                          "latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
+
+    @skipUnless_CNRM_Lustre()
+    def test_retrieval_cmip6_data(self):
+        g = ds(project='CMIP6', period='2000-2001', variable='tos', table='Omon', grid='gn', model='CNRM-CM6-1',
+               experiment='hist-nat', realization='r1i1p1f2')
+        climaf_ds = ccdo(g, operator='fldmean')
+        print(cfile(climaf_ds))
+
+        g = ds(project='CMIP6', period='2000-2001', variable='tos', table='Omon', grid='gn', model='CNRM-CM6-1',
+               experiment='omip2', realization='r1i1p1f2')
+        climaf_ds = ccdo(g, operator='fldmean')
+        print(cfile(climaf_ds))
+
+    @skipUnless_CNRM_Lustre()
+    def test_retrieval_data_CNRM(self):
+        cproject('data_CNRM')
+        root = "/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
+        suffix = "${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
+        data_url = root + suffix
+        dataloc(project='data_CNRM', organization='generic', url=data_url)
+        # -----------------------------------------------------------
+        # Declare how variables are scattered/grouped among files
+        # -----------------------------------------------------------
+        calias("data_CNRM", "tos,thetao", filenameVar="grid_T_table2.2")
+        calias("data_CNRM", "uo", filenameVar="grid_U_table2.3")
+        calias("data_CNRM", "vo", filenameVar="grid_V_table2.3")
+        a = ds(project="data_CNRM", variable="uo", simulation="PRE6CPLCr2alb", period="199001")
+        cfile(a)
+        self.assertEqual(a.baseFiles(), "/cnrm/est/COMMON/climaf/test_data/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19900101_19900131_grid_U_table2.3.nc")
 
     def tearDown(self):
         craz()

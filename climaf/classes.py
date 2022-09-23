@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver
@@ -14,10 +14,14 @@ import re
 import string
 import copy
 import os.path
+from collections import defaultdict
 from functools import reduce, partial
 import six
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+import json
+import shutil
+import glob
 import xarray as xr
 from datetime import timedelta
 
@@ -28,6 +32,14 @@ from climaf.period import init_period, cperiod, merge_periods, intersect_periods
     lastyears, firstyears, group_periods, freq_to_minutes
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
+
+
+def derive_cproject(name, parent_name, new_project_facets=list()):
+    if name in cprojects or any([elt.project == name for elt in locs]):
+        raise Climaf_Classes_Error("Could not derive a project from an existing one if it already exists: %s." % name)
+    else:
+        cprojects[parent_name].derive(name, new_project_facets)
+        [elt.derive(name) for elt in locs if elt.project == parent_name]
 
 
 class cproject(object):
@@ -138,6 +150,21 @@ class cproject(object):
         self.attributes_for_ensemble = ['simulation']
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
+        self.use_frequency = kwargs.get("use_frequency", False)
+
+    def derive(self, new_name, new_facets=list()):
+        args = list()
+        for a in self.facets:
+            if a in self.facet_defaults:
+                args.append((a, self.facet_defaults[a]))
+            else:
+                args.append(a)
+        args.extend(new_facets)
+        kwargs = dict()
+        kwargs["separator"] = self.separator
+        if len(self.attributes_for_ensemble) > 1:
+            kwargs["ensemble"] = self.attributes_for_ensemble[1:]
+        return cproject(new_name, *args, **kwargs)
 
     def __repr__(self):
         return self.crs
@@ -155,6 +182,112 @@ class cproject(object):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
 
+    def build_cvalid_from_tree_of_files(self, project_name=None):
+        if project_name is None:
+            project_name = self.project
+        # Find out the directory paths to be checked (other keys can be considered by hand)
+        project_locs = [os.path.dirname(loc) for loc in locs if loc.project in [project_name, ]]
+        # Do not consider root
+        project_locs = [loc.replace("${root}", self.facet_defaults["root"]) for loc in project_locs]
+        facets_regexp = re.compile(r"\$\{(?P<facet>[^\{^\}]+)\}")
+        list_facets = list()
+        for loc in project_locs:
+            list_facets.append([m.groupdict()["facet"] for m in facets_regexp.finditer(loc)])
+        dict_facets = defaultdict(list)
+        for (loc, facets) in zip(project_locs, list_facets):
+            loc_list = [loc, ]
+            tmp_loc_list = list()
+            for facet in facets:
+                facet_reg = r"\$\{%s\}" % facet
+                facet_regexp = re.compile(facet_reg)
+                for tmp_loc in loc_list:
+                    match = facet_regexp.match(tmp_loc)
+                    if match is not None:
+                        begin_tmp_loc = tmp_loc[:tmp_loc.find(os.sep, match.end())]
+                        begin_tmp_loc = begin_tmp_loc.replace(facet_reg, "*")
+                        list_values = glob.glob(begin_tmp_loc)
+                        list_values = [val.replace(tmp_loc[:match.start()], "")[:len(tmp_loc) - match.end()]
+                                       for val in list_values]
+                        dict_facets[facet].extend(list_values)
+                        tmp_loc_list.extend([tmp_loc.replace(facet_reg, val) for val in list_values])
+                    else:
+                        tmp_loc_list.append(tmp_loc)
+                loc_list, tmp_loc_list = tmp_loc_list, list()
+        for key in dict_facets:
+            dict_facets[key] = sorted(list(set(dict_facets[key])))
+        return dict_facets
+
+    def build_cvalid_conf_file_name(self, project_name=None, choice="both"):
+        """
+        Build cvalid conf file name from project name.
+        :param project_name: name of the default project to be used
+        :param choice: where to look for the conf file, either "user" (in $HOME/.climaf), "default" (in climaf/projects)
+                       or "both"
+        :return: a list of possible conf file names
+        """
+        if project_name is None:
+            project_name = self.project
+        cvalid_user_conf_file = os.sep.join([os.environ["HOME"], ".climaf", "cvalid_{}.json".format(project_name)])
+        cvalid_default_conf_file = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "project",
+                                                "cvalid_{}.json".format(project_name)])
+        if choice in ["both", ]:
+            return [cvalid_user_conf_file, cvalid_default_conf_file]
+        elif choice in ["user", ]:
+            return [cvalid_user_conf_file, ]
+        elif choice in ["default", ]:
+            return [cvalid_default_conf_file, ]
+        else:
+            raise ValueError("Unknown value for choice: %s" % choice)
+
+    def initialize_cvalid_values(self, project_name=None):
+        """
+        Initialize cvalid values for the current project with values defined in a json file, either in the CliMAF'
+        project directory or in the climaf conf directory.
+        :param project_name: name of the project to build the conf file name
+        """
+        cvalid_conf_files = self.build_cvalid_conf_file_name(project_name=project_name, choice="both")
+        cvalid_conf_files = [f for f in cvalid_conf_files if os.path.isfile(f)]
+        if len(cvalid_conf_files) > 0:
+            cvalid_conf_file = cvalid_conf_files[0]
+            content = json.load(cvalid_conf_file)
+            for key in content:
+                self.cvalid(key, content[key])
+
+    def initialize_user_cvalid_values(self, project_name=None, from_tree_of_files=False, force=False):
+        """
+        Initialize the user's configuration file for project project_name.
+        If the configuration file already exists, do nothing except if force=True.
+        If from_tree_of_file=True, read the tree of files to find out the possible values (not implemented yet).
+        :param project_name: name of the default project
+        :param from_tree_of_files: boolean, should the tree of file be read?
+        :param force: boolean, should an existing user conf file be bypassed?
+        """
+        cvalid_user_conf_file = self.build_cvalid_conf_file_name(project_name=project_name, choice="user")[0]
+        cvalid_default_conf_file = self.build_cvalid_conf_file_name(project_name=project_name, choice="default")[0]
+        if os.path.isfile(cvalid_user_conf_file):
+            if force:
+                clogger.warning("User's cvalid configuration file %s already exists and force=True, replace it" %
+                                cvalid_user_conf_file)
+                os.remove(cvalid_user_conf_file)
+                if from_tree_of_files:
+                    content = self.build_cvalid_from_tree_of_files(project_name)
+                    json.dump(content, cvalid_user_conf_file)
+                elif os.path.isfile(cvalid_default_conf_file):
+                    if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                        os.makedirs(os.path.dirname(cvalid_user_conf_file))
+                    shutil.copyfile(cvalid_default_conf_file, cvalid_user_conf_file)
+                else:
+                    clogger.error("Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+            else:
+                clogger.warning("User's cvalid configuration file %s already exists and force=False, do nothing." %
+                                cvalid_user_conf_file)
+        elif cvalid_default_conf_file:
+            if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                os.makedirs(os.path.dirname(cvalid_user_conf_file))
+            shutil.copyfile(cvalid_default_conf_file, cvalid_user_conf_file)
+        else:
+            clogger.error("Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+
     def cvalid(self, attribute, value=None):
         """Set or get the list of valid values for a CliMAF dataset attribute
         or facet (such as e.g. 'model', 'simulation' ...). Useful
@@ -168,7 +301,7 @@ class cproject(object):
         """
         #
         if attribute not in self.facets:
-            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (self.project, attribute))
         if value is None:
             return self.facet_authorized_values.get(attribute, None)
         else:
@@ -589,7 +722,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, periods=None, split=None):
+    def glob(self, what=None, periods=None, split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -646,7 +779,7 @@ class cdataset(cobject):
         clogger.debug("glob() with dic=%s" % repr(dic))
         cases = list()
         files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
-                            return_combinations=cases, **dic)
+                            return_combinations=cases, use_frequency=use_frequency, **dic)
         if what in ['files', ]:
             return files
         else:
@@ -786,6 +919,14 @@ class cdataset(cobject):
             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ...}
 
         """
+        use_frequency = cprojects[self.project].use_frequency
+        if use_frequency:
+            if "frequency" in self.kvp:
+                use_frequency = self.kvp["frequency"]
+            else:
+                use_frequency = cdef("frequency", project=self.project)
+                if not use_frequency:
+                    use_frequency = False
         dic = self.kvp.copy()
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
@@ -796,7 +937,7 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s" % repr(dic))
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency, **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var
@@ -928,17 +1069,17 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self, frequency = True, gap = True, period = True):
+    def check(self, frequency=True, gap=True, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
         - if frequency is True : check if data frequency is consistent with dataset frequency
         - if gap is True : check if file data have a gap
-        - if period is True : check if period covered by data actually includes the 
+        - if period is True : check if period covered by data actually includes the
           whole of dataset period
 
         Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
         """
-        if gap : 
+        if gap:
             frequency = True
         #
         files = self.baseFiles()
@@ -948,22 +1089,22 @@ class cdataset(cobject):
         clogger.debug("List of selected files: %s" % files)
         #
         rep = True
-        dsets = [ xr.open_dataset(f,use_cftime=True) for f in files ]
+        dsets = [xr.open_dataset(f, use_cftime=True) for f in files]
         all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
         #
         if self.frequency == 'fx' or self.frequency == 'annual_cycle':
-            clogger.info("No check for fixed data for %s",self)
+            clogger.info("No check for fixed data for %s", self)
             return True
         if self.frequency == "monthly" and frequency:
             clogger.error("Check cannot yet process monthly data due to" +
                           "to a shortcoming in analyzing monthly data frequency")
             return None
-        if not getattr(dsets[0],"frequency",False) and frequency :
-            clogger.warning("No frequency in file(s) for %s",self)
+        if not getattr(dsets[0], "frequency", False) and frequency:
+            clogger.warning("No frequency in file(s) for %s", self)
             return False
-        if "time" not in all_dsets :
-            clogger.warning("Cannot yet chek a dataset which time dimension" +
-                            "is not named 'time' (%s)"%self)
+        if "time" not in all_dsets:
+            clogger.warning("Cannot yet check a dataset which time dimension" +
+                            "is not named 'time' (%s)" % self)
             return False
         #
         times = all_dsets.time
@@ -972,17 +1113,17 @@ class cdataset(cobject):
         if frequency:
             # Check if data time interval is consistent with dataset frequency
             data_freq = xr.infer_freq(times)
-            if data_freq is None :
-                clogger.error("Time interval detected by xr.infer_freq is None %s"%str(times))
+            if data_freq is None:
+                clogger.error("Time interval detected by xr.infer_freq is None %s" % str(times))
                 return False
-            table = { "monthly" : "MS", "daily" : "D", "day" : "D", "6h" : "6H", "3h" : "3H", 
-                     "1h" : "1H", "6Hourly" : "6H", "3Hourly" : "3H"}
-            if self.frequency not in table :
-                clogger.error("Check cannot yet handle frequency %s"%self.frequency)
+            table = {"monthly": "MS", "daily": "D", "day": "D", "6h": "6H", "3h": "3H",
+                     "1h": "1H", "6Hourly": "6H", "3Hourly": "3H"}
+            if self.frequency not in table:
+                clogger.error("Check cannot yet handle frequency %s" % self.frequency)
                 return None
-            if ( data_freq != table[self.frequency] ): 
+            if data_freq != table[self.frequency]:
                 message = 'Data time interval %s is not consistent with dataset frequency %s'
-                clogger.warning(message%(data_freq,self.frequency))
+                clogger.warning(message % (data_freq, self.frequency))
                 rep = False
 
         if gap:
@@ -990,27 +1131,27 @@ class cdataset(cobject):
             time_values = times.values.flatten()
             delta = freq_to_minutes(data_freq)
             cpt = 0
-            for ptim,tim in zip(time_values[:-1],time_values[1:]):
-                if ptim + timedelta(minutes=delta) != tim :
+            for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                if ptim + timedelta(minutes=delta) != tim:
                     rep = False
                     cpt += 1
-                    if cpt > 3 : 
+                    if cpt > 3:
                         break
-                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s"%\
-                                (ptim,tim,delta))
-        
+                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
+                                  (ptim, tim, delta))
+
         if period:
             # Compare period covered by data files with dataset's period
-            cell_methods = getattr(dsets[0][varOf(self)],"cell_methods",None)
-            file_period = timeLimits(times, use_frequency = True, cell_methods = cell_methods,
-                                 strict_on_time_dim_name = False)
+            cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
+            file_period = timeLimits(times, use_frequency=True, cell_methods=cell_methods,
+                                     strict_on_time_dim_name=False)
             clogger.debug('Period covered by selected files: %s' % file_period)
             consist = ""
             if not file_period.includes(self.period):
                 consist = "not "
                 rep = False
-            clogger.info("Datafile time period (%s) includes dataset time period (%s)" % \
-                         (file_period,self.period) + "=> time periods are %sconsistent." % (consist))
+            clogger.info("Datafile time period (%s) includes dataset time period (%s)" %
+                         (file_period, self.period) + "=> time periods are %sconsistent." % consist)
         return rep
 
 
@@ -1322,7 +1463,10 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
             if not fileHasVar(filename, v):
                 raise Climaf_Classes_Error("No variable %s in file %s" % (v, filename))
     #
-    fperiod = timeLimits(filename)
+    try:
+        fperiod = timeLimits(filename)
+    except:
+        fperiod = None
     if period is None:
         if fperiod is None:
             period = "fx"
@@ -1337,8 +1481,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
            variable=variable, period=period, path=filename)
     d.files = filename
 
-    d.frequency = attrOfFile(filename,"frequency","*")
-        
+    d.frequency = attrOfFile(filename, "frequency", "*")
+
     return d
 
 
@@ -1347,12 +1491,12 @@ class ctree(cobject):
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
-        if len(operands) == 0 :
+        if len(operands) == 0:
             raise Climaf_Classes_Error("Cannot apply an operator to no operand")
         self.operator = climaf_operator
         self.script = script
         import copy
-        if script is None :
+        if script is None:
             self.flags = False
         else:
             self.flags = copy.copy(script.flags)
@@ -2214,7 +2358,6 @@ def timePeriod(cobject):
         return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
-
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):

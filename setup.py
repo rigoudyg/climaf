@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from setuptools import find_packages
 from setuptools import setup
 
-version = __import__('climaf').version
+version = __import__('climaf.cache').version
 description = 'CliMAF: a Climate Model Assessment Framework.'
 long_description = (
     open('README.rst').read()
