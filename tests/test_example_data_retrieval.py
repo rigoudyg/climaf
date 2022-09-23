@@ -69,6 +69,23 @@ class DataRetrieval_1(unittest.TestCase):
         climaf_ds = ccdo(g, operator='fldmean')
         print(cfile(climaf_ds))
 
+    @skipUnless_CNRM_Lustre()
+    def test_retrieval_data_CNRM(self):
+        cproject('data_CNRM')
+        root = "/cnrm/est/COMMON/climaf/test_data/${simulation}/O/"
+        suffix = "${simulation}_1m_YYYYMMDD_YYYYMMDD_${variable}.nc"
+        data_url = root + suffix
+        dataloc(project='data_CNRM', organization='generic', url=data_url)
+        # -----------------------------------------------------------
+        # Declare how variables are scattered/grouped among files
+        # -----------------------------------------------------------
+        calias("data_CNRM", "tos,thetao", filenameVar="grid_T_table2.2")
+        calias("data_CNRM", "uo", filenameVar="grid_U_table2.3")
+        calias("data_CNRM", "vo", filenameVar="grid_V_table2.3")
+        a = ds(project="data_CNRM", variable="uo", simulation="PRE6CPLCr2alb", period="199001")
+        cfile(a)
+        self.assertEqual(a.baseFiles(), "/cnrm/est/COMMON/climaf/test_data/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19900101_19900131_grid_U_table2.3.nc")
+
     def tearDown(self):
         craz()
 
