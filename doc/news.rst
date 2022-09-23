@@ -6,7 +6,12 @@ What's new
 
 Changes, newest first:
 
-- branch xarray4netcdf:
+- V3.0:
+
+  - Python2 compatibility is dropped in this version.
+
+  - climaf module `html` has been renamed `chtml` to avoid conflicts with python
+    standard package `html`
 
   - function :py:func:`~climaf.classes.fds` now sets the dataset's
     frequency using file's global attribute 'frequency'
@@ -15,6 +20,12 @@ Changes, newest first:
     been reworked, accepts flags for setting what to check, and
     provides a consistent return value (which can be None if a
     decision cannot be made)
+
+  - when dealing with netcdf files without time bounds, it must be specified
+    when the project is defined using option 'use_frequency=True'. 'frequency'
+    must also be a facet of the project and it must be initialized using `cdef`
+
+  - A project can now be derived from an existing one (facets, dataloc).
 
   - technical :
 
