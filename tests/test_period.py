@@ -105,8 +105,7 @@ class CreatePeriodFixedTests(unittest.TestCase):
         self.assertFalse(self.my_period.includes(self.my_test_period))
 
     def test_intersects(self):
-        with self.assertRaises(Climaf_Period_Error):
-            self.my_period.intersects(self.my_test_period)
+        self.assertEqual(self.my_period.intersects(self.my_test_period), self.my_test_period)
 
     def tearDown(self):
         craz()

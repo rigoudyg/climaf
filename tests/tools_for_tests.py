@@ -7,6 +7,7 @@ Tools to deal with tests.
 
 from __future__ import unicode_literals, absolute_import, print_function, division
 
+import os
 import unittest
 import re
 import six
@@ -176,8 +177,14 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
                               shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if rep != 0:
+            tmp_dir = os.sep.join([os.path.dirname(file_test), "..", "tmp"])
+            os.makedirs(tmp_dir, exist_ok=True)
+            cfile(object_test, target=os.sep.join([tmp_dir, os.path.basename(file_test)]))
             if display_error:
-                subprocess.check_call(display_cmd.format(diff_file), shell=True)
+                try:
+                    subprocess.check_call(display_cmd.format(diff_file), shell=True)
+                except subprocess.SubprocessError:
+                    print("Could not display %s" % diff_file)
             os.remove(diff_file)
             raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))
         else:
