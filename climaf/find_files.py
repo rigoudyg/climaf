@@ -31,7 +31,7 @@ from climaf.period import init_period, sort_periods_list, cperiod
 from climaf.netcdfbasics import fileHasVar, timeLimits
 
 
-def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, **kwargs):
+def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, return_combinations=None, use_frequency=False, **kwargs):
     """
     Allow to describe a ``generic`` file organization : the list of files returned
     by this function is composed of files which :
@@ -225,7 +225,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                     continue
                 else:
                     # Extract file period period from filename
-                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt)
+                    fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt, use_frequency=use_frequency)
     
                 #
                 # For non-fixed fields, if file period matches requested period, check variable
@@ -439,7 +439,7 @@ def my_glob(remote_prefix, pattern, pattern2, url, date_regexp_keyword, date_reg
     return list(ret) 
     
 
-def extract_period(filename, template, date_regexp_keyword, date_regexp_patt):
+def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, use_frequency=False):
     """Test if TEMPLATE includes a DATE_REGEXP_KEYWORD and if yes,
     replaces it with DATE_REGEXP_PATTERN, after having replaced
     globing wildcards (*,?) by regexp exquivalent wildcards (.*,.)
@@ -463,7 +463,7 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt):
         return fperiod
     else:
         try:
-            fperiod = timeLimits(filename)
+            fperiod = timeLimits(filename, use_frequency=use_frequency)
             return fperiod
         except:
             clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)

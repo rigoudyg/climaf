@@ -36,12 +36,8 @@ def derive_cproject(name, parent_name, new_project_facets=list()):
     if name in cprojects or any([elt.project == name for elt in locs]):
         raise Climaf_Classes_Error("Could not derive a project from an existing one if it already exists: %s." % name)
     else:
-        import pprint
-        print(parent_name, name)
         cprojects[parent_name].derive(name, new_project_facets)
-        pprint.pprint(cprojects[name])
         [elt.derive(name) for elt in locs if elt.project == parent_name]
-        pprint.pprint(locs)
 
 
 class cproject(object):
@@ -152,6 +148,7 @@ class cproject(object):
         self.attributes_for_ensemble = ['simulation']
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
+        self.use_frequency = kwargs.get("use_frequency", False)
 
     def derive(self, new_name, new_facets=list()):
         args = list()
@@ -723,7 +720,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, periods=None, split=None):
+    def glob(self, what=None, periods=None, split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -780,7 +777,7 @@ class cdataset(cobject):
         clogger.debug("glob() with dic=%s" % repr(dic))
         cases = list()
         files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
-                            return_combinations=cases, **dic)
+                            return_combinations=cases, use_frequency=use_frequency, **dic)
         if what in ['files', ]:
             return files
         else:
@@ -920,6 +917,7 @@ class cdataset(cobject):
             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ...}
 
         """
+        use_frequency = cprojects[self.project].use_frequency
         dic = self.kvp.copy()
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
@@ -930,7 +928,7 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s" % repr(dic))
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency, **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var
