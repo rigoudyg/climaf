@@ -1455,7 +1455,10 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
             if not fileHasVar(filename, v):
                 raise Climaf_Classes_Error("No variable %s in file %s" % (v, filename))
     #
-    fperiod = timeLimits(filename)
+    try:
+        fperiod = timeLimits(filename)
+    except:
+        fperiod = None
     if period is None:
         if fperiod is None:
             period = "fx"
