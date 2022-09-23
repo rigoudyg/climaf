@@ -7,7 +7,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from optparse import OptionParser
 
 from climaf.api import *
-from climaf.html import *
+from climaf.chtml import *
 from climaf import cachedir
 
 

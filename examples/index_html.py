@@ -18,7 +18,7 @@ import os
 import os.path
 
 from climaf.api import *
-from climaf.html import *
+from climaf.chtml import *
 from climaf import cachedir
 
 # Some global variables

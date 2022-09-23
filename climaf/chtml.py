@@ -283,7 +283,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                print('index_atlas in html.py = ', index_atlas)
+                print('index_atlas in chtml.py = ', index_atlas)
                 try:
                     with open(os.path.expanduser(index_atlas), "rb") as atlas_index_r:
                         tt = pickle.load(atlas_index_r)
@@ -465,7 +465,7 @@ def fline(func, farg, sargs, title=None,
             print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
             return
         else:
-            sargs = OrderedDict(list(zip(repr(sargs), sargs)))
+            sargs = OrderedDict(list([(repr(sarg), sarg) for sarg in sargs]))
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]

@@ -12,7 +12,7 @@ import os
 # Created : S.Sénési - 2014
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
-           "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
+           "operators", "period", "standard_operators", "cmacro", "chtml.py", "functions", "plot",
            "projects", "derived_variables", "ESMValTool_diags"]
 
 

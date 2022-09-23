@@ -15,7 +15,7 @@ from env.environment import *
 from climaf.cache import setNewUniqueCache, craz
 from climaf import __path__ as cpath
 from climaf.api import ccdo, select, time_average, plot, cfile, ds, craz
-from climaf.html import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
+from climaf.chtml import header, section, vspace, link_on_its_own_line, line, open_table, close_table, open_line, \
     close_line, cell, fline, flines, trailer
 
 
