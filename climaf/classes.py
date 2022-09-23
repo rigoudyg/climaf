@@ -32,6 +32,18 @@ from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
 
 
+def derive_cproject(name, parent_name, new_project_facets=list()):
+    if name in cprojects or any([elt.project == name for elt in locs]):
+        raise Climaf_Classes_Error("Could not derive a project from an existing one if it already exists: %s." % name)
+    else:
+        import pprint
+        print(parent_name, name)
+        cprojects[parent_name].derive(name, new_project_facets)
+        pprint.pprint(cprojects[name])
+        [elt.derive(name) for elt in locs if elt.project == parent_name]
+        pprint.pprint(locs)
+
+
 class cproject(object):
     def __init__(self, name, *args, **kwargs):
         """
@@ -140,6 +152,20 @@ class cproject(object):
         self.attributes_for_ensemble = ['simulation']
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
+
+    def derive(self, new_name, new_facets=list()):
+        args = list()
+        for a in self.facets:
+            if a in self.facet_defaults:
+                args.append((a, self.facet_defaults[a]))
+            else:
+                args.append(a)
+        args.extend(new_facets)
+        kwargs = dict()
+        kwargs["separator"] = self.separator
+        if len(self.attributes_for_ensemble) > 1:
+            kwargs["ensemble"] = self.attributes_for_ensemble[1:]
+        return cproject(new_name, *args, **kwargs)
 
     def __repr__(self):
         return self.crs

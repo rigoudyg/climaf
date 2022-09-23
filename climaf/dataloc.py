@@ -181,6 +181,10 @@ class dataloc(object):
         if not (any([loc == self for loc in locs])):
             locs.append(self)
 
+    def derive(self, name):
+        return dataloc(project=name, organization=self.organization, url=self.urls, model=self.model,
+                       simulation=self.simulation, realm=self.realm, table=self.table, frequency=self.frequency)
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__

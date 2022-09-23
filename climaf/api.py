@@ -91,7 +91,7 @@ from .projects import *
 #############################################################################################
 #
 from climaf.classes import cdef, cdataset, ds, cproject, cpage, \
-    cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms
+    cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms, derive_cproject
 from climaf.cmacro import macro
 from climaf.driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from climaf.dataloc import dataloc
