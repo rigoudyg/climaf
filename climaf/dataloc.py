@@ -246,7 +246,8 @@ def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     return rep
 
 
-def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None, use_frequency=False, **kwargs):
+def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None,
+                use_frequency=False, **kwargs):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided

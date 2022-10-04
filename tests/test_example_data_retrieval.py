@@ -84,7 +84,8 @@ class DataRetrieval_1(unittest.TestCase):
         calias("data_CNRM", "vo", filenameVar="grid_V_table2.3")
         a = ds(project="data_CNRM", variable="uo", simulation="PRE6CPLCr2alb", period="199001")
         cfile(a)
-        self.assertEqual(a.baseFiles(), "/cnrm/est/COMMON/climaf/test_data/PRE6CPLCr2alb/O/PRE6CPLCr2alb_1m_19900101_19900131_grid_U_table2.3.nc")
+        self.assertEqual(a.baseFiles(), "/cnrm/est/COMMON/climaf/test_data/PRE6CPLCr2alb/O/"
+                                        "PRE6CPLCr2alb_1m_19900101_19900131_grid_U_table2.3.nc")
 
     def tearDown(self):
         craz()

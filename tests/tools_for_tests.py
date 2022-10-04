@@ -7,6 +7,7 @@ Tools to deal with tests.
 
 from __future__ import unicode_literals, absolute_import, print_function, division
 
+import os
 import unittest
 import re
 import six
@@ -54,7 +55,8 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     return list_figures, content
 
 
-def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None):
+def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None,
+                       by=None, allow_url_change=False):
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
     file_ref = os.path.sep.join([dir_ref, file_ref_name])
@@ -77,13 +79,21 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None):
     list_figures_test, content_test = get_figures_and_content_from_html(file_test, fig_regexp, patterns_to_exclude,
                                                                         add_dir=True)
     list_figures_ref, content_ref = get_figures_and_content_from_html(file_ref, fig_regexp, patterns_to_exclude)
+    if allow_url_change:
+        url_line_pattern = "<a href=.*Back to C-ESM-EP frontpage.*</a>"
+        text = re.findall(url_line_pattern, content_ref)[0]
+        content_ref = content_ref.replace(text, "")
+        text = re.findall(url_line_pattern, content_test)[0]
+        content_test = content_test.replace(text, "")
+    if replace is not None:
+        content_ref = content_ref.replace(replace, by)
     if content_test != content_ref:
         raise ValueError("The content of files %s and %s are different\n%s\n!=\n%s" % (file_test, file_ref,
                                                                                        content_test, content_ref))
     if len(list_figures_ref) != len(list_figures_test):
         raise ValueError("The number of figures if different in %s and %s" % (file_test, file_ref))
     for (fig_ref, fig_test) in zip(list_figures_ref, list_figures_test):
-        compare_picture_files(fig_test, fig_ref, dir_ref, dir_ref_default=None)
+        compare_picture_files(fig_test, fig_ref, dir_ref, dir_ref_default=None, display_error=display_error)
 
 
 def compare_text_files(file_test, file_ref, **kwargs):
@@ -167,8 +177,14 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
                               shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if rep != 0:
+            tmp_dir = os.sep.join([os.path.dirname(file_test), "..", "tmp"])
+            os.makedirs(tmp_dir, exist_ok=True)
+            cfile(object_test, target=os.sep.join([tmp_dir, os.path.basename(file_test)]))
             if display_error:
-                subprocess.check_call(display_cmd.format(diff_file), shell=True)
+                try:
+                    subprocess.check_call(display_cmd.format(diff_file), shell=True)
+                except subprocess.SubprocessError:
+                    print("Could not display %s" % diff_file)
             os.remove(diff_file)
             raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))
         else:

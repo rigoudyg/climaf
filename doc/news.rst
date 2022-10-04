@@ -8,10 +8,15 @@ Changes, newest first:
 
 - V3.0:
 
-  - Python2 compatibility is dropped in this version.
+  - Compatibility break:
 
-  - climaf module `html` has been renamed `chtml` to avoid conflicts with python
-    standard package `html`
+    - Python2 compatibility is dropped in this version.
+
+    - climaf module `html` has been renamed `chtml` to avoid conflicts with python
+      standard package `html`
+
+  - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
+    at TGCC on machine 'irene' and 'irene-amd' (including tests suite)
 
   - function :py:func:`~climaf.classes.fds` now sets the dataset's
     frequency using file's global attribute 'frequency'
@@ -20,6 +25,9 @@ Changes, newest first:
     been reworked, accepts flags for setting what to check, and
     provides a consistent return value (which can be None if a
     decision cannot be made)
+
+  - default is now to deactivate optimization for CMIP6 data indexing,
+    which seems buggy
 
   - when dealing with netcdf files without time bounds, it must be specified
     when the project is defined using option 'use_frequency=True'. 'frequency'
@@ -34,6 +42,12 @@ Changes, newest first:
       provided by module nectdfbasics are used throughout CliMAF code,
       except for a very few calls to xarray (in driver.cread and
       classes.cdatset.check)
+
+    - remove dependency to module 'cesemp_env' in bin/climaf
+
+    - ease installation by embarking epstopdf
+
+    - fix bugs in find_files (for case period = fx), in clist
 
 - V2.0.2:
 

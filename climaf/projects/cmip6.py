@@ -19,7 +19,7 @@ Example for a CMIP6 dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -28,7 +28,7 @@ root = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/work/cont003/cmip6/cmip6"
-if onCiclad:
+if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/bdd"
     # root="/ccc/work/cont003/cmip6/cmip6"

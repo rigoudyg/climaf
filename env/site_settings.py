@@ -14,6 +14,7 @@ atCNRM = False
 atCerfacs = False
 atIPSL = False
 onCiclad = False
+onSpirit = False
 atTGCC = False
 onAda = False
 onErgon = False
@@ -32,6 +33,9 @@ if os.path.exists('/cnrm'):
     atCNRM = True
 if 'ciclad' in HostName or 'loholt' in HostName or 'ipsl.polytechnique.fr' in HostName or 'climserv' in HostName:
     onCiclad = True
+    atIPSL = True
+if 'spirit' in HostName:
+    onSpirit = True
     atIPSL = True
 if 'ada' in HostName:
     onAda = True

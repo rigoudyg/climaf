@@ -200,9 +200,9 @@ def load_standard_operators():
     #
     if os.system("type exiv2 >/dev/null 2>&1") == 0:
         cscript('cepscrop',
-                'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
-                                                                    'pdftops -eps tmpfile-crop.pdf ${out}; '
-                                                                    'rm -f tmpfile.pdf tmpfile-crop.pdf ',
+                binpath + 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
+                                                                              'pdftops -eps tmpfile-crop.pdf ${out}; '
+                                                                              'rm -f tmpfile.pdf tmpfile-crop.pdf ',
                 format="eps")
     #
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
@@ -299,7 +299,7 @@ def load_standard_operators():
             _var='slope')
     #
     # ml2pl (only on Ciclad)
-    if onCiclad:
+    if onCiclad or onSpirit:
         cscript("ml2pl", scriptpath + "ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
         fixed_fields("ml2pl", ("press_levels.txt", scriptpath + "press_levels.txt"))

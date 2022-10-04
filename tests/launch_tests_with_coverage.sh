@@ -18,6 +18,8 @@ else
     run_command_line="python${python_version}"
 fi
 
+run_command_line="$run_command_line -W ignore::DeprecationWarning:pycompat"
+
 # Add CliMAF path to environment
 export PYTHONPATH=$PWD/..:$PYTHONPATH
 

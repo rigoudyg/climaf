@@ -17,6 +17,8 @@ import os.path
 from collections import defaultdict
 from functools import reduce, partial
 import six
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import json
 import shutil
 import glob
@@ -935,7 +937,8 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s" % repr(dic))
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency, **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency,
+                            **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var
@@ -986,7 +989,8 @@ class cdataset(cobject):
                     elif kw in ["period", ]:
                         error_msg.append("Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
                     else:
-                        error_msg.append("Wildcard attribute %s is ambiguous %s" % (kw, str(ambiguous_dict[kw])))
+                        error_msg.append("Wildcard attribute %s is ambiguous %s for dataset %s" %
+                                         (kw, str(ambiguous_dict[kw]), self))
                 raise Climaf_Classes_Error(" ".join(error_msg))
             else:
                 dic.update(**non_ambiguous_dict)

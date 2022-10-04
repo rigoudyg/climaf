@@ -262,7 +262,6 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
 
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
-            from datetime import datetime
             nbs = []
             from random import randrange
             nb = randrange(1, 10000000000)

@@ -18,6 +18,8 @@ import time
 import datetime
 import logging
 #
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 import xarray as xr
 #
 from env.environment import *

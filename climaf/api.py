@@ -78,7 +78,7 @@ import os
 #
 from env.environment import *
 from env.clogging import clogger, clog, clog_file, logdir
-from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
+from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC, atIDRIS, atIPSL, onSpip
 #
 import climaf
 

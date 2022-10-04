@@ -5,6 +5,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import datetime
 import re
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import xarray as xr
 import six
 from datetime import timedelta
@@ -21,11 +23,14 @@ def varOfFile(filename):
         if "aire" in lvars:
             # Special case of IPSL-CM 'Analyse' outputs
             lvars.remove("aire")
+        if "area" in lvars:
+            # Special case of IPSL-CM CMIP6 NEMO published outputs
+            lvars.remove("area")
         for var in lvars.copy():
             if re.findall("_b(ou)?nds$", var):
                 lvars.remove(var)
     if len(lvars) > 1:
-        clogger.debug("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
+        clogger.error("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
         return None
     if len(lvars) == 1:
         return lvars[0]
@@ -36,15 +41,17 @@ def varsOfFile(filename, all=False):
     Returns the list of variable names in NetCDF file FILENAME. If ALL is False
     only variable which are not dimensions nor scalar coordinates are returned
     """
+    lvars = list()
     with xr.open_dataset(filename, decode_times=False) as ds:
-        lvars = set(list(ds.variables))
+        lvars = set(list(ds.variables.keys()))
         if all is False:
             # remove dimensions
             lvars = lvars - set(list(ds.dims))
             # Remove scalar coordinates
             lvars = [elt for elt in lvars if not(hasattr(ds[elt], "axis") or hasattr(ds[elt], "bounds"))]
             # Remove variables which are related to dimensions (e.g. dim bounds....)
-            lvars = [elt for elt in lvars if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", elt)]
+            lvars = [elt for elt in lvars
+                     if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", elt)]
         else:
             lvars = lvars & set(list(ds.dim))
     return sorted(list(lvars))
@@ -198,7 +205,7 @@ def convert_date_string_to_datetime(a_date):
         clogger.error("The entry date has a length of %d, can not handle it" % len(a_date))
         raise ValueError("The entry date has a length of %d, can not handle it" % len(a_date))
     return datetime.datetime.strptime(a_date, pattern)
-            
+
 
 def isVerticalLevel(varname):
     return varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] \

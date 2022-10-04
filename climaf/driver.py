@@ -19,6 +19,9 @@ import tempfile
 from datetime import datetime
 from functools import reduce
 from six import string_types
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xarray import open_dataset as xr_open_dataset
 import subprocess
 
@@ -1076,8 +1079,13 @@ def cread(datafile, varname=None, period=None):
             raise Climaf_Error("File %s doesn't have requested variable %s" % (datafile, varname))
         if period is not None:
             clogger.warning("Cannot yet select on period (%s) using CMa for files %s - TBD" % (period, datafile))
-        with xr_open_dataset(datafile, use_cftime=True, mask_and_scale=True) as f:
-            return f[varname].to_masked_array(copy=False)
+        try:
+            with xr_open_dataset(datafile, use_cftime=True, mask_and_scale=True) as f:
+                return f[varname].to_masked_array(copy=False)
+        except ValueError:
+            with xr_open_dataset(datafile, decode_times=False, mask_and_scale=True) as f:
+                clogger.error("Error (but going on anyway) : cannot use cftime when reading file %s : ", datafile)
+                return f[varname].to_masked_array(copy=False)
     else:
         clogger.error("cannot yet handle %s" % datafile)
         return None
@@ -1144,7 +1152,7 @@ def set_variable(obj, varname, format):
     if format == 'file':
         oldvarname = varOfFile(obj)
         if not oldvarname:
-            raise Climaf_Driver_Error("Cannot set variable name for a multi-variable dataset: %s " % oldvarname)
+            raise Climaf_Driver_Error("Cannot change variable name in file : %s " % obj)
         if oldvarname != varname:
             command = "ncrename -v %s,%s %s >/dev/null 2>&1" % (oldvarname, varname, obj)
             if os.system(command) != 0:

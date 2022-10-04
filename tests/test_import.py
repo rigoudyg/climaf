@@ -28,7 +28,7 @@ testmodules = [
     "climaf.driver",
     "climaf.easyCMIP_functions",
     "climaf.functions",
-    "climaf.html",
+    "climaf.chtml",
     "climaf.netcdfbasics",
     "climaf.operators",
     "climaf.operators_derive",
