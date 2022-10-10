@@ -141,7 +141,7 @@ class HtmlIndexCreation(unittest.TestCase):
                            dir_ref_default=self.default_reference_directory)
 
     def tearDown(self):
-        pass  # craz()
+        craz()
 
 
 if __name__ == '__main__':

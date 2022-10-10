@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+
+#####
+# Launch the unitary tests for CliMAF
+# args:
+#     - report_ensemble (if run_coverage is 1), default 1: if 1, coverage is computed for the whole CliMAF package, if 0 by module
+#     - python_version, default 3: the python version to be used
+#     - run_modules, default all: the list of test modules to be launched
+#     - run_coverage, default 0: 1 coverage is on, 0 coverage is off
+#     - plot_config, default default: the set of config used to generate plots, there is a set by default but it could not be the good one depending on the system install
+#####
+set -e
 
 report_ensemble=${1:-1}
 echo $report_ensemble
@@ -43,20 +55,11 @@ for module in $run_modules; do
     echo $PWD
     if [ $run_coverage -eq 0 ] ; then
         ${run_command_line} "test_${module}.py"
-        if [ ! $? -eq 0 ] ; then
-            exit 1
-        fi
     else
         if [[ "$report_ensemble" == "1" ]]; then
             ${run_command_line} --source=climaf,scripts "test_${module}.py"
-            if [ ! $? -eq 0 ] ; then
-                exit 1
-            fi
         else
             ${run_command_line} --source="climaf.${module}" "test_${module}.py"
-            if [ ! $? -eq 0 ] ; then
-                exit 1
-            fi
         fi
     fi
 done
