@@ -215,14 +215,14 @@ def register(filename, crs, costs, outfilename=None):
             # while time.time() < os.path.getmtime(filename) + 0.2 : time.sleep(0.2)
             if re.findall(".nc$", filename) and ncatted_software is not None:
                 command = "%s -h -a CRS_def,global,o,c,\"%s\" -a CliMAF,global,o,c,\"CLImate Model Assessment " \
-                          "Framework version %s (http://climaf.rtfd.org)\" %s" % (ncatted_software, crs, version,
+                          "Framework version %s (http://climaf.rtfd.org)\" %s" % (ncatted_software, crs, climaf_version,
                                                                                   filename)
             elif re.findall(".png$", filename) and convert_software is not None:
                 crs2 = crs.replace(r"%", r"\%").replace(r'"', r'\"')
                 command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
-                          (convert_software, crs2, version, filename, filename, filename, filename)
+                          (convert_software, crs2, climaf_version, filename, filename, filename, filename)
             elif re.findall(".pdf$", filename) and pdftk_software is not None:
                 tmpfile = str(uuid.uuid4())
                 command = "%s %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
@@ -232,7 +232,7 @@ def register(filename, crs, costs, outfilename=None):
             elif re.findall(".eps$", filename) and exiv2_software is not None:
                 command = '%s -M"add Xmp.dc.CliMAF CLImate Model Assessment Framework version %s ' \
                           '(http://climaf.rtfd.org)" -M"add Xmp.dc.CRS_def %s" %s' % \
-                          (exiv2_software, version, crs, filename)
+                          (exiv2_software, climaf_version, crs, filename)
             else:
                 command = None
             if command is None:
