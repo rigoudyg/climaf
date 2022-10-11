@@ -98,6 +98,7 @@ optimize_cmip6_wildcards = False  # (buggy - SS - 2022/01/07 - don't find some d
 # True means mandatory. None means : please try. False means : don't try
 stamping = True
 
+#: For development usage, the list of projects for which the check on valid values will not raise an error
 bypass_valid_check_for_project = []
 
 

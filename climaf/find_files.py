@@ -363,7 +363,7 @@ def store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_perio
     """
     
     #
-    # first check that all facet values belong to the list of autorized
+    # first check that all facet values belong to the list of authorized
     # values possibly defined for each facet. Return False otherwise
     project = kwargs["project"]
     proj = cprojects[project]
