@@ -182,6 +182,11 @@ class dataloc(object):
             locs.append(self)
 
     def derive(self, name):
+        """
+        Create data location for a new project by copying the one existing for the current project.
+        :param name: name of the new project
+        :return: the data location for the new project
+        """
         return dataloc(project=name, organization=self.organization, url=self.urls, model=self.model,
                        simulation=self.simulation, realm=self.realm, table=self.table, frequency=self.frequency)
 

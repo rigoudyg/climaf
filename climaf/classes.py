@@ -35,6 +35,15 @@ from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, 
 
 
 def derive_cproject(name, parent_name, new_project_facets=list()):
+    """
+    Create a new project named 'name' from the project 'parent_name' adding the facets listed in 'new_project_facets'
+    if specified. Also derive the location list from the parent project.
+
+    :param name: name of the new project
+    :param parent_name: name of the source project
+    :param new_project_facets: the list of the facets to add to the new project (could be already present in parent).
+    :return: the new project
+    """
     if name in cprojects or any([elt.project == name for elt in locs]):
         raise Climaf_Classes_Error("Could not derive a project from an existing one if it already exists: %s." % name)
     else:
@@ -62,6 +71,8 @@ class cproject(object):
             - ``ensemble`` for declaring a list of attribute
               names which are allowed for defining an ensemble in
               this project ('simulation' is automatically allowed)
+            - ``use_frequency`` to declare that the frequency can not be derived from time bounds of the file.
+              In this case the facet ``frequency`` is mandatory for the project and a default value must be defined.
 
         Returns : a cproject object, which string representation is
         the pattern later used in CliMAF Refreence Syntax for
@@ -153,6 +164,12 @@ class cproject(object):
         self.use_frequency = kwargs.get("use_frequency", False)
 
     def derive(self, new_name, new_facets=list()):
+        """
+        Derive a new project from this one with name 'new_name' and possibly new facets listed in 'new_facets'
+        :param new_name: name of the newly created project
+        :param new_facets: list of the new facets
+        :return: the new project
+        """
         args = list()
         for a in self.facets:
             if a in self.facet_defaults:
@@ -1076,7 +1093,7 @@ class cdataset(cobject):
         - if frequency is True : check if data frequency is consistent with dataset frequency
         - if gap is True : check if file data have a gap
         - if period is True : check if period covered by data actually includes the
-          whole of dataset period
+        whole of dataset period
 
         Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
         """

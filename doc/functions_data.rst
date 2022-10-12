@@ -68,6 +68,13 @@ cproject : declare a new project and its non-standard attributes/facets
 
 .. autoclass:: climaf.classes.cproject
 
+
+derive_cproject : create a new project from an existing one by changing its name and possibly its facets
+--------------------------------------------------------------------------------------------------------
+
+.. autofunction:: climaf.classes.derive_cproject
+
+
 cprojects : dictionary of known projects
 --------------------------------------------------------------------------
 

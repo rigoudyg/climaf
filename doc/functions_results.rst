@@ -46,49 +46,49 @@ cpage_pdf : create an array of figures (output: 'pdf' figure)
 html : create an html index, with tables of links to figures
 ------------------------------------------------------------
 
-.. automodule:: climaf.html
+.. automodule:: climaf.chtml
    :noindex:
 
-.. autofunction:: climaf.html.header
+.. autofunction:: climaf.chtml.header
    :noindex:
 
-.. autofunction:: climaf.html.trailer
+.. autofunction:: climaf.chtml.trailer
    :noindex:
 
-.. autofunction:: climaf.html.section
+.. autofunction:: climaf.chtml.section
    :noindex:
 
-.. autofunction:: climaf.html.open_table
+.. autofunction:: climaf.chtml.open_table
    :noindex:
 
-.. autofunction:: climaf.html.close_table
+.. autofunction:: climaf.chtml.close_table
    :noindex:
 
-.. autofunction:: climaf.html.open_line
+.. autofunction:: climaf.chtml.open_line
    :noindex:
 
-.. autofunction:: climaf.html.close_line
+.. autofunction:: climaf.chtml.close_line
    :noindex:
 
-.. autofunction:: climaf.html.line
+.. autofunction:: climaf.chtml.line
    :noindex:
 
-.. autofunction:: climaf.html.link
+.. autofunction:: climaf.chtml.link
    :noindex:
 
-.. autofunction:: climaf.html.link_on_its_own_line
+.. autofunction:: climaf.chtml.link_on_its_own_line
    :noindex:
 
-.. autofunction:: climaf.html.cell
+.. autofunction:: climaf.chtml.cell
    :noindex:
 
-.. autofunction:: climaf.html.fline
+.. autofunction:: climaf.chtml.fline
    :noindex:
 
-.. autofunction:: climaf.html.flines
+.. autofunction:: climaf.chtml.flines
    :noindex:
 
-.. autofunction:: climaf.html.vspace
+.. autofunction:: climaf.chtml.vspace
    :noindex:
    
 
