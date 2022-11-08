@@ -13,11 +13,11 @@ def set_CMIP6_valid_values(project):
 
     proj = cprojects[project]
     
-    proj.cvalid('institute', ['AS-RCEC', 'CCCma', 'CSIRO-ARCCSS', 'INM', 'MPI-M',
+    proj.cvalid('institute', ['AS-RCEC', 'CCCma', 'CSIRO-ARCCSS', 'INM', 'MPI-M','DKRZ',
                               'NIMS-KMA', 'UA', 'AWI', 'CCCR-IITM', 'E3SM-Project',
                               'IPSL', 'MRI', 'NOAA-GFDL', 'BCC', 'CMCC', 'EC-Earth-Consortium',
                               'KIOST', 'NASA-GISS,' 'NUIST', 'CAMS', 'CNRM-CERFACS',
-                              'FIO-QLNM', 'MIROC', 'NCAR', 'SNU', ' CAS', 'CSIRO',
+                              'FIO-QLNM', 'MIROC', 'NCAR', 'SNU', 'CAS', 'CSIRO',
                               'HAMMOZ-Consortium', 'MOHC', 'NCC', 'THU']
                 )
     proj.cvalid('model', ["UKESM1-0-LL", "HadGEM3-GC31-LL", "MRI-ESM2-0",
