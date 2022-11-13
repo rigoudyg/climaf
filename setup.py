@@ -4,6 +4,8 @@
 from setuptools import find_packages
 from setuptools import setup
 
+import env
+
 #version = __import__('climaf.cache').climaf_version
 version = env.environment.climaf_version
 description = 'CliMAF: a Climate Model Assessment Framework.'
