@@ -1,10 +1,10 @@
 {
   "institute": [
-    "AS-RCEC", "CCCma", "CSIRO-ARCCSS", "INM", "MPI-M",
+      "AS-RCEC", "CCCma", "CSIRO-ARCCSS", "INM", "MPI-M", "DKRZ",
     "NIMS-KMA", "UA", "AWI", "CCCR-IITM", "E3SM-Project",
     "IPSL", "MRI", "NOAA-GFDL", "BCC", "CMCC", "EC-Earth-Consortium",
     "KIOST", "NASA-GISS", "NUIST", "CAMS", "CNRM-CERFACS",
-    "FIO-QLNM", "MIROC", "NCAR", "SNU", " CAS", "CSIRO",
+    "FIO-QLNM", "MIROC", "NCAR", "SNU", "CAS", "CSIRO",
     "HAMMOZ-Consortium", "MOHC", "NCC", "THU"
   ],
   "model": [
