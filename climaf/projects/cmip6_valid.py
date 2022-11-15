@@ -16,7 +16,7 @@ def set_CMIP6_valid_values(project):
     proj.cvalid('institute', ['AS-RCEC', 'CCCma', 'CSIRO-ARCCSS', 'INM', 'MPI-M','DKRZ',
                               'NIMS-KMA', 'UA', 'AWI', 'CCCR-IITM', 'E3SM-Project',
                               'IPSL', 'MRI', 'NOAA-GFDL', 'BCC', 'CMCC', 'EC-Earth-Consortium',
-                              'KIOST', 'NASA-GISS,' 'NUIST', 'CAMS', 'CNRM-CERFACS',
+                              'KIOST', 'NASA-GISS', 'NUIST', 'CAMS', 'CNRM-CERFACS',
                               'FIO-QLNM', 'MIROC', 'NCAR', 'SNU', 'CAS', 'CSIRO',
                               'HAMMOZ-Consortium', 'MOHC', 'NCC', 'THU']
                 )
