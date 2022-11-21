@@ -331,6 +331,10 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Then, if needed, deal with the operator
     clogger.debug("Operator considered: %s" % operator)
     if operator is not None:
+        # Discard leading '-' if any
+        if operator[0] == '-':
+            operator = operator[1:]
+        #
         if apply_operator_after_merge:
             cdo_commands_after_merge.append("-{}".format(operator))
         else:
