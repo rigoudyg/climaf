@@ -17,7 +17,7 @@ import time
 import shutil
 import six
 
-from env.site_settings import onCiclad
+from env.site_settings import onCiclad, onSpirit
 from env.clogging import clogger, clog
 
 
@@ -271,7 +271,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Find out which command must be used for cdo
     # For the time being, at most sites, must use NetCDF3 file format chained CDO
     # operations because NetCDF4 is not threadsafe there
-    if onCiclad and not running_climaf_tests:
+    if (onCiclad or onSpirit) and not running_climaf_tests:
         init_cdo_command = "cdo -O"
     else:
         init_cdo_command = "cdo -O -f nc"

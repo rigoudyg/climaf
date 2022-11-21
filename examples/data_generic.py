@@ -86,7 +86,7 @@ my_file = cfile(rst)
 # Access OCMIP5 data on Ciclad (see comments above)
 # ---------------------------------------------------------------
 
-if onCiclad:
+if onCiclad or onSpirit:
     # These definitions are now built-in :
     # cproject("OCMIP5","model","frequency")
     # cfreqs('OCMIP5',{'monthly':'mon' })
