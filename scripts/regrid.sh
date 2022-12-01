@@ -15,8 +15,8 @@ var=$4
 option=${5:-remapbil}
 if [ -f $fieldgrid ] ; then 
     cdo griddes $fieldgrid > climaf_tmp_grid_$$
-    cdo $option,climaf_tmp_grid_$$ -selname $var $fieldin $fieldout 
+    cdo $option,climaf_tmp_grid_$$ -selname,$var $fieldin $fieldout 
     rm climaf_tmp_grid_$$
 else
-    cdo $option,$fieldgrid $fieldin $fieldout 
+    cdo $option,$fieldgrid -selname,$var $fieldin $fieldout 
 fi
