@@ -99,11 +99,11 @@ def load_standard_operators():
 
     #
     cscript('regrid',
-            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridn',
-            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridll', scriptpath + 'regridll.sh ${in} ${out} ${cdogrid} '
