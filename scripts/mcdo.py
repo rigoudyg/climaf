@@ -55,9 +55,11 @@ def parse_args():
     parser.add_argument("--operator", type=correct_args_type, help="Operator to be applied")
     parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
                         help="If True, the operator is applied after merge time. If false, it is applied before.")
+    parser.add_argument("--seldate_is_first", type=bool, default=True,
+                        help="If True, period selection occurs before any other operation.")
     parser.add_argument("--output_file", type=correct_args_type, help="Name of the output file")
     parser.add_argument("--var", "--variable", dest="variable", type=correct_args_type,
-                        help="Variable to be considered")
+                        help="Variable to be considered", default=None)
     parser.add_argument("--period", type=correct_args_type, help="Period to be considered")
     parser.add_argument("--region", type=correct_list_args,
                         help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
@@ -189,12 +191,32 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
         return file_to_treat
 
 
-def call_subprocess(command, test=None):
+def call_subprocess(command, test=None, allow_seldate_failure=False):
+    # Execute command in a subprocess.
+
+    # On request, allow for non-zero return code in case command
+    # includes 'cdo ... seldate' and stderr shows evidence that this
+    # seldate operation failed (and then return False)
+    
     clogger.debug("Command launched %s" % command)
     clogger.debug("Time at launch %s" % time.time())
     print_in_file(command, output_file=test)
-    clogger.debug(subprocess.check_output(command, shell=True))
+    proc=subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    clogger.debug(proc.stdout)
     clogger.debug("Time at end %s" % time.time())
+    if proc.returncode != 0 :
+        if allow_seldate_failure and \
+           re.match(".*cdo.*seldate",command) and \
+           re.match(".*cdo.*seldate.*No timesteps selected!",str(proc.stdout)):
+            return False
+        else:
+            raise subprocess.CalledProcessError(
+                returncode=proc.returncode,
+                cmd=command,
+                output=proc.stdout)
+    else:
+        return True
+
 
 
 def remove_dir_and_content(path_to_treat):
@@ -260,7 +282,7 @@ def change_to_tmp_dir(func):
 
 @change_to_tmp_dir
 def main(input_files, output_file, tmp, original_directory, variable=None, alias=None, region=None, units=None, vm=None,
-         period=None, operator=None, apply_operator_after_merge=None, test=None,
+         period=None, operator=None, apply_operator_after_merge=None, seldate_is_first=True, test=None,
          running_climaf_tests=False):
     # Initialize cdo commands
     cdo_commands_before_merge = list()
@@ -302,7 +324,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Then, if needed, change the units
     clogger.debug("Units considered: %s" % units)
     if units is not None:
-        if var is None:
+        if variable is None:
             clogger.error("Units can be used only if variable or alias is specified")
             raise Exception("Units can be used only if variable or alias is specified")
         else:
@@ -318,15 +340,15 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
         cdo_command_for_merge = "-mergetime"
 
     # Then deal with date selection
+    seldate=""
     clogger.debug("Period considered: %s" % period)
     if period is not None:
-        print("type(str) = ", type(period))
-        print("period = ", period)
         seldate = "-seldate,{}".format(period)
         clim_time_fix = clim_timefix(input_files[0])
         if clim_time_fix is not None:
             seldate = " ".join([seldate, clim_time_fix])
-        cdo_commands_after_merge.append(seldate)
+        if not seldate_is_first:
+            cdo_commands_after_merge.append(seldate)
 
     # Then, if needed, deal with the operator
     clogger.debug("Operator considered: %s" % operator)
@@ -366,17 +388,28 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
                 total_cdo_commands_before_merge = cdo_commands_before_merge
             else:
                 total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+            if seldate_is_first:
+                total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
             if len(total_cdo_commands_before_merge) > 0:
                 cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
                                        [a_file, tmp_file_path])
                 print_in_file(cdo_command, output_file=test)
-                call_subprocess(cdo_command)
+                command_succeed = call_subprocess(cdo_command, allow_seldate_failure=seldate_is_first)
                 os.remove(a_file)
-                shutil.move(tmp_file_path, a_file)
-            if not os.path.isfile(a_file):
-                clogger.error("Could not create the file %s" % a_file)
-                raise Exception("Could not create the file %s" % a_file)
-            files_to_treat_after_merging.append(a_file)
+                if command_succeed is True:
+                    shutil.move(tmp_file_path, a_file)
+                    if not os.path.isfile(a_file):
+                        clogger.error("Could not create file %s" % a_file)
+                        raise Exception("Could not create file %s" % a_file)
+                    files_to_treat_after_merging.append(a_file)
+                else :
+                    # Assume that seldate provided no data, and just ignore that file
+                    pass
+            else: 
+                if not os.path.isfile(a_file):
+                    clogger.error("Could not access file %s" % a_file)
+                    raise Exception("Could not access file %s" % a_file)
+                files_to_treat_after_merging.append(a_file)
         if cdo_command_for_merge is not None:
             tmp_output_file = find_tmp_filename(output_file, tmp)
             files_to_treat_after_merging = apply_cdo_command_on_slice(init_cdo_command=init_cdo_command,
@@ -394,6 +427,8 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
             total_cdo_commands_before_merge = cdo_commands_before_merge
         else:
             total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+        if seldate_is_first:
+            total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                list(reversed(total_cdo_commands_before_merge)) + files_to_treat_before_merging +
                                [output_file, ])
