@@ -6,6 +6,24 @@ What's new
 
 Changes, newest first:
 
+- V3.a:
+
+   - Running on machines `spirit` : all CliMAF examples have been
+     adapted; also, the default format set for CDO outputs is now
+     NetDCF4.
+
+   - Bugs :
+
+     - operators `regrid` and `regridn` take care of discarding any
+       ancillary variable in input data (such as `area` with `sos`),
+       in order that CDO succeeds in regriding
+     
+   - Internals :
+
+     - Engine mcdo.py now applies first the selection on date, in
+       order to take advantage of much improved CDO/NetCDF performance
+       on this operation
+
 - V3.0:
 
   - Compatibility break:
