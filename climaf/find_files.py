@@ -285,7 +285,12 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
         
     # Post-process wildcard facets values
     post_process_wildcard_facets_values(wildcards, return_wildcards, kwargs, periods_dict)
-    
+
+    if return_wildcards is not None and 'period' in return_wildcards:
+        for key in return_wildcards['period']:
+            return_wildcards['period'][key]=list(return_wildcards['period'][key])
+            clogger.info("Attribute period ='*' has values %s" % periods_dict)
+                
     return rep
 
 
