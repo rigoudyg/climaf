@@ -33,6 +33,8 @@ from climaf.period import init_period, cperiod, merge_periods, intersect_periods
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
 
+# Should function ds() try to resolve for period=*
+auto_resolve = False
 
 def derive_cproject(name, parent_name, new_project_facets=list()):
     """
@@ -1710,8 +1712,8 @@ def select_projects(**kwargs):
 
 
 def ds(*args, **kwargs):
-    """
-    Returns a dataset from its full Climate Reference Syntax string. Example ::
+    """Returns a dataset from its full Climate Reference Syntax
+    string. Example ::
 
      >>> ds('CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last')
 
@@ -1721,20 +1723,30 @@ def ds(*args, **kwargs):
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
-    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this
-    will work only if no dataset's attribute is ambiguous. 'first_50y' also works, similarly
+    In that latter case, you may use e.g. period='last_50y' to get the
+    last 50 years (or less) of data; but this will work only if no
+    dataset's attribute is ambiguous. 'first_50y' also works,
+    similarly; and also period='*'.
 
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
+
     """
     if len(args) > 1:
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
-            match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
-            if match is not None:
-                return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
-                                                   option=match.group('option').lower())
+            if kwargs['period'] == '*' and auto_resolve:
+                clogger.info('Trying to solve for period for %s'%kwargs)
+                if resolve_star_period(kwargs):
+                    # Case where there is a '*' only for period. kwargs has been modified
+                    clogger.info('Solved period = %s'%kwargs['period'])
+                    return cdataset(**select_projects(**kwargs))
+            else:
+                match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
+                if match is not None:
+                    return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
+                                                       option=match.group('option').lower())
         return cdataset(**select_projects(**kwargs))
 
     crs = args[0]
@@ -2378,6 +2390,24 @@ def timePeriod(cobject):
         return None  # clogger.error("unkown class for argument "+`cobject`)
 
 
+def resolve_star_period(kwargs):
+    
+    # If dict 'kwargs' has only kw 'period' with value '*', resolve
+    # corresponding dataset on period, and sets kwargs['period']
+    # accordingly (if dataset has only one corresponding period)
+    
+    if 'period' in kwargs and kwargs['period'] == '*' and \
+       not any([ "*" in kwargs[k] or "?" in kwargs[k] for k in kwargs if k != 'period' ]):
+        explorer=cdataset(**select_projects(**kwargs))
+        attributes = explorer.explore(option='choices')
+        if 'period' in attributes:
+            periods = attributes['period']
+            if len(periods) == 1:
+                kwargs['period'] = str(periods[0])
+                return True
+    return False
+    
+    
 def resolve_first_or_last_years(kwargs, duration, option="last"):
     # Returns a dataset after translation of period like 'last_50y'
     kwargs['period'] = '*'

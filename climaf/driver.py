@@ -213,11 +213,14 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
         ds_ambiguous_args = ds.explore("choices")
         if len(ds_ambiguous_args) != 0:
-            clogger.warning("Before doing a cfile on the dataset %s, check that it "
-                            "is completely defined with 'explore'." % cobject.crs)
             ds = ds.explore("resolve")
-            clogger.warning("Update dataset %s with the following arguments: %s" % (cobject.crs,
-                                                                                    str(ds_ambiguous_args)))
+            clogger.warning("When doing a cfile on dataset %s, we had to ensure that it "
+                            "is completely defined, using  method 'explore', by updating "
+                            "with the following arguments: %s" % (cobject.crs,
+                                                                  str(ds_ambiguous_args)))
+            clogger.warning("This was at the cost of querying the file system, more or "
+                            "less heavily. You may wish to add such attributes by yourself")
+            #clogger.debug("After resolve for ambiguous arg, updated dataset kvp is %s",str(ds.kvp))
     cache_value, costs = hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
@@ -790,9 +793,15 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict["labels"] = reduce(lambda x, y: x + "$" + y, op.order)
         if op:
             per = timePeriod(op)
-            if per and not per.fx and str(per) != "" and scriptCall.flags.canSelectTime:
-                subdict["period"] = str(per)
-                subdict["period_iso"] = per.iso()
+            if per and str(per) != "" and scriptCall.flags.canSelectTime:
+                if isinstance(per,string_types):
+                    if per != '*':
+                        clogger.error("Period type (%s) is wrong for object %s. Try method 'explore'"%(type(per),op))
+                    else:
+                        clogger.warning("Period is * for object %s; this may reveal an internal error"%op)
+                elif not per.fx: 
+                    subdict["period"] = str(per)
+                    subdict["period_iso"] = per.iso()
         if scriptCall.flags.canSelectDomain:
             subdict["domain"] = domainOf(op)
     else:

@@ -184,8 +184,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
             temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
             #
             # Do globbing with plain varname
+            clogger.info("Globbing with plain varname on %s " % (temp2))
             lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
-            clogger.debug("Globbed %d files with plain varname on %s : " % (len(lfiles), temp2))
+            clogger.info("Globbed %d files with plain varname on %s : " % (len(lfiles), temp2))
             #
             # If unsuccessful using varname, try with filenameVar
             if len(lfiles) == 0 and "filenameVar" in simple_kwargs and simple_kwargs['filenameVar']:
@@ -199,8 +200,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
                 #
                 # Do globbing with fileVarname
+                clogger.info("Globbing for filenamevar on %s " % (temp2))
                 lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
-                clogger.debug("Globbed %d files for filenamevar on %s: " % (len(lfiles), temp2))
+                clogger.info("Globbed %d files for filenamevar on %s: " % (len(lfiles), temp2))
             #
             # For registering encountered values for those facets which have a wildcard,
             # construct a regexp with a group name for all facets (but period)
