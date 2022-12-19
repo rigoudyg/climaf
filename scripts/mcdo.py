@@ -16,6 +16,7 @@ import subprocess
 import time
 import shutil
 import six
+import xarray as xr
 
 from env.site_settings import onCiclad, onSpirit
 from env.clogging import clogger, clog
@@ -79,11 +80,16 @@ def parse_args():
 
 # Define several auxiliary functions
 clim_timefix_pattern = re.compile(r'IGCM_OUT.*_SE_.*(?P<value>\d{4})_\d{4}_1M.*nc')
+
 nemo_fix_pattern_mon = re.compile(r'.*1m.*grid_T_table2\.2\.nc')
 nemo_fix_pattern_day = re.compile(r'.*1d.*grid_T_table2\.2\.nc')
 nemo_fix_pattern = re.compile(r'.*1[m|d].*grid_T_table2\.2\.nc')
-aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
 nemo_coordinates_pattern = re.compile(r'coord.*t_ave_01month|t_ave_00086400')
+
+aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
+
+IPSL_CMIP6_msftyz_filename_pattern = re.compile(r'.*msftyz_Omon_IPSL-CM6A.*\.nc')
+IPSL_CMIP6_msftyz_issue_pattern = re.compile(r'.*x = 1 ;.*') 
 
 
 def clim_timefix(file_to_treat):
@@ -165,7 +171,7 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
     if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not(re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
                                                               not(re.compile(r".*MED-11.*.nc").match(file_to_treat))):
-        current_command = ["ncdump", "-h", file_to_treat]
+        current_command = " ".join(["ncdump", "-h", file_to_treat])
         print_in_file(current_command, output_file=test)
         rep = subprocess.check_output(current_command, shell=True)
         rep = rep.split("\n")
@@ -189,6 +195,49 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
                 return out
     else:
         return file_to_treat
+
+def IPSL_CMIP6_msftyz_dimfix(file_to_treat, tmp_dir, filevar, test=None):
+    # Get rid of a degenerated dimension in IPSL CMIP6 outputs for variable msftyz
+    # Echoes the name of a file with suppressed dimension (be it a modified file or a copy)
+    # Creates an alternate file in $tmp if no write permission on orginal file and
+    # renaming is actually useful
+
+    if IPSL_CMIP6_msftyz_filename_pattern.match(file_to_treat):
+
+        clogger.debug("Filename matches IPSL CMIP6 msftyz data")
+        # Check that file metadata actually shows the issue,
+        # (namely a dimension x with size 1)
+        current_command = " ".join(["ncdump", "-h", file_to_treat])
+        print_in_file(current_command, output_file=test)
+        rep = subprocess.check_output(current_command, shell=True, text=True)
+        rep = rep.split("\n")
+
+        if any([IPSL_CMIP6_msftyz_issue_pattern.match(line) for line in rep]):
+            
+            clogger.debug("File content matches IPSL CMIP6 msftyz data")
+            # Create an alternate target filename
+            out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
+            if os.path.isfile(out):
+                os.remove(out)
+            
+            # Process orginal file to target file 
+            ds=xr.open_dataset(file_to_treat, decode_times=False)
+            ds['msftyz'] = ds['msftyz'].sel(x=0)
+            ds=ds.reset_coords(names=['nav_lat','nav_lon'])
+            ds=ds.drop(['nav_lat','nav_lon'])
+            ds.to_netcdf(out)
+
+            # If allowed, remove original file (which is a link) and
+            # rename target as original, otherwise return target filename
+            if os.access(file_to_treat, os.W_OK):
+                print_in_file("rm -f {}".format(file_to_treat), output_file=test)
+                os.remove(file_to_treat)
+                print_in_file("mv {} {}".format(out, file_to_treat), output_file=test)
+                shutil.move(out, file_to_treat)
+                return file_to_treat
+            else:
+                return out
+    return file_to_treat
 
 
 def call_subprocess(command, test=None, allow_seldate_failure=False):
@@ -378,6 +427,9 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
             l_file = nemo_timefix(l_file, tmp, test=test)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
             l_file = aladin_coordfix(l_file, tmp, filevar, test=test)
+        if os.environ.get("CLIMAF_FIX_IPSL_CMIP6_MSFTYZ", False):
+            clogger.debug('Considering a fix for IPSL CMIP6 msftyz data')
+            l_file = IPSL_CMIP6_msftyz_dimfix(l_file, tmp, filevar, test=test)
         files_to_treat_before_merging.append(l_file)
 
     if len(files_to_treat_before_merging) > 1:
