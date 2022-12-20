@@ -1,5 +1,5 @@
-cdo -O -f nc -sellonlatbox,10,350,-20,60 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1850.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1850.nc
-cdo -O -f nc -sellonlatbox,10,350,-20,60 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1851.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1851.nc
-cdo -O -f nc -sellonlatbox,10,350,-20,60 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1852.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1852.nc
+cdo -O -f nc -sellonlatbox,10,350,-20,60 -seldate,1850-06-01T00:00:00,1852-04-03T00:00:00 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1850.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1850.nc
+cdo -O -f nc -sellonlatbox,10,350,-20,60 -seldate,1850-06-01T00:00:00,1852-04-03T00:00:00 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1851.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1851.nc
+cdo -O -f nc -sellonlatbox,10,350,-20,60 -seldate,1850-06-01T00:00:00,1852-04-03T00:00:00 /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1852.nc /tmp/climaf_XXX/tmp_tas_Amon_CNRM-CM5_historical_r1i1p1_1852.nc
 cdo -O -f nc -mergetime /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1850.nc /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1851.nc /tmp/climaf_XXX/tas_Amon_CNRM-CM5_historical_r1i1p1_1852.nc /tmp/climaf_XXX/test_2.nc
-cdo -O -f nc -ymonavg -seldate,1850-06-01T00:00:00,1852-04-03T00:00:00 /tmp/climaf_XXX/test_2.nc _TEST_PATH_/test_2.nc
+cdo -O -f nc -ymonavg /tmp/climaf_XXX/test_2.nc  _TEST_PATH_/test_2.nc
