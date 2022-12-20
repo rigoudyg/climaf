@@ -6,17 +6,26 @@ What's new
 
 Changes, newest first:
 
-- V3.a:
+- V3.x:
 
    - Running on machines `spirit` : all CliMAF examples have been
      adapted; also, the default format set for CDO outputs is now
      NetDCF4.
+
+   - msftyz data for IPSLCM6 and CMIP6 are automatically fixed for
+     their degenerated dimension, provided environment variable
+     CLIMAF_FIX_IPSL_CMIP6_MSFTYZ is set (to any value)
+
+   - function ds() can resolve period=* if it is the only wildcard;
+     triggered by setting classes.auto_resolve to True
 
    - Bugs :
 
      - operators `regrid` and `regridn` take care of discarding any
        ancillary variable in input data (such as `area` with `sos`),
        in order that CDO succeeds in regriding
+
+     - fix on processing period=last_XX for a CMIP5 case
      
    - Internals :
 
