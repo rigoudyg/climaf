@@ -1493,7 +1493,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
             # raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
-    else:
+    elif period != 'fx':
         if fperiod and not fperiod.includes(init_period(period)):
             raise Climaf_Classes_Error("Max period from file %s is %s" % (filename, repr(fperiod)))
     #
@@ -1502,6 +1502,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     d.files = filename
 
     d.frequency = attrOfFile(filename, "frequency", "*")
+    if period == 'fx' :
+        d.frequency = 'fx'
 
     return d
 
