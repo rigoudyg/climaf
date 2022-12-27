@@ -42,6 +42,9 @@ Changes, newest first:
     - climaf module `html` has been renamed `chtml` to avoid conflicts with python
       standard package `html`
 
+    - because CliMAF now uses xarray as sole netcdf package, users on shared
+      machine must export OPENBLAS_NUM_THREADS=1 or another sensible value
+
   - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
     at TGCC on machine 'irene' and 'irene-amd' (including tests suite)
 
@@ -66,7 +69,7 @@ Changes, newest first:
 
   - technical :
 
-    - clean-up of nectdf libraries use : xarray becomes the sole
+    - clean-up of netcdf libraries use : xarray becomes the sole
       package used; module anynetcdf is discarded and only functions
       provided by module nectdfbasics are used throughout CliMAF code,
       except for a very few calls to xarray (in driver.cread and
