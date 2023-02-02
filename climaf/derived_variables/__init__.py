@@ -3,12 +3,12 @@
 
 from __future__ import print_function, division, absolute_import  # , unicode_literals
 
+from env.site_settings import *
+from env.environment import *
+
 # Some projects like atmosphere_derived_variables, others don't
 # __all__= [ "atmosphere_derived_variables", "ocean_derived_variables" ]
 __all__ = ["ocean_derived_variables", ]
-
-from env.site_settings import *
-from env.environment import *
 
 # -- Load only the ipsl derived variables if we are at IPSL
 if atIPSL:

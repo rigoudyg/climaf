@@ -165,7 +165,7 @@ class cperiod(object):
         else:
             year = int(year)
             return self.start <= datetime.datetime(year=year, month=1, day=1) and \
-                   datetime.datetime(year=year+1, month=1, day=1) <= self.end
+                datetime.datetime(year=year + 1, month=1, day=1) <= self.end
 
     #
     def start_with(self, begin):
@@ -403,9 +403,11 @@ def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=T
                 # print "last.end=",last.end,"next.start=",next_one.start
                 # if (last.end == next_one.start) :
                 #    already_merged[-1]=cperiod(last.start,next_one.end)
-                if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and last.end.day == 31
-                                                  and next_one.start.month == 1 and next_one.start.day == 1
-                                                  and next_one.start.year == last.end.year + 1):
+                if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and
+                                                  last.end.day == 31 and
+                                                  next_one.start.month == 1 and
+                                                  next_one.start.day == 1 and
+                                                  next_one.start.year == last.end.year + 1):
                     if next_one.end > last.end:
                         # the next period is not entirely included in the
                         # last merged one
@@ -512,7 +514,7 @@ def group_periods(diclist):
         output.append(dic)
     #
     return output
-        
+
 
 def freq_to_minutes(data_freq):
     """

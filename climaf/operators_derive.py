@@ -86,8 +86,8 @@ def derive(project, derivedVar, Operator, *invars, **params):
             derivedVar = dict(out=derivedVar)
         for outname in derivedVar:
             if (outname != 'out' and
-                    (not getattr(Operator, "outvarnames", None)
-                     or outname not in Operator.outvarnames)):
+                    (not getattr(Operator, "outvarnames", None) or
+                     outname not in Operator.outvarnames)):
                 raise Climaf_Operator_Error("%s is not a named  output for operator %s; type help(%s)" %
                                             (outname, Operator, Operator))
             s = cscripts[Operator]

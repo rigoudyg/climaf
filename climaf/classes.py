@@ -18,7 +18,6 @@ from collections import defaultdict
 from functools import reduce, partial
 import six
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 import json
 import shutil
 import glob
@@ -33,8 +32,11 @@ from climaf.period import init_period, cperiod, merge_periods, intersect_periods
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 # Should function ds() try to resolve for period=*
 auto_resolve = False
+
 
 def derive_cproject(name, parent_name, new_project_facets=list()):
     """
@@ -1502,7 +1504,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     d.files = filename
 
     d.frequency = attrOfFile(filename, "frequency", "*")
-    if period == 'fx' :
+    if period == 'fx':
         d.frequency = 'fx'
 
     return d
@@ -1739,10 +1741,10 @@ def ds(*args, **kwargs):
     if len(args) == 0:
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
             if kwargs['period'] == '*' and auto_resolve:
-                clogger.info('Trying to solve for period for %s'%kwargs)
+                clogger.info('Trying to solve for period for %s' % kwargs)
                 if resolve_star_period(kwargs):
                     # Case where there is a '*' only for period. kwargs has been modified
-                    clogger.info('Solved period = %s'%kwargs['period'])
+                    clogger.info('Solved period = %s' % kwargs['period'])
                     return cdataset(**select_projects(**kwargs))
             else:
                 match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
@@ -2302,28 +2304,36 @@ def domainOf(cobject):
             clogger.error("Unkown class for argument " + repr(cobject))
 
 
-def varOf(cobject): return attributeOf(cobject, "variable")
+def varOf(cobject):
+    return attributeOf(cobject, "variable")
 
 
-def modelOf(cobject): return attributeOf(cobject, "model")
+def modelOf(cobject):
+    return attributeOf(cobject, "model")
 
 
-def simulationOf(cobject): return attributeOf(cobject, "simulation")
+def simulationOf(cobject):
+    return attributeOf(cobject, "simulation")
 
 
-def experimentOf(cobject): return attributeOf(cobject, "experiment")
+def experimentOf(cobject):
+    return attributeOf(cobject, "experiment")
 
 
-def realizationOf(cobject): return attributeOf(cobject, "realization")
+def realizationOf(cobject):
+    return attributeOf(cobject, "realization")
 
 
-def projectOf(cobject): return attributeOf(cobject, "project")
+def projectOf(cobject):
+    return attributeOf(cobject, "project")
 
 
-def realmOf(cobject): return attributeOf(cobject, "realm")
+def realmOf(cobject):
+    return attributeOf(cobject, "realm")
 
 
-def gridOf(cobject): return attributeOf(cobject, "grid")
+def gridOf(cobject):
+    return attributeOf(cobject, "grid")
 
 
 def attributeOf(cobject, attrib):
@@ -2393,14 +2403,14 @@ def timePeriod(cobject):
 
 
 def resolve_star_period(kwargs):
-    
+
     # If dict 'kwargs' has only kw 'period' with value '*', resolve
     # corresponding dataset on period, and sets kwargs['period']
     # accordingly (if dataset has only one corresponding period)
-    
+
     if 'period' in kwargs and kwargs['period'] == '*' and \
-       not any([ "*" in kwargs[k] or "?" in kwargs[k] for k in kwargs if k != 'period' ]):
-        explorer=cdataset(**select_projects(**kwargs))
+       not any(["*" in kwargs[k] or "?" in kwargs[k] for k in kwargs if k != 'period']):
+        explorer = cdataset(** select_projects(** kwargs))
         attributes = explorer.explore(option='choices')
         if 'period' in attributes:
             periods = attributes['period']
@@ -2408,8 +2418,8 @@ def resolve_star_period(kwargs):
                 kwargs['period'] = str(periods[0])
                 return True
     return False
-    
-    
+
+
 def resolve_first_or_last_years(kwargs, duration, option="last"):
     # Returns a dataset after translation of period like 'last_50y'
     kwargs['period'] = '*'

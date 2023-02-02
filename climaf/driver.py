@@ -21,7 +21,6 @@ from functools import reduce
 from six import string_types
 
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xarray import open_dataset as xr_open_dataset
 import subprocess
 
@@ -43,6 +42,7 @@ from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptCh
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
 from climaf.ESMValTool_diags import call_evt_script
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # When evaluating an object, default behaviour is to search cache for including or begin objects
 # but this could be expensive
@@ -220,7 +220,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
                                                                   str(ds_ambiguous_args)))
             clogger.warning("This was at the cost of querying the file system, more or "
                             "less heavily. You may wish to add such attributes by yourself")
-            #clogger.debug("After resolve for ambiguous arg, updated dataset kvp is %s",str(ds.kvp))
+            # clogger.debug("After resolve for ambiguous arg, updated dataset kvp is %s",str(ds.kvp))
     cache_value, costs = hasExactObject(ds)
     if cache_value is not None:
         clogger.debug("Dataset %s exists in cache" % ds)
@@ -794,12 +794,12 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         if op:
             per = timePeriod(op)
             if per and str(per) != "" and scriptCall.flags.canSelectTime:
-                if isinstance(per,string_types):
+                if isinstance(per, string_types):
                     if per != '*':
-                        clogger.error("Period type (%s) is wrong for object %s. Try method 'explore'"%(type(per),op))
+                        clogger.error("Period type (%s) is wrong for object %s. Try method 'explore'" % (type(per), op))
                     else:
-                        clogger.warning("Period is * for object %s; this may reveal an internal error"%op)
-                elif not per.fx: 
+                        clogger.warning("Period is * for object %s; this may reveal an internal error" % op)
+                elif not per.fx:
                     subdict["period"] = str(per)
                     subdict["period_iso"] = per.iso()
         if scriptCall.flags.canSelectDomain:

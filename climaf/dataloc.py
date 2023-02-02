@@ -201,7 +201,7 @@ class dataloc(object):
 
     def __str__(self):
         return self.model + self.project + self.simulation + self.frequency + self.realm + self.table + \
-               self.organization + repr(self.urls)
+            self.organization + repr(self.urls)
 
     def pr(self):
         print("For model " + self.model + " of project " + self.project +
@@ -566,5 +566,3 @@ def test2():
 
 if __name__ == "__main__":
     test2()
-
-

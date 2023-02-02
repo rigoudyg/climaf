@@ -68,9 +68,9 @@ if True:
 
     # -- call the dataloc CliMAF function
     # -- CMIP5
-    dataloc(project='CMIP5', organization='generic', url=[pattern1]+[patternf]+[patternf2])
+    dataloc(project='CMIP5', organization='generic', url=[pattern1] + [patternf] + [patternf2])
     # -- CMIP5_extent
-    dataloc(project='CMIP5_extent', organization='generic', url=[pattern1]+[pattern2])
+    dataloc(project='CMIP5_extent', organization='generic', url=[pattern1] + [pattern2])
 
     # -- Make the alias and default values for both projects
     for project in ['CMIP5', 'CMIP5_extent']:

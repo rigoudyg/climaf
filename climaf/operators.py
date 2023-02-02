@@ -419,6 +419,5 @@ if __name__ == "__main__":
         print(script_name, " has been called with args=", args, " and dic=", dic)
         print("Command would be:", end=" ")
 
-
     cscript('test_script', 'echo $*')
     test_script(arg1=1, arg2='two')

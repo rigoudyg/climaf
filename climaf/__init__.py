@@ -93,7 +93,7 @@ if not already_inited and not onrtd:
         exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
-    # Load cache scalar values 
+    # Load cache scalar values
     cache.load_cvalues()
     tim("load_cvalues")
     #
