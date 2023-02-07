@@ -14,7 +14,7 @@ from subprocess import getoutput, getstatusoutput
 
 from env.clogging import clogger, clog, clog_file
 import env.clogging
-from env.site_settings import atTGCC, atIPSL, onCiclad
+from env.site_settings import atTGCC, atIPSL, onCiclad, atCNRM
 
 # Variables
 
@@ -206,3 +206,8 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         clogger.warning("At least one stamping requirement is not fulfilled, turn it to None.")
         stamping = None
     clogger.info("---")
+
+if atCNRM:
+    pdf_page_builder = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
+else:
+    pdf_page_builder = "pdfjam"

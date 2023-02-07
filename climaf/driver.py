@@ -1565,8 +1565,8 @@ def cfilePage_pdf(cobj, deep, recurse_list=None):
     preamb = '"\\pagestyle{empty} \\usepackage{hyperref} \\usepackage{graphicx} \\usepackage{geometry} ' \
              '\\geometry{vmargin=%dcm,hmargin=2cm}"' % cobj.y
 
-    args = ["pdfjam", "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta, "--nup",
-            fig_nb]  # "%s"%preamb
+    args = [pdf_page_builder, "--keepinfo", "--preamble", preamb, "--papersize", page_size, "--delta", fig_delta,
+            "--nup", fig_nb]  # "%s"%preamb
     #
     # page composition
     total_costs = compute_cost()
