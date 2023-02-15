@@ -30,7 +30,8 @@ from climaf.classes import compare_trees, cobject, cdataset, guess_projects, all
 from climaf.cmacro import crewrite
 from climaf import __path__ as cpath
 
-handle_cvalues = 'by_hash'  # Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
+# Can be False, "by_crs" or anything else. 'by_crs' means key=CRS; else means key=hash
+handle_cvalues = 'by_hash'
 cvalues = dict()
 #: The length for truncating the hash value of CRS expressions when forming cache filenames
 fileNameLength = 60
@@ -59,7 +60,8 @@ def setNewUniqueCache(path, raz=True):
 
     path = os.path.expanduser(path)
     env.environment.cachedirs = [path]  # The list of cache directories
-    env.environment.cacheIndexFileName = path + "/index"  # The place to write the index
+    env.environment.cacheIndexFileName = path + \
+        "/index"  # The place to write the index
     env.environment.currentCache = path
     if raz:
         craz(hideError=True)
@@ -106,7 +108,8 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
 
 def hash_to_path(vhash, format, option="new", prefix=""):
     if option in ["new", ]:
-        rep = os.sep.join([env.environment.currentCache, prefix + vhash[0:2], vhash[2:]])
+        rep = os.sep.join([env.environment.currentCache,
+                          prefix + vhash[0:2], vhash[2:]])
     else:
         rep = os.sep.join([env.environment.currentCache,
                            prefix + stringToPath(vhash[0:fileNameLength - 1], directoryNameLength)])
@@ -195,7 +198,8 @@ def register(filename, crs, costs, outfilename=None):
                 return True
             else:
                 # clogger.critical("cannot move by" % cmd)
-                raise Climaf_Cache_Error("cannot move (possibly after stamping) by %s" % cmd)
+                raise Climaf_Cache_Error(
+                    "cannot move (possibly after stamping) by %s" % cmd)
 
     global dropped_crs
     #
@@ -222,7 +226,8 @@ def register(filename, crs, costs, outfilename=None):
                 command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
                           "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
-                          (convert_software, crs2, climaf_version, filename, filename, filename, filename)
+                          (convert_software, crs2, climaf_version,
+                           filename, filename, filename, filename)
             elif re.findall(".pdf$", filename) and pdftk_software is not None:
                 tmpfile = str(uuid.uuid4())
                 command = "%s %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
@@ -237,7 +242,8 @@ def register(filename, crs, costs, outfilename=None):
                 command = None
             if command is None:
                 if stamping is None:
-                    clogger.warning("Command is None and stamping is None. No stamping done.")
+                    clogger.warning(
+                        "Command is None and stamping is None. No stamping done.")
                     return do_move(crs, filename, outfilename)
                 elif stamping is True:
                     raise Climaf_Cache_Error("Cannot stamp by command None. "
@@ -337,7 +343,8 @@ def hasMatchingObject(cobject, ds_func):
                 if os.path.exists(f) or os.path.exists(alternate_filename(f)):
                     return co, altperiod
                 else:
-                    clogger.debug("Removing %s from cache index, because file is missing", crs)
+                    clogger.debug(
+                        "Removing %s from cache index, because file is missing", crs)
                     key_to_rm.append(crs)
     for el in key_to_rm:
         crs2filename.pop(el)
@@ -367,7 +374,8 @@ def hasExactObject(cobject):
     formats_to_test = known_formats + graphic_formats
     f = None
     while not found and i < len(formats_to_test):
-        f = generateUniqueFileName(cobject.crs, format=formats_to_test[i], create_dirs=False)
+        f = generateUniqueFileName(
+            cobject.crs, format=formats_to_test[i], create_dirs=False)
         if os.path.exists(f):
             found = True
         else:
@@ -389,7 +397,8 @@ def hasExactObject(cobject):
         # return f
     else:
         if cobject.crs in crs2filename:
-            clogger.debug("Dropping cobject.crs from cache index, because file is missing")
+            clogger.debug(
+                "Dropping cobject.crs from cache index, because file is missing")
             crs2filename.pop(cobject.crs)
         return None, compute_cost()
 
@@ -415,7 +424,8 @@ def complement(crsb, crse, crs):
     duration = time.time() - tim1
     costs.increment(duration)
     if os.system(command) != 0:
-        clogger.error("Issue when merging %s and %s in %s (using command:%s)" % (crsb, crse, crs, command))
+        clogger.error("Issue when merging %s and %s in %s (using command:%s)" % (
+            crsb, crse, crs, command))
         return None, costs
     else:
         cdrop(crsb)
@@ -457,7 +467,8 @@ def cdrop(obj, rm=True, force=False):
         clogger.error("%s is not a CliMAF object" % repr(obj))
         return
     if crs in crs2filename:
-        clogger.info("Discarding cached value for %s (except if protected)" % crs)
+        clogger.info(
+            "Discarding cached value for %s (except if protected)" % crs)
         fil, _ = crs2filename[crs]
         if not os.path.exists(fil):
             fil = alternate_filename(fil)
@@ -484,7 +495,8 @@ def cdrop(obj, rm=True, force=False):
                     pass
                 return True
             except:
-                clogger.warning("When trying to remove %s : file does not exist in cache" % crs)
+                clogger.warning(
+                    "When trying to remove %s : file does not exist in cache" % crs)
                 return False
     else:
         clogger.info("%s is not cached" % crs)
@@ -651,7 +663,8 @@ def cload_for_project(project):
             crs2filename[crs] = d[crs]
             d.pop(crs)
         except:
-            clogger.error("CRS expression %s is not valid for project %s" % (crs, project))
+            clogger.error(
+                "CRS expression %s is not valid for project %s" % (crs, project))
 
 
 def craz(force=False, hideError=False):
@@ -675,11 +688,13 @@ def craz(force=False, hideError=False):
             list_of_crs = list(crs2filename)
             for crs in list_of_crs:
                 if cdrop(crs):
-                    clogger.debug('Removed file: %s', generateUniqueFileName(crs))
+                    clogger.debug('Removed file: %s',
+                                  generateUniqueFileName(crs))
                 else:
-                    clogger.debug('Could not remove file (either not existing or protected): %s', crs2filename[crs])
+                    clogger.debug(
+                        'Could not remove file (either not existing or protected): %s', crs2filename[crs])
                     clogger.debug('Associated CRS : %s', crs)
-        os.system("ls  " + cc)
+        #os.system("ls  " + cc)
 
 
 def cdump(use_macro=True):
@@ -813,7 +828,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         find_return = os.popen(command).read()
         list_search_files_after_find = find_return.split('\n')
         list_search_files_after_find.pop(-1)
-        clogger.debug("List of search files: " + repr(list_search_files_after_find))
+        clogger.debug("List of search files: " +
+                      repr(list_search_files_after_find))
 
         # Search CRS for each found file
         for filen in list_search_files_after_find:
@@ -823,9 +839,11 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
 
         if len(new_dict) != 0:
             if new_dict != crs2filename:
-                clogger.debug("Dictionary after find for size/age/access: " + repr(new_dict))
+                clogger.debug(
+                    "Dictionary after find for size/age/access: " + repr(new_dict))
             else:
-                clogger.debug("Size/age/access criteria do not lead to any filtering")
+                clogger.debug(
+                    "Size/age/access criteria do not lead to any filtering")
         else:
             clogger.debug("No file meet the size/age/access criteria")
     else:
@@ -841,7 +859,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         for crs in new_dict:
             try:
                 if re.search(pattern, crewrite(crs)) or re.search(pattern, new_dict[crs][0]):
-                    clogger.debug("Pattern found in %s: %s" % (crs, new_dict[crs][0]))
+                    clogger.debug("Pattern found in %s: %s" %
+                                  (crs, new_dict[crs][0]))
                     find_pattern = True
                 else:
                     # Do not remove now from new_dict, because we loop on it
@@ -853,7 +872,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             del new_dict[crs]
 
         if find_pattern:
-            clogger.debug("Dictionary after search for pattern: " + repr(new_dict))
+            clogger.debug(
+                "Dictionary after search for pattern: " + repr(new_dict))
         elif len_new_dict != 0:
             clogger.debug("No string found for pattern => no result")
 
@@ -867,7 +887,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         for crs in new_dict:
             if re.search(not_pattern, crewrite(crs)) is None and \
                     re.search(not_pattern, new_dict[crs][0]) is None:
-                clogger.debug("Pattern not found in %s: %s" % (crs, new_dict[crs][0]))
+                clogger.debug("Pattern not found in %s: %s" %
+                              (crs, new_dict[crs][0]))
                 find_not_pattern = True
             else:
                 list_crs_to_rm.append(crs)
@@ -875,7 +896,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
             del new_dict[crs]
 
         if find_not_pattern:
-            clogger.debug("Dictionary after search for not_pattern: " + repr(new_dict))
+            clogger.debug(
+                "Dictionary after search for not_pattern: " + repr(new_dict))
         elif len_new_dict != 0:
             clogger.debug("All strings contain not_pattern => no result")
 
@@ -883,7 +905,8 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
     len_new_dict = len(new_dict)
 
     # request on new dictionary through usage, count and remove
-    work_dic = new_dict if (var_find or pattern != "" or not_pattern != "") else crs2filename
+    work_dic = new_dict if (var_find or pattern !=
+                            "" or not_pattern != "") else crs2filename
 
     if usage is True and len_new_dict != 0:
         # construction of a dictionary containing crs and disk-usage associated
@@ -1045,7 +1068,8 @@ def rebuild():
     global crs2filename
 
     if not stamping:
-        clogger.warning("Cannot rebuild cache index, because we are not in 'stamping' mode")
+        clogger.warning(
+            "Cannot rebuild cache index, because we are not in 'stamping' mode")
         return None
     files_in_cache = list_cache()
     crs2filename.clear()
@@ -1065,7 +1089,8 @@ def store_cvalue(crs, index, value, costs):
     """
     if handle_cvalues is not False:
         if handle_cvalues in ["by_crs", ]:
-            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+            key = hashlib.sha224(
+                (crs + "%d" % index).encode("utf-8")).hexdigest()
         else:
             key = crs + "[%d]" % index
         cvalues[key] = value, costs
@@ -1077,7 +1102,8 @@ def has_cvalue(crs, index):
     """
     if handle_cvalues is not False:
         if handle_cvalues in ["by_crs", ]:
-            key = hashlib.sha224((crs + "%d" % index).encode("utf-8")).hexdigest()
+            key = hashlib.sha224(
+                (crs + "%d" % index).encode("utf-8")).hexdigest()
         else:
             key = crs + "[%d]" % index
         value = cvalues.get(key, None)
@@ -1096,7 +1122,8 @@ def load_cvalues():
     global cvalues
 
     if handle_cvalues is not False:
-        cache_file = os.sep.join([env.environment.currentCache, "cvalues.json"])
+        cache_file = os.sep.join(
+            [env.environment.currentCache, "cvalues.json"])
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
                 tmp = json.load(f)
@@ -1129,7 +1156,8 @@ def sync_cvalues():
         tmp = ccache.replace(".json", ".tmp")
         with open(tmp, "w") as f:
             tofile = encode_index(cvalues)
-            json.dump(tofile, f, separators=(',', ': '), indent=3, ensure_ascii=True)
+            json.dump(tofile, f, separators=(',', ': '),
+                      indent=3, ensure_ascii=True)
             del tofile
         os.rename(tmp, ccache)
 
@@ -1151,6 +1179,7 @@ class compute_cost(object):
     - tc : a cost for all compute operations involved in object's genesis
     - lc : another cost, for the last( top-level) operation
     """
+
     def __init__(self, cost=0., total_cost=None):
         """
         Create a compute_cost object. 
@@ -1207,7 +1236,8 @@ def ccost(cobject):
                 if cobject[member].crs in crs2filename:
                     cost.add(crs2filename[cobject[member].crs][1])
                 else:
-                    raise Climaf_Error("At least one ensemble member is not cached (%s)" % member)
+                    raise Climaf_Error(
+                        "At least one ensemble member is not cached (%s)" % member)
             return cost
         else:
             clogger.warning("Object is not (yet) cached; try cfile()")

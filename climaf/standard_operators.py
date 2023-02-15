@@ -29,21 +29,24 @@ def load_standard_operators():
     # Compute scripts
     #
     cscript('select',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins} ',
+            scriptpath +
+            'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+            '--vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('remote_select',
-            scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --domain="${domain}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
+            scriptpath +
+            'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --domain="${domain}" '
+            '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins}')
+            scriptpath +
+            'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+            '--vm="${missing}" ${ins}')
     #
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
@@ -73,28 +76,34 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('space_average',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True)
     cscript('space_average_fast',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithSpaceConcatenation=True)
     cscript('time_average_fast',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox',
-            scriptpath + 'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
+            '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     cscript('llbox_fast',
-            scriptpath + 'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
+            scriptpath +
+            'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
 
     #
@@ -182,14 +191,15 @@ def load_standard_operators():
     # hovm : to plot Hovmoller diagrams
     #
     cscript('hovm',
-            '(ncl -Q ' + scriptpath + 'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${Var}\"\' '
-                                      ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' '
-                                      'lonE=\'\"${lonE}\"\' '
-                                      ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} '
-                                      'units=\'\"${units}\"\' reverse=${reverse} mean_axis=\'\"${mean_axis}\"\' '
-                                      'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
-                                      ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
-                                      'options=\'\"${options}\"\' fmt=\'\"${fmt}\"\' )',
+            '(ncl -Q ' + scriptpath +
+            'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${Var}\"\' '
+            ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' '
+            'lonE=\'\"${lonE}\"\' '
+            ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} '
+            'units=\'\"${units}\"\' reverse=${reverse} mean_axis=\'\"${mean_axis}\"\' '
+            'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
+            'options=\'\"${options}\"\' fmt=\'\"${fmt}\"\' )',
             format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
@@ -200,9 +210,10 @@ def load_standard_operators():
     #
     if os.system("type exiv2 >/dev/null 2>&1") == 0:
         cscript('cepscrop',
-                binpath + 'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
-                                                                              'pdftops -eps tmpfile-crop.pdf ${out}; '
-                                                                              'rm -f tmpfile.pdf tmpfile-crop.pdf ',
+                binpath + 'epstopdf ${in} --outfile=tmpfile.pdf;' +
+                binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
+                'pdftops -eps tmpfile-crop.pdf ${out}; '
+                'rm -f tmpfile.pdf tmpfile-crop.pdf ',
                 format="eps")
     #
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
@@ -294,23 +305,26 @@ def load_standard_operators():
     #
     # cLinearRegression
     cscript('cLinearRegression',
-            'python3 ' + scriptpath + 'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
-                                      '--yvariable ${var_2} --outfile ${out}',
+            'python3 ' + scriptpath +
+            'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
+            '--yvariable ${var_2} --outfile ${out}',
             _var='slope')
     #
     # ml2pl (only for IPSL)
-    if onCiclad or onSpirit or atTGCC:
+    if onCiclad or onSpirit or atTGCC or atIDRIS:
         cscript("ml2pl", scriptpath + "ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-        fixed_fields("ml2pl", ("press_levels.txt", scriptpath + "press_levels.txt"))
+        fixed_fields("ml2pl", ("press_levels.txt",
+                     scriptpath + "press_levels.txt"))
     #
     # curl_tau_atm
     cscript('curl_tau_atm',
-            'ferret -script ' + scriptpath + 'curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon '
-                                             '-d LAT,lat -v LAT,lat -v CURLTAU,curltau ${out} ; '
-                                             'ncatted -O -a coordinates,curltau,o,c,"time lat lon" '
-                                             '-a long_name,curltau,o,c,"Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU'
-                                             '[D=1,Y=@DDC])" ${out}',
+            'ferret -script ' + scriptpath +
+            'curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon '
+            '-d LAT,lat -v LAT,lat -v CURLTAU,curltau ${out} ; '
+            'ncatted -O -a coordinates,curltau,o,c,"time lat lon" '
+            '-a long_name,curltau,o,c,"Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU'
+            '[D=1,Y=@DDC])" ${out}',
             _var='curltau')
 
     #
@@ -360,8 +374,9 @@ def load_cdftools_operators():
     #        "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
     #       canSelectVar=True)
     cscript('ccdftransport',
-            scriptpath + 'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" '
-                         '"${opt2}" ${out} ${out_htrp} ${out_strp}',
+            scriptpath +
+            'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" '
+            '"${opt2}" ${out} ${out_htrp} ${out_strp}',
             _var='vtrp', htrp_var='htrp', strp_var='strp', canSelectVar=True)
 
     #
@@ -390,16 +405,18 @@ def load_cdftools_operators():
     # cdfsections
     #
     cscript('ccdfsections',
-            scriptpath + 'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} '
-                         '${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} '
-                         '${out_sig1} ${out_sig2} ${out_sig4}',
+            scriptpath +
+            'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} '
+            '${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} '
+            '${out_sig1} ${out_sig2} ${out_sig4}',
             _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1",
             sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
     #
     cscript('ccdfsectionsm',
-            scriptpath + 'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} '
-                         '${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} '
-                         '${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',
+            scriptpath +
+            'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} '
+            '${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} '
+            '${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',
             _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1",
             sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
 
@@ -449,4 +466,5 @@ def load_cdftools_operators():
             _var="zo%s_${basin}", canSelectVar=True)
     #
     # rmse_xyt
-    cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+    cscript(
+        'rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
