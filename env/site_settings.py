@@ -19,6 +19,7 @@ atTGCC = False
 onAda = False
 onErgon = False
 atIDRIS = False
+onJeanZay = False
 onSpip = False
 
 HostName = os.uname()[1].strip().lower()
@@ -43,6 +44,10 @@ if 'ada' in HostName:
     atIPSL = True
 if 'ergon' in HostName:
     onErgon = True
+    atIDRIS = True
+    atIPSL = True
+if 'jean-zay' in HostName:
+    onJeanZay = True
     atIDRIS = True
     atIPSL = True
 if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.path.exists(Home + '/.spip'):

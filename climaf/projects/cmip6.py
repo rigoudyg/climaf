@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This module declares locations for searching data for CMIP6 outputs produced by 
-libIGCM or Eclis for all frequencies.
+This module declares locations for searching data for CMIP6 outputs organized according to CMIP6 DRS
 
 Attributes for CMIP6 datasets are: model, experiment, table, realization, grid, version, institute, mip, root
 
@@ -29,11 +28,11 @@ if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/work/cont003/cmip6/cmip6"
 if onCiclad or onSpirit:
-    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
+    # Declare a list of root directories for CMIP6 data on IPSL's meso center
     root = "/bdd"
     # root="/ccc/work/cont003/cmip6/cmip6"
 if atCNRM:
-    # Declare a list of root directories for IPSL data at TGCC
+    # Declare a list of root directories for CMIP6 data at CNRM
     root = "/cnrm/cmip"
 
 if True:
