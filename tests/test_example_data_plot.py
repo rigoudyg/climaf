@@ -10,7 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import unittest
 
-from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
+from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre, skipIf_CondaEnv
 from env.environment import *
 
 from climaf.cache import setNewUniqueCache, craz
@@ -635,27 +635,30 @@ class DataPlot(unittest.TestCase):
     def test_data_plot_3(self):
         """
         """
-        fig1 = plot(self.my_dataset_light_80, title="title", resolution="1600*2400")
+        fig1 = plot(self.my_dataset_light_80,
+                    title="title", resolution="1600*2400")
         page1 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
                       widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=800, page_height=1200)
         compare_picture_files(page1, "test3.1.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page2 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
                       widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title", background="grey90", x=-300,
-                      y=26, pt=20, font='Utopia', ybox=60)
+                      y=26, pt=20, font='DejaVu-Sans', ybox=60)
         compare_picture_files(page2, "test3.2.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page3 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
-                      widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title")
+                      widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title", font='DejaVu-Sans')
         compare_picture_files(page3, "test3.3.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page4 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]])
         compare_picture_files(page4, "test3.4.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        page5 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]], page_trim=False)
+        page5 = cpage([[None, fig1], [fig1, fig1], [
+                      fig1, fig1]], page_trim=False)
         compare_picture_files(page5, "test3.5.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        ens = cens({'1980': self.my_dataset_light_80, '1981': self.my_dataset_light_81})
+        ens = cens({'1980': self.my_dataset_light_80,
+                   '1981': self.my_dataset_light_81})
         fig_ens = plot(ens, title="title")
         compare_picture_files(fig_ens, ["test3.6-1.png", "test3.6-2.png"], self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
@@ -665,13 +668,24 @@ class DataPlot(unittest.TestCase):
         page7 = cpage(fig_ens, heights=[0.8, 0.2], page_trim=False)
         compare_picture_files(page7, "test3.8.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
+
+    # Issue with missing laTeX package pdfpages.sty
+    @skipIf_CondaEnv()
+    def test_data_plot_3_1(self):
+        fig1 = plot(self.my_dataset_light_80,
+                    title="title", resolution="1600*2400")
         pdfpage1 = cpage_pdf([[fig1, fig1], [fig1, fig1], [fig1, fig1]],
                              widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=1000., page_height=1500.,
-                             scale=0.95, title='Page title', x=-5, y=5, font='ptm', pt='Huge', titlebox=True,
+                             scale=0.95, title='Page title', x=-5, y=5, font='DejaVu-Sans', pt='Huge', titlebox=True,
                              background="red")
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        fig2 = plot(self.my_dataset_light_80, title="title", resolution="13*19", format="pdf")
+
+    # Issue with pdfcrop: Can't locate mktexlsr.pl
+    @skipIf_CondaEnv()
+    def test_data_plot_3_2(self):
+        fig2 = plot(self.my_dataset_light_80, title="title",
+                    resolution="13*19", format="pdf")
         fig2_crop = cpdfcrop(fig2)
         pdfpage2 = cpage_pdf([[fig2_crop, fig2_crop], [fig2_crop, fig2_crop], [fig2_crop, fig2_crop]],
                              widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=1000., page_height=1500.,

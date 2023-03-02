@@ -30,6 +30,12 @@ def skipUnless_Ciclad():
     return unittest.skip("because not on Ciclad")
 
 
+def skipIf_CondaEnv():
+    if os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "").find("conda") >= 0:
+        return unittest.skip("because using conda environment")
+    return lambda func: func
+
+
 def remove_dir_and_content(dirname):
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
