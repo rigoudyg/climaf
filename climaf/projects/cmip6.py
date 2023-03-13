@@ -59,15 +59,15 @@ if True:
         # --> systematic arguments = simulation, frequency, variable
         # -- Set the aliases for the frequency
         # -- Set default values
-        cdef('root',        root,                       project=project)
-        cdef('institute',   '*',                        project=project)
-        cdef('model',       '*',                        project=project)
-        cdef('mip',         '*',                        project=project)
-        cdef('grid',        'g*',                       project=project)
-        cdef('realization', 'r1i1p1f*',                 project=project)
-        cdef('experiment',  'historical',               project=project)
-        cdef('version',     'latest',                   project=project)
-        cdef('table',       '*',                        project=project)
+        cdef('root', root, project=project)
+        cdef('institute', '*', project=project)
+        cdef('model', '*', project=project)
+        cdef('mip', '*', project=project)
+        cdef('grid', 'g*', project=project)
+        cdef('realization', 'r1i1p1f*', project=project)
+        cdef('experiment', 'historical', project=project)
+        cdef('version', 'latest', project=project)
+        cdef('table', '*', project=project)
         #
         calias(project, 'tos', offset=273.15, units="K")
         calias(project, 'thetao', offset=273.15, units="K")
@@ -83,17 +83,17 @@ if True:
     #
     # -- IPSL-CM6 special historical-EXT experiment
     project = 'IPSL-CM6_historical-EXT'
-    cdef('root',        root,                       project=project)
-    cdef('institute',   'IPSL',                     project=project)
-    cdef('model',       'IPSL-CM6A-LR',             project=project)
-    cdef('mip',         'CMIP',                     project=project)
-    cdef('grid',        'g*',                       project=project)
-    cdef('realization', 'r1i1p1f*',                 project=project)
-    cdef('experiment',  'historical',               project=project)
-    cdef('version',     'latest',                   project=project)
-    cdef('table',       '*',                        project=project)
+    cdef('root', root, project=project)
+    cdef('institute', 'IPSL', project=project)
+    cdef('model', 'IPSL-CM6A-LR', project=project)
+    cdef('mip', 'CMIP', project=project)
+    cdef('grid', 'g*', project=project)
+    cdef('realization', 'r1i1p1f*', project=project)
+    cdef('experiment', 'historical', project=project)
+    cdef('version', 'latest', project=project)
+    cdef('table', '*', project=project)
 
-    # -------------
+    # ------------
     # -- Define the patterns
     base_pattern1 = "${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
     base_pattern1 += "${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}"
@@ -119,6 +119,3 @@ if True:
     patterns3 = [base_pattern3 + "_${PERIOD}" + ".nc", base_pattern3 + ".nc"]
 
     dataloc(project='IPSL-CM6_historical-EXT', url=patterns3)
-
-
-

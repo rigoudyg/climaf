@@ -43,22 +43,22 @@ def cmip6_optimize_wildcards(kwargs):
     It assumes that all CMIP6 data are organized using CMIP6 canonical
     DRS with a pattern like :
     `${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/`
-    
+
     It uses tables which are built automatically, stored in CLiMAF
     cache, and can be refreshed by clearing it. See
     :py:func:`~climaf.projects.optimize.clear_tables`
-    
+
     First principle is to focus on facets which are high in the DRS
     hierarchy, and so in the directories hierarchy. For such facets,
     in order to speed-up search when the facet value includes a
     wildcard, and when another facet allows to reduce significantly
     the number of values of the wildcard facet, we build a look-up
     table.
-    
+
     This is for instance the case in CMIP6 when facet 'mip' is * and
     facet 'experiment' is known. Or when 'institute' is * and 'model'
     is known.
-    
+
     Next principle is to the build a list of valid paths segment after
     segment, by testing which wildcard segments values among the
     possible ones actually lead to an existing path. For some cases,
@@ -72,7 +72,7 @@ def cmip6_optimize_wildcards(kwargs):
     :py:func:`~climaf.dataloc.selectFiles`)
 
     """
-    
+
     if not env.environment.optimize_cmip6_wildcards:
         return [kwargs.copy()]
     else:
@@ -215,13 +215,13 @@ def cmip6_path2dict(path, root):
     """Returns a dict of facet/value pairs derived from PATH after
     removing prefix ROOT and assuming that the path matches CMIP6
     DRS"""
-    path = path[len(root)+1:].split(os.sep)
+    path = path[len(root) + 1:].split(os.sep)
     rep = {key: pos for (pos, key) in enumerate(["mip", "institute", "model", "experiment", "realization", "table",
                                                 "variable", "grid", "version"])}
     for k in rep:
         rep[k] = path[rep[k]]
     return rep
-    
+
 
 def cmip6_facets(path, root, *fields):
     """Returns a tuple of facets values for the ranks in FIELDS, derived
@@ -233,9 +233,9 @@ def cmip6_facets(path, root, *fields):
 
     """
     rep = list()
-    path = path[len(root)+1:].split(os.sep)
+    path = path[len(root) + 1:].split(os.sep)
     for field in fields:
-        rep.append(path[field-1])
+        rep.append(path[field - 1])
     return tuple(rep)
 
 
@@ -264,9 +264,8 @@ def listdirs(parent, pattern, test_exists=False):
         rep = glob.glob(os.sep.join([parent, pattern]))
         return rep
 
-    
-def cmip6_optimize_check_paths(paths):
 
+def cmip6_optimize_check_paths(paths):
     """Check that paths patterns in PATHS fit (at least some of) the
     requirements for optimizing data search
     """
@@ -282,16 +281,15 @@ def cmip6_optimize_check_paths(paths):
 
 def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                           key_index=-1, reset=False, value_pattern=None, root=None):
-
     """Returns the ensemble of directories which have files matching a
     given GLOB_PATTERN, which is supposed to end with a "/*" which
     corresponds to CASE_VALUE. The directory names are extracted from
     glob() return at a hierarchy level indicated by SPLIT_INDEX;
-    
+
     Method : Uses an entry CASE_NAME in a global lookup table 
     Try to read it from file if not present.
     If it fails builds (stores, and writes) it by globbing according to the pattern
-    
+
     If arg RESET is True, performs the globbing anyway and re-write the table
     on disk
 
@@ -300,11 +298,11 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
     """
     global dirnames
     # print("begin:",dirnames)
-    
+
     filen = _build_filename(case_name)
     should_write = False
     #
-    if reset: 
+    if reset:
         dirnames.pop(case_name, None)
     elif case_name not in dirnames:
         # Try to load table from file
@@ -343,7 +341,7 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
     if should_write:
         with open(filen, "w") as f:
             json.dump(dirnames[case_name], f, separators=(',', ': '), indent=3, ensure_ascii=True)
-        
+
     #
     if not wild(case_value):
         # clogger.debug('Looking for entry %s in table %s'%(case_value,case_name))
@@ -368,7 +366,7 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                 rep.append(r)
         ret = rep
     return ret
-        
+
 
 def clear_tables(pattern=None):
     """Clear all search optimization tabes that include a given pattern
@@ -496,4 +494,3 @@ def possible_values(project, tag, root, key, value_pattern):
                                     **paras)
         clogger.debug('According to table %s , %s and %s lead to possible values %s' % (tag, key, value_pattern, ret))
         return ret
-

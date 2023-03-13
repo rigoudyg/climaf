@@ -11,11 +11,12 @@ set -ex
 fieldin=$1
 fieldgrid=$2
 fieldout=$3
-option=${4:-remapbil}
+var=$4
+option=${5:-remapbil}
 if [ -f $fieldgrid ] ; then 
     cdo griddes $fieldgrid > climaf_tmp_grid_$$
-    cdo $option,climaf_tmp_grid_$$ $fieldin $fieldout 
+    cdo $option,climaf_tmp_grid_$$ -selname,$var $fieldin $fieldout 
     rm climaf_tmp_grid_$$
 else
-    cdo $option,$fieldgrid $fieldin $fieldout 
+    cdo $option,$fieldgrid -selname,$var $fieldin $fieldout 
 fi

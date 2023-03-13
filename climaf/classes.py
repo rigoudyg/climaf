@@ -18,7 +18,6 @@ from collections import defaultdict
 from functools import reduce, partial
 import six
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 import json
 import shutil
 import glob
@@ -32,6 +31,11 @@ from climaf.period import init_period, cperiod, merge_periods, intersect_periods
     lastyears, firstyears, group_periods, freq_to_minutes
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Should function ds() try to resolve for period=*
+auto_resolve = False
 
 
 def derive_cproject(name, parent_name, new_project_facets=list()):
@@ -1491,7 +1495,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
             # raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
-    else:
+    elif period != 'fx':
         if fperiod and not fperiod.includes(init_period(period)):
             raise Climaf_Classes_Error("Max period from file %s is %s" % (filename, repr(fperiod)))
     #
@@ -1500,6 +1504,8 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     d.files = filename
 
     d.frequency = attrOfFile(filename, "frequency", "*")
+    if period == 'fx':
+        d.frequency = 'fx'
 
     return d
 
@@ -1710,8 +1716,8 @@ def select_projects(**kwargs):
 
 
 def ds(*args, **kwargs):
-    """
-    Returns a dataset from its full Climate Reference Syntax string. Example ::
+    """Returns a dataset from its full Climate Reference Syntax
+    string. Example ::
 
      >>> ds('CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last')
 
@@ -1721,20 +1727,30 @@ def ds(*args, **kwargs):
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
-    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this
-    will work only if no dataset's attribute is ambiguous. 'first_50y' also works, similarly
+    In that latter case, you may use e.g. period='last_50y' to get the
+    last 50 years (or less) of data; but this will work only if no
+    dataset's attribute is ambiguous. 'first_50y' also works,
+    similarly; and also period='*'.
 
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
+
     """
     if len(args) > 1:
         raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
-            match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
-            if match is not None:
-                return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
-                                                   option=match.group('option').lower())
+            if kwargs['period'] == '*' and auto_resolve:
+                clogger.info('Trying to solve for period for %s' % kwargs)
+                if resolve_star_period(kwargs):
+                    # Case where there is a '*' only for period. kwargs has been modified
+                    clogger.info('Solved period = %s' % kwargs['period'])
+                    return cdataset(**select_projects(**kwargs))
+            else:
+                match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
+                if match is not None:
+                    return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
+                                                       option=match.group('option').lower())
         return cdataset(**select_projects(**kwargs))
 
     crs = args[0]
@@ -2288,28 +2304,36 @@ def domainOf(cobject):
             clogger.error("Unkown class for argument " + repr(cobject))
 
 
-def varOf(cobject): return attributeOf(cobject, "variable")
+def varOf(cobject):
+    return attributeOf(cobject, "variable")
 
 
-def modelOf(cobject): return attributeOf(cobject, "model")
+def modelOf(cobject):
+    return attributeOf(cobject, "model")
 
 
-def simulationOf(cobject): return attributeOf(cobject, "simulation")
+def simulationOf(cobject):
+    return attributeOf(cobject, "simulation")
 
 
-def experimentOf(cobject): return attributeOf(cobject, "experiment")
+def experimentOf(cobject):
+    return attributeOf(cobject, "experiment")
 
 
-def realizationOf(cobject): return attributeOf(cobject, "realization")
+def realizationOf(cobject):
+    return attributeOf(cobject, "realization")
 
 
-def projectOf(cobject): return attributeOf(cobject, "project")
+def projectOf(cobject):
+    return attributeOf(cobject, "project")
 
 
-def realmOf(cobject): return attributeOf(cobject, "realm")
+def realmOf(cobject):
+    return attributeOf(cobject, "realm")
 
 
-def gridOf(cobject): return attributeOf(cobject, "grid")
+def gridOf(cobject):
+    return attributeOf(cobject, "grid")
 
 
 def attributeOf(cobject, attrib):
@@ -2376,6 +2400,24 @@ def timePeriod(cobject):
         return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
+
+
+def resolve_star_period(kwargs):
+
+    # If dict 'kwargs' has only kw 'period' with value '*', resolve
+    # corresponding dataset on period, and sets kwargs['period']
+    # accordingly (if dataset has only one corresponding period)
+
+    if 'period' in kwargs and kwargs['period'] == '*' and \
+       not any(["*" in kwargs[k] or "?" in kwargs[k] for k in kwargs if k != 'period']):
+        explorer = cdataset(** select_projects(** kwargs))
+        attributes = explorer.explore(option='choices')
+        if 'period' in attributes:
+            periods = attributes['period']
+            if len(periods) == 1:
+                kwargs['period'] = str(periods[0])
+                return True
+    return False
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):

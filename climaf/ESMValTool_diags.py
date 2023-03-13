@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Driver and utilities for launching an ESMValTool diagnostic. 
+Driver and utilities for launching an ESMValTool diagnostic.
 
 Originally developped with ESMValTool version 2.2.0
 """
@@ -9,7 +9,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 # We assume that the dataset period has complete years (because (some) EVT diags do assume it too)
 # Created : S.Senesi - 2021
-    
+
 import sys
 import os
 import yaml
@@ -19,7 +19,6 @@ import datetime
 import logging
 #
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning) 
 import xarray as xr
 #
 from env.environment import *
@@ -29,6 +28,8 @@ from env.site_settings import atIPSL
 import climaf
 from climaf.utils import Climaf_Error, Climaf_Driver_Error
 from climaf.classes import timePeriod, cens, varOf, projectOf, experimentOf, realizationOf
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #: Path for the wrapper script for setting ESMValTool's diag scripts environment and launching them
 wrapper = None
@@ -43,7 +44,7 @@ def evt_script(climaf_name, script):
     argument SCRIPT and own arguments.
 
     """
-    
+
     doc = "CliMAF wrapper for EVT script : %s" % script
     defs = 'def %s(*args,**dic) :\n  """%s"""\n  ' % (climaf_name, doc) + \
            'return climaf.driver.ceval_evt("%s","%s",*args,**dic)\n' \
@@ -52,11 +53,11 @@ def evt_script(climaf_name, script):
     exec(defs, locals())  #
     exec("from climaf.ESMValTool_diags import %s" % climaf_name, sys.modules['__main__'].__dict__)
     clogger.debug("ESMValTool script %s has been declared as function %s" % (script, climaf_name))
-        
-        
+
+
 def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
     """
-    Driver for calling an ESMValTool diagnostic script (DS). 
+    Driver for calling an ESMValTool diagnostic script (DS).
 
     This function is NOT supposed to be called directly except by CliMAF driver, see doc.
 
@@ -73,19 +74,19 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
 
     - parameters : additional key/value pairs to provide to the DS
 
-    This drivers creates a directory dedicated to running that DS, and all 
+    This drivers creates a directory dedicated to running that DS, and all
     necessary interface files. It checks that execution was successfull.
 
     Returns a pair : DS working directory, dictionnary of provenance information
 
     """
-    
-    # Initalize most settings 
+
+    # Initalize most settings
     settings = {
         'recipe': 'CliMAF',
         'script': script,
         'climaf_version': climaf_version,
-        
+
         # User may wish to change next attributes for each call
         'auxiliary_data_dir': None,
         'log_level': _translate_loglevel(clogger.getEffectiveLevel()),
@@ -95,24 +96,24 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
         'write_plots': True,
         'quick_plot': {},
         }
-    
+
     # Account for dynamical, un-controlled, script call parameters to update settings
     settings.update(parameters)
 
     # Create a working directory according to ESMValTool habits
     # (e.g. cvdp_20210523_044731)
     output_dir = settings.get('output_dir', './evtscript_output/')
-    tmpdir = output_dir+"/%s_%s" % (climaf_name, datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
+    tmpdir = output_dir + "/%s_%s" % (climaf_name, datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     tmpdir = os.path.abspath(tmpdir) + "/"
     os.makedirs(tmpdir)
-    
+
     # Create sub-directories according to ESMValTol habits
     for adir in ['work_dir', 'run_dir', 'preproc_dir']:
         settings[adir] = tmpdir + adir.replace('_dir', '')
         if not os.path.exists(settings[adir]):
             os.mkdir(settings[adir])
     # Plot dir doesn't stick to the rule ('plot' -> 'plots')
-    settings['plot_dir'] = tmpdir + 'plots'    
+    settings['plot_dir'] = tmpdir + 'plots'
     if not os.path.exists(settings['plot_dir']):
         os.mkdir(settings['plot_dir'])
 
@@ -157,7 +158,7 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
             # wait, but not long because the stdout buffer may fill up:
             # https://docs.python.org/3.6/library/subprocess.html#subprocess.Popen.stdout
             time.sleep(0.001)
-                
+
     if returncode == 0:
         clogger.debug("Script %s (%s) completed successfully", climaf_name, script)
     else:
@@ -177,10 +178,10 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
         raise Climaf_Error("Script %s (%s) didn't produce provenance information" %
                            (climaf_name, script))
     return tmpdir, prov_dict
- 
-                                
+
+
 def _create_metadata_file(script, ensemble, value, preproc_dir, metadatas):
-    """Create an ESMVamTool diagnostic script interface file of type 'medata file' 
+    """Create an ESMVamTool diagnostic script interface file of type 'medata file'
 
     This yaml file describes each input file of an objects' ENSEMBLE
     provided to a SCRIPT. Input files are those listed in VALUE, as a
@@ -247,13 +248,13 @@ def _create_metadata_file(script, ensemble, value, preproc_dir, metadatas):
         d['standard_name'] = stdname
         d['units'] = units
         metadata[d['filename']] = d
-        
+
     # Write metadata file
     metadata_filename = data_dir + "/metadata.yml"
     with open(metadata_filename, 'w') as file:
         yaml.safe_dump(metadata, file)
 
-    metadatas[variable] = metadata_filename 
+    metadatas[variable] = metadata_filename
 
 
 def _read_attr_from_file(afile, variable):
@@ -274,7 +275,7 @@ def _translate_loglevel(level):
     """
     Returns a string corresponding to the logging LEVEL, understandable by ESMVamTool
     """
-    
+
     if level == logging.INFO:
         return "info"
     elif level == logging.DEBUG:
@@ -287,20 +288,19 @@ def _translate_loglevel(level):
         return "critical"
     else:
         return level
-    
+
 
 def _init_wrapper():
     """
-    Find a wrapper script for ESMValTool diags for the current platform. Its task 
-    is to set the environment for executing such diags, and to launch it. See an 
-    example of such wrapper in 
+    Find a wrapper script for ESMValTool diags for the current platform. Its task
+    is to set the environment for executing such diags, and to launch it. See an
+    example of such wrapper in
     :download:`$CLIMAF/scripts/ESMValTool_python_diags_wrapper_for_ciclad.sh<../scripts/EVT_python_diags_wrapper_for_ciclad.sh>`
     """
     if atIPSL:
-        scripts_dir = __file__ + "/../../scripts" 
+        scripts_dir = __file__ + "/../../scripts"
         wrapper = scripts_dir / "EVT_python_diags_wrapper_for_ciclad.sh"
     else:
         raise Climaf_Error(
             "Cannot find a relevant wrapper for ESMValTool diagnostic scripts "
             "for current platform (in directory {})".format(scripts_dir))
-

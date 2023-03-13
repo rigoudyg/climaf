@@ -75,7 +75,7 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
     Generated names drive a structure where each directory name
     has dirNameLength characters
 
-    If the filename already exists and is a symbolic link, check that the target 
+    If the filename already exists and is a symbolic link, check that the target
     actually exists, otherwise delete the link
     """
     #
@@ -125,7 +125,7 @@ def alternate_filename(fpath):
     # Get file format
     format = fpath.split(".")[-1]
     # Remove cache root location prefix
-    relative_fpath = fpath[len(env.environment.currentCache)+1:]
+    relative_fpath = fpath[len(env.environment.currentCache) + 1:]
     # Get name without slashes nor extension
     vhash = relative_fpath.replace("/", "").split(".")[0]
     #
@@ -1147,7 +1147,7 @@ def raz_cvalues():
 
 class compute_cost(object):
     """
-    Handling compute costs for objects : 
+    Handling compute costs for objects :
     - tc : a cost for all compute operations involved in object's genesis
     - lc : another cost, for the last( top-level) operation
     """

@@ -16,8 +16,9 @@ import subprocess
 import time
 import shutil
 import six
+import xarray as xr
 
-from env.site_settings import onCiclad
+from env.site_settings import onCiclad, onSpirit
 from env.clogging import clogger, clog
 
 
@@ -55,9 +56,11 @@ def parse_args():
     parser.add_argument("--operator", type=correct_args_type, help="Operator to be applied")
     parser.add_argument("--apply_operator_after_merge", type=bool, default=True,
                         help="If True, the operator is applied after merge time. If false, it is applied before.")
+    parser.add_argument("--seldate_is_first", type=bool, default=True,
+                        help="If True, period selection occurs before any other operation.")
     parser.add_argument("--output_file", type=correct_args_type, help="Name of the output file")
     parser.add_argument("--var", "--variable", dest="variable", type=correct_args_type,
-                        help="Variable to be considered")
+                        help="Variable to be considered", default=None)
     parser.add_argument("--period", type=correct_args_type, help="Period to be considered")
     parser.add_argument("--region", type=correct_list_args,
                         help="Region to be considered, i.e. latmin,latmax,lonmin,lonmax")
@@ -77,11 +80,16 @@ def parse_args():
 
 # Define several auxiliary functions
 clim_timefix_pattern = re.compile(r'IGCM_OUT.*_SE_.*(?P<value>\d{4})_\d{4}_1M.*nc')
+
 nemo_fix_pattern_mon = re.compile(r'.*1m.*grid_T_table2\.2\.nc')
 nemo_fix_pattern_day = re.compile(r'.*1d.*grid_T_table2\.2\.nc')
 nemo_fix_pattern = re.compile(r'.*1[m|d].*grid_T_table2\.2\.nc')
-aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
 nemo_coordinates_pattern = re.compile(r'coord.*t_ave_01month|t_ave_00086400')
+
+aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
+
+IPSL_CMIP6_msftyz_filename_pattern = re.compile(r'.*msftyz_Omon_IPSL-CM6A.*\.nc')
+IPSL_CMIP6_msftyz_issue_pattern = re.compile(r'.*x = 1 ;.*') 
 
 
 def clim_timefix(file_to_treat):
@@ -163,7 +171,7 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
     if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not(re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
                                                               not(re.compile(r".*MED-11.*.nc").match(file_to_treat))):
-        current_command = ["ncdump", "-h", file_to_treat]
+        current_command = " ".join(["ncdump", "-h", file_to_treat])
         print_in_file(current_command, output_file=test)
         rep = subprocess.check_output(current_command, shell=True)
         rep = rep.split("\n")
@@ -188,13 +196,76 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     else:
         return file_to_treat
 
+def IPSL_CMIP6_msftyz_dimfix(file_to_treat, tmp_dir, filevar, test=None):
+    # Get rid of a degenerated dimension in IPSL CMIP6 outputs for variable msftyz
+    # Echoes the name of a file with suppressed dimension (be it a modified file or a copy)
+    # Creates an alternate file in $tmp if no write permission on orginal file and
+    # renaming is actually useful
 
-def call_subprocess(command, test=None):
+    if IPSL_CMIP6_msftyz_filename_pattern.match(file_to_treat):
+
+        clogger.debug("Filename matches IPSL CMIP6 msftyz data")
+        # Check that file metadata actually shows the issue,
+        # (namely a dimension x with size 1)
+        current_command = " ".join(["ncdump", "-h", file_to_treat])
+        print_in_file(current_command, output_file=test)
+        rep = subprocess.check_output(current_command, shell=True, text=True)
+        rep = rep.split("\n")
+
+        if any([IPSL_CMIP6_msftyz_issue_pattern.match(line) for line in rep]):
+            
+            clogger.debug("File content matches IPSL CMIP6 msftyz data")
+            # Create an alternate target filename
+            out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
+            if os.path.isfile(out):
+                os.remove(out)
+            
+            # Process orginal file to target file 
+            ds=xr.open_dataset(file_to_treat, decode_times=False)
+            ds['msftyz'] = ds['msftyz'].sel(x=0)
+            ds=ds.reset_coords(names=['nav_lat','nav_lon'])
+            ds=ds.drop(['nav_lat','nav_lon'])
+            ds.to_netcdf(out)
+
+            # If allowed, remove original file (which is a link) and
+            # rename target as original, otherwise return target filename
+            if os.access(file_to_treat, os.W_OK):
+                print_in_file("rm -f {}".format(file_to_treat), output_file=test)
+                os.remove(file_to_treat)
+                print_in_file("mv {} {}".format(out, file_to_treat), output_file=test)
+                shutil.move(out, file_to_treat)
+                return file_to_treat
+            else:
+                return out
+    return file_to_treat
+
+
+def call_subprocess(command, test=None, allow_seldate_failure=False):
+    # Execute command in a subprocess.
+
+    # On request, allow for non-zero return code in case command
+    # includes 'cdo ... seldate' and stderr shows evidence that this
+    # seldate operation failed (and then return False)
+    
     clogger.debug("Command launched %s" % command)
     clogger.debug("Time at launch %s" % time.time())
     print_in_file(command, output_file=test)
-    clogger.debug(subprocess.check_output(command, shell=True))
+    proc=subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    clogger.debug(proc.stdout)
     clogger.debug("Time at end %s" % time.time())
+    if proc.returncode != 0 :
+        if allow_seldate_failure and \
+           re.match(".*cdo.*seldate",command) and \
+           re.match(".*cdo.*seldate.*No timesteps selected!",str(proc.stdout)):
+            return False
+        else:
+            raise subprocess.CalledProcessError(
+                returncode=proc.returncode,
+                cmd=command,
+                output=proc.stdout)
+    else:
+        return True
+
 
 
 def remove_dir_and_content(path_to_treat):
@@ -260,7 +331,7 @@ def change_to_tmp_dir(func):
 
 @change_to_tmp_dir
 def main(input_files, output_file, tmp, original_directory, variable=None, alias=None, region=None, units=None, vm=None,
-         period=None, operator=None, apply_operator_after_merge=None, test=None,
+         period=None, operator=None, apply_operator_after_merge=None, seldate_is_first=True, test=None,
          running_climaf_tests=False):
     # Initialize cdo commands
     cdo_commands_before_merge = list()
@@ -271,7 +342,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Find out which command must be used for cdo
     # For the time being, at most sites, must use NetCDF3 file format chained CDO
     # operations because NetCDF4 is not threadsafe there
-    if onCiclad and not running_climaf_tests:
+    if (onCiclad or onSpirit) and not running_climaf_tests:
         init_cdo_command = "cdo -O"
     else:
         init_cdo_command = "cdo -O -f nc"
@@ -302,7 +373,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Then, if needed, change the units
     clogger.debug("Units considered: %s" % units)
     if units is not None:
-        if var is None:
+        if variable is None:
             clogger.error("Units can be used only if variable or alias is specified")
             raise Exception("Units can be used only if variable or alias is specified")
         else:
@@ -318,19 +389,23 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
         cdo_command_for_merge = "-mergetime"
 
     # Then deal with date selection
+    seldate=""
     clogger.debug("Period considered: %s" % period)
     if period is not None:
-        print("type(str) = ", type(period))
-        print("period = ", period)
         seldate = "-seldate,{}".format(period)
         clim_time_fix = clim_timefix(input_files[0])
         if clim_time_fix is not None:
             seldate = " ".join([seldate, clim_time_fix])
-        cdo_commands_after_merge.append(seldate)
+        if not seldate_is_first:
+            cdo_commands_after_merge.append(seldate)
 
     # Then, if needed, deal with the operator
     clogger.debug("Operator considered: %s" % operator)
     if operator is not None:
+        # Discard leading '-' if any
+        if operator[0] == '-':
+            operator = operator[1:]
+        #
         if apply_operator_after_merge:
             cdo_commands_after_merge.append("-{}".format(operator))
         else:
@@ -352,6 +427,9 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
             l_file = nemo_timefix(l_file, tmp, test=test)
         if os.environ.get("CLIMAF_FIX_ALADIN_COORD", False):
             l_file = aladin_coordfix(l_file, tmp, filevar, test=test)
+        if os.environ.get("CLIMAF_FIX_IPSL_CMIP6_MSFTYZ", False):
+            clogger.debug('Considering a fix for IPSL CMIP6 msftyz data')
+            l_file = IPSL_CMIP6_msftyz_dimfix(l_file, tmp, filevar, test=test)
         files_to_treat_before_merging.append(l_file)
 
     if len(files_to_treat_before_merging) > 1:
@@ -362,17 +440,28 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
                 total_cdo_commands_before_merge = cdo_commands_before_merge
             else:
                 total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+            if seldate_is_first:
+                total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
             if len(total_cdo_commands_before_merge) > 0:
                 cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
                                        [a_file, tmp_file_path])
                 print_in_file(cdo_command, output_file=test)
-                call_subprocess(cdo_command)
+                command_succeed = call_subprocess(cdo_command, allow_seldate_failure=seldate_is_first)
                 os.remove(a_file)
-                shutil.move(tmp_file_path, a_file)
-            if not os.path.isfile(a_file):
-                clogger.error("Could not create the file %s" % a_file)
-                raise Exception("Could not create the file %s" % a_file)
-            files_to_treat_after_merging.append(a_file)
+                if command_succeed is True:
+                    shutil.move(tmp_file_path, a_file)
+                    if not os.path.isfile(a_file):
+                        clogger.error("Could not create file %s" % a_file)
+                        raise Exception("Could not create file %s" % a_file)
+                    files_to_treat_after_merging.append(a_file)
+                else :
+                    # Assume that seldate provided no data, and just ignore that file
+                    pass
+            else: 
+                if not os.path.isfile(a_file):
+                    clogger.error("Could not access file %s" % a_file)
+                    raise Exception("Could not access file %s" % a_file)
+                files_to_treat_after_merging.append(a_file)
         if cdo_command_for_merge is not None:
             tmp_output_file = find_tmp_filename(output_file, tmp)
             files_to_treat_after_merging = apply_cdo_command_on_slice(init_cdo_command=init_cdo_command,
@@ -390,6 +479,8 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
             total_cdo_commands_before_merge = cdo_commands_before_merge
         else:
             total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
+        if seldate_is_first:
+            total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                list(reversed(total_cdo_commands_before_merge)) + files_to_treat_before_merging +
                                [output_file, ])

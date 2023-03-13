@@ -49,7 +49,7 @@ def load_standard_operators():
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
-    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF 
+    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF
     # do not loose track of variable name for the output of some CDO operators
     # because it takes it from operand ${in_1}, while some CDO operators impose to have it second
     cscript('ccdo2_flip', 'cdo ${operator} ${in_2} ${in_1} ${out}')
@@ -99,11 +99,11 @@ def load_standard_operators():
 
     #
     cscript('regrid',
-            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridn',
-            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridll', scriptpath + 'regridll.sh ${in} ${out} ${cdogrid} '
@@ -298,8 +298,8 @@ def load_standard_operators():
                                       '--yvariable ${var_2} --outfile ${out}',
             _var='slope')
     #
-    # ml2pl (only on Ciclad)
-    if onCiclad or onSpirit:
+    # ml2pl (only for IPSL)
+    if onCiclad or onSpirit or atTGCC:
         cscript("ml2pl", scriptpath + "ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
         fixed_fields("ml2pl", ("press_levels.txt", scriptpath + "press_levels.txt"))
@@ -450,4 +450,3 @@ def load_cdftools_operators():
     #
     # rmse_xyt
     cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
-

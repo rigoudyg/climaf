@@ -572,8 +572,8 @@ def summary(dat):
             for key in tmpkvp:
                 if isinstance(tmpkvp[key], list) and len(tmpkvp[key]) > 1:
                     keytest = key
-                    print('Multiple available values for attribute "' + key + '" that is set to "*" in your ds() call: '
-                          , tmpkvp[key])
+                    print('Multiple available values for attribute "' + key +
+                          '" that is set to "*" in your ds() call: ', tmpkvp[key])
                     print('Specify one of them (within ds() or with cdef())')
             if not keytest:
                 for f in dat.baseFiles(ensure_dataset=False).split():

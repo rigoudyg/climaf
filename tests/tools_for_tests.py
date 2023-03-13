@@ -60,8 +60,8 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, 
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
     file_ref = os.path.sep.join([dir_ref, file_ref_name])
-    default_file_ref = os.path.sep.join([dir_ref_default, file_ref_name])
     if not os.path.exists(file_ref):
+        default_file_ref = os.path.sep.join([dir_ref_default, file_ref_name])
         if not os.path.exists(default_file_ref):
             raise ValueError("Could not find a reference file for %s" % file_ref_name)
         else:

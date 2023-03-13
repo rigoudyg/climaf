@@ -12,7 +12,7 @@ from climaf import cachedir
 
 
 # This example does work only on Ciclad
-if not onCiclad:
+if not onCiclad and not onSpirit:
     exit(0)
 
 desc = "\n\nProto d'atlas océanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"

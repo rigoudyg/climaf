@@ -58,7 +58,7 @@ Main functions are :
  - ``raz_cvalues`` : reset scalar values cache
 
  - ``csync``    : save cache index to disk
- 
+
  - ``ccost``    : provide compute costs for an object
 
 

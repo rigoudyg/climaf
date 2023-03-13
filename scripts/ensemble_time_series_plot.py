@@ -266,7 +266,7 @@ if args.lw:
     if len(lw_list) == 1:
         lw_list = lw_list * len(filenames_list)
 else:
-    lw_list = [0.4] * len(filenames_list)
+    lw_list = [1] * len(filenames_list)
 
 # -- alphas
 if args.alphas:
@@ -366,12 +366,12 @@ for pathfilename in filenames_list:
         for elt in tvalue:
             if not isinstance(elt, cdatetime):
                 # if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
-                if isinstance(elt, (cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
-                    strdate = elt.strftime().split(' ')[0]
-                    year = int(strdate.split('-')[0])
-                    month = int(strdate.split('-')[1])
-                    day = int(strdate.split('-')[2])
-                    datevar.append(cdatetime(year, month, day))
+                #if isinstance(elt, (cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
+                strdate = elt.strftime().split(' ')[0]
+                year = int(strdate.split('-')[0])
+                month = int(strdate.split('-')[1])
+                day = int(strdate.split('-')[2])
+                datevar.append(cdatetime(year, month, day))
             else:
                 datevar.append(elt)
         print('datevar = ', datevar)

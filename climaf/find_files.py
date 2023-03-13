@@ -45,7 +45,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
      - match the `period`` provided in kwargs
 
     kwargs can have entries which are list, and are then interpreted as :
-    
+
     - a first element which is a pattern (i.e. which include * or ?)
 
     - more elements which are the possible values, as diagnosed by some logic upstream
@@ -184,8 +184,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
             temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
             #
             # Do globbing with plain varname
+            clogger.info("Globbing with plain varname on %s " % (temp2))
             lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
-            clogger.debug("Globbed %d files with plain varname on %s : " % (len(lfiles), temp2))
+            clogger.info("Globbed %d files with plain varname on %s : " % (len(lfiles), temp2))
             #
             # If unsuccessful using varname, try with filenameVar
             if len(lfiles) == 0 and "filenameVar" in simple_kwargs and simple_kwargs['filenameVar']:
@@ -199,8 +200,9 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                 temp3 = temp3.replace(date_keyword, date_regexp_patt_glob)
                 #
                 # Do globbing with fileVarname
+                clogger.info("Globbing for filenamevar on %s " % (temp2))
                 lfiles = my_glob(remote_prefix, temp2, temp3, url, date_regexp_keyword, date_regexp_patt, kwargs)
-                clogger.debug("Globbed %d files for filenamevar on %s: " % (len(lfiles), temp2))
+                clogger.info("Globbed %d files for filenamevar on %s: " % (len(lfiles), temp2))
             #
             # For registering encountered values for those facets which have a wildcard,
             # construct a regexp with a group name for all facets (but period)
@@ -209,7 +211,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
             #
             for f in lfiles:
                 #
-                # Process fixed-fields case, or extract file time period 
+                # Process fixed-fields case, or extract file time period
                 #
                 fperiod = None
                 if kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or \
@@ -236,7 +238,7 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                     # Extract file period period from filename
                     fperiod = extract_period(f, template, date_regexp_keyword, date_regexp_patt,
                                              use_frequency=use_frequency)
-    
+
                 #
                 # For non-fixed fields, if file period matches requested period, check variable
                 #
@@ -277,15 +279,20 @@ def selectGenericFiles(urls, return_wildcards=None, merge_periods_on=None, retur
                         clogger.debug('not appending %s because period doesn t intersect %s' % (f, period))
                     else:
                         clogger.debug('not appending %s for some other reason %s' % f)
-    
+
         # Break on first url with any matching data
         if len(rep) > 0:
             clogger.debug('url %s does match for ' % url + repr(kwargs))
             break
-        
+
     # Post-process wildcard facets values
     post_process_wildcard_facets_values(wildcards, return_wildcards, kwargs, periods_dict)
-    
+
+    if return_wildcards is not None and 'period' in return_wildcards:
+        for key in return_wildcards['period']:
+            return_wildcards['period'][key] = list(return_wildcards['period'][key])
+            clogger.info("Attribute period ='*' has values %s" % periods_dict)
+
     return rep
 
 
@@ -311,10 +318,10 @@ def build_facets_regexp(string, kwargs, date_regexp_keyword, date_regexp_patt):
     (but period)
     """
     _, base = mysplit(string)
-    
+
     # Change glob syntax wildcards to regexp syntax
     base = base.replace("?", ".").replace("*", ".*")
-    
+
     # Substitute rightmost occurrences by a group-capable pattern which name is the facet name
     alt_kwargs = kwargs.copy()
     for kw in kwargs:
@@ -327,7 +334,7 @@ def build_facets_regexp(string, kwargs, date_regexp_keyword, date_regexp_patt):
     # We substitute second and next occurrences by non-group-capable patterns
     facets_regexp = Template(base).safe_substitute(**alt_kwargs)
     #
-    # Same for date regexp, except from the left (why ?)  
+    # Same for date regexp, except from the left (why ?)
     facets_regexp = facets_regexp.replace(date_regexp_keyword, date_regexp_patt, 1)
     facets_regexp = facets_regexp.replace(date_regexp_keyword, ".*")
     #
@@ -361,7 +368,7 @@ def store_wildcard_facet_values(f, facets_regexp, kwargs, wildcards, merge_perio
     Return False if any facet value is not allowed in project kwargs["project"]
 
     """
-    
+
     #
     # first check that all facet values belong to the list of authorized
     # values possibly defined for each facet. Return False otherwise
@@ -447,7 +454,7 @@ def my_glob(remote_prefix, pattern, pattern2, url, date_regexp_keyword, date_reg
     else:
         ret = set()
         pattern_to_search = re.compile(pattern2)
-        patterns_to_fill = re.compile("^"+date_regexp_patt+"$")
+        patterns_to_fill = re.compile("^" + date_regexp_patt + "$")
         for f in lfiles:
             match = pattern_to_search.match(f)
             if not match:
@@ -457,7 +464,7 @@ def my_glob(remote_prefix, pattern, pattern2, url, date_regexp_keyword, date_reg
                 if patterns_to_fill.match(match):
                     ret.add(f)
     return list(ret)
-    
+
 
 def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, use_frequency=False):
     """Test if TEMPLATE includes a DATE_REGEXP_KEYWORD and if yes,
@@ -493,7 +500,7 @@ def extract_period(filename, template, date_regexp_keyword, date_regexp_patt, us
         except:
             clogger.info("Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
 
-        
+
 def glob_remote_data(url, pattern):
     """
     Returns a list of path names that match pattern, for remote data
@@ -565,4 +572,3 @@ def post_process_wildcard_facets_values(wildcards, return_wildcards, kwargs, per
                         clogger.error(message)
         else:
             clogger.debug("return_wildcards is None")
-
