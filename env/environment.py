@@ -211,3 +211,6 @@ if atCNRM:
     pdf_page_builder = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
     pdf_page_builder = "pdfjam"
+
+if atCNRM and os.path.isdir("/cnrm/est/COMMON/climaf/add_packages"):
+    sys.path.append("/cnrm/est/COMMON/climaf/add_packages")
