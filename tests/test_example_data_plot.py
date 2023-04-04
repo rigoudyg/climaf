@@ -579,6 +579,11 @@ class DataPlot(unittest.TestCase):
         """
         """
         fig1 = plot(self.my_dataset_light_80, title="title", resolution="1600*2400")
+        compare_picture_files(fig1, "test3.1_fig.png", self.reference_directory,
+                              dir_ref_default=self.default_reference_directory)
+        fig1_pdf = plot(self.my_dataset_light_80, title="title", resolution="1600*2400", format="pdf")
+        compare_picture_files(fig1_pdf, "test3.1_fig.pdf", self.reference_directory,
+                              dir_ref_default=self.default_reference_directory)
         page1 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
                       widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=800, page_height=1200)
         compare_picture_files(page1, "test3.1.png", self.reference_directory,
@@ -615,7 +620,11 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         fig2 = plot(self.my_dataset_light_80, title="title", resolution="13*19", format="pdf")
+        compare_picture_files(fig2, "test3.2_fig.pdf", self.reference_directory,
+                              dir_ref_default=self.default_reference_directory)
         fig2_crop = cpdfcrop(fig2)
+        compare_picture_files(fig2_crop, "test3.2_fig_crop.pdf", self.reference_directory,
+                              dir_ref_default=self.default_reference_directory)
         pdfpage2 = cpage_pdf([[fig2_crop, fig2_crop], [fig2_crop, fig2_crop], [fig2_crop, fig2_crop]],
                              widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=1000., page_height=1500.,
                              scale=0.95, title='Page title', x=-5, y=10, font='ptm', pt='huge', titlebox=True,

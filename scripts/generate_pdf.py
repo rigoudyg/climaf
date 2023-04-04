@@ -6,8 +6,9 @@ Script to generate pdf documents using latex syntax from python.
 """
 from __future__ import unicode_literals, absolute_import, print_function, division
 
-import os.path
+from env.environment import *
 
+import os
 import pdflatex
 import argparse
 
