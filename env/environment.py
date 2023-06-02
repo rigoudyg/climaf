@@ -14,7 +14,7 @@ from subprocess import getoutput, getstatusoutput
 
 from env.clogging import clogger, clog, clog_file
 import env.clogging
-from env.site_settings import atTGCC, atIPSL, onCiclad, atCNRM
+from env.site_settings import *
 
 # Variables
 
@@ -139,11 +139,16 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
-        ncl_software = my_which("ncl")
+        if atCNRM:
+            ncl_software = "/opt/ncarg6/bin/ncl"
+            if not os.path.exists(ncl_software):
+                ncl_software = my_which("ncl")
+        else:
+            ncl_software = my_which("ncl")
         clogger.info("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)
     except:
         ncl_software = None
-        clogger.warning("ncl not found -> can't use CliMAF plotting scripts")
+        clogger.warning("ncl not found -> can't use CliMAF plotting scripts based on it")
     try:
         cdo_software = my_which("cdo")
         tmp = str.split(getstatusoutput(cdo_software + ' -V')[1], ' ')
@@ -212,5 +217,3 @@ if atCNRM:
 else:
     pdf_page_builder = "pdfjam"
 
-if atCNRM and os.path.isdir("/cnrm/est/COMMON/climaf/add_packages"):
-    sys.path.append("/cnrm/est/COMMON/climaf/add_packages")
