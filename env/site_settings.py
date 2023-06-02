@@ -9,6 +9,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 import sys
+import platform
 
 atCNRM = False
 atCerfacs = False
@@ -57,3 +58,29 @@ if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.
     VolumesDir = os.getenv('VolumesDir')
 if os.path.exists('/data/scratch/globc'):
     atCerfacs = True
+
+
+def _found_python_version_to_use(list_dirs, python_version):
+    if python_version in list_dirs:
+        return True, python_version
+    elif "." in python_version:
+        python_version = ".".join(python_version.split(".")[:-1])
+        return _found_python_version_to_use(list_dirs, python_version)
+    else:
+        return False, list_dirs
+
+
+if atCNRM:
+    additional_packages = os.sep.join(["", "cnrm", "est", "COMMON", "climaf", "add_packages", "lib"])
+    if os.path.isdir(additional_packages):
+        rep = os.listdir(additional_packages)
+        rep = [r for r in rep if "python" in r]
+        python_version = platform.python_version()
+        found, python_version_to_add = _found_python_version_to_use(rep, python_version)
+        if found:
+            sys.path.append(os.sep.join([additional_packages, python_version_to_add, "site-packages"]))
+        else:
+            for r in rep:
+                sys.path.append(os.sep.join([additional_packages, r, "site-packages"]))
+    else:
+        print("Warning: additional packages not found, could cause issues.")
