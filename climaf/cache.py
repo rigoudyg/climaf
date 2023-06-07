@@ -694,7 +694,7 @@ def craz(force=False, hideError=False):
                     clogger.debug(
                         'Could not remove file (either not existing or protected): %s', crs2filename[crs])
                     clogger.debug('Associated CRS : %s', crs)
-        #os.system("ls  " + cc)
+        # os.system("ls  " + cc)
 
 
 def cdump(use_macro=True):

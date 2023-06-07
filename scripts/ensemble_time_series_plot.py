@@ -366,7 +366,7 @@ for pathfilename in filenames_list:
         for elt in tvalue:
             if not isinstance(elt, cdatetime):
                 # if isinstance(elt, (netcdftime._netcdftime.DatetimeNoLeap, netcdftime._netcdftime.Datetime360Day,
-                #if isinstance(elt, (cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
+                # if isinstance(elt, (cftime.DatetimeNoLeap, cftime._cftime.DatetimeGregorian)):
                 strdate = elt.strftime().split(' ')[0]
                 year = int(strdate.split('-')[0])
                 month = int(strdate.split('-')[1])

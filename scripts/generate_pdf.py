@@ -20,7 +20,8 @@ parser.add_argument("--delta", required=True, help="String defining the delta")
 parser.add_argument("--nup", required=True, help="String defining the number of lines and columns")
 parser.add_argument("--outfile", required=True, help="Output file")
 parser.add_argument("--pagecommand", required=True, help="Command to apply")
-parser.add_argument("--openright", default="false", choices=["false", "False", "true", "True"], help="Should the document begin with a blank page?")
+parser.add_argument("--openright", default="false", choices=["false", "False", "true", "True"],
+                    help="Should the document begin with a blank page?")
 parser.add_argument("--scale", default="1.", help="Scale to apply")
 parser.add_argument("--keepinfo", action="store_true")
 args = parser.parse_args()
@@ -44,7 +45,7 @@ template = r"""
 
 output_basename = os.path.basename(args.outfile)
 if output_basename.endswith(".pdf"):
-       output_basename = output_basename[:-4]
+    output_basename = output_basename[:-4]
 
 pdfl = pdflatex.PDFLaTeX.from_binarystring(template.encode("utf-8"), output_basename)
 pdfl.set_output_directory(os.path.dirname(args.outfile))
