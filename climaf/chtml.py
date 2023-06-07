@@ -133,9 +133,11 @@ def link(label, filename, thumbnail=None, hover=True):
       - if thumbnail is None, size is '200*200'
     """
     if filename is not None and not isinstance(filename, six.string_types):
-        raise TypeError("The filename provided should be None or a string, not %s" % filename)
+        raise TypeError(
+            "The filename provided should be None or a string, not %s" % filename)
     if label is not None and not isinstance(label, six.string_types):
-        raise TypeError("The label provided should be None or a string, not %s" % label)
+        raise TypeError(
+            "The label provided should be None or a string, not %s" % label)
     if filename:
         regex = re.compile('(?P<width>[0-9]+)[x*](?P<height>[0-9]+)')
         if thumbnail is not None:
@@ -144,8 +146,10 @@ def link(label, filename, thumbnail=None, hover=True):
             if isinstance(thumbnail, six.string_types):
                 thumbnail_regex_match = regex.match(thumbnail)
                 if thumbnail_regex_match:
-                    thumbnail_width = thumbnail_regex_match.groupdict()["width"]
-                    thumbnail_height = thumbnail_regex_match.groupdict()["height"]
+                    thumbnail_width = thumbnail_regex_match.groupdict()[
+                        "width"]
+                    thumbnail_height = thumbnail_regex_match.groupdict()[
+                        "height"]
             else:
                 thumbnail_width = thumbnail
                 thumbnail_height = thumbnail
@@ -185,7 +189,8 @@ def link(label, filename, thumbnail=None, hover=True):
 
             else:
                 rep = '<A HREF="' + str(filename) + '"><IMG HEIGHT=' + str(thumbnail_height) + \
-                      ' WIDTH=' + str(thumbnail_width) + ' SRC="' + str(filename) + '"></a>'
+                      ' WIDTH=' + str(thumbnail_width) + \
+                    ' SRC="' + str(filename) + '"></a>'
 
         else:
             if hover:
@@ -258,7 +263,8 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
     if dirname:
         os.system('mkdir -p ' + dirname)
         if filename:
-            tmpfilename, filextension = os.path.splitext(os.path.basename(filename))
+            tmpfilename, filextension = os.path.splitext(
+                os.path.basename(filename))
 
             # !!! # -- Make a new nb that is unique to avoid the issues with images
             #          in the cache of the browser
@@ -269,13 +275,16 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 nb = randrange(1, 10000000000)
             nbs.append(nb)
             try:
-                os.link(filename, dirname + "/climaf_atlas" + str(nb) + filextension)
+                os.link(filename, dirname + "/climaf_atlas" +
+                        str(nb) + filextension)
             except:
-                shutil.copy(filename, dirname + "/climaf_atlas" + str(nb) + filextension)
+                shutil.copy(filename, dirname + "/climaf_atlas" +
+                            str(nb) + filextension)
             # -- Create/append the index file in the output directory that will provide
             # -- the CRS with the new png file (climaf_atlas...png)
             index_atlas = dirname + "/index_atlas"
-            index_dict = {getCRS(filename): "climaf_atlas" + str(nb) + filextension}
+            index_dict = {getCRS(filename): "climaf_atlas" +
+                          str(nb) + filextension}
             #
             if not os.path.isfile(index_atlas):
                 # -- Create the dictionary
@@ -292,7 +301,8 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt.update(index_dict)
             # -- Save the file
             with open(os.path.expanduser(index_atlas), "wb") as atlas_index_w:
-                pickle.dump(tt, atlas_index_w, protocol=2)  # Used for python 2 compatibility
+                # Used for python 2 compatibility
+                pickle.dump(tt, atlas_index_w, protocol=2)
 
             return '<TD ALIGN=RIGHT>' + \
                    link(label, "climaf_atlas" + str(nb) + filextension, thumbnail, hover) + \
@@ -461,7 +471,8 @@ def fline(func, farg, sargs, title=None,
     if not isinstance(sargs, (dict, OrderedDict)):
         imposed_labels = False
         if not isinstance(sargs, (list, KeysView, ValuesView)):
-            print("Issue with second args : not a dict nor a list (got {}) ".format(repr(sargs)))
+            print("Issue with second args : not a dict nor a list (got {}) ".format(
+                repr(sargs)))
             return
         else:
             sargs = OrderedDict(list([(repr(sarg), sarg) for sarg in sargs]))
@@ -591,7 +602,8 @@ def safe_mode_cfile_plot(myplot, do_cfile=True, safe_mode=True):
             except:
                 # -- In case it didn't work, we try to see if it comes from the availability of the data
                 print('!! Plotting failed ', myplot)
-                print("set clog('debug') and safe_mode=False to identify where the plotting failed")
+                print(
+                    "set clog('debug') and safe_mode=False to identify where the plotting failed")
                 return blank_cell
 
 

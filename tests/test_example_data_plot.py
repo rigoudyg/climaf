@@ -10,7 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import unittest
 
-from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
+from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre, skipIf_CondaEnv
 from env.environment import *
 
 from climaf.cache import setNewUniqueCache, craz
@@ -59,6 +59,16 @@ class DataGplotMaps(unittest.TestCase):
         compare_picture_files(plot_map, "test_A.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         #
+
+    @skipIf_CondaEnv()
+    def test_gplot_maps_1_2(self):
+        """
+        Crop of a Map with one field and vectors, with contours lines like color fill, default projection (a cylindrical
+        equidistant), with 'pdf' output format and paper resolution of 17x22 inches (<=> 1224x1584 pixels)
+        """
+        plot_map = plot(self.tas, None, self.uas, self.vas,
+                        title='1 field (contours lines follow color filled contours) + vectors',
+                        contours=1, vcRefLengthF=0.02, vcRefMagnitudeF=11.5, format="pdf", resolution='17*22')
         plot_map_crop = cpdfcrop(plot_map)
         self.assertEqual(str(plot_map_crop),
                          "cpdfcrop(plot(ds('example|AMIPV6ALB2G|tas|198001|global|monthly'),"
@@ -590,11 +600,11 @@ class DataPlot(unittest.TestCase):
                               dir_ref_default=self.default_reference_directory)
         page2 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
                       widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title", background="grey90", x=-300,
-                      y=26, pt=20, font='Utopia', ybox=60)
+                      y=26, pt=20, font='DejaVu-Sans', ybox=60)
         compare_picture_files(page2, "test3.2.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page3 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
-                      widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title")
+                      widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], title="Page title", font='DejaVu-Sans')
         compare_picture_files(page3, "test3.3.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page4 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]])
@@ -613,12 +623,22 @@ class DataPlot(unittest.TestCase):
         page7 = cpage(fig_ens, heights=[0.8, 0.2], page_trim=False)
         compare_picture_files(page7, "test3.8.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
+
+    # Issue with missing laTeX package pdfpages.sty
+    @skipIf_CondaEnv()
+    def test_data_plot_3_1(self):
+        fig1 = plot(self.my_dataset_light_80,
+                    title="title", resolution="1600*2400")
         pdfpage1 = cpage_pdf([[fig1, fig1], [fig1, fig1], [fig1, fig1]],
                              widths=[0.2, 0.8], heights=[0.33, 0.33, 0.33], page_width=1000., page_height=1500.,
-                             scale=0.95, title='Page title', x=-5, y=5, font='ptm', pt='Huge', titlebox=True,
+                             scale=0.95, title='Page title', x=-5, y=5, font='DejaVu-Sans', pt='Huge', titlebox=True,
                              background="red")
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
+
+    # Issue with pdfcrop: Can't locate mktexlsr.pl
+    @skipIf_CondaEnv()
+    def test_data_plot_3_2(self):
         fig2 = plot(self.my_dataset_light_80, title="title", resolution="13*19", format="pdf")
         compare_picture_files(fig2, "test3.2_fig.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)

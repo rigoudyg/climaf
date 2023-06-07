@@ -1,0 +1,64 @@
+name: Test suite 
+run-name: Test suite launched by ${{ github.actor }} 
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+  Sole_job_yet:
+    name: Testing with ubuntu 20.04, conda and python 3.11
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        #python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: [ "3.11"]
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: climaf_test
+          use-mamba: true
+          
+      - name: Cache Conda env
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{
+            hashFiles('tests/conda_test_environment.yml') }}-${{ env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if environment.yml has not changed
+          CACHE_NUMBER: 0
+        id: cache
+        
+      - name: Update environment if needed
+        run:
+          mamba env update -n climaf_test -f tests/conda_test_environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+      
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "netcdfbasics" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "period" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "cache" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "classes" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "functions" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "operators" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "standard_operators" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "operators_derive" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "operators_scripts" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "cmacro" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "driver" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "dataloc" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "find_files" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "html" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "example_data_retrieval" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "example_index_html" 0)
+      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "mcdo" 0)
+      #- run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "example_data_plot" 0 "github_conda_GR")

@@ -87,7 +87,8 @@ class DeriveAndAliasTests(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_derived_variable(self):
-        tas = ds(project='example', simulation="AMIPV6ALB2G", variable="tas_K_mul", frequency='monthly', period="198001")
+        tas = ds(project='example', simulation="AMIPV6ALB2G", variable="tas_K_mul", frequency='monthly',
+                 period="198001")
         self.assertEqual(str(tas), "ds('example|AMIPV6ALB2G|tas_K_mul|198001|global|monthly')")
         cfile(tas)
 

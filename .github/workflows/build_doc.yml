@@ -1,0 +1,52 @@
+name: Doc Build
+run-name: ${{ github.actor }} is building doc 
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+  Sole_job_yet:
+    name: Build doc 
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        
+      - name: Setup Mambaforge 
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: climaf_test
+          use-mamba: true
+          
+      - name: Cache Conda env
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CONDA }}/envs
+          key:
+            conda-${{ runner.os }}--${{ runner.arch }}--${{
+            hashFiles('tests/conda_test_environment.yml') }}-${{ env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 0
+        id: cache
+        
+      - name: Update environment
+        run:
+          mamba env update -n climaf_test -f tests/conda_test_environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - run: (cd doc && make -k html)
+
+      - name: Archive doc
+        uses: actions/upload-artifact@v3
+        with:
+          name: doc
+          retention-days: 5
+          path: |
+            doc/_build/html
+        

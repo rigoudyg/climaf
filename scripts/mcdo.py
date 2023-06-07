@@ -196,6 +196,7 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     else:
         return file_to_treat
 
+
 def IPSL_CMIP6_msftyz_dimfix(file_to_treat, tmp_dir, filevar, test=None):
     # Get rid of a degenerated dimension in IPSL CMIP6 outputs for variable msftyz
     # Echoes the name of a file with suppressed dimension (be it a modified file or a copy)
@@ -221,10 +222,10 @@ def IPSL_CMIP6_msftyz_dimfix(file_to_treat, tmp_dir, filevar, test=None):
                 os.remove(out)
             
             # Process orginal file to target file 
-            ds=xr.open_dataset(file_to_treat, decode_times=False)
+            ds = xr.open_dataset(file_to_treat, decode_times=False)
             ds['msftyz'] = ds['msftyz'].sel(x=0)
-            ds=ds.reset_coords(names=['nav_lat','nav_lon'])
-            ds=ds.drop(['nav_lat','nav_lon'])
+            ds = ds.reset_coords(names=['nav_lat', 'nav_lon'])
+            ds = ds.drop(['nav_lat', 'nav_lon'])
             ds.to_netcdf(out)
 
             # If allowed, remove original file (which is a link) and
@@ -250,13 +251,13 @@ def call_subprocess(command, test=None, allow_seldate_failure=False):
     clogger.debug("Command launched %s" % command)
     clogger.debug("Time at launch %s" % time.time())
     print_in_file(command, output_file=test)
-    proc=subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    proc = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     clogger.debug(proc.stdout)
     clogger.debug("Time at end %s" % time.time())
-    if proc.returncode != 0 :
+    if proc.returncode != 0:
         if allow_seldate_failure and \
-           re.match(".*cdo.*seldate",command) and \
-           re.match(".*cdo.*seldate.*No timesteps selected!",str(proc.stdout)):
+           re.match(".*cdo.*seldate", command) and \
+           re.match(".*cdo.*seldate.*No timesteps selected!", str(proc.stdout)):
             return False
         else:
             raise subprocess.CalledProcessError(
@@ -265,7 +266,6 @@ def call_subprocess(command, test=None, allow_seldate_failure=False):
                 output=proc.stdout)
     else:
         return True
-
 
 
 def remove_dir_and_content(path_to_treat):
@@ -389,7 +389,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
         cdo_command_for_merge = "-mergetime"
 
     # Then deal with date selection
-    seldate=""
+    seldate = ""
     clogger.debug("Period considered: %s" % period)
     if period is not None:
         seldate = "-seldate,{}".format(period)
@@ -441,7 +441,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
             else:
                 total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
             if seldate_is_first:
-                total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
+                total_cdo_commands_before_merge = [seldate, ] + total_cdo_commands_before_merge
             if len(total_cdo_commands_before_merge) > 0:
                 cdo_command = " ".join([init_cdo_command, ] + list(reversed(total_cdo_commands_before_merge)) +
                                        [a_file, tmp_file_path])
@@ -454,7 +454,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
                         clogger.error("Could not create file %s" % a_file)
                         raise Exception("Could not create file %s" % a_file)
                     files_to_treat_after_merging.append(a_file)
-                else :
+                else:
                     # Assume that seldate provided no data, and just ignore that file
                     pass
             else: 
@@ -480,7 +480,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
         else:
             total_cdo_commands_before_merge = cdo_commands_for_selvar + cdo_commands_before_merge
         if seldate_is_first:
-            total_cdo_commands_before_merge = [ seldate ] + total_cdo_commands_before_merge
+            total_cdo_commands_before_merge = [seldate, ] + total_cdo_commands_before_merge
         cdo_command = " ".join([init_cdo_command, ] + list(reversed(cdo_commands_after_merge)) +
                                list(reversed(total_cdo_commands_before_merge)) + files_to_treat_before_merging +
                                [output_file, ])

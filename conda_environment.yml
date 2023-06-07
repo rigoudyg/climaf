@@ -1,0 +1,28 @@
+name: climaf
+channels:
+  - pypi
+  - conda-forge
+dependencies:
+  - cdo
+  - nco
+  - ncl
+  - ncview
+  - python=3
+  - exiv2
+  - latexcodec
+  - pip
+  - pip:
+          - netCDF4
+          - numpy
+          - sphinx
+          - cftime
+          - natsort
+          - pyyaml
+          - matplotlib
+          - Cython
+          - Cartopy
+          - python-dateutil
+          - pdflatex
+          - dask
+          - xarray
+          - coverage
