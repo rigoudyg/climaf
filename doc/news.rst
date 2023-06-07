@@ -6,33 +6,6 @@ What's new
 
 Changes, newest first:
 
-- V3.x:
-
-   - Running on machines `spirit` : all CliMAF examples have been
-     adapted; also, the default format set for CDO outputs is now
-     NetDCF4.
-
-   - msftyz data for IPSLCM6 and CMIP6 are automatically fixed for
-     their degenerated dimension, provided environment variable
-     CLIMAF_FIX_IPSL_CMIP6_MSFTYZ is set (to any value)
-
-   - function ds() can resolve period=* if it is the only wildcard;
-     triggered by setting classes.auto_resolve to True
-
-   - Bugs :
-
-     - operators `regrid` and `regridn` take care of discarding any
-       ancillary variable in input data (such as `area` with `sos`),
-       in order that CDO succeeds in regriding
-
-     - fix on processing period=last_XX for a CMIP5 case
-     
-   - Internals :
-
-     - Engine mcdo.py now applies first the selection on date, in
-       order to take advantage of much improved CDO/NetCDF performance
-       on this operation
-
 - V3.0:
 
   - Compatibility break:
@@ -46,7 +19,9 @@ Changes, newest first:
       machine must export OPENBLAS_NUM_THREADS=1 or another sensible value
 
   - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
-    at TGCC on machine 'irene' and 'irene-amd' (including tests suite)
+    at TGCC on machine 'irene' and 'irene-amd' (including tests suite),
+    all CliMAF examples have been adapted; also, the default format
+    set for CDO outputs is now NetDCF4.
 
   - function :py:func:`~climaf.classes.fds` now sets the dataset's
     frequency using file's global attribute 'frequency'
@@ -56,8 +31,15 @@ Changes, newest first:
     provides a consistent return value (which can be None if a
     decision cannot be made)
 
+  - function :py:func:`climaf.class.ds` can resolve period=* if it is the only wildcard;
+    triggered by setting classes.auto_resolve to True
+
   - default is now to deactivate optimization for CMIP6 data indexing,
     which seems buggy
+
+  - msftyz data for IPSLCM6 and CMIP6 are automatically fixed for
+    their degenerated dimension, provided environment variable
+    CLIMAF_FIX_IPSL_CMIP6_MSFTYZ is set (to any value)
 
   - when dealing with netcdf files without time bounds, it must be specified
     when the project is defined using option 'use_frequency=True'. 'frequency'
@@ -67,7 +49,17 @@ Changes, newest first:
 
   - A project can now be derived from an existing one (facets, dataloc).
 
-  - technical :
+  - Bugs :
+
+    - operators `regrid` and `regridn` take care of discarding any
+      ancillary variable in input data (such as `area` with `sos`),
+      in order that CDO succeeds in regriding
+
+    - fix on processing period=last_XX for a CMIP5 case
+
+    - fix bugs in find_files (for case period = fx), in clist
+
+  - Technical :
 
     - clean-up of netcdf libraries use : xarray becomes the sole
       package used; module anynetcdf is discarded and only functions
@@ -79,7 +71,9 @@ Changes, newest first:
 
     - ease installation by embarking epstopdf
 
-    - fix bugs in find_files (for case period = fx), in clist
+    - Engine mcdo.py now applies first the selection on date, in
+      order to take advantage of much improved CDO/NetCDF performance
+      on this operation
 
 - V2.0.2:
 
