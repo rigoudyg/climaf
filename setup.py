@@ -9,7 +9,7 @@ from setuptools import setup
 version = __import__('env.environment').environment.climaf_version
 description = 'CliMAF: a Climate Model Assessment Framework.'
 long_description = (
-    open('README.rst').read()
+    open('README.md').read()
 )
 
 requires = [line.strip() for line in open('requirements.txt')]
