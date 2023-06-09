@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """
@@ -30,17 +30,17 @@ class scriptFlags(object):
 
     def __eq__(self, other):
         return isinstance(other, scriptFlags) and \
-               (self.canOpendap == other.canOpendap) and \
-               (self.canSelectVar == other.canSelectVar) and \
-               (self.canSelectTime == other.canSelectTime) and \
-               (self.canSelectDomain == other.canSelectDomain) and \
-               (self.canAggregateTime == other.canAggregateTime) and \
-               (self.canAlias == other.canAlias) and \
-               (self.canMissing == other.canMissing) and \
-               (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
-               (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
-               (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation) and \
-               (self.doCatTime == other.doCatTime)
+            (self.canOpendap == other.canOpendap) and \
+            (self.canSelectVar == other.canSelectVar) and \
+            (self.canSelectTime == other.canSelectTime) and \
+            (self.canSelectDomain == other.canSelectDomain) and \
+            (self.canAggregateTime == other.canAggregateTime) and \
+            (self.canAlias == other.canAlias) and \
+            (self.canMissing == other.canMissing) and \
+            (self.commuteWithEnsemble == other.commuteWithEnsemble) and \
+            (self.commuteWithTimeConcatenation == other.commuteWithTimeConcatenation) and \
+            (self.commuteWithSpaceConcatenation == other.commuteWithSpaceConcatenation) and \
+            (self.doCatTime == other.doCatTime)
 
     def unset_selectors(self):
         self.canSelectVar = False

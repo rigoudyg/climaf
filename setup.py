@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from setuptools import find_packages
 from setuptools import setup
 
-version = __import__('climaf').version
+# version = __import__('climaf.cache').climaf_version
+
+version = __import__('env.environment').environment.climaf_version
 description = 'CliMAF: a Climate Model Assessment Framework.'
 long_description = (
-    open('README.rst').read()
+    open('README.md').read()
 )
 
 requires = [line.strip() for line in open('requirements.txt')]

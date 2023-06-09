@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -10,17 +10,18 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 import os
 import sys
-import subprocess
-try:
-    from commands import getoutput, getstatusoutput
-except ImportError:
-    from subprocess import getoutput, getstatusoutput
+from subprocess import getoutput, getstatusoutput
 
 from env.clogging import clogger, clog, clog_file
 import env.clogging
-from env.site_settings import atTGCC, atIPSL, onCiclad
+from env.site_settings import *
 
 # Variables
+
+#: Climaf version
+from env.utils import get_subprocess_output
+
+climaf_version = "3.0"
 
 #: Dictionary of declared projects (type is cproject)
 cprojects = dict()
@@ -91,19 +92,20 @@ cacheIndexFileName = None
 currentCache = None
 
 #: Should the search for CMI6 files be optimized by building tables
-optimize_cmip6_wildcards = True
+optimize_cmip6_wildcards = False  # (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
 stamping = True
 
+#: For development usage, the list of projects for which the check on valid values will not raise an error
+bypass_valid_check_for_project = []
+
 
 # Check commands available
 def my_which(soft):
-    rep = subprocess.check_output("which {}".format(soft), shell=True).decode("utf-8")
-    if "\n" in rep:
-        rep = rep.replace("\n", "")
-    return rep
+    return get_subprocess_output("which {}".format(soft), to_replace=[("\n", "")])
+
 
 #
 # Set default logging levels
@@ -112,7 +114,7 @@ clog(loglevel)
 env.clogging.logdir = logdir
 if not os.access(env.clogging.logdir, mode=os.W_OK):
     print("Cannot write logfile in non-writeable directory : " + os.path.abspath(env.clogging.logdir))
-    exit()
+    sys.exit()
 clog_file(logfilelevel)
 
 # Ensure that the variable TMPDIR, if defined, points to an existing directory
@@ -126,15 +128,7 @@ if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
 # Check dependencies
 try:
     xdg_bin = my_which("xdg-open")
-    print("xdg-open is available")
-except:
-    xdg_bin = None
-    print("Warning: could not find xdg-open")
-
-# Check dependencies
-try:
-    xdg_bin = my_which("xdg-open")
-    print("xdg-open is available")
+    # print("xdg-open is available")
 except:
     xdg_bin = None
     print("Warning: could not find xdg-open")
@@ -145,11 +139,16 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
     print("---")
     print("Required softwares to run CliMAF => you are using the following versions/installations:")
     try:
-        ncl_software = my_which("ncl")
+        if atCNRM:
+            ncl_software = "/opt/ncarg6/bin/ncl"
+            if not os.path.exists(ncl_software):
+                ncl_software = my_which("ncl")
+        else:
+            ncl_software = my_which("ncl")
         clogger.info("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)
     except:
         ncl_software = None
-        clogger.warning("ncl not found -> can't use CliMAF plotting scripts")
+        clogger.warning("ncl not found -> can't use CliMAF plotting scripts based on it")
     try:
         cdo_software = my_which("cdo")
         tmp = str.split(getstatusoutput(cdo_software + ' -V')[1], ' ')
@@ -212,3 +211,9 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         clogger.warning("At least one stamping requirement is not fulfilled, turn it to None.")
         stamping = None
     clogger.info("---")
+
+if atCNRM:
+    pdf_page_builder = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
+else:
+    pdf_page_builder = "pdfjam"
+

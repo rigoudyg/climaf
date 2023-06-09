@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CORDEX, CORDEX_extent and CORDEX-Adjust outputs on Ciclad-CLIMERI
@@ -18,13 +18,13 @@ Attributes are:
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 
 root = None
-if onCiclad:
+if onCiclad or onSpirit:
     root = "/bdd"
 # if atCNRM:
 #   # Declare a list of root directories for IPSL data at TGCC

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """
@@ -16,6 +16,8 @@ from env.environment import *
 from climaf.cache import setNewUniqueCache, craz
 from climaf.operators import scriptFlags, cscript, fixed_fields, coperator
 from climaf.operators_derive import derive, is_derived_variable, derived_variable, Climaf_Operator_Error
+from climaf.classes import calias, ds
+from climaf.driver import cfile
 
 
 class DeriveTest(unittest.TestCase):
@@ -71,6 +73,24 @@ class DerivedVariableTest(unittest.TestCase):
         self.assertIsNone(derived_variable("ta", "CMIP6"))
         self.assertEqual(derived_variable("rscre", "erai"), ("minus", "rscre", ["rs", "rscs"], {}))
         self.assertEqual(derived_variable("ta", "erai"), ('rescale', 'ta', ['t'], {'scale': 1.0, 'offset': 0.0}))
+
+    def tearDown(self):
+        craz()
+
+
+class DeriveAndAliasTests(unittest.TestCase):
+
+    def setUp(self):
+        calias("example", 'tas_degC', 'tas', scale=1., offset=-273.15, units="degC")
+        derive('example', 'tas_degC_mul', 'ccdo', 'tas_degC', operator="mulc,5")
+        calias("example", "tas_K_mul", "tas_degC_mul", offset=273.15, units="K")
+
+    @unittest.expectedFailure
+    def test_derived_variable(self):
+        tas = ds(project='example', simulation="AMIPV6ALB2G", variable="tas_K_mul", frequency='monthly',
+                 period="198001")
+        self.assertEqual(str(tas), "ds('example|AMIPV6ALB2G|tas_K_mul|198001|global|monthly')")
+        cfile(tas)
 
     def tearDown(self):
         craz()

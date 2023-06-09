@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
@@ -12,7 +12,9 @@ from climaf.utils import Climaf_Error
 from climaf.api import *
 from climaf.operators import *
 from climaf.driver import cvalue, cfile
+from climaf.netcdfbasics import varsOfFile, verticalLevelName, verticalLevelUnits, verticalLevelValues
 from climaf import classes
+from climaf import cachedir
 
 
 def cscalar(dat):
@@ -228,27 +230,16 @@ def iplot(map):
 # -- Calcul de moyenne sur la verticale dans l'ocean
 
 # -> Identifie les niveaux verticaux du fichier compris entre zmin et zmax
-def getLevs(dat, zmin=0, zmax=100000, convertPressureUnit=None):
+def getLevs(filename, zmin=0, zmax=100000, convertPressureUnit=None):
     """
     TBD
     """
-    from climaf.anynetcdf import ncf
-    filename = cfile(dat)
-    fileobj = ncf(filename)
     min_lev = zmin
     max_lev = zmax
     my_levs = None
-    levname = None
-    for varname in fileobj.variables:
-        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'plev'] or \
-                'plev' in varname.lower():
-            levname = varname
-    levunits = fileobj.variables[levname].units
-    try:
-        levValues = fileobj.variables[levname].getValue()
-    except:
-        levValues = fileobj[levname][0:len(fileobj[levname])]
-    for lev in levValues:
+    levname = verticalLevelName(filename)
+    levunits = verticalLevelUnits(filename)
+    for lev in verticalLevelValues(filename):
         if min_lev <= lev <= max_lev:
             if convertPressureUnit:
                 if convertPressureUnit in ['hPaToPa', ]:
@@ -581,8 +572,8 @@ def summary(dat):
             for key in tmpkvp:
                 if isinstance(tmpkvp[key], list) and len(tmpkvp[key]) > 1:
                     keytest = key
-                    print('Multiple available values for attribute "' + key + '" that is set to "*" in your ds() call: '
-                          , tmpkvp[key])
+                    print('Multiple available values for attribute "' + key +
+                          '" that is set to "*" in your ds() call: ', tmpkvp[key])
                     print('Specify one of them (within ds() or with cdef())')
             if not keytest:
                 for f in dat.baseFiles(ensure_dataset=False).split():
@@ -630,22 +621,11 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
 
     """
 
-    from climaf.anynetcdf import ncf
-    from climaf import cachedir
-
     file1 = cfile(dat1)
-    clogger.debug('file1 = %s' % file1)
-    ncfile1 = ncf(file1)
 
     # -- First, we check the unit of the vertical dimension of file1
-    levname1 = None
-    for varname in ncfile1.variables:
-        if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] or \
-                'plev' in varname.lower():
-            levname1 = varname
-    if not levname1:
-        clogger.debug('Name of the vertical axis not found for dat1')
-    levunits1 = ncfile1.variables[levname1].units
+    levname1 = verticalLevelName(file1)
+    levunits1 = verticalLevelUnits(file1)
     if levunits1.lower() in ['hpa', 'millibar', 'mbar', 'hectopascal']:
         # -- Multiplier par 100
         cscript('convert_plev_hPa_to_Pa',
@@ -659,25 +639,10 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
     if dat2:
         file2 = cfile(dat2)
         clogger.debug('file2 = %s' % file2)
-        ncfile2 = ncf(file2)
+        levname2 = verticalLevelName(file1)
+        levunits2 = verticalLevelUnits(file2)
+        levValues2 = verticalLevelValues(file2)
 
-        levname2 = None
-        for varname in ncfile2.variables:
-            if varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] or \
-                    'plev' in varname.lower():
-                levname2 = varname
-        clogger.debug('levname2 = %s' % levname2)
-        if not levname2:
-            clogger.debug('Name of the vertical axis not found for dat2')
-        levunits2 = ncfile2.variables[levname2].units
-        clogger.debug('ncfile2 = %s' % ncfile2)
-        try:
-            levValues2 = ncfile2.variables[levname2].getValue()
-        except:
-            try:
-                levValues2 = ncfile2.variables[levname2].data
-            except:
-                levValues2 = ncfile2[levname2][0:len(ncfile2[levname2])]
         if levunits2.lower() in ['hpa', 'millibar', 'mbar', 'hectopascal']:
             # -- Multiplier par 100
             cscript('convert_plev_hPa_to_Pa',
@@ -685,7 +650,6 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
                     '/convert_to_Pa_tmp.nc ; ncatted -O -a units,' + levname2 + ',o,c,Pa ' + cachedir +
                     '/convert_to_Pa_tmp.nc ; mv ' + cachedir + '/convert_to_Pa_tmp.nc ${out}')
             dat2 = climaf.operators.convert_plev_hPa_to_Pa(dat2)
-
             # -> The vertical axis of file2 is now set to Pa in the netcdf file
             scale = 100.0
         else:

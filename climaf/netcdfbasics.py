@@ -1,65 +1,61 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import datetime
 import re
+import warnings
+import xarray as xr
+import six
+from datetime import timedelta
 
+from climaf.utils import Climaf_Error
 from env.environment import *
 from env.clogging import clogger, dedent
-from climaf.period import cperiod
-from climaf.anynetcdf import ncf
+from climaf.period import cperiod, freq_to_minutes
 
-
-class Climaf_Netcdf_Error(Exception):
-    def __init__(self, valeur):
-        self.valeur = valeur
-        clogger.error(self.__str__())
-        dedent(100)
-
-    def __str__(self):
-        return repr(self.valeur)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def varOfFile(filename):
     lvars = varsOfFile(filename)
     if len(lvars) > 1:
-        clogger.debug("Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
+        # Special case of IPSL-CM outputs
+        for area in ["area", "cell_area", "aire"]:
+            if area in lvars:
+                lvars.remove(area)
+        for var in lvars.copy():
+            if re.findall("_b(ou)?nds$", var):
+                lvars.remove(var)
+    if len(lvars) > 1:
+        clogger.error(
+            "Got multiple variables (%s) and no direction to choose  - File is %s" % (repr(lvars), filename))
         return None
     if len(lvars) == 1:
         return lvars[0]
 
 
-def varsOfFile(filename):
+def varsOfFile(filename, all=False):
     """
-    Returns the list of non-dimensions variable in NetCDF file FILENAME
+    Returns the list of variable names in NetCDF file FILENAME. If ALL is False
+    only variable which are not dimensions nor scalar coordinates are returned
     """
-    lvars = []
-    fileobj = ncf(filename, 'r')
-    vars = fileobj.variables
-    if isinstance(vars, dict):
-        svars = list(vars)
-    for filevar in svars:
-        if ((filevar not in fileobj.dimensions) and
-                # other variables linked to dimensions
-                not re.findall("^lat", filevar) and
-                not re.findall("^lon", filevar) and
-                not re.findall("^LAT", filevar) and
-                not re.findall("^LON", filevar) and
-                not re.findall("nav_lat", filevar) and
-                not re.findall("nav_lon", filevar) and
-                not re.findall("^time_", filevar) and
-                not re.findall("crs", filevar) and
-                not re.findall("_bnds$", filevar)):
-            lvars.append(filevar)
-    # case of scalar coordinates
-    if isinstance(vars, dict):
-        for var in vars.keys():
-            if var in lvars and (hasattr(vars[var], "axis") or hasattr(vars[var], "bounds")):
-                lvars.remove(var)
-
-    fileobj.close()
-    return lvars
+    lvars = list()
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        lvars = set(list(ds.variables.keys()))
+        if all is False:
+            # remove dimensions
+            lvars = lvars - set(list(ds.dims))
+            # Remove scalar coordinates
+            lvars = [elt for elt in lvars if not(
+                hasattr(ds[elt], "axis") or hasattr(ds[elt], "bounds"))]
+            # Remove variables which are related to dimensions (e.g. dim bounds....)
+            lvars = [elt for elt in lvars
+                     if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", elt)]
+        else:
+            lvars = lvars & set(list(ds.dim))
+    return sorted(list(lvars))
 
 
 def fileHasVar(filename, varname):
@@ -67,39 +63,17 @@ def fileHasVar(filename, varname):
     returns True if FILENAME has variable VARNAME
     """
     rep = False
-    clogger.debug("opening " + filename + " for checkin if has variable " + varname)
-    fileobj = ncf(filename)
-    vars = fileobj.variables
-    if isinstance(vars, dict):
-        vars = list(vars)
-    for filevar in vars:
-        if filevar == varname:
-            rep = True
-            break
-    fileobj.close()
-    return rep
+    clogger.debug("opening " + filename +
+                  " for checkin if has variable " + varname)
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        return varname in ds
 
 
 def fileHasDim(filename, dimname):
     """
     returns True if FILENAME has dimension dimname
     """
-    rep = False
-    clogger.debug("opening " + filename + " for checkin if has dimension " + dimname)
-    fileobj = ncf(filename)
-    dims = fileobj.dimensions
-    vars = fileobj.variables
-    if isinstance(dims, dict):
-        dims = list(dims)
-    if isinstance(vars, dict):
-        vars = list(vars)
-    dims = dims + vars
-    for filedim in dims:
-        if filedim == dimname:
-            rep = True
-            break
-    fileobj.close()
-    return rep
+    return dimname in dimsOfFile(filename)
 
 
 def dimsOfFile(filename):
@@ -107,46 +81,168 @@ def dimsOfFile(filename):
     returns the list of dimensions of the netcdf file filename
     """
     clogger.debug("opening " + filename + " for checking the dimensions")
-    fileobj = ncf(filename)
-    dims = fileobj.dimensions
-    if isinstance(dims, dict):
-        dims = list(dims)
-    fileobj.close()
-    return dims
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        return ds.dims
 
 
 def model_id(filename):
     """
 
     """
-    rep = 'no_model'
-    clogger.debug("opening " + filename)
-    f = ncf(filename, 'r')
-    if 'model_id' in dir(f):
-        rep = f.model_id
-    f.close()
-    return rep
+    return attrOfFile(filename, 'model_id', 'no_model')
 
 
-def timeLimits(filename):
+def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name=True,
+               cell_methods=None, time_average=None):
+    """
+    Returns a cperiod object representing the time period covered by a datafile or 
+    a cftime Index 
+
+    For the case of a datafile : if there is a time bounds variable if file, it is 
+    used. Otherwise, if use_frequency is True, method below is applied
+
+    For the case of a cftime Index argument, except is use_frequency is True, its 
+    first and last time values are used; otherwise, method below applies
+
+    When no time bounds are available: if time_average is False, we assume that 
+    values are instant values; otherwise, arg cell_methods is scrutinized
+    to detect a 'time:mean' occurrence and decide if we have instant values. If we 
+    don't, and use_frequency is True, the frequency between time values is computed, 
+    and used to compute bounds by adding half a period at both ends (the case is 
+    of month is handled)
+
+    """
+    tdim = None
+    if isinstance(filename_or_timedim, six.string_types):
+        with xr.open_dataset(filename_or_timedim, use_cftime=True) as ds:
+            for var in ds.variables:
+                if re.findall("^time.*b(ou)?nds$", var):
+                    tdim = ds.variables[var]
+                    break
+        if tdim is not None:
+            start = tdim[0, 0]  # This is a DataArray
+            end = tdim[-1, 1]
+    elif not use_frequency:
+        # Assume that the provided cfTime index represents time bounds
+        tdim = filename_or_timedim
+        start = tdim[0]  # This is a DataArray
+        end = tdim[-1]
+    if tdim is not None:
+        start = start.values.flatten()[0]  # this is a nectdf time object
+        end = end.values.flatten()[0]
+        return cperiod(start, end)
     #
-    try:
-        import netcdftime
-    except ImportError:
-        try:
-            from NetCDF4 import netcdftime
-        except ImportError:
-            raise Climaf_Netcdf_Error("Netcdf time handling is yet available only with module netcdftime")
-    #
-    rep = None
-    f = ncf(filename)
-    if 'time_bnds' in f.variables:
-        tim = f.variables['time_bnds']
-        if 'units' in dir(tim) and 'calendar' in dir(tim):
-            start = tim[0, 0]
-            end = tim[-1, 1]
-            ct = netcdftime.utime(tim.units, calendar=tim.calendar)
-            return cperiod(ct.num2date(start), ct.num2date(end))
-    f.close()
-    return rep
-    # raise Climaf_Netcdf_Error("No time bounds in file %s, and no guess method yet developped (TBD)"%filename)
+    else:
+        if not isinstance(filename_or_timedim, six.string_types):
+            timedim = filename_or_timedim
+        else:
+            with xr.open_dataset(filename_or_timedim, use_cftime=True) as ds:
+                if "time" in ds:
+                    timedim = ds.time
+                else:
+                    time_error_message = "No time dimension found in %s, dims are %s" % \
+                                         (filename_or_timedim, [
+                                          str(d) for d in ds.dims])
+                    if strict_on_time_dim_name:
+                        clogger.warning(time_error_message)
+                        return None
+                    else:
+                        found = False
+                        for dim in ds.dims:
+                            if re.findall("^time.*", str(dim)):
+                                start = ds[dim][0].values.flatten()[0]
+                                end = ds[dim][-1].values.flatten()[0]
+                                timedim = ds[dim]
+                                found = True
+                                break
+                        if not found:
+                            clogger.error(time_error_message)
+                            return None
+        #
+        if cell_methods is not None and time_average is None:
+            time_average = (re.findall(
+                '.*time *: *mean', cell_methods)[0] != '')
+        if time_average is False:
+            delta = 0
+        else:
+            if use_frequency is False:
+                raise Climaf_Error("No time bounds variable in file or no time dimension provided, " +
+                                   "and use_frequency is False (%s)" % filename_or_timedim)
+            try:
+                data_freq = xr.infer_freq(timedim)
+            except:
+                data_freq = use_frequency
+            if not data_freq:
+                data_freq = use_frequency
+            if not data_freq:
+                raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
+                                   timedim.name + os.linesep + str(timedim))
+            delta = freq_to_minutes(data_freq) / 2
+            if delta is None:
+                clogger.error("Frequency %s not yet managed" % data_freq)
+                return None
+            if data_freq[-2:] == "MS" and start.days in [14, 15, 16] and end.days in [14, 15, 16]:
+                delta = "special_month"
+        #
+        start = timedim[0].values.flatten()[0]
+        if isinstance(start, float):
+            start = convert_date_string_to_datetime(str(int(start)))
+        end = timedim[-1].values.flatten()[0]
+        if isinstance(end, float):
+            end = convert_date_string_to_datetime(str(int(end)))
+        if delta == "special_month":
+            start = start - timedelta(days=start.day - 1)
+            end = end + timedelta(days=end.daysinmonth - end.day + 1)
+        else:
+            start = start - timedelta(minutes=delta)
+            end = end + timedelta(minutes=delta)
+        return cperiod(start, end)
+
+
+def convert_date_string_to_datetime(a_date):
+    date_formats = ["%Y", "%Y%m", "%Y%m%d",
+                    "%Y%m%d%H", "%Y%m%d%H%M", "%Y%m%d%H%M%S"]
+    length = len(a_date)
+    if length in [4, 6, 8, 10, 12, 14]:
+        # The index of the date format is 0 for 4-digits date, 1 for 6-digits date...
+        pattern = date_formats[(length - 4) // 2]
+    else:
+        clogger.error(
+            "The entry date has a length of %d, can not handle it" % len(a_date))
+        raise ValueError(
+            "The entry date has a length of %d, can not handle it" % len(a_date))
+    return datetime.datetime.strptime(a_date, pattern)
+
+
+def isVerticalLevel(varname):
+    return varname.lower() in ['level', 'levels', 'lev', 'levs', 'depth', 'deptht', 'presnivs', 'olevel'] \
+        or 'plev' in varname.lower()
+
+
+def verticalLevelName(filename):
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        varname = [var for var in ds.variables if isVerticalLevel(var)]
+        if len(varname) > 0:
+            return varname[0]
+        else:
+            raise Climaf_Error(
+                "No vertical level dimension identified in %s" % filename)
+
+
+def verticalLevelUnits(filename):
+    lev = verticalLevelName(filename)
+    if lev:
+        with xr.open_dataset(filename, decode_times=False) as ds:
+            return ds[lev].units
+
+
+def verticalLevelValues(filename):
+    lev = verticalLevelName(filename)
+    if lev:
+        with xr.open_dataset(filename, decode_times=False) as ds:
+            return list(ds[lev].values)
+
+
+def attrOfFile(filename, attribute, default=None):
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        return getattr(ds, attribute, default)

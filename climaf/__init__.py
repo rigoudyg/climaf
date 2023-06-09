@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Climaf is documented at ReadTheDocs : http://climaf.readthedocs.org/
@@ -12,11 +12,8 @@ import os
 # Created : S.Sénési - 2014
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
-           "operators", "period", "standard_operators", "cmacro", "html", "functions", "plot",
-           "projects", "derived_variables","ESMValTool_diags"]
-
-
-version = "2.0.2"
+           "operators", "period", "standard_operators", "cmacro", "chtml", "functions", "plot",
+           "projects", "derived_variables", "ESMValTool_diags"]
 
 
 def tim(string=None):
@@ -49,9 +46,9 @@ if not already_inited and not onrtd:
 
     tim("atexit")
     #
-    print("CliMAF version = " + version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
     from env.environment import *
+    print("CliMAF climaf_version = " + climaf_version, file=sys.stderr)
+    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
 
     tim("softwares")
     #
@@ -96,7 +93,7 @@ if not already_inited and not onrtd:
         exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
-    # Load cache scalar values 
+    # Load cache scalar values
     cache.load_cvalues()
     tim("load_cvalues")
     #

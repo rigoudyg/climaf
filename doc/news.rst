@@ -6,6 +6,75 @@ What's new
 
 Changes, newest first:
 
+- V3.0:
+
+  - Compatibility break:
+
+    - Python2 compatibility is dropped in this version.
+
+    - climaf module `html` has been renamed `chtml` to avoid conflicts with python
+      standard package `html`
+
+    - because CliMAF now uses xarray as sole netcdf package, users on shared
+      machine must export OPENBLAS_NUM_THREADS=1 or another sensible value
+
+  - CliMAF now runs on new IPSL clusters 'spirit1' and "spirit2' and
+    at TGCC on machine 'irene' and 'irene-amd' (including tests suite),
+    all CliMAF examples have been adapted; also, the default format
+    set for CDO outputs is now NetDCF4.
+
+  - function :py:func:`~climaf.classes.fds` now sets the dataset's
+    frequency using file's global attribute 'frequency'
+
+  - dataset's method :py:meth:`~climaf.classes.cdataset.check` has
+    been reworked, accepts flags for setting what to check, and
+    provides a consistent return value (which can be None if a
+    decision cannot be made)
+
+  - function :py:func:`climaf.class.ds` can resolve period=* if it is the only wildcard;
+    triggered by setting classes.auto_resolve to True
+
+  - default is now to deactivate optimization for CMIP6 data indexing,
+    which seems buggy
+
+  - msftyz data for IPSLCM6 and CMIP6 are automatically fixed for
+    their degenerated dimension, provided environment variable
+    CLIMAF_FIX_IPSL_CMIP6_MSFTYZ is set (to any value)
+
+  - when dealing with netcdf files without time bounds, it must be specified
+    when the project is defined using option 'use_frequency=True'. 'frequency'
+    must also be a facet of the project and it must be initialized using `cdef`.
+    'frequency' currently support the following values: 'mon' (month), 'MS' (month),
+    'D' (day), 'H' (hour), 'M' (minute).
+
+  - A project can now be derived from an existing one (facets, dataloc).
+
+  - Bugs :
+
+    - operators `regrid` and `regridn` take care of discarding any
+      ancillary variable in input data (such as `area` with `sos`),
+      in order that CDO succeeds in regriding
+
+    - fix on processing period=last_XX for a CMIP5 case
+
+    - fix bugs in find_files (for case period = fx), in clist
+
+  - Technical :
+
+    - clean-up of netcdf libraries use : xarray becomes the sole
+      package used; module anynetcdf is discarded and only functions
+      provided by module nectdfbasics are used throughout CliMAF code,
+      except for a very few calls to xarray (in driver.cread and
+      classes.cdatset.check)
+
+    - remove dependency to module 'cesemp_env' in bin/climaf
+
+    - ease installation by embarking epstopdf
+
+    - Engine mcdo.py now applies first the selection on date, in
+      order to take advantage of much improved CDO/NetCDF performance
+      on this operation
+
 - V2.0.2:
 
   - CliMAF can **call ESMValTool diagnostic scripts**, feeding them with data accessed and pre-processed by CliMAF calls. See :doc:`esmvaltool`
@@ -464,9 +533,9 @@ Changes, newest first:
 
   - html package:
 
-    - **Change interface for function** :py:func:`~climaf.html.line`: now use a list of pairs (label,figure_filename)
+    - **Change interface for function** :py:func:`~climaf.chtml.line`: now use a list of pairs (label,figure_filename)
       as first arg
-    - add function :py:func:`~climaf.html.link_on_its_own_line`
+    - add function :py:func:`~climaf.chtml.link_on_its_own_line`
 
 
 
@@ -662,9 +731,9 @@ Changes, newest first:
 
   - A new standard operator, to crop eps figures to their minimal size: ``cepscrop``; see :doc:`scripts/cepscrop`
 
-  - Changes for several functions of package :py:mod:`climaf.html` (which easily creates an html index which includes
-    tables of links -or thumbnails- to image files). See :py:func:`~climaf.html.link()`, :py:func:`~climaf.html.cell()`,
-    :py:func:`~climaf.html.line()`, :py:func:`~climaf.html.fline()`, :py:func:`~climaf.html.flines()`:
+  - Changes for several functions of package :py:mod:`climaf.chtml` (which easily creates an html index which includes
+    tables of links -or thumbnails- to image files). See :py:func:`~climaf.chtml.link()`, :py:func:`~climaf.chtml.cell()`,
+    :py:func:`~climaf.chtml.line()`, :py:func:`~climaf.chtml.fline()`, :py:func:`~climaf.chtml.flines()`:
 
     - new arguments:
 
@@ -782,8 +851,8 @@ Changes, newest first:
   - Multi-variable datasets are managed. This is handy for cases where variables are grouped in a file. See an example
     in: :download:`cdftransport.py <../examples/cdftransport.py>`, where variable 'products' is assigned
 
-  - Package :py:mod:`climaf.html` has been re-designed: simpler function names (:py:func:`~climaf.html.fline()`,
-    :py:func:`~climaf.html.flines()`, addition of basic function :py:func:`~climaf.html.line()` for creating a simple
+  - Package :py:mod:`climaf.chtml` has been re-designed: simpler function names (:py:func:`~climaf.chtml.fline()`,
+    :py:func:`~climaf.chtml.flines()`, addition of basic function :py:func:`~climaf.chtml.line()` for creating a simple
     links line; improve doc
 
   - New function :py:func:`~climaf.classes.fds()` allows to define simply a dataset from a single data file. See example
@@ -837,12 +906,12 @@ Changes, newest first:
 
   - Outputs and rendering
 
-    - Package climaf.html allows to **easily create an html index**, which includes tables of links (or thumbnails) to
+    - Package climaf.chtml allows to **easily create an html index**, which includes tables of links (or thumbnails) to
       image files; iterating on e.g. seasons and variables is handled by CliMAF. See:
 
       - a screen dump for such an index: |indx|
       - the corresponding rendering code in :download:`index_html.py <../examples/index_html.py>`
-      - the package documentation: :py:mod:`climaf.html`
+      - the package documentation: :py:mod:`climaf.chtml`
     - Function :py:func:`~climaf.driver.cfile` can create **hard links**: the same datafile (actually: the samer inode)
       will exists with two filenames (one in CliMAF cache, one which is yours), while disk usage is counted only for one
       datafile; you may remove any of the two file(name)s as you want, without disturbing accessing the data with the

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -21,7 +21,6 @@ testmodules = [
     "env.site_settings",
     "climaf",
     "climaf.api",
-    "climaf.anynetcdf",
     "climaf.cache",
     "climaf.classes",
     "climaf.cmacro",
@@ -29,7 +28,7 @@ testmodules = [
     "climaf.driver",
     "climaf.easyCMIP_functions",
     "climaf.functions",
-    "climaf.html",
+    "climaf.chtml",
     "climaf.netcdfbasics",
     "climaf.operators",
     "climaf.operators_derive",

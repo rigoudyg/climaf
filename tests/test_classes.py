@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from env.environment import *
-from env.site_settings import atCNRM, onCiclad
+from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC
 from climaf.cache import setNewUniqueCache, craz
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
     calias, crealms
@@ -56,6 +56,21 @@ class CprojectTests(unittest.TestCase):
 
     @unittest.skipUnless(False, "Test not yet written")
     def test_cproject_crs2ds(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_cvalid(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_cvalid_values(self):
+        # TODO: Write the test
+        pass
+
+    @unittest.skipUnless(False, "Test not yet written")
+    def test_cpoject_initialize_user_cvalid_values(self):
         # TODO: Write the test
         pass
 
@@ -166,8 +181,10 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip")
-        elif onCiclad:
+        elif onCiclad or onSpirit:
             self.assertEqual(a["root"], "/bdd")
+        elif atTGCC:
+            root = "/ccc/work/cont003/cmip6/cmip6"
         else:
             self.assertEqual(a["root"], "")
         self.assertEqual(a["simulation"], "")
@@ -194,7 +211,7 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         # TODO: Test the place on which the test is launched before this test
         if atCNRM:
             self.assertEqual(a["root"], "/cnrm/cmip/cnrm/ESG")
-        elif onCiclad:
+        elif onCiclad or onSpirit:
             self.assertEqual(a["root"], "/bdd")
         else:
             self.assertEqual(a["root"], "")
@@ -269,7 +286,7 @@ class CdatasetTests(unittest.TestCase):
         # TODO: Write the test
         if atCNRM:
             self.root = "/cnrm/cmip/cnrm/ESG"
-        elif onCiclad:
+        elif onCiclad or onSpirit:
             self.root = "/bdd"
         else:
             self.root = ""

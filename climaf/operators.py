@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 
@@ -11,10 +11,12 @@ CliMAF handling of external scripts and binaries , and of internal operators (Py
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import re
+import subprocess
 
 
 from env.clogging import clogger
 from env.environment import *
+from env.utils import get_subprocess_output
 from climaf.operators_scripts import scriptFlags
 from climaf.utils import Climaf_Operator_Error
 from climaf.driver import capply
@@ -233,8 +235,7 @@ class cscript(object):
             # Check now that script is executable
             scriptcommand = command.split(' ')[0].replace("(", "")
             try:
-                executable = str(subprocess.check_output("which {}".format(scriptcommand), shell=True))
-                executable = executable.replace("\n", "")
+                executable = get_subprocess_output("which {}".format(scriptcommand), to_replace=[("\n", "")])
                 clogger.debug("Found %s" % executable)
                 #
                 # Analyze inputs field keywords and populate dict
@@ -417,7 +418,6 @@ if __name__ == "__main__":
     def ceval(script_name, *args, **dic):
         print(script_name, " has been called with args=", args, " and dic=", dic)
         print("Command would be:", end=" ")
-
 
     cscript('test_script', 'echo $*')
     test_script(arg1=1, arg2='two')

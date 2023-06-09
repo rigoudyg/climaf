@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
  Basic types and syntax for a CLIMAF Reference Syntax interpreter and driver
@@ -14,16 +14,46 @@ import re
 import string
 import copy
 import os.path
+from collections import defaultdict
 from functools import reduce, partial
 import six
+import warnings
+import json
+import shutil
+import glob
+import xarray as xr
+from datetime import timedelta
 
 from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
 from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
-    lastyears, firstyears, group_periods
+    lastyears, firstyears, group_periods, freq_to_minutes
 from env.clogging import clogger
-from climaf.netcdfbasics import fileHasVar, varsOfFile, timeLimits, model_id
+from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# Should function ds() try to resolve for period=*
+auto_resolve = False
+
+
+def derive_cproject(name, parent_name, new_project_facets=list()):
+    """
+    Create a new project named 'name' from the project 'parent_name' adding the facets listed in 'new_project_facets'
+    if specified. Also derive the location list from the parent project.
+
+    :param name: name of the new project
+    :param parent_name: name of the source project
+    :param new_project_facets: the list of the facets to add to the new project (could be already present in parent).
+    :return: the new project
+    """
+    if name in cprojects or any([elt.project == name for elt in locs]):
+        raise Climaf_Classes_Error(
+            "Could not derive a project from an existing one if it already exists: %s." % name)
+    else:
+        cprojects[parent_name].derive(name, new_project_facets)
+        [elt.derive(name) for elt in locs if elt.project == parent_name]
 
 
 class cproject(object):
@@ -46,6 +76,8 @@ class cproject(object):
             - ``ensemble`` for declaring a list of attribute
               names which are allowed for defining an ensemble in
               this project ('simulation' is automatically allowed)
+            - ``use_frequency`` to declare that the frequency can not be derived from time bounds of the file.
+              In this case the facet ``frequency`` is mandatory for the project and a default value must be defined.
 
         Returns : a cproject object, which string representation is
         the pattern later used in CliMAF Refreence Syntax for
@@ -122,7 +154,8 @@ class cproject(object):
         if "sep" in kwargs:
             self.separator = kwargs['sep']
         if self.separator == ",":
-            raise Climaf_Classes_Error("Character ',' is forbidden as a project separator")
+            raise Climaf_Classes_Error(
+                "Character ',' is forbidden as a project separator")
         cprojects[name] = self
         self.crs = ""
         # Build the pattern for the datasets CRS for this cproject
@@ -134,6 +167,27 @@ class cproject(object):
         self.attributes_for_ensemble = ['simulation']
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
+        self.use_frequency = kwargs.get("use_frequency", False)
+
+    def derive(self, new_name, new_facets=list()):
+        """
+        Derive a new project from this one with name 'new_name' and possibly new facets listed in 'new_facets'
+        :param new_name: name of the newly created project
+        :param new_facets: list of the new facets
+        :return: the new project
+        """
+        args = list()
+        for a in self.facets:
+            if a in self.facet_defaults:
+                args.append((a, self.facet_defaults[a]))
+            else:
+                args.append(a)
+        args.extend(new_facets)
+        kwargs = dict()
+        kwargs["separator"] = self.separator
+        if len(self.attributes_for_ensemble) > 1:
+            kwargs["ensemble"] = self.attributes_for_ensemble[1:]
+        return cproject(new_name, *args, **kwargs)
 
     def __repr__(self):
         return self.crs
@@ -151,6 +205,125 @@ class cproject(object):
                     kvp[f] = fields[i]
                 return cdataset(**kvp)
 
+    def build_cvalid_from_tree_of_files(self, project_name=None):
+        if project_name is None:
+            project_name = self.project
+        # Find out the directory paths to be checked (other keys can be considered by hand)
+        project_locs = [os.path.dirname(loc) for loc in locs if loc.project in [
+            project_name, ]]
+        # Do not consider root
+        project_locs = [loc.replace(
+            "${root}", self.facet_defaults["root"]) for loc in project_locs]
+        facets_regexp = re.compile(r"\$\{(?P<facet>[^\{^\}]+)\}")
+        list_facets = list()
+        for loc in project_locs:
+            list_facets.append([m.groupdict()["facet"]
+                               for m in facets_regexp.finditer(loc)])
+        dict_facets = defaultdict(list)
+        for (loc, facets) in zip(project_locs, list_facets):
+            loc_list = [loc, ]
+            tmp_loc_list = list()
+            for facet in facets:
+                facet_reg = r"\$\{%s\}" % facet
+                facet_regexp = re.compile(facet_reg)
+                for tmp_loc in loc_list:
+                    match = facet_regexp.match(tmp_loc)
+                    if match is not None:
+                        begin_tmp_loc = tmp_loc[:tmp_loc.find(
+                            os.sep, match.end())]
+                        begin_tmp_loc = begin_tmp_loc.replace(facet_reg, "*")
+                        list_values = glob.glob(begin_tmp_loc)
+                        list_values = [val.replace(tmp_loc[:match.start()], "")[:len(tmp_loc) - match.end()]
+                                       for val in list_values]
+                        dict_facets[facet].extend(list_values)
+                        tmp_loc_list.extend(
+                            [tmp_loc.replace(facet_reg, val) for val in list_values])
+                    else:
+                        tmp_loc_list.append(tmp_loc)
+                loc_list, tmp_loc_list = tmp_loc_list, list()
+        for key in dict_facets:
+            dict_facets[key] = sorted(list(set(dict_facets[key])))
+        return dict_facets
+
+    def build_cvalid_conf_file_name(self, project_name=None, choice="both"):
+        """
+        Build cvalid conf file name from project name.
+        :param project_name: name of the default project to be used
+        :param choice: where to look for the conf file, either "user" (in $HOME/.climaf), "default" (in climaf/projects)
+                       or "both"
+        :return: a list of possible conf file names
+        """
+        if project_name is None:
+            project_name = self.project
+        cvalid_user_conf_file = os.sep.join(
+            [os.environ["HOME"], ".climaf", "cvalid_{}.json".format(project_name)])
+        cvalid_default_conf_file = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "project",
+                                                "cvalid_{}.json".format(project_name)])
+        if choice in ["both", ]:
+            return [cvalid_user_conf_file, cvalid_default_conf_file]
+        elif choice in ["user", ]:
+            return [cvalid_user_conf_file, ]
+        elif choice in ["default", ]:
+            return [cvalid_default_conf_file, ]
+        else:
+            raise ValueError("Unknown value for choice: %s" % choice)
+
+    def initialize_cvalid_values(self, project_name=None):
+        """
+        Initialize cvalid values for the current project with values defined in a json file, either in the CliMAF'
+        project directory or in the climaf conf directory.
+        :param project_name: name of the project to build the conf file name
+        """
+        cvalid_conf_files = self.build_cvalid_conf_file_name(
+            project_name=project_name, choice="both")
+        cvalid_conf_files = [f for f in cvalid_conf_files if os.path.isfile(f)]
+        if len(cvalid_conf_files) > 0:
+            cvalid_conf_file = cvalid_conf_files[0]
+            content = json.load(cvalid_conf_file)
+            for key in content:
+                self.cvalid(key, content[key])
+
+    def initialize_user_cvalid_values(self, project_name=None, from_tree_of_files=False, force=False):
+        """
+        Initialize the user's configuration file for project project_name.
+        If the configuration file already exists, do nothing except if force=True.
+        If from_tree_of_file=True, read the tree of files to find out the possible values (not implemented yet).
+        :param project_name: name of the default project
+        :param from_tree_of_files: boolean, should the tree of file be read?
+        :param force: boolean, should an existing user conf file be bypassed?
+        """
+        cvalid_user_conf_file = self.build_cvalid_conf_file_name(
+            project_name=project_name, choice="user")[0]
+        cvalid_default_conf_file = self.build_cvalid_conf_file_name(
+            project_name=project_name, choice="default")[0]
+        if os.path.isfile(cvalid_user_conf_file):
+            if force:
+                clogger.warning("User's cvalid configuration file %s already exists and force=True, replace it" %
+                                cvalid_user_conf_file)
+                os.remove(cvalid_user_conf_file)
+                if from_tree_of_files:
+                    content = self.build_cvalid_from_tree_of_files(
+                        project_name)
+                    json.dump(content, cvalid_user_conf_file)
+                elif os.path.isfile(cvalid_default_conf_file):
+                    if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                        os.makedirs(os.path.dirname(cvalid_user_conf_file))
+                    shutil.copyfile(cvalid_default_conf_file,
+                                    cvalid_user_conf_file)
+                else:
+                    clogger.error(
+                        "Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+            else:
+                clogger.warning("User's cvalid configuration file %s already exists and force=False, do nothing." %
+                                cvalid_user_conf_file)
+        elif cvalid_default_conf_file:
+            if not os.path.isdir(os.path.dirname(cvalid_user_conf_file)):
+                os.makedirs(os.path.dirname(cvalid_user_conf_file))
+            shutil.copyfile(cvalid_default_conf_file, cvalid_user_conf_file)
+        else:
+            clogger.error(
+                "Default cvalid configuration file %s does not exist" % cvalid_default_conf_file)
+
     def cvalid(self, attribute, value=None):
         """Set or get the list of valid values for a CliMAF dataset attribute
         or facet (such as e.g. 'model', 'simulation' ...). Useful
@@ -164,7 +337,8 @@ class cproject(object):
         """
         #
         if attribute not in self.facets:
-            raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+            raise Climaf_Classes_Error(
+                "project '%s' doesn't use facet '%s'" % (self.project, attribute))
         if value is None:
             return self.facet_authorized_values.get(attribute, None)
         else:
@@ -191,12 +365,14 @@ def cdef(attribute, value=None, project=None):
     >>> cdef('frequency','monthly',project='OCMPI5')
     """
     if project not in cprojects:
-        raise Climaf_Classes_Error("project '%s' has not yet been declared" % project)
+        raise Climaf_Classes_Error(
+            "project '%s' has not yet been declared" % project)
     if attribute == 'project':
         project = None
     #
     if project and attribute not in cprojects[project].facets:
-        raise Climaf_Classes_Error("project '%s' doesn't use facet '%s'" % (project, attribute))
+        raise Climaf_Classes_Error(
+            "project '%s' doesn't use facet '%s'" % (project, attribute))
     if value is None:
         rep = cprojects[project].facet_defaults.get(attribute, None)
         if not rep:
@@ -303,7 +479,8 @@ def processDatasetArgs(**kwargs):
         # Allow for a synonym for 'simulation' in CMIP5 : 'member'
         if 'member' in kwargs and kwargs['member'] not in [None, '']:
             attval['simulation'] = kwargs['member']
-            clogger.info('Attribute "member" in project CMIP5 has been translated to "simulation"')
+            clogger.info(
+                'Attribute "member" in project CMIP5 has been translated to "simulation"')
         # Special processing for CMIP5 fixed fields : handling redundancy in facets
         if (attval['table'] == 'fx' or attval['period'] == 'fx' or
                 attval['simulation'] == 'r0i0p0' or attval['frequency'] == 'fx'):
@@ -431,7 +608,8 @@ class cdataset(cobject):
         if "," in self.variable and self.alias:
             filevar, scale, offset, units, filenameVar, missing, conditions = self.alias
             if filevar != self.variable or scale != 1. or offset != 0 or missing:
-                raise Climaf_Classes_Error("Cannot alias/scale/setmiss on group variable")
+                raise Climaf_Classes_Error(
+                    "Cannot alias/scale/setmiss on group variable")
         # Build CliMAF Ref Syntax for the dataset
         self.crs = self.buildcrs()
         #
@@ -479,16 +657,19 @@ class cdataset(cobject):
             try:
                 res = self.explore('resolve')
             except:
-                raise Climaf_Classes_Error("Cannot proceed with errata: Cannot resolve ambiguities on %s" % repr(self))
+                raise Climaf_Classes_Error(
+                    "Cannot proceed with errata: Cannot resolve ambiguities on %s" % repr(self))
             # CMIP6.CMIP.CNRM-CERFACS.CNRM-ESM2-1.1pctCO2.r1i1p1f2.Emon.expfe.gn.v20181018
             ref = ".".join(["CMIP6", res.kvp["mip"], res.kvp["institute"], res.kvp["model"], res.kvp["experiment"],
                             res.kvp["realization"], res.kvp["table"], res.kvp["variable"], res.kvp["grid"],
                             "v" + res.kvp["version"]])
-            clogger.warning("Querying errata service %s using %s" % (service, browser))
+            clogger.warning("Querying errata service %s using %s" %
+                            (service, browser))
             os.system("%s %s%s &" % (browser, service, ref))
             # voir le fichier api_errata_Atef.py pour faire mieux
         else:
-            clogger.warning("No errata service is yet defined for project %s" % self.project)
+            clogger.warning(
+                "No errata service is yet defined for project %s" % self.project)
 
     def isLocal(self):
         # return self.baseFiles().find(":")<0
@@ -585,7 +766,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, periods=None, split=None):
+    def glob(self, what=None, periods=None, split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -642,7 +823,7 @@ class cdataset(cobject):
         clogger.debug("glob() with dic=%s" % repr(dic))
         cases = list()
         files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
-                            return_combinations=cases, **dic)
+                            return_combinations=cases, use_frequency=use_frequency, **dic)
         if what in ['files', ]:
             return files
         else:
@@ -782,6 +963,14 @@ class cdataset(cobject):
             'model': ['CNRM-ESM2-1', 'CNRM-CM6-1'], ...}
 
         """
+        use_frequency = cprojects[self.project].use_frequency
+        if use_frequency:
+            if "frequency" in self.kvp:
+                use_frequency = self.kvp["frequency"]
+            else:
+                use_frequency = cdef("frequency", project=self.project)
+                if not use_frequency:
+                    use_frequency = False
         dic = self.kvp.copy()
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
@@ -792,7 +981,8 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s" % repr(dic))
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency,
+                            **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var
@@ -803,13 +993,16 @@ class cdataset(cobject):
             # print "periods=",periods
             if option not in ['choices', ]:
                 if group_periods_on:
-                    raise Climaf_Classes_Error("Can use 'group_periods_on' only with option='choices'")
+                    raise Climaf_Classes_Error(
+                        "Can use 'group_periods_on' only with option='choices'")
                 if operation != 'intersection':
-                    raise Climaf_Classes_Error("Can use operation %s only with option='choices'" % operation)
+                    raise Climaf_Classes_Error(
+                        "Can use operation %s only with option='choices'" % operation)
             if operation in ['intersection', ]:
                 if group_periods_on:
                     # print "periods=",periods
-                    merged_periods = [merge_periods(p) for p in list(periods.values())]
+                    merged_periods = [merge_periods(
+                        p) for p in list(periods.values())]
                     inter = merged_periods.pop(0)
                     for p in merged_periods:
                         inter = intersect_periods_list(inter, p)
@@ -828,12 +1021,16 @@ class cdataset(cobject):
                         periods[key] = merge_periods(periods[key])
                 wildcards['period'] = periods
             else:
-                raise Climaf_Classes_Error("Operation %s is not known " % operation)
+                raise Climaf_Classes_Error(
+                    "Operation %s is not known " % operation)
         #
-        wildcard_attributes_list = [k for k in dic if isinstance(dic[k], six.string_types) and "*" in dic[k]]
+        wildcard_attributes_list = [k for k in dic if isinstance(
+            dic[k], six.string_types) and "*" in dic[k]]
         if option in ['resolve', ]:
-            clogger.debug("Trying to resolve on attributes %s" % wildcard_attributes_list)
-            non_ambiguous_dict, ambiguous_dict = self.check_if_dict_ambiguous(wildcards)
+            clogger.debug("Trying to resolve on attributes %s" %
+                          wildcard_attributes_list)
+            non_ambiguous_dict, ambiguous_dict = self.check_if_dict_ambiguous(
+                wildcards)
             if len(ambiguous_dict) != 0:
                 error_msg = list()
                 for kw in sorted(list(ambiguous_dict)):
@@ -841,19 +1038,23 @@ class cdataset(cobject):
                         error_msg.append("Filename variable %s is matched by multiple variables %s" %
                                          (ambiguous_dict[kw][0], repr(ambiguous_dict[kw][1])))
                     elif kw in ["period", ]:
-                        error_msg.append("Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
+                        error_msg.append(
+                            "Periods with holes are not handled: %s" % str(ambiguous_dict[kw]))
                     else:
-                        error_msg.append("Wildcard attribute %s is ambiguous %s" % (kw, str(ambiguous_dict[kw])))
+                        error_msg.append("Wildcard attribute %s is ambiguous %s for dataset %s" %
+                                         (kw, str(ambiguous_dict[kw]), self))
                 raise Climaf_Classes_Error(" ".join(error_msg))
             else:
                 dic.update(**non_ambiguous_dict)
                 return ds(**dic)
         elif option in ['choices', ]:
-            clogger.debug("Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
+            clogger.debug(
+                "Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
             self.files = files
             return wildcards
         elif option in ['ensemble', ]:
-            clogger.debug("Trying to create an ensemble on attributes %s" % wildcard_attributes_list)
+            clogger.debug("Trying to create an ensemble on attributes %s" %
+                          wildcard_attributes_list)
             is_ensemble = False
             for kw in wildcards:
                 entry = wildcards[kw]
@@ -897,9 +1098,11 @@ class cdataset(cobject):
                 self.explore()
             else:
                 cases = self.explore(option='choices')
-                list_keys = [k for k in cases if type(cases[k]) is list and k != 'period']
+                list_keys = [k for k in cases if type(
+                    cases[k]) is list and k != 'period']
                 if len(list_keys) > 0:
-                    clogger.error("The dataset is ambiguous on %s; its CRS is %s" % (cases, self))
+                    clogger.error(
+                        "The dataset is ambiguous on %s; its CRS is %s" % (cases, self))
                     return None
         return self.files
 
@@ -923,210 +1126,92 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self):
+    def check(self, frequency=True, gap=True, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
-        - check if first data time interval is consistent with dataset frequency
-        - check if file data have a gap
-        - check if period covered by data files actually includes the whole of dataset period
+        - if frequency is True : check if data frequency is consistent with dataset frequency
+        - if gap is True : check if file data have a gap
+        - if period is True : check if period covered by data actually includes the
+        whole of dataset period
 
-        Returns: True if period of data files included dataset period, False otherwise.
-
-        Examples:
-
-        >>> # Dataset with monthly frequency
-        >>> tas=ds(project='example', simulation='AMIPV6ALB2G', variable='tas',period='1980-1981')
-        >>> res1=tas.check()
-        >>>
-        >>> # Ensemble with monthly frequency
-        >>> j0=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1980')
-        >>> j1=ds(project='example',simulation='AMIPV6ALB2G', variable='tas', frequency='monthly', period='1981')
-        >>> ens=cens({'1980':j0, '1981':j1})
-        >>> res2=ens.check()
-
-        >>> # Define a new project for 'em' data with 3 hours frequency in particular
-        >>> cproject('em_3h', 'root', 'group', 'realm', 'frequency', separator='|')
-        >>> path='/cnrm/cmip/cnrm/simulations/${group}/${realm}/Regu/${frequency}/${simulation}/${variable}_??_YYYY.nc'
-        >>> dataloc(project='em_3h', organization='generic', url=path)
-
-        >>> # Dataset with 3h frequency for 'tas' variable (instant)
-        >>> tas_3h=ds(project='em_3h', variable='tas', group='AR4', realm='Atmos', frequency='3Hourly',
-        ...           simulation='A1B', period='2050-2100')
-        >>> res3=tas_3h.check()
-
-        >>> # Dataset with 3h frequency for 'pr' variable (time mean)
-        >>> pr_3h=ds(project='em_3h', variable='pr', group='AR4', realm='Atmos', frequency='3Hourly', simulation='A1B',
-        ...          period='2050-2100')
-        >>> res4=pr_3h.check()
-
+        Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
         """
-        from .anynetcdf import ncf
-        from datetime import timedelta
-        from netCDF4 import num2date
-        import numpy as np
-
-        # Returns the list of files which include the data for the dataset
-        # or for each member of the ensemble
-        if isinstance(self, cdataset):
-            if self.isLocal() or self.isCached():
-                files = self.baseFiles()
-            else:
-                files = self.local_copies_of_remote_files
-            if not files:
-                clogger.error('No file found for: %s' % self)
-                if not (self.isLocal() or self.isCached()):
-                    clogger.warning('For remote data, you have to do at first "cfile(%s)"' % self)
-                return False
-        else:
-            clogger.error("Cannot handle %s" % self)
-            return
+        if gap:
+            frequency = True
         #
-        if files:
-            filedate = []
-            clogger.debug("List of selected files: %s" % files)
-
-            var = varOf(self).split(',')[0]
-            # Concatenate all data files
-            for filename in files.split():
-                fileobj = ncf(filename)
-                #
-                if self.project in aliases and var in aliases[self.project]:
-                    var = aliases[self.project][var][0]
-                #
-                dimname = ''
-                for dim in fileobj.variables[var].dimensions:
-                    if 'time' in dim:
-                        dimname = dim
-                if not dimname:
-                    clogger.error('No time dimension for variable %s' % var)
-                time_obj = fileobj.variables[dimname]
-                filedate = np.concatenate((filedate, num2date(time_obj.getValue(), units=time_obj.units,
-                                                              calendar=time_obj.calendar)))
-
-            clogger.debug('Time data of selected files: %s' % filedate)
-
-            # Check if first data time interval is consistent with dataset frequency
-            if len(filedate) > 1:
-                filedate_delta = (filedate[1] - filedate[0]).total_seconds()
-            else:
-                clogger.error('Time dimension is degenerated.')
-                return
-
-            if ((self.frequency == 'monthly' or not self.frequency)
-                and (filedate_delta > 31. * 24. * 3600 or filedate_delta <= 29. * 24. * 3600.)) \
-                    or (self.frequency == 'yearly' and
-                        (filedate_delta > 366. * 24. * 3600. or filedate_delta < 365. * 24. * 3600.)) \
-                    or (self.frequency == 'decadal' and
-                        (filedate_delta > 3653. * 24. * 3600. or filedate_delta < 3651. * 24. * 3600.)):
-
-                clogger.warning(
-                    'First data time interval (= %.1f days) is not consistent with dataset frequency (i.e. %s)'
-                    % (filedate_delta / (24. * 3600.), self.frequency))
-
-            elif self.frequency == 'daily' and filedate_delta != 86400.:
-                clogger.warning(
-                    'First data time interval (= %.2f hours) is not consistent with dataset frequency (i.e. %s)'
-                    % (filedate_delta / 3600., self.frequency))
-
-            elif (self.frequency == '6h' or self.frequency == '3h' or self.frequency == '1h'
-                  or self.frequency == '3Hourly' or self.frequency == '6Hourly') \
-                    and filedate_delta != float(self.frequency[0]) * 3600.:
-                clogger.warning('First data time interval (= %.2f hours) is different to dataset frequency (i.e. %.2f)'
-                                % (filedate_delta / 3600., float(self.frequency[0])))
-
-            # Check if file data have a gap
-            i = 0
-            cpt = 0
-            while i < len(filedate) - 2:
-                i += 1
-                if (filedate[i + 1] - filedate[i]).total_seconds() != filedate_delta:
-                    cpt += 1
-                    if cpt < 5:
-                        if self.frequency == 'monthly' or not self.frequency or \
-                                self.frequency == 'yearly' or self.frequency == 'decadal':
-                            clogger.error('File data have a gap between indexes %i and %i: delta = %.0f days '
-                                          % (i, i + 1, (filedate[i + 1] - filedate[i]).total_seconds() / (24. * 3600.))
-                                          + 'instead of %.0f days (<=> 1st data interval)'
-                                          % (filedate_delta / (24. * 3600.)))
-                        elif self.frequency == 'daily' or self.frequency == '6h' or \
-                                self.frequency == '3h' or self.frequency == '1h' or \
-                                self.frequency == '3Hourly' or self.frequency == '6Hourly':
-                            clogger.error('File data have a gap between indexes %i and %i: ' % (i, i + 1) +
-                                          'delta = %.0f hours instead of %.0f hours (<=> 1st data interval)'
-                                          % ((filedate[i + 1] - filedate[i]).total_seconds() / 3600.,
-                                             filedate_delta / 3600.))
-            #
-            # Compute period covered by data files
-            if self.frequency == 'monthly' or not self.frequency:
-                filedate[0] = filedate[0].replace(day=0o1)
-                if filedate[-1].month > 11:
-                    filedate[-1] = filedate[-1].replace(year=filedate[-1].year + 1)
-                    filedate[-1] = filedate[-1].replace(month=0o1)
-                    filedate[-1] = filedate[-1].replace(day=0o1)
-                else:
-                    filedate[-1] = filedate[-1].replace(month=filedate[-1].month + 1)
-                    filedate[-1] = filedate[-1].replace(day=0o1)
-
-            elif self.frequency == 'daily':
-                filedate[0] = filedate[0].replace(hour=00)
-                filedate[-1] = filedate[-1].replace(hour=00)
-                filedate[-1] = filedate[-1] + timedelta(days=1)
-
-            elif self.frequency == '6h' or self.frequency == '3h' or self.frequency == '1h' \
-                    or self.frequency == '3Hourly' or self.frequency == '6Hourly':
-
-                if 'cell_methods' in fileobj.variables[var].__dict__:  # time mean
-
-                    regex = re.compile(r'.*time *: *mean *\(? *interval *: *([0-9]+.?[0-9]+?) ([a-zA-Z]+) *\)')
-                    cell_meth_att = regex.search(fileobj.variables[var].cell_methods)
-                    if cell_meth_att:
-                        if cell_meth_att.group(2) == 'hours':
-                            freq = float(cell_meth_att.group(1))
-                        elif cell_meth_att.group(2) == 'minutes':
-                            freq = float(cell_meth_att.group(1)) / 60.
-                    else:  # 'cell_methods' attribute defined with the value 'time: mean'
-                        freq = filedate_delta / 3600.
-
-                    filedate[0] = filedate[0] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                  ((filedate[0].hour * 60 + filedate[0].minute) -
-                                                                   (freq / 2.) * 60) % (freq * 60))
-                    filedate[-1] = filedate[-1] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                    ((filedate[-1].hour * 60 + filedate[-1].minute) -
-                                                                     (freq / 2.) * 60) % (freq * 60) - freq * 60)
-
-                else:  # assume it is instant data
-                    freq = filedate_delta / 3600.
-                    filedate[-1] = filedate[-1] - timedelta(minutes=(freq / 2.) * 60 +
-                                                                    ((filedate[-1].hour * 60 + filedate[-1].minute) -
-                                                                     (freq / 2.) * 60) % (freq * 60) - 2 * freq * 60)
-
-            elif self.frequency == 'yearly' or self.frequency == 'decadal':
-                filedate[0] = filedate[0].replace(month=0o1)
-                filedate[0] = filedate[0].replace(day=0o1)
-                filedate[-1] = filedate[-1].replace(month=0o1)
-                filedate[-1] = filedate[-1].replace(day=0o1)
-                filedate[-1] = filedate[-1] + timedelta(years=1)
-
-            elif self.frequency == 'fx' or self.frequency == 'annual_cycle':
-                clogger.error('Check time consistency with a frequency equal to %s has no sense' % self.frequency)
-
-            else:
-                clogger.error('Dataset frequency is non-standard: frequency = %s. ' % self.frequency +
-                              'Normalized frequency values are: decadal, yearly, monthly, ' +
-                              'daily, 6h, 3h, fx and annual_cycle')
-            #
-            # Check period of datafiles vs dataset period
-            clogger.debug('Period covered by selected files: %s' % filedate)
-            file_period = cperiod(start=filedate[0], end=filedate[-1])
-            #
-            if file_period.includes(self.period):
-                clogger.info("Time data in datafiles (i.e. %s) includes time data of " % file_period +
-                             "dataset (i.e. %s) => dataset are consistent." % self.period)
-                return True
-            else:
-                clogger.info("Time data in datafiles (i.e. %s) don't include time data of " % file_period +
-                             "dataset (i.e. %s) => dataset are not consistent." % self.period)
+        files = self.baseFiles()
+        if not files:
+            return False
+        files = files.split()
+        clogger.debug("List of selected files: %s" % files)
+        #
+        rep = True
+        dsets = [xr.open_dataset(f, use_cftime=True) for f in files]
+        all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
+        #
+        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
+            clogger.info("No check for fixed data for %s", self)
+            return True
+        if self.frequency == "monthly" and frequency:
+            clogger.error("Check cannot yet process monthly data due to" +
+                          "to a shortcoming in analyzing monthly data frequency")
+            return None
+        if not getattr(dsets[0], "frequency", False) and frequency:
+            clogger.warning("No frequency in file(s) for %s", self)
+            return False
+        if "time" not in all_dsets:
+            clogger.warning("Cannot yet check a dataset which time dimension" +
+                            "is not named 'time' (%s)" % self)
+            return False
+        #
+        times = all_dsets.time
+        clogger.debug('Time data of selected files: %s' % times)
+        #
+        if frequency:
+            # Check if data time interval is consistent with dataset frequency
+            data_freq = xr.infer_freq(times)
+            if data_freq is None:
+                clogger.error(
+                    "Time interval detected by xr.infer_freq is None %s" % str(times))
                 return False
+            table = {"monthly": "MS", "daily": "D", "day": "D", "6h": "6H", "3h": "3H",
+                     "1h": "1H", "6Hourly": "6H", "3Hourly": "3H"}
+            if self.frequency not in table:
+                clogger.error("Check cannot yet handle frequency %s" %
+                              self.frequency)
+                return None
+            if data_freq != table[self.frequency]:
+                message = 'Data time interval %s is not consistent with dataset frequency %s'
+                clogger.warning(message % (data_freq, self.frequency))
+                rep = False
+
+        if gap:
+            # Check if file data have a gap
+            time_values = times.values.flatten()
+            delta = freq_to_minutes(data_freq)
+            cpt = 0
+            for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                if ptim + timedelta(minutes=delta) != tim:
+                    rep = False
+                    cpt += 1
+                    if cpt > 3:
+                        break
+                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
+                                  (ptim, tim, delta))
+
+        if period:
+            # Compare period covered by data files with dataset's period
+            cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
+            file_period = timeLimits(times, use_frequency=True, cell_methods=cell_methods,
+                                     strict_on_time_dim_name=False)
+            clogger.debug('Period covered by selected files: %s' % file_period)
+            consist = ""
+            if not file_period.includes(self.period):
+                consist = "not "
+                rep = False
+            clogger.info("Datafile time period (%s) includes dataset time period (%s)" %
+                         (file_period, self.period) + "=> time periods are %sconsistent." % consist)
+        return rep
 
 
 class cens(cobject, dict):
@@ -1191,7 +1276,8 @@ class cens(cobject, dict):
         if not all(map(lambda x: isinstance(x, six.string_types), list(dic))):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not all(map(lambda x: isinstance(x, cobject), list(dic.values()))):
-            raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
+            raise Climaf_Classes_Error(
+                "Ensemble members must be CliMAF objects")
         self.sortfunc = sortfunc
         #
         dict.update(self, dic)
@@ -1215,7 +1301,8 @@ class cens(cobject, dict):
     def __eq__(self, other):
         res = super(cens, self).__eq__(other)
         if res:
-            res = res and self.order == other.order and all([self.__dict__[m] == other.__dict[m] for m in self.order])
+            res = res and self.order == other.order and all(
+                [self.__dict__[m] == other.__dict[m] for m in self.order])
         return res
 
     def set_order(self, order, ordered_keylist=None):
@@ -1234,7 +1321,8 @@ class cens(cobject, dict):
         if not isinstance(k, six.string_types):
             raise Climaf_Classes_Error("Ensemble keys/labels must be strings")
         if not isinstance(v, cobject):
-            raise Climaf_Classes_Error("Ensemble members must be CliMAF objects")
+            raise Climaf_Classes_Error(
+                "Ensemble members must be CliMAF objects")
         dict.__setitem__(self, k, v)
         if k not in self.order:
             self.order.append(k)
@@ -1277,7 +1365,8 @@ class cens(cobject, dict):
     def buildcrs(self, crsrewrite=None, period=None):
         if crsrewrite is None and period is None:
             # A useful optimization, for multi-model studies
-            rep = "cens({%s})" % ",".join(["'%s':%s" % (m, self[m].crs) for m in self.order])
+            rep = "cens({%s})" % ",".join(
+                ["'%s':%s" % (m, self[m].crs) for m in self.order])
         else:
             rep = "cens({%s})" % ",".join(["'%s':%s" % (m, self[m].buildcrs(crsrewrite=crsrewrite, period=period))
                                            for m in self.order])
@@ -1336,12 +1425,14 @@ def eds(first=None, **kwargs):
         clogger.debug("Looking at attr %s for ensemble" % attr)
         if isinstance(attval[attr], list) and attr != "domain":
             if attr not in cprojects[attval["project"]].attributes_for_ensemble:
-                raise Climaf_Classes_Error("Attribute %s cannot be used for ensemble" % attr)
+                raise Climaf_Classes_Error(
+                    "Attribute %s cannot be used for ensemble" % attr)
             clogger.debug("Attr %s is used for an ensemble" % attr)
             nlist += 1
             listattr.append(attr)
     if len(listattr) < 1:
-        raise Climaf_Classes_Error("For building an ensemble, must have at least one attribute which is a list")
+        raise Climaf_Classes_Error(
+            "For building an ensemble, must have at least one attribute which is a list")
     # Create an ensemble of datasets if applicable
     d = dict()
     if len(listattr) == 1:
@@ -1402,6 +1493,7 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
     - period : the period actually covered by the data file (if it has time_bnds)
     - model : the 'model_id' attribute if it exists, otherwise : 'no_model'
     - project  : 'file' (with separator = '|')
+    - frequency : the value of global attribute fequency in datafile, if it exists
 
     The following restriction apply to such datasets :
 
@@ -1434,22 +1526,32 @@ def fds(filename, simulation=None, variable=None, period=None, model=None):
         lvars = variable.split(',')
         for v in lvars:
             if not fileHasVar(filename, v):
-                raise Climaf_Classes_Error("No variable %s in file %s" % (v, filename))
+                raise Climaf_Classes_Error(
+                    "No variable %s in file %s" % (v, filename))
     #
-    fperiod = timeLimits(filename)
+    try:
+        fperiod = timeLimits(filename)
+    except:
+        fperiod = None
     if period is None:
         if fperiod is None:
             period = "fx"
             # raise Climaf_Classes_Error("Must provide a period for file %s " % filename)
         else:
             period = repr(fperiod)
-    else:
+    elif period != 'fx':
         if fperiod and not fperiod.includes(init_period(period)):
-            raise Climaf_Classes_Error("Max period from file %s is %s" % (filename, repr(fperiod)))
+            raise Climaf_Classes_Error(
+                "Max period from file %s is %s" % (filename, repr(fperiod)))
     #
     d = ds(project='file', model=model, simulation=simulation,
            variable=variable, period=period, path=filename)
     d.files = filename
+
+    d.frequency = attrOfFile(filename, "frequency", "*")
+    if period == 'fx':
+        d.frequency = 'fx'
+
     return d
 
 
@@ -1458,12 +1560,13 @@ class ctree(cobject):
         """ Builds the tree of a composed object, including a dict for outputs.
 
         """
-        if len(operands) == 0 :
-            raise Climaf_Classes_Error("Cannot apply an operator to no operand")
+        if len(operands) == 0:
+            raise Climaf_Classes_Error(
+                "Cannot apply an operator to no operand")
         self.operator = climaf_operator
         self.script = script
         import copy
-        if script is None :
+        if script is None:
             self.flags = False
         else:
             self.flags = copy.copy(script.flags)
@@ -1479,7 +1582,8 @@ class ctree(cobject):
         self.parameters = parameters
         for o in operands:
             if o and not isinstance(o, cobject):
-                raise Climaf_Classes_Error("operand " + repr(o) + " is not a CliMAF object")
+                raise Climaf_Classes_Error(
+                    "operand " + repr(o) + " is not a CliMAF object")
         self.crs = self.buildcrs()
         self.outputs = dict()
         self.register()
@@ -1598,17 +1702,20 @@ def compare_trees(tree1, tree2, func, filter_on_operator=None):
                 clogger.debug("... %s" % str(rep))
                 return rep
             else:
-                clogger.debug("Parameters are not coherent: %s/%s" % (tree1.parameters, tree2.parameters))
+                clogger.debug("Parameters are not coherent: %s/%s" %
+                              (tree1.parameters, tree2.parameters))
                 return None
     elif isinstance(tree1, scriptChild) and isinstance(tree2, scriptChild):
         clogger.debug("Comparison of two scriptChild...")
         if tree1.varname == tree2.varname:
             clogger.debug("... varnames are coherent: %s" % tree1.varname)
-            rep = compare_trees(tree1.father, tree2.father, func, filter_on_operator)
+            rep = compare_trees(tree1.father, tree2.father,
+                                func, filter_on_operator)
             clogger.debug("... %s" % str(rep))
             return rep
         else:
-            clogger.debug("... varnames are not coherent: %s/%s" % (tree1.varname, tree2.varname))
+            clogger.debug("... varnames are not coherent: %s/%s" %
+                          (tree1.varname, tree2.varname))
             return None
 
 
@@ -1639,7 +1746,8 @@ def select_projects(**kwargs):
         dat = cdataset(**wkwargs)
         files = dat.baseFiles()
         if files:
-            clogger.info('-- File found for project ' + project + ' and ' + repr(wkwargs))
+            clogger.info('-- File found for project ' +
+                         project + ' and ' + repr(wkwargs))
             try:
                 tmpVarInFile = varIsAliased(project, wkwargs['variable'])[0]
             except:
@@ -1654,13 +1762,14 @@ def select_projects(**kwargs):
                                  0])
                 # clogger.info('--> Try with another project than '+project+' or another variable name')
         else:
-            clogger.info('-- No file found for project ' + project + ' and ' + repr(wkwargs))
+            clogger.info('-- No file found for project ' +
+                         project + ' and ' + repr(wkwargs))
     return kwargs
 
 
 def ds(*args, **kwargs):
-    """
-    Returns a dataset from its full Climate Reference Syntax string. Example ::
+    """Returns a dataset from its full Climate Reference Syntax
+    string. Example ::
 
      >>> ds('CMIP5.historical.pr.[1980].global.monthly.CNRM-CM5.r1i1p1.mon.Amon.atmos.last')
 
@@ -1670,20 +1779,32 @@ def ds(*args, **kwargs):
      >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
-    In that case, you may use e.g. period='last_50y' to get the last 50 years (or less) of data; but this
-    will work only if no dataset's attribute is ambiguous. 'first_50y' also works, similarly
+    In that latter case, you may use e.g. period='last_50y' to get the
+    last 50 years (or less) of data; but this will work only if no
+    dataset's attribute is ambiguous. 'first_50y' also works,
+    similarly; and also period='*'.
 
     You must refer to doc at : :py:meth:`~climaf.classes.cdataset`
+
     """
     if len(args) > 1:
-        raise Climaf_Classes_Error("Must provide either only a string or only keyword arguments")
+        raise Climaf_Classes_Error(
+            "Must provide either only a string or only keyword arguments")
     # clogger.debug("Entering , with args=%s, kwargs=%s"%(`args`,`kwargs`))
     if len(args) == 0:
         if 'period' in kwargs and isinstance(kwargs['period'], six.string_types):
-            match = re.match("(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
-            if match is not None:
-                return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
-                                                   option=match.group('option').lower())
+            if kwargs['period'] == '*' and auto_resolve:
+                clogger.info('Trying to solve for period for %s' % kwargs)
+                if resolve_star_period(kwargs):
+                    # Case where there is a '*' only for period. kwargs has been modified
+                    clogger.info('Solved period = %s' % kwargs['period'])
+                    return cdataset(**select_projects(**kwargs))
+            else:
+                match = re.match(
+                    "(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
+                if match is not None:
+                    return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
+                                                       option=match.group('option').lower())
         return cdataset(**select_projects(**kwargs))
 
     crs = args[0]
@@ -1696,13 +1817,15 @@ def ds(*args, **kwargs):
         if dataset:
             results.append(dataset)
     if len(results) > 1:
-        e = "CRS expression %s is ambiguous among projects %s" % (crs, repr(list(cprojects)))
+        e = "CRS expression %s is ambiguous among projects %s" % (
+            crs, repr(list(cprojects)))
         if allow_errors_on_ds_call:
             clogger.info(e)
         else:
             raise Climaf_Classes_Error(e)
     elif len(results) == 0:
-        e = "CRS expression %s is not valid for any project in %s" % (crs, repr(list(cprojects)))
+        e = "CRS expression %s is not valid for any project in %s" % (
+            crs, repr(list(cprojects)))
         if allow_errors_on_ds_call:
             clogger.debug(e)
         else:
@@ -1873,12 +1996,14 @@ class cpage_all(cobject):
         self.heights = heights
 
         if not all(isinstance(fig_line, list) for fig_line in fig_lines):
-            raise Climaf_Classes_Error("each element in fig_lines must be a list of figures")
+            raise Climaf_Classes_Error(
+                "each element in fig_lines must be a list of figures")
         if not all([len(fig_lines[i]) == len(self.widths) for i in range(1, len(fig_lines))]):
             raise Climaf_Classes_Error("each line in fig_lines must have same dimension as widths %d" %
                                        len(self.widths))
         if len(fig_lines) != len(self.heights):
-            raise Climaf_Classes_Error("fig_lines must have same size than heights")
+            raise Climaf_Classes_Error(
+                "fig_lines must have same size than heights")
         self.fig_lines = fig_lines
 
     def check_figs_cens(self, fig_lines, widths, heights):
@@ -1892,7 +2017,8 @@ class cpage_all(cobject):
 
         if len(figs) < len(heights) * len(widths):
             figs.extend([None] * (len(heights) * len(widths) - len(figs) + 1))
-        self.fig_lines = [figs[x: x + len(widths)] for x in range(0, len(heights) * len(widths), len(widths))]
+        self.fig_lines = [
+            figs[x: x + len(widths)] for x in range(0, len(heights) * len(widths), len(widths))]
 
     def buildcrs(self, crsrewrite=None, period=None):
         rep = list()
@@ -1901,7 +2027,8 @@ class cpage_all(cobject):
                 rep.append("[%s]" % ",".join([f.buildcrs(crsrewrite=crsrewrite) if f is not None else repr(f)
                                               for f in line]))
             else:
-                rep.append("[%s]" % ",".join([f.crs if f is not None else repr(f) for f in line]))
+                rep.append("[%s]" % ",".join(
+                    [f.crs if f is not None else repr(f) for f in line]))
         return rep
 
 
@@ -1998,16 +2125,21 @@ class cpage(cpage_all):
         self.insert = insert
         self.insert_width = insert_width
         if self.ybox < (self.y + self.pt):
-            raise Climaf_Classes_Error("Title exceeds the assigned box: ybox<y+pt")
+            raise Climaf_Classes_Error(
+                "Title exceeds the assigned box: ybox<y+pt")
         if not isinstance(fig_lines, (list, cens)):
             raise Climaf_Classes_Error("fig_lines must be a CliMAF ensemble or a list "
                                        "of lists (each representing a line of figures)")
         elif isinstance(fig_lines, list):
-            self.check_figs_list(fig_lines=fig_lines, widths=widths, heights=heights)
-        elif not widths and not heights:  # case of an ensemble (cens) if heights and widths are not provided
-            self.scatter_on_page([fig_lines[label] for label in fig_lines.order])
+            self.check_figs_list(fig_lines=fig_lines,
+                                 widths=widths, heights=heights)
+        # case of an ensemble (cens) if heights and widths are not provided
+        elif not widths and not heights:
+            self.scatter_on_page([fig_lines[label]
+                                 for label in fig_lines.order])
         else:  # case of an ensemble (cens) with heights or widths provided
-            self.check_figs_cens(fig_lines=fig_lines, widths=widths, heights=heights)
+            self.check_figs_cens(fig_lines=fig_lines,
+                                 widths=widths, heights=heights)
         #
         self.crs = self.buildcrs()
 
@@ -2133,19 +2265,24 @@ class cpage_pdf(cpage_all):
             raise Climaf_Classes_Error("fig_lines must be a CliMAF ensemble or a list "
                                        "of lists (each representing a line of figures)")
         elif isinstance(fig_lines, list):
-            self.check_figs_list(fig_lines=fig_lines, widths=widths, heights=heights)
+            self.check_figs_list(fig_lines=fig_lines,
+                                 widths=widths, heights=heights)
         else:  # case of an ensemble (cens)
-            self.check_figs_cens(fig_lines=fig_lines, widths=widths, heights=heights)
+            self.check_figs_cens(fig_lines=fig_lines,
+                                 widths=widths, heights=heights)
         #
         self.crs = self.buildcrs()
 
     def buildcrs(self, crsrewrite=None, period=None):
-        rep = super(cpage_pdf, self).buildcrs(crsrewrite=crsrewrite, period=period)
+        rep = super(cpage_pdf, self).buildcrs(
+            crsrewrite=crsrewrite, period=period)
         param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
-                (repr(self.widths), repr(self.heights), self.page_width, self.page_height, self.scale, self.openright)
+                (repr(self.widths), repr(self.heights), self.page_width,
+                 self.page_height, self.scale, self.openright)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, titlebox='%s', pt='%s', font='%s', backgroud='%s'" % \
-                    (param, self.title, self.x, self.y, self.titlebox, self.pt, self.font, self.background)
+                    (param, self.title, self.x, self.y, self.titlebox,
+                     self.pt, self.font, self.background)
         rep = "cpage_pdf([%s],%s)" % (",".join(rep), param)
 
         return rep
@@ -2222,13 +2359,16 @@ def domainOf(cobject):
             else:
                 return cobject.domain
     elif isinstance(cobject, ctree):
-        clogger.debug("For now, domainOf logic for scripts output is basic (1st operand) - TBD")
+        clogger.debug(
+            "For now, domainOf logic for scripts output is basic (1st operand) - TBD")
         return domainOf(cobject.operands[0])
     elif isinstance(cobject, scriptChild):
-        clogger.debug("For now, domainOf logic for scriptChilds is basic - TBD")
+        clogger.debug(
+            "For now, domainOf logic for scriptChilds is basic - TBD")
         return domainOf(cobject.father)
     elif isinstance(cobject, cens):
-        clogger.debug("for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
+        clogger.debug(
+            "for now, domainOf logic for 'cens' objet is basic (1st member)- TBD")
         return domainOf(list(cobject.values())[0])
     elif cobject is None:
         return "none"
@@ -2237,28 +2377,36 @@ def domainOf(cobject):
             clogger.error("Unkown class for argument " + repr(cobject))
 
 
-def varOf(cobject): return attributeOf(cobject, "variable")
+def varOf(cobject):
+    return attributeOf(cobject, "variable")
 
 
-def modelOf(cobject): return attributeOf(cobject, "model")
+def modelOf(cobject):
+    return attributeOf(cobject, "model")
 
 
-def simulationOf(cobject): return attributeOf(cobject, "simulation")
+def simulationOf(cobject):
+    return attributeOf(cobject, "simulation")
 
 
-def experimentOf(cobject): return attributeOf(cobject, "experiment")
+def experimentOf(cobject):
+    return attributeOf(cobject, "experiment")
 
 
-def realizationOf(cobject): return attributeOf(cobject, "realization")
+def realizationOf(cobject):
+    return attributeOf(cobject, "realization")
 
 
-def projectOf(cobject): return attributeOf(cobject, "project")
+def projectOf(cobject):
+    return attributeOf(cobject, "project")
 
 
-def realmOf(cobject): return attributeOf(cobject, "realm")
+def realmOf(cobject):
+    return attributeOf(cobject, "realm")
 
 
-def gridOf(cobject): return attributeOf(cobject, "grid")
+def gridOf(cobject):
+    return attributeOf(cobject, "grid")
 
 
 def attributeOf(cobject, attrib):
@@ -2295,7 +2443,8 @@ def attributeOf(cobject, attrib):
     elif cobject is None:
         return ''
     else:
-        raise Climaf_Classes_Error("Unknown class for argument " + repr(cobject))
+        raise Climaf_Classes_Error(
+            "Unknown class for argument " + repr(cobject))
 
 
 def timePeriod(cobject):
@@ -2305,9 +2454,11 @@ def timePeriod(cobject):
     if isinstance(cobject, cdataset):
         return cobject.period
     elif isinstance(cobject, ctree):
-        clogger.debug("timePeriod : processing %s,operands=%s" % (cobject.script, repr(cobject.operands)))
+        clogger.debug("timePeriod : processing %s,operands=%s" %
+                      (cobject.script, repr(cobject.operands)))
         if cobject.script.flags.doCatTime and len(cobject.operands) > 1:
-            clogger.debug("Building composite period for results of %s" % cobject.operator)
+            clogger.debug(
+                "Building composite period for results of %s" % cobject.operator)
             periods = [timePeriod(op) for op in cobject.operands]
             merged_period = merge_periods(periods)
             if len(merged_period) > 1:
@@ -2315,17 +2466,37 @@ def timePeriod(cobject):
                                           (cobject.operator, merged_period))
             return merged_period[0]
         else:
-            clogger.debug("timePeriod logic for script is 'choose 1st operand' %s" % cobject.script)
+            clogger.debug(
+                "timePeriod logic for script is 'choose 1st operand' %s" % cobject.script)
             return timePeriod(cobject.operands[0])
     elif isinstance(cobject, scriptChild):
-        clogger.debug("for now, timePeriod logic for scriptChilds is basic - TBD")
+        clogger.debug(
+            "for now, timePeriod logic for scriptChilds is basic - TBD")
         return timePeriod(cobject.father)
     elif isinstance(cobject, cens):
-        clogger.debug("for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
+        clogger.debug(
+            "for now, timePeriod logic for 'cens' objet is basic (1st member)- TBD")
         return timePeriod(list(cobject.values())[0])
     else:
         return None  # clogger.error("unkown class for argument "+`cobject`)
 
+
+def resolve_star_period(kwargs):
+
+    # If dict 'kwargs' has only kw 'period' with value '*', resolve
+    # corresponding dataset on period, and sets kwargs['period']
+    # accordingly (if dataset has only one corresponding period)
+
+    if 'period' in kwargs and kwargs['period'] == '*' and \
+       not any(["*" in kwargs[k] or "?" in kwargs[k] for k in kwargs if k != 'period']):
+        explorer = cdataset(** select_projects(** kwargs))
+        attributes = explorer.explore(option='choices')
+        if 'period' in attributes:
+            periods = attributes['period']
+            if len(periods) == 1:
+                kwargs['period'] = str(periods[0])
+                return True
+    return False
 
 
 def resolve_first_or_last_years(kwargs, duration, option="last"):
@@ -2359,7 +2530,8 @@ def test():
     cdef("period", "197901-198012")
     cdef("domain", "global")
     #
-    tos = cdataset(experiment="rcp85", variable="tos", period="19790101-19790102")
+    tos = cdataset(experiment="rcp85", variable="tos",
+                   period="19790101-19790102")
     tr = ctree("operator", tos, para1="val1", para2="val2")
     print(tr)
     # tos.pr()

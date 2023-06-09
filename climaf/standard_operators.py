@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Management of CliMAF standard operators
@@ -29,27 +29,30 @@ def load_standard_operators():
     # Compute scripts
     #
     cscript('select',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins} ',
+            scriptpath +
+            'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+            '--vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('remote_select',
-            scriptpath + 'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --domain="${domain}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
+            scriptpath +
+            'mcdo_remote.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --domain="${domain}" '
+            '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins} ',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('ccdo',
-            scriptpath + 'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
-                         ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
-                         '--vm="${missing}" ${ins}')
+            scriptpath +
+            'mcdo.py --operator="${operator}" --output_file="${out}" --var="${var}"'
+            ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
+            '--vm="${missing}" ${ins}')
     #
     cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
     cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
     cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
-    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF 
+    # Define some CliMAF operators with tricky arguments ordering in order that CliMAF
     # do not loose track of variable name for the output of some CDO operators
     # because it takes it from operand ${in_1}, while some CDO operators impose to have it second
     cscript('ccdo2_flip', 'cdo ${operator} ${in_2} ${in_1} ${out}')
@@ -73,37 +76,43 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('space_average',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="fldmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True)
     cscript('space_average_fast',
-            scriptpath + 'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="fldmean" --output_file="${out}" ${ins}',
             commuteWithTimeConcatenation=True)
     #
     cscript('time_average',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="timmean" --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${domain}" --alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithSpaceConcatenation=True)
     cscript('time_average_fast',
-            scriptpath + 'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
+            scriptpath +
+            'mcdo.py --operator="timmean" --output_file="${out}" ${ins}',
             commuteWithSpaceConcatenation=True)
     #
     cscript('llbox',
-            scriptpath + 'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
-                         ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
-                         '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
+            scriptpath +
+            'mcdo.py --output_file="${out}" --var="${var}" --period="${period_iso}"'
+            ' --region="${latmin},${latmax},${lonmin},${lonmax}" '
+            '--alias="${alias}" --units="${units}" --vm="${missing}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     cscript('llbox_fast',
-            scriptpath + 'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
+            scriptpath +
+            'mcdo.py --output_file="${out}" --region="${latmin},${latmax},${lonmin},${lonmax}" ${ins}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
 
     #
     cscript('regrid',
-            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${in_2} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridn',
-            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${option}',
+            scriptpath + 'regrid.sh ${in} ${cdogrid} ${out} ${Var} ${option}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('regridll', scriptpath + 'regridll.sh ${in} ${out} ${cdogrid} '
@@ -182,14 +191,15 @@ def load_standard_operators():
     # hovm : to plot Hovmoller diagrams
     #
     cscript('hovm',
-            '(ncl -Q ' + scriptpath + 'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${Var}\"\' '
-                                      ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' '
-                                      'lonE=\'\"${lonE}\"\' '
-                                      ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} '
-                                      'units=\'\"${units}\"\' reverse=${reverse} mean_axis=\'\"${mean_axis}\"\' '
-                                      'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
-                                      ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
-                                      'options=\'\"${options}\"\' fmt=\'\"${fmt}\"\' )',
+            '(ncl -Q ' + scriptpath +
+            'hovmoller.ncl infile=\'\"${in}\"\' plotname=\'\"${out}\"\' var=\'\"${Var}\"\' '
+            ' invXY=${invXY} latS=\'\"${latS}\"\' latN=\'\"${latN}\"\' lonW=\'\"${lonW}\"\' '
+            'lonE=\'\"${lonE}\"\' '
+            ' colormap=\'\"${color}\"\' myscale=${scale} myoffset=${offset} '
+            'units=\'\"${units}\"\' reverse=${reverse} mean_axis=\'\"${mean_axis}\"\' '
+            'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\"${title}\"\' '
+            ' type=\'\"${format}\"\' resolution=\'\"${resolution}\"\' trim=${trim} '
+            'options=\'\"${options}\"\' fmt=\'\"${fmt}\"\' )',
             format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
@@ -200,9 +210,10 @@ def load_standard_operators():
     #
     if os.system("type exiv2 >/dev/null 2>&1") == 0:
         cscript('cepscrop',
-                'epstopdf ${in} --outfile=tmpfile.pdf;' + binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
-                                                                    'pdftops -eps tmpfile-crop.pdf ${out}; '
-                                                                    'rm -f tmpfile.pdf tmpfile-crop.pdf ',
+                binpath + 'epstopdf ${in} --outfile=tmpfile.pdf;' +
+                binpath + 'pdfcrop tmpfile.pdf tmpfile-crop.pdf; '
+                'pdftops -eps tmpfile-crop.pdf ${out}; '
+                'rm -f tmpfile.pdf tmpfile-crop.pdf ',
                 format="eps")
     #
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
@@ -231,86 +242,89 @@ def load_standard_operators():
     #
     # ensemble_ts_plot
     cscript('ensemble_ts_plot',
-            'python ' + scriptpath + 'ensemble_time_series_plot.py '
-                                     '--filenames="${mmin}" '
-                                     '--outfig=${out} '
-                                     '--labels=\'\"${labels}\"\' '
-                                     '--variable=${Var} '
-                                     '--colors="${colors}" '
-                                     '--alphas="${alphas}" '
-                                     '--linestyles="${linestyles}" '
-                                     '--min="${min}" '
-                                     '--max="${max}" '
-                                     '--lw="${lw}" '
-                                     '--alphas="${alphas}" '
-                                     '--linestyles="${linestyles}" '
-                                     '--offset="${offset}" --scale="${scale}" '
-                                     '--highlight_period="${highlight_period}" '
-                                     '--highlight_period_lw="${highlight_period_lw}" '
-                                     '--xlabel="${xlabel}" --ylabel="${ylabel}" '
-                                     '--xlabel_fontsize="${xlabel_fontsize}" '
-                                     '--ylabel_fontsize="${ylabel_fontsize}" '
-                                     '--xlim="${xlim}" --ylim="${ylim}" '
-                                     '--tick_size="${tick_size}" '
-                                     '--text="${text}" '
-                                     '--text_fontsize="${text_fontsize}" '
-                                     '--text_colors="${text_colors}" '
-                                     '--text_verticalalignment="${text_verticalalignment}" '
-                                     '--text_horizontalalignment="${text_horizontalalignment}" '
-                                     '--legend_colors="${leg_colors}" '
-                                     '--legend_labels="${legend_labels}" '
-                                     '--title="${title}" '
-                                     '--title_fontsize="${title_fontsize}" '
-                                     '--left_string="${left_string}" '
-                                     '--right_string="${right_string}" '
-                                     '--center_string="${center_string}" '
-                                     '--left_string_fontsize="${left_string_fontsize}" '
-                                     '--right_string_fontsize="${right_string_fontsize}" '
-                                     '--center_string_fontsize="${center_string_fontsize}" '
-                                     '--legend_loc="${legend_loc}" '
-                                     '--legend_xy_pos="${legend_xy_pos}" '
-                                     '--legend_labels="${legend_labels}" '
-                                     '--legend_colors="${legend_colors}" '
-                                     '--legend_fontsize="${legend_fontsize}" '
-                                     '--legend_ncol="${legend_ncol}" '
-                                     '--legend_lw="${legend_lw}" '
-                                     '--draw_legend="${draw_legend}" '
-                                     '--legend_frame="${legend_frame}" '
-                                     '--append_custom_legend_to_default="${append_custom_legend_to_default}" '
-                                     '--left_margin="${left_margin}" '
-                                     '--right_margin="${right_margin}" '
-                                     '--top_margin="${top_margin}" '
-                                     '--bottom_margin="${bottom_margin}" '
-                                     '--horizontal_lines_values="${horizontal_lines_values}" '
-                                     '--horizontal_lines_styles="${horizontal_lines_styles}" '
-                                     '--horizontal_lines_lw="${horizontal_lines_lw}" '
-                                     '--horizontal_lines_colors="${horizontal_lines_colors}" '
-                                     '--vertical_lines_values="${vertical_lines_values}" '
-                                     '--vertical_lines_styles="${vertical_lines_styles}" '
-                                     '--vertical_lines_lw="${vertical_lines_lw}" '
-                                     '--vertical_lines_colors="${vertical_lines_colors}" '
-                                     '--fig_size="${fig_size}" ',
+            'python3 ' + scriptpath + 'ensemble_time_series_plot.py '
+                                      '--filenames="${mmin}" '
+                                      '--outfig=${out} '
+                                      '--labels=\'\"${labels}\"\' '
+                                      '--variable=${Var} '
+                                      '--colors="${colors}" '
+                                      '--alphas="${alphas}" '
+                                      '--linestyles="${linestyles}" '
+                                      '--min="${min}" '
+                                      '--max="${max}" '
+                                      '--lw="${lw}" '
+                                      '--alphas="${alphas}" '
+                                      '--linestyles="${linestyles}" '
+                                      '--offset="${offset}" --scale="${scale}" '
+                                      '--highlight_period="${highlight_period}" '
+                                      '--highlight_period_lw="${highlight_period_lw}" '
+                                      '--xlabel="${xlabel}" --ylabel="${ylabel}" '
+                                      '--xlabel_fontsize="${xlabel_fontsize}" '
+                                      '--ylabel_fontsize="${ylabel_fontsize}" '
+                                      '--xlim="${xlim}" --ylim="${ylim}" '
+                                      '--tick_size="${tick_size}" '
+                                      '--text="${text}" '
+                                      '--text_fontsize="${text_fontsize}" '
+                                      '--text_colors="${text_colors}" '
+                                      '--text_verticalalignment="${text_verticalalignment}" '
+                                      '--text_horizontalalignment="${text_horizontalalignment}" '
+                                      '--legend_colors="${leg_colors}" '
+                                      '--legend_labels="${legend_labels}" '
+                                      '--title="${title}" '
+                                      '--title_fontsize="${title_fontsize}" '
+                                      '--left_string="${left_string}" '
+                                      '--right_string="${right_string}" '
+                                      '--center_string="${center_string}" '
+                                      '--left_string_fontsize="${left_string_fontsize}" '
+                                      '--right_string_fontsize="${right_string_fontsize}" '
+                                      '--center_string_fontsize="${center_string_fontsize}" '
+                                      '--legend_loc="${legend_loc}" '
+                                      '--legend_xy_pos="${legend_xy_pos}" '
+                                      '--legend_labels="${legend_labels}" '
+                                      '--legend_colors="${legend_colors}" '
+                                      '--legend_fontsize="${legend_fontsize}" '
+                                      '--legend_ncol="${legend_ncol}" '
+                                      '--legend_lw="${legend_lw}" '
+                                      '--draw_legend="${draw_legend}" '
+                                      '--legend_frame="${legend_frame}" '
+                                      '--append_custom_legend_to_default="${append_custom_legend_to_default}" '
+                                      '--left_margin="${left_margin}" '
+                                      '--right_margin="${right_margin}" '
+                                      '--top_margin="${top_margin}" '
+                                      '--bottom_margin="${bottom_margin}" '
+                                      '--horizontal_lines_values="${horizontal_lines_values}" '
+                                      '--horizontal_lines_styles="${horizontal_lines_styles}" '
+                                      '--horizontal_lines_lw="${horizontal_lines_lw}" '
+                                      '--horizontal_lines_colors="${horizontal_lines_colors}" '
+                                      '--vertical_lines_values="${vertical_lines_values}" '
+                                      '--vertical_lines_styles="${vertical_lines_styles}" '
+                                      '--vertical_lines_lw="${vertical_lines_lw}" '
+                                      '--vertical_lines_colors="${vertical_lines_colors}" '
+                                      '--fig_size="${fig_size}" ',
             format='png')
     #
     # cLinearRegression
     cscript('cLinearRegression',
-            'python ' + scriptpath + 'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
-                                     '--yvariable ${var_2} --outfile ${out}',
+            'python3 ' + scriptpath +
+            'LinearRegression_UVCDAT.py --X ${in_1} --xvariable ${var_1} --Y ${in_2} '
+            '--yvariable ${var_2} --outfile ${out}',
             _var='slope')
     #
-    # ml2pl (only on Ciclad)
-    if onCiclad:
+    # ml2pl (only for IPSL)
+    if onCiclad or onSpirit or atTGCC or atIDRIS:
         cscript("ml2pl", scriptpath + "ml2pl.sh -p ${var_2} -v ${var_1} ${in_1} ${out} ${in_2}",
                 commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
-        fixed_fields("ml2pl", ("press_levels.txt", scriptpath + "press_levels.txt"))
+        fixed_fields("ml2pl", ("press_levels.txt",
+                     scriptpath + "press_levels.txt"))
     #
     # curl_tau_atm
     cscript('curl_tau_atm',
-            'ferret -script ' + scriptpath + 'curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon '
-                                             '-d LAT,lat -v LAT,lat -v CURLTAU,curltau ${out} ; '
-                                             'ncatted -O -a coordinates,curltau,o,c,"time lat lon" '
-                                             '-a long_name,curltau,o,c,"Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU'
-                                             '[D=1,Y=@DDC])" ${out}',
+            'ferret -script ' + scriptpath +
+            'curl_tau_atm.jnl ${in_1} ${in_2} ${out} ; ncrename -d LON,lon -v LON,lon '
+            '-d LAT,lat -v LAT,lat -v CURLTAU,curltau ${out} ; '
+            'ncatted -O -a coordinates,curltau,o,c,"time lat lon" '
+            '-a long_name,curltau,o,c,"Wind Stress Curl (Ferret: TAUV[D=2,X=@DDC]-TAUU'
+            '[D=1,Y=@DDC])" ${out}',
             _var='curltau')
 
     #
@@ -360,8 +374,9 @@ def load_cdftools_operators():
     #        "${jmax}" "${opt1}" "${opt2}" ${out} ${out_htrp} ${out_strp}',
     #       canSelectVar=True)
     cscript('ccdftransport',
-            scriptpath + 'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" '
-                         '"${opt2}" ${out} ${out_htrp} ${out_strp}',
+            scriptpath +
+            'cdftransp.sh ${in_1} ${in_2} ${in_3} "${imin}" "${imax}" "${jmin}" "${jmax}" "${opt1}" '
+            '"${opt2}" ${out} ${out_htrp} ${out_strp}',
             _var='vtrp', htrp_var='htrp', strp_var='strp', canSelectVar=True)
 
     #
@@ -390,16 +405,18 @@ def load_cdftools_operators():
     # cdfsections
     #
     cscript('ccdfsections',
-            scriptpath + 'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} '
-                         '${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} '
-                         '${out_sig1} ${out_sig2} ${out_sig4}',
+            scriptpath +
+            'cdfsections.sh ${in_1} ${in_2} ${in_3} ${larf} ${lorf} ${Nsec} ${lat1} ${lon1} ${lat2} '
+            '${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} ${out_sig0} '
+            '${out_sig1} ${out_sig2} ${out_sig4}',
             _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1",
             sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
     #
     cscript('ccdfsectionsm',
-            scriptpath + 'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} '
-                         '${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} '
-                         '${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',
+            scriptpath +
+            'cdfsectionsm.sh ${in_1} ${in_2} ${in_3} ${in_4} ${in_5} ${larf} ${lorf} ${Nsec} ${lat1} '
+            '${lon1} ${lat2} ${lon2} ${n1} "${more_points}" ${out} ${out_Utang} ${out_so} ${out_thetao} '
+            '${out_sig0} ${out_sig1} ${out_sig2} ${out_sig4}',
             _var="Uorth", Utang_var="Utang", so_var="so", thetao_var="thetao", sig0_var="sig0", sig1_var="sig1",
             sig2_var="sig2", sig4_var="sig4", canSelectVar=True)
 
@@ -449,5 +466,5 @@ def load_cdftools_operators():
             _var="zo%s_${basin}", canSelectVar=True)
     #
     # rmse_xyt
-    cscript('rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
-
+    cscript(
+        'rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')

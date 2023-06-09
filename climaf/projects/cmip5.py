@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for CMIP5 outputs produced by
@@ -18,17 +18,17 @@ Example for a CMIP5 dataset declaration:
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 
 root = None
-if onCiclad:
+if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/bdd"
 if atCNRM:
-    # Declare a list of root directories for IPSL data at TGCC
+    # Declare a list of root directories for IPSL data at CNRM
     root = "/cnrm/cmip/cnrm/ESG"
 
 # if root:
@@ -52,9 +52,12 @@ if True:
                    '${realization}/${version}/${variable}/'
 
     # a pattern for fixed fields
-    patternf = pattern1 + '${variable}_${table}_${model}_${experiment}_r0i0p0.nc'
-    patternf = patternf.replace("/${realization}", "/r0i0p0").replace("/${version}", "/latest")
-    patternf = patternf.replace("/${frequency}", "/fx").replace("/${table}", "/fx")
+    patternf = pattern1 + \
+        '${variable}_${table}_${model}_${experiment}_r0i0p0.nc'
+    patternf = patternf.replace(
+        "/${realization}", "/r0i0p0").replace("/${version}", "/latest")
+    patternf = patternf.replace(
+        "/${frequency}", "/fx").replace("/${table}", "/fx")
     # On Ciclad, some fixed fields don't have the last (per-variable) directories level
     patternf2 = patternf.replace("/${variable}/", "/")
 
@@ -68,12 +71,11 @@ if True:
 
     # -- call the dataloc CliMAF function
     # -- CMIP5
-    dataloc(project='CMIP5', organization='generic', url=pattern1)
-    dataloc(project='CMIP5', organization='generic', url=patternf)
-    dataloc(project='CMIP5', organization='generic', url=patternf2)
+    dataloc(project='CMIP5', organization='generic',
+            url=[pattern1] + [patternf] + [patternf2])
     # -- CMIP5_extent
-    dataloc(project='CMIP5_extent', organization='generic', url=pattern1)
-    dataloc(project='CMIP5_extent', organization='generic', url=pattern2)
+    dataloc(project='CMIP5_extent', organization='generic',
+            url=[pattern1] + [pattern2])
 
     # -- Make the alias and default values for both projects
     for project in ['CMIP5', 'CMIP5_extent']:
@@ -89,7 +91,8 @@ if True:
 
         cdef('root', root, project=project)
         # cdef('institute'   , '*'          , project=project)
-        cdef('table', '*', project=project)  # impossible, because of ambiguities
+        # impossible, because of ambiguities
+        cdef('table', '*', project=project)
         cdef('realm', '*', project=project)
         cdef('realization', 'r1i1p1', project=project)
         cdef('experiment', 'historical', project=project)
@@ -114,8 +117,10 @@ if True:
 
     cdef('root', root, project='CMIP5-Adjust')
     # cdef('institute'      , '*'           , project='CMIP5-Adjust')
-    cdef('table', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
-    cdef('realm', '*', project='CMIP5-Adjust')  # impossible, because of ambiguities
+    # impossible, because of ambiguities
+    cdef('table', '*', project='CMIP5-Adjust')
+    # impossible, because of ambiguities
+    cdef('realm', '*', project='CMIP5-Adjust')
     cdef('realization', 'r1i1p1', project='CMIP5-Adjust')
     cdef('experiment', 'rcp85', project='CMIP5-Adjust')
     cdef('version', 'latest', project='CMIP5-Adjust')

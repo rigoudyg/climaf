@@ -1,8 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-This module declares locations for searching data for CMIP6 outputs produced by 
-libIGCM or Eclis for all frequencies.
+This module declares locations for searching data for CMIP6 outputs organized according to CMIP6 DRS
 
 Attributes for CMIP6 datasets are: model, experiment, table, realization, grid, version, institute, mip, root
 
@@ -19,22 +18,21 @@ Example for a CMIP6 dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, onCiclad, onSpip, atCNRM
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip, atCNRM
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
-from climaf.projects.cmip6_valid import set_CMIP6_valid_values
 
 root = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/work/cont003/cmip6/cmip6"
-if onCiclad:
-    # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
+if onCiclad or onSpirit:
+    # Declare a list of root directories for CMIP6 data on IPSL's meso center
     root = "/bdd"
     # root="/ccc/work/cont003/cmip6/cmip6"
 if atCNRM:
-    # Declare a list of root directories for IPSL data at TGCC
+    # Declare a list of root directories for CMIP6 data at CNRM
     root = "/cnrm/cmip"
 
 if True:
@@ -53,23 +51,25 @@ if True:
     cproject('IPSL-CM6_historical-EXT', 'root', 'model', 'institute', 'mip', 'table', 'experiment',
              'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
+    for project in ["CMIP6", "CMIP6_extent", 'IPSL-CM6_historical-EXT']:
+        cprojects[project].initialize_cvalid_values("CMIP6")
+
     for project in ['CMIP6', 'CMIP6_extent']:
         # --> systematic arguments = simulation, frequency, variable
         # -- Set the aliases for the frequency
         # -- Set default values
-        cdef('root',        root,                       project=project)
-        cdef('institute',   '*',                        project=project)
-        cdef('model',       '*',                        project=project)
-        cdef('mip',         '*',                        project=project)
-        cdef('grid',        'g*',                       project=project)
-        cdef('realization', 'r1i1p1f*',                 project=project)
-        cdef('experiment',  'historical',               project=project)
-        cdef('version',     'latest',                   project=project)
-        cdef('table',       '*',                        project=project)
-        set_CMIP6_valid_values(project)
+        cdef('root', root, project=project)
+        cdef('institute', '*', project=project)
+        cdef('model', '*', project=project)
+        cdef('mip', '*', project=project)
+        cdef('grid', 'g*', project=project)
+        cdef('realization', 'r1i1p1f*', project=project)
+        cdef('experiment', 'historical', project=project)
+        cdef('version', 'latest', project=project)
+        cdef('table', '*', project=project)
         #
-        calias(project, 'tos', offset=273.15)
-        calias(project, 'thetao', offset=273.15)
+        calias(project, 'tos', offset=273.15, units="K")
+        calias(project, 'thetao', offset=273.15, units="K")
         calias(project, 'sivolu', 'sivol')
         calias(project, 'sic', 'siconc')
         calias(project, 'sit', 'sithick')
@@ -82,18 +82,17 @@ if True:
     #
     # -- IPSL-CM6 special historical-EXT experiment
     project = 'IPSL-CM6_historical-EXT'
-    cdef('root',        root,                       project=project)
-    cdef('institute',   'IPSL',                     project=project)
-    cdef('model',       'IPSL-CM6A-LR',             project=project)
-    cdef('mip',         'CMIP',                     project=project)
-    cdef('grid',        'g*',                       project=project)
-    cdef('realization', 'r1i1p1f*',                 project=project)
-    cdef('experiment',  'historical',               project=project)
-    cdef('version',     'latest',                   project=project)
-    cdef('table',       '*',                        project=project)
-    set_CMIP6_valid_values(project)
+    cdef('root', root, project=project)
+    cdef('institute', 'IPSL', project=project)
+    cdef('model', 'IPSL-CM6A-LR', project=project)
+    cdef('mip', 'CMIP', project=project)
+    cdef('grid', 'g*', project=project)
+    cdef('realization', 'r1i1p1f*', project=project)
+    cdef('experiment', 'historical', project=project)
+    cdef('version', 'latest', project=project)
+    cdef('table', '*', project=project)
 
-    # -------------
+    # ------------
     # -- Define the patterns
     base_pattern1 = "${root}/CMIP6/${mip}/${institute}/${model}/${experiment}/${realization}/${table}/"
     base_pattern1 += "${variable}/${grid}/${version}/${variable}_${table}_${model}_${experiment}_${realization}_${grid}"
@@ -119,6 +118,3 @@ if True:
     patterns3 = [base_pattern3 + "_${PERIOD}" + ".nc", base_pattern3 + ".nc"]
 
     dataloc(project='IPSL-CM6_historical-EXT', url=patterns3)
-
-
-

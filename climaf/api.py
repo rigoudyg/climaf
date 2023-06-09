@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 CliMAF module ``api`` defines functions for basic CliMAF use : a kind of Application Program Interface for scripting in
@@ -58,7 +58,7 @@ Main functions are :
  - ``raz_cvalues`` : reset scalar values cache
 
  - ``csync``    : save cache index to disk
- 
+
  - ``ccost``    : provide compute costs for an object
 
 
@@ -78,7 +78,7 @@ import os
 #
 from env.environment import *
 from env.clogging import clogger, clog, clog_file, logdir
-from env.site_settings import atCNRM, onCiclad, atTGCC, atIDRIS, atIPSL, onSpip
+from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC, atIDRIS, atIPSL, onSpip
 #
 import climaf
 
@@ -91,7 +91,7 @@ from .projects import *
 #############################################################################################
 #
 from climaf.classes import cdef, cdataset, ds, cproject, cpage, \
-    cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms
+    cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms, derive_cproject
 from climaf.cmacro import macro
 from climaf.driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
 from climaf.dataloc import dataloc

@@ -1,8 +1,11 @@
+#!/bin/bash
 # This is a template. Fill in the path to the executable.
 
 # This is a script in Bash.
 
 # Author: Lionel GUEZ
+# Changes : Stéphane Sénési - 01/2023 - use a workdir (possibly in
+#              CLIMAF_CACHE, else in /tmp)
 
 # This script is a wrapper for a Fortran program. The program reads a
 # NetCDF file. It interpolates an arbitrary set of NetCDF variables
@@ -26,16 +29,15 @@
 # the surface of the Earth. Variables following the "-m" option are
 # set to mssing below the surface of the Earth.
 
-# Do not run several instances of this script in parallel in the same
-# directory. File names are not made different for different
-# instances.
+set -e
 
-##set -x
+# Absolute path to Fortran executable (here supposed to be in same dir as this script:
+executable=$(dirname $0)/ml2pl
 
-# Absolute path to Fortran executable:
-#executable=/data/guez/build/Ml2pl/ml2pl
-executable=$CLIMAF/scripts/ml2pl
-#executable=$(dirname *0)/ml2pl
+# Workdir
+curdir=$(pwd)
+workdir=${CLIMAF_CACHE:-/tmp}/ml2pl_$$
+mkdir -p $workdir
 
 USAGE="usage: ml2pl.sh [OPTION]... input-file output-file [pressure_file]
 Interpolates NetCDF variables from model levels to pressure levels.
@@ -62,6 +64,10 @@ The target pressure levels should be in a text file called
 \"press_levels.txt\" in the current directory. The first line of the
 file is skipped, assuming it is a title line. Pressure levels should
 be in hPa, in descending order.
+
+The script uses a workdir located in directory $CLIMAF_CACHE or /tmp,
+and named ml2pl_$$; this allows for concurrent execution of multiple
+instances
 
 For further documentation, see:
 http://lmdz.lmd.jussieu.fr/utilisateurs/outils/utilisation-de-lmdz#section-9"
@@ -105,6 +111,10 @@ if [[ -z $variable_list_v && -z $variable_list_w && -z $variable_list_m ]]
 fi
 
 shift $((OPTIND - 1))
+input_file=$(realpath $1)
+output_file=$(realpath $2)
+pressure_file=$(realpath $3)
+cd $workdir
 
 if (($# <= 1))
 then
@@ -126,50 +136,44 @@ if [[ ! -x $executable ]]
     exit 1
 fi
 
-if [[ ! -f $1 ]]
+if [[ ! -f $input_file ]]
     then
-    echo "ml2pl.sh: $1 not found"
+    echo "ml2pl.sh: $input_file not found"
     exit 1
 fi
 
-if [[ ! -f "press_levels.txt" ]]
-    then
+if [[ ! -f $curdir/press_levels.txt ]];    then
     echo "ml2pl.sh: press_levels.txt not found"
     echo "Use option -h for help"
     exit 1
+else
+    ln -sf $curdir/press_levels.txt .
 fi
 
 if (($# == 2))
 then
-    ln -sf $1 input_file_ml2pl.nc
+    ln -sf $input_file input_file_ml2pl.nc
 else
     # $# == 3
-    if [[ ! -f $3 ]]
+    if [[ ! -f $pressure_file ]]
     then
-	echo "ml2pl.sh: $3 not found"
+	echo "ml2pl.sh: $pressure_file not found"
 	exit 1
     fi
-    #cp $3 input_file_ml2pl.nc
-    #ncks --append ${variable_list_v:+--variable=$variable_list_v} \
-    #	${variable_list_w:+--variable=$variable_list_w} \
-    #	${variable_list_m:+--variable=$variable_list_m} $1 input_file_ml2pl.nc
-    #echo "Appended $1 to $3."
-    echo "ncdump de $1"
-    ncdump -h $1
-    echo "ncdump de $3"
-    ncdump -h $3
+    echo "ncdump de $input_file"
+    ncdump -h $input_file
+    echo "ncdump de $pressure_file"
+    ncdump -h $pressure_file
     echo "cdo merge ${variable_list_v:+-selvar,$variable_list_v} \
     ${variable_list_w:+-selvar,$variable_list_w} \
-    ${variable_list_m:+-selvar,$variable_list_m} $1 $3 input_file_ml2pl.nc"
+    ${variable_list_m:+-selvar,$variable_list_m} $input_file $pressure_file input_file_ml2pl.nc"
     cdo -O merge ${variable_list_v:+-selvar,$variable_list_v} \
     ${variable_list_w:+-selvar,$variable_list_w} \
-    ${variable_list_m:+-selvar,$variable_list_m} $1 $3 input_file_ml2pl.nc
-echo "merge done for $1 and $3."
+    ${variable_list_m:+-selvar,$variable_list_m} $input_file $pressure_file input_file_ml2pl.nc
+    echo "merge done for $input_file and $pressure_file."
     echo "ncdump du merge "
     ncdump -h input_file_ml2pl.nc
 fi
-
-output_file=$2
 
 IFS=","
 
@@ -206,4 +210,7 @@ EOF
 # pressure_var is not defined.)
 
 mv output_file_ml2pl.nc $output_file
-rm input_file_ml2pl.nc variable_list_ml2pl
+rm input_file_ml2pl.nc variable_list_ml2pl press_levels.txt
+rm -f "="
+cd ..
+rmdir $workdir

@@ -85,33 +85,33 @@ cpage_pdf : create an array of figures (output: 'pdf' figure)
 html : package for creating an html index, with tables of links to figures
 --------------------------------------------------------------------------
 
-.. automodule:: climaf.html
+.. automodule:: climaf.chtml
 
-.. autofunction:: climaf.html.header
+.. autofunction:: climaf.chtml.header
 
-.. autofunction:: climaf.html.trailer
+.. autofunction:: climaf.chtml.trailer
 
-.. autofunction:: climaf.html.section
+.. autofunction:: climaf.chtml.section
 
-.. autofunction:: climaf.html.open_table
+.. autofunction:: climaf.chtml.open_table
 
-.. autofunction:: climaf.html.close_table
+.. autofunction:: climaf.chtml.close_table
 
-.. autofunction:: climaf.html.open_line
+.. autofunction:: climaf.chtml.open_line
 
-.. autofunction:: climaf.html.close_line
+.. autofunction:: climaf.chtml.close_line
 
-.. autofunction:: climaf.html.line
+.. autofunction:: climaf.chtml.line
 
-.. autofunction:: climaf.html.link
+.. autofunction:: climaf.chtml.link
 
-.. autofunction:: climaf.html.link_on_its_own_line
+.. autofunction:: climaf.chtml.link_on_its_own_line
 
-.. autofunction:: climaf.html.cell
+.. autofunction:: climaf.chtml.cell
 
-.. autofunction:: climaf.html.fline
+.. autofunction:: climaf.chtml.fline
 
-.. autofunction:: climaf.html.flines
+.. autofunction:: climaf.chtml.flines
 
-.. autofunction:: climaf.html.vspace
+.. autofunction:: climaf.chtml.vspace
 

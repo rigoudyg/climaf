@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """
@@ -7,11 +7,27 @@ CliMAF utilities.
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import copy
 from string import Template
 from collections import defaultdict
+import numpy as np
 
 from env.clogging import clogger, dedent, dedent as cdedent
 from env.environment import *
+
+
+def ranges_to_string(ranges=list(), add=list(), sym=False, sep=" "):
+    if not isinstance(add, list):
+        add = [add, ]
+    if len(ranges) > 0 and not isinstance(ranges[0], list):
+        ranges = [ranges, ]
+    list_nb = copy.deepcopy(add)
+    for (start, stop, step) in ranges:
+        list_nb.extend(np.arange(start, stop + step, step))
+    if sym:
+        list_nb.extend([-val for val in list_nb])
+    list_nb = sorted(list(set(list_nb)))
+    return sep.join([str(elt) for elt in list_nb])
 
 
 def turn_list_to_tuple(val):

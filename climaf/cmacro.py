@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 CliMAF macros module :
@@ -77,23 +77,26 @@ def macro(name, cobj, lobjects=[]):
     if isinstance(cobj, six.string_types):
         s = cobj
         # Next line used for interpreting macros's CRS
-        exec("from climaf.cmacro import cdummy; ARG=cdummy()", sys.modules['__main__'].__dict__)
+        exec("from climaf.cmacro import cdummy; ARG=cdummy()",
+             sys.modules['__main__'].__dict__)
         try:
             cobj = eval(cobj, sys.modules['__main__'].__dict__)
         except:
             # usually case of a CRS which project is not currently defined
-            clogger.error("Cannot interpret %s with the projects currently define" % s)
+            clogger.error(
+                "Cannot interpret %s with the projects currently define" % s)
             return None
         # print "string %s was interpreted as %s"%(s,cobj)
     domatch = False
     for o in lobjects:
         domatch = domatch or cobj == o or \
-                  (isinstance(cobj, cobject) and cobj.buildcrs() == o.buildcrs())
+            (isinstance(cobj, cobject) and cobj.buildcrs() == o.buildcrs())
     if isinstance(cobj, cdataset) or isinstance(cobj, cdummy) or domatch:
         return cdummy()
     elif isinstance(cobj, ctree):
         rep = ctree(cobj.operator, cobj.script,
-                    *list(map(macro, [None] * len(cobj.operands), cobj.operands)),
+                    *list(map(macro, [None] *
+                          len(cobj.operands), cobj.operands)),
                     **cobj.parameters)
     elif isinstance(cobj, scriptChild):
         rep = scriptChild(macro(None, cobj.father), cobj.varname)
@@ -116,7 +119,8 @@ def macro(name, cobj, lobjects=[]):
         defs = 'def %s(*args) :\n  """%s"""\n  return instantiate(cmacros["%s"],[ x for x in args])\n' \
                % (name, doc, name)
         exec(defs, globals())
-        exec("from climaf.cmacro import %s" % name, sys.modules['__main__'].__dict__)
+        exec("from climaf.cmacro import %s" %
+             name, sys.modules['__main__'].__dict__)
         clogger.debug("Macro %s has been declared" % name)
 
     return rep
@@ -162,7 +166,9 @@ def crewrite(crs, alsoAtTop=True):
                               repr(macro(None, co)))
                 argl = cmatch(cmacros[m], co)
                 if len(argl) > 0:
-                    rep = m + "({})".format(",".join([crewrite(arg.buildcrs(crsrewrite=crewrite)) for arg in argl]))
+                    rep = m + \
+                        "({})".format(
+                            ",".join([crewrite(arg.buildcrs(crsrewrite=crewrite)) for arg in argl]))
         # No macro matches at top level, or top level not wished.
         # Let us dig a bit
         if rep is None:
@@ -218,7 +224,8 @@ def read(filename):
         macrofile = open(os.path.expanduser(filename), "r")
         clogger.debug("Macrofile %s read" % macrofile)
         macros_texts = json.load(macrofile)
-        clogger.debug("After reading file %s, macros=%s" % (macrofile, repr(macros_texts)))
+        clogger.debug("After reading file %s, macros=%s" %
+                      (macrofile, repr(macros_texts)))
         macrofile.close()
     except:
         clogger.info("Issue reading macro file %s ", filename)
@@ -253,7 +260,8 @@ def show(interp=True):
     """
     for m in cmacros:
         if interp:
-            print("% 15s : %s" % (m, crewrite(cmacros[m].buildcrs(), alsoAtTop=False)))
+            print("% 15s : %s" %
+                  (m, crewrite(cmacros[m].buildcrs(), alsoAtTop=False)))
         else:
             print("% 15s : %s" % (m, cmacros[m]))
 
@@ -281,7 +289,8 @@ def instantiate(mac, operands, toplevel=True):
     elif isinstance(mac, cdataset):
         rep = cdataset
     if toplevel and len(operands) != 0:
-        raise Climaf_Macro_Error('too many operands; left operands are : ' + repr(operands))
+        raise Climaf_Macro_Error(
+            'too many operands; left operands are : ' + repr(operands))
     return rep
 
 

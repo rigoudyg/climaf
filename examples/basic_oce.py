@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Example for CliMAF use with ORCA data
@@ -24,7 +24,7 @@ cdef("project", "CMIP5")
 cdef("frequency", "monthly")
 
 # Choose a model and define your dataset
-if onCiclad:
+if onCiclad or onSpirit:
     cdef("model", "IPSL-CM5A-LR")
 else:
     if atCNRM:

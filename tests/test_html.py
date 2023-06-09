@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -17,7 +17,7 @@ from climaf.cache import setNewUniqueCache, craz
 from climaf import __file__ as climaf_based_file
 from climaf.classes import ds
 from climaf.driver import cfile
-from climaf.html import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
+from climaf.chtml import header, trailer, vspace, section, open_table, close_table, open_line, close_line, link,\
     link_on_its_own_line, cell, line, flines, fline, cinstantiate, compareCompanion, start_line, safe_mode_cfile_plot, \
     Climaf_Html_Error
 

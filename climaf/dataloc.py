@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ CliMAF datasets location handling and data access module
@@ -181,6 +181,15 @@ class dataloc(object):
         if not (any([loc == self for loc in locs])):
             locs.append(self)
 
+    def derive(self, name):
+        """
+        Create data location for a new project by copying the one existing for the current project.
+        :param name: name of the new project
+        :return: the data location for the new project
+        """
+        return dataloc(project=name, organization=self.organization, url=self.urls, model=self.model,
+                       simulation=self.simulation, realm=self.realm, table=self.table, frequency=self.frequency)
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
@@ -192,7 +201,7 @@ class dataloc(object):
 
     def __str__(self):
         return self.model + self.project + self.simulation + self.frequency + self.realm + self.table + \
-               self.organization + repr(self.urls)
+            self.organization + repr(self.urls)
 
     def pr(self):
         print("For model " + self.model + " of project " + self.project +
@@ -231,7 +240,8 @@ def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", ta
 def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     if project == 'file':
         return True
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
+    ofu = getlocs(project=project, model=model, simulation=simulation,
+                  frequency=frequency, realm=realm, table=table)
     if len(ofu) == 0:
         return False
     rep = True
@@ -242,7 +252,8 @@ def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     return rep
 
 
-def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None, **kwargs):
+def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None,
+                use_frequency=False, **kwargs):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
@@ -271,7 +282,8 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
     realm = kwargs.get("realm", "*")
     table = kwargs.get("table", "*")
 
-    ofu = getlocs(project=project, model=model, simulation=simulation, frequency=frequency, realm=realm, table=table)
+    ofu = getlocs(project=project, model=model, simulation=simulation,
+                  frequency=frequency, realm=realm, table=table)
     clogger.debug("locs=" + repr(ofu))
     if len(ofu) == 0:
         clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
@@ -281,9 +293,11 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
             clogger.warning("Organisation = %s will be deprecated quite soon." % org +
                             "Please refer to you CliMAF wizard for removing its use")
         if return_wildcards is not None and len(return_wildcards) > 0 and org != "generic":
-            raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
+            raise Climaf_Error(
+                "Can handle multiple facet query only for organization=generic ")
         if return_combinations is not None and len(return_combinations) > 0 and org != "generic":
-            raise Climaf_Error("Can handle multiple facet query only for organization=generic ")
+            raise Climaf_Error(
+                "Can handle multiple facet query only for organization=generic ")
         kwargs2 = kwargs.copy()
         # Convert normalized frequency to project-specific frequency if applicable
         if "frequency" in kwargs and project in frequencies:
@@ -316,11 +330,12 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
                                         "optimized CMIP6 search. Use cdataset.glob() or set "
                                         "env.environment.optimize_cmip6_wildcards to False")
                     for kwa in kwargs_list:
-                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations, **kwa))
+                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations,
+                                                      use_frequency=use_frequency, **kwa))
             else:
                 rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
                                               return_combinations=return_combinations,
-                                              merge_periods_on=merge_periods_on,
+                                              merge_periods_on=merge_periods_on, use_frequency=use_frequency,
                                               **kwargs2))
         else:
             raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
@@ -374,13 +389,15 @@ def selectEmFiles(**kwargs):
         command = ["grep", "^export EM_DIRECTORY_" + realm + freq_for_em + "=",
                    os.path.expanduser(os.getenv("EM_HOME")) + "/expe_" + simulation]
         try:
-            ex = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ex = subprocess.Popen(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except:
             clogger.error("Issue getting archive_location for " + simulation + " for realm " + realm + " with: " +
                           repr(command))
             break
         if ex.wait() == 0:
-            dir = ex.stdout.read().split("=")[1].replace('"', "").replace("\n", "")
+            dir = ex.stdout.read().split("=")[1].replace(
+                '"', "").replace("\n", "")
             clogger.debug("Looking at dir " + dir)
             if os.path.exists(dir):
                 lfiles = os.listdir(dir)
@@ -412,14 +429,16 @@ def periodOfEmFile(filename, realm, freq):
                 speriod = "%s01-%s12" % (year, year)
                 return init_period(speriod)
         else:
-            raise Climaf_Error("can yet handle only monthly frequency for realms A and L - TBD")
+            raise Climaf_Error(
+                "can yet handle only monthly frequency for realms A and L - TBD")
     elif realm == 'O' or realm == 'I':
         if freq == 'monthly' or freq == 'mon' or freq == '':
             altfreq = 'm'
         elif freq[0:2] == 'da':
             altfreq = 'd'
         else:
-            raise Climaf_Error("Can yet handle only monthly and daily frequency for realms O and I - TBD")
+            raise Climaf_Error(
+                "Can yet handle only monthly and daily frequency for realms O and I - TBD")
         patt = r'^.*_1' + altfreq + r'_([0-9]{8})_*([0-9]{8}).*nc'
         beg = re.sub(patt, r'\1', filename)
         end = re.sub(patt, r'\2', filename)
@@ -481,12 +500,15 @@ def selectCmip5DrsFiles(urls, **kwargs):
     for url in urls:
         totry = ['merge/', 'output/', 'output?/', 'main/', '']
         for p in totry:
-            pattern1 = url + "/" + project + "/" + p + "*/" + model  # one * for modelling center
+            pattern1 = url + "/" + project + "/" + p + \
+                "*/" + model  # one * for modelling center
             joker_version = "*"
-            patternv = os.sep.join([pattern1, experiment, freqd, realm, table, simulation, joker_version, variable])
+            patternv = os.sep.join(
+                [pattern1, experiment, freqd, realm, table, simulation, joker_version, variable])
             if len(glob.glob(patternv)) > 0:
                 break
-        patternv = os.sep.join([pattern1, experiment, freqd, realm, table, simulation])
+        patternv = os.sep.join(
+            [pattern1, experiment, freqd, realm, table, simulation])
         # Get version directories list
         ldirs = glob.glob(patternv)
         clogger.debug("Globbing with " + patternv + " gives:" + repr(ldirs))
@@ -502,9 +524,11 @@ def selectCmip5DrsFiles(urls, **kwargs):
                     if "last" in lversions:
                         cversion = "last"
                     else:
-                        cversion = lversions[-1]  # Assume that order provided by sort() is OK
+                        # Assume that order provided by sort() is OK
+                        cversion = lversions[-1]
             # print "using version "+cversion+" for requested version: "+version
-            lfiles = glob.glob(os.sep.join([repert, cversion, variable, "*.nc"]))
+            lfiles = glob.glob(os.sep.join(
+                [repert, cversion, variable, "*.nc"]))
             # print "listing "+repert+"/"+cversion+"/"+variable+"/*.nc"
             # print 'lfiles='+`lfiles`
             for f in lfiles:
@@ -545,7 +569,8 @@ def remote_to_local_filename(url):
     else:
         hostname = url.split(":")[k]
 
-    local_filename = os.path.expanduser(default_remote_cache) + '/' + hostname + os.path.abspath(url.split(":")[-1])
+    local_filename = os.path.expanduser(
+        default_remote_cache) + '/' + hostname + os.path.abspath(url.split(":")[-1])
     return local_filename
 
 
@@ -555,5 +580,3 @@ def test2():
 
 if __name__ == "__main__":
     test2()
-
-

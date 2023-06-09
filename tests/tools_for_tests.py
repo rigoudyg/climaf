@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -7,10 +7,12 @@ Tools to deal with tests.
 
 from __future__ import unicode_literals, absolute_import, print_function, division
 
+import os
 import unittest
 import re
 import six
 import shutil
+import subprocess
 
 from env.environment import *
 from climaf.api import cshow, ncview, cfile
@@ -28,6 +30,12 @@ def skipUnless_Ciclad():
     return unittest.skip("because not on Ciclad")
 
 
+def skipIf_CondaEnv():
+    if os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "").find("conda") >= 0:
+        return unittest.skip("because using conda environment")
+    return lambda func: func
+
+
 def remove_dir_and_content(dirname):
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
@@ -36,7 +44,7 @@ def remove_dir_and_content(dirname):
         print("Try to remove a non existing directory: %s" % dirname)
 
 
-def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=list()):
+def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=list(), add_dir=False):
     with open(html_file, "r") as fic:
         content = fic.read()
     list_figures = list()
@@ -44,7 +52,7 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     for regexp_match in regexp.finditer(content):
         value = regexp_match.groupdict()["value"]
         list_replacement.append(value)
-        if not value.startswith(os.sep):
+        if add_dir and not value.startswith(os.sep):
             value = os.sep.join([os.path.dirname(html_file), value])
         if value not in list_figures and not any([p in value for p in patterns_to_exclude]):
             list_figures.append(value)
@@ -53,7 +61,19 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     return list_figures, content
 
 
-def compare_html_files(file_test, file_ref):
+def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None,
+                       by=None, allow_url_change=False):
+    if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
+        raise ValueError("Neither reference directory nor default one exists")
+    file_ref = os.path.sep.join([dir_ref, file_ref_name])
+    if not os.path.exists(file_ref):
+        default_file_ref = os.path.sep.join([dir_ref_default, file_ref_name])
+        if not os.path.exists(default_file_ref):
+            raise ValueError(
+                "Could not find a reference file for %s" % file_ref_name)
+        else:
+            file_ref = default_file_ref
+            dir_ref = dir_ref_default
     if not os.path.exists(file_test) or not os.path.exists(file_ref):
         raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
     if file_ref.split(".")[-1] != "html":
@@ -63,15 +83,27 @@ def compare_html_files(file_test, file_ref):
                                                                     os.path.basename(file_ref)))
     fig_regexp = re.compile(r'(HREF|SRC)="(?P<value>[^"]*\.png)"')
     patterns_to_exclude = ["Logo-CliMAF-compact.png", ]
-    list_figures_test, content_test = get_figures_and_content_from_html(file_test, fig_regexp, patterns_to_exclude)
-    list_figures_ref, content_ref = get_figures_and_content_from_html(file_ref, fig_regexp, patterns_to_exclude)
+    list_figures_test, content_test = get_figures_and_content_from_html(file_test, fig_regexp, patterns_to_exclude,
+                                                                        add_dir=True)
+    list_figures_ref, content_ref = get_figures_and_content_from_html(
+        file_ref, fig_regexp, patterns_to_exclude)
+    if allow_url_change:
+        url_line_pattern = "<a href=.*Back to C-ESM-EP frontpage.*</a>"
+        text = re.findall(url_line_pattern, content_ref)[0]
+        content_ref = content_ref.replace(text, "")
+        text = re.findall(url_line_pattern, content_test)[0]
+        content_test = content_test.replace(text, "")
+    if replace is not None:
+        content_ref = content_ref.replace(replace, by)
     if content_test != content_ref:
         raise ValueError("The content of files %s and %s are different\n%s\n!=\n%s" % (file_test, file_ref,
                                                                                        content_test, content_ref))
     if len(list_figures_ref) != len(list_figures_test):
-        raise ValueError("The number of figures if different in %s and %s" % (file_test, file_ref))
+        raise ValueError(
+            "The number of figures if different in %s and %s" % (file_test, file_ref))
     for (fig_ref, fig_test) in zip(list_figures_ref, list_figures_test):
-        compare_picture_files(fig_test, fig_ref)
+        compare_picture_files(fig_test, fig_ref, dir_ref,
+                              dir_ref_default=None, display_error=display_error)
 
 
 def compare_text_files(file_test, file_ref, **kwargs):
@@ -102,30 +134,49 @@ def compare_netcdf_files(file_test, file_ref, display=False):
                                                                     os.path.basename(file_ref)))
     if display:
         ncview(file_test)
-    rep = subprocess.check_output("cdo diffn {} {}".format(file_test, file_ref), shell=True)
+    rep = subprocess.check_output(
+        "cdo diffn {} {}".format(file_test, file_ref), shell=True)
     if len(str(rep).split("\n")) > 1:
-        raise ValueError("The content of files %s and %s are different" % (file_test, file_ref))
+        raise ValueError(
+            "The content of files %s and %s are different" % (file_test, file_ref))
 
 
-def compare_picture_files(object_test, fic_ref, display=False, display_error=True):
+def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, display=False, display_error=True):
     # TODO: Check the metadata of the files
     # Transform the strings in list of strings
-    if not (isinstance(object_test, six.string_types) and os.path.isfile(object_test)):
-        fic_test = cfile(object_test)
-    else:
+    if isinstance(object_test, six.string_types) and os.path.exists(object_test):
         fic_test = object_test
+    else:
+        fic_test = cfile(object_test)
     fic_test = fic_test.split(" ")
+    if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
+        raise ValueError("Neither reference directory nor default one exists")
     if not isinstance(fic_ref, list):
         fic_ref = [fic_ref, ]
+    for (i, elt) in enumerate(fic_ref):
+        elt_ref = os.path.sep.join([dir_ref, elt])
+        if dir_ref_default is not None:
+            elt_default_ref = os.path.sep.join([dir_ref_default, elt])
+        else:
+            elt_default_ref = "foo"
+        if os.path.exists(elt_ref):
+            fic_ref[i] = elt_ref
+        elif os.path.exists(elt_default_ref):
+            fic_ref[i] = elt_default_ref
+        else:
+            raise ValueError("Could not find the reference file for %s" % elt)
     # Loop on the files
     for (file_test, file_ref) in zip(fic_test, fic_ref):
         # Check the existence and the consistency of the comparison
         if not (os.path.exists(file_test) and os.path.exists(file_ref)):
-            raise ValueError("Check files existence: %s - %s" % (file_test, file_ref))
+            raise ValueError("Check files existence: %s - %s" %
+                             (file_test, file_ref))
         # Find out the format of the files and the dedicated display command
-        files_format = list(set([file_test.split(".")[-1], file_ref.split(".")[-1]]))
+        files_format = list(
+            set([file_test.split(".")[-1], file_ref.split(".")[-1]]))
         if len(files_format) > 1:
-            raise ValueError("Files to compare have not the same format: %s" % " - ".join(files_format))
+            raise ValueError(
+                "Files to compare have not the same format: %s" % " - ".join(files_format))
         else:
             files_format = files_format[0]
         if files_format not in ["png", "eps", "jpeg", "pdf"]:
@@ -141,9 +192,18 @@ def compare_picture_files(object_test, fic_ref, display=False, display_error=Tru
         rep = subprocess.call("compare -compose src -metric AE {} {} {}".format(file_test, file_ref, diff_file),
                               shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if rep != 0:
+            tmp_dir = os.sep.join([os.path.dirname(file_test), "..", "tmp"])
+            os.makedirs(tmp_dir, exist_ok=True)
+            cfile(object_test, target=os.sep.join(
+                [tmp_dir, os.path.basename(file_test)]))
             if display_error:
-                subprocess.check_call(display_cmd.format(diff_file), shell=True)
+                try:
+                    subprocess.check_call(
+                        display_cmd.format(diff_file), shell=True)
+                except subprocess.SubprocessError:
+                    print("Could not display %s" % diff_file)
             os.remove(diff_file)
-            raise ValueError("The following files differ: %s - %s" % (file_test, file_ref))
+            raise ValueError("The following files differ: %s - %s" %
+                             (file_test, file_ref))
         else:
             os.remove(diff_file)

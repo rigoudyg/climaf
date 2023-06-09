@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """  Basic types and syntax for managing time periods in CLIMAF
 
@@ -13,6 +13,7 @@ import datetime
 import six
 import copy
 
+from climaf.utils import Climaf_Error
 from env.clogging import clogger, dedent
 from env.environment import *
 
@@ -41,6 +42,9 @@ class cperiod(object):
                 except:
                     raise Climaf_Period_Error("issue with start or end, %s : %s,\n%s : %s" %
                                               (type(start), str(start), type(end), str(end)))
+            if start > end:
+                raise Climaf_Period_Error("Period's start (%s) must be before period's end (%s)" %
+                                          (repr(start), repr(end)))
             self.start = start
             self.end = end
             if pattern is None:
@@ -64,6 +68,30 @@ class cperiod(object):
         if test and end_self != end_other:
             test = False
         return test
+
+    def __le__(self, other):
+        if self.start != other.start:
+            return self.start <= other.start
+        else:
+            return self.end <= other.end
+
+    def __lt__(self, other):
+        if self.start != other.start:
+            return self.start < other.start
+        else:
+            return self.end < other.end
+
+    def __ge__(self, other):
+        if self.start != other.start:
+            return self.start >= other.start
+        else:
+            return self.end >= other.end
+
+    def __gt__(self, other):
+        if self.start != other.start:
+            return self.start > other.start
+        else:
+            return self.end > other.end
 
     #
     def __hash__(self):
@@ -134,7 +162,10 @@ class cperiod(object):
     def hasFullYear(self, year):
         if self.fx:
             raise Climaf_Period_Error("Meaningless for period 'fx'")
-        return int(year) in range(self.start.year, self.end.year + 1)
+        else:
+            year = int(year)
+            return self.start <= datetime.datetime(year=year, month=1, day=1) and \
+                datetime.datetime(year=year + 1, month=1, day=1) <= self.end
 
     #
     def start_with(self, begin):
@@ -168,17 +199,28 @@ class cperiod(object):
         """
         Returns the intersection of period self and period 'other' if any
         """
-        if self.fx:
-            raise Climaf_Period_Error("Meaningless for period 'fx'")
         if other:
-            start = self.start
-            if other.start > start:
-                start = other.start
-            end = self.end
-            if other.end < end:
-                end = other.end
-            if start < end:
-                return cperiod(start, end)
+            if self.fx and other.fx:
+                clogger.warning("Meaningless for period 'fx'")
+                return cperiod("fx")
+            elif self.fx:
+                return cperiod(other.start, other.end)
+            elif other.fx:
+                return cperiod(self.start, self.start)
+            else:
+                start = self.start
+                if other.start > start:
+                    start = other.start
+                end = self.end
+                if other.end < end:
+                    end = other.end
+                if start < end:
+                    return cperiod(start, end)
+        else:
+            if self.fx:
+                return cperiod("fx")
+            else:
+                return cperiod(self.start, self.end)
 
 
 def init_period(dates):
@@ -211,6 +253,49 @@ def init_period(dates):
     :py:func:`~climaf.operators.cscript`
 
     """
+    def str_to_date(a_date, end=False):
+        if a_date.startswith("-"):
+            sign = -1
+            a_date = a_date[1:]
+        elif a_date.startswith("+"):
+            sign = 1
+            a_date = a_date[1:]
+        else:
+            sign = 1
+        a_date = a_date.zfill(4)
+        year = int(a_date[0:4]) * sign
+        month = int(a_date[4:6]) if len(a_date) > 5 else 1
+        day = int(a_date[6:8]) if len(a_date) > 7 else 1
+        hour = int(a_date[8:10]) if len(a_date) > 9 else 0
+        minute = int(a_date[10:12]) if len(a_date) > 11 else 0
+        add_day = 0
+        add_hour = 0
+        add_minute = 0
+        if end:
+            if len(a_date) < 6:
+                year += 1
+            elif len(a_date) < 8:
+                month += 1
+                if month > 12:
+                    month = 1
+                    year += 1
+            elif len(a_date) < 10:
+                add_day = 1
+            elif len(a_date) < 12:
+                add_hour = 1
+            else:
+                add_minute = 1
+        try:
+            if year <= 0:
+                raise Climaf_Period_Error("Could not yet deal with negative or null years.")
+            else:
+                rep = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute)
+        except:
+            raise Climaf_Period_Error(
+                "String %s is not a date (%s %s %s %s %s)" % (a_date, year, month, day, hour, minute))
+        if end:
+            rep += datetime.timedelta(days=add_day, hours=add_hour, minutes=add_minute)
+        return rep
 
     # clogger.debug("analyzing  %s"%dates)
     if isinstance(dates, cperiod):
@@ -219,77 +304,25 @@ def init_period(dates):
         raise Climaf_Period_Error("arg is not a string : " + repr(dates))
     else:
         dates = str(dates)
-    if dates == 'fx':
-        return cperiod('fx')
-
-    start = re.sub(r'^([0-9]{1,12}).*', r'\1', dates)
-    # Pad with leading 0 to reach a length of 4 characters
-    start = (4 - len(start)) * "0" + start
-    # TBD : check that start actually matches a date
-    syear = int(start[0:4])
-    smonth = int(start[4:6]) if len(start) > 5 else 1
-    sday = int(start[6:8]) if len(start) > 7 else 1
-    shour = int(start[8:10]) if len(start) > 9 else 0
-    sminute = int(start[10:12]) if len(start) > 11 else 0
-    try:
-        s = datetime.datetime(year=syear, month=smonth, day=sday, hour=shour, minute=sminute)
-    except:
-        raise Climaf_Period_Error(
-            "period start string %s is not a date (%s %s %s %s %s)" % (start, syear, smonth, sday, shour, sminute))
-    #
-    #
-    end = re.sub(r'.*[-_]([0-9]{1,12})$', r'\1', dates)
-    end = (4 - len(end)) * "0" + end
-    # clogger.debug("For dates=%s, start= %s, end=%s"%(dates,start,end))
-    if end == dates:
-        end = start
-    else:
-        # clogger.debug("len(end)=%d"%len(end))
-        if len(start) != len(end):
-            raise Climaf_Period_Error(
-                "Must have same numer of digits for start and end dates (%s and %s)" % (start, end))
-    #
-    emonth = 1
-    eday = 1
-    ehour = 0
-    eminute = 0
-    add_day = 0
-    add_hour = 0
-    add_minute = 0
-    if len(end) in [4, 5]:
-        eyear = int(end[0:4]) + 1
-    elif len(end) in [6, 7]:
-        eyear = int(end[0:4])
-        emonth = int(end[4:6]) + 1
-        if emonth > 12:
-            emonth = 1
-            eyear = eyear + 1
-    elif len(end) in [8, 9]:
-        add_day = 1
-        eyear = int(end[0:4])
-        emonth = int(end[4:6])
-        eday = int(end[6:8])
-    elif len(end) in [10, 11]:
-        add_hour = 1
-        eyear = int(end[0:4])
-        emonth = int(end[4:6])
-        eday = int(end[6:8])
-        ehour = int(end[8:10])
-    elif len(end) == 12:
-        add_minute = 1
-        eyear = int(end[0:4])
-        emonth = int(end[4:6])
-        eday = int(end[6:8])
-        ehour = int(end[8:10])
-        eminute = int(end[10:12])
-    #
-    e = datetime.datetime(year=eyear, month=emonth, day=eday, hour=ehour, minute=eminute)
-    e = e + datetime.timedelta(days=add_day, hours=add_hour, minutes=add_minute)
-
-    if s < e:
-        return cperiod(s, e, None)
-    else:
-        raise Climaf_Period_Error("Must have start (" + repr(s) + ") before,(or equal to, end (" + repr(e) + ")")
+        if dates in ['fx', ]:
+            return cperiod('fx')
+        else:
+            period_regexp = re.compile(r"(?P<start>-?\d+)([-_](?P<end>-?\d+))?")
+            period_match = period_regexp.match(dates)
+            if period_match:
+                start = period_match.groupdict()["start"]
+                s = str_to_date(start)
+                end = period_match.groupdict()["end"]
+                if end is None:
+                    e = str_to_date(start, end=True)
+                else:
+                    e = str_to_date(end, end=True)
+                if s < e:
+                    return cperiod(s, e, None)
+                else:
+                    raise Climaf_Period_Error("Must have start (%s) before or equal to end (%s)" % (repr(s), repr(e)))
+            else:
+                raise Climaf_Period_Error("Could not create a period with string %s" % dates)
 
 
 def sort_periods_list(periods_list):
@@ -324,11 +357,14 @@ def sort_periods_list(periods_list):
         return rep
 
     #
-    clist = copy.copy(periods_list)
-    sorted_tree = SortTree(clist.pop())
-    while clist:
-        insert(clist.pop(), sorted_tree)
-    return walk(sorted_tree)
+    if isinstance(periods_list, list) and all([isinstance(elt, cperiod) for elt in periods_list]):
+        clist = copy.copy(periods_list)
+        sorted_tree = SortTree(clist.pop())
+        while clist:
+            insert(clist.pop(), sorted_tree)
+        return walk(sorted_tree)
+    else:
+        raise Climaf_Period_Error("Can not deal with something else than a list of cperiod objects.")
 
 
 def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=True):
@@ -345,39 +381,45 @@ def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=T
     For dealing with very long list of periods, which do not allow for recursion, we
     proceed with batches of N elements
     """
-    N = 300
-    if isinstance(already_merged, list) and len(already_merged) == 0:
-        if len(remain_to_merge) < 2:
-            return remain_to_merge
-        sorted_remain = sorted(remain_to_merge, key=(lambda x: x.start))
-        if len(sorted_remain) <= N:
-            return merge_periods(sorted_remain[1:], [sorted_remain[0]], handle_360_days_year)
-        else:
-            # Avoid too much recursion
-            first_batch = merge_periods(sorted_remain[0:N])
-            return merge_periods(sorted_remain[N:], first_batch, handle_360_days_year)
-
-    if len(remain_to_merge) > 0:
-        last = already_merged[-1]
-        next_one = remain_to_merge.pop(0)
-        # print "last.end=",last.end,"next.start=",next_one.start
-        # if (last.end == next_one.start) :
-        #    already_merged[-1]=cperiod(last.start,next_one.end)
-        if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and last.end.day == 31 and
-                                          next_one.start.month == 1 and next_one.start.day == 1
-                                          and next_one.start.year == last.end.year + 1):
-            if next_one.end > last.end:
-                # the next period is not entirely included in the
-                # last merged one
-                already_merged[-1] = cperiod(last.start, next_one.end)
-        else:
-            # There is no overlap between both periods
-            already_merged.append(next_one)
-    #
-    if len(remain_to_merge) > 0:
-        return merge_periods(remain_to_merge, already_merged, handle_360_days_year)
+    if not (isinstance(remain_to_merge, list) and all([isinstance(elt, cperiod) for elt in remain_to_merge])):
+        raise Climaf_Period_Error("Can not deal with something else than a list of cperiod objects.")
     else:
-        return already_merged
+        N = 300
+        if isinstance(already_merged, list) and len(already_merged) == 0:
+            if len(remain_to_merge) < 2:
+                return remain_to_merge
+            else:
+                sorted_remain = sorted(remain_to_merge)
+                if len(sorted_remain) <= N:
+                    return merge_periods(sorted_remain[1:], [sorted_remain[0]], handle_360_days_year)
+                else:
+                    # Avoid too much recursion
+                    first_batch = merge_periods(sorted_remain[0:N])
+                    return merge_periods(sorted_remain[N:], first_batch, handle_360_days_year)
+        else:
+            if len(remain_to_merge) > 0:
+                last = already_merged[-1]
+                next_one = remain_to_merge.pop(0)
+                # print "last.end=",last.end,"next.start=",next_one.start
+                # if (last.end == next_one.start) :
+                #    already_merged[-1]=cperiod(last.start,next_one.end)
+                if next_one.start <= last.end or (handle_360_days_year and last.end.month == 12 and
+                                                  last.end.day == 31 and
+                                                  next_one.start.month == 1 and
+                                                  next_one.start.day == 1 and
+                                                  next_one.start.year == last.end.year + 1):
+                    if next_one.end > last.end:
+                        # the next period is not entirely included in the
+                        # last merged one
+                        already_merged[-1] = cperiod(last.start, next_one.end)
+                else:
+                    # There is no overlap between both periods
+                    already_merged.append(next_one)
+            #
+            if len(remain_to_merge) > 0:
+                return merge_periods(remain_to_merge, already_merged, handle_360_days_year)
+            else:
+                return already_merged
 
 
 def intersect_periods_list(lperiod1, lperiod2):
@@ -387,13 +429,17 @@ def intersect_periods_list(lperiod1, lperiod2):
     Algorithm : for each period in l1, compute intersection with all periods in l2,
     and add it in a big list; finally, merge  the big list
     """
-    big = []
-    for p1 in lperiod1:
-        for p2 in lperiod2:
-            inter = p1.intersects(p2)
-            if inter:
-                big.append(inter)
-    return merge_periods(big)
+    if not(isinstance(lperiod1, list) and [isinstance(elt, cperiod) for elt in lperiod1] and
+           isinstance(lperiod2, list) and [isinstance(elt, cperiod) for elt in lperiod2]):
+        raise Climaf_Period_Error("Can not deal with something else than list of cperiod objects")
+    else:
+        big = []
+        for p1 in lperiod1:
+            for p2 in lperiod2:
+                inter = p1.intersects(p2)
+                if inter:
+                    big.append(inter)
+        return merge_periods(big)
 
 
 def lastyears(period, nyears):
@@ -402,12 +448,16 @@ def lastyears(period, nyears):
     """
     # print "period=",period, 'type=',type(period),'nyears=',nyears
     if isinstance(period, six.string_types):
-        period = cperiod(period)
+        period = init_period(period)
+    elif not isinstance(period, cperiod):
+        raise Climaf_Period_Error("Can not deal with periods that are not string or cperiod objects")
+    if not isinstance(nyears, int):
+        raise Climaf_Period_Error("nyears must be an integer, not %s" % nyears)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year
     ystart = rep.start.year
     if ystart < yend - nyears:
-        s = rep.start
+        s = rep.end
         rep.start = datetime.datetime(year=yend - nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
     return repr(rep)
 
@@ -418,11 +468,15 @@ def firstyears(period, nyears):
     """
     if isinstance(period, six.string_types):
         period = init_period(period)
+    elif not isinstance(period, cperiod):
+        raise Climaf_Period_Error("Can not deal with periods that are not string or cperiod objects")
+    if not isinstance(nyears, int):
+        raise Climaf_Period_Error("nyears must be an integer, not %s" % nyears)
     rep = cperiod(period.start, period.end)
     yend = rep.end.year
     ystart = rep.start.year
     if yend > ystart + nyears:
-        s = rep.end
+        s = rep.start
         rep.end = datetime.datetime(year=ystart + nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
     # print "period=",period, 'type=',type(period),'nyears=',nyears
     # print rep
@@ -460,7 +514,26 @@ def group_periods(diclist):
         output.append(dic)
     #
     return output
-        
+
+
+def freq_to_minutes(data_freq):
+    """
+    Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
+    Returns duration in minutes (quite arbitrary for months)
+    """
+    data_freq = data_freq.replace("mon", "MS")
+    number = re.findall("^[0-9]*", data_freq)
+    if len(number[0]) == 0:
+        number = 1
+    else:
+        number = int(number[0])
+    units = re.findall("[A-Z]*$", data_freq)[0]
+    scale = {"M": 1, "H": 60, "D": 60 * 24, "MS": 30 * 60 * 24}
+    if units in scale:
+        return number * scale[units]
+    else:
+        raise Climaf_Error("Cannot interpret frequency %s, returning O minutes" % data_freq)
+
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):

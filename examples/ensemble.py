@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Example of ensemble definition and handling in CliMAF
@@ -38,7 +38,7 @@ cshow(p)
 # Advanced example : create plot panel of various members, add a member, and compute anomalies
 ###############################################################################################
 
-if atCNRM or onCiclad:
+if atCNRM or onCiclad or onSpirit:
     # Define some default values for using CMIP5 data for various realizations
     cdef("project", "CMIP5")
     cdef("frequency", "monthly")
@@ -61,7 +61,7 @@ cshow(multiplot)
 page = cpage(multiplot)
 cshow(page)
 
-if atCNRM or onCiclad:
+if atCNRM or onCiclad or onSpirit:
     # Add a member to an ensemble
     member = ds(experiment="historical", period="1860", simulation="r3i1p1", table="Amon")
     ens["r3i1p1"] = member

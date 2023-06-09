@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
@@ -7,12 +7,12 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from optparse import OptionParser
 
 from climaf.api import *
-from climaf.html import *
+from climaf.chtml import *
 from climaf import cachedir
 
 
 # This example does work only on Ciclad
-if not onCiclad:
+if not onCiclad and not onSpirit:
     exit(0)
 
 desc = "\n\nProto d'atlas océanique (Nemo) en CliMAF (CMIP5 seulement pour l'instant)"
@@ -107,7 +107,7 @@ def plot_basin_moc(model, variable="msftmyz", basin=1):
     moc_model = ds(variable=variable, **model)
     moc_model_mean = time_average(moc_model)
     # extraire le bassin de rang 'basin' (def: Atlantique=1)
-    moc_model_mean_atl = slice(moc_model_mean, dim='x', min=basin, max=basin)
+    moc_model_mean_atl = cslice_average(moc_model_mean, dim='x', min=basin, max=basin)
     # masquer les valeurs
     moc_model_mean_atl_mask = mask(moc_model_mean_atl, miss=0.0)
     # Plot
@@ -127,10 +127,10 @@ def moc_profile_vs_obs_rapid(model, variable="msftmyz", basin=1):
     moc_model = ds(**mod)
     moc_model_mean = time_average(moc_model)
     # extraire le bassin Atlantique de la MOC modele
-    moc_model_mean_atl = slice(moc_model_mean, dim='x', min=basin, max=basin)
+    moc_model_mean_atl = cslice_average(moc_model_mean, dim='x', min=basin, max=basin)
     # masquer les valeurs et extraire la latitude 26
     moc_model_mean_atl_mask = mask(moc_model_mean_atl, miss=0.0)
-    moc_model_26 = slice(moc_model_mean_atl_mask, dim='lat', min=26.5, max=26.5)
+    moc_model_26 = cslice_average(moc_model_mean_atl_mask, dim='lat', min=26.5, max=26.5)
     #
     moc_obs = ds(project="ref_pcmdi", variable='moc')
     moc_obs_mean = time_average(moc_obs)

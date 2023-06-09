@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 This module declares locations for searching data for IPSL CMIP6 outputs produced by libIGCM for all frequencies,
@@ -11,7 +11,7 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from env.site_settings import atTGCC, onCiclad, onSpip
+from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, crealms, cdef
@@ -21,7 +21,7 @@ login = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/work/cont003/gencmip6"
-if onCiclad:
+if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/work/cont003/thredds"
     login = "fabric"

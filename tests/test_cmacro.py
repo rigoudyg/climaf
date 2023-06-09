@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -29,7 +29,8 @@ class MacroTests(unittest.TestCase):
     def test_simple(self):
         january_ta = ds(project='example', simulation='AMIPV6ALB2G', variable='ta', frequency='monthly',
                         period='198001')
-        ta_europe = llbox(january_ta, latmin=40, latmax=60, lonmin=-15, lonmax=25)
+        ta_europe = llbox(january_ta, latmin=40,
+                          latmax=60, lonmin=-15, lonmax=25)
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm)
         my_macro = macro('eu_cross_section', fig_ezm)
@@ -43,9 +44,11 @@ class MacroTests(unittest.TestCase):
         self.assertTrue(isinstance(my_macro, ctree))
         self.assertEqual(my_macro.buildcrs(),
                          "plot(ccdo(llbox(ARG,latmax=60,latmin=40,lonmax=25,lonmin=-15),operator='zonmean'))")
-        pr = ds(project='example', simulation='AMIPV6ALB2G', variable='pr', frequency='monthly', period='198001')
+        pr = ds(project='example', simulation='AMIPV6ALB2G',
+                variable='pr', frequency='monthly', period='198001')
         pr_ezm = eu_cross_section(pr)
-        self.assertEqual(cmacros["eu_cross_section"].buildcrs().replace("ARG", pr.buildcrs()), pr_ezm.buildcrs())
+        self.assertEqual(cmacros["eu_cross_section"].buildcrs().replace(
+            "ARG", pr.buildcrs()), pr_ezm.buildcrs())
 
     def test_lobjects(self):
         january_ta = ds(project='example', simulation='AMIPV6ALB2G', variable='ta', frequency='monthly',
@@ -81,16 +84,18 @@ class MacroTests(unittest.TestCase):
         ta_ezm = mycdo(january_ta, operator='zonmean')
         my_macro = macro("a_macro", ta_ezm.outputs["2"])
         self.assertTrue(isinstance(my_macro, scriptChild))
-        self.assertEqual(my_macro.buildcrs(), "mycdo(ARG,operator='zonmean').2")
+        self.assertEqual(my_macro.buildcrs(),
+                         "mycdo(ARG,operator='zonmean').2")
 
     def test_cpage(self):
-        tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
+        tas_ds = ds(project='example', simulation='AMIPV6ALB2G',
+                    variable='tas', period='1980-1981')
         tas_avg = time_average(tas_ds)
         fig = plot(tas_avg, title='title')
         my_page = cpage([[None, fig], [fig, fig], [fig, fig]], widths=[0.2, 0.8],
                         heights=[0.33, 0.33, 0.33], fig_trim=False, page_trim=False,
                         format='pdf', title='Page title', x=10, y=20, ybox=45,
-                        pt=20, font='Utopia', gravity='South', background='grey90',
+                        pt=20, font='DejaVu-Sans', gravity='South', background='grey90',
                         page_width=1600., page_height=2400.)
         my_macro = macro("a_macro", my_page)
         self.assertTrue(isinstance(my_macro, cpage))
@@ -102,7 +107,8 @@ class MacroTests(unittest.TestCase):
 
     def test_cpage_pdf(self):
         # TODO: Modify CliMAF to allow macros built upon cpage_pdf
-        tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
+        tas_ds = ds(project='example', simulation='AMIPV6ALB2G',
+                    variable='tas', period='1980-1981')
         tas_avg = time_average(tas_ds)
         fig = plot(tas_avg, title='title', format='pdf')
         crop_fig = cpdfcrop(fig)
@@ -158,7 +164,8 @@ class CrewriteTests(unittest.TestCase):
         january_ta2 = ds(project='example', simulation='AMIPV6ALB2G', variable='ta', frequency='monthly',
                          period='19800101')
         january_ta = minus(january_ta1, january_ta2)
-        ta_europe = llbox(january_ta, latmin=40, latmax=60, lonmin=-15, lonmax=25)
+        ta_europe = llbox(january_ta, latmin=40,
+                          latmax=60, lonmin=-15, lonmax=25)
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm, format="eps")
         my_macro = macro('eu_cross_section', fig_ezm, [january_ta2, ])
@@ -194,7 +201,8 @@ class CmatchTests(unittest.TestCase):
         january_ta2 = ds(project='example', simulation='AMIPV6ALB2G', variable='ta', frequency='monthly',
                          period='19800101')
         january_ta = minus(january_ta1, january_ta2)
-        ta_europe = llbox(january_ta, latmin=40, latmax=60, lonmin=-15, lonmax=25)
+        ta_europe = llbox(january_ta, latmin=40,
+                          latmax=60, lonmin=-15, lonmax=25)
         ta_ezm = ccdo(ta_europe, operator='zonmean')
         fig_ezm = plot(ta_ezm, format="eps")
         my_macro = macro('eu_cross_section', fig_ezm, [january_ta2, ])
@@ -206,13 +214,14 @@ class CmatchTests(unittest.TestCase):
     @unittest.expectedFailure
     def test_cpage(self):
         # TODO: Find out where orientation parameter comes from...
-        tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
+        tas_ds = ds(project='example', simulation='AMIPV6ALB2G',
+                    variable='tas', period='1980-1981')
         tas_avg = time_average(tas_ds)
         fig = plot(tas_avg, title='title')
         my_page = cpage([[None, fig], [fig, fig], [fig, fig]], widths=[0.2, 0.8],
                         heights=[0.33, 0.33, 0.33], fig_trim=False, page_trim=False,
                         format='pdf', title='Page title', x=10, y=20, ybox=45,
-                        pt=20, font='Utopia', gravity='South', background='grey90',
+                        pt=20, font='DejaVu-Sans', gravity='South', background='grey90',
                         page_width=1600., page_height=2400.)
         my_macro = macro("a_macro", my_page)
         cmatch_result = cmatch(my_macro, my_page)
@@ -230,7 +239,8 @@ class ReadWriteTests(unittest.TestCase):
         mean_january_ta = time_average(january_ta)
         my_bias = minus(january_ta, mean_january_ta)
         my_macro = macro("my_bias", my_bias, [mean_january_ta, ])
-        self.my_macro_file = os.path.sep.join([tmp_directory, "my_macro_test.json"])
+        self.my_macro_file = os.path.sep.join(
+            [tmp_directory, "my_macro_test.json"])
         write(self.my_macro_file)
         del cmacros["my_bias"]
         self.assertNotIn("my_bias", cmacros)
@@ -278,7 +288,8 @@ class InstantiateTests(unittest.TestCase):
 
 if __name__ == '__main__':
     # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_macro"])
+    tmp_directory = "/".join([os.environ["HOME"],
+                             "tmp", "tests", "test_macro"])
     remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)

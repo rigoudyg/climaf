@@ -10,3 +10,4 @@ cftime
 # python-dateutil
 natsort
 pyyaml
+xarray
