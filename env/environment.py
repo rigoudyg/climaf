@@ -87,10 +87,6 @@ cachedirs = None
 #: The place to write the index
 cacheIndexFileName = None
 
-
-#: Current cache directory
-currentCache = None
-
 #: Should the search for CMI6 files be optimized by building tables
 optimize_cmip6_wildcards = False  # (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
 
