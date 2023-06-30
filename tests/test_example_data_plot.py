@@ -70,7 +70,6 @@ class DataGplotMaps(unittest.TestCase):
                               dir_ref_default=self.default_reference_directory)
         #
 
-    @skipIf_CondaEnv()
     def test_gplot_maps_1_2(self):
         """
         Crop of a Map with one field and vectors, with contours lines like color fill, default projection (a cylindrical
@@ -675,8 +674,6 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(page7, "test3.8.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
-    # Issue with missing laTeX package pdfpages.sty
-    @skipIf_CondaEnv()
     def test_data_plot_3_1(self):
         fig1 = plot(self.my_dataset_light_80,
                     title="title", resolution="1600*2400")
@@ -687,10 +684,6 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
-    # Issue with pdfcrop: Can't locate mktexlsr.pl
-    # see : https://github.com/conda-forge/texlive-core-feedstock/issues/61
-    # et il manque aussi le module TeXLive/TLUtils ....
-    @skipIf_CondaEnv()
     def test_data_plot_3_2(self):
         fig2 = plot(self.my_dataset_light_80, title="title",
                     resolution="13*19", format="pdf")
