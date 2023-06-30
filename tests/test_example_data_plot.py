@@ -684,10 +684,6 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
-    # Issue with pdfcrop: Can't locate mktexlsr.pl
-    # see : https://github.com/conda-forge/texlive-core-feedstock/issues/61
-    # et il manque aussi le module TeXLive/TLUtils ....
-    @skipIf_CondaEnv()
     def test_data_plot_3_2(self):
         fig2 = plot(self.my_dataset_light_80, title="title",
                     resolution="13*19", format="pdf")
