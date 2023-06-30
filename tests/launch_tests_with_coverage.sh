@@ -20,6 +20,8 @@ run_modules=${3:-"netcdfbasics period cache classes functions operators standard
 echo $run_modules
 run_coverage=${4:-0}
 echo $run_coverage
+# As of June 2023, there are a few plot configurations; labels are
+# sub-directories names in reference_data/test_data_plot 
 plot_config=${5:-"default"}
 echo $plot_config
 
