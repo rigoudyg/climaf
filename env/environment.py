@@ -219,12 +219,13 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         clogger.warning("exiv2 not available, can not stamp eps files")
         do_stamping = False
     if not do_stamping and stamping is True:
-        clogger.warning("At least one stamping requirement is not fulfilled, turn it to None.")
+        clogger.warning(
+            "At least one stamping requirement is not fulfilled, turn it to None.")
         stamping = None
     clogger.info("---")
 
-if atCNRM:
-    pdf_page_builder = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
+if atCNRM or atIPSL:
+    pdf_page_builder = os.sep.join([os.path.dirname(
+        os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
     pdf_page_builder = "pdfjam"
-
