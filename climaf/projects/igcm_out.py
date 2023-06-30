@@ -119,7 +119,7 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, onCiclad, onSpirit, onSpip
+from env.site_settings import atTGCC, atIDRIS, onCiclad, onSpirit, onSpip
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -129,6 +129,8 @@ login = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/store/cont003/gencmip6"
+if atIDRIS:
+    root = "/gpfsstore/rech/psl/"
 if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/store/cont003/thredds"
@@ -150,7 +152,8 @@ if root:
     cdef('clim_period', '????_????', project='IGCM_OUT')
     cdef('clim_period_length', '*',
          project='IGCM_OUT')  # --> Takes the following values: '*', '' (to access only to SE), '_50Y', '_100Y'
-    cdef('ave_length', '*', project='IGCM_OUT')  # --> Takes the following values: MO, DA...
+    # --> Takes the following values: MO, DA...
+    cdef('ave_length', '*', project='IGCM_OUT')
     cdef('model', '*', project='IGCM_OUT')
     cdef('status', '*', project='IGCM_OUT')  # --> PROD, DEVT, TEST
     cdef('simulation', '*', project='IGCM_OUT')
@@ -167,7 +170,8 @@ if root:
     # cdef('period_separator'        , '_', project='IGCM_OUT')
 
     # Frequency alias
-    cfreqs('IGCM_OUT', {'monthly': '1M', 'daily': '1D', 'seasonal': 'SE', 'annual_cycle': 'SE', 'yearly': '1Y'})
+    cfreqs('IGCM_OUT', {'monthly': '1M', 'daily': '1D',
+           'seasonal': 'SE', 'annual_cycle': 'SE', 'yearly': '1Y'})
 
     if onCiclad or onSpirit:
         urls_IGCM_OUT = [
@@ -298,14 +302,19 @@ if root:
     calias("IGCM_OUT", 'maint_resp', filenameVar='sechiba_history')
     calias("IGCM_OUT", 'growth_resp', filenameVar='sechiba_history')
     calias("IGCM_OUT", 'hetero_resp', filenameVar='sechiba_history')
-    calias("IGCM_OUT", 'maintresp', 'maint_resp', filenameVar='sechiba_history')
-    calias("IGCM_OUT", 'growthresp', 'growth_resp', filenameVar='sechiba_history')
-    calias("IGCM_OUT", 'heteroresp', 'hetero_resp', filenameVar='sechiba_history')
+    calias("IGCM_OUT", 'maintresp', 'maint_resp',
+           filenameVar='sechiba_history')
+    calias("IGCM_OUT", 'growthresp', 'growth_resp',
+           filenameVar='sechiba_history')
+    calias("IGCM_OUT", 'heteroresp', 'hetero_resp',
+           filenameVar='sechiba_history')
     # derive("IGCM_OUT", 'auto_resp', 'plus', 'growth_resp', 'maint_resp')
     # derive("IGCM_OUT", 'autoresp', 'plus', 'growth_resp', 'maint_resp')
     calias("IGCM_OUT", 'nee', filenameVar='sechiba_history')
-    calias("IGCM_OUT", 'total_soil_carb', 'TOTAL_SOIL_CARB', filenameVar='stomate_history')
-    calias("IGCM_OUT", 'totalsoilcarb', 'TOTAL_SOIL_CARB', filenameVar='stomate_history')
+    calias("IGCM_OUT", 'total_soil_carb',
+           'TOTAL_SOIL_CARB', filenameVar='stomate_history')
+    calias("IGCM_OUT", 'totalsoilcarb', 'TOTAL_SOIL_CARB',
+           filenameVar='stomate_history')
     calias("IGCM_OUT", 'maxvegetfrac', filenameVar='sechiba_history')
     calias("IGCM_OUT", 'vegetfrac', filenameVar='sechiba_history')
     # calias("IGCM_OUT", 'gpp'   , scale=0.001  ,filenameVar='sechiba_history')
@@ -314,7 +323,8 @@ if root:
     # derive("IGCM_OUT", 'gpptot', 'divide', 'cfracgpp','Contfrac')
     # -> alias for the obs
     calias("ref_climatos", 'gpptot', 'gpp')
-    calias("IGCM_OUT", 'GPP', 'gpp', scale=0.001, filenameVar='sechiba_history')
+    calias("IGCM_OUT", 'GPP', 'gpp', scale=0.001,
+           filenameVar='sechiba_history')
     calias("IGCM_OUT", 'Contfrac', filenameVar='sechiba_history')
 
     # ---------------------------------------------------------------------------------------------- #
@@ -404,5 +414,6 @@ if root:
     calias("IGCM_OUT", 'SWdnSFCclr', filenameVar='histmth')
 
     # -- P - E
-    calias('IGCM_OUT', 'hflsevap', 'hfls', scale=-1. / 2.5e6, filenameVar='histmth')
+    calias('IGCM_OUT', 'hflsevap', 'hfls', scale=-
+           1. / 2.5e6, filenameVar='histmth')
     # derive('IGCM_OUT', 'pme', 'minus', 'pr' ,'hflsevap')
