@@ -180,7 +180,7 @@ if root:
             "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/"
             "${frequency}${clim_period_length}/${simulation}_${frequency}_${clim_period}_1M_${variable}.nc",
         ]
-    if atTGCC:
+    if atTGCC or atIDRIS:
         urls_IGCM_OUT = [
             "${root}/${login}/IGCM_OUT/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
             "${simulation}_${PERIOD}_${frequency}_${variable}.nc",
