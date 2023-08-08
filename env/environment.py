@@ -123,7 +123,7 @@ if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
     if os.path.isfile(tmpdir):
         os.remove(tmpdir)
     # Account for the case where concurrent jobs execute this line almost simultaneously
-    os.makedirs(tmpdir, exist_ok=True)
+    os.makedirs(tmpdir, exist_OK=True)
 
 # Check dependencies
 try:
@@ -221,7 +221,7 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         stamping = None
     clogger.info("---")
 
-if atCNRM or atIPSL:
+if atCNRM or onSpirit or atTGCC or atIDRIS:
     pdf_page_builder = os.sep.join([os.path.dirname(
         os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
