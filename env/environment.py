@@ -123,7 +123,7 @@ if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
     if os.path.isfile(tmpdir):
         os.remove(tmpdir)
     # Account for the case where concurrent jobs execute this line almost simultaneously
-    os.makedirs(tmpdir, exist_OK=True)
+    os.makedirs(tmpdir, exist_ok=True)
 
 # Check dependencies
 try:
