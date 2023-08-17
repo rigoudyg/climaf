@@ -56,7 +56,7 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
 
 
 def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None,
-                       by=None, allow_url_change=False):
+                       by=None, allow_url_change=False, generate_diffs_html=False):
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
     file_ref = os.path.sep.join([dir_ref, file_ref_name])
@@ -95,9 +95,32 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, 
     if len(list_figures_ref) != len(list_figures_test):
         raise ValueError(
             "The number of figures if different in %s and %s" % (file_test, file_ref))
+    nb_NOK = 0
+    if generate_diffs_html:
+        diffs_triplets = []
     for (fig_ref, fig_test) in zip(list_figures_ref, list_figures_test):
-        compare_picture_files(fig_test, fig_ref, dir_ref,
-                              dir_ref_default=None, display_error=display_error)
+        try:
+            triplets = compare_picture_files(fig_test, fig_ref, dir_ref,
+                                             dir_ref_default=None, display_error=display_error,
+                                             provide_triplets=generate_diffs_html)
+            if generate_diffs_html:
+                diffs_triplets.extend(triplets)
+        except ValueError as error:
+            nb_NOK += 1
+            print(error.args)
+    if nb_NOK > 0:
+        raise ValueError(f" {nb_NOK} pictures are "
+                         f"different between {file_test} and {file_ref}")
+    if generate_diffs_html:
+        if len(diffs_triplets) > 0:
+            html_file = build_diffs_html(diffs_triplets, file_test)
+            if html_file.startswith("/thredds/ipsl/"):
+                html_file = html_file.replace(
+                    "/thredds/ipsl/",
+                    "https://thredds-su.ipsl.fr/thredds/fileServer/ipsl_thredds/")
+            raise ValueError(
+                "%d pictures are different. See html diff file %s" %
+                (len(diffs_triplets),html_file))
 
 
 def compare_text_files(file_test, file_ref, **kwargs):
@@ -135,13 +158,18 @@ def compare_netcdf_files(file_test, file_ref, display=False):
             "The content of files %s and %s are different" % (file_test, file_ref))
 
 
-def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, display=False, display_error=True):
+def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, display=False, display_error=True, provide_triplets=False):
+    # provide_triplets True -> don't raise an error for differing files, but
+    # provide a list of triplets (file_test, file_ref, diff_file)
+
     # TODO: Check the metadata of the files
     # Transform the strings in list of strings
     if isinstance(object_test, six.string_types) and os.path.exists(object_test):
         fic_test = object_test
+        object_is_fic = True
     else:
         fic_test = cfile(object_test)
+        object_is_fic = False
     fic_test = fic_test.split(" ")
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
@@ -159,6 +187,8 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
             fic_ref[i] = elt_default_ref
         else:
             raise ValueError("Could not find the reference file for %s" % elt)
+    if provide_triplets:
+        triplets = []  # Will list triplets of files when there is a differnece
     # Loop on the files
     for (file_test, file_ref) in zip(fic_test, fic_ref):
         # Check the existence and the consistency of the comparison
@@ -188,16 +218,62 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
         if rep != 0:
             tmp_dir = os.sep.join([os.path.dirname(file_test), "..", "tmp"])
             os.makedirs(tmp_dir, exist_ok=True)
-            cfile(object_test, target=os.sep.join(
-                [tmp_dir, os.path.basename(file_test)]))
+            if not object_is_fic:
+                cfile(object_test,
+                      target=os.sep.join([tmp_dir, os.path.basename(file_test)]))
             if display_error:
+                message = ""
                 try:
                     subprocess.check_call(
                         display_cmd.format(diff_file), shell=True)
+                    os.remove(diff_file)
                 except subprocess.SubprocessError:
                     print("Could not display %s" % diff_file)
-            os.remove(diff_file)
-            raise ValueError("The following files differ: %s - %s" %
-                             (file_test, file_ref))
+            else:
+                message = "\n" + f"See diff file : {diff_file}"
+            message = "The following files differ: %s - %s" % (
+                file_test, file_ref) + message
+            if provide_triplets:
+                # print(message)
+                triplets.append((file_test, file_ref, diff_file))
+            else:
+                raise ValueError(message)
         else:
             os.remove(diff_file)
+    if provide_triplets:
+        return(triplets)
+
+
+def build_diffs_html(diffs_triplets, file_test):
+    # Provided with a list of image filename triplets, create an html doc that show
+    # one line of images per triplet
+    # The html file is located with file_test in subdir diff/ and has the same basename
+    # The image files are copied in the same subdir
+    #
+    header='<?xml version="1.0" encoding="iso-8859-1"?>\n' +\
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"\n' +\
+        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' +\
+        '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">\n' +\
+        '<head>\n<title>[ DIFFS ]</title>\n</head>\n<body>' +\
+        '<TABLE CELLSPACING=5>\n'
+    text=header
+    #
+    form='\n<TD ALIGN=RIGHT><A HREF="{}"><IMG HEIGHT=350 WIDTH=600 SRC="{}"></a></TD>'
+    tmp_dir=os.sep.join([os.path.dirname(file_test), "diffs"])
+    os.makedirs(tmp_dir, exist_ok=True)
+    for triplet in diffs_triplets:
+        text += "\n<TR>"
+        for fic in triplet:
+            ficb=os.path.basename(fic)
+            fic_copy=os.sep.join([tmp_dir, ficb])
+            shutil.copy(fic, fic_copy)
+            text += form.format(ficb, ficb)
+        text += "\n<TR>"
+        #
+    text += "\n</TABLE>"
+    text += "\n</body>"
+    #
+    target=os.sep.join([tmp_dir, os.path.basename(file_test)])
+    with open(target, "w") as fic:
+        fic.write(text)
+    return(target)
