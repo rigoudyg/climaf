@@ -872,7 +872,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
     if start > len(members):
         return 'The list of members is shorter than what you asked; specify smaller N or nplot'
     if end > len(members):
-        end = -1
+        end = len(members)
     members_selection = members[start:end]
     for mem in ens:
         if mem not in members_selection:
