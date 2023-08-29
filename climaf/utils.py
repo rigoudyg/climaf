@@ -40,25 +40,33 @@ def turn_list_to_tuple(val):
 def remove_keys_with_same_values(diclist):
     """Assuming DICLIST is a list of dicts which all have the same set of
     keys, remove in each dict those keys which value is the same
-    across all dicts.
-    Returns a subdict with those keys which have a common value
+    across all dicts (content of DICLIST is actually changed !).
+
+    Also returns a subdict with those keys which have a common value
 
     """
     if len(diclist) == 0:
         return []
-    else:
-        #
-        values = defaultdict(set)
-        #
-        for dic in diclist:
-            for k in values:
-                values[k].add(turn_list_to_tuple(dic[k]))
-        keys_with_different_values = [k for k in values if len(values[k]) != 1]
-        for k in keys_with_different_values:
-            del values[k]
+    #
+    # Build 'values': a dict of the set (across DICLIST) of values for each key
+    values = { k:set() for k in diclist[0] }
+    for dic in diclist:
         for k in values:
-            values[k] = list(values[k])[0]
-        return values
+            values[k].add(turn_list_to_tuple(dic[k]))
+    #
+    # Identify those key which value is the same across diclist
+    keys_with_common_values = [ k for k in values if len(values[k]) == 1 ]
+    #
+    # Register common values in a dict that will be returned
+    common_values_dict = { key, diclist[0][key] for key in keys_with_common_values }
+    #
+    # Withdraw each commmon-value-key in each dict of DICLIST. 
+    for dic in diclist :
+        for k in keys_with_common_values:
+            dic.pop(k)
+
+    # Warn : on top of returning the dict of common values, DICLIST has been modified 
+    return common_values_dict
 
 
 def cartesian_product_substitute(input_string, skip_keys=list(), **kwargs):
