@@ -54,15 +54,13 @@ def remove_keys_with_same_values(diclist):
         for k in values:
             values[k].add(turn_list_to_tuple(dic[k]))
     #
-    # Identify those key which value is the same across diclist
-    keys_with_common_values = [ k for k in values if len(values[k]) == 1 ]
-    #
     # Register common values in a dict that will be returned
-    common_values_dict = { key, diclist[0][key] for key in keys_with_common_values }
+    common_values_dict = { key : diclist[0][key]
+                           for key in values if len(values[key]) == 1 }
     #
     # Withdraw each commmon-value-key in each dict of DICLIST. 
     for dic in diclist :
-        for k in keys_with_common_values:
+        for k in common_values_dict.keys():
             dic.pop(k)
 
     # Warn : on top of returning the dict of common values, DICLIST has been modified 
