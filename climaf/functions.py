@@ -17,6 +17,9 @@ from climaf import classes
 from climaf import cachedir
 
 
+
+
+
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).
@@ -872,7 +875,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
     if start > len(members):
         return 'The list of members is shorter than what you asked; specify smaller N or nplot'
     if end > len(members):
-        end = -1
+        end = len(members)
     members_selection = members[start:end]
     for mem in ens:
         if mem not in members_selection:
@@ -882,3 +885,46 @@ def iplot_members(ens, nplot=12, N=1, **pp):
     mp = cpage(plot(new_ens, **pp))
 
     return iplot(mp)
+
+
+
+def save_ensemble_object(ens, outfilename = 'ensemble_object.json'):
+    '''
+    Takes an ensemble object ens (first argument) and saves it in a json file outfilename
+    (second argument).
+    It converts the CliMAF objects of the ensemble to strings to allow saving the ensemble dictionary in a json file.
+    Use load_ensemble_object on the json file produced by save_ensemble_object to get your ensemble back.
+    '''
+    import json
+    # -- Need to convert the CliMAF objects to string
+    save_json_dict = dict()
+    for elt in ens:
+        save_json_dict[elt] = str(ens[elt])
+
+    with open(outfilename, "w") as outfile:
+        json.dump(save_json_dict, outfile)
+    print('Saved ensemble object in : '+outfilename)
+    print('Use load_ensemble_object to load it back as a CliMAF ensemble')
+
+
+def load_ensemble_object(filename):
+    '''
+    Takes the name of the json file containing the dictionary of the ensemble you saved with save_ensemble_object
+    and returns a ready-to-use CliMAF ensemble object.
+    '''
+
+    import json
+
+    with open(filename, 'r') as openfile:
+        # Reading from json file
+        my_tmp_ens_dict = json.load(openfile)
+
+    # -- Convert the strong back to CliMAF objects
+    myens_dict = dict()
+    for elt in my_tmp_ens_dict:
+        myens_dict[elt] = eval(my_tmp_ens_dict[elt])
+
+    myens = cens(myens_dict)
+
+    return(myens)
+

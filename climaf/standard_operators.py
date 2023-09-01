@@ -328,6 +328,11 @@ def load_standard_operators():
             _var='curltau')
 
     #
+    # rmse_xyt
+    cscript(
+        'rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')
+    #
+
     if os.system("type cdfmean >/dev/null 2>&1") == 0:
         load_cdftools_operators()
     else:
@@ -465,6 +470,3 @@ def load_cdftools_operators():
             'zo${Var}_${basin} tmpfile.nc ${out}; rm -f tmpfile.nc zonalmean.nc',
             _var="zo%s_${basin}", canSelectVar=True)
     #
-    # rmse_xyt
-    cscript(
-        'rmse_xyt', 'cdo sqrt -fldmean -timmean -sqr -sub ${in_1} ${in_2} ${out}')

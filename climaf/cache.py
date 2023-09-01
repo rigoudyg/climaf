@@ -913,7 +913,10 @@ def clist(size="", age="", access=0, pattern="", not_pattern="", usage=False, co
         dic_usage = dict()
         tmp = ""
         for crs in work_dic:
-            tmp += work_dic[crs] + " "
+            if isinstance(work_dic[crs], tuple):
+                tmp += work_dic[crs][0] + " "
+            if isinstance(work_dic[crs], str):
+                tmp += work_dic[crs] + " "
         res = os.popen("du -sc %s" % tmp).read()
 
         regex = re.compile('([0-9]+)\t')
