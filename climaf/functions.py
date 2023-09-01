@@ -904,7 +904,7 @@ def save_ensemble_object(ens, outfilename = 'ensemble_object.json'):
     with open(outfilename, "w") as outfile:
         json.dump(save_json_dict, outfile)
     print('Saved ensemble object in : '+outfilename)
-    print('Use load_ensemble_object to load it back as a CliMAF ensemble')
+    print('Use load_ensemble_object("'+outfilename+'") to load it back as a CliMAF ensemble')
 
 
 def load_ensemble_object(filename):
