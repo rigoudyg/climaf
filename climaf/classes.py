@@ -777,15 +777,15 @@ class cdataset(cobject):
           - otherwise, returns a list of facet/value dictionnaries for
             matching data (or a pair, see below)
 
-        In last case, data file periods are not returned if arg
-        PERIODS is None and data search is optimized for the project.
-        In that case, the globbing is done on data directories and not
-        on data files, which is much faster.
-
         If PERIODS is not None, individual data files periods are
         merged among cases with same facets values
 
-        if SPLIT is not None, a pair is returned intead of the dicts list :
+        Otherwise, individual data file periods are returned, except
+        in the case where WHAT != 'files' (because in such a case, the
+        globbing is done on data directories and not on data files,
+        which is much faster).
+
+        if SPLIT is not None, a pair is returned instead of the dicts list :
 
            - first element is a dict with facets which values are the
              same among all cases
@@ -795,7 +795,7 @@ class cdataset(cobject):
 
         Example :
 
-        >>> tos_data = ds(project='CMIP6', variable='tos', period='*',
+        >>> tos_data = ds(project='CMIP6', mip='CMIP', variable='tos', period='*',
                table='Omon', model='CNRM*', realization='r1i1p1f*' )
 
         >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
@@ -814,6 +814,12 @@ class cdataset(cobject):
 
         """
         dic = self.kvp.copy()
+        if 'project' not in dic :
+            raise Climaf_Classes_Error("Facet 'project' is missing in dataset's facet")
+        project = dic['project']
+        if "*" in project or "?" in project :
+            raise Climaf_Classes_Error("A wildcard in facet project (%s) "%project + \
+                                       "would stress the file system too much")
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
             req_var = dic["variable"]
@@ -824,6 +830,10 @@ class cdataset(cobject):
         cases = list()
         files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
                             return_combinations=cases, use_frequency=use_frequency, **dic)
+        # Add facet project in each case
+        for case in cases :
+            case['project'] = project
+        #
         if what in ['files', ]:
             return files
         else:
@@ -835,8 +845,8 @@ class cdataset(cobject):
                 for case in cases:
                     case.pop('period', None)
             if split is not None:
-                keys = remove_keys_with_same_values(cases)
-                return keys, cases
+                dicts = remove_keys_with_same_values(cases)
+                return dicts, cases
             else:
                 return cases
 
