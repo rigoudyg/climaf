@@ -766,7 +766,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, periods=None, split=None, use_frequency=False):
+    def glob(self, what=None, merge_periods=True, split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -775,15 +775,13 @@ class cdataset(cobject):
           - if WHAT = 'files' , returns a string of all data filenames
 
           - otherwise, returns a list of facet/value dictionnaries for
-            matching data (or a pair, see below)
+            matching data (or a pair of lists, see SPLIT below)
 
-        If PERIODS is not None, individual data files periods are
-        merged among cases with same facets values
+        If MERGE_PERIODS is True (so, by default), each returned
+        period is a list of the intersection of the requested period
+        and (merged) available data periods.
 
-        Otherwise, individual data file periods are returned, except
-        in the case where WHAT != 'files' (because in such a case, the
-        globbing is done on data directories and not on data files,
-        which is much faster).
+        Otherwise, individual data file periods are returned. 
 
         if SPLIT is not None, a pair is returned instead of the dicts list :
 
@@ -796,16 +794,17 @@ class cdataset(cobject):
         Example :
 
         >>> tos_data = ds(project='CMIP6', mip='CMIP', variable='tos', period='*',
-               table='Omon', model='CNRM*', realization='r1i1p1f*' )
+               table='Omon', institute='CNRM-CERFACS', model='CNRM*', realization='r1i1p1f2' )
 
-        >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
+        >>> common_values, varied_values = tos_data.glob(merge_periods=True, split=True)
 
-        >>> common_keys
-        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical',
-        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos',
-        'version': 'latest', 'period': [1850-2014], 'root': '/bdd'}
+        >>> common_values
+        {'variable': 'tos', 'period': [1850-2014], 'root': '/bdd', 
+         'institute': 'CNRM-CERFACS', 'mip': 'CMIP', 'table': 'Omon', 
+         'experiment': 'historical', 'realization': 'r1i1p1f2', 'version': 'latest', 
+         'project': 'CMIP6'}
 
-        >>> varied_keys
+        >>> varied_values
         [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' },
          {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'},
          {'model': 'CNRM-CM6-1'   , 'grid': 'gn' },
@@ -828,7 +827,7 @@ class cdataset(cobject):
                 dic["filenameVar"] = filenameVar
         clogger.debug("glob() with dic=%s" % repr(dic))
         cases = list()
-        files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
+        files = selectFiles(with_periods=(merge_periods is True or what in ['files', ]),
                             return_combinations=cases, use_frequency=use_frequency, **dic)
         # Add facet project in each case
         for case in cases :
@@ -837,13 +836,12 @@ class cdataset(cobject):
         if what in ['files', ]:
             return files
         else:
-            if periods is not None:
+            if merge_periods is True:
                 cases = group_periods(cases)
-            else:
-                # For non-optimized cases, select_files returns periods,
-                # but we want an even behaviour
-                for case in cases:
-                    case.pop('period', None)
+                period = dic['period']
+                if period != "*" :
+                    for case in cases :
+                        case['period'] = [ p.intersects(period) for p in case['period'] ]
             if split is not None:
                 dicts = remove_keys_with_same_values(cases)
                 return dicts, cases
