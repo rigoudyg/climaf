@@ -766,7 +766,8 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, merge_periods=True, split=None, use_frequency=False):
+    def glob(self, what=None, ensure_period=True, merge_periods=True, 
+             split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -777,8 +778,13 @@ class cdataset(cobject):
           - otherwise, returns a list of facet/value dictionnaries for
             matching data (or a pair of lists, see SPLIT below)
 
-        If MERGE_PERIODS is True (so, by default), each returned
-        period is a list of the intersection of the requested period
+        If ENSURE_PERIOD is True, returns only results where the
+        requested data period is fully covered by the set of data
+        files. Each returned period is then the same as the requested
+        period
+
+        Otherwise, if MERGE_PERIODS is True, each returned period is
+        actually a list of the intersections of the requested period
         and (merged) available data periods.
 
         Otherwise, individual data file periods are returned. 
@@ -836,12 +842,23 @@ class cdataset(cobject):
         if what in ['files', ]:
             return files
         else:
+            if ensure_period is True :
+                merge_periods = True
             if merge_periods is True:
                 cases = group_periods(cases)
+                # Keep only the intersection of requested period and data periods
                 period = dic['period']
                 if period != "*" :
-                    for case in cases :
+                    for case in cases:
                         case['period'] = [ p.intersects(period) for p in case['period'] ]
+                if ensure_period is True:
+                    # Build the list of cases which period exactly matches 
+                    tempo = list()
+                    for case in cases:
+                        if len(case['period']) == 1:
+                            case['period'] = case['period'][0] 
+                        tempo.append(case)
+                    cases = tempo
             if split is not None:
                 dicts = remove_keys_with_same_values(cases)
                 return dicts, cases
