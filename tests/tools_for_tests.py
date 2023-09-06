@@ -16,6 +16,7 @@ import subprocess
 
 from env.environment import *
 from climaf.api import cshow, ncview, cfile
+from climaf.chtml import *
 
 
 def skipUnless_CNRM_Lustre():
@@ -55,7 +56,8 @@ def get_figures_and_content_from_html(html_file, regexp, patterns_to_exclude=lis
     return list_figures, content
 
 
-def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, display_error=True, replace=None,
+def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None,
+                       display_error=True, replace=None,
                        by=None, allow_url_change=False, generate_diffs_html=False):
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
@@ -111,16 +113,17 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None, 
     if nb_NOK > 0:
         raise ValueError(f" {nb_NOK} pictures are "
                          f"different between {file_test} and {file_ref}")
-    if generate_diffs_html:
+    elif generate_diffs_html:
         if len(diffs_triplets) > 0:
             html_file = build_diffs_html(diffs_triplets, file_test)
             if html_file.startswith("/thredds/ipsl/"):
                 html_file = html_file.replace(
                     "/thredds/ipsl/",
                     "https://thredds-su.ipsl.fr/thredds/fileServer/ipsl_thredds/")
-            raise ValueError(
+            print(
                 "%d pictures are different. See html diff file %s" %
                 (len(diffs_triplets),html_file))
+        return(len(diffs_triplets))
 
 
 def compare_text_files(file_test, file_ref, **kwargs):
@@ -247,31 +250,34 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
 def build_diffs_html(diffs_triplets, file_test):
     # Provided with a list of image filename triplets, create an html doc that show
     # one line of images per triplet
-    # The html file is located with file_test in subdir diff/ and has the same basename
-    # The image files are copied in the same subdir
+    # The html file is located with file_test in subdir diffs/ and has the same basename
     #
-    header='<?xml version="1.0" encoding="iso-8859-1"?>\n' +\
-        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"\n' +\
-        '"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n' +\
-        '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">\n' +\
-        '<head>\n<title>[ DIFFS ]</title>\n</head>\n<body>' +\
-        '<TABLE CELLSPACING=5>\n'
-    text=header
+    text = header("DIFFS")
+    text += open_table("", columns=["test","ref","diff","CRS"])
     #
-    form='\n<TD ALIGN=RIGHT><A HREF="{}"><IMG HEIGHT=350 WIDTH=600 SRC="{}"></a></TD>'
     tmp_dir=os.sep.join([os.path.dirname(file_test), "diffs"])
     os.makedirs(tmp_dir, exist_ok=True)
+    #
     for triplet in diffs_triplets:
-        text += "\n<TR>"
+        text += open_line()
         for fic in triplet:
-            ficb=os.path.basename(fic)
-            fic_copy=os.sep.join([tmp_dir, ficb])
-            shutil.copy(fic, fic_copy)
-            text += form.format(ficb, ficb)
-        text += "\n<TR>"
+            # ficb=os.path.basename(fic)
+            # fic_copy=os.sep.join([tmp_dir, ficb])
+            # shutil.copy(fic, fic_copy)
+            text += cell("", filename=fic, dirname=tmp_dir, thumbnail=300)
         #
-    text += "\n</TABLE>"
-    text += "\n</body>"
+        # When they don't match, show CRS included in the two first
+        # image files of each triplet,
+        test_CRS = subprocess.check_output(
+            'identify -format "%[CRS_def]" {}'.format(triplet[0]), shell=True)
+        ref_CRS = subprocess.check_output(
+            'identify -format "%[CRS_def]" {}'.format(triplet[1]), shell=True)
+        if ref_CRS != test_CRS :
+            text += cell(f"{ref_CRS}\n|{test_CRS}")
+        text += close_line()
+    #
+    text += close_table()
+    text += trailer()
     #
     target=os.sep.join([tmp_dir, os.path.basename(file_test)])
     with open(target, "w") as fic:

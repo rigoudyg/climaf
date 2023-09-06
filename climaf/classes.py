@@ -856,7 +856,7 @@ class cdataset(cobject):
                     tempo = list()
                     for case in cases:
                         if len(case['period']) == 1:
-                            case['period'] = case['period'][0] 
+                            case['period'] = case['period'][0] # This also fits case period==*
                         tempo.append(case)
                     cases = tempo
             if split is not None:
