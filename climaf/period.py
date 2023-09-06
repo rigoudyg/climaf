@@ -486,12 +486,16 @@ def firstyears(period, nyears):
 def group_periods(diclist):
     """Assuming DICLIST is a list of dictionnaries which include key
     'period', identifies all dicts which have the same content for the
-    other keys, merge the periosd for those dicts and returns the list of 
+    other keys, merge the periods for those dicts and returns the list of 
     dicts with this merge periods
 
     Used e.g. on 'return_combinations' output of a series of selectGenericFiles
     """
     tempo = dict()
+    #
+    # For each dict,
+    #  - build a key with the set of key values (except for key period),
+    #  - and enlist period value in dict tempo
     for dic in diclist:
         aperiod = dic['period']
         if not isinstance(aperiod, cperiod):
@@ -500,13 +504,14 @@ def group_periods(diclist):
         keys = list(dic.keys())
         keys.remove('period')
         keys.sort()
-        tuple_key = tuple([dic[k] for k in keys])
+        values_tuple = tuple([dic[k] for k in keys])
         #
-        if tuple_key not in tempo:
-            tempo[tuple_key] = dic.copy()
-            tempo[tuple_key]['period'] = list()
-        tempo[tuple_key]['period'].append(aperiod)
+        if values_tuple not in tempo:
+            tempo[values_tuple] = dic.copy()
+            tempo[values_tuple]['period'] = list()
+        tempo[values_tuple]['period'].append(aperiod)
     #
+    # Merge the enlisted periods 
     output = list()
     for key in tempo:
         dic = tempo[key]

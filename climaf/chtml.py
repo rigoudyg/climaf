@@ -291,7 +291,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
                 tt = index_dict
             else:
                 # -- Read the content of the index
-                print('index_atlas in chtml.py = ', index_atlas)
+                #print('index_atlas in chtml.py = ', index_atlas)
                 try:
                     with open(os.path.expanduser(index_atlas), "rb") as atlas_index_r:
                         tt = pickle.load(atlas_index_r)
