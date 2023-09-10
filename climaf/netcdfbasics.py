@@ -94,22 +94,26 @@ def model_id(filename):
 
 def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name=True,
                cell_methods=None, time_average=None):
-    """
-    Returns a cperiod object representing the time period covered by a datafile or 
-    a cftime Index 
+    """Returns a cperiod object representing the time period covered by a datafile or 
+    by a cftime Index (including the time averaging periods at both end if applicable)
 
-    For the case of a datafile : if there is a time bounds variable if file, it is 
-    used. Otherwise, if use_frequency is True, method below is applied
+    For the case of a datafile : if there is a time bounds variable in file, it is 
+    used. Otherwise, if USE_FREQUENCY is True or a string, method below is applied
 
-    For the case of a cftime Index argument, except is use_frequency is True, its 
-    first and last time values are used; otherwise, method below applies
+    For the case of a cftime Index argument, its first and last time
+    values are used, except is USE_FREQUENCY is True or a string; in that last 
+    case, method below applies
 
-    When no time bounds are available: if time_average is False, we assume that 
-    values are instant values; otherwise, arg cell_methods is scrutinized
-    to detect a 'time:mean' occurrence and decide if we have instant values. If we 
-    don't, and use_frequency is True, the frequency between time values is computed, 
-    and used to compute bounds by adding half a period at both ends (the case is 
-    of month is handled)
+    When no time bounds are available, or when arg is a cftime Index
+    and USE_FREQUENCY is True or a string, the method applied is :
+      -  if TIME_AVERAGE is False, we assume that values are instant values
+      -  otherwise, arg CELL_METHODS is scrutinized to detect a 'time.*:mean' 
+         occurrence and decide if we have instant values. 
+           * If no, 
+           * If yes, the frequency 
+         between time values is computed, and used to compute bounds by adding 
+         half a period at both ends (for the case of month, we assume that full 
+         months are averaged and adjust to month start/end )
 
     """
     tdim = None
@@ -122,11 +126,16 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
         if tdim is not None:
             start = tdim[0, 0]  # This is a DataArray
             end = tdim[-1, 1]
-    elif not use_frequency:
-        # Assume that the provided cfTime index represents time bounds
-        tdim = filename_or_timedim
-        start = tdim[0]  # This is a DataArray
-        end = tdim[-1]
+        else:
+            clogger.warning(
+                f"No time bounds variable in {filename_or_timedim}")
+            if not use_frequency:
+                return None
+    else:
+        if not use_frequency:
+            # Assume that the provided cfTime index represents time bounds
+            tdim = filename_or_timedim
+    #
     if tdim is not None:
         start = start.values.flatten()[0]  # this is a nectdf time object
         end = end.values.flatten()[0]
@@ -135,6 +144,8 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
     else:
         if not isinstance(filename_or_timedim, six.string_types):
             timedim = filename_or_timedim
+            start = timedim.values.flatten()[0]
+            end = timedim.values.flatten()[-1]
         else:
             with xr.open_dataset(filename_or_timedim, use_cftime=True) as ds:
                 if "time" in ds:
@@ -154,6 +165,8 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
                                 end = ds[dim][-1].values.flatten()[0]
                                 timedim = ds[dim]
                                 found = True
+                                clogger.warning(
+                                    "Using %s as the time dimension" % dim)
                                 break
                         if not found:
                             clogger.error(time_error_message)
@@ -162,27 +175,26 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
         if cell_methods is not None and time_average is None:
             time_average = (re.findall(
                 '.*time *: *mean', cell_methods)[0] != '')
+
+        # Diagnose delta, the time interval between data samples
         if time_average is False:
             delta = 0
         else:
-            if use_frequency is False:
+            if not use_frequency:
                 raise Climaf_Error("No time bounds variable in file or no time dimension provided, " +
                                    "and use_frequency is False (%s)" % filename_or_timedim)
-            try:
-                data_freq = xr.infer_freq(timedim)
-            except:
-                data_freq = use_frequency
-            if not data_freq:
-                data_freq = use_frequency
-            if not data_freq:
-                raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
-                                   timedim.name + os.linesep + str(timedim))
-            delta = freq_to_minutes(data_freq) / 2
-            if delta is None:
-                clogger.error("Frequency %s not yet managed" % data_freq)
-                return None
-            if data_freq[-2:] == "MS" and start.days in [14, 15, 16] and end.days in [14, 15, 16]:
-                delta = "special_month"
+            data_freq = xr.infer_freq(timedim)
+            if (data_freq is None and use_frequency == "monthly") or data_freq[-2:] == "MS":
+                if start.day in [14, 15, 16] and end.day in [14, 15, 16]:
+                    delta = "special_month"
+                else:
+                    raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
+                                       timedim.name)
+            else:
+                delta = freq_to_minutes(data_freq) / 2
+                if delta is None:
+                    clogger.error("Frequency %s not yet managed" % data_freq)
+                    return None
         #
         start = timedim[0].values.flatten()[0]
         if isinstance(start, float):
@@ -191,8 +203,9 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
         if isinstance(end, float):
             end = convert_date_string_to_datetime(str(int(end)))
         if delta == "special_month":
-            start = start - timedelta(days=start.day - 1)
-            end = end + timedelta(days=end.daysinmonth - end.day + 1)
+            start = start - timedelta(days=start.day - 1, hours=12)
+            end = end + timedelta(days=end.daysinmonth -
+                                  end.day + 1, hours=-12)
         else:
             start = start - timedelta(minutes=delta)
             end = end + timedelta(minutes=delta)

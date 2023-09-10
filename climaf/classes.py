@@ -766,7 +766,7 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, ensure_period=True, merge_periods=True, 
+    def glob(self, what=None, ensure_period=True, merge_periods=True,
              split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
@@ -819,11 +819,12 @@ class cdataset(cobject):
 
         """
         dic = self.kvp.copy()
-        if 'project' not in dic :
-            raise Climaf_Classes_Error("Facet 'project' is missing in dataset's facet")
+        if 'project' not in dic:
+            raise Climaf_Classes_Error(
+                "Facet 'project' is missing in dataset's facet")
         project = dic['project']
-        if "*" in project or "?" in project :
-            raise Climaf_Classes_Error("A wildcard in facet project (%s) "%project + \
+        if "*" in project or "?" in project:
+            raise Climaf_Classes_Error("A wildcard in facet project (%s) " % project +
                                        "would stress the file system too much")
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
@@ -836,27 +837,29 @@ class cdataset(cobject):
         files = selectFiles(with_periods=(merge_periods is True or what in ['files', ]),
                             return_combinations=cases, use_frequency=use_frequency, **dic)
         # Add facet project in each case
-        for case in cases :
+        for case in cases:
             case['project'] = project
         #
         if what in ['files', ]:
             return files
         else:
-            if ensure_period is True :
+            if ensure_period is True:
                 merge_periods = True
             if merge_periods is True:
                 cases = group_periods(cases)
                 # Keep only the intersection of requested period and data periods
                 period = dic['period']
-                if period != "*" :
+                if period != "*":
                     for case in cases:
-                        case['period'] = [ p.intersects(period) for p in case['period'] ]
+                        case['period'] = [p.intersects(
+                            period) for p in case['period']]
                 if ensure_period is True:
-                    # Build the list of cases which period exactly matches 
+                    # Build the list of cases which period exactly matches
                     tempo = list()
                     for case in cases:
                         if len(case['period']) == 1:
-                            case['period'] = case['period'][0] # This also fits case period==*
+                            # This also fits case period==*
+                            case['period'] = case['period'][0]
                         tempo.append(case)
                     cases = tempo
             if split is not None:
@@ -1151,22 +1154,31 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self, frequency=True, gap=True, period=True):
+    def check(self, frequency=False, gap=False, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
-        - if frequency is True : check if data frequency is consistent with dataset frequency
+        - if frequency is True : check if datafile frequency is consistent 
+          with facet frequency
         - if gap is True : check if file data have a gap
         - if period is True : check if period covered by data actually includes the
-        whole of dataset period
+          whole of dataset period (regardless of possible gaps)
 
-        Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
+        Default case is to check only period
+
+        Returns: True if every check is OK, False if one fails, None if any cannot be analyzed
+
+        For gap and period check, monthly data are processed quite empirically
         """
-        if gap:
-            frequency = True
+        #
+        if not (frequency or period or gap):
+            clogger.error(
+                "You must activate at least one of the diags : frequency, gap or period")
+            return(None)
         #
         files = self.baseFiles()
         if not files:
-            return False
+            clogger.error("The dataset has no data file !")
+            return None
         files = files.split()
         clogger.debug("List of selected files: %s" % files)
         #
@@ -1177,59 +1189,86 @@ class cdataset(cobject):
         if self.frequency == 'fx' or self.frequency == 'annual_cycle':
             clogger.info("No check for fixed data for %s", self)
             return True
-        if self.frequency == "monthly" and frequency:
-            clogger.error("Check cannot yet process monthly data due to" +
-                          "to a shortcoming in analyzing monthly data frequency")
-            return None
-        if not getattr(dsets[0], "frequency", False) and frequency:
-            clogger.warning("No frequency in file(s) for %s", self)
-            return False
+        #
         if "time" not in all_dsets:
             clogger.warning("Cannot yet check a dataset which time dimension" +
                             "is not named 'time' (%s)" % self)
-            return False
+            return None
+        #
+        if self.frequency in ["monthly", "mon"] or \
+           dsets[0].frequency in ["monthly", "mon"]:
+            monthly = True
         #
         times = all_dsets.time
         clogger.debug('Time data of selected files: %s' % times)
+        cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
+        time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
+        #
+        data_freq = xr.infer_freq(times)
+        if data_freq is None:
+            if (frequency and self.frequency != "*") or (gap and not monthly):
+                clogger.error(
+                    "Time interval detected by xr.infer_freq is None %s" % str(times))
+                return None
         #
         if frequency:
             # Check if data time interval is consistent with dataset frequency
-            data_freq = xr.infer_freq(times)
-            if data_freq is None:
-                clogger.error(
-                    "Time interval detected by xr.infer_freq is None %s" % str(times))
-                return False
             table = {"monthly": "MS", "daily": "D", "day": "D", "6h": "6H", "3h": "3H",
                      "1h": "1H", "6Hourly": "6H", "3Hourly": "3H"}
             if self.frequency not in table:
-                clogger.error("Check cannot yet handle frequency %s" %
-                              self.frequency)
+                clogger.error(
+                    "Frequency check cannot handle dataset's frequency %s" % self.frequency)
                 return None
             if data_freq != table[self.frequency]:
-                message = 'Data time interval %s is not consistent with dataset frequency %s'
+                message = 'Datafile time interval %s is not consistent with dataset\' frequency %s'
                 clogger.warning(message % (data_freq, self.frequency))
                 rep = False
-
+        #
         if gap:
-            # Check if file data have a gap
             time_values = times.values.flatten()
-            delta = freq_to_minutes(data_freq)
-            cpt = 0
-            for ptim, tim in zip(time_values[:-1], time_values[1:]):
-                if ptim + timedelta(minutes=delta) != tim:
-                    rep = False
-                    cpt += 1
-                    if cpt > 3:
-                        break
-                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
-                                  (ptim, tim, delta))
-
+            # Check if file data have a gap
+            clogger.debug("Checking for gap")
+            if monthly:
+                clogger.warning(
+                    "For monthly data, gap check is quite empirical")
+                # clogger.error("Check cannot yet check gap monthly data due to" +
+                #              " a shortcoming in incrementing for monthly data")
+                # return None
+                cpt = 0
+                for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                    delta = tim - ptim
+                    if delta < timedelta(days=29) or \
+                       delta > timedelta(days=31):
+                        rep = False
+                        cpt += 1
+                        if cpt > 3:
+                            break
+                        clogger.error("File data time issue between " +
+                                      "%s and %s, interval inconsistent with monthly data" %
+                                      (ptim, tim))
+            else:
+                cpt = 0
+                delta = freq_to_minutes(data_freq)
+                for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                    if ptim + timedelta(minutes=delta) != tim:
+                        rep = False
+                        cpt += 1
+                        if cpt > 3:
+                            break
+                        clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
+                                      (ptim, tim, delta))
+        #
         if period:
             # Compare period covered by data files with dataset's period
-            cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
-            file_period = timeLimits(times, use_frequency=True, cell_methods=cell_methods,
+            clogger.debug("Checking for period")
+            if monthly:
+                use_freq = "monthly"
+            else:
+                use_freq = True
+            file_period = timeLimits(times, use_frequency=use_freq, cell_methods=cell_methods,
                                      strict_on_time_dim_name=False)
-            clogger.debug('Period covered by selected files: %s' % file_period)
+            clogger.debug(
+                'Period covered by selected files is: %s' % file_period)
             consist = ""
             if not file_period.includes(self.period):
                 consist = "not "
