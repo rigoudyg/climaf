@@ -49,26 +49,25 @@ def remove_keys_with_same_values(diclist):
         return []
     #
     # Build 'values': a dict of the set (across DICLIST) of values for each key
-    values = { k:set() for k in diclist[0] }
+    values = {k: set() for k in diclist[0]}
     for dic in diclist:
         for k in values:
             values[k].add(turn_list_to_tuple(dic[k]))
     #
     # Register common values in a dict that will be returned
-    common_values_dict = { key : diclist[0][key]
-                           for key in values if len(values[key]) == 1 }
+    common_values_dict = {key: diclist[0][key]
+                          for key in values if len(values[key]) == 1}
     #
-    # Withdraw each commmon-value-key in each dict of DICLIST. 
-    for dic in diclist :
+    # Withdraw each commmon-value-key in each dict of DICLIST.
+    for dic in diclist:
         for k in common_values_dict.keys():
             dic.pop(k)
 
-    # Warn : on top of returning the dict of common values, DICLIST has been modified 
+    # Warn : on top of returning the dict of common values, DICLIST has been modified
     return common_values_dict
 
 
 def cartesian_product_substitute(input_string, skip_keys=list(), **kwargs):
-
     """Iterate Template.safe_substitute on a list of strings, subtituting
     for those keys in kwargs which have a value of type list, by
     creating the cartesian product of all values in all sets
@@ -92,7 +91,8 @@ def cartesian_product_substitute(input_string, skip_keys=list(), **kwargs):
     { 'x':'*', 'y':'?' },
 
     """
-    set_kw = [kw for kw in kwargs if isinstance(kwargs[kw], list) and kw not in skip_keys]
+    set_kw = [kw for kw in kwargs if isinstance(
+        kwargs[kw], list) and kw not in skip_keys]
     single_kw = list(set(list(kwargs)) - set(set_kw) - set(skip_keys))
     # Deal with substitutions for which there is one possible value
     for kw in single_kw:
