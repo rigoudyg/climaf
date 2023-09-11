@@ -1208,7 +1208,7 @@ class cdataset(cobject):
         if data_freq is None:
             if (frequency and self.frequency != "*") or (gap and not monthly):
                 clogger.error(
-                    "Time interval detected by xr.infer_freq is None %s" % str(times))
+                    "Time interval detected by xr.infer_freq is None ")
                 return None
         #
         if frequency:
