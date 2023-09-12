@@ -555,6 +555,20 @@ def freq_to_minutes(data_freq):
             "Cannot interpret frequency %s, returning O minutes" % data_freq)
 
 
+def build_date_regexp_pattern():
+    # a pattern for dates for regexp, with groups 'period', 'start' and 'end'
+    digit = "[0-9]"
+    year = "%s{4}" % digit
+    month = "(01|02|03|04|05|06|07|08|09|10|11|12)"
+    day = "([0-3][0-9])"
+    hour = "(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
+    minutes = "[0-5][0-9]"
+    seconds = minutes
+    date = f"{year}({month}({day}({hour}({minutes}({seconds})?)?)?)?)?"
+    date_regexp_patt = f"(?P<period>(?P<start>{date})([_-](?P<end>{date}))?)"
+    return date_regexp_patt
+
+
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
         self.valeur = valeur

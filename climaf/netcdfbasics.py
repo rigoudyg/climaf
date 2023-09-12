@@ -258,3 +258,25 @@ def verticalLevelValues(filename):
 def attrOfFile(filename, attribute, default=None):
     with xr.open_dataset(filename, decode_times=False) as ds:
         return getattr(ds, attribute, default)
+
+
+def infer_freq(times, monthly):
+    """A wrapper for xarray.infer_freq, for alleviating its shortcoming in
+    infering frequency monthly. If MONTHLY is True, an adhoc,
+    approximate algorithm is used for checking if TIMES represent
+    monthly data. Otherwise, xarray.infer_freq is used """
+    #
+    if not monthly:
+        return xr.infer_freq(times)
+    time_values = times.values.flatten()
+    OK = 1
+    for cpt in range(0, 4):
+        ptim = time_values[cpt]
+        tim = time_values[cpt+1]
+        delta = tim - ptim
+        if delta < timedelta(days=29) or delta > timedelta(days=31):
+            OK = 0
+    if OK == 1:
+        return "MS"
+    else:
+        return None
