@@ -28,9 +28,9 @@ from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
 from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
-    lastyears, firstyears, group_periods, freq_to_minutes
+    lastyears, firstyears, group_periods, freq_to_minutes, build_date_regexp_pattern
 from env.clogging import clogger
-from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
+from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id, infer_freq
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -526,8 +526,7 @@ class cdataset(cobject):
     # def __init__(self,project=None,model=None,simulation=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self, **kwargs):
-        """
-        Create a CLIMAF dataset.
+        """Create a CLIMAF dataset.
 
         A CLIMAF dataset is a description of what the data (rather than
         the data itself or a file).  It is basically a set of pairs
@@ -565,6 +564,21 @@ class cdataset(cobject):
            - or a 'derived' variable (see  :py:func:`~climaf.operators_derive.derive` ),
 
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
+
+        - check : this is actually not a dataset attribute but an
+          optionnal argument that can trigger a check of the datafiles
+          associated with th dataset; allowed values are : 
+
+            - 'light' : checks that the period indicated by dates in data 
+              filenames includes dataset's period (see :py:func:`~climaf.classes.cdataset.light_check)` 
+
+            - 'period' : checks that the period covered by data in files 
+              includes dataset's period (see :py:func:`~climaf.classes.cdataset.check)
+
+            - 'full' : in addition to case 'period', also checks for gaps in 
+               data, and for frequency (see :py:func:`~climaf.classes.cdataset.check)
+
+           An error is raised if the check fails.
 
         - in project CMIP5 , for triplets (frequency, simulation, period, table )  :
           if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
@@ -616,6 +630,22 @@ class cdataset(cobject):
         self.files = None
         self.local_copies_of_remote_files = None
         self.register()
+        if "check" in kwargs:
+            if kwargs["check"] == "light":
+                if not self.light_check():
+                    raise Climaf_Classes_Error(
+                        "Period light check failed for %s" % self)
+            elif kwargs["check"] == "period":
+                if not self.check(period=True, gap=False, frequency=False):
+                    raise Climaf_Classes_Error(
+                        "Period check failed for %s" % self)
+            elif kwargs["check"] == "full":
+                if not self.check(period=True, gap=True, frequency=True):
+                    raise Climaf_Classes_Error(
+                        "Period/gap/frequency check failed for %s" % self)
+            else:
+                raise Climaf_Classes_Error(
+                    "Provided value for check is invalid %s" % kwargs["check"])
 
     def __eq__(self, other):
         res = super(cdataset, self).__eq__(other)
@@ -787,7 +817,7 @@ class cdataset(cobject):
         actually a list of the intersections of the requested period
         and (merged) available data periods.
 
-        Otherwise, individual data file periods are returned. 
+        Otherwise, individual data file periods are returned.
 
         if SPLIT is not None, a pair is returned instead of the dicts list :
 
@@ -805,9 +835,9 @@ class cdataset(cobject):
         >>> common_values, varied_values = tos_data.glob(merge_periods=True, split=True)
 
         >>> common_values
-        {'variable': 'tos', 'period': [1850-2014], 'root': '/bdd', 
-         'institute': 'CNRM-CERFACS', 'mip': 'CMIP', 'table': 'Omon', 
-         'experiment': 'historical', 'realization': 'r1i1p1f2', 'version': 'latest', 
+        {'variable': 'tos', 'period': [1850-2014], 'root': '/bdd',
+         'institute': 'CNRM-CERFACS', 'mip': 'CMIP', 'table': 'Omon',
+         'experiment': 'historical', 'realization': 'r1i1p1f2', 'version': 'latest',
          'project': 'CMIP6'}
 
         >>> varied_values
@@ -1154,10 +1184,44 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
+    def light_check(self):
+        """Check that dataset's period is covered by the period deduced from
+        the filenames of its datafiles. Filenames with non-date digits
+        (e.g. initialization year) may generate interpretation
+        problems
+
+        Return True if the period is covered
+
+        Nervertheless, data in files may show gaps; use
+        dataset.check(gap=True) if you need a deeper check
+
+        """
+        #
+        pattern = build_date_regexp_pattern()
+        files = self.baseFiles()
+        if files is None:
+            clogger.warning("No data file for dataset %s" % self)
+            return None
+        files = files.split()
+        periods = []
+        for fil in files:
+            matches = re.findall(pattern, fil)
+            if len(matches) != 1:
+                clogger.error(
+                    f"No (or too much) date(s) found in filename {file}")
+                return None
+            else:
+                # First element is a tuple, which first element matches the period
+                periods.append(init_period(matches[0][0]))
+        clogger.debug("File periods are :" + str(periods))
+        data_period = merge_periods(periods)
+        clogger.debug("Merged periods : " + str(data_period))
+        return any([p.includes(self.period) for p in data_period])
+
     def check(self, frequency=False, gap=False, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
-        - if frequency is True : check if datafile frequency is consistent 
+        - if frequency is True : check if datafile frequency is consistent
           with facet frequency
         - if gap is True : check if file data have a gap
         - if period is True : check if period covered by data actually includes the
@@ -1175,6 +1239,10 @@ class cdataset(cobject):
                 "You must activate at least one of the diags : frequency, gap or period")
             return(None)
         #
+        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
+            clogger.info("No check for fixed data for %s", self)
+            return True
+        #
         files = self.baseFiles()
         if not files:
             clogger.error("The dataset has no data file !")
@@ -1185,10 +1253,6 @@ class cdataset(cobject):
         rep = True
         dsets = [xr.open_dataset(f, use_cftime=True) for f in files]
         all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
-        #
-        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
-            clogger.info("No check for fixed data for %s", self)
-            return True
         #
         if "time" not in all_dsets:
             clogger.warning("Cannot yet check a dataset which time dimension" +
@@ -1204,11 +1268,12 @@ class cdataset(cobject):
         cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
         time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
         #
-        data_freq = xr.infer_freq(times)
+        data_freq = infer_freq(times, monthly)
+        clogger.debug("Frequency is "+data_freq)
         if data_freq is None:
             if (frequency and self.frequency != "*") or (gap and not monthly):
                 clogger.error(
-                    "Time interval detected by xr.infer_freq is None ")
+                    "Time interval detected by infer_freq() is None ")
                 return None
         #
         if frequency:
@@ -1762,7 +1827,7 @@ def compare_trees(tree1, tree2, func, filter_on_operator=None):
                 clogger.debug("Parameters are coherent: %s" % tree1.parameters)
                 rep = (reduce(lambda a, b: a if repr(a) == repr(b) else None,
                               [compare_trees(op1, op2, func, filter_on_operator)
-                               for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                              for op1, op2 in zip(tree1.operands, tree2.operands)]))
                 clogger.debug("... %s" % str(rep))
                 return rep
             else:
@@ -1840,7 +1905,7 @@ def ds(*args, **kwargs):
     Also a shortcut for :py:meth:`~climaf.classes.cdataset`,
     when used with with only keywords arguments. Example ::
 
-     >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
+     >>> ds(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     In that latter case, you may use e.g. period='last_50y' to get the
@@ -1969,7 +2034,8 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
 
     Example ::
 
-    >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    # scale and offset may be provided
+    >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)
     >>> calias('CMIP6','evspsbl',scale=-1., conditions={ 'model':'CanESM5' , 'version': ['20180103', '20190112'] })
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
@@ -2247,8 +2313,8 @@ class cpage(cpage_all):
              self.page_height)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, ybox=%d, pt=%d, font='%s', gravity='%s', backgroud='%s', " \
-                    "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
-                                                      self.gravity, self.background, self.insert, self.insert_width)
+                "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
+                                                  self.gravity, self.background, self.insert, self.insert_width)
         rep = "cpage([%s],%s)" % (",".join(rep), param)
 
         return rep
@@ -2341,12 +2407,12 @@ class cpage_pdf(cpage_all):
         rep = super(cpage_pdf, self).buildcrs(
             crsrewrite=crsrewrite, period=period)
         param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
-                (repr(self.widths), repr(self.heights), self.page_width,
-                 self.page_height, self.scale, self.openright)
+            (repr(self.widths), repr(self.heights), self.page_width,
+             self.page_height, self.scale, self.openright)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, titlebox='%s', pt='%s', font='%s', backgroud='%s'" % \
-                    (param, self.title, self.x, self.y, self.titlebox,
-                     self.pt, self.font, self.background)
+                (param, self.title, self.x, self.y, self.titlebox,
+                 self.pt, self.font, self.background)
         rep = "cpage_pdf([%s],%s)" % (",".join(rep), param)
 
         return rep
