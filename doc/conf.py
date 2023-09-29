@@ -48,13 +48,7 @@ extensions = [
     , 'sphinx.ext.viewcode'
 ]
 
-from env.site_settings import atCNRM, onCiclad
-if atCNRM:
-    # This one works at CNRM
-    extensions.append('sphinxcontrib.napoleon')
-else:
-    # this one works at RTD and Ciclad
-    extensions.append('sphinx.ext.napoleon')
+extensions.append('sphinx.ext.napoleon')
 
 os.environ['IN_SPHINX'] = 'yes'
 
