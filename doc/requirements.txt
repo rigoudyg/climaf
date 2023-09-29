@@ -1,4 +1,8 @@
 xarray
-#sphinxcontrib-napoleon==0.2.11
+sphinx
 sphinx_rtd_theme
-
+pyyaml
+netCDF4
+numpy
+cftime
+natsort
