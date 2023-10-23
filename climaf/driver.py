@@ -936,7 +936,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # Account for script call parameters
     for p in scriptCall.parameters:
         # clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
-        subdict[p] = scriptCall.parameters[p]
+        subdict[p] = repr(scriptCall.parameters[p])
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
