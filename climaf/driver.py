@@ -964,18 +964,23 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict.pop('member_label')
     #
     # Substitute all args
+    clogger.debug("Script call template and subdict before sustitution : " +
+                  template.safe_substitute() + repr(subdict))
     template = template.safe_substitute(subdict)
+    clogger.debug("Script call template after sustitution : " +
+                  template)
     #
     # Allowing for some formal parameters to be missing in the actual call:
     #
     # Discard remaining substrings looking like :
-    #  some_word='"${some_keyword}"' , or simply : '"${some_keyword}"'
-    template = re.sub(r'((--)?\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
-    #
-    # Discard remaining substrings looking like :
-    #  some_word=${some_keyword}  or  simply : ${some_keyword}
-    template = re.sub(r"((--)?\w*=)?\$\{\w*\}", r"", template)
-    #
+    #  some_keyword='"${some_word}"' , or '"${some_word}"'
+    #  some_keyword="'${some_word}'" , or "'${some_word}'"
+    #  some_keyword="${some_word}" , or "${some_word}"
+    #  some_keyword='${some_word}' , or '${some_word}'
+    #  some_keyword=${some_word}   , or ${some_word}
+    #  with optionnal '--' before 'some_keyword'
+    template = re.sub(r'((--)?\w*=)?([\'\"]{0,2})\$\{\w*\}\3', r"", template)
+    #    #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None:
         # subdict_ff=dict()

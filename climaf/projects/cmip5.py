@@ -6,8 +6,7 @@ libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP5 datasets are: model, experiment, table, realization, grid, version, institute, mip, root
 
-Syntax for these attributes is described in `the CMIP5 DRS document
-  <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`
+Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
 
 Example for a CMIP5 dataset declaration:
 
