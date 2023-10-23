@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
+from env.site_settings import atCNRM, onCiclad
+from env.environment import climaf_version
 #
 # CliMAF documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov  6 23:20:27 2014.
@@ -27,8 +29,6 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 
 
-from env.environment import climaf_version
-
 # -- General configuration ------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -43,12 +43,9 @@ needs_sphinx = "1.8.4"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc'
-    , 'sphinx.ext.todo'
-    , 'sphinx.ext.viewcode'
+    'sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode'
 ]
 
-from env.site_settings import atCNRM, onCiclad
 if atCNRM:
     # This one works at CNRM
     extensions.append('sphinxcontrib.napoleon')
@@ -88,7 +85,7 @@ release = climaf_version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
