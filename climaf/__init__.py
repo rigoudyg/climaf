@@ -12,7 +12,7 @@ import os
 # Created : S.Sénési - 2014
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
-           "operators", "period", "standard_operators",
+           "operators", "period", "standard_operators", "plot_operators",
            "cmacro", "chtml", "functions", "plot",
            "projects", "derived_variables", "ESMValTool_diags"]
 
@@ -90,6 +90,7 @@ if not already_inited and not onrtd:
          sys.modules['__main__'].__dict__)
     tim("execs_cscript")
     standard_operators.load_standard_operators()
+    plot_operators.load_plot_operators()
     tim("load_ops")
     from . import projects
     exec("from climaf.projects  import %s" %
