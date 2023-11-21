@@ -105,7 +105,7 @@ vectors_map_group.add_argument("--vectors_map_transform_options",
                                help="Options of the coordinate system on which the vectors data is.",
                                type=json.loads, default=dict())
 # Add generic features
-parser.add_argument("--coordinates", help="Coordinates to be plotted",
+parser.add_argument("--coordinates", help="Coordinates to be plotted. Useful only in tricky cases (e.g. not CF-compliant)",
                     type=list, default=["auto"])
 parser.add_argument("--projection", help="The projection to be used for the map",
                     type=str, default="PlateCarree")
@@ -164,7 +164,7 @@ def find_ccrs(coordinates, options=None):
         coordinates = "LambertConformal"
         options = new_options
 
-    if coordinates in ccrs.__dict__:
+    elif coordinates in ccrs.__dict__:
         if options:
             return ccrs.__dict__[coordinates].__call__(**options)
         else:
@@ -186,9 +186,9 @@ def compute_xy(lat2d, lon2d, projection):
         lat2d[-1][-1], lon2d[-1][-1], ccrs.PlateCarree())
     xsize = lat2d.shape[1]
     ysize = lat2d.shape[0]
-    print("0,0 -> ", lon2d[0][0], lat2d[0][0])
-    print("-1 -1-> ", lon2d[-1][-1], lat2d[-1][-1])
-    print(f"x0={x0}, xm={xm}, y0={y0}, ym={ym}, xsize={xsize}, ysize={ysize}")
+    # print("0,0 -> ", lon2d[0][0], lat2d[0][0])
+    # print("-1 -1-> ", lon2d[-1][-1], lat2d[-1][-1])
+    # print(f"x0={x0}, xm={xm}, y0={y0}, ym={ym}, xsize={xsize}, ysize={ysize}")
     X = np.linspace(x0, xm, xsize)
     Y = np.linspace(y0, ym, ysize)
     return np.meshgrid(X, Y)
@@ -221,9 +221,12 @@ def get_variable_and_coordinates_from_dataset(file, variable, coordinates, proje
                     dataset.variables[dimension][:])
     else:
         # Less simple case: data dimensions do not directly carry
-        # geographic information. Must look for coordinates variables
+        # geographic information. Example : Aladin data on Lambert
+        # grid
 
-        # Try attribute 'coordinates' of the
+        # Must look for coordinates variables
+
+        # Try with attribute 'coordinates' of the
         # variable, to identify the relevant file variables
         CF_coords = getattr(variable_dataset, 'coordinates', False)
         if CF_coords:
