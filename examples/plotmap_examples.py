@@ -30,3 +30,6 @@ cshow(plotmap(l2, clrt="LambertII",
 
 # Playing with projections
 cshow(plotmap(l2, clrt="LambertII", clrto=[10, 37, 37], proj="Stereographic"))
+
+# Select options
+cshow(plotmap(data, clrso=[('isel', {'time': 0})]))

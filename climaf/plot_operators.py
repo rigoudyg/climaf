@@ -22,6 +22,7 @@ def load_plot_operators():
             '--output_file=${out} '
             '--coordinates="${coord}" '
             '--format="${format}" '
+            '--debug="${debug}" '
             '--savefig_options="${savefig_options}" '
             # Colored map
             '--colored_map_file="${in_1}" '
@@ -30,6 +31,9 @@ def load_plot_operators():
             '--colored_map_colors="${clrc}" '
             '--colored_map_transform=${clrt} '
             '--colored_map_transform_options="${clrto}" '
+            '--colored_map_selection_options="${clrso}" '
+            '--colored_map_scale="${clrs}" '
+            '--colored_map_offset="${clro}" '
             # Contour map
             '--contours_map_file="${in_2}" '
             '--contours_map_variable="${var_2}" '

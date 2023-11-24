@@ -2,7 +2,9 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 import os
 import argparse
 import json
-from netCDF4 import Dataset
+import six
+#from netCDF4 import Dataset
+import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
@@ -13,6 +15,35 @@ import cartopy.feature as cfeature
 """
 This script aims at plotting different fields on the same map.
 """
+
+
+def check_none_or_other(value):
+    if value is None or value in ["", "none", "None"]:
+        return None
+    elif isinstance(value, (int, float)):
+        return value
+    elif value in ["True", True]:
+        return True
+    elif value in ["False", False]:
+        return False
+    elif isinstance(value, six.string_types):
+        return value.strip()
+    elif isinstance(value, (list, tuple)):
+        return [check_none_or_other(elt) for elt in value]
+    elif isinstance(value, dict):
+        return {check_none_or_other(key): check_none_or_other(value) for (key, value) in value.items()}
+    else:
+        return str(value).strip()
+
+
+def check_json_format(value):
+    value = json.loads(value)
+    if isinstance(value, list):
+        value = [check_none_or_other(val) for val in value]
+    elif isinstance(value, dict):
+        for key in value.keys():
+            value[key] = check_none_or_other(value[key])
+    return value
 
 
 # Create the parser
@@ -32,7 +63,16 @@ colored_map_group.add_argument("--colored_map_transform", help="Coordinate syste
                                type=str, default=None)
 colored_map_group.add_argument("--colored_map_transform_options",
                                help="Options of the coordinate system on which the colored map data is.",
-                               type=json.loads, default=None)
+                               type=check_json_format, default=None)
+colored_map_group.add_argument("--colored_map_selection_options",
+                               help="Options to be used to select coordinates if needed."
+                                    "Expected format: list of tuples (selection method, associated dict options)",
+                               type=check_json_format, default=dict())
+colored_map_group.add_argument("--colored_map_scale", help="Scale factor to apply to the colored map field",
+                               type=float, default=None)
+colored_map_group.add_argument("--colored_map_offset", help="Offset to apply to the colored map field",
+                               type=float, default=None)
+
 # Add contours map features
 contours_map_group = parser.add_argument_group(
     "contours_map", description="Arguments linked with contours map")
@@ -48,7 +88,7 @@ contours_map_group.add_argument("--contours_map_transform", help="Coordinate sys
                                 type=str, default=None)
 contours_map_group.add_argument("--contours_map_transform_options",
                                 help="Options of the coordinate system on which the contours data is.",
-                                type=json.loads, default=None)
+                                type=check_json_format, default=None)
 # Add shaded map features
 shaded_map_group = parser.add_argument_group(
     "shaded_map", description="Arguments linked with shaded map")
@@ -64,7 +104,7 @@ shaded_map_group.add_argument("--shaded_map_transform", help="Coordinate system 
                               type=str, default=None)
 shaded_map_group.add_argument("--shaded_map_transform_options",
                               help="Options of the coordinate system on which the shaded data is.",
-                              type=json.loads, default=None)
+                              type=check_json_format, default=None)
 # Add shaded map features
 shade2_map_group = parser.add_argument_group(
     "shade2_map", description="Arguments linked with shade2 map")
@@ -80,7 +120,7 @@ shade2_map_group.add_argument("--shade2_map_transform", help="Coordinate system 
                               type=str, default=None)
 shade2_map_group.add_argument("--shade2_map_transform_options",
                               help="Options of the coordinate system on which the shade2 data is.",
-                              type=json.loads, default=None)
+                              type=check_json_format, default=None)
 
 # Add vectors map features
 vectors_map_group = parser.add_argument_group(
@@ -98,19 +138,19 @@ vectors_map_group.add_argument("--vectors_map_v_variable", help="Variable (v com
 vectors_map_group.add_argument("--vectors_map_type", help="Number of level of the shaded map color bar",
                                default="quivers", choices=["quivers", "barbs", "streamplots"])
 vectors_map_group.add_argument("--vectors_map_options", help="Options of the vector map.",
-                               type=json.loads, default=None)
+                               type=check_json_format, default=None)
 vectors_map_group.add_argument("--vectors_map_transform", help="Coordinate system on which the vectors data is.",
                                type=str, default=None)
 vectors_map_group.add_argument("--vectors_map_transform_options",
                                help="Options of the coordinate system on which the vectors data is.",
-                               type=json.loads, default=dict())
+                               type=check_json_format, default=dict())
 # Add generic features
 parser.add_argument("--coordinates", help="Coordinates to be plotted. Useful only in tricky cases (e.g. not CF-compliant)",
                     type=list, default=["auto"])
 parser.add_argument("--projection", help="The projection to be used for the map",
                     type=str, default="PlateCarree")
 parser.add_argument("--projection_options", help="The options of the projection to be used for the map",
-                    type=json.loads, default=None)
+                    type=check_json_format, default=None)
 parser.add_argument("--feature_name", help="The cartopy.feature name of feature to add",
                     type=str, default=None)
 parser.add_argument("--feature_color", help="The color of feature to add",
@@ -120,17 +160,47 @@ parser.add_argument(
 parser.add_argument("--title", help="Title of the graphic", default=None)
 parser.add_argument("--format", help="Output format", type=str, default="png")
 parser.add_argument("--savefig_options",
-                    help="Arguments for plt.savefig", type=json.loads, default=dict())
+                    help="Arguments for plt.savefig", type=check_json_format, default=dict())
 parser.add_argument(
     "--lines",
     help="List of lines to plot, and their plot options : "
     "[[lats], [lons], options _dict]  or [ [[lats], [lons], options _dict] ]",
-    type=json.loads, default=None)
+    type=check_json_format, default=None)
+parser.add_argument("--debug", help="The color of feature to add",
+                    type=bool, default=True)
+
+
+def read_dataset(input_file, variable=None):
+    with xr.open_dataset(input_file, decode_cf=True, decode_times=True, decode_coords=True, decode_timedelta=True,
+                         use_cftime=True) as ds:
+        if variable is None:
+            return ds
+        else:
+            return ds.__getattr__(variable)
+
+
+def filter_dataset(dataset, dimensions, selection_options=list()):
+    for (key, opts) in selection_options:
+        dataset = dataset.__getattribute__(key).__call__(**opts)
+    dims_to_remove = sorted(list(set(dataset.dims) - set(dimensions)))
+    if len(dims_to_remove) > 0:
+        print("Warning: The following dimensions will be selected by their first value : %s"
+              % ", ".join(dims_to_remove))
+        dataset = dataset.isel(**{dim: 0 for dim in dims_to_remove})
+    missing_dims = sorted(list(set(dimensions) - set(dataset.dims)))
+    if len(missing_dims) > 0:
+        raise ValueError("The following dimensions can not be found : %s" %
+                         ", ".join(missing_dims))
+    if debug:
+        print("Tranposing data to ", *dimensions)
+    dataset = dataset.transpose(*dimensions)
+    print(dataset)
+    return dataset
 
 
 # Define a few functions for generic treatments
 def find_data_in_dataset(variable_dataset, dimensions):
-    variable_dimensions = variable_dataset.dimensions
+    variable_dimensions = variable_dataset.dims
     intersect_dimensions = list(set(variable_dimensions) & set(dimensions))
     # Find out the dimensions to keep
     select_variable_dimension = list()
@@ -146,9 +216,13 @@ def find_data_in_dataset(variable_dataset, dimensions):
 
 
 def find_ccrs(coordinates, options=None):
+    if debug:
+        print("In find_ccrs, coordinates=", coordinates)
     # Allows for shortcuts for a few cases
     if coordinates == "LambertII":
         # Tag for a tangent Lambert Conformal proj with no false easting/northing.
+        if debug:
+            print("Using shortcut LambertII for projection")
         # Interpret options as an ordered list :
         # [ longitude_of_central_meridian, standard_parallel, latitude_of_projection_origin ]
         # and transform that for cartopy.crs.LambertConformal args
@@ -164,7 +238,7 @@ def find_ccrs(coordinates, options=None):
         coordinates = "LambertConformal"
         options = new_options
 
-    elif coordinates in ccrs.__dict__:
+    if coordinates in ccrs.__dict__:
         if options:
             return ccrs.__dict__[coordinates].__call__(**options)
         else:
@@ -180,75 +254,76 @@ def compute_xy(lat2d, lon2d, projection):
     and LON2D values
     X and Y units are coordinates on the projection plane
     """
-    x0, y0 = projection.transform_point(
-        lat2d[0][0], lon2d[0][0], ccrs.PlateCarree())
-    xm, ym = projection.transform_point(
-        lat2d[-1][-1], lon2d[-1][-1], ccrs.PlateCarree())
-    xsize = lat2d.shape[1]
-    ysize = lat2d.shape[0]
-    # print("0,0 -> ", lon2d[0][0], lat2d[0][0])
-    # print("-1 -1-> ", lon2d[-1][-1], lat2d[-1][-1])
-    # print(f"x0={x0}, xm={xm}, y0={y0}, ym={ym}, xsize={xsize}, ysize={ysize}")
+    first_point = [lon2d.values[0][0], lat2d.values[0][0]]
+    last_point = [lon2d.values[-1][-1], lat2d.values[-1][-1]]
+    y0, x0 = projection.transform_point(*first_point, ccrs.PlateCarree())
+    ym, xm = projection.transform_point(*last_point, ccrs.PlateCarree())
+    xsize = lat2d.shape[0]
+    ysize = lat2d.shape[1]
+    print("0,0 -> ", first_point)
+    print("-1 -1-> ", *last_point)
+    print(f"x0={x0}, xm={xm}, y0={y0}, ym={ym}, xsize={xsize}, ysize={ysize}")
     X = np.linspace(x0, xm, xsize)
     Y = np.linspace(y0, ym, ysize)
-    return np.meshgrid(X, Y)
+    grid = np.meshgrid(Y, X)
+    if debug:
+        print("Grid shape for x and y", grid[0].shape)
+    return grid
 
 
-def get_variable_and_coordinates_from_dataset(file, variable, coordinates, projection):
+def get_variable_and_coordinates_from_dataset(input_file, variable, coordinates, projection, selection_options=list()):
     # Check that the file exists
-    if not os.path.isfile(file):
-        raise ValueError("The input file %s does not exist." % file)
-    # Read the file content
-    dataset = Dataset(file, "r")
-    # Get the variable dataset
-    if variable in dataset.variables:
-        variable_dataset = dataset.variables[variable]
-    else:
-        raise ValueError(
-            "The input file %s does not contain the variable %s." % file, variable)
+    if not os.path.isfile(input_file):
+        raise ValueError("The input file %s does not exist." % input_file)
+    variable_dataset = read_dataset(input_file, variable)
 
     if coordinates == ["auto"]:
-        coordinates = horizontal_dimensions(variable_dataset.dimensions)
+        coordinates = horizontal_dimensions(variable_dataset.dims)
+
+    variable_dataset = filter_dataset(
+        variable_dataset, coordinates, selection_options=list())
 
     # Retrieve and possibly compute coordinates data
+    dataset = read_dataset(input_file)
     variable_coordinates_data = list()
-    # First simple case : when the dimensions of the variable are file
-    # variables, and hence, are 1D coordinates
-    if all([dim in dataset.variables for dim in variable_dataset.dimensions]):
-        for dimension in variable_dataset.dimensions:
-            if dimension in coordinates:
-                variable_coordinates_data.append(
-                    dataset.variables[dimension][:])
+    if all([dim in dataset.variables for dim in coordinates]):
+        # First simple case : when the dimensions of the variable are file
+        # variables, and hence, are 1D coordinates
+        if debug:
+            print("Coordinates are file variables")
+        for dim in coordinates:
+            if debug:
+                print("Adding coordinates data for ", dim)
+            variable_coordinates_data.append(dataset.variables[dim][:])
     else:
         # Less simple case: data dimensions do not directly carry
         # geographic information. Example : Aladin data on Lambert
-        # grid
-
-        # Must look for coordinates variables
-
-        # Try with attribute 'coordinates' of the
-        # variable, to identify the relevant file variables
-        CF_coords = getattr(variable_dataset, 'coordinates', False)
+        # grid -> must use coordinates variables for getting
+        # geographic coordinates
+        if debug:
+            print("Coordinates are not file variables")
+        CF_coords = getattr(variable_dataset, 'coords', False)
         if CF_coords:
-            print("Using CF coords", CF_coords)
-            coords = choose_among_CF_coordinates(CF_coords)
+            # Use attribute 'coordinates' of the
+            # variable, to identify the relevant file variables
+            #coords = choose_among_CF_coordinates(CF_coords)
+            coords = ["lat", "lon"]
         else:
             # Use user-provided (or heuristic) info
             coords = coordinates
-        #
-        lat2d = dataset.variables[coords[0]][:, :]
-        lon2d = dataset.variables[coords[1]][:, :]
+            if debug:
+                print("Using provided coordinates : ", coordinates)
+        # if debug:
+        #    print("Dataset_variables", repr(dataset.variables))
+        lat2d = dataset.variables[coords[0]].transpose(*coordinates)
+        lon2d = dataset.variables[coords[1]].transpose(*coordinates)
         X, Y = compute_xy(lat2d, lon2d, projection)
         variable_coordinates_data.append(X)
         variable_coordinates_data.append(Y)
 
-    # Retrieve data
-    variable_data = find_data_in_dataset(variable_dataset, coordinates)
-    # Close the dataset
-    dataset.close()
     # Return the values found
     # print("variable_dimensions_data=", variable_dimensions_data)
-    return variable_data, variable_coordinates_data
+    return variable_dataset, variable_coordinates_data
 
 
 def horizontal_dimensions(dimensions):
@@ -257,9 +332,11 @@ def horizontal_dimensions(dimensions):
     a map, among a set of dimensions
     """
     possible_pairs = [("lon", "lat"), ("LON", "LAT"),
-                      ("longitude", "latitude"), ("Lon", "Lat"), ("x", "y")]
+                      ("longitude", "latitude"), ("Lon", "Lat"), ("y", "x")]
     for x, y in possible_pairs:
         if x in dimensions and y in dimensions:
+            if debug:
+                print("Using horizontal dimensions :", x, y)
             return [x, y]
     raise ValueError("Cannot identify horizontal dimensions in ", dimensions)
 
@@ -277,23 +354,39 @@ def choose_among_CF_coordinates(CF_coords):
             chosen.append(coordinate)
     if chosen == ['lat', 'lon']:
         chosen = ['lon', 'lat']
+    if debug:
+        print("Choosing coordinates %s among CF coordinates %s" %
+              (CF_coords, chosen))
     return(chosen)
 
 
 # Define a few functions for plots
 def plot_colored_map(ax, coordinates, colored_map_file, colored_map_variable,
                      colored_map_transform, colored_map_transform_options, projection,
-                     colored_map_colors, colored_map_levels):
+                     colored_map_colors, colored_map_levels, colored_map_selection_options,
+                     colored_map_scale, colored_map_offset):
     # Find the transform
     if colored_map_transform:
+        if debug:
+            print("Using specific transform %s for colored map",
+                  colored_map_transform)
         transform = find_ccrs(colored_map_transform,
                               colored_map_transform_options)
     else:
+        if debug:
+            print("Using common transform %s for colored map", repr(projection))
         transform = projection
 
     # Find used data
     variable_data, variable_coordinates_data = get_variable_and_coordinates_from_dataset(
-        colored_map_file, colored_map_variable, coordinates, transform)
+        colored_map_file, colored_map_variable, coordinates, transform, colored_map_selection_options)
+
+    # Apply scale and offset if applicable
+    if colored_map_scale:
+        variable_data = variable_data * colored_map_scale
+    if colored_map_offset:
+        variable_data = variable_data + colored_map_offset
+
     # Plot the map
     colored_map_plot = plt.contourf(*variable_coordinates_data,
                                     variable_data, colored_map_levels,
@@ -393,7 +486,8 @@ def plot_map(args):
 
     # Deal with projection
     projection = find_ccrs(args.projection, args.projection_options)
-    # print("Map projection set to "+repr(projection))
+    if debug:
+        print("Map projection set to "+repr(projection))
 
     # Initialize the plot
     ax = plt.axes(projection=projection)
@@ -409,7 +503,11 @@ def plot_map(args):
                          colored_map_transform_options=args.colored_map_transform_options,
                          projection=projection,
                          colored_map_colors=args.colored_map_colors,
-                         colored_map_levels=args.colored_map_levels)
+                         colored_map_levels=args.colored_map_levels,
+                         colored_map_selection_options=args.colored_map_selection_options,
+                         colored_map_scale=args.colored_map_scale,
+                         colored_map_offset=args.colored_map_offset,
+                         )
 
     # Deal with the contours map if needed
     if args.contours_map_file:
@@ -483,7 +581,7 @@ def plot_map(args):
 def heuristics(args):
     # Transform or process arguments for implementing shortcuts
     # or adapting the real world to the strict logic above
-    #
+
     # Allow to simply draw contours of the colored map field
     # by providing contours_map_levels
     if args.contours_map_levels is not None and args.contours_map_file is None and \
@@ -496,13 +594,14 @@ def heuristics(args):
             args.contours_map_colors = args.colored_map_colors
     #
     # Put args.format in savefig options (possibly overriding the value there)
-    # This for consistency when used in CliMAF
+    # This for consistency when used in CliMAF (hard-coded in CliMAF driver)
     args.savefig_options['format'] = args.format
 
 
 if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
+    debug = args.debug
     # Apply heuristics which implements shortcuts in arguments
     heuristics(args)
     # Plot the map
