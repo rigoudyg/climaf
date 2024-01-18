@@ -19,6 +19,7 @@ import tempfile
 from datetime import datetime
 from functools import reduce
 from six import string_types
+import json
 
 import warnings
 from xarray import open_dataset as xr_open_dataset
@@ -938,19 +939,20 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # Account for script call parameters
     for p in scriptCall.parameters:
         # clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
-        subdict[p] = repr(scriptCall.parameters[p])
+        subdict[p] = json.dumps(scriptCall.parameters[p])
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
     #
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
-    exact, _ = hasExactObject(scriptCall.operands[0])
-    if exact:
-        # for key in ["period","period_iso","var","domain","missing","alias","units"]:
-        for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
-            if key in subdict:
-                subdict.pop(key)
+    if scriptCall.operands[0] != '':
+        exact, _ = hasExactObject(scriptCall.operands[0])
+        if exact:
+            # for key in ["period","period_iso","var","domain","missing","alias","units"]:
+            for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
+                if key in subdict:
+                    subdict.pop(key)
     #
     # print("subdict="+`subdict`)
     # Combine CRS and possibly member_label to provide/complement title
