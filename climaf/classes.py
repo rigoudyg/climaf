@@ -2570,7 +2570,7 @@ def attributeOf(cobject, attrib):
         return "dummy"
     elif isinstance(cobject, cpage) or isinstance(cobject, cpage_pdf):
         return None
-    elif cobject is None:
+    elif cobject is None or cobject == '':
         return ''
     else:
         raise Climaf_Classes_Error(

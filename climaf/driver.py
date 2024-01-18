@@ -895,14 +895,16 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    if script.outputFormat not in none_formats:
+    required_outputFormat = scriptCall.parameters.get('format', None)
+    if script.outputFormat not in none_formats and required_outputFormat != "show":
         if script.outputFormat == "graph":
             if 'format' in scriptCall.parameters:
-                if scriptCall.parameters['format'] in graphic_formats:
-                    output_fmt = scriptCall.parameters['format']
+                if required_outputFormat in graphic_formats:
+                    output_fmt = required_outputFormat
                 else:
-                    raise Climaf_Driver_Error('Allowed graphic formats yet are : %s' % ', '.join(
-                        [repr(x) for x in graphic_formats]))
+                    raise Climaf_Driver_Error("Required format % s doesn't belong to graphic formats : %s"
+                                              % (required_outputFormat,
+                                                 ', '.join([repr(x) for x in graphic_formats])))
             else:  # default graphic format
                 output_fmt = "png"
         else:
@@ -1043,7 +1045,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         with open(logdir + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
-    if script.outputFormat in none_formats:
+    if script.outputFormat in none_formats or required_outputFormat == 'show':
+        clogger.debug("No output to manage, because script.outputFormat=%s and required_outputFormat=%s" %
+                      (script.outputFormat, required_outputFormat))
         return None, 0.0
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
