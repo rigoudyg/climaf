@@ -984,6 +984,11 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #  some_keyword=${some_word}   , or ${some_word}
     #  with optionnal '--' before 'some_keyword'
     template = re.sub(r'((--)?\w*=)?([\'\"]{0,2})\$\{\w*\}\3', r"", template)
+    clogger.debug("Script call template after removing missing args : " +
+                  template)
+    template = re.sub(r'((--)?\w*=) *([\'\"])\3', r"", template)
+    clogger.debug("Script call template after removing empty args : " +
+                  template)
     #    #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None:
