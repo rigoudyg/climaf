@@ -38,7 +38,7 @@ def load_plot_operators():
             "--colored_map_transform_options='${clrto}' "
             "--colored_map_selection_options='${clrso}' "
             "--colored_map_engine=${clre} "
-            "--colored_map_engine_options=${clreo} "
+            "--colored_map_engine_options='${clreo}' "
             "--colored_map_min='${clrn}' "
             "--colored_map_max='${clrx}' "
             "--colored_map_scale='${clrs}' "
@@ -70,6 +70,7 @@ def load_plot_operators():
             "--vectors_map_transform=${vect} "
             "--vectors_map_transform_options='${vecto}' "
             "--vectors_map_scale='${vecs}' "
+            "--vectors_map_gridsizes='${vecg}' "
             #
             # Shade map
             #
@@ -118,6 +119,7 @@ def load_plot_operators():
             "--colored_map_max=${max} "
             "--colored_map_delta=${delta} "
             "--contours_map_levels='${contours}' "
+            "--print_time=${print_time} "
             "--xpolyline=${xpolyline} "
             "--ypolyline=${ypolyline} "
             "--polyline_options='${polyline_options}' ",
