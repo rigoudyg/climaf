@@ -122,7 +122,7 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None,
                     "https://thredds-su.ipsl.fr/thredds/fileServer/ipsl_thredds/")
             print(
                 "%d pictures are different. See html diff file %s" %
-                (len(diffs_triplets),html_file))
+                (len(diffs_triplets), html_file))
         return(len(diffs_triplets))
 
 
@@ -169,10 +169,8 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
     # Transform the strings in list of strings
     if isinstance(object_test, six.string_types) and os.path.exists(object_test):
         fic_test = object_test
-        object_is_fic = True
     else:
         fic_test = cfile(object_test)
-        object_is_fic = False
     fic_test = fic_test.split(" ")
     if not os.path.isdir(dir_ref) and not os.path.isdir(dir_ref_default):
         raise ValueError("Neither reference directory nor default one exists")
@@ -221,9 +219,11 @@ def compare_picture_files(object_test, fic_ref, dir_ref, dir_ref_default=None, d
         if rep != 0:
             tmp_dir = os.sep.join([os.path.dirname(file_test), "..", "tmp"])
             os.makedirs(tmp_dir, exist_ok=True)
-            if not object_is_fic:
-                cfile(object_test,
-                      target=os.sep.join([tmp_dir, os.path.basename(file_test)]))
+            # cfile(object_test,
+            #       target=os.sep.join([tmp_dir, os.path.basename(file_test)]))
+            # Cannot use cfile because it fails when object_test is an ensemble
+            subprocess.call("cp " + file_test + " " + tmp_dir,
+                            shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             if display_error:
                 message = ""
                 try:
@@ -253,9 +253,9 @@ def build_diffs_html(diffs_triplets, file_test):
     # The html file is located with file_test in subdir diffs/ and has the same basename
     #
     text = header("DIFFS")
-    text += open_table("", columns=["test","ref","diff","CRS"])
+    text += open_table("", columns=["test", "ref", "diff", "CRS"])
     #
-    tmp_dir=os.sep.join([os.path.dirname(file_test), "diffs"])
+    tmp_dir = os.sep.join([os.path.dirname(file_test), "diffs"])
     os.makedirs(tmp_dir, exist_ok=True)
     #
     for triplet in diffs_triplets:
@@ -272,14 +272,14 @@ def build_diffs_html(diffs_triplets, file_test):
             'identify -format "%[CRS_def]" {}'.format(triplet[0]), shell=True)
         ref_CRS = subprocess.check_output(
             'identify -format "%[CRS_def]" {}'.format(triplet[1]), shell=True)
-        if ref_CRS != test_CRS :
+        if ref_CRS != test_CRS:
             text += cell(f"{ref_CRS}\n|{test_CRS}")
         text += close_line()
     #
     text += close_table()
     text += trailer()
     #
-    target=os.sep.join([tmp_dir, os.path.basename(file_test)])
+    target = os.sep.join([tmp_dir, os.path.basename(file_test)])
     with open(target, "w") as fic:
         fic.write(text)
     return(target)
