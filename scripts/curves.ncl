@@ -93,10 +93,10 @@ function str_convert(str:string)
 local val, valf
 begin
   
-  if .not. ismissing(str_match(str,"True")) then
+  if .not. ismissing(str_match(str,"true")) then
     return(True)
   else
-    if .not. ismissing(str_match(str,"False")) then
+    if .not. ismissing(str_match(str,"false")) then
       return(False)
     else
 
@@ -153,8 +153,22 @@ begin
   if (.not. isvar("myscale_aux")) then myscale_aux=1.0 end if
   if (.not. isvar("myoffset_aux")) then myoffset_aux=0.0 end if 
   if (.not. isvar("type")) then type="png" end if
-  if (.not. isvar("trim")) then trim=True end if
-  if (.not. isvar("invXY")) then invXY=False end if
+
+  if (.not. isvar("invXY")) then
+    invXY=False
+  else
+    inv=str_convert(invXY)
+    delete(invXY)
+    invXY=inv
+  end if
+
+  if (.not. isvar("trim")) then
+    trim=True
+  else
+    inv=str_convert(trim)
+    delete(trim)
+    trim=inv
+  end if
 
   files=str_split(infile," ")
   n=dimsizes(files)

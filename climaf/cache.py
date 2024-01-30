@@ -203,14 +203,15 @@ def register(filename, crs, costs, outfilename=None):
 
     global dropped_crs
     #
-    # It appears that we have to let some time to the file system  for updating its inode tables
+    # It appears that we have to let some time to the file system
+    # for updating its inode tables
     waited = 0
     while waited < 50 and not os.path.exists(filename):
         time.sleep(0.1)
         waited += 1
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" %
-                                 (filename, crs))
+        raise Climaf_Cache_Error("File %s wasn't created upstream " % filename +
+                                 "(or not quick enough). It represents %s" % crs)
     else:
         if stamping is False:
             clogger.debug('No stamping')

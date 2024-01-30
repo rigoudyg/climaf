@@ -137,20 +137,20 @@ def load_standard_operators():
     #
     cscript('plot', '(ncl -Q ' + scriptpath + 'gplot.ncl main_file=\'"${in}"\' aux_file=\'"${in_2}"\' '
                                               'u_file=\'"${in_3}"\' v_file=\'"${in_4}"\' rotation=${rotation} '
-                                              'plotname=\'"${out}"\' colormap=\'"${color}\' vmin=${min} '
+                                              'plotname=\'"${out}"\' colormap=\'${color}\' vmin=${min} '
                                               'vmax=${max} vdelta=${delta} main_var=\'"${Var}"\' '
                                               'aux_var=\'"${var_2}"\' u_var=\'"${var_3}"\' v_var=\'"${var_4}"\' '
                                               'title=\'${title}\' myscale=${scale} myoffset=${offset} '
                                               'mpCenterLonF=${mpCenterLonF} vcRefMagnitudeF=${vcRefMagnitudeF} '
                                               'vcRefLengthF=${vcRefLengthF} vcMinDistanceF=${vcMinDistanceF} '
                                               'vcGlyphStyle=\'${vcGlyphStyle}\' '
-                                              'vcLineArrowColor=\'${vcLineArrowColor}\' units=\'"${units}"\' '
+                                              'vcLineArrowColor=\'${vcLineArrowColor}\' units=\'${units}\' '
                                               'y=\'${y}\' ccolors=\'${colors}\' level=${level} time=${time} '
-                                              'date=\'${date}\' proj=\'${proj}\' contours=\'${contours}\' '
+                                              'date=\'"${date}"\' proj=\'${proj}\' contours=\'${contours}\' '
                                               'focus=\'${focus}\' type=\'${format}\' '
-                                              'resolution=\'${resolution}\' trim=${trim} fmt=\'${fmt}\' '
-                                              'vcb=${vcb} lbLabelFontHeightF=${lbLabelFontHeightF} invXY=${invXY} '
-                                              'reverse=${reverse} tmYLLabelFontHeightF=${tmYLLabelFontHeightF} '
+                                              'resolution=\'${resolution}\' trim=\'"${trim}"\' fmt=\'${fmt}\' '
+                                              'vcb=\'"${vcb}"\' lbLabelFontHeightF=${lbLabelFontHeightF} invXY=\'"${invXY}"\' '
+                                              'reverse=\'"${reverse}"\' tmYLLabelFontHeightF=${tmYLLabelFontHeightF} '
                                               'tmXBLabelFontHeightF=${tmXBLabelFontHeightF} '
                                               'tmYRLabelFontHeightF=${tmYRLabelFontHeightF} '
                                               'tiXAxisFontHeightF=${tiXAxisFontHeightF} '
@@ -165,26 +165,26 @@ def load_standard_operators():
                                               'gsnStringFontHeightF=${gsnStringFontHeightF} '
                                               'shade_below=${shade_below} shade_above=${shade_above} '
                                               'options=\'${options}\' aux_options=\'${aux_options}\' '
-                                              'shade2_options=\'\${shade2_options}\"\' shade2_var=\'\"${var_5}\"\' '
-                                              'shade2_file=\'\"${in_5}\"\' '
-                                              'shade2_below=\'\${shade2_below}\"\' '
-                                              'shade2_above=\'\${shade2_above}\"\' '
-                                              'shading_options=\'\${shading_options}\"\' myscale_aux=${scale_aux} '
-                                              'myoffset_aux=${offset_aux} xpolyline=\'\${xpolyline}\"\' '
-                                              'ypolyline=\'\${ypolyline}\"\' '
-                                              'polyline_options=\'\${polyline_options}\"\' )',
+                                              'shade2_options=\'${shade2_options}\' shade2_var=\'${var_5}\' '
+                                              'shade2_file=\'"${in_5}"\' '
+                                              'shade2_below=\'${shade2_below}\' '
+                                              'shade2_above=\'${shade2_above}\' '
+                                              'shading_options=\'${shading_options}\' myscale_aux=${scale_aux} '
+                                              'myoffset_aux=${offset_aux} xpolyline=\'${xpolyline}\' '
+                                              'ypolyline=\'${ypolyline}\' '
+                                              'polyline_options=\'${polyline_options}\' )',
             format="graph")
     #
     # curves: plot a series of xy curves (along time, lat, lon or pressure/z_index) for an ensemble
     #
-    cscript('curves', '(ncl -Q ' + scriptpath + 'curves.ncl infile=\'\${mmin}\"\' '
-                                                'plotname=\'\"${out}\"\' var=\'\"${Var}\"\' title=\'\${title}\"\' '
-                                                'y=\'\${y}\"\' labels=\'\${labels}\"\' colors=\'\${colors}\"\' '
-                                                'units=\'\"${units}\"\' X_axis=\'\${X_axis}\"\' fmt=\'\${fmt}\"\' '
-                                                'options=\'\${options}\"\' aux_options=\'\${aux_options}\"\' '
+    cscript('curves', '(ncl -Q ' + scriptpath + 'curves.ncl infile=\'"${mmin}"\' '
+                                                'plotname=\'"${out}"\' var=\'"${Var}"\' title=\'${title}\' '
+                                                'y=\'${y}\' labels=\'${labels}\' colors=\'${colors}\' '
+                                                'units=\'${units}\' X_axis=\'${X_axis}\"\' fmt=\'${fmt}\' '
+                                                'options=\'${options}\' aux_options=\'${aux_options}\' '
                                                 'lgcols=${lgcols} myscale=${scale} myoffset=${offset} '
-                                                'type=\'\${format}\"\' resolution=\'\${resolution}\"\' trim=${trim} '
-                                                'invXY=${invXY} vmin=${min} vmax=${max} myscale_aux=${scale_aux} '
+                                                'type=\'${format}\' resolution=\'${resolution}\' trim=\'"${trim}"\' '
+                                                'invXY=\'"${invXY}"\' vmin=${min} vmax=${max} myscale_aux=${scale_aux} '
                                                 'myoffset_aux=${offset_aux} )',
             format="graph")
     #
@@ -192,14 +192,13 @@ def load_standard_operators():
     #
     cscript('hovm',
             '(ncl -Q ' + scriptpath +
-            'hovmoller.ncl infile=\'\${in}\"\' plotname=\'\${out}\"\' var=\'\${Var}\"\' '
-            ' invXY=${invXY} latS=\'\${latS}\"\' latN=\'\${latN}\"\' lonW=\'\${lonW}\"\' '
-            'lonE=\'\${lonE}\"\' '
-            ' colormap=\'\${color}\"\' myscale=${scale} myoffset=${offset} '
-            'units=\'\"${units}\"\' reverse=${reverse} mean_axis=\'\${mean_axis}\"\' '
-            'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'\${title}\"\' '
-            ' type=\'\${format}\"\' resolution=\'\${resolution}\"\' trim=${trim} '
-            'options=\'\${options}\"\' fmt=\'\${fmt}\"\' )',
+            'hovmoller.ncl infile=\'"${in}"\' plotname=\'"${out}"\' var=\'"${Var}"\' '
+            ' invXY=\'"${invXY}"\' latS=${latS} latN=${latN} lonW=${lonW} lonE=${lonE} '
+            ' colormap=\'${color}\' myscale=${scale} myoffset=${offset} '
+            'units=\'${units}\' reverse=\'"${reverse}"\' mean_axis=\'${mean_axis}\' '
+            'xpoint=${xpoint} ypoint=${ypoint} zpoint=${zpoint} title=\'${title}\' '
+            ' type=\'${format}\' resolution=\'${resolution}\' trim=\'"${trim}"\' '
+            'options=\'${options}\' fmt=\'${fmt}\' )',
             format="graph")
     #
     # cpdfcrop : pdfcrop by preserving metadata
