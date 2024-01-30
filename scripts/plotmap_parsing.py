@@ -1,6 +1,7 @@
 import six
 import json
 import argparse
+import re
 import numpy as np
 import cartopy.feature
 
@@ -248,7 +249,7 @@ def create_parser():
                         type=str, default=None)
     parser.add_argument("--projection_options",
                         help="The options of the projection to be used for the map",
-                        type=check_json_format, default=dict())
+                        type=check_json_format, default=None)
     parser.add_argument("--features",
                         help="A dict of features and attributes to add : {feature_name : kwargs }",
                         type=check_json_format, default=dict())
@@ -420,12 +421,12 @@ def mimic_gplot(args, selection_options_list):
     resol = args.resolution
     if resol is not None and type(resol) is str:
         if re.fullmatch(r"[0-9]*x[0-9]*", resol):
-            resol = tuple(resol.split("x"))
+            resol = tuple([int(x) for x in resol.split("x")])
             if args.debug:
                 print("resolution =", resol)
         else:
             raise ValueError(
-                "Issue with resolution %s. Standard format names are not supported" % resol)
+                "Issue with resolution %s. (Note : standard format names are not supported)" % resol)
 
     if 'figsize' not in args.figure_options:
         # Process resolution, the gplot way
@@ -451,11 +452,11 @@ def mimic_gplot(args, selection_options_list):
         # else just let what the caller may have set
 
     # Coastlines. Set it by default, and allow user to override default
-    if 'coastlines' in args.axis_methods:
+    if 'coastlines' not in args.axis_methods:
+        args.axis_methods['coastlines'] = [{}]
+    else:
         if args.axis_methods['coastlines'] in [None, [None]]:
             args.axis_methods.pop('coastlines')
-    else:
-        args.axis_methods['coastlines'] = [{}]
 
     # Gridlines
     if 'gridlines' in args.axis_methods:
@@ -632,6 +633,13 @@ def mimic_gplot(args, selection_options_list):
             args.projection_options = dict()
         if "central_longitude" not in args.projection_options:
             args.projection_options["central_longitude"] = 0.0
+
+    if args.projection_options is None:
+        if args.projection is None:
+            args.projection = "PlateCarree"
+            args.projection_options = {'central_longitude': 180.}
+        else:
+            args.projection_options = {}
 
     if args.xpolyline is not None and args.ypolyline is not None:
         x = args.xpolyline.split()

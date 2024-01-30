@@ -16,6 +16,7 @@ import cmaps
 
 from plotmap_parsing import create_parser, process_args, mimic_gplot
 
+
 # -*- coding: utf-8 -*-
 
 """
@@ -96,8 +97,9 @@ def find_ccrs(crs_name, options=dict(), data_filename=None):
 
     # Default CRS is PlateCarree
     if crs_name is None:
-        crs_name = "PlateCarree"
-        options = {}
+        # raise ValueError(
+        #     "crs_name is None (can't deduce it from file %s)" % fic)
+        return ccrs.PlateCarree()
 
     if debug:
         print("In find_ccrs, crs_name=", crs_name)
@@ -143,18 +145,19 @@ def fix_longitudes(lons):
     return fixed_lons
 
 
-def compute_xy(lat2d, lon2d, projection, exact=True):
+def compute_xy(lat2d, lon2d, projection, regular=False):
     """
     Compute args X and Y for matplotlib's contour-type functions,
     for a given PROJECTION and a grid with the given LAT2D
     and LON2D values
 
-    If EXACT is False, assume that the data are evenly spaced on
+    X and Y units are coordinates on the projection plane
+
+    If REGULAR is True, assume that the data are evenly spaced on
     the projection plane, which allows to speed up the process
 
-    X and Y units are coordinates on the projection plane
     """
-    if exact:
+    if regular is False:
         if projection != ccrs.PlateCarree():
             ret = projection.transform_points(
                 ccrs.PlateCarree(), lon2d.values, lat2d.values)
@@ -168,8 +171,8 @@ def compute_xy(lat2d, lon2d, projection, exact=True):
         last_point = [lon2d[-1][-1], lat2d[-1][-1]]
         x0, y0 = projection.transform_point(*first_point, ccrs.PlateCarree())
         xm, ym = projection.transform_point(*last_point, ccrs.PlateCarree())
-        ysize = lat2d.shape[0]
         xsize = lat2d.shape[1]
+        ysize = lat2d.shape[0]
         if debug:
             print("0,0 -> ", first_point)
             print("-1 -1-> ", *last_point)
@@ -178,16 +181,17 @@ def compute_xy(lat2d, lon2d, projection, exact=True):
         X = np.linspace(x0, xm, xsize)
         Y = np.linspace(y0, ym, ysize)
         grid = np.meshgrid(X, Y)
-        if debug:
-            print("Grid shape for x and y", grid[0].shape)
         return grid
 
 
 def get_variable_and_coordinates_from_dataset(
-        input_file, variable, dimensions, projection, selection_options=list(), exact=True):
+        input_file, variable, dimensions, projection,
+        selection_options=list(), regular=True):
     """
-    If EXACT is False, and when variable dimensions are not file variables, values for
-    coordinates are assumed to be linear between first and last points
+    If REGULAR is True, and when variable dimensions are not file
+    variables, values for coordinates are assumed to be linear between
+    first and last points
+
     """
     # Check that the file exists
     if not os.path.isfile(input_file):
@@ -211,16 +215,22 @@ def get_variable_and_coordinates_from_dataset(
                 print("Adding coordinates data for ", dim)
             variable_coordinates_data.append(dataset.variables[dim])
     else:
-        # e.g. the case of Aladin LambertII projection, or Nemo ORCA grid"
-        if debug:
-            print(f"Coordinates ({dimensions}) are not file variables")
+        # e.g. the case of Aladin LambertII projection, or Nemo ORCA grid,
+        # which provides lat/lon as 2d-arrays indexed by grid variables
+
         # TBD : be more flexible on lat_name. Inspect coords names
-        lat_name = "lat"
-        lon_name = "lon"
-        lat2d = variable_dataset.coords[lat_name]
-        lon2d = variable_dataset.coords[lon_name]
-        lon2d_fixed = fix_longitudes(lon2d)
-        X, Y = compute_xy(lat2d, lon2d_fixed, projection, exact)
+        # lat_name = "lat"
+        # lon_name = "lon"
+        # lat2d = variable_dataset.coords[lat_name]
+        # lon2d = variable_dataset.coords[lon_name]
+        dimensions = horizontal_dimensions(variable_dataset.coords)
+        if debug:
+            print(f"Using 2D variables {dimensions} for computing X and Ys")
+        lon2d = variable_dataset.coords[dimensions[0]]
+        lat2d = variable_dataset.coords[dimensions[1]]
+        #lon2d_fixed = fix_longitudes(lon2d)
+        #X, Y = compute_xy(lat2d, lon2d_fixed, projection, exact)
+        X, Y = compute_xy(lat2d, lon2d, projection, regular)
         variable_coordinates_data.append(X)
         variable_coordinates_data.append(Y)
     #
@@ -230,7 +240,7 @@ def get_variable_and_coordinates_from_dataset(
 def horizontal_dimensions(dimensions):
     """
     Heuristics for identifying horizontal dimensions for
-    a map, among a set of dimensions
+    a map, among a set of dimensions or coordinates
     TBD : should used CF convention for choosing horizontal dimensions
     """
     possible_pairs = [("lon", "lat"), ("LON", "LAT"),
@@ -295,10 +305,17 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
             print("We won't remap")
         transform = projection
 
-    # Find used data, and coordintaes if needed
+    # If user requested to avoid data remapping, this implies he knows
+    # data is regularly spaced. This is used to speed up computing
+    # coordinates on projection plane when lat and lon are 2D
+    regular = False
+    if colored_map_transform == "do not remap":
+        regular = True
+
+    # Find used data, and coordinates if needed
     variable_data, variable_coordinates_data = get_variable_and_coordinates_from_dataset(
         colored_map_file, colored_map_variable, coordinates, transform,
-        colored_map_selection_options, colored_map_transform != "do not remap")
+        colored_map_selection_options, regular)
 
     # Capture units,long_name and time before changing variable_data type
     if args.units:
@@ -362,13 +379,15 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
         elif colored_map_engine == 'pcolormesh':
             if debug:
                 print("Plotting with pcolormesh and remapping")
-            if colored_map_cmap is not None:
-                raise ValueError("Cannot apply desired colors to the color_map plot "
-                                 "because plot engine is not set to contourf")
+            # if colored_map_cmap is not None:
+            #    raise ValueError("Cannot apply desired colors to the color_map plot "
+            #                     "because plot engine is not set to contourf")
             norm = create_norm(colored_map_levels, colored_map_cmap,
                                variable_data, colored_map_min, colored_map_max)
             colored_map_plot = ax.pcolormesh(
                 *variable_coordinates_data, variable_data, norm=norm, **contourf_args)
+        else:
+            raise ValueError("Unknown plot engine %s" % colored_map_engine)
     else:
         if debug:
             print("Plotting without remapping, and with contourf")
@@ -386,8 +405,14 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
 
     # Colorbar. https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.colorbar
     if 'shrink' not in args.colorbar_options:
-        # TBD : compute colorbar shrink based on figure aspect ratio, or heuristic
-        args.colorbar_options['shrink'] = 0.4
+        if colorbar_options.get('orientation', 'vertical') == 'vertical':
+            # TBD : improve colorbar shrink formula (doesn't account for titles vertical extent)
+            xn, xx, yn, yx = ax.get_extent()
+            if (xx - xn) > (yx - yn):
+                args.colorbar_options['shrink'] = 0.8 * (yx - yn) / (xx - xn)
+                if debug:
+                    print('shrink :', xx, xn, yx, yn,
+                          args.colorbar_options['shrink'])
 
     fig.colorbar(colored_map_plot, ax=ax, **colorbar_options)
 
@@ -418,7 +443,8 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
 
     # Find used data
     variable_data, variable_coordinates_data = get_variable_and_coordinates_from_dataset(
-        contours_map_file, contours_map_variable, coordinates, transform, contours_map_selection_options)
+        contours_map_file, contours_map_variable, coordinates,
+        transform, contours_map_selection_options)
 
     # Capture units,long_name and time before changing variable_data type
     if args.units:
@@ -469,7 +495,8 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
         transform = projection
     # Find used data
     variable_data, variable_coordinates_data = get_variable_and_coordinates_from_dataset(
-        shaded_map_file, shaded_map_variable, coordinates, transform, shaded_map_selection_options)
+        shaded_map_file, shaded_map_variable, coordinates,
+        transform, shaded_map_selection_options)
 
    # Capture units,long_name and time before changing variable_data type
     if args.units:
@@ -565,6 +592,9 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
     if vectors_map_type in dir(ax):
         ax.__getattribute__(vectors_map_type).__call__(xp, yp, up, vp,
                                                        **vectors_map_options)
+        # Ci-dessous : marche pareil
+        # ax.__getattribute__(vectors_map_type).__call__(xp, yp, up, vp,
+        #         **vectors_map_options, transform=projection)
     else:
         raise ValueError("unknown vectors map type %s." % vectors_map_type)
 
@@ -592,6 +622,38 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
                       crs=ccrs.PlateCarree())
 
     title_is_plotted = False
+
+    # Axes methods
+    for method in args.axis_methods:
+        for kwargs in args.axis_methods[method]:
+            largs = kwargs.pop('largs', [])
+            if method == 'set_extent':
+                #kwargs['crs'] = projection
+                kwargs['extents'] = tuple(kwargs['extents'])
+            if debug:
+                print(f"Calling axis method {method} with kwargs: {kwargs}")
+            ax.__getattribute__(method).__call__(*largs, **kwargs)
+            print("extent=", ax.get_extent())
+
+    # Plt methods
+    for method in args.plt_methods:
+        for kwargs in args.plt_methods[method]:
+            largs = kwargs.pop('largs', [])
+            if debug:
+                print(f"Calling plt method {method} with kwargs: {kwargs}")
+            plt.__getattribute__(method).__call__(*largs, **kwargs)
+
+    # Geocat-viz methods
+    for method in args.gv_methods:
+        for kwargs in args.gv_methods[method]:
+            largs = kwargs.pop('largs', [])
+            if debug:
+                print(
+                    f"Calling geocat.viz method {method} with kwargs: {kwargs}")
+            gv.__getattribute__(method).__call__(ax, *largs, **kwargs)
+    # gv.util.set_axes_limits_and_ticks(ax, xticks=args.xticks, yticks=args.yticks)
+    # gv.add_major_minor_ticks(ax)
+    # gv.add_lat_lon_ticklabels(ax)
 
     # Deal with the colored map if needed
     if args.colored_map_file:
@@ -701,38 +763,6 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
                         title_is_plotted=title_is_plotted,
                         )
         title_is_plotted = True
-
-    # Axes methods
-    for method in args.axis_methods:
-        for kwargs in args.axis_methods[method]:
-            largs = kwargs.pop('largs', [])
-            if method == 'set_extent':
-                kwargs['crs'] = projection
-                kwargs['extents'] = tuple(kwargs['extents'])
-            if debug:
-                print(f"Calling axis method {method} with kwargs: {kwargs}")
-            ax.__getattribute__(method).__call__(*largs, **kwargs)
-            print("extent=", ax.get_extent())
-
-    # Plt methods
-    for method in args.plt_methods:
-        for kwargs in args.plt_methods[method]:
-            largs = kwargs.pop('largs', [])
-            if debug:
-                print(f"Calling plt method {method} with kwargs: {kwargs}")
-            plt.__getattribute__(method).__call__(*largs, **kwargs)
-
-    # Geocat-viz methods
-    for method in args.gv_methods:
-        for kwargs in args.gv_methods[method]:
-            largs = kwargs.pop('largs', [])
-            if debug:
-                print(
-                    f"Calling geocat.viz method {method} with kwargs: {kwargs}")
-            gv.__getattribute__(method).__call__(ax, *largs, **kwargs)
-    # gv.util.set_axes_limits_and_ticks(ax, xticks=args.xticks, yticks=args.yticks)
-    # gv.add_major_minor_ticks(ax)
-    # gv.add_lat_lon_ticklabels(ax)
 
     print("extent=", ax.get_extent())
     # Deal with output
