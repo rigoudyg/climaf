@@ -962,9 +962,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #        else:
     #            subdict["title"]=subdict["crs"]
     else:
-        # print("Got a member label : %s"%subdict['member_label'])
         if 'member_label' in subdict:
-            subdict["title"] = subdict["title"] + " " + subdict['member_label']
+            subdict["title"] = json.dumps(
+                eval(subdict["title"]) + " " + eval(subdict['member_label']))
             subdict.pop('member_label')
     #
     # Substitute all args
