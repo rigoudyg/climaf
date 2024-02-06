@@ -34,6 +34,9 @@ def read_dataset(input_file, variable=None):
 
 
 def filter_dataset(dataset, dimensions, selection_options=dict()):
+    if debug:
+        print("Filter_dataset. selection_options=",
+              selection_options, " dimensions=", dimensions)
     # e.g. selection_options ={ "isel": {"time": 0, "level" : 3} }
     for method in selection_options:
         # e.g. kwargs = {"time": 0, "level" : 3}
@@ -79,11 +82,13 @@ def find_data_in_dataset(variable_dataset, dimensions):
 def find_ccrs(crs_name, options=dict(), data_filename=None):
     """
     Returns a cartopy Coordinate Reference System based on its name and options.
-    If CRS_NAME is a filename, first tries to find both CRS name and options 
-    in file's NetCDF metadata; 
+    If CRS_NAME is a filename, first tries to find both CRS name and options
+    in file's NetCDF metadata;
     Else, if CRS_NAME is None, tries the same with file DATA_FILENAME
     If both unsuccessful, return cartopy.crs.PlateCarree()
     """
+    if debug:
+        print("Find_ccrs with ", crs_name, options, data_filename)
     # First try to identify a file using first crs_name then data_filename
     fic = None
     if crs_name is not None and os.path.exists(crs_name):
@@ -113,10 +118,10 @@ def find_ccrs(crs_name, options=dict(), data_filename=None):
 def ccrs_from_metadata(filename):
     """
     Returns a Cartopy's Coordinate Reference System name and options dict
-    by analyzing NetCDF metadata, assuming it follows the CF convention at 
+    by analyzing NetCDF metadata, assuming it follows the CF convention at
     http://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf-conventions.html#appendix-grid-mappings
 
-    Yet limited to the case of Lambert Conformal projection, as coded in Aladin model outputs. 
+    Yet limited to the case of Lambert Conformal projection, as coded in Aladin model outputs.
     """
     ccrs_name = None
     ccrs_options = {}
@@ -228,8 +233,8 @@ def get_variable_and_coordinates_from_dataset(
             print(f"Using 2D variables {dimensions} for computing X and Ys")
         lon2d = variable_dataset.coords[dimensions[0]]
         lat2d = variable_dataset.coords[dimensions[1]]
-        #lon2d_fixed = fix_longitudes(lon2d)
-        #X, Y = compute_xy(lat2d, lon2d_fixed, projection, exact)
+        # lon2d_fixed = fix_longitudes(lon2d)
+        # X, Y = compute_xy(lat2d, lon2d_fixed, projection, exact)
         X, Y = compute_xy(lat2d, lon2d, projection, regular)
         variable_coordinates_data.append(X)
         variable_coordinates_data.append(Y)
@@ -335,11 +340,11 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     # Apply scale and offset
     if colored_map_scale:
         variable_data = variable_data * colored_map_scale
-        if not arg.units:
+        if not args.units:
             units = "?"
     if colored_map_offset:
         variable_data = variable_data + colored_map_offset
-        if not arg.units:
+        if not args.units:
             units = "?"
 
     # Allow cmap name to refer to package 'cmaps' - see https://github.com/hhuangwx/cmaps
@@ -365,40 +370,42 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     contourf_args.update(colored_map_engine_options)
     if colored_map_levels is not None and 'levels' not in contourf_args:
         contourf_args['levels'] = colored_map_levels
-
+    contourf_args["transform"] = transform
+    #
+    if colored_map_engine == "contourf":
+        ploter = plt.contourf
+    elif colored_map_engine == 'pcolormesh':
+        ploter = plt.pcolormesh
+    else:
+        raise ValueError("Unknown plot engine %s" % colored_map_engine)
+    #
     if colored_map_transform != "do not remap":
-        contourf_args["transform"] = transform
-        if colored_map_engine == "contourf":
-            if debug:
-                print("Plotting with contourf and remapping")
-                print("Contourf levels=", colored_map_levels)
-                print("Contourf args=", contourf_args)
-            colored_map_plot = plt.contourf(
-                *variable_coordinates_data, variable_data,
-                **contourf_args)  # colors=colored_map_cmap,
-        elif colored_map_engine == 'pcolormesh':
-            if debug:
-                print("Plotting with pcolormesh and remapping")
-            # if colored_map_cmap is not None:
-            #    raise ValueError("Cannot apply desired colors to the color_map plot "
-            #                     "because plot engine is not set to contourf")
-            norm = create_norm(colored_map_levels, colored_map_cmap,
-                               variable_data, colored_map_min, colored_map_max)
-            colored_map_plot = ax.pcolormesh(
-                *variable_coordinates_data, variable_data, norm=norm, **contourf_args)
-        else:
-            raise ValueError("Unknown plot engine %s" % colored_map_engine)
+        if debug:
+            print(f"Plotting with {colored_map_engine} and remapping; kw=",
+                  contourf_args)
+        if colored_map_engine == 'pcolormesh':
+            contourf_args['norm'] = create_norm(colored_map_levels,
+                                                colored_map_cmap, variable_data,
+                                                colored_map_min, colored_map_max)
+        colored_map_plot = ploter(
+            *variable_coordinates_data, variable_data, **contourf_args)
     else:
         if debug:
-            print("Plotting without remapping, and with contourf")
-        ymin = np.min(variable_coordinates_data[1])
-        ymax = np.max(variable_coordinates_data[1])
-        xmin = np.min(variable_coordinates_data[0])
-        xmax = np.max(variable_coordinates_data[0])
-        contourf_args["extent"] = (xmin, xmax, ymin, ymax)
-        contourf_args["transform"] = projection
-        # Provided colored_map_transform calls for avoiding to remap data
-        colored_map_plot = plt.contourf(variable_data, **contourf_args)
+            print(f"Plotting with {colored_map_engine} and no remapping; kw=",
+                  contourf_args)
+        if colored_map_engine == 'contourf':
+            ymin = np.min(variable_coordinates_data[1])
+            ymax = np.max(variable_coordinates_data[1])
+            xmin = np.min(variable_coordinates_data[0])
+            xmax = np.max(variable_coordinates_data[0])
+            contourf_args["extent"] = (xmin, xmax, ymin, ymax)
+            #contourf_args["transform"] = projection
+            colored_map_plot = plt.contourf(variable_data, **contourf_args)
+        elif colored_map_engine == 'pcolormesh':
+            colored_map_plot = plt.pcolormesh(
+                *variable_coordinates_data, variable_data, **contourf_args)
+
+    #
     for method in colored_map_methods:
         colored_map_plot.__getattr__(method).__call__(
             **colored_map_methods[method])
@@ -434,7 +441,7 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
                       contours_map_selection_options, contours_map_min, contours_map_max,
                       contours_map_scale, contours_map_offset, title, title_is_plotted):
     # Find the transform
-    if contours_map_transform:
+    if contours_map_transform != "do not remap":
         transform = find_ccrs(contours_map_transform,
                               contours_map_transform_options,
                               contours_map_file)
@@ -470,11 +477,11 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
         kwargs["vmax"] = contours_map_max
     if len(contours_map_colors) > 0:
         kwargs["colors"] = contours_map_colors
-    if contours_map_levels is not None:
-        plt.contour(*variable_coordinates_data, variable_data,
-                    contours_map_levels, **kwargs)
-    else:
-        plt.contour(*variable_coordinates_data, variable_data, **kwargs)
+    if contours_map_levels is not None and 'levels' not in kwargs:
+        kwargs['levels'] = contours_map_levels
+    if debug:
+        print("Plotting with contour and args", kwargs)
+    plt.contour(*variable_coordinates_data, variable_data, **kwargs)
 
     if not title_is_plotted:
         gv.set_titles_and_labels(
@@ -487,7 +494,7 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
                     shaded_map_min, shaded_map_max,
                     shaded_map_scale, shaded_map_offset, title, title_is_plotted):
     # Find the transform
-    if shaded_map_transform:
+    if shaded_map_transform != "do not remap":
         transform = find_ccrs(shaded_map_transform,
                               shaded_map_transform_options,
                               shaded_map_file)
@@ -534,7 +541,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
                     vectors_map_type, vectors_map_options, vectors_map_selection_options,
                     vectors_map_scale, vectors_map_gridsizes, title, title_is_plotted):
     # Find the transform
-    if vectors_map_transform:
+    if vectors_map_transform != "do not remap":
         transform = find_ccrs(vectors_map_transform,
                               vectors_map_transform_options,
                               vectors_map_u_file)
@@ -610,7 +617,8 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
     # Deal with projection
     projection = find_ccrs(args.projection, args.projection_options)
     if debug:
-        print("Map projection set to %s" % args.projection)
+        print("Map projection set to %s %s" %
+              (args.projection, args.projection_options))
 
     # Initialize the plot
     fig = plt.figure(**args.figure_options)
@@ -628,7 +636,7 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
         for kwargs in args.axis_methods[method]:
             largs = kwargs.pop('largs', [])
             if method == 'set_extent':
-                #kwargs['crs'] = projection
+                # kwargs['crs'] = projection
                 kwargs['extents'] = tuple(kwargs['extents'])
             if debug:
                 print(f"Calling axis method {method} with kwargs: {kwargs}")
