@@ -374,7 +374,7 @@ def process_args(args):
                         if feature not in features:
                             raise ValueError(f"Required feature {feature} doesn't " +
                                              f"belong to cartopy.features {features}")
-                        dic['feature'] = eval(f"cartopy.cfeature.{feature}")
+                        dic['feature'] = eval(f"cartopy.feature.{feature}")
                 else:
                     raise ValueError(
                         "axis_methods 'add_feature' does not include key 'feature' in its args  dic :",
@@ -451,6 +451,32 @@ def mimic_gplot(args, selection_options_list):
         args.savefig_options['bbox_inches'] = 'tight'
         # else just let what the caller may have set
 
+    # Projection shorcuts
+    if args.projection is not None and args.projection[0:2] in ['NH', 'SH']:
+        print(
+            "TBD : For proj == NHxx or SHxx, limit is not yet a circle. " +
+            "This can be improved using that URL: " +
+            "https://scitools.org.uk/cartopy/docs/latest/gallery/lines_and_polygons/always_circular_stereo.html")
+        if len(args.projection) > 2:
+            latitude_limit = float(args.projection[2:])
+        if args.projection[0:2] == 'NH':
+            args.projection = "NorthPolarStereo"
+            settings['polar_stereo_extent'] = [-180, 180, latitude_limit, 90]
+        if args.projection[0:2] == 'SH':
+            args.projection = "SouthPolarStereo"
+            settings['polar_stereo_extent'] = [-180, 180, -90, -latitude_limit]
+        if args.projection_options is None:
+            args.projection_options = dict()
+        if "central_longitude" not in args.projection_options:
+            args.projection_options["central_longitude"] = 0.0
+
+    if args.projection_options is None:
+        if args.projection is None:
+            args.projection = "PlateCarree"
+            args.projection_options = {'central_longitude': 180.}
+        else:
+            args.projection_options = {}
+
     # Coastlines. Set it by default, and allow user to override default
     if 'coastlines' not in args.axis_methods:
         args.axis_methods['coastlines'] = [{}]
@@ -492,9 +518,12 @@ def mimic_gplot(args, selection_options_list):
     #
     #
     if args.colored_map_cmap is not None:
-        if "," in args.colored_map_cmap:
+        if "," in args.colored_map_cmap or type(args.colored_map_cmap) is list:
             # We have an explicit list of color names -> use contourf args 'colors'
-            cdic['colors'] = args.colored_map_cmap.split(",")
+            if "," in args.colored_map_cmap:
+                cdic['colors'] = args.colored_map_cmap.split(",")
+            else:
+                cdic['colors'] = args.colored_map_cmap
             cdic['cmap'] = None
             # In that case contourf doesn't support vmin/vmax, nor 'norm'
             # and maybe needs 'levels'.
@@ -522,11 +551,11 @@ def mimic_gplot(args, selection_options_list):
     if args.debug:
         print("cdic=", cdic)
     args.colored_map_engine_options.update(**cdic)
-    if args.contours_map_levels == 1 and args.colored_map_levels is not None:
-        args.contours_map_levels = args.colored_map_levels
 
-    # contours = 1 allows to simply draw contours of the colored map field by
-    # providing contours_map_levels (a check is done that no contours file is provided)
+    # arg 'contours_map_level' (or (contours')' allows to simply draw
+    # contours of the colored map field by providing
+    # contours_map_levels (a check is done that no contours file is
+    # provided)
     if args.contours_map_levels is not None and \
        args.contours_map_file is None and \
        args.colored_map_file is not None:
@@ -534,6 +563,8 @@ def mimic_gplot(args, selection_options_list):
         args.contours_map_variable = args.colored_map_variable
         args.contours_map_transform = args.colored_map_transform
         args.contours_map_transform_options = args.colored_map_transform_options
+        if args.contours_map_levels == 1 and args.colored_map_levels is not None:
+            args.contours_map_levels = args.colored_map_levels
         if args.contours_map_colors is None:
             args.contours_map_colors = args.colored_map_cmap
 
@@ -549,7 +580,7 @@ def mimic_gplot(args, selection_options_list):
         if 'add_feature' not in args.axis_methods:
             args.axis_methods['add_feature'] = []
         args.axis_methods['add_feature'].append(
-            {'feature': eval(f"cfeature.{feature}"), 'facecolor': 'white', 'zorder': 1})
+            {'feature': eval(f"cartopy.feature.{feature}"), 'facecolor': 'white', 'zorder': 1})
 
     if args.scale:
         if args.colored_map_file is not None:
@@ -614,32 +645,6 @@ def mimic_gplot(args, selection_options_list):
             if 'sel' not in options:
                 options['sel'] = dict()
             options['sel']['time'] = date
-
-    # Projection shorcuts
-    if args.projection is not None and args.projection[0:2] in ['NH', 'SH']:
-        print(
-            "TBD : For proj == NHxx or SHxx, limit is not yet a circle. " +
-            "This can be improved using that URL: " +
-            "https://scitools.org.uk/cartopy/docs/latest/gallery/lines_and_polygons/always_circular_stereo.html")
-        if len(args.projection) > 2:
-            latitude_limit = float(args.projection[2:])
-        if args.projection[0:2] == 'NH':
-            args.projection = "NorthPolarStereo"
-            settings['polar_stereo_extent'] = [-180, 180, latitude_limit, 90]
-        if args.projection[0:2] == 'SH':
-            args.projection = "SouthPolarStereo"
-            settings['polar_stereo_extent'] = [-180, 180, -90, -latitude_limit]
-        if args.projection_options is None:
-            args.projection_options = dict()
-        if "central_longitude" not in args.projection_options:
-            args.projection_options["central_longitude"] = 0.0
-
-    if args.projection_options is None:
-        if args.projection is None:
-            args.projection = "PlateCarree"
-            args.projection_options = {'central_longitude': 180.}
-        else:
-            args.projection_options = {}
 
     if args.xpolyline is not None and args.ypolyline is not None:
         x = args.xpolyline.split()

@@ -1,12 +1,13 @@
+# # Demonstration of the new CLiMAF operator 'plotmap', dedicated to replace operator 'plot' , which backend script gplot.ncl is at threat due to Ncl maintenance announcements
+
+# ## plotmap is backed by script plotmap.py which uses matplotlib, cartopy and geocat
+
 from IPython.display import Image, display
 from climaf.api import *
-#lcmn
-#export PROJ_DATA=/net/nfs/tools/Users/SU/jservon/spirit-2021.11_envs/20230904/share/proj
-#export PYPROJ_GLOBAL_CONTEXT = ON
-#~/climaf_installs/climaf_running/bin/climaf
 
 
 # +
+# Convenience functions
 def currently_running_in_a_notebook():
     try:
         name = get_ipython().__class__.__name__
@@ -24,13 +25,17 @@ def cshow(obj, drop=False):
         display(Image(cfile(obj)))
     else:
         climaf.api.cshow(obj)
-            
 
 
 # -
 
+# Some CMIP data
 data = fds(
     cpath + "/../examples/data/tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc")
+
+# More example data
+dg = ds(project="example", simulation="AMIPV6ALB2G",
+        variable="tas", period="1981", frequency="monthly")
 
 # ## Basics
 
@@ -40,13 +45,13 @@ cshow(plot(data, title="Reference, using gplot.ncl"),True)
 # Same with new script. Mapping values to colors is slightly different 
 cshow(plotmap(data, title="Using plotmap"),True)
 
+# One can easily tune the number of levels used
+cshow(plotmap(data, title="hand-tuned levels #", levels=10),True)
+
 # Changing the Reference longitude
 cshow(plotmap(data, title="Changing the Reference longitude", 
               proj="PlateCarree", proj_options={"central_longitude":90},
              ),True)
-
-# One can easily tune the number of levels used
-cshow(plotmap(data, title="hand-tuned levels #", levels=10),True)
 
 # The part of the coordinates range shown is called the 'extent'
 # You can change it, but you must specify longitudes that fits in central_longitude +/- 180°
@@ -56,36 +61,36 @@ cshow(plotmap(data,axis_methods={'set_extent': {'extents': (0 , 90, -10, 30) }})
 # ## Playing with colors
 
 # Play with number of colors
-cshow(plotmap(data, clrl=15))
+cshow(plotmap(data, levels=15))
 
+# Choosing each color
 mycolors = 'white,black,RoyalBlue,LightSkyBlue,PowderBlue,lightseagreen,PaleGreen,Wheat,Brown,Pink'
 cshow(plotmap(data, color= mycolors),True)
 
+# Choosing the mapping of values to colors
 mycolors = 'white,black,RoyalBlue,LightSkyBlue,PowderBlue'
 mylevels = '210,220,240,300,310'
 cshow(plotmap(data, color= mycolors, levels=mylevels),True)
 
-mycolors = 'white,black,RoyalBlue,LightSkyBlue,PowderBlue'
+# 'colors' and levels" can also be python lists
+mycolors = [ 'white' , 'black' , 'RoyalBlue' , 'LightSkyBlue' , 'PowderBlue' ]
 mylevels = [210,220,240,300,310]
 cshow(plotmap(data, color= mycolors, levels=mylevels),True)
 
-clog('warning')
-mycolors = 'white,black,RoyalBlue,LightSkyBlue,PowderBlue'
-mylevels = [210,220,240,300,310]
-cshow(plotmap(data, color= mycolors, levels=mylevels, contours=1),True)
+# Adding contours between colored regions
+mylevels = [210,220,240,290,300,310]
+cshow(plotmap(data, levels=mylevels, contours=1),True)
 
-cshow(plotmap(data, color= mycolors, colors=mylevels),True)
-
+# NCL colormaps are available
 cshow(plotmap(data, color = 'helix'),True)
 
-# Using Ncl colormaps
-cshow(plotmap(nd, clrmap="helix"))
-
+# How to change gridlines look
 cshow(plotmap(data, axis_methods={
     'gridlines': { 'linewidths': 5, 'linestyles': 'dashed', 'draw_labels' : {"bottom": "x", "left": "y"}}}),
       True)
 
-cshow(plotmap(data, clre="contourf"),True)
+# To avoid smoothing, use colormap engine 'pcolormesh' 
+cshow(plotmap(data, clre="pcolormesh"),True)
 
 # ## Data selection
 
@@ -98,23 +103,24 @@ cshow(plotmap(data, time=1, print_time=True),True)
 # Selection on date
 cshow(plotmap(data, date='185003', print_time=True),True)
 
-# Selection by providing explicit 'selection options' argument
-cshow(plotmap(data, clrso=[["isel", {"time": 0}]]))
+# Selection by providing explicit 'selection options' arguments
+cshow(plotmap(data, clrso={"isel" : {"time": 0}}, print_time=True),True)
 
 # Again: selection by providing explicit 'selection options' argument
-cshow(plotmap(data, clrso=[['sel', {'time': ' 1850-01'}]]))
+cshow(plotmap(data, clrso={'sel' : {'time': '1850-02'}}, print_time=True))
 
-# ## Mimicking gplot
+# ## Mimicking various gplot options/args
 
 # Changing image size
-cshow(plotmap(data, title="Using plotmap", resolution="600x400"),True)
+cshow(plotmap(data, title="Changing image size", resolution="600x400"),True)
 
 # Showing only a data range. Here is gplot.ncl reference
-cshow(plot(data, min=210, max=250, delta=5),True)
+cshow(plot(data, min=210, max=250, delta=5, title="A range, with 'plot'"),True)
 
 # Showing only a data range. Here is potmap version
-cshow(plotmap(data, min = 210, max = 250, delta=5),True)
+cshow(plotmap(data, min = 210, max = 250, delta=5, title="A range, with 'plotmap'"),True)
 
+# What if surrounding white space is left
 cshow(plotmap(data,trim=False),True)
 
 # Request an horizontal colorbar
@@ -127,15 +133,88 @@ cshow(plotmap(data,focus='ocean'),True)
 cshow(plotmap(data,focus='land'),True)
 
 # Apply offset and change displayed units accordingly
-cshow(plotmap(data,offset=-273.15, units="C"),True)
+cshow(plotmap(data, offset=-273.15, units="C"),True)
 
 # Polar stereo projection (yet with square limits)
 cshow(plotmap(data,proj='NH70'),True)
 
 # Polylines
-cshow(plotmap(data,xpolyline="0 90",ypolyline="0 45", polyline_options={'color': 'red'}),True)
+cshow(plotmap(data,xpolyline="0 90",ypolyline="0 45", polyline_options={'color': 'blue'}),True)
 
-# ## Playing with projections
+# Nemo data :
+nd = fds(cpath + "/../examples/data/tos_Omon_CNRM_gn_185001-185003.nc")
+cshow(plotmap(nd),True)
+
+# Filling the gaps near ORCA grid poles needs another plot engine  :
+cshow(plotmap(nd, clre="pcolormesh"),True)
+
+# ## Shading
+
+# Representing binary fields using shading. 
+# Binary field #1 is 5th plotmap arg, #2 is 6th arg
+# shdh and shdh2 provides patterns for the binary values
+dgsup=ccdo(dg, operator = "gec,282")
+dginf=ccdo(dg, operator = "lec,252")
+cshow(plotmap(dg, "", "", "", dgsup, dginf,
+              shdh = [None, '/'], shd2h = [None, '+']),True)
+
+# Shading, more dense
+cshow(plotmap(dg, "", "", "", dgsup, dginf,
+      shdh = [None, '///'], shd2h = [None, '+++']),True)
+
+# ## Vectors
+
+# Vector plots. Get data
+ua = fds(cpath + "/../examples/data/uas_CNRM-CM6_sample.nc")
+va = fds(cpath + "/../examples/data/vas_CNRM-CM6_sample.nc")
+
+# Default vector representation type is 'quiver' (arrows)
+# Vector components are args 3 and 4 of plotmap
+cshow(plotmap("","",ua,va),True)
+
+# ### Tuning vector grid size and arrows attributes. See [quiver doc](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.quiver.html#matplotlib.pyplot.quiver) for more options (but don't play with args X,Y, u, v)
+
+cshow(plotmap("","",ua,va,
+              vecg=50, 
+              veco={'color':'blue', 'headwidth':2.5, 'headlength':4}),
+      True)
+
+# Controling the map projection
+cshow(plotmap("","",ua,va, proj="Mollweide"),True)
+
+# ###  Another vector representation type is barbs. See [its doc](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.barbs.html#matplotlib.pyplot.barbs) for more options
+
+cshow(plotmap("","",ua,va,vecty="barbs", vecg=40, veco={'length':3.5, 'barbcolor' : 'blue'},),True)
+
+# ### The third vector representation type is streamlines. Here is the [doc](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.streamplot.html#matplotlib.pyplot.streamplot) for more options
+
+cshow(plotmap("","",ua,va,vecty="streamplot", veco={'density' : 3 , 'linewidth': 0.7},),True)
+
+# Superimposing colored map and streamplot
+cshow(plotmap(dg,"",ua,va,
+              vecty="streamplot",  
+              veco={'density' : 3 , 'linewidth': 0.7},
+              axis_methods={'set_extent': {'extents': (0. , 60, 0., 60.) }}
+             ),True)
+
+# ## Output formats
+
+# Output in pdf format
+f=cfile(plotmap(dg, format='pdf'))
+print(f)
+# ! display $f
+
+# Output in eps format
+f=cfile(plotmap(dg, format='eps'))
+print(f)
+# ! display $f
+
+# Launching plotmap with format='show' uses 
+# matplotlib.show(block=True), which pops up a window. 
+# This works only outisde a Notebook 
+cfile(plotmap(dg, format="show"))  
+
+# ## Playing with projections, and using data on a rectangular projected grid
 
 # Next data was generated on a grid that uses Lambert2 projection
 l2 = fds(cpath + "/../examples/data/sfcWind_aladin_ext.nc")
@@ -145,9 +224,7 @@ l2 = fds(cpath + "/../examples/data/sfcWind_aladin_ext.nc")
 cshow(plotmap(l2),True)
 
 
-# Changing the colored map engine
-cshow(plotmap(l2,clre="pcolormesh"),True)
-
+# This plot engine option speeds up computaton, but may damage the plot
 cshow(plotmap(l2, clreo={'transform_first':True}),True)
 
 # We can request another target projection
@@ -172,7 +249,7 @@ cshow(plotmap(l2, clrt=cfile(l2)),True)
 
 
 # If we want to plot on the data grid, we have to describe it explicitly, 
-# using args 'proj' and 'proj_options'. We pack them in a small dict
+# Here we use args 'proj' and 'proj_options', and pack them in a small dict
 projection = { 
     'proj' : 'LambertConformal', 
     'proj_options' : {
@@ -184,44 +261,23 @@ projection = {
 # Note : data will actually be remapped on its own grid (To be checked)
 cshow(plotmap(l2, **projection),True)
 
-# We can also describe target projetion using a file
+# We can also describe target projection using a file with relevant metadata
 cshow(plotmap(l2, proj=cfile(l2)),True)
 
-# Same without data remapping.
+# We can explictly request that the data is not remapped. But there is no watch dog here !
 cshow(plotmap(l2, proj=cfile(l2), clrt="do not remap"),True)
 
-# 
-cshow(plotmap(l2, axis_methods={'set_extent': {'extents': (-60 , 90, -20, 70) }}),True)
+# Still without remapping, and using another plot engine to 'see' data grid cells
+cshow(plotmap(l2, proj=cfile(l2), clrt="do not remap", clre="pcolormesh"),True)
 
-# 
-cshow(plotmap(l2, axis_methods={'set_extent': {'extents': (-20 , 80, -20, 70) }},
-             proj="PlateCarree", proj_options={'central_longitude' : 180}),True)
+# Selecting the plot domain, using 'extents'
+cshow(plotmap(l2, axis_methods={'set_extent': {'extents': (0 , 70, 20, 60) }}),True)
 
-# time(cshow(plotmap(l2, proj="LambertII", proj_options=[ 10, 37, 37], clre="contourf")))
-# Wall time: 8.82 s
-# time(cshow(plotmap(l2, proj="LambertII", proj_options=[ 10, 37, 37], clre="contourf", clrt="do not remap")))
-# Wall time: 7.48 s
+# ## Advanced features
 
-
-# Nemo data :
-nd = fds(cpath + "/../examples/data/tos_Omon_CNRM_gn_185001-185003.nc")
-cshow(plotmap(nd),True)
-
-# Filling the gaps near ORCA grid poles needs another plot engine  :
-cshow(plotmap(nd, clre="pcolormesh"),True)
-
-# Example data
-dg = ds(project="example", simulation="AMIPV6ALB2G",
-        variable="tas", period="1981", frequency="monthly")
-
-cfile(plotmap(dg))
-cfile(plotmap(dg, format="show"))  # Use plt.show(block=True)
-
+# ### The methods of [cartopy.mpl.geoaxes.GeoAxes](https://scitools.org.uk/cartopy/docs/latest/reference/generated/cartopy.mpl.geoaxes.GeoAxes.html#cartopy-mpl-geoaxes-geoaxes) can be called using arg axis_methods
 #
-cfile(plotmap(dg, format='pdf'))  # cshow problématique
-cfile(plotmap(dg, format='eps'))  # cshow problématique
 
-# Axis_methods
 cshow(plotmap(dg, axis_methods={
     'coastlines': {'color': 'grey'},
     'gridlines': {}
@@ -231,164 +287,9 @@ cshow(plotmap(dg, axis_methods={
 cshow(plotmap(dg, axis_methods={
     'add_feature': {'feature': 'LAND', 'facecolor': 'black', 'zorder': 1}}))
 
-# Pyplot_methods
-# Title, called only once
-cshow(plotmap(dg, plt_methods={
-    'title': {'label': "mytitle", 'loc': 'right'}}))
-
-# Title, with a list of calls
-cshow(plotmap(dg, plt_methods={
-    'title': [
-        {'label': "mytitle", 'loc': 'right'},
-        {'label': "my left title", 'loc': 'left'}
-    ]
-}))
-
-# For pyplot methods with non-keyword args, such as 'plot', use keyword 'largs'
-cshow(plotmap(data, plt_methods={
-    'plot': [{'largs': [[0, 90], [0, 45]], 'color': 'blue', 'marker': 'o'}]
-}),True)
-
+# ### Some methods of [matplotlib.pyplot](https://matplotlib.org/stable/api/pyplot_summary.html#module-matplotlib.pyplot) can be called using arg plt_methods
+#
 
 cshow(plotmap(dg, plt_methods={
     'text': {'x':-120, 'y': 45, 's': 'mytext', 'horizontalalignment': 'left'}}))
 
-
-# ## Shading
-
-# Shading
-dgsup=ccdo(dg, operator = "gec,282")
-dginf=ccdo(dg, operator = "lec,252")
-cshow(plotmap(dg, "", "", "", dgsup, dginf,
-      shdh = [None, '/'], shd2h = [None, '+']),True)
-
-# Shading, more dense
-cshow(plotmap(dg, "", "", "", dgsup, dginf,
-      shdh = [None, '///'], shd2h = [None, '+++']),True)
-
-# ## Vectors
-
-# Vector plots. Get data
-ua = fds(cpath + "/../examples/data/uas_CNRM-CM6_sample.nc")
-va = fds(cpath + "/../examples/data/vas_CNRM-CM6_sample.nc")
-
-cshow(plotmap("","",ua,va),True)
-
-# Default vector type is 'quiver'
-cshow(plotmap("","",ua,va),True)
-
-# Tuning vector grid size and arrows attributes
-cshow(plotmap("","",ua,va,
-              vecg=50, 
-              veco={'color':'blue', 'headwidth':2.5, 'headlength':4}),
-      True)
-
-cshow(plotmap("","",ua,va, proj="Mollweide", vect="PlateCarree"),True)
-
-# +
-
-cshow(plotmap("","",ua,va,vecty="barbs", vecg=40, veco={'length':3.5, 'barbcolor' : 'blue'},),True)
-
-# +
-
-cshow(plotmap(data,"",ua,va,vecty="barbs", vecg=40, veco={'length':3.5, 'barbcolor' : 'blue'},),True)
-# -
-
-# Ploting stremalines yet has a bug re. western longitudes
-cshow(plotmap("","",ua,va,vecty="streamplot", veco={'density' : 3 , 'linewidth': 0.7},),True)
-
-# Ploting stremalines yet has a bug re. western longitudes
-cshow(plotmap("","",ua,va,
-              vecty="streamplot",  
-              veco={'density' : 3 , 'linewidth': 0.7},
-              axis_methods={'set_extent': {'extents': (-180. , 180, -70., 70.) }}
-             ),True)
-
-# +
-
-cshow(plotmap(data,"",ua,va,vecty="streamplot",  veco={'density' : 3 , 'linewidth': 0.7}),True)
-# -
-
-# ## Development
-
-import xarray as xr
-
-f=xr.open_dataset(cpath + "/../examples/data/sfcWind_aladin_ext.nc")
-
-import xarray as xr
-
-f=xr.open_dataset(cpath + "/../examples/data/tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc")
-
-f.tas.__getattr__('long_name')
-
-dir(f.tas)
-
-f.tas.__getattribute__('isel')
-
-if 'time' in f.tas.isel(time=0).coords:
-    print(f.tas.isel(time=0).time.values)
-
-t=f.tas.isel(time=0).time
-
-t.values
-
-a=plot(ccdo(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),operator='zonmean'),
-     title='1 field cross-section (without contours lines)',
-     xpolyline='-60.0, -30.0, -30.0, -60.0, -60.0',
-     y='log',
-     ypolyline='70.0, 70.0, 50.0, 50.0, 70.0')
-cshow(a,True)
-
-a=plot(ds('example|AMIPV6ALB2G|tas|1980|global|monthly'),
-       llbox(ds('example|AMIPV6ALB2G|tas|1980|global|monthly'),
-             latmax=80,latmin=30,lonmax=120,lonmin=60),
-       ds('example|AMIPV6ALB2G|uas|1980|global|monthly'),
-       ds('example|AMIPV6ALB2G|vas|1980|global|monthly'),
-       date=19800131,level=10.0,title='Selecting level and time close to 10 and 19800131 respectively',
-       vcRefLengthF=0.02,vcRefMagnitudeF=11.5)
-cshow(a,True)
-
-
-
-cshow(curves(space_average(ds('example|AMIPV6ALB2G|tas|1980-1981|global|monthly')),title='AMIPV6'), True)
-
-from IPython.display import Image, display
-from climaf.api import *
-#lcmn
-#export PROJ_DATA=/net/nfs/tools/Users/SU/jservon/spirit-2021.11_envs/20230904/share/proj
-#export PYPROJ_GLOBAL_CONTEXT = ON
-#~/climaf_installs/climaf_running/bin/climaf
-
-
-# +
-def currently_running_in_a_notebook():
-    try:
-        name = get_ipython().__class__.__name__
-        if name == 'ZMQInteractiveShell':
-            return True
-        else:
-            return False
-    except:
-        return False
-    
-def cshow(obj, drop=False):
-    if drop :
-        cdrop(obj)
-    if currently_running_in_a_notebook():
-        display(Image(cfile(obj)))
-    else:
-        climaf.api.cshow(obj)
-            
-
-
-# -
-
-cshow(plot(ccdo(ccdo(ds('example|AMIPV6ALB2G|ta|1980|global|monthly'),
-                     operator='zonmean'),
-                operator='mermean'),
-           ccdo(
-               ccdo(llbox(ds('example|AMIPV6ALB2G|ta|1980|global|monthly'),
-                          latmax=90,latmin=10,lonmax=150,lonmin=50),operator='zonmean'),
-               operator='mermean'),
-           invXY=True,title='Profiles (t,z)',y='log', resolution='300x300', trim=True,
-          color="BlueDarkRed18"), True)

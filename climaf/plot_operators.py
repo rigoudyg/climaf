@@ -32,7 +32,9 @@ def load_plot_operators():
             #
             "--colored_map_file='${in_1}' "
             "--colored_map_variable='${var_1}' "
+            "--colored_map_levels='${clrl}' "
             "--colored_map_levels='${colored_map_levels}' "
+            "--colored_map_cmap='${clrc}' "
             "--colored_map_cmap='${colored_map_color}' "
             "--colored_map_transform=${clrt} "
             "--colored_map_transform_options='${clrto}' "
