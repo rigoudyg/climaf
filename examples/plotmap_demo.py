@@ -5,6 +5,10 @@
 from IPython.display import Image, display
 from climaf.api import *
 
+# Some CMIP data
+data = fds(
+    cpath + "/../examples/data/tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc")
+
 
 # +
 # Convenience functions
@@ -28,10 +32,6 @@ def cshow(obj, drop=False):
 
 
 # -
-
-# Some CMIP data
-data = fds(
-    cpath + "/../examples/data/tas_Amon_CNRM-CM5_historical_r1i1p1_185001-185212.nc")
 
 # More example data
 dg = ds(project="example", simulation="AMIPV6ALB2G",
@@ -58,10 +58,41 @@ cshow(plotmap(data, title="Changing the Reference longitude",
 # So, by default (i.e. central_longitude=180), that fits in  [ 0, 360 [
 cshow(plotmap(data,axis_methods={'set_extent': {'extents': (0 , 90, -10, 30) }}),True)
 
+# ## Title and other strings are managed by function [geocat.viz.util.set_titles_and_labels](https://geocat-viz.readthedocs.io/en/latest/user_api/generated/geocat.viz.util.set_titles_and_labels.html) wich uses arguments in 'title_options'
+
+# Playing with title size
+cshow(plotmap(data, title='Main title',
+              title_options = {'maintitlefontsize':50}
+             ),True)
+
+# If you provide both 'main_title' in 'title_options' and 'title', the former prevails
+cshow(plotmap(data, title='Main title',
+              title_options = {'maintitle':'title_options prevails'}
+             ),True)
+
+# Controling upper left and right strings
+cshow(plotmap(data, title='Main title',
+              title_options = {
+                  'lefttitle':'Left String',
+                  'righttitle':'Right String',
+                  'righttitlefontsize': 6,
+              }
+             ),True)
+
+# Controling upper left and right strings
+cshow(plotmap(data, title='Main title',
+              title_options = {
+                  'lefttitle':'Left String',
+                  'righttitle':'Right String',
+                  'righttitlefontsize': 6,
+                  'subtitle':'Subtitle',
+              }
+             ),True)
+
 # ## Playing with colors
 
 # Play with number of colors
-cshow(plotmap(data, levels=15))
+cshow(plotmap(data, levels=15),True)
 
 # Choosing each color
 mycolors = 'white,black,RoyalBlue,LightSkyBlue,PowderBlue,lightseagreen,PaleGreen,Wheat,Brown,Pink'
@@ -278,14 +309,23 @@ cshow(plotmap(l2, axis_methods={'set_extent': {'extents': (0 , 70, 20, 60) }}),T
 # ### The methods of [cartopy.mpl.geoaxes.GeoAxes](https://scitools.org.uk/cartopy/docs/latest/reference/generated/cartopy.mpl.geoaxes.GeoAxes.html#cartopy-mpl-geoaxes-geoaxes) can be called using arg axis_methods
 #
 
-cshow(plotmap(dg, axis_methods={
-    'coastlines': {'color': 'grey'},
-    'gridlines': {}
-}))
+cshow(plotmap(dg, axis_methods={'coastlines': {'color': 'white'},
+}),True)
+
+cshow(plotmap(dg, axis_methods={'gridlines': {}}),True)
 
 # Add feature (implictly from cartopy.feature) (tested with only a colored map)
 cshow(plotmap(dg, axis_methods={
     'add_feature': {'feature': 'LAND', 'facecolor': 'black', 'zorder': 1}}))
+
+# ### Also, [Geocat-viz methods](https://geocat-viz.readthedocs.io/en/latest/user_api/index.html) can be invoked using arg 'gv_method'
+
+cshow(plotmap(dg, 
+              gv_methods={'add_major_minor_ticks': { 
+                              'labelsize':'small',
+                              'x_minor_per_major':2
+                              }
+                         }),True)
 
 # ### Some methods of [matplotlib.pyplot](https://matplotlib.org/stable/api/pyplot_summary.html#module-matplotlib.pyplot) can be called using arg plt_methods
 #
