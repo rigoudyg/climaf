@@ -19,13 +19,17 @@ from plotmap_parsing import create_parser, process_args, mimic_gplot
 
 # -*- coding: utf-8 -*-
 
-"""
-This script aims at plotting different fields on the same map, and replacing/reproducing a former ploting script used in CliMAF, gplot.ncl.
-"""
+""" This script aims at plotting different fields on the same map, and
+replacing/reproducing a former ploting script used in CliMAF,
+gplot.ncl.  """
+
+lefttitle = ""
+righttitle = ""
 
 
 def read_dataset(input_file, variable=None):
-    with xr.open_dataset(input_file, decode_cf=True, decode_times=True, decode_coords=True, decode_timedelta=True,
+    with xr.open_dataset(input_file, decode_cf=True, decode_times=True,
+                         decode_coords=True, decode_timedelta=True,
                          use_cftime=True) as ds:
         if variable is None:
             return ds
@@ -178,7 +182,7 @@ def compute_xy(lat2d, lon2d, projection, regular=False):
         xm, ym = projection.transform_point(*last_point, ccrs.PlateCarree())
         xsize = lat2d.shape[1]
         ysize = lat2d.shape[0]
-        if debug:
+        if debug and False:
             print("0,0 -> ", first_point)
             print("-1 -1-> ", *last_point)
             print(
@@ -191,11 +195,17 @@ def compute_xy(lat2d, lon2d, projection, regular=False):
 
 def get_variable_and_coordinates_from_dataset(
         input_file, variable, dimensions, projection,
-        selection_options=list(), regular=True):
+        selection_options=list(), regular=False):
     """
-    If REGULAR is True, and when variable dimensions are not file
-    variables, values for coordinates are assumed to be linear between
-    first and last points
+    Main goals :
+    - identify coordinates order based on heuristics (see horizontal_dimensions())
+    - convert coordinates to projection space if they are 2D
+    - add a cyclic point in longitude under some conditions
+    - select data 
+
+    If REGULAR is True, and when variable coordinates are 2D,
+    values for coordinates are assumed to be regularly
+    spaced between first and last points
 
     """
     # Check that the file exists
@@ -204,41 +214,53 @@ def get_variable_and_coordinates_from_dataset(
     variable_dataset = read_dataset(input_file, variable)
     if dimensions == ["auto"]:
         dimensions = horizontal_dimensions(variable_dataset.dims)
+        if debug:
+            print("Using horizontal dimensions :", dimensions)
     variable_dataset = filter_dataset(
         variable_dataset, dimensions, selection_options)
 
-    # Retrieve and possibly compute coordinates data
-    dataset = read_dataset(input_file)
-    variable_coordinates_data = list()
-    if all([dim in dataset.variables for dim in dimensions]):
-        # First simple case : when the dimensions of the variable are file
-        # variables, and hence, are 1D coordinates, hopefully lat and lon
-        if debug:
-            print(f"Coordinates ({dimensions}) are file variables")
-        for dim in dimensions:
+    # add cyclic point if one of the dimensions is a longitude and longitude range is ~ 360
+    d0 = dimensions[0]  # Name of first dimension
+    d0v = variable_dataset[dimensions[0]]  # Values for that dimension
+    if d0 in ['lon', 'longitude', 'LON', 'Lon']:
+        # Compute longitude range
+        lon_range = d0v.max() % 360. - d0v.min() % 360.
+        # add longitude grid increment
+        delta = d0v[1] % 360. - d0v[0] % 360.
+        lon_range = (lon_range + delta) % 360
+        if lon_range > 359.9 or lon_range < 0.1:
             if debug:
-                print("Adding coordinates data for ", dim)
-            variable_coordinates_data.append(dataset.variables[dim])
-    else:
+                print("Adding cyclic longitude")
+            variable_dataset = gv.xr_add_cyclic_longitudes(
+                variable_dataset, d0)
+
+    # Retrieve and possibly compute coordinates data
+    variable_coordinates_data = list()
+    coords = horizontal_dimensions(variable_dataset.coords)
+    #
+    if len(variable_dataset.coords[coords[0]].shape) == 2:
+        # The variable has 2d coordinates
         # e.g. the case of Aladin LambertII projection, or Nemo ORCA grid,
         # which provides lat/lon as 2d-arrays indexed by grid variables
-
-        # TBD : be more flexible on lat_name. Inspect coords names
-        # lat_name = "lat"
-        # lon_name = "lon"
-        # lat2d = variable_dataset.coords[lat_name]
-        # lon2d = variable_dataset.coords[lon_name]
-        dimensions = horizontal_dimensions(variable_dataset.coords)
         if debug:
-            print(f"Using 2D variables {dimensions} for computing X and Ys")
-        lon2d = variable_dataset.coords[dimensions[0]]
-        lat2d = variable_dataset.coords[dimensions[1]]
-        # lon2d_fixed = fix_longitudes(lon2d)
-        # X, Y = compute_xy(lat2d, lon2d_fixed, projection, exact)
+            print(f"Using 2D variables {coords} for computing X and Ys")
+        lon2d = variable_dataset.coords[coords[0]]
+        lat2d = variable_dataset.coords[coords[1]]
         X, Y = compute_xy(lat2d, lon2d, projection, regular)
         variable_coordinates_data.append(X)
         variable_coordinates_data.append(Y)
-    #
+        #
+    else:
+        # Coordinates are 1D
+        if debug:
+            print(f"Coordinates ({dimensions}) are file variables")
+        # dataset = read_dataset(input_file)
+        for dim in dimensions:
+            if debug:
+                print("Adding coordinates data for ", dim)
+            # variable_coordinates_data.append(dataset.variables[dim])
+            variable_coordinates_data.append(variable_dataset[dim])
+        #
     return variable_dataset, variable_coordinates_data
 
 
@@ -249,11 +271,9 @@ def horizontal_dimensions(dimensions):
     TBD : should used CF convention for choosing horizontal dimensions
     """
     possible_pairs = [("lon", "lat"), ("LON", "LAT"),
-                      ("longitude", "latitude"), ("Lon", "Lat"), ("y", "x")]
+                      ("longitude", "latitude"), ("Lon", "Lat"), ("y", "x"), ("i", "j")]
     for x, y in possible_pairs:
         if x in dimensions and y in dimensions:
-            if debug:
-                print("Using horizontal dimensions :", x, y)
             return [x, y]
     raise ValueError("Cannot identify horizontal dimensions in ", dimensions)
 
@@ -278,6 +298,8 @@ def choose_among_CF_coordinates(CF_coords):
 
 
 def create_norm(nlevels, cmap, z, zmin, zmax):
+    if type(nlevels) is list:
+        nlevels = len(nlevels)
     if zmin is None:
         zmin = z.min()
     if zmax is None:
@@ -296,7 +318,9 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
                      colored_map_engine, colored_map_engine_options,
                      colored_map_min, colored_map_max,
                      colored_map_scale, colored_map_offset, colored_map_methods,
-                     colorbar_options, print_time, title, title_is_plotted):
+                     colorbar_options, print_time):
+    if debug:
+        print("\n\nPlotting colored map\n", 55*"-")
     # Find the transform
     if colored_map_transform != "do not remap":
         if debug:
@@ -355,18 +379,6 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
 
     # Prepare to plot the map
     contourf_args = dict(zorder=0, cmap=colored_map_cmap)
-    if colored_map_min is not None:
-        contourf_args["vmin"] = colored_map_min
-        if args.colored_map_cmap is not None and \
-           type(colored_map_engine_options.get('colors', None)) is not list:
-            variable_data = np.where(
-                variable_data > colored_map_min, variable_data, colored_map_min)
-    if colored_map_max is not None:
-        contourf_args["vmax"] = colored_map_max
-        if args.colored_map_cmap is not None and \
-           type(colored_map_engine_options.get('colors', None)) is not list:
-            variable_data = np.where(
-                variable_data < colored_map_max, variable_data, colored_map_max)
     contourf_args.update(colored_map_engine_options)
     if colored_map_levels is not None and 'levels' not in contourf_args:
         contourf_args['levels'] = colored_map_levels
@@ -374,36 +386,44 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     #
     if colored_map_engine == "contourf":
         ploter = plt.contourf
+        if colored_map_min is not None:
+            contourf_args["vmin"] = colored_map_min
+            if args.colored_map_cmap is not None and \
+               type(colored_map_engine_options.get('colors', None)) is not list:
+                variable_data = np.where(
+                    variable_data > colored_map_min, variable_data, colored_map_min)
+        if colored_map_max is not None:
+            contourf_args["vmax"] = colored_map_max
+            if args.colored_map_cmap is not None and \
+               type(colored_map_engine_options.get('colors', None)) is not list:
+                variable_data = np.where(
+                    variable_data < colored_map_max, variable_data, colored_map_max)
+    #
     elif colored_map_engine == 'pcolormesh':
         ploter = plt.pcolormesh
+        contourf_args.pop('levels', None)
+        contourf_args['norm'] = create_norm(colored_map_levels,
+                                            colored_map_cmap, variable_data,
+                                            colored_map_min, colored_map_max)
     else:
         raise ValueError("Unknown plot engine %s" % colored_map_engine)
     #
-    if colored_map_transform != "do not remap":
+    if debug:
+        print(f"Plotting with {colored_map_engine} ; and kwargs : ",
+              contourf_args)
+    if colored_map_transform == "do not remap" and ploter == plt.contour:
+        ymin = np.min(variable_coordinates_data[1])
+        ymax = np.max(variable_coordinates_data[1])
+        xmin = np.min(variable_coordinates_data[0])
+        xmax = np.max(variable_coordinates_data[0])
+        contourf_args["extent"] = (xmin, xmax, ymin, ymax)
         if debug:
-            print(f"Plotting with {colored_map_engine} and remapping; kw=",
-                  contourf_args)
-        if colored_map_engine == 'pcolormesh':
-            contourf_args['norm'] = create_norm(colored_map_levels,
-                                                colored_map_cmap, variable_data,
-                                                colored_map_min, colored_map_max)
+            print("Printing with no remapping, extent=",
+                  contourf_args["extent"])
+        colored_map_plot = ploter(variable_data, **contourf_args)
+    else:
         colored_map_plot = ploter(
             *variable_coordinates_data, variable_data, **contourf_args)
-    else:
-        if debug:
-            print(f"Plotting with {colored_map_engine} and no remapping; kw=",
-                  contourf_args)
-        if colored_map_engine == 'contourf':
-            ymin = np.min(variable_coordinates_data[1])
-            ymax = np.max(variable_coordinates_data[1])
-            xmin = np.min(variable_coordinates_data[0])
-            xmax = np.max(variable_coordinates_data[0])
-            contourf_args["extent"] = (xmin, xmax, ymin, ymax)
-            #contourf_args["transform"] = projection
-            colored_map_plot = plt.contourf(variable_data, **contourf_args)
-        elif colored_map_engine == 'pcolormesh':
-            colored_map_plot = plt.pcolormesh(
-                *variable_coordinates_data, variable_data, **contourf_args)
 
     #
     for method in colored_map_methods:
@@ -426,20 +446,18 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     # Variable name as left title, time + units as right title.
     if timestamp is not None and print_time is True:
         units = timestamp + " / " + units
-    #     plt.title(label=units, loc='right', y=-0.15)
-    # else:
-    #     plt.title(label=units, loc='right', y=1.03)
-    # plt.title(label=name, loc='left', y=1.03)
-    if not title_is_plotted:
-        gv.set_titles_and_labels(ax, maintitle=title, lefttitle=name,
-                                 righttitle=units, lefttitlefontsize=15, righttitlefontsize=15, )
+
+    return name, units
 
 
 def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
                       contours_map_transform, contours_map_transform_options, projection,
                       contours_map_colors, contours_map_levels,
-                      contours_map_selection_options, contours_map_min, contours_map_max,
-                      contours_map_scale, contours_map_offset, title, title_is_plotted):
+                      contours_map_selection_options, contours_map_engine_options,
+                      contours_map_min, contours_map_max,
+                      contours_map_scale, contours_map_offset):
+    if debug:
+        print("\n\nPlotting contours map\n", 55*"-")
     # Find the transform
     if contours_map_transform != "do not remap":
         transform = find_ccrs(contours_map_transform,
@@ -479,20 +497,21 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
         kwargs["colors"] = contours_map_colors
     if contours_map_levels is not None and 'levels' not in kwargs:
         kwargs['levels'] = contours_map_levels
+    kwargs.update(contours_map_engine_options)
     if debug:
         print("Plotting with contour and args", kwargs)
     plt.contour(*variable_coordinates_data, variable_data, **kwargs)
 
-    if not title_is_plotted:
-        gv.set_titles_and_labels(
-            ax, maintitle=title, lefttitle=name, righttitle=units)
+    return name, units
 
 
 def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
                     shaded_map_transform, shaded_map_transform_options, projection,
                     shaded_map_hatches, shaded_map_levels, shaded_map_selection_options,
                     shaded_map_min, shaded_map_max,
-                    shaded_map_scale, shaded_map_offset, title, title_is_plotted):
+                    shaded_map_scale, shaded_map_offset):
+    if debug:
+        print("\n\n Plotting shaded map\n", 55*"-")
     # Find the transform
     if shaded_map_transform != "do not remap":
         transform = find_ccrs(shaded_map_transform,
@@ -530,16 +549,17 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
         kwargs["vmax"] = shaded_map_max
     plt.contourf(*variable_coordinates_data, variable_data,
                  shaded_map_levels, **kwargs)
-    if not title_is_plotted:
-        gv.set_titles_and_labels(
-            ax, maintitle=title, lefttitle=name, righttitle=units)
+
+    return name, units
 
 
 def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
                     vectors_map_u_variable, vectors_map_v_variable,
                     vectors_map_transform, vectors_map_transform_options, projection,
                     vectors_map_type, vectors_map_options, vectors_map_selection_options,
-                    vectors_map_scale, vectors_map_gridsizes, title, title_is_plotted):
+                    vectors_map_scale, vectors_map_gridsizes):
+    if debug:
+        print("\n\n Plotting vector map\n", 55*"-")
     # Find the transform
     if vectors_map_transform != "do not remap":
         transform = find_ccrs(vectors_map_transform,
@@ -557,7 +577,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
         transform, vectors_map_selection_options)
 
     # Check that coordinates are the same
-    if any([any(ucoord != vcoord) for ucoord, vcoord in
+    if any([(ucoord != vcoord).any() for ucoord, vcoord in
             zip(variable_u_coordinates_data, variable_v_coordinates_data)]):
         raise ValueError(
             "Zonal and meridian component of the vector field must have same coordinates.")
@@ -580,17 +600,25 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
             units = "?"
 
     if type(vectors_map_gridsizes) is int:
-        x0 = variable_u_coordinates_data[0][0]
-        xm = variable_u_coordinates_data[0][-1]
-        y0 = variable_u_coordinates_data[1][0]
-        ym = variable_u_coordinates_data[1][-1]
+        x0 = variable_u_coordinates_data[0].min()
+        xm = variable_u_coordinates_data[0].max()
+        coord_std_name = variable_u_coordinates_data[0].attrs.get(
+            'standard_name', '')
+        if coord_std_name == 'longitude':
+            x0 = x0 % 360.
+            xm = xm % 360.
+        y0 = variable_u_coordinates_data[1].min()
+        ym = variable_u_coordinates_data[1].max()
+        # if variable_u_coordinates_data[0].
         ysize = int(float(vectors_map_gridsizes) * (ym - y0) / (xm - x0))
         sizes = (vectors_map_gridsizes, ysize)
     elif type(vectors_map_gridsizes) is list:
         sizes = tuple(vectors_map_gridsizes)
     else:
         raise ValueError(
-            "Grid sizes muts be an int or a list of int ", vectors_map_gridsizes)
+            "Grid sizes muts be an int or a list of int : ", vectors_map_gridsizes)
+    if debug:
+        print("Vectors grid sizes : ", sizes)
     xp, yp, up, vp = vector_to_grid(transform, projection, sizes,
                                     *variable_u_coordinates_data,
                                     variable_u_data, variable_v_data)
@@ -605,9 +633,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
     else:
         raise ValueError("unknown vectors map type %s." % vectors_map_type)
 
-    if not title_is_plotted:
-        gv.set_titles_and_labels(
-            ax, maintitle=title, lefttitle=name, righttitle=units)
+    return name, units
 
 
 def plot_map(args, polar_stereo_extent=None, print_time=False):
@@ -623,13 +649,10 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
     # Initialize the plot
     fig = plt.figure(**args.figure_options)
     ax = plt.axes(projection=projection)
-    if polar_stereo_extent is not None:
-        if debug:
-            print("Setting extent to ", polar_stereo_extent)
-        ax.set_extent(polar_stereo_extent,
-                      crs=ccrs.PlateCarree())
+    if debug:
+        print("extent=", ax.get_extent())
 
-    title_is_plotted = False
+    titles_are_set = False
 
     # Axes methods
     for method in args.axis_methods:
@@ -641,7 +664,8 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
             if debug:
                 print(f"Calling axis method {method} with kwargs: {kwargs}")
             ax.__getattribute__(method).__call__(*largs, **kwargs)
-            print("extent=", ax.get_extent())
+            if debug:
+                print("extent=", ax.get_extent())
 
     # Plt methods
     for method in args.plt_methods:
@@ -651,6 +675,121 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
                 print(f"Calling plt method {method} with kwargs: {kwargs}")
             plt.__getattribute__(method).__call__(*largs, **kwargs)
 
+    # Deal with the colored map if needed
+    if args.colored_map_file:
+        name, units = plot_colored_map(fig=fig, ax=ax, coordinates=coordinates,
+                                       colored_map_file=args.colored_map_file,
+                                       colored_map_variable=args.colored_map_variable,
+                                       colored_map_transform=args.colored_map_transform,
+                                       colored_map_transform_options=args.colored_map_transform_options,
+                                       projection=projection,
+                                       colored_map_cmap=args.colored_map_cmap,
+                                       colored_map_levels=args.colored_map_levels,
+                                       colored_map_selection_options=args.colored_map_selection_options,
+                                       colored_map_engine=args.colored_map_engine,
+                                       colored_map_engine_options=args.colored_map_engine_options,
+                                       colored_map_min=args.colored_map_min,
+                                       colored_map_max=args.colored_map_max,
+                                       colored_map_scale=args.colored_map_scale,
+                                       colored_map_offset=args.colored_map_offset,
+                                       colored_map_methods=args.colored_map_methods,
+                                       colorbar_options=args.colorbar_options,
+                                       print_time=print_time,
+                                       )
+        if not titles_are_set:
+            lefttitle = name
+            righttitle = units
+            titles_are_set = True
+
+    # Deal with the contours map if needed
+    if args.contours_map_file:
+        name, units = plot_contours_map(ax=ax,
+                                        coordinates=coordinates,
+                                        contours_map_file=args.contours_map_file,
+                                        contours_map_variable=args.contours_map_variable,
+                                        contours_map_transform=args.contours_map_transform,
+                                        contours_map_transform_options=args.contours_map_transform_options,
+                                        projection=projection,
+                                        contours_map_colors=args.contours_map_colors,
+                                        contours_map_levels=args.contours_map_levels,
+                                        contours_map_selection_options=args.contours_map_selection_options,
+                                        contours_map_engine_options=args.contours_map_engine_options,
+                                        contours_map_min=args.contours_map_min,
+                                        contours_map_max=args.contours_map_max,
+                                        contours_map_scale=args.contours_map_scale,
+                                        contours_map_offset=args.contours_map_offset,
+                                        )
+        if not titles_are_set:
+            lefttitle = name
+            righttitle = units
+            titles_are_set = True
+
+    # Deal with the shaded map if needed
+    if args.shaded_map_file is not None:
+        name, units = plot_shaded_map(ax=ax,
+                                      coordinates=coordinates,
+                                      shaded_map_file=args.shaded_map_file,
+                                      shaded_map_variable=args.shaded_map_variable,
+                                      shaded_map_transform=args.shaded_map_transform,
+                                      shaded_map_transform_options=args.shaded_map_transform_options,
+                                      projection=projection,
+                                      shaded_map_hatches=args.shaded_map_hatches,
+                                      shaded_map_levels=args.shaded_map_levels,
+                                      shaded_map_selection_options=args.shaded_map_selection_options,
+                                      shaded_map_min=args.shaded_map_min,
+                                      shaded_map_max=args.shaded_map_max,
+                                      shaded_map_scale=args.shaded_map_scale,
+                                      shaded_map_offset=args.shaded_map_offset,
+                                      )
+        if not titles_are_set:
+            lefttitle = name
+            righttitle = units
+            titles_are_set = True
+
+    # Deal with the shade2 map if needed
+    if args.shade2_map_file is not None:
+        name, units = plot_shaded_map(ax=ax,
+                                      coordinates=coordinates,
+                                      shaded_map_file=args.shade2_map_file,
+                                      shaded_map_variable=args.shade2_map_variable,
+                                      shaded_map_transform=args.shade2_map_transform,
+                                      shaded_map_transform_options=args.shade2_map_transform_options,
+                                      projection=projection,
+                                      shaded_map_hatches=args.shade2_map_hatches,
+                                      shaded_map_levels=args.shade2_map_levels,
+                                      shaded_map_selection_options=args.shade2_map_selection_options,
+                                      shaded_map_min=args.shade2_map_min,
+                                      shaded_map_max=args.shade2_map_max,
+                                      shaded_map_scale=args.shade2_map_scale,
+                                      shaded_map_offset=args.shade2_map_offset,
+                                      )
+        if not titles_are_set:
+            lefttitle = name
+            righttitle = units
+            titles_are_set = True
+
+    # Deal with the vector map if needed
+    if args.vectors_map_u_file is not None and args.vectors_map_v_file is not None:
+        name, units = plot_vector_map(ax=ax,
+                                      coordinates=coordinates,
+                                      vectors_map_u_file=args.vectors_map_u_file,
+                                      vectors_map_v_file=args.vectors_map_v_file,
+                                      vectors_map_u_variable=args.vectors_map_u_variable,
+                                      vectors_map_v_variable=args.vectors_map_v_variable,
+                                      vectors_map_transform=args.vectors_map_transform,
+                                      vectors_map_transform_options=args.vectors_map_transform_options,
+                                      projection=projection,
+                                      vectors_map_type=args.vectors_map_type,
+                                      vectors_map_options=args.vectors_map_options,
+                                      vectors_map_selection_options=args.vectors_map_selection_options,
+                                      vectors_map_scale=args.vectors_map_scale,
+                                      vectors_map_gridsizes=args.vectors_map_gridsizes,
+                                      )
+        if not titles_are_set:
+            lefttitle = name
+            righttitle = units
+            titles_are_set = True
+
     # Geocat-viz methods
     for method in args.gv_methods:
         for kwargs in args.gv_methods[method]:
@@ -659,120 +798,22 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
                 print(
                     f"Calling geocat.viz method {method} with kwargs: {kwargs}")
             gv.__getattribute__(method).__call__(ax, *largs, **kwargs)
-    # gv.util.set_axes_limits_and_ticks(ax, xticks=args.xticks, yticks=args.yticks)
+
+    if polar_stereo_extent is not None:
+        if debug:
+            print("Setting extent to ", polar_stereo_extent)
+        ax.set_extent(polar_stereo_extent, crs=ccrs.PlateCarree())
+
     # gv.add_major_minor_ticks(ax)
     # gv.add_lat_lon_ticklabels(ax)
 
-    # Deal with the colored map if needed
-    if args.colored_map_file:
-        plot_colored_map(fig=fig, ax=ax, coordinates=coordinates,
-                         colored_map_file=args.colored_map_file,
-                         colored_map_variable=args.colored_map_variable,
-                         colored_map_transform=args.colored_map_transform,
-                         colored_map_transform_options=args.colored_map_transform_options,
-                         projection=projection,
-                         colored_map_cmap=args.colored_map_cmap,
-                         colored_map_levels=args.colored_map_levels,
-                         colored_map_selection_options=args.colored_map_selection_options,
-                         colored_map_engine=args.colored_map_engine,
-                         colored_map_engine_options=args.colored_map_engine_options,
-                         colored_map_min=args.colored_map_min,
-                         colored_map_max=args.colored_map_max,
-                         colored_map_scale=args.colored_map_scale,
-                         colored_map_offset=args.colored_map_offset,
-                         colored_map_methods=args.colored_map_methods,
-                         colorbar_options=args.colorbar_options,
-                         print_time=print_time,
-                         title=args.title,
-                         title_is_plotted=title_is_plotted,
-                         )
-        title_is_plotted = True
+    title_args = dict(lefttitle=lefttitle, righttitle=righttitle)
+    title_args.update(args.title_options)
+    gv.set_titles_and_labels(ax, **title_args)
+    #
+    if debug:
+        print("extent=", ax.get_extent())
 
-    # Deal with the contours map if needed
-    if args.contours_map_file:
-        plot_contours_map(ax=ax,
-                          coordinates=coordinates,
-                          contours_map_file=args.contours_map_file,
-                          contours_map_variable=args.contours_map_variable,
-                          contours_map_transform=args.contours_map_transform,
-                          contours_map_transform_options=args.contours_map_transform_options,
-                          projection=projection,
-                          contours_map_colors=args.contours_map_colors,
-                          contours_map_levels=args.contours_map_levels,
-                          contours_map_selection_options=args.contours_map_selection_options,
-                          contours_map_min=args.contours_map_min,
-                          contours_map_max=args.contours_map_max,
-                          contours_map_scale=args.contours_map_scale,
-                          contours_map_offset=args.contours_map_offset,
-                          title=args.title,
-                          title_is_plotted=title_is_plotted,
-                          )
-        title_is_plotted = True
-
-    # Deal with the shaded map if needed
-    if args.shaded_map_file is not None:
-        plot_shaded_map(ax=ax,
-                        coordinates=coordinates,
-                        shaded_map_file=args.shaded_map_file,
-                        shaded_map_variable=args.shaded_map_variable,
-                        shaded_map_transform=args.shaded_map_transform,
-                        shaded_map_transform_options=args.shaded_map_transform_options,
-                        projection=projection,
-                        shaded_map_hatches=args.shaded_map_hatches,
-                        shaded_map_levels=args.shaded_map_levels,
-                        shaded_map_selection_options=args.shaded_map_selection_options,
-                        shaded_map_min=args.shaded_map_min,
-                        shaded_map_max=args.shaded_map_max,
-                        shaded_map_scale=args.shaded_map_scale,
-                        shaded_map_offset=args.shaded_map_offset,
-                        title=args.title,
-                        title_is_plotted=title_is_plotted,
-                        )
-        title_is_plotted = True
-
-    # Deal with the shade2 map if needed
-    if args.shade2_map_file is not None:
-        plot_shaded_map(ax=ax,
-                        coordinates=coordinates,
-                        shaded_map_file=args.shade2_map_file,
-                        shaded_map_variable=args.shade2_map_variable,
-                        shaded_map_transform=args.shade2_map_transform,
-                        shaded_map_transform_options=args.shade2_map_transform_options,
-                        projection=projection,
-                        shaded_map_hatches=args.shade2_map_hatches,
-                        shaded_map_levels=args.shade2_map_levels,
-                        shaded_map_selection_options=args.shade2_map_selection_options,
-                        shaded_map_min=args.shade2_map_min,
-                        shaded_map_max=args.shade2_map_max,
-                        shaded_map_scale=args.shade2_map_scale,
-                        shaded_map_offset=args.shade2_map_offset,
-                        title=args.title,
-                        title_is_plotted=title_is_plotted,
-                        )
-        title_is_plotted = True
-
-    # Deal with the vector map if needed
-    if args.vectors_map_u_file is not None and args.vectors_map_v_file is not None:
-        plot_vector_map(ax=ax,
-                        coordinates=coordinates,
-                        vectors_map_u_file=args.vectors_map_u_file,
-                        vectors_map_v_file=args.vectors_map_v_file,
-                        vectors_map_u_variable=args.vectors_map_u_variable,
-                        vectors_map_v_variable=args.vectors_map_v_variable,
-                        vectors_map_transform=args.vectors_map_transform,
-                        vectors_map_transform_options=args.vectors_map_transform_options,
-                        projection=projection,
-                        vectors_map_type=args.vectors_map_type,
-                        vectors_map_options=args.vectors_map_options,
-                        vectors_map_selection_options=args.vectors_map_selection_options,
-                        vectors_map_scale=args.vectors_map_scale,
-                        vectors_map_gridsizes=args.vectors_map_gridsizes,
-                        title=args.title,
-                        title_is_plotted=title_is_plotted,
-                        )
-        title_is_plotted = True
-
-    print("extent=", ax.get_extent())
     # Deal with output
     output_file = args.output_file
     if output_file is not None:
@@ -800,19 +841,9 @@ if __name__ == "__main__":
                               args.shade2_map_selection_options]
 
     # Analyze arguments for compatibility with the old plot routine
-    # gplot.ncl and translate it in changed args
+    # gplot.ncl and translate it in changed args, and in a returned
+    # dict of settings
     gplot_settings = mimic_gplot(args, selection_options_list)
 
     # Plot the map
     plot_map(args, **gplot_settings)
-
-
-# debug = True
-
-# transform = find_ccrs("PlateCarree")
-
-# variable_data, variable_coordinates_data = get_variable_and_coordinates_from_dataset(
-#     "/home/ssenesi/climaf_installs/climaf_running/examples/data/tos_Omon_CNRM_gn_185001-185003.nc",
-#     "tos", ["y", "x"], transform, dict())
-
-# create_norm(10, "RdBu", variable_data, None, None)

@@ -116,6 +116,9 @@ def create_parser():
                                     help="Options to be used to select data at some coordinate values if needed."
                                     "Expected format: dict with key=selection method and value=dict of args",
                                     type=check_json_format, default=dict())
+    contours_map_group.add_argument("--contours_map_engine_options",
+                                    help="Args for the contour plot engine",
+                                    type=check_json_format, default=dict())
     contours_map_group.add_argument("--contours_map_min",
                                     help="Min value to plot on the contours map",
                                     type=float, default=None)
@@ -269,8 +272,8 @@ def create_parser():
                         help="Arguments for plt.figure()", type=check_json_format, default=dict())
     parser.add_argument("--savefig_options",
                         help="Arguments for plt.savefig()", type=check_json_format, default=dict())
-    # parser.add_argument("--title_options",
-    #                    help="Arguments for figure.suptitle()", type=check_json_format, default=dict())
+    parser.add_argument("--title_options", help="Arguments for gv.set_titles_and_labels()",
+                        type=check_json_format, default=dict())
     parser.add_argument(
         "--lines",
         help="List of lines to plot, and their plot options : "
@@ -282,9 +285,8 @@ def create_parser():
 
     gplot_group = parser.add_argument_group(
         "gplot", description="Arguments reproducing those of gplot.ncl")
-    gplot_group.add_argument(
-        "--title",
-        help="Title of the graphic", default=None)
+    gplot_group.add_argument("--title",
+                             help="Title of the graphic", default=None)
     gplot_group.add_argument("--trim",
                              help="Crop the surrounding extra white space",
                              type=check_json_format, default=True)
@@ -330,12 +332,6 @@ def create_parser():
     gplot_group.add_argument("--polyline_options",
                              help="A dict of arguments to plot for drawing polyline",
                              type=check_json_format, default=dict(color='blue'))
-    gplot_group.add_argument("--xticks",
-                             help="A list of ticks location on x-axis",
-                             type=check_json_format, default=list())
-    gplot_group.add_argument("--yticks",
-                             help="A list of ticks location on y-axis",
-                             type=check_json_format, default=list())
     # gplot_group.add_argument("--", help="",
     #                         type=, default=)
 
@@ -351,8 +347,8 @@ def process_args(args):
     args.savefig_options['format'] = args.format
 
     # We allow axis_methods and plt_methods values (kwargs) to be
-    # dict rather than dict list. Here, we normalize for that
-    for methods in [args.axis_methods, args.plt_methods]:
+    # dicts rather than dicts lists. Here, we normalize for that
+    for methods in [args.axis_methods, args.plt_methods, args.gv_methods]:
         for method in methods:
             if type(methods[method]) is not list:
                 methods[method] = [methods[method]]
@@ -395,6 +391,16 @@ def process_args(args):
             spliter = " "
         args.contours_map_levels = args.contours_map_levels.split(spliter)
 
+    # Set some title font sizes, and put 'title', in 'title_options'
+    if 'maintitle' not in args.title_options and args.title is not None:
+        args.title_options['maintitle'] = args.title
+    if 'maintitlefontsize' not in args.title_options:
+        args.title_options['maintitlefontsize'] = 21
+    if 'lefttitlefontsize' not in args.title_options:
+        args.title_options['lefttitlefontsize'] = 15
+    if 'righttitlefontsize' not in args.title_options:
+        args.title_options['righttitlefontsize'] = 15
+
 
 def mimic_gplot(args, selection_options_list):
     """
@@ -404,7 +410,7 @@ def mimic_gplot(args, selection_options_list):
     For most cases, this consists in changing 'args'
     For the remaining cases, this translates in returned dict 'settings'
 
-    Currenty handles : title, trim, date, time, units, focus, vcb
+    Currenty handles : trim, date, time, units, focus, vcb
     """
 
     settings = dict()
@@ -451,6 +457,10 @@ def mimic_gplot(args, selection_options_list):
         args.savefig_options['bbox_inches'] = 'tight'
         # else just let what the caller may have set
 
+    if 'gridlines' not in args.axis_methods:
+        args.axis_methods['gridlines'] = \
+            [dict(draw_labels={"bottom": "x", "left": "y"}, alpha=0.1,)]
+
     # Projection shorcuts
     if args.projection is not None and args.projection[0:2] in ['NH', 'SH']:
         print(
@@ -459,16 +469,25 @@ def mimic_gplot(args, selection_options_list):
             "https://scitools.org.uk/cartopy/docs/latest/gallery/lines_and_polygons/always_circular_stereo.html")
         if len(args.projection) > 2:
             latitude_limit = float(args.projection[2:])
+        ranges_dict = dict(lon_range=[-180, 180])
         if args.projection[0:2] == 'NH':
             args.projection = "NorthPolarStereo"
+            ranges_dict['lat_range'] = [latitude_limit, 90]
             settings['polar_stereo_extent'] = [-180, 180, latitude_limit, 90]
         if args.projection[0:2] == 'SH':
             args.projection = "SouthPolarStereo"
+            # Sign for latitude of pole is awkward, but that's the gv convention !
+            ranges_dict['lat_range'] = [-latitude_limit, 90]
             settings['polar_stereo_extent'] = [-180, 180, -90, -latitude_limit]
+        args.gv_methods['set_map_boundary'] = [ranges_dict]
+
         if args.projection_options is None:
             args.projection_options = dict()
         if "central_longitude" not in args.projection_options:
             args.projection_options["central_longitude"] = 0.0
+        if 'gridlines' not in args.axis_methods:
+            args.axis_methods['gridlines'] = [dict(draw_labels=True, linestyle="--",
+                                                   color='black', alpha=0.5)]
 
     if args.projection_options is None:
         if args.projection is None:
@@ -484,31 +503,12 @@ def mimic_gplot(args, selection_options_list):
         if args.axis_methods['coastlines'] in [None, [None]]:
             args.axis_methods.pop('coastlines')
 
-    # Gridlines
-    if 'gridlines' in args.axis_methods:
-        if args.axis_methods['gridlines'] in [None, [None]]:
-            args.axis_methods.pop('gridlines')
+    # Ticks 'a la Ncl'. Set it by default, and allow user to override default
+    if 'add_major_minor_ticks' not in args.gv_methods:
+        args.gv_methods['add_major_minor_ticks'] = [{'labelsize': 'large'}]
     else:
-        args.axis_methods['gridlines'] = [{
-            'draw_labels': {"bottom": "x", "left": "y"}}]
-
-    # # Gridlines 'a la Ncl'
-    # if 'add_major_minor_ticks' not in args.gv_methods:
-    #     args.gv_methods['add_major_minor_ticks'] = [{}]
-    # else:
-    #     if args.gv_methods['add_major_minor_ticks'] in [None, [None]]:
-    #         args.gv_methods.pop('add_major_minor_ticks')
-
-    # if 'add_lat_lon_ticklabels' not in args.gv_methods:
-    #     args.gv_methods['add_lat_lon_ticklabels'] = [{}]
-    # else:
-    #     if args.gv_methods['add_lat_lon_ticklabels'] in [None, [None]]:
-    #         args.gv_methods.pop('add_lat_lon_ticklabels')
-
-    # if args.xticks is not None and len(args.xticks) == 0:
-    #    args.xticks = np.arange(-180, 210, 30)
-    # if args.yticks is not None and len(args.yticks) == 0:
-    #    args.yticks = np.arange(-90, 120, 30)
+        if args.gv_methods['add_major_minor_ticks'] in [None, [None]]:
+            args.gv_methods.pop('add_major_minor_ticks')
 
     #####################
     # Colors and levels
@@ -538,35 +538,52 @@ def mimic_gplot(args, selection_options_list):
         else:
             # A single string is a colormap name -> use contourf arg 'cmap'
             cdic['cmap'] = args.colored_map_cmap
+            # if args.colored_map_levels is None:
+            #     # TBD : diagnose levels number from cmap name
+            #     args.colored_map_levels = 50
             # We can handle either a list of levels, or min/max.
             # Contourf rather uses min/max (if provided)
             if args.colored_map_min is not None and args.colored_map_max is not None:
-                cdic["vmin"] = args.colored_map_min
-                cdic["vmax"] = args.colored_map_max
+                #cdic["vmin"] = args.colored_map_min
+                #cdic["vmax"] = args.colored_map_max
                 if args.colored_map_delta is not None:
-                    cdic['levels'] = np.arange(
+                    args.colored_map_levels = list(np.arange(
                         args.colored_map_min,
                         args.colored_map_max + args.colored_map_delta,
-                        args.colored_map_delta)
+                        args.colored_map_delta))
+                    cdic['levels'] = args.colored_map_levels
+
     if args.debug:
-        print("cdic=", cdic)
+        print("Colors/levels options for colormap engine=", cdic)
     args.colored_map_engine_options.update(**cdic)
 
-    # arg 'contours_map_level' (or (contours')' allows to simply draw
-    # contours of the colored map field by providing
+    # Contours
+    #############
+
+    if 'linewidths' not in args.contours_map_engine_options:
+        args.contours_map_engine_options['linewidths'] = 0.3
+
+    # arg 'contours_map_level' (or 'contours')' allows to simply draw
+    # contours of the COLORED map field by providing
     # contours_map_levels (a check is done that no contours file is
     # provided)
+    use_colored_map_file_for_contours = False
     if args.contours_map_levels is not None and \
        args.contours_map_file is None and \
        args.colored_map_file is not None:
+        use_colored_map_file_for_contours = True
         args.contours_map_file = args.colored_map_file
         args.contours_map_variable = args.colored_map_variable
         args.contours_map_transform = args.colored_map_transform
         args.contours_map_transform_options = args.colored_map_transform_options
+        args.contours_map_selection_options = args.colored_map_selection_options
         if args.contours_map_levels == 1 and args.colored_map_levels is not None:
             args.contours_map_levels = args.colored_map_levels
-        if args.contours_map_colors is None:
-            args.contours_map_colors = args.colored_map_cmap
+        if len(args.contours_map_colors) == 0:
+            args.contours_map_colors = 'black'  # args.colored_map_cmap
+        if args.debug:
+            print('Using colored_map_file for contours, levels=',
+                  args.contours_map_levels, '  colors=', args.contours_map_colors)
 
     # Focus
     if args.focus:
@@ -580,7 +597,7 @@ def mimic_gplot(args, selection_options_list):
         if 'add_feature' not in args.axis_methods:
             args.axis_methods['add_feature'] = []
         args.axis_methods['add_feature'].append(
-            {'feature': eval(f"cartopy.feature.{feature}"), 'facecolor': 'white', 'zorder': 1})
+            {'feature': eval(f"cartopy.feature.{feature}"), 'facecolor': 'silver', 'zorder': 1})
 
     if args.scale:
         if args.colored_map_file is not None:
@@ -590,6 +607,8 @@ def mimic_gplot(args, selection_options_list):
         else:
             raise ValueError(
                 "Argument 'scale' can only be use with a colored map or a contours map")
+        if use_colored_map_file_for_contours:
+            args.contours_map_scale = args.scale
 
     if args.offset:
         if args.colored_map_file is not None:
@@ -599,6 +618,8 @@ def mimic_gplot(args, selection_options_list):
         else:
             raise ValueError(
                 "Argument 'offset' can only be use with a colored map or a contours map")
+        if use_colored_map_file_for_contours:
+            args.contours_map_offset = args.offset
 
     # Arg 'units' is handled directly in plot_colored_map
 
