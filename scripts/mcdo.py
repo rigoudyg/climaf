@@ -17,6 +17,9 @@ import time
 import shutil
 import six
 import xarray as xr
+import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from env.site_settings import onCiclad, onSpirit
 from env.clogging import clogger, clog

@@ -137,27 +137,25 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             timedim = filename_or_timedim
         else:
             with xr.open_dataset(filename_or_timedim, use_cftime=True) as ds:
-                if "time" in ds:
-                    timedim = ds.time
+                time_error_message = "No time dimension found in %s, dims are %s" % \
+                                     (filename_or_timedim, [str(d) for d in ds.dims])
+                if "time" in ds.variables:
+                    timedim = "time"
+                elif strict_on_time_dim_name:
+                    clogger.warning(time_error_message)
+                    return None
                 else:
-                    time_error_message = "No time dimension found in %s, dims are %s" % \
-                                         (filename_or_timedim, [
-                                          str(d) for d in ds.dims])
-                    if strict_on_time_dim_name:
-                        clogger.warning(time_error_message)
-                        return None
-                    else:
-                        found = False
-                        for dim in ds.dims:
-                            if re.findall("^time.*", str(dim)):
-                                start = ds[dim][0].values.flatten()[0]
-                                end = ds[dim][-1].values.flatten()[0]
-                                timedim = ds[dim]
-                                found = True
-                                break
-                        if not found:
-                            clogger.error(time_error_message)
-                            return None
+                    timedim = [dim for dim in ds.dims if re.findall("^time.*", str(dim))]
+                    found = len(timedim) > 0
+                    if found:
+                        timedim = timedim[0]
+                if found:
+                    start = ds[timedim][0].values.flatten()[0]
+                    end = ds[timedim][-1].values.flatten()[0]
+                    timedim = ds[timedim]
+                else:
+                    clogger.error(time_error_message)
+                    return None
         #
         if cell_methods is not None and time_average is None:
             time_average = (re.findall(
@@ -181,7 +179,7 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             if delta is None:
                 clogger.error("Frequency %s not yet managed" % data_freq)
                 return None
-            if data_freq[-2:] == "MS" and start.days in [14, 15, 16] and end.days in [14, 15, 16]:
+            if data_freq[-2:] == "MS" and start.day in [14, 15, 16] and end.day in [14, 15, 16]:
                 delta = "special_month"
         #
         start = timedim[0].values.flatten()[0]
