@@ -101,7 +101,7 @@ def create_parser():
                                     help="Variable to be plotted on contours map",
                                     type=str, default=None)
     contours_map_group.add_argument("--contours_map_levels",
-                                    help="Number of level of the contours color bar",
+                                    help="List of levels for the contours",
                                     type=check_json_format, default=None)
     contours_map_group.add_argument("--contours_map_colors",
                                     help="Colors that should be used for the contours map",
@@ -141,8 +141,8 @@ def create_parser():
                                   help="Variable to be plotted on shaded map",
                                   type=str, default=None)
     shaded_map_group.add_argument("--shaded_map_levels",
-                                  help="Number of level of the shaded map color bar",
-                                  type=int, default=1)
+                                  help="List or number of levels of the shaded map color bar",
+                                  type=check_json_format, default=1)
     shaded_map_group.add_argument("--shaded_map_hatches",
                                   help="Hatches that should be used for the shaded map",
                                   type=check_json_format, default=[None, "/"])
@@ -178,8 +178,8 @@ def create_parser():
                                   help="Variable to be plotted on shade2 map",
                                   type=str, default=None)
     shade2_map_group.add_argument("--shade2_map_levels",
-                                  help="Number of level of the shade2 map color bar",
-                                  type=int, default=1)
+                                  help="List or number of level of the shade2 map color bar",
+                                  type=check_json_format, default=1)
     shade2_map_group.add_argument("--shade2_map_hatches",
                                   help="Hatches that should be used for the shade2 map",
                                   type=check_json_format, default=[None, "*"])
@@ -253,9 +253,6 @@ def create_parser():
     parser.add_argument("--projection_options",
                         help="The options of the projection to be used for the map",
                         type=check_json_format, default=None)
-    parser.add_argument("--features",
-                        help="A dict of features and attributes to add : {feature_name : kwargs }",
-                        type=check_json_format, default=dict())
     parser.add_argument("--plt_methods", type=check_json_format, default=dict(),
                         help="Dict of pyplot methods to be called, with values = args dicts list")
     parser.add_argument("--axis_methods", type=check_json_format, default=dict(),
@@ -274,11 +271,6 @@ def create_parser():
                         help="Arguments for plt.savefig()", type=check_json_format, default=dict())
     parser.add_argument("--title_options", help="Arguments for gv.set_titles_and_labels()",
                         type=check_json_format, default=dict())
-    parser.add_argument(
-        "--lines",
-        help="List of lines to plot, and their plot options : "
-        "[[lats], [lons], options _dict]  or [ [[lats], [lons], options _dict] ]",
-        type=check_json_format, default=None)
     parser.add_argument("--debug",
                         help="To get some details",
                         type=bool, default=True)
@@ -400,6 +392,39 @@ def process_args(args):
         args.title_options['lefttitlefontsize'] = 15
     if 'righttitlefontsize' not in args.title_options:
         args.title_options['righttitlefontsize'] = 15
+
+    # For map projection, translate symbolic names to relevant
+    # projection info
+    if args.projection == "colored" or args.projection == 'clr':
+        if args.colored_map_transform is not None:
+            args.projection = args.colored_map_transform
+            args.projection_options = args.colored_map_transform_options
+        else:
+            args.projection = args.colored_map_file
+    if args.projection == "contours" or args.projection == 'cnt':
+        if args.contours_map_transform is not None:
+            args.projection = args.contours_map_transform
+            args.projection_options = args.contours_map_transform_options
+        else:
+            args.projection = args.contours_map_file
+    if args.projection == "vectors" or args.projection == 'vec':
+        if args.vectors_map_transform is not None:
+            args.projection = args.vectors_map_transform
+            args.projection_options = args.vectors_map_transform_options
+        else:
+            args.projection = args.vectors_map_u_file
+    if args.projection == "shaded" or args.projection == 'shd':
+        if args.shaded_map_transform is not None:
+            args.projection = args.shaded_map_transform
+            args.projection_options = args.shaded_map_transform_options
+        else:
+            args.projection = args.shaded_map_file
+    if args.projection == "shade2" or args.projection == 'shd2':
+        if args.shade2_map_transform is not None:
+            args.projection = args.shade2_map_transform
+            args.projection_options = args.shade2_map_transform_options
+        else:
+            args.projection = args.shade2_map_file
 
 
 def mimic_gplot(args, selection_options_list):
@@ -561,7 +586,10 @@ def mimic_gplot(args, selection_options_list):
     #############
 
     if 'linewidths' not in args.contours_map_engine_options:
-        args.contours_map_engine_options['linewidths'] = 0.3
+        args.contours_map_engine_options['linewidths'] = 0.4
+
+    if len(args.contours_map_colors) == 0:
+        args.contours_map_colors = ['black']  # args.colored_map_cmap
 
     # arg 'contours_map_level' (or 'contours')' allows to simply draw
     # contours of the COLORED map field by providing
@@ -579,8 +607,6 @@ def mimic_gplot(args, selection_options_list):
         args.contours_map_selection_options = args.colored_map_selection_options
         if args.contours_map_levels == 1 and args.colored_map_levels is not None:
             args.contours_map_levels = args.colored_map_levels
-        if len(args.contours_map_colors) == 0:
-            args.contours_map_colors = 'black'  # args.colored_map_cmap
         if args.debug:
             print('Using colored_map_file for contours, levels=',
                   args.contours_map_levels, '  colors=', args.contours_map_colors)
@@ -668,8 +694,12 @@ def mimic_gplot(args, selection_options_list):
             options['sel']['time'] = date
 
     if args.xpolyline is not None and args.ypolyline is not None:
-        x = args.xpolyline.split()
-        y = args.ypolyline.split()
+        x = args.xpolyline
+        if ' ' in args.xpolyline:
+            x = x.split()
+        y = args.ypolyline
+        if ' ' in args.ypolyline:
+            y = y.split()
         if len(x) != len(y):
             raise ValueError(
                 "xpolyline and ypolyline does not have the same length")

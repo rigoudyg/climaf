@@ -114,6 +114,7 @@ Documented operators and 'object functions' as of today:
 .. _graphic_operators:
 
     - :doc:`scripts/plot`
+    - :doc:`scripts/plotmap`
     - :py:func:`~climaf.plot.plot_params.plot_params`
     - :doc:`scripts/curves`
     - :doc:`scripts/ensemble_ts_plot`

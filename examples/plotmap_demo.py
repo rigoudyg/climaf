@@ -179,19 +179,14 @@ cshow(plotmap(nd),True)
 # Filling the gaps near ORCA grid poles needs another plot engine  :
 cshow(plotmap(nd, clre="pcolormesh"),True)
 
-# ## Shading
+# ## Pattern shading (hatching)
+# See also [hatch style reference](https://matplotlib.org/stable/gallery/shapes_and_collections/hatch_style_reference.html)
 
-# Representing binary fields using shading. 
-# Binary field #1 is 5th plotmap arg, #2 is 6th arg
-# shdh and shdh2 provides patterns for the binary values
-dgsup=ccdo(dg, operator = "gec,282")
-dginf=ccdo(dg, operator = "lec,252")
-cshow(plotmap(dg, "", "", "", dgsup, dginf,
-              shdh = [None, '/'], shd2h = [None, '+']),True)
-
-# Shading, more dense
-cshow(plotmap(dg, "", "", "", dgsup, dginf,
-      shdh = [None, '///'], shd2h = [None, '+++']),True)
+# Pattern-shading up to two fields, provided as 5th and/or 6th plotmap arg
+# shdl (resp. shdl2) provides levels between which shading occurs
+# shdh (resp shdh2) provides patterns list, which is reused circularly if needed
+#    None means no pattern, repeated pattern means increased density
+cshow(plotmap(dg, "", "", "", dg, shdl=[210, 240, 270, 285, 300],shdh = ['+', None, '///']),True)
 
 # ## Vectors
 
@@ -255,13 +250,7 @@ l2 = fds(cpath + "/../examples/data/sfcWind_aladin_ext.nc")
 cshow(plotmap(l2),True)
 
 
-# This plot engine option speeds up computaton, but may damage the plot
-cshow(plotmap(l2, clreo={'transform_first':True}),True)
-
-# We can request another target projection
-cshow(plotmap(l2, proj="Stereographic"),True)
-
-# We can explicitly specify data grid's projection parameters
+# We can also explicitly specify data grid's projection parameters
 # which is useful if data file metadata is missing or not 'understandable' by plotmap
 transform = { 
     'clrt' : 'LambertConformal', 
@@ -279,7 +268,13 @@ cshow(plotmap(l2, **transform),True)
 cshow(plotmap(l2, clrt=cfile(l2)),True)
 
 
-# If we want to plot on the data grid, we have to describe it explicitly, 
+# This plot engine option speeds up computaton, but may damage the plot
+cshow(plotmap(l2, clreo={'transform_first':True}),True)
+
+# We can request another target projection
+cshow(plotmap(l2, proj="Stereographic"),True)
+
+# If we want to plot on the data grid, we may describe it explicitly, 
 # Here we use args 'proj' and 'proj_options', and pack them in a small dict
 projection = { 
     'proj' : 'LambertConformal', 
@@ -292,16 +287,19 @@ projection = {
 # Note : data will actually be remapped on its own grid (To be checked)
 cshow(plotmap(l2, **projection),True)
 
+# But we can also just refer to the projection of the colored field 
+cshow(plotmap(l2, proj="clr"),True)
+
 # We can also describe target projection using a file with relevant metadata
 cshow(plotmap(l2, proj=cfile(l2)),True)
 
 # We can explictly request that the data is not remapped. But there is no watch dog here !
-cshow(plotmap(l2, proj=cfile(l2), clrt="do not remap"),True)
+cshow(plotmap(l2, proj=cfile(l2), clrt="no_remap"),True)
 
 # Still without remapping, and using another plot engine to 'see' data grid cells
-cshow(plotmap(l2, proj=cfile(l2), clrt="do not remap", clre="pcolormesh"),True)
+cshow(plotmap(l2, proj=cfile(l2), clrt="no_remap", clre="pcolormesh"),True)
 
-# Selecting the plot domain, using 'extents'
+# Selecting the plot domain, using 'extents' (here projection PlateCarree is implicit)
 cshow(plotmap(l2, axis_methods={'set_extent': {'extents': (0 , 70, 20, 60) }}),True)
 
 # ## Advanced features
