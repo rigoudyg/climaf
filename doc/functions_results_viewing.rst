@@ -22,7 +22,7 @@ Functions to create images, and to display datasets and images
 Warning
 ------------
 **SEE ALSO** :ref:`the graphic operators <graphic_operators>`  and
-especially :doc:`scripts/plot`
+especially :doc:`scripts/plot` and :doc:`scripts/plotmap`
 
 ncview: display a dataset 
 -----------------------------

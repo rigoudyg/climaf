@@ -322,7 +322,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     if debug:
         print("\n\nPlotting colored map\n", 55*"-")
     # Find the transform
-    if colored_map_transform != "do not remap":
+    if colored_map_transform != "no_remap":
         if debug:
             print("Using dedicated transform %s for interpreting colored map field")
             # colored_map_transform)
@@ -338,7 +338,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     # data is regularly spaced. This is used to speed up computing
     # coordinates on projection plane when lat and lon are 2D
     regular = False
-    if colored_map_transform == "do not remap":
+    if colored_map_transform == "no_remap":
         regular = True
 
     # Find used data, and coordinates if needed
@@ -411,14 +411,14 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     if debug:
         print(f"Plotting with {colored_map_engine} ; and kwargs : ",
               contourf_args)
-    if colored_map_transform == "do not remap" and ploter == plt.contour:
+    if colored_map_transform == "no_remap" and ploter == plt.contourf:
         ymin = np.min(variable_coordinates_data[1])
         ymax = np.max(variable_coordinates_data[1])
         xmin = np.min(variable_coordinates_data[0])
         xmax = np.max(variable_coordinates_data[0])
         contourf_args["extent"] = (xmin, xmax, ymin, ymax)
         if debug:
-            print("Printing with no remapping, extent=",
+            print("Ploting with no remapping, extent=",
                   contourf_args["extent"])
         colored_map_plot = ploter(variable_data, **contourf_args)
     else:
@@ -459,7 +459,7 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
     if debug:
         print("\n\nPlotting contours map\n", 55*"-")
     # Find the transform
-    if contours_map_transform != "do not remap":
+    if contours_map_transform != "no_remap":
         transform = find_ccrs(contours_map_transform,
                               contours_map_transform_options,
                               contours_map_file)
@@ -500,7 +500,13 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
     kwargs.update(contours_map_engine_options)
     if debug:
         print("Plotting with contour and args", kwargs)
-    plt.contour(*variable_coordinates_data, variable_data, **kwargs)
+    CS = plt.contour(*variable_coordinates_data, variable_data, **kwargs)
+
+    if 'clabel' in args.plt_methods:
+        plt.clabel(CS, **args.plt_methods['clabel'][0])
+    if 'clabel' in args.axis_methods:
+        print('kw=', args.axis_methods['clabel'])
+        ax.clabel(CS, **args.axis_methods['clabel'][0])
 
     return name, units
 
@@ -513,7 +519,7 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
     if debug:
         print("\n\n Plotting shaded map\n", 55*"-")
     # Find the transform
-    if shaded_map_transform != "do not remap":
+    if shaded_map_transform != "no_remap":
         transform = find_ccrs(shaded_map_transform,
                               shaded_map_transform_options,
                               shaded_map_file)
@@ -541,12 +547,17 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
         variable_data = variable_data + shaded_map_offset
 
     # Plot the map
+    # if type(shaded_map_levels) is list:
+    #    shaded_map_levels = np.array(shaded_map_levels)
     kwargs = dict(zorder=0, transform=transform,
                   hatches=shaded_map_hatches, colors='none')
     if shaded_map_min is not None:
         kwargs["vmin"] = shaded_map_min
     if shaded_map_max is not None:
         kwargs["vmax"] = shaded_map_max
+    if debug:
+        print(f"Shading with contourf ; and kwargs : ", kwargs)
+
     plt.contourf(*variable_coordinates_data, variable_data,
                  shaded_map_levels, **kwargs)
 
@@ -561,7 +572,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
     if debug:
         print("\n\n Plotting vector map\n", 55*"-")
     # Find the transform
-    if vectors_map_transform != "do not remap":
+    if vectors_map_transform != "no_remap":
         transform = find_ccrs(vectors_map_transform,
                               vectors_map_transform_options,
                               vectors_map_u_file)
@@ -656,6 +667,9 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
 
     # Axes methods
     for method in args.axis_methods:
+        if method == 'clabel':
+            # Will be processed in plot_contours_map
+            continue
         for kwargs in args.axis_methods[method]:
             largs = kwargs.pop('largs', [])
             if method == 'set_extent':
@@ -669,6 +683,9 @@ def plot_map(args, polar_stereo_extent=None, print_time=False):
 
     # Plt methods
     for method in args.plt_methods:
+        if method == 'clabel':
+            # Will be processed in plot_contours_map
+            continue
         for kwargs in args.plt_methods[method]:
             largs = kwargs.pop('largs', [])
             if debug:

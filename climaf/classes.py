@@ -573,10 +573,10 @@ class cdataset(cobject):
               filenames includes dataset's period (see :py:func:`~climaf.classes.cdataset.light_check)` 
 
             - 'period' : checks that the period covered by data in files 
-              includes dataset's period (see :py:func:`~climaf.classes.cdataset.check)
+              includes dataset's period (see :py:func:`~climaf.classes.cdataset.check)`
 
             - 'full' : in addition to case 'period', also checks for gaps in 
-               data, and for frequency (see :py:func:`~climaf.classes.cdataset.check)
+               data, and for frequency (see :py:func:`~climaf.classes.cdataset.check)`
 
            An error is raised if the check fails.
 
@@ -1221,6 +1221,7 @@ class cdataset(cobject):
     def check(self, frequency=False, gap=False, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
+
         - if frequency is True : check if datafile frequency is consistent
           with facet frequency
         - if gap is True : check if file data have a gap
@@ -2034,7 +2035,7 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
 
     Example ::
 
-    # scale and offset may be provided
+    >>> # scale and offset may be provided
     >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)
     >>> calias('CMIP6','evspsbl',scale=-1., conditions={ 'model':'CanESM5' , 'version': ['20180103', '20190112'] })
     >>> calias('erai','tas','t2m',filenameVar='2T')
