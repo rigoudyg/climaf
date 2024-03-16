@@ -5,7 +5,7 @@ Plot a map showing any combination of various fields : one color-shaded, one by 
 
 ``Plotmap`` intends to replace operator ``plot``, albeit only for maps. Hence, its interface is quite compatible. Il also includes a novel interface.
 
-It is implemented using module ``scripts/plotmap.py``, based on https://matplotlib.org/, https://scitools.org.uk/cartopy/ , and https://geocat-viz.readthedocs.io
+It is implemented using module ``scripts/plotmap.py``, based on `Matplotlib <https://matplotlib.org/>`_ , `Cartopy <https://scitools.org.uk/cartopy/>`_ , and `GeoCat Viz >https://geocat-viz.readthedocs.io>`_
 
 A :download:`dedicated notebook (Getting started with plotmap) <../../examples/Getting-started-with-plotmap.html>` allows to get started with its use. :download:`Another notebook (plotmapdemo) <../../examples/plotmapdemo.html>` includes more examples for each functionnality.
 
