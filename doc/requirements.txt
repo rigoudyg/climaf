@@ -1,8 +1,2 @@
 xarray
-sphinx
 sphinx_rtd_theme
-pyyaml
-netCDF4
-numpy
-cftime
-natsort
