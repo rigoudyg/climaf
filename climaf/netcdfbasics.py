@@ -148,8 +148,14 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             end = timedim.values.flatten()[-1]
         else:
             with xr.open_dataset(filename_or_timedim, use_cftime=True) as ds:
-                if "time" in ds:
-                    timedim = ds.time
+                time_error_message = "No time dimension found in %s, dims are %s" % \
+                                     (filename_or_timedim, [
+                                      str(d) for d in ds.dims])
+                if "time" in ds.variables:
+                    timedim = "time"
+                elif strict_on_time_dim_name:
+                    clogger.warning(time_error_message)
+                    return None
                 else:
                     time_error_message = "No time dimension found in %s, dims are %s" % \
                                          (filename_or_timedim, [
@@ -183,18 +189,21 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
             if not use_frequency:
                 raise Climaf_Error("No time bounds variable in file or no time dimension provided, " +
                                    "and use_frequency is False (%s)" % filename_or_timedim)
-            data_freq = xr.infer_freq(timedim)
-            if (data_freq is None and use_frequency == "monthly") or data_freq[-2:] == "MS":
-                if start.day in [14, 15, 16] and end.day in [14, 15, 16]:
-                    delta = "special_month"
-                else:
-                    raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
-                                       timedim.name)
-            else:
-                delta = freq_to_minutes(data_freq) / 2
-                if delta is None:
-                    clogger.error("Frequency %s not yet managed" % data_freq)
-                    return None
+            try:
+                data_freq = xr.infer_freq(timedim)
+            except:
+                data_freq = use_frequency
+            if not data_freq:
+                data_freq = use_frequency
+            if not data_freq:
+                raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
+                                   timedim.name + os.linesep + str(timedim))
+            delta = freq_to_minutes(data_freq) / 2
+            if delta is None:
+                clogger.error("Frequency %s not yet managed" % data_freq)
+                return None
+            if data_freq[-2:] == "MS" and start.day in [14, 15, 16] and end.day in [14, 15, 16]:
+                delta = "special_month"
         #
         start = timedim[0].values.flatten()[0]
         if isinstance(start, float):

@@ -30,7 +30,6 @@ sys.path.insert(0, os.path.abspath('..'))
 # Without next dummy 'if', my editor would move next two lines before
 # the sys.path.insert when saving this file ...
 if True:
-    from env.site_settings import atCNRM, onCiclad
     from env.environment import climaf_version
 
 
@@ -51,12 +50,7 @@ extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.viewcode'
 ]
 
-if atCNRM:
-    # This one works at CNRM
-    extensions.append('sphinxcontrib.napoleon')
-else:
-    # this one works at RTD and Ciclad
-    extensions.append('sphinx.ext.napoleon')
+extensions.append('sphinx.ext.napoleon')
 
 os.environ['IN_SPHINX'] = 'yes'
 

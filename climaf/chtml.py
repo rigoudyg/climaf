@@ -17,6 +17,7 @@ or :download:`a screen dump for a similar code <../doc/html_index.png>`  here |i
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
+import pprint
 import re
 import pickle
 import shutil
@@ -475,7 +476,13 @@ def fline(func, farg, sargs, title=None,
                 repr(sargs)))
             return
         else:
-            sargs = OrderedDict(list([(repr(sarg), sarg) for sarg in sargs]))
+            new_sargs = OrderedDict()
+            for sarg in sargs:
+                if isinstance(sarg, six.string_types):
+                    new_sargs[sarg] = sarg
+                else:
+                    new_sargs[repr(sarg)] = sarg
+            sargs = new_sargs
     rep = open_line(title)
     for key in sargs:
         allargs = [farg, sargs[key]]
