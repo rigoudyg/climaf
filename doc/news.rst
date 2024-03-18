@@ -6,6 +6,26 @@ What's new
 
 Changes, newest first:
 
+- V3.x:
+
+  - Add operator plotmap, a replacement for operator plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`
+  - Function cshow now calls display(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
+  - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.ds`
+  - Various fixes for running at IDRIS
+  - Fixes errors in : cdu(), iplot_members()
+  - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new argument ensure_period (default is True)
+
+    
+  - Internals :
+
+    - When calling an external script, operator arguments values are dumped in json format; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
+    - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
+    - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
+    - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)
+    - add function period.build_date_rexep()
+    - fix concurrency issue in makedirs(tmpdir)
+    - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
+    
 - V3.0:
 
   - Compatibility break:
@@ -87,8 +107,8 @@ Changes, newest first:
   - log:
 
     - CliMAF check for external softwares version at init stage can be
-    silent, using :py:func:`~env.clogging.clog`, with a log level of
-    'critical'
+      silent, using :py:func:`~env.clogging.clog`, with a log level of
+      'critical'
 
     - Other messages at init stage can be discarded by redirecting stderr
 
@@ -164,7 +184,7 @@ Changes, newest first:
   - Operator:
 
     - Standard operator ``slice`` has been renamed into ``cslice_average`` and ``cslice_select`` has been created.
-    - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
+    - New operators `scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
       available as output of those CDO operators which use an ancilary field as first
       argument (as e.g. 'ifthen' and 'ifthenelse').
 

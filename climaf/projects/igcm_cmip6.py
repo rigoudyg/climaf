@@ -21,6 +21,8 @@ login = None
 if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/work/cont003/gencmip6"
+if atIDRIS: # quite non-sensical at IDRIS, but avoids issues with C-ESM-EP
+    root = "/gpfsstore/rech/psl/"
 if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/work/cont003/thredds"

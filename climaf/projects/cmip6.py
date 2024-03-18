@@ -39,17 +39,17 @@ if True:
     # -- Declare a 'CMIP6 CliMAF project
     # ------------------------------------ >
     cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
-             'grid', 'version', ensemble=['model', 'realization'], separator='%')
+             'frequency', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
     cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment',
-             'realization', 'grid', 'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
+             'realization', 'frequency', 'grid', 'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
 
     # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
     cproject('IPSL-CM6_historical-EXT', 'root', 'model', 'institute', 'mip', 'table', 'experiment',
-             'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
+             'realization', 'frequency', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
     for project in ["CMIP6", "CMIP6_extent", 'IPSL-CM6_historical-EXT']:
         cprojects[project].initialize_cvalid_values("CMIP6")

@@ -8,8 +8,12 @@ dependencies:
   - ncl
   - ncview
   - python=3
+  - ipython
   - exiv2
   - latexcodec
+  - pyproj
+  - proj
+  - geocat-viz
   - pip
   - pip:
           - netCDF4

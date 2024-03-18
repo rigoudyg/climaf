@@ -445,19 +445,19 @@ dict_plot_params = {
     },
     'ta850': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },
     'ta700': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },
     'ta500': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },

@@ -12,7 +12,8 @@ import os
 # Created : S.Sénési - 2014
 
 __all__ = ["cache", "classes", "dataloc", "driver", "netcdfbasics",
-           "operators", "period", "standard_operators", "cmacro", "chtml", "functions", "plot",
+           "operators", "period", "standard_operators", "plot_operators",
+           "cmacro", "chtml", "functions", "plot",
            "projects", "derived_variables", "ESMValTool_diags"]
 
 
@@ -29,7 +30,8 @@ def tim(string=None):
         # if ("dotiming" in vars() and dotiming) :
         print_delta = False
         if print_delta:
-            print("Duration %.1f for step %s" % (delta, string), file=sys.stderr)
+            print("Duration %.1f for step %s" %
+                  (delta, string), file=sys.stderr)
 
 
 already_inited = False
@@ -48,7 +50,8 @@ if not already_inited and not onrtd:
     #
     from env.environment import *
     print("CliMAF climaf_version = " + climaf_version, file=sys.stderr)
-    print("CliMAF install => " + "/".join(__file__.split("/")[:-2]), file=sys.stderr)
+    print("CliMAF install => " +
+          "/".join(__file__.split("/")[:-2]), file=sys.stderr)
 
     tim("softwares")
     #
@@ -56,6 +59,7 @@ if not already_inited and not onrtd:
     import env.site_settings as site_settings
     from . import cache
     from . import standard_operators
+    from . import plot_operators
     from . import cmacro
     from . import operators
 
@@ -70,7 +74,8 @@ if not already_inited and not onrtd:
     # Decide for cache location
     cachedir = default_cache  # TODO: For compatibility, delete ones useless
     cache.setNewUniqueCache(default_cache, raz=False)
-    print("Cache directory set to : " + default_cache + " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
+    print("Cache directory set to : " + default_cache +
+          " (use $CLIMAF_CACHE if set) ", file=sys.stderr)
     tim("set cache")
     # Decide for cache location for remote data
     print("Cache directory for remote data set to : " + default_remote_cache + " (use $CLIMAF_REMOTE_CACHE if set) ",
@@ -78,19 +83,24 @@ if not already_inited and not onrtd:
     #
     # Init dynamic CliMAF operators, and import projects and some funcs in main
     tim("execs_projects")
-    exec("from climaf.classes   import ds, eds, cens, fds", sys.modules['__main__'].__dict__)
+    exec("from climaf.classes   import ds, eds, cens, fds",
+         sys.modules['__main__'].__dict__)
     tim("execs_classes")
-    exec("from climaf.operators import cscript", sys.modules['__main__'].__dict__)
+    exec("from climaf.operators import cscript",
+         sys.modules['__main__'].__dict__)
     tim("execs_cscript")
     standard_operators.load_standard_operators()
+    plot_operators.load_plot_operators()
     tim("load_ops")
     from . import projects
-    exec("from climaf.projects  import %s" % ",".join(projects.__all__), sys.modules['__main__'].__dict__)
+    exec("from climaf.projects  import %s" %
+         ",".join(projects.__all__), sys.modules['__main__'].__dict__)
     #
     # Read and execute user config file
     conf_file = os.path.expanduser("~/.climaf")
     if os.path.isfile(conf_file):
-        exec(compile(open(conf_file).read(), conf_file, "exec"), sys.modules['__main__'].__dict__)
+        exec(compile(open(conf_file).read(), conf_file, "exec"),
+             sys.modules['__main__'].__dict__)
     tim(".climaf")
     #
     # Load cache scalar values

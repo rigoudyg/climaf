@@ -17,9 +17,6 @@ from climaf import classes
 from climaf import cachedir
 
 
-
-
-
 def cscalar(dat):
     """ Returns a scalar value using cMA (and not a masked array,
         to avoid the subsetting that is generally needed).
@@ -261,7 +258,8 @@ def vertical_average(dat, zmin, zmax):
     Computes a vertical average on the vertical levels between zmin and zmax
     """
     levs = getLevs(dat, zmin, zmax)
-    clogger.debug(' --> Compute average on the following vertical levels : ' + levs)
+    clogger.debug(
+        ' --> Compute average on the following vertical levels : ' + levs)
     tmp = ccdo(dat, operator="'vertmean -sellevel,'+levs'")
     return tmp
 
@@ -371,7 +369,8 @@ def clim_average(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.warning(
+                'DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == "DJFM":
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
@@ -473,7 +472,8 @@ def clim_average_fast(dat, season):
         selmonths = selmonth = None
         if str(season).upper() == 'DJF':
             selmonths = '1,2,12'
-            clogger.warning('DJF is actually processed as JF....D. Maybe an issue for short periods !')
+            clogger.warning(
+                'DJF is actually processed as JF....D. Maybe an issue for short periods !')
         if str(season).upper() == 'DJFM':
             selmonths = '1,2,3,12'
         if str(season).upper() == 'MAM':
@@ -665,7 +665,8 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
         #
         # --> We can now interpolate dat1 on dat2 verticaly and horizontally
         if horizontal_regridding:
-            regridded_dat1 = ccdo(regrid(dat1, dat2, option='remapdis'), operator='intlevel' + levels)
+            regridded_dat1 = ccdo(
+                regrid(dat1, dat2, option='remapdis'), operator='intlevel' + levels)
         else:
             regridded_dat1 = ccdo(dat1, operator='intlevel' + levels)
     else:
@@ -677,11 +678,13 @@ def lonlatvert_interpolation(dat1, dat2=None, vertical_levels=None, cdo_horizont
             else:
                 levels = ',' + vertical_levels
             if horizontal_regridding:
-                regridded_dat1 = ccdo(regridn(dat1, cdogrid=cdo_horizontal_grid), operator='intlevel' + levels)
+                regridded_dat1 = ccdo(
+                    regridn(dat1, cdogrid=cdo_horizontal_grid), operator='intlevel' + levels)
             else:
                 regridded_dat1 = ccdo(dat1, operator='intlevel' + levels)
         else:
-            clogger.error('--> Provide a list of vertical levels with vertical_levels')
+            clogger.error(
+                '--> Provide a list of vertical levels with vertical_levels')
     return regridded_dat1
 
 
@@ -854,7 +857,8 @@ def ts_plot(ts, **kwargs):
         w_kwargs.update(dict(left_string=w_kwargs['title']))
         w_kwargs.pop('title')
         if 'title_fontsize' in w_kwargs:
-            w_kwargs.update(dict(left_string_fontsize=w_kwargs['title_fontsize']))
+            w_kwargs.update(
+                dict(left_string_fontsize=w_kwargs['title_fontsize']))
             w_kwargs.pop('title_fontsize')
 
     return ensemble_ts_plot(ens_ts, **w_kwargs)
@@ -887,8 +891,7 @@ def iplot_members(ens, nplot=12, N=1, **pp):
     return iplot(mp)
 
 
-
-def save_ensemble_object(ens, outfilename = 'ensemble_object.json'):
+def save_ensemble_object(ens, outfilename='ensemble_object.json'):
     '''
     Takes an ensemble object ens (first argument) and saves it in a json file outfilename
     (second argument).
@@ -904,7 +907,8 @@ def save_ensemble_object(ens, outfilename = 'ensemble_object.json'):
     with open(outfilename, "w") as outfile:
         json.dump(save_json_dict, outfile)
     print('Saved ensemble object in : '+outfilename)
-    print('Use load_ensemble_object("'+outfilename+'") to load it back as a CliMAF ensemble')
+    print('Use load_ensemble_object("'+outfilename +
+          '") to load it back as a CliMAF ensemble')
 
 
 def load_ensemble_object(filename):
@@ -927,4 +931,3 @@ def load_ensemble_object(filename):
     myens = cens(myens_dict)
 
     return(myens)
-

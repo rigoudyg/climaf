@@ -10,7 +10,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os
 import unittest
 
-from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre, skipIf_CondaEnv
+from tests.tools_for_tests import remove_dir_and_content, compare_picture_files, skipUnless_CNRM_Lustre
 from env.environment import *
 
 from climaf.cache import setNewUniqueCache, craz
@@ -25,22 +25,32 @@ if not isinstance(cpath, list):
 class DataGplotMaps(unittest.TestCase):
 
     def setUp(self):
-        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
+        reference_directory = os.sep.join(
+            cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.reference_directory = os.sep.join([reference_directory,
                                                 os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
-        self.default_reference_directory = os.sep.join([reference_directory, "default"])
-        self.tas = ds(project='example', simulation="AMIPV6ALB2G", variable="tas", frequency='monthly', period="198001")
-        self.sub_tas = llbox(self.tas, latmin=30, latmax=80, lonmin=60, lonmax=120)
-        self.uas = ds(project='example', simulation="AMIPV6ALB2G", variable="uas", period="198001")
-        self.vas = ds(project='example', simulation="AMIPV6ALB2G", variable="vas", period="198001")
+        self.default_reference_directory = os.sep.join(
+            [reference_directory, "default"])
+        self.tas = ds(project='example', simulation="AMIPV6ALB2G",
+                      variable="tas", frequency='monthly', period="198001")
+        self.sub_tas = llbox(self.tas, latmin=30,
+                             latmax=80, lonmin=60, lonmax=120)
+        self.uas = ds(project='example', simulation="AMIPV6ALB2G",
+                      variable="uas", period="198001")
+        self.vas = ds(project='example', simulation="AMIPV6ALB2G",
+                      variable="vas", period="198001")
         self.ta_1980 = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly',
                           period="1980")
-        self.sub_ta_1980 = llbox(self.ta_1980, latmin=30, latmax=80, lonmin=60, lonmax=120)
+        self.sub_ta_1980 = llbox(
+            self.ta_1980, latmin=30, latmax=80, lonmin=60, lonmax=120)
         self.tas_1980 = ds(project='example', simulation="AMIPV6ALB2G", variable="tas", frequency='monthly',
                            period="1980")
-        self.sub_tas_1980 = llbox(self.tas_1980, latmin=30, latmax=80, lonmin=60, lonmax=120)
-        self.uas_1980 = ds(project='example', simulation="AMIPV6ALB2G", variable="uas", period="1980")
-        self.vas_1980 = ds(project='example', simulation="AMIPV6ALB2G", variable="vas", period="1980")
+        self.sub_tas_1980 = llbox(
+            self.tas_1980, latmin=30, latmax=80, lonmin=60, lonmax=120)
+        self.uas_1980 = ds(
+            project='example', simulation="AMIPV6ALB2G", variable="uas", period="1980")
+        self.vas_1980 = ds(
+            project='example', simulation="AMIPV6ALB2G", variable="vas", period="1980")
 
     def test_gplot_maps_1(self):
         """
@@ -60,7 +70,6 @@ class DataGplotMaps(unittest.TestCase):
                               dir_ref_default=self.default_reference_directory)
         #
 
-    @skipIf_CondaEnv()
     def test_gplot_maps_1_2(self):
         """
         Crop of a Map with one field and vectors, with contours lines like color fill, default projection (a cylindrical
@@ -222,10 +231,12 @@ class DataGplotMaps(unittest.TestCase):
 class DataGplotMapsRotation(unittest.TestCase):
 
     def setUp(self):
-        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
+        reference_directory = os.sep.join(
+            cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.reference_directory = os.sep.join([reference_directory,
                                                 os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
-        self.default_reference_directory = os.sep.join([reference_directory, "default"])
+        self.default_reference_directory = os.sep.join(
+            [reference_directory, "default"])
         # -----------------------------------------------------------
         # Declare "data_CNRM" project with some 'standard' Nemo output files
         # (actually, they are easier accessible using project "EM")
@@ -245,21 +256,32 @@ class DataGplotMapsRotation(unittest.TestCase):
         # -----------------------------------------------------------
         # Define datasets for main field, auxiliary field and vectors
         # -----------------------------------------------------------
-        self.tos = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="tos", period="199807")
-        self.sub_tos = llbox(self.tos, latmin=30, latmax=80, lonmin=-60, lonmax=0)
-        self.duo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="uo", period="199807")
-        self.dvo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="vo", period="199807")
-        self.duo_1998 = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="uo", period="1998")
-        self.dvo_1998 = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="vo", period="1998")
-        self.tos_1998 = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="tos", period="1998")
-        self.sub_tos_1998 = llbox(self.tos_1998, latmin=30, latmax=80, lonmin=-60, lonmax=0)
-        self.thetao_1998 = ds(project="data_CNRM", simulation="PRE6CPLCr2alb", variable="thetao", period="1998")
-        self.sub_thetao_1998 = llbox(self.thetao_1998, latmin=30, latmax=80, lonmin=-60, lonmax=0)
+        self.tos = ds(project="data_CNRM", simulation="PRE6CPLCr2alb",
+                      variable="tos", period="199807")
+        self.sub_tos = llbox(self.tos, latmin=30,
+                             latmax=80, lonmin=-60, lonmax=0)
+        self.duo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb",
+                      variable="uo", period="199807")
+        self.dvo = ds(project="data_CNRM", simulation="PRE6CPLCr2alb",
+                      variable="vo", period="199807")
+        self.duo_1998 = ds(
+            project="data_CNRM", simulation="PRE6CPLCr2alb", variable="uo", period="1998")
+        self.dvo_1998 = ds(
+            project="data_CNRM", simulation="PRE6CPLCr2alb", variable="vo", period="1998")
+        self.tos_1998 = ds(
+            project="data_CNRM", simulation="PRE6CPLCr2alb", variable="tos", period="1998")
+        self.sub_tos_1998 = llbox(
+            self.tos_1998, latmin=30, latmax=80, lonmin=-60, lonmax=0)
+        self.thetao_1998 = ds(
+            project="data_CNRM", simulation="PRE6CPLCr2alb", variable="thetao", period="1998")
+        self.sub_thetao_1998 = llbox(
+            self.thetao_1998, latmin=30, latmax=80, lonmin=-60, lonmax=0)
 
         # -----------------------------------------------------------
         # How to get the required file for rotating vectors from model grid on geographic grid
         # -----------------------------------------------------------
-        fixed_fields('plot', ('angles.nc', os.sep.join(cpath + ["..", "tools", "angle_${project}.nc"])))
+        fixed_fields('plot', ('angles.nc', os.sep.join(
+            cpath + ["..", "tools", "angle_${project}.nc"])))
 
     def test_gplot_maps_rotation_1(self):
         """
@@ -373,18 +395,24 @@ class DataGplotMapsRotation(unittest.TestCase):
 class DataGplotCrossSections(unittest.TestCase):
 
     def setUp(self):
-        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
+        reference_directory = os.sep.join(
+            cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.reference_directory = os.sep.join([reference_directory,
                                                 os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
-        self.default_reference_directory = os.sep.join([reference_directory, "default"])
-        self.ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", period="1980")
+        self.default_reference_directory = os.sep.join(
+            [reference_directory, "default"])
+        self.ta = ds(project='example', simulation="AMIPV6ALB2G",
+                     variable="ta", period="1980")
         self.january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly',
                              period="198001")
         self.january_ta_zonal_mean = ccdo(self.january_ta, operator="zonmean")
         self.ta_zonal_mean = ccdo(self.ta, operator="zonmean")
-        self.january_cross_field = llbox(self.january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
-        self.cross_field = llbox(self.ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
-        self.january_ta_zonal_mean2 = ccdo(self.january_cross_field, operator="zonmean")
+        self.january_cross_field = llbox(
+            self.january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
+        self.cross_field = llbox(
+            self.ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
+        self.january_ta_zonal_mean2 = ccdo(
+            self.january_cross_field, operator="zonmean")
         self.ta_zonal_mean2 = ccdo(self.cross_field, operator="zonmean")
 
     def test_gplot_cross_sections_1(self):
@@ -418,7 +446,8 @@ class DataGplotCrossSections(unittest.TestCase):
         """
         A cross-section of one field, which contours lines don t follow color filled contours
         """
-        plot_cross = plot(self.january_ta_zonal_mean, contours="240 245 250", title='1 field (user-controled contours)')
+        plot_cross = plot(self.january_ta_zonal_mean, contours="240 245 250",
+                          title='1 field (user-controled contours)')
         self.assertEqual(str(plot_cross),
                          "plot(ccdo(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),operator='zonmean'),"
                          "contours='240 245 250',title='1 field (user-controled contours)')")
@@ -497,29 +526,38 @@ class DataGplotCrossSections(unittest.TestCase):
 class DataGplotProfiles(unittest.TestCase):
 
     def setUp(self):
-        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
+        reference_directory = os.sep.join(
+            cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.reference_directory = os.sep.join([reference_directory,
                                                 os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
-        self.default_reference_directory = os.sep.join([reference_directory, "default"])
+        self.default_reference_directory = os.sep.join(
+            [reference_directory, "default"])
         self.january_ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly',
                              period="198001")
-        self.ta = ds(project='example', simulation="AMIPV6ALB2G", variable="ta", frequency='monthly', period="1980")
+        self.ta = ds(project='example', simulation="AMIPV6ALB2G",
+                     variable="ta", frequency='monthly', period="1980")
         self.january_ta_zonal_mean = ccdo(self.january_ta, operator="zonmean")
         self.ta_zonal_mean = ccdo(self.ta, operator="zonmean")
-        self.january_cross_field = llbox(self.january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
-        self.cross_field = llbox(self.ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
-        self.january_ta_zonal_mean2 = ccdo(self.january_cross_field, operator="zonmean")
+        self.january_cross_field = llbox(
+            self.january_ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
+        self.cross_field = llbox(
+            self.ta, latmin=10, latmax=90, lonmin=50, lonmax=150)
+        self.january_ta_zonal_mean2 = ccdo(
+            self.january_cross_field, operator="zonmean")
         self.ta_zonal_mean2 = ccdo(self.cross_field, operator="zonmean")
-        self.january_ta_profile = ccdo(self.january_ta_zonal_mean, operator="mermean")
+        self.january_ta_profile = ccdo(
+            self.january_ta_zonal_mean, operator="mermean")
         self.ta_profile = ccdo(self.ta_zonal_mean, operator="mermean")
-        self.january_ta_profile2 = ccdo(self.january_ta_zonal_mean2, operator="mermean")
+        self.january_ta_profile2 = ccdo(
+            self.january_ta_zonal_mean2, operator="mermean")
         self.ta_profile2 = ccdo(self.ta_zonal_mean2, operator="mermean")
 
     def test_gplot_profiles_1(self):
         """
         One profile, with a logarithmic scale
         """
-        plot_profile = plot(self.january_ta_profile, title='A profile', y="log")
+        plot_profile = plot(self.january_ta_profile,
+                            title='A profile', y="log")
         self.assertEqual(str(plot_profile),
                          "plot(ccdo(ccdo(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),operator='zonmean'),"
                          "operator='mermean'),title='A profile',y='log')")
@@ -530,7 +568,8 @@ class DataGplotProfiles(unittest.TestCase):
         """
         Two profiles, with a index-linear spacing for vertical axis (default)
         """
-        plot_profile = plot(self.january_ta_profile, self.january_ta_profile2, title='Two profiles', y="lin")
+        plot_profile = plot(self.january_ta_profile,
+                            self.january_ta_profile2, title='Two profiles', y="lin")
         self.assertEqual(str(plot_profile),
                          "plot(ccdo(ccdo(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),operator='zonmean'),"
                          "operator='mermean'),ccdo(ccdo(llbox(ds('example|AMIPV6ALB2G|ta|198001|global|monthly'),"
@@ -543,7 +582,8 @@ class DataGplotProfiles(unittest.TestCase):
         """
         A (t,z) profile, with a a logarithmic scale
         """
-        plot_profile = plot(self.ta_profile, self.ta_profile2, title='Profiles (t,z)', y="log", invXY=True)
+        plot_profile = plot(self.ta_profile, self.ta_profile2,
+                            title='Profiles (t,z)', y="log", invXY=True)
         self.assertEqual(str(plot_profile),
                          "plot(ccdo(ccdo(ds('example|AMIPV6ALB2G|ta|1980|global|monthly'),operator='zonmean'),"
                          "operator='mermean'),ccdo(ccdo(llbox(ds('example|AMIPV6ALB2G|ta|1980|global|monthly'),"
@@ -561,21 +601,27 @@ class DataPlot(unittest.TestCase):
     def setUp(self):
         cdef("project", "example")
         cdef("frequency", "monthly")
-        self.my_dataset = ds(simulation="AMIPV6ALB2G", variable="tas", period="1980-1981")
-        self.my_dataset_light_80 = ds(simulation="AMIPV6ALB2G", variable="tas", period="198001")
-        self.my_dataset_light_81 = ds(simulation="AMIPV6ALB2G", variable="tas", period="198101")
+        self.my_dataset = ds(simulation="AMIPV6ALB2G",
+                             variable="tas", period="1980-1981")
+        self.my_dataset_light_80 = ds(
+            simulation="AMIPV6ALB2G", variable="tas", period="198001")
+        self.my_dataset_light_81 = ds(
+            simulation="AMIPV6ALB2G", variable="tas", period="198101")
         cfile(self.my_dataset)
-        reference_directory = os.sep.join(cpath + ["..", "tests", "reference_data", "test_data_plot"])
+        reference_directory = os.sep.join(
+            cpath + ["..", "tests", "reference_data", "test_data_plot"])
         self.reference_directory = os.sep.join([reference_directory,
                                                 os.environ.get("CLIMAF_TEST_PLOT_CONFIG", "default")])
-        self.default_reference_directory = os.sep.join([reference_directory, "default"])
+        self.default_reference_directory = os.sep.join(
+            [reference_directory, "default"])
 
     def test_data_plot_1(self):
         ta = time_average(self.my_dataset)
         map_test = plot(ta, title="TAS")
         compare_picture_files(map_test, "test_1.1.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        map_test = plot(ta, title="TAS", min=-15, max=25, delta=2., offset=-273.15, units="C")
+        map_test = plot(ta, title="TAS", min=-15, max=25,
+                        delta=2., offset=-273.15, units="C")
         compare_picture_files(map_test, "test_1.2.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
@@ -588,10 +634,12 @@ class DataPlot(unittest.TestCase):
     def test_data_plot_3(self):
         """
         """
-        fig1 = plot(self.my_dataset_light_80, title="title", resolution="1600*2400")
+        fig1 = plot(self.my_dataset_light_80,
+                    title="title", resolution="1600*2400")
         compare_picture_files(fig1, "test3.1_fig.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        fig1_pdf = plot(self.my_dataset_light_80, title="title", resolution="1600*2400", format="pdf")
+        fig1_pdf = plot(self.my_dataset_light_80, title="title",
+                        resolution="1600*2400", format="pdf")
         compare_picture_files(fig1_pdf, "test3.1_fig.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         page1 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]],
@@ -610,10 +658,12 @@ class DataPlot(unittest.TestCase):
         page4 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]])
         compare_picture_files(page4, "test3.4.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        page5 = cpage([[None, fig1], [fig1, fig1], [fig1, fig1]], page_trim=False)
+        page5 = cpage([[None, fig1], [fig1, fig1], [
+                      fig1, fig1]], page_trim=False)
         compare_picture_files(page5, "test3.5.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        ens = cens({'1980': self.my_dataset_light_80, '1981': self.my_dataset_light_81})
+        ens = cens({'1980': self.my_dataset_light_80,
+                   '1981': self.my_dataset_light_81})
         fig_ens = plot(ens, title="title")
         compare_picture_files(fig_ens, ["test3.6-1.png", "test3.6-2.png"], self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
@@ -624,8 +674,6 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(page7, "test3.8.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
-    # Issue with missing laTeX package pdfpages.sty
-    @skipIf_CondaEnv()
     def test_data_plot_3_1(self):
         fig1 = plot(self.my_dataset_light_80,
                     title="title", resolution="1600*2400")
@@ -636,10 +684,9 @@ class DataPlot(unittest.TestCase):
         compare_picture_files(pdfpage1, "test3.1.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
-    # Issue with pdfcrop: Can't locate mktexlsr.pl
-    @skipIf_CondaEnv()
     def test_data_plot_3_2(self):
-        fig2 = plot(self.my_dataset_light_80, title="title", resolution="13*19", format="pdf")
+        fig2 = plot(self.my_dataset_light_80, title="title",
+                    resolution="13*19", format="pdf")
         compare_picture_files(fig2, "test3.2_fig.pdf", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
         fig2_crop = cpdfcrop(fig2)
@@ -659,7 +706,8 @@ class DataPlot(unittest.TestCase):
         my_plot_1 = plot(my_ds)
         compare_picture_files(my_plot_1, "test4.1.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
-        my_plot_2 = plot(my_ds, min=100000000., max=2000000000., delta=10000000.)
+        my_plot_2 = plot(my_ds, min=100000000.,
+                         max=2000000000., delta=10000000.)
         compare_picture_files(my_plot_2, "test4.2.png", self.reference_directory,
                               dir_ref_default=self.default_reference_directory)
 
@@ -669,7 +717,8 @@ class DataPlot(unittest.TestCase):
 
 if __name__ == '__main__':
     # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_data_plot"])
+    tmp_directory = "/".join([os.environ["HOME"], "tmp",
+                             "tests", "test_data_plot"])
     remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)

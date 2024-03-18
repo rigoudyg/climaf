@@ -28,9 +28,9 @@ from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
 from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
-    lastyears, firstyears, group_periods, freq_to_minutes
+    lastyears, firstyears, group_periods, freq_to_minutes, build_date_regexp_pattern
 from env.clogging import clogger
-from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id
+from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id, infer_freq
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -526,8 +526,7 @@ class cdataset(cobject):
     # def __init__(self,project=None,model=None,simulation=None,period=None,
     #             rip=None,frequency=None,domain=None,variable=None,version='last') :
     def __init__(self, **kwargs):
-        """
-        Create a CLIMAF dataset.
+        """Create a CLIMAF dataset.
 
         A CLIMAF dataset is a description of what the data (rather than
         the data itself or a file).  It is basically a set of pairs
@@ -565,6 +564,21 @@ class cdataset(cobject):
            - or a 'derived' variable (see  :py:func:`~climaf.operators_derive.derive` ),
 
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
+
+        - check : this is actually not a dataset attribute but an
+          optionnal argument that can trigger a check of the datafiles
+          associated with th dataset; allowed values are : 
+
+            - 'light' : checks that the period indicated by dates in data 
+              filenames includes dataset's period (see :py:func:`~climaf.classes.cdataset.light_check)` 
+
+            - 'period' : checks that the period covered by data in files 
+              includes dataset's period (see :py:func:`~climaf.classes.cdataset.check)`
+
+            - 'full' : in addition to case 'period', also checks for gaps in 
+               data, and for frequency (see :py:func:`~climaf.classes.cdataset.check)`
+
+           An error is raised if the check fails.
 
         - in project CMIP5 , for triplets (frequency, simulation, period, table )  :
           if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
@@ -616,6 +630,22 @@ class cdataset(cobject):
         self.files = None
         self.local_copies_of_remote_files = None
         self.register()
+        if "check" in kwargs:
+            if kwargs["check"] == "light":
+                if not self.light_check():
+                    raise Climaf_Classes_Error(
+                        "Period light check failed for %s" % self)
+            elif kwargs["check"] == "period":
+                if not self.check(period=True, gap=False, frequency=False):
+                    raise Climaf_Classes_Error(
+                        "Period check failed for %s" % self)
+            elif kwargs["check"] == "full":
+                if not self.check(period=True, gap=True, frequency=True):
+                    raise Climaf_Classes_Error(
+                        "Period/gap/frequency check failed for %s" % self)
+            else:
+                raise Climaf_Classes_Error(
+                    "Provided value for check is invalid %s" % kwargs["check"])
 
     def __eq__(self, other):
         res = super(cdataset, self).__eq__(other)
@@ -766,7 +796,8 @@ class cdataset(cobject):
                 non_ambigous_dict[kw] = val
         return non_ambigous_dict, ambiguous_dict
 
-    def glob(self, what=None, periods=None, split=None, use_frequency=False):
+    def glob(self, what=None, ensure_period=True, merge_periods=True,
+             split=None, use_frequency=False):
         """Datafile exploration for a dataset which possibly has
         wildcards (* and ?) in attributes/facets.
 
@@ -775,17 +806,20 @@ class cdataset(cobject):
           - if WHAT = 'files' , returns a string of all data filenames
 
           - otherwise, returns a list of facet/value dictionnaries for
-            matching data (or a pair, see below)
+            matching data (or a pair of lists, see SPLIT below)
 
-        In last case, data file periods are not returned if arg
-        PERIODS is None and data search is optimized for the project.
-        In that case, the globbing is done on data directories and not
-        on data files, which is much faster.
+        If ENSURE_PERIOD is True, returns only results where the
+        requested data period is fully covered by the set of data
+        files. Each returned period is then the same as the requested
+        period
 
-        If PERIODS is not None, individual data files periods are
-        merged among cases with same facets values
+        Otherwise, if MERGE_PERIODS is True, each returned period is
+        actually a list of the intersections of the requested period
+        and (merged) available data periods.
 
-        if SPLIT is not None, a pair is returned intead of the dicts list :
+        Otherwise, individual data file periods are returned.
+
+        if SPLIT is not None, a pair is returned instead of the dicts list :
 
            - first element is a dict with facets which values are the
              same among all cases
@@ -795,17 +829,18 @@ class cdataset(cobject):
 
         Example :
 
-        >>> tos_data = ds(project='CMIP6', variable='tos', period='*',
-               table='Omon', model='CNRM*', realization='r1i1p1f*' )
+        >>> tos_data = ds(project='CMIP6', mip='CMIP', variable='tos', period='*',
+               table='Omon', institute='CNRM-CERFACS', model='CNRM*', realization='r1i1p1f2' )
 
-        >>> common_keys, varied_keys = tos_data.glob(periods=True, split=True)
+        >>> common_values, varied_values = tos_data.glob(merge_periods=True, split=True)
 
-        >>> common_keys
-        {'mip': 'CMIP', 'institute': 'CNRM-CERFACS', 'experiment': 'historical',
-        'realization': 'r1i1p1f2', 'table': 'Omon', 'variable': 'tos',
-        'version': 'latest', 'period': [1850-2014], 'root': '/bdd'}
+        >>> common_values
+        {'variable': 'tos', 'period': [1850-2014], 'root': '/bdd',
+         'institute': 'CNRM-CERFACS', 'mip': 'CMIP', 'table': 'Omon',
+         'experiment': 'historical', 'realization': 'r1i1p1f2', 'version': 'latest',
+         'project': 'CMIP6'}
 
-        >>> varied_keys
+        >>> varied_values
         [{'model': 'CNRM-ESM2-1'  , 'grid': 'gn' },
          {'model': 'CNRM-ESM2-1'  , 'grid': 'gr1'},
          {'model': 'CNRM-CM6-1'   , 'grid': 'gn' },
@@ -814,6 +849,13 @@ class cdataset(cobject):
 
         """
         dic = self.kvp.copy()
+        if 'project' not in dic:
+            raise Climaf_Classes_Error(
+                "Facet 'project' is missing in dataset's facet")
+        project = dic['project']
+        if "*" in project or "?" in project:
+            raise Climaf_Classes_Error("A wildcard in facet project (%s) " % project +
+                                       "would stress the file system too much")
         if self.alias:
             filevar, _, _, _, filenameVar, _, conditions = self.alias
             req_var = dic["variable"]
@@ -822,21 +864,37 @@ class cdataset(cobject):
                 dic["filenameVar"] = filenameVar
         clogger.debug("glob() with dic=%s" % repr(dic))
         cases = list()
-        files = selectFiles(with_periods=(periods is not None or what in ['files', ]),
+        files = selectFiles(with_periods=(merge_periods is True or what in ['files', ]),
                             return_combinations=cases, use_frequency=use_frequency, **dic)
+        # Add facet project in each case
+        for case in cases:
+            case['project'] = project
+        #
         if what in ['files', ]:
             return files
         else:
-            if periods is not None:
+            if ensure_period is True:
+                merge_periods = True
+            if merge_periods is True:
                 cases = group_periods(cases)
-            else:
-                # For non-optimized cases, select_files returns periods,
-                # but we want an even behaviour
-                for case in cases:
-                    case.pop('period', None)
+                # Keep only the intersection of requested period and data periods
+                period = dic['period']
+                if period != "*":
+                    for case in cases:
+                        case['period'] = [p.intersects(
+                            period) for p in case['period']]
+                if ensure_period is True:
+                    # Build the list of cases which period exactly matches
+                    tempo = list()
+                    for case in cases:
+                        if len(case['period']) == 1:
+                            # This also fits case period==*
+                            case['period'] = case['period'][0]
+                        tempo.append(case)
+                    cases = tempo
             if split is not None:
-                keys = remove_keys_with_same_values(cases)
-                return keys, cases
+                dicts = remove_keys_with_same_values(cases)
+                return dicts, cases
             else:
                 return cases
 
@@ -1126,22 +1184,70 @@ class cdataset(cobject):
                       "dataset %s" % (self.variable, self.crs))
         return False
 
-    def check(self, frequency=True, gap=True, period=True):
+    def light_check(self):
+        """Check that dataset's period is covered by the period deduced from
+        the filenames of its datafiles. Filenames with non-date digits
+        (e.g. initialization year) may generate interpretation
+        problems
+
+        Return True if the period is covered
+
+        Nervertheless, data in files may show gaps; use
+        dataset.check(gap=True) if you need a deeper check
+
+        """
+        #
+        pattern = build_date_regexp_pattern()
+        files = self.baseFiles()
+        if files is None:
+            clogger.warning("No data file for dataset %s" % self)
+            return None
+        files = files.split()
+        periods = []
+        for fil in files:
+            matches = re.findall(pattern, fil)
+            if len(matches) != 1:
+                clogger.error(
+                    f"No (or too much) date(s) found in filename {file}")
+                return None
+            else:
+                # First element is a tuple, which first element matches the period
+                periods.append(init_period(matches[0][0]))
+        clogger.debug("File periods are :" + str(periods))
+        data_period = merge_periods(periods)
+        clogger.debug("Merged periods : " + str(data_period))
+        return any([p.includes(self.period) for p in data_period])
+
+    def check(self, frequency=False, gap=False, period=True):
         """
         Check time consistency of first variable of a dataset or ensemble members:
-        - if frequency is True : check if data frequency is consistent with dataset frequency
+
+        - if frequency is True : check if datafile frequency is consistent
+          with facet frequency
         - if gap is True : check if file data have a gap
         - if period is True : check if period covered by data actually includes the
-        whole of dataset period
+          whole of dataset period (regardless of possible gaps)
 
-        Returns: True if every check is OK, False if one fails, None if analysis is not yet possible
+        Default case is to check only period
+
+        Returns: True if every check is OK, False if one fails, None if any cannot be analyzed
+
+        For gap and period check, monthly data are processed quite empirically
         """
-        if gap:
-            frequency = True
+        #
+        if not (frequency or period or gap):
+            clogger.error(
+                "You must activate at least one of the diags : frequency, gap or period")
+            return(None)
+        #
+        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
+            clogger.info("No check for fixed data for %s", self)
+            return True
         #
         files = self.baseFiles()
         if not files:
-            return False
+            clogger.error("The dataset has no data file !")
+            return None
         files = files.split()
         clogger.debug("List of selected files: %s" % files)
         #
@@ -1149,62 +1255,86 @@ class cdataset(cobject):
         dsets = [xr.open_dataset(f, use_cftime=True) for f in files]
         all_dsets = xr.combine_by_coords(dsets, combine_attrs='override')
         #
-        if self.frequency == 'fx' or self.frequency == 'annual_cycle':
-            clogger.info("No check for fixed data for %s", self)
-            return True
-        if self.frequency == "monthly" and frequency:
-            clogger.error("Check cannot yet process monthly data due to" +
-                          "to a shortcoming in analyzing monthly data frequency")
-            return None
-        if not getattr(dsets[0], "frequency", False) and frequency:
-            clogger.warning("No frequency in file(s) for %s", self)
-            return False
         if "time" not in all_dsets:
             clogger.warning("Cannot yet check a dataset which time dimension" +
                             "is not named 'time' (%s)" % self)
-            return False
+            return None
+        #
+        if self.frequency in ["monthly", "mon"] or \
+           dsets[0].frequency in ["monthly", "mon"]:
+            monthly = True
         #
         times = all_dsets.time
         clogger.debug('Time data of selected files: %s' % times)
+        cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
+        time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
+        #
+        data_freq = infer_freq(times, monthly)
+        clogger.debug("Frequency is "+data_freq)
+        if data_freq is None:
+            if (frequency and self.frequency != "*") or (gap and not monthly):
+                clogger.error(
+                    "Time interval detected by infer_freq() is None ")
+                return None
         #
         if frequency:
             # Check if data time interval is consistent with dataset frequency
-            data_freq = xr.infer_freq(times)
-            if data_freq is None:
-                clogger.error(
-                    "Time interval detected by xr.infer_freq is None %s" % str(times))
-                return False
             table = {"monthly": "MS", "daily": "D", "day": "D", "6h": "6H", "3h": "3H",
                      "1h": "1H", "6Hourly": "6H", "3Hourly": "3H"}
             if self.frequency not in table:
-                clogger.error("Check cannot yet handle frequency %s" %
-                              self.frequency)
+                clogger.error(
+                    "Frequency check cannot handle dataset's frequency %s" % self.frequency)
                 return None
             if data_freq != table[self.frequency]:
-                message = 'Data time interval %s is not consistent with dataset frequency %s'
+                message = 'Datafile time interval %s is not consistent with dataset\' frequency %s'
                 clogger.warning(message % (data_freq, self.frequency))
                 rep = False
-
+        #
         if gap:
-            # Check if file data have a gap
             time_values = times.values.flatten()
-            delta = freq_to_minutes(data_freq)
-            cpt = 0
-            for ptim, tim in zip(time_values[:-1], time_values[1:]):
-                if ptim + timedelta(minutes=delta) != tim:
-                    rep = False
-                    cpt += 1
-                    if cpt > 3:
-                        break
-                    clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
-                                  (ptim, tim, delta))
-
+            # Check if file data have a gap
+            clogger.debug("Checking for gap")
+            if monthly:
+                clogger.warning(
+                    "For monthly data, gap check is quite empirical")
+                # clogger.error("Check cannot yet check gap monthly data due to" +
+                #              " a shortcoming in incrementing for monthly data")
+                # return None
+                cpt = 0
+                for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                    delta = tim - ptim
+                    if delta < timedelta(days=29) or \
+                       delta > timedelta(days=31):
+                        rep = False
+                        cpt += 1
+                        if cpt > 3:
+                            break
+                        clogger.error("File data time issue between " +
+                                      "%s and %s, interval inconsistent with monthly data" %
+                                      (ptim, tim))
+            else:
+                cpt = 0
+                delta = freq_to_minutes(data_freq)
+                for ptim, tim in zip(time_values[:-1], time_values[1:]):
+                    if ptim + timedelta(minutes=delta) != tim:
+                        rep = False
+                        cpt += 1
+                        if cpt > 3:
+                            break
+                        clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
+                                      (ptim, tim, delta))
+        #
         if period:
             # Compare period covered by data files with dataset's period
-            cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
-            file_period = timeLimits(times, use_frequency=True, cell_methods=cell_methods,
+            clogger.debug("Checking for period")
+            if monthly:
+                use_freq = "monthly"
+            else:
+                use_freq = True
+            file_period = timeLimits(times, use_frequency=use_freq, cell_methods=cell_methods,
                                      strict_on_time_dim_name=False)
-            clogger.debug('Period covered by selected files: %s' % file_period)
+            clogger.debug(
+                'Period covered by selected files is: %s' % file_period)
             consist = ""
             if not file_period.includes(self.period):
                 consist = "not "
@@ -1698,7 +1828,7 @@ def compare_trees(tree1, tree2, func, filter_on_operator=None):
                 clogger.debug("Parameters are coherent: %s" % tree1.parameters)
                 rep = (reduce(lambda a, b: a if repr(a) == repr(b) else None,
                               [compare_trees(op1, op2, func, filter_on_operator)
-                               for op1, op2 in zip(tree1.operands, tree2.operands)]))
+                              for op1, op2 in zip(tree1.operands, tree2.operands)]))
                 clogger.debug("... %s" % str(rep))
                 return rep
             else:
@@ -1776,7 +1906,7 @@ def ds(*args, **kwargs):
     Also a shortcut for :py:meth:`~climaf.classes.cdataset`,
     when used with with only keywords arguments. Example ::
 
-     >>> cdataset(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
+     >>> ds(project='CMIP5', model='CNRM-CM5', experiment='historical', frequency='monthly',\
               simulation='r2i3p9', domain=[40,60,-10,20], variable='tas', period='1980-1989', version='last')
 
     In that latter case, you may use e.g. period='last_50y' to get the
@@ -1905,7 +2035,8 @@ def calias(project, variable, fileVariable=None, scale=1., offset=0.,
 
     Example ::
 
-    >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)  # scale and offset may be provided
+    >>> # scale and offset may be provided
+    >>> calias('erai','tas_degC','t2m',scale=1., offset=-273.15)
     >>> calias('CMIP6','evspsbl',scale=-1., conditions={ 'model':'CanESM5' , 'version': ['20180103', '20190112'] })
     >>> calias('erai','tas','t2m',filenameVar='2T')
     >>> calias('EM',[ 'sic', 'sit', 'sim', 'snd', 'ialb', 'tsice'], missing=1.e+20)
@@ -2183,8 +2314,8 @@ class cpage(cpage_all):
              self.page_height)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, ybox=%d, pt=%d, font='%s', gravity='%s', backgroud='%s', " \
-                    "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
-                                                      self.gravity, self.background, self.insert, self.insert_width)
+                "insert='%s', insert_width=%d" % (param, self.title, self.x, self.y, self.ybox, self.pt, self.font,
+                                                  self.gravity, self.background, self.insert, self.insert_width)
         rep = "cpage([%s],%s)" % (",".join(rep), param)
 
         return rep
@@ -2277,12 +2408,12 @@ class cpage_pdf(cpage_all):
         rep = super(cpage_pdf, self).buildcrs(
             crsrewrite=crsrewrite, period=period)
         param = "%s,%s, page_width=%d, page_height=%d, scale=%.2f, openright='%s'" % \
-                (repr(self.widths), repr(self.heights), self.page_width,
-                 self.page_height, self.scale, self.openright)
+            (repr(self.widths), repr(self.heights), self.page_width,
+             self.page_height, self.scale, self.openright)
         if isinstance(self.title, six.string_types) and len(self.title) != 0:
             param = "%s, title='%s', x=%d, y=%d, titlebox='%s', pt='%s', font='%s', backgroud='%s'" % \
-                    (param, self.title, self.x, self.y, self.titlebox,
-                     self.pt, self.font, self.background)
+                (param, self.title, self.x, self.y, self.titlebox,
+                 self.pt, self.font, self.background)
         rep = "cpage_pdf([%s],%s)" % (",".join(rep), param)
 
         return rep
@@ -2440,7 +2571,7 @@ def attributeOf(cobject, attrib):
         return "dummy"
     elif isinstance(cobject, cpage) or isinstance(cobject, cpage_pdf):
         return None
-    elif cobject is None:
+    elif cobject is None or cobject == '':
         return ''
     else:
         raise Climaf_Classes_Error(

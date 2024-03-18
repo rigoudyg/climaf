@@ -93,7 +93,7 @@ from .projects import *
 from climaf.classes import cdef, cdataset, ds, cproject, cpage, \
     cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms, derive_cproject
 from climaf.cmacro import macro
-from climaf.driver import ceval, cfile, cshow, cMA, cvalue, cimport, cexport, calias, efile
+from climaf.driver import ceval, cfile, cMA, cvalue, cimport, cexport, calias, efile
 from climaf.dataloc import dataloc
 from climaf.operators import cscript, fixed_fields
 from climaf.operators_derive import derive
@@ -105,6 +105,7 @@ from climaf.plot.varlongname import varlongname
 from climaf.derived_variables import *
 from climaf.functions import *
 from climaf.easyCMIP_functions import *
+from IPython.display import Image, display
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not
@@ -117,3 +118,23 @@ def cerr():
 
     """
     os.system('cat ' + logdir + '/last.out')
+
+
+def cshow(obj, drop=False):
+
+    def currently_running_in_a_notebook():
+        try:
+            name = get_ipython().__class__.__name__
+            if name == 'ZMQInteractiveShell':
+                return True
+            else:
+                return False
+        except:
+            return False
+
+    if drop:
+        cdrop(obj)
+    if currently_running_in_a_notebook():
+        display(Image(cfile(obj)))
+    else:
+        climaf.driver.cshow(obj)

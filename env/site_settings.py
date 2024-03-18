@@ -47,7 +47,7 @@ if 'ergon' in HostName:
     onErgon = True
     atIDRIS = True
     atIPSL = True
-if 'jean-zay' in HostName:
+if 'jean-zay' in HostName or os.path.exists('/gpfsdswork'):
     onJeanZay = True
     atIDRIS = True
     atIPSL = True
@@ -71,16 +71,20 @@ def _found_python_version_to_use(list_dirs, python_version):
 
 
 if atCNRM:
-    additional_packages = os.sep.join(["", "cnrm", "est", "COMMON", "climaf", "add_packages", "lib"])
+    additional_packages = os.sep.join(
+        ["", "cnrm", "est", "COMMON", "climaf", "add_packages", "lib"])
     if os.path.isdir(additional_packages):
         rep = os.listdir(additional_packages)
         rep = [r for r in rep if "python" in r]
         python_version = platform.python_version()
-        found, python_version_to_add = _found_python_version_to_use(rep, python_version)
+        found, python_version_to_add = _found_python_version_to_use(
+            rep, python_version)
         if found:
-            sys.path.append(os.sep.join([additional_packages, python_version_to_add, "site-packages"]))
+            sys.path.append(os.sep.join(
+                [additional_packages, python_version_to_add, "site-packages"]))
         else:
             for r in rep:
-                sys.path.append(os.sep.join([additional_packages, r, "site-packages"]))
+                sys.path.append(os.sep.join(
+                    [additional_packages, r, "site-packages"]))
     else:
         print("Warning: additional packages not found, could cause issues.")

@@ -57,7 +57,7 @@ if onCiclad or onSpirit:
 if atTGCC:
     root = "/ccc/work/cont003/igcmg/igcmg/IGCM/ReferenceDatasets/"
 if atIDRIS:
-    root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
+    root = "/gpfswork/rech/psl/commun/IGCM/ReferenceDatasets/"
 if atCerfacs:
     root = "/data/scratch/globc/dcom/globc_obs/OBS4MIPS_ANA4MIPS_CMOR/Tier1/ERA5/"
 if atCNRM:
@@ -76,10 +76,12 @@ cdef('table', '*', project='ref_era5cerfacs')
 # Obs de MOC RAPID (Il a fallu bricoler les donnees d'origine pour la dimension time au debut et unlim)
 # dataloc(project="ref_climatos",organization="generic",
 #        url='/home/esanchez/data_climaf/${variable}_vertical_unlim.nc')
-calias(project='ref_era5cerfacs', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
+calias(project='ref_era5cerfacs', variable='moc',
+       fileVariable='stream_function_mar', filenameVar='moc')
 
 if root:
-    pattern1 = root + "${variable}_${table}_${obs_type}_${product}_${PERIOD}.nc"
+    pattern1 = root + \
+        "${variable}_${table}_${obs_type}_${product}_${PERIOD}.nc"
     dataloc(project='ref_era5cerfacs', organization='generic', url=[pattern1])
 
 # calias("ref_era5cerfacs","tas",offset=273.15)
