@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division, unicode_literals, absolute_import
-from env.site_settings import atCNRM, onCiclad
-from env.environment import climaf_version
+
 #
 # CliMAF documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov  6 23:20:27 2014.
@@ -27,6 +26,12 @@ import os
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0, os.path.abspath('../climaf'))
 sys.path.insert(0, os.path.abspath('..'))
+
+# Without next dummy 'if', my editor would move next two lines before
+# the sys.path.insert when saving this file ...
+if True:
+    from env.site_settings import atCNRM, onCiclad
+    from env.environment import climaf_version
 
 
 # -- General configuration ------------------------------------------------
