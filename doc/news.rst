@@ -9,20 +9,20 @@ Changes, newest first:
 - V3.x:
 
   - Add operator plotmap, a replacement for operator plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`
-  - Function cshow now calls diplay(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
-  - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.fds`
+  - Function cshow now calls display(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
+  - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.ds`
   - Various fixes for running at IDRIS
-    
   - Fixes errors in : cdu(), iplot_members()
+  - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new argument ensure_period (default is True)
+
     
   - Internals :
 
     - When calling an external script, operator arguments values are dumped in json format; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
-    - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forxarded to the script
+    - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
     - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)
     - add function period.build_date_rexep()
-    - dataset's method glob() has new argument ensure_period (default is True)
     - fix concurrency issue in makedirs(tmpdir)
     - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
     
