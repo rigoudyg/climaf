@@ -216,6 +216,8 @@ def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", ta
     the lowest number of wildcards (*) in attributes
 
     """
+    if project in projects_using_intake:
+        return [('intake', None, None)]
     rep = []
     for loc in locs:
         list_loc = [(loc.project, project), (loc.model, model), (loc.simulation, simulation),
@@ -240,6 +242,9 @@ def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", ta
 def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     if project == 'file':
         return True
+    if project in projects_using_intake:
+        return True
+    #
     ofu = getlocs(project=project, model=model, simulation=simulation,
                   frequency=frequency, realm=realm, table=table)
     if len(ofu) == 0:
@@ -252,8 +257,15 @@ def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     return rep
 
 
-def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None, with_periods=None,
-                use_frequency=False, **kwargs):
+def can_preprocess(project, urls):
+    if project in ["CMIP6", ] and \
+       env.environment.optimize_cmip6_wildcards and \
+       cmip6_optimize_check_paths(urls):
+        return cmip6_optimize_wildcards
+
+
+def selectFiles(return_wildcards=None, merge_periods_on=None, return_combinations=None,
+                with_periods=None, use_frequency=False, **search_dict):
     """
     Returns the shortest list of (local or remote) files which include
     the data for the list of (facet,value) pairs provided
@@ -265,7 +277,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
       pairs
 
     - check that data organization is as known one, i.e. is one of 'generic',
-      CMIP5_DRS' or 'EM'
+      'intake', 'CMIP5_DRS' or 'EM'
 
     - derive relevant filenames search function such as as :
       py:func:`~climaf.dataloc.selectCmip5DrsFiles` from data
@@ -274,85 +286,11 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
     - pass urls and relevant facet values to this filenames search function
 
     """
-    rep = []
-    project = kwargs['project']
-    simulation = kwargs['simulation']
-    model = kwargs.get("model", "*")
-    frequency = kwargs.get("frequency", "*")
-    realm = kwargs.get("realm", "*")
-    table = kwargs.get("table", "*")
+    project = search_dict['project']
 
-    ofu = getlocs(project=project, model=model, simulation=simulation,
-                  frequency=frequency, realm=realm, table=table)
-    clogger.debug("locs=" + repr(ofu))
-    if len(ofu) == 0:
-        clogger.warning("no datalocation found for %s %s %s %s  %s %s " % (project, model, simulation, frequency, realm,
-                                                                           table))
-    for org, _, urls in ofu:
-        if org not in ['generic', ]:
-            clogger.warning("Organisation = %s will be deprecated quite soon." % org +
-                            "Please refer to you CliMAF wizard for removing its use")
-        if return_wildcards is not None and len(return_wildcards) > 0 and org != "generic":
-            raise Climaf_Error(
-                "Can handle multiple facet query only for organization=generic ")
-        if return_combinations is not None and len(return_combinations) > 0 and org != "generic":
-            raise Climaf_Error(
-                "Can handle multiple facet query only for organization=generic ")
-        kwargs2 = kwargs.copy()
-        # Convert normalized frequency to project-specific frequency if applicable
-        if "frequency" in kwargs and project in frequencies:
-            normfreq = kwargs2['frequency']
-            if normfreq in frequencies[project]:
-                kwargs2['frequency'] = frequencies[project][normfreq]
-        # JS # Convert normalized realm to project-specific realm if applicable
-        if "realm" in kwargs and project in realms:
-            normrealm = kwargs2['realm']
-            if normrealm in realms[project]:
-                kwargs2['realm'] = realms[project][normrealm]
-        #
-        # Call organization-specific routine
-        if org in ["EM", ]:
-            rep.extend(selectEmFiles(**kwargs2))
-        elif org in ["CMIP5_DRS", ]:
-            rep.extend(selectCmip5DrsFiles(urls, **kwargs2))
-        elif org in ["generic", ]:
-            if project in ["CMIP6", ] and env.environment.optimize_cmip6_wildcards and \
-               cmip6_optimize_check_paths(urls):
-                kwargs_list = cmip6_optimize_wildcards(kwargs2)
-                if not with_periods and return_combinations is not None:
-                    # Just return the list of dicts with facet values combinations
-                    return_combinations.extend(kwargs_list)
-                    rep.append('dummy')
-                else:
-                    if return_combinations is None:
-                        # Also for glob, but must get periods
-                        clogger.warning("cdataset.explore doesn't anymore return choices with  "
-                                        "optimized CMIP6 search. Use cdataset.glob() or set "
-                                        "env.environment.optimize_cmip6_wildcards to False")
-                    for kwa in kwargs_list:
-                        rep.extend(selectGenericFiles(urls, return_combinations=return_combinations,
-                                                      use_frequency=use_frequency, **kwa))
-            else:
-                rep.extend(selectGenericFiles(urls, return_wildcards=return_wildcards,
-                                              return_combinations=return_combinations,
-                                              merge_periods_on=merge_periods_on, use_frequency=use_frequency,
-                                              **kwargs2))
-        else:
-            raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
-                               model + " of project " + project)
-    if not ofu:
-        return None
-    elif len(rep) == 0:
-        clogger.warning("no file found for %s, at these "
-                        "data locations %s " % (repr(kwargs), repr(urls)))
-        clogger.warning("i.e. at " + str([url.replace("${PERIOD}", "$PERIOD").replace("$", "").format(**kwargs)
-                                          for url in urls]))
-        if env.environment.optimize_cmip6_wildcards:
-            clogger.warning("If you think this may be due to fresh data ingest, "
-                            "you may wish to reset some of the tables used in "
-                            "optimizing CMIP6 data search. See help(climaf.projects.optimize.clear_tables)")
-        return None
-    else:
+    def format_output(rep):
+        if len(rep) == 0:
+            return None
         # When returning strings (actually filenames), join them in a single string
         if len(rep) > 0 and isinstance((rep[0]), six.string_types):
             # Discard duplicates (assumes that sorting is harmless for later processing)
@@ -360,6 +298,96 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
             # Assemble filenames in one single string
             rep = ' '.join(rep)
         return rep
+
+    if project in projects_using_intake:
+        rep = selectGenericFiles(None, search_dict, return_combinations=return_combinations,
+                                 use_frequency=use_frequency, return_wildcards=return_wildcards,
+                                 merge_periods_on=merge_periods_on)
+        return format_output(rep)
+    ###########################################################################################
+    #
+    rep = []
+    simulation = search_dict['simulation']
+    model = search_dict.get("model", "*")
+    frequency = search_dict.get("frequency", "*")
+    realm = search_dict.get("realm", "*")
+    table = search_dict.get("table", "*")
+    ofu = getlocs(project=project, model=model, simulation=simulation,
+                  frequency=frequency, realm=realm, table=table)
+    clogger.debug("locs=" + repr(ofu))
+    if len(ofu) == 0:
+        clogger.warning("no datalocation found for %s %s %s %s  %s %s " %
+                        (project, model, simulation, frequency, realm, table))
+    for org, _, urls in ofu:
+        clogger.info("Will seek with urls" + str(urls))
+        if org not in ['generic', ]:
+            clogger.warning("Organisation = %s will be deprecated quite soon." % org +
+                            "Please refer to you CliMAF wizard for removing its use")
+            if return_wildcards is not None and len(return_wildcards) > 0:
+                raise Climaf_Error(
+                    "Can handle multiple facet query only for organization=generic ")
+            if return_combinations is not None and len(return_combinations) > 0:
+                raise Climaf_Error(
+                    "Can handle multiple facet query only for organization=generic ")
+        search_dict2 = search_dict.copy()
+
+        # Convert normalized frequency to project-specific frequency if applicable
+        if "frequency" in search_dict and project in frequencies:
+            normfreq = search_dict2['frequency']
+            if normfreq in frequencies[project]:
+                search_dict2['frequency'] = frequencies[project][normfreq]
+
+        # Convert normalized realm to project-specific realm if applicable
+        if "realm" in search_dict and project in realms:
+            normrealm = search_dict2['realm']
+            if normrealm in realms[project]:
+                search_dict2['realm'] = realms[project][normrealm]
+        #
+        # Call organization-specific routine
+        if org in ["EM", ]:
+            rep.extend(selectEmFiles(**search_dict2))
+        elif org in ["CMIP5_DRS", ]:
+            rep.extend(selectCmip5DrsFiles(urls, **search_dict2))
+        elif org in ["generic", ]:
+            preprocessor = can_preprocess(project, urls)
+            if preprocessor:
+                search_dict_list = preprocessor(search_dict2)
+                if not with_periods and return_combinations is not None:
+                    # Just return the list of dicts with facet values combinations
+                    return_combinations.extend(search_dict_list)
+                    rep.append('dummy')
+                else:
+                    if return_combinations is None:
+                        # Also for glob, but must get periods
+                        clogger.warning("cdataset.explore can't return choices when using  "
+                                        "optimized search. Use cdataset.glob() or "
+                                        "de-activate optimize search")
+                        # "optimized search. Use cdataset.glob() or set "
+                        # "env.environment.optimize_cmip6_wildcards to False")
+                    for kwa in search_dict_list:
+                        rep.extend(selectGenericFiles(urls, kwa, return_combinations=return_combinations,
+                                                      use_frequency=use_frequency))
+            else:
+                rep.extend(selectGenericFiles(urls, search_dict2, return_combinations=return_combinations,
+                                              use_frequency=use_frequency, return_wildcards=return_wildcards,
+                                              merge_periods_on=merge_periods_on))
+        else:
+            raise Climaf_Error("Cannot process organization " + org + " for simulation " + simulation + " and model " +
+                               model + " of project " + project)
+    if not ofu:
+        return None
+    elif len(rep) == 0:
+        clogger.warning("no file found for %s, at these "
+                        "data locations %s " % (repr(search_dict), repr(urls)))
+        clogger.warning("i.e. at " + str([url.replace("${PERIOD}", "$PERIOD").replace("$", "").format(**search_dict)
+                                          for url in urls]))
+        if env.environment.optimize_cmip6_wildcards:
+            clogger.warning("If you think this may be due to fresh data ingest, "
+                            "you may wish to reset some of the tables used in "
+                            "optimizing CMIP6 data search. See help(climaf.projects.optimize.clear_tables)")
+        return None
+    else:
+        return format_output(rep)
 
 
 def selectEmFiles(**kwargs):

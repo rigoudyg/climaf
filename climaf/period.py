@@ -224,6 +224,15 @@ class cperiod(object):
                 return cperiod(self.start, self.end)
 
 
+def init_period_iso(start, end):
+    """
+    Init a CliMAF 'period' object from two ISO dates such as 1850-01-01T00:00:00
+    """
+    def concat(date):
+        return date[0:4] + date[5:7] + date[8:10] + date[11:13] + date[14:16]
+    return init_period(concat(start) + "_" + concat(end))
+
+
 def init_period(dates):
     """
     Init a CliMAF 'period' object
@@ -538,9 +547,15 @@ def group_periods(diclist):
 def freq_to_minutes(data_freq):
     """
     Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
+    or in : day, mon, sem, 6hr, 3hr
     Returns duration in minutes (quite arbitrary for months)
     """
+    data_freq = data_freq.replace("sem", "6MS")
     data_freq = data_freq.replace("mon", "MS")
+    data_freq = data_freq.replace("day", "D")
+    data_freq = data_freq.replace("6hr", "6H")
+    data_freq = data_freq.replace("3hr", "3H")
+
     number = re.findall("^[0-9]*", data_freq)
     if len(number[0]) == 0:
         number = 1

@@ -168,6 +168,14 @@ class cproject(object):
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
         self.use_frequency = kwargs.get("use_frequency", False)
+        # A dict for translating CliMAF facet names to project facet names
+        # for use by intake
+        self.translate_facet = kwargs.get("translate_facet", dict())
+        # A pattern for extracting the period from the filename
+        # This is used for project which data is indexed using intake,
+        # and only until intake fields 'period_start' and 'period_end'
+        # are fixed at IPSL
+        self.period_pattern = kwargs.get("period_pattern", "*_${PERIOD}.nc")
 
     def derive(self, new_name, new_facets=list()):
         """
