@@ -91,7 +91,9 @@ if True:
         cdef('grid', 'g*', project=project)
         cdef('realization', 'r1i1p1f*', project=project)
         cdef('experiment', 'historical', project=project)
-        cdef('version', 'latest', project=project)
+        #cdef('version', 'latest', project=project)
+        # With intake, version 'latest' is not available anymore
+        cdef('version', '*', project=project)
         cdef('table', '*', project=project)
         #
         calias(project, 'tos', offset=273.15, units="K")
@@ -115,7 +117,9 @@ if True:
     cdef('grid', 'g*', project=project)
     cdef('realization', 'r1i1p1f*', project=project)
     cdef('experiment', 'historical', project=project)
-    cdef('version', 'latest', project=project)
+    #cdef('version', 'latest', project=project)
+    # With intake, version 'latest' is not available anymore
+    cdef('version', '*', project=project)
     cdef('table', '*', project=project)
 
     # ------------
