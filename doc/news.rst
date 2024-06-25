@@ -8,7 +8,8 @@ Changes, newest first:
 
 - V3.x:
 
-  - Add operator plotmap, a replacement for operator plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`
+  - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs. First use implies reading the catalog, which can last up to 30s for CMIP6; but next requests are much quicker. Can be deactivated by setting `env.environment.projects_using_intake` list to []. Current list includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included as a test case for introducing a new project natively managed with intake. As a consequence, the default value for facet `version` is now `*` for CMIP6, CMIP5 and CORDEX. See 'internals' below for details. 
+  - Add operator **plotmap**, a replacement for operator `plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`
   - Function cshow now calls display(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
   - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.ds`
   - Various fixes for running at IDRIS
@@ -18,6 +19,18 @@ Changes, newest first:
     
   - Internals :
 
+    - New module projects/intake_search.py handles intake catalogs, thanks to:
+
+       - variables in env.environment.py :
+ 
+           - the list of target projects: `projects_using_intake` and
+           - the catalog path: `intake_catalog`
+
+       - for each target project:
+	 
+	   - a dict `translate_facet` for matching CliMAF facet names to intake catalog facet names
+	   - a string `period_pattern` which allows to extract the period from the filename; this is needed only because IPSL catalogs do not provide relevant values for that, yet
+	     
     - When calling an external script, operator arguments values are dumped in json format; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
     - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
