@@ -5,8 +5,7 @@
 shell-like wildcards (i.e. include * or ?)
 
 For now limited to project CMIP6 and active only if
-env.environment.optimize_cmip6_wildcards is True (which is the
-default) . See doc for
+env.environment.optimize_cmip6_wildcards is True. See doc for
 :py:func:`~climaf.projects.optimize.cmip6_optimize_wildcards`
 
 """

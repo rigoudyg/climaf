@@ -92,6 +92,20 @@ cacheIndexFileName = None
 # (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
 optimize_cmip6_wildcards = False
 
+#: Keyword used in filename patterns as a placeholder for a pair of dates representing the data period for the file
+date_keyword = "${PERIOD}"
+# date_keyword is used in climaf/projects/*py and climaf/classes.py for class cprojects
+
+if onSpirit:
+    #: Path for the Intake data catalog
+    intake_catalog = '/modfs/catalogs/master_latest.yml'
+
+    #: List of projects that can have an optimized search using an intake catalog
+    projects_using_intake = ["CMIP5", "CMIP6", "CORDEX", "PMIP3"]
+else:
+    intake_catalog = None
+    projects_using_intake = []
+
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
 stamping = True

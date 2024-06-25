@@ -30,17 +30,37 @@ if atCNRM:
     # Declare a list of root directories for IPSL data at CNRM
     root = "/cnrm/cmip/cnrm/ESG"
 
+# a dict translating CliMAF facets to CMIP5 facets (those known by intake)
+translate_facet = {
+    'table': 'cmor_table',
+    'frequency': 'time_frequency',
+    'simulation': None,
+    'domain': None,
+    'root': None,
+    'frequency': None,
+}
+
+# A pattern for finding period in filename when using intake catalogs
+# (which, at IPSL, as of 20240517, have buggy values for period_start
+# and period_end)
+period_pattern = "*_${PERIOD}.nc"
+
+
 # if root:
 if True:
     # -- Declare a CMIP5 CliMAF project
     # ------------------------------------ >
-    cproject('CMIP5', 'root', 'model', 'table', 'experiment', 'realization', 'frequency', 'realm',
-             'version', ensemble=['model', 'realization'], separator='%')
+    cproject('CMIP5', 'root', 'model', 'table', 'experiment',
+             'realization', 'frequency', 'realm', 'version',
+             ensemble=['model', 'realization'], separator='%',
+             translate_facet=translate_facet, period_pattern=period_pattern)
+
     # -- Declare a CMIP5 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
-    cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment', 'extent_experiment', 'realization', 'frequency',
-             'realm',
-             'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
+    cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment',
+             'extent_experiment', 'realization', 'frequency', 'realm',
+             'version', 'extent_version', ensemble=['model', 'realization'],
+             separator='%')
 
     # -- Define the pattern for CMIP5
     if atCNRM:
@@ -98,7 +118,9 @@ if True:
         if atCNRM:
             cdef('version', '*', project=project)
         else:
-            cdef('version', 'latest', project=project)
+            #cdef('version', 'latest', project=project)
+            # With intake, version 'latest' is not available anymore
+            cdef('version', '*', project=project)
         cdef('frequency', '*', project=project)
     cdef('extent_experiment', 'rcp85', project='CMIP5_extent')
 

@@ -13,7 +13,7 @@ from datetime import timedelta
 from climaf.utils import Climaf_Error
 from env.environment import *
 from env.clogging import clogger, dedent
-from climaf.period import cperiod, freq_to_minutes
+from climaf.period import cperiod, freq_to_minutes, init_period, build_date_regexp_pattern
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -290,3 +290,54 @@ def infer_freq(times, monthly):
         return "MS"
     else:
         return None
+
+
+def extract_period(filename, template, use_frequency=False):
+    """Extract the period from FILENAME (or from the file itself),
+    using TEMPLATE, which is a pattern possibly using keyword
+    "${PERIOD}"
+
+    First replaces globing wildcards (*,?) by regexp equivalent
+    wildcards (.*,.) in TEMPLATE
+
+    Next, if TEMPLATE includes the period keyword "${PERIOD}",
+    replaces it with a regexp for matching pairs of dates
+
+    If test is OK, the changed template is used to extract the date values,
+    from FILENAME 
+
+    Otherwise, use timeLimits to extract period by
+    reading datafile's time dimension
+
+    """
+    # Construct regexp for extracting dates from filename
+    template_toreg = template.replace(
+        r"*", r".*").replace(r"?", r".").replace(r"+", r"\+")
+    period_keyword = "${PERIOD}"
+    #
+    if template_toreg.find(period_keyword) >= 0:
+        date_regexp = template_toreg.replace(
+            period_keyword, build_date_regexp_pattern(), 1)
+    else:
+        date_regexp = None
+    #
+    if date_regexp:
+        tperiod = re.sub(date_regexp, r'\g<period>', filename)
+        clogger.debug("")
+        clogger.debug("Extracting period using regexp %s in filename %s" % (
+            date_regexp, filename))
+        if tperiod == filename:
+            clogger.error("Cannot find a period in %s with regexp %s" % (filename, date_regexp) +
+                          " \n template=%s, kw=%s" % (template, period_keyword))
+            return None
+        else:
+            clogger.debug("Found period=" + tperiod)
+            fperiod = init_period(tperiod)
+            return fperiod
+    else:
+        try:
+            fperiod = timeLimits(filename, use_frequency=use_frequency)
+            return fperiod
+        except:
+            clogger.info(
+                "Cannot yet filter re. time using only file content or xarray (for %s)." % filename)
