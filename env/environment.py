@@ -76,7 +76,8 @@ else:
 default_cache = os.getenv("CLIMAF_CACHE", default_cache)
 
 #: Default remote cache directory
-default_remote_cache = os.getenv("CLIMAF_REMOTE_CACHE", os.sep.join([default_cache, "remote_data"]))
+default_remote_cache = os.getenv(
+    "CLIMAF_REMOTE_CACHE", os.sep.join([default_cache, "remote_data"]))
 
 #: Current cache directory
 currentCache = None
@@ -88,7 +89,8 @@ cachedirs = None
 cacheIndexFileName = None
 
 #: Should the search for CMI6 files be optimized by building tables
-optimize_cmip6_wildcards = False  # (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
+# (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
+optimize_cmip6_wildcards = False
 
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
@@ -109,7 +111,8 @@ clog(loglevel)
 
 env.clogging.logdir = logdir
 if not os.access(env.clogging.logdir, mode=os.W_OK):
-    print("Cannot write logfile in non-writeable directory : " + os.path.abspath(env.clogging.logdir))
+    print("Cannot write logfile in non-writeable directory : " +
+          os.path.abspath(env.clogging.logdir))
     sys.exit()
 clog_file(logfilelevel)
 
@@ -141,21 +144,25 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
                 ncl_software = my_which("ncl")
         else:
             ncl_software = my_which("ncl")
-        clogger.info("ncl " + getoutput(ncl_software + ' -V') + " => " + ncl_software)
+        clogger.info("ncl " + getoutput(ncl_software + ' -V') +
+                     " => " + ncl_software)
     except:
         ncl_software = None
-        clogger.warning("ncl not found -> can't use CliMAF plotting scripts based on it")
+        clogger.warning(
+            "ncl not found -> can't use CliMAF plotting scripts based on it")
     try:
         cdo_software = my_which("cdo")
         tmp = str.split(getstatusoutput(cdo_software + ' -V')[1], ' ')
-        clogger.info("cdo " + tmp[tmp.index('version') + 1] + " => " + cdo_software)
+        clogger.info(
+            "cdo " + tmp[tmp.index('version') + 1] + " => " + cdo_software)
     except:
         cdo_software = None
         clogger.error("cdo not found -> CDO is mandatory to run CliMAF")
     try:
         ncks_sofware = my_which("ncks")
         tmp = str.split(getstatusoutput(ncks_sofware + ' --version')[1], ' ')
-        clogger.info("nco (ncks) " + tmp[tmp.index('version') + 1] + " => " + ncks_sofware)
+        clogger.info("nco (ncks) " +
+                     tmp[tmp.index('version') + 1] + " => " + ncks_sofware)
     except:
         ncks_sofware = None
         clogger.warning("nco not found -> can't use nco from CliMAF")
@@ -163,11 +170,14 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         if atTGCC or atIPSL or onCiclad:
             ncdump_software = '/prodigfs/ipslfs/dods/jservon/miniconda/envs/cesmep_env/bin/ncdump'
             ncdump_ret = getstatusoutput(ncdump_software)
-            clogger.info("ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + ncdump_software)
+            clogger.info(
+                "ncdump " + ncdump_ret[-1].split('\n')[-1].split()[3] + " => " + ncdump_software)
         else:
             ncdump_software = my_which("ncdump")
-            binary_info = getstatusoutput(ncdump_software + " --version")[-1].split("\n")[-1]
-            binary_info = binary_info.split("version")[-1].split("of")[0].strip()
+            binary_info = getstatusoutput(
+                ncdump_software + " --version")[-1].split("\n")[-1]
+            binary_info = binary_info.split(
+                "version")[-1].split("of")[0].strip()
             clogger.info("ncdump " + binary_info + " => " + ncdump_software)
     except:
         ncdump_software = None
@@ -180,7 +190,8 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         clogger.info("nco (ncatted) found -> " + ncatted_software)
     except:
         ncatted_software = None
-        clogger.warning("nco (ncatted) not available, can not stamp netcdf files")
+        clogger.warning(
+            "nco (ncatted) not available, can not stamp netcdf files")
         do_stamping = False
     try:
         convert_software = my_which("convert")
@@ -204,12 +215,21 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         clogger.warning("exiv2 not available, can not stamp eps files")
         do_stamping = False
     if not do_stamping and stamping is True:
-        clogger.warning("At least one stamping requirement is not fulfilled, turn it to None.")
+        clogger.warning(
+            "At least one stamping requirement is not fulfilled, turn it to None.")
         stamping = None
     clogger.info("---")
 
 if atCNRM:
-    pdf_page_builder = os.sep.join([os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
+    pdf_page_builder = os.sep.join([os.path.dirname(
+        os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
     pdf_page_builder = "pdfjam"
 
+#: A pid which fits at TGCC in case of containerized concurrent processes
+robust_pid = os.getpid()
+if atTGCC:
+    # We are running there in a container, so concurrent instances
+    # of CliMAF may have the same process ID, while they have distinct
+    # values of environement variable SCRIPTID
+    pid = os.getenv("SCRIPT_PID", robust_pid)
