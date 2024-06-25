@@ -32,6 +32,7 @@ if atCNRM:
 
 # a dict translating CliMAF facets to CMIP5 facets (those known by intake)
 translate_facet = {
+    'realization': 'ensemble',
     'table': 'cmor_table',
     'frequency': 'time_frequency',
     'simulation': None,
