@@ -1,22 +1,33 @@
 #!/bin/bash
 doc="
-$0 FIELDIN FIELDGRID FIELDOUT
+$0 FIELDIN GRIDFIELD FIELDOUT VARIABLE
 
-Interpolate FIELDIN, on grid provided by FIELDGRID, to FIELDOUT,using CDO
-If FIELDGRID is not a file, interpret it as a CDO standard grid name
+Interpolate FIELDIN, on grid provided by GRIDFIELD, to FIELDOUT,using CDO
+If GRIDFIELD is not a file, interpret it as a CDO standard grid name
+Only variable VARIABLE is kept in output
 
+If grids are the same, do not interpolate (because otherwise, CDO 
+generate diffs)
 No effort to optimize (e.g. by using pre-computed weights) yet !
 "
 set -ex
 fieldin=$1
-fieldgrid=$2
+gridfield=$2
 fieldout=$3
 var=$4
 option=${5:-remapbil}
-if [ -f $fieldgrid ] ; then 
-    cdo griddes $fieldgrid > climaf_tmp_grid_$$
-    cdo $option,climaf_tmp_grid_$$ -selname,$var $fieldin $fieldout 
-    rm climaf_tmp_grid_$$
+#
+if [ -f $gridfield ] ; then 
+    cdo griddes $gridfield > climaf_tmp_target_grid_$$
+    
+    # interpolate only if input grid is not the same as target grid
+    cdo griddes $fieldin > climaf_tmp_input_grid_$$
+    if ! diff -q climaf_tmp_target_grid_$$ climaf_tmp_input_grid_$$ ; then
+	interpolator="$option,climaf_tmp_target_grid_$$"
+    fi
+    cdo $interpolator -selname,$var $fieldin $fieldout 
+    rm climaf_tmp_*_grid_$$
 else
-    cdo $option,$fieldgrid -selname,$var $fieldin $fieldout 
+    grid=$gridfield
+    cdo $option,$grid -selname,$var $fieldin $fieldout 
 fi
