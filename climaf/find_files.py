@@ -257,6 +257,8 @@ def check_period_and_store(f, period, values, kwargs, wildcards, merge_periods_o
         return store_wildcard_facet_values(f, values, kwargs, wildcards, merge_periods_on, combinations)
     else:
         fperiod = values['period']
+        if fperiod and isinstance(fperiod, six.string_types):
+            fperiod = init_period(fperiod)
         #
         if fperiod and (periods is not None or period.intersects(fperiod)):
             clogger.debug('Period is OK')
