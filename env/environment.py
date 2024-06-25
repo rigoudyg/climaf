@@ -226,3 +226,11 @@ if atCNRM or onSpirit or atTGCC or atIDRIS:
         os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
     pdf_page_builder = "pdfjam"
+
+#: A pid which fits at TGCC in case of containerized concurrent processes
+robust_pid = os.getpid()
+if atTGCC:
+    # We are running there in a container, so concurrent instances
+    # of CliMAF may have the same process ID, while they have distinct
+    # values of environement variable SCRIPTID
+    pid = os.getenv("SCRIPT_PID", robust_pid)

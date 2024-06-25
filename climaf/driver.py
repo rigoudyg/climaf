@@ -916,7 +916,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         # #generateUniqueFileName(scriptCall.crs, format=output_fmt)
         tmpfile, tmpfile_fmt = os.path.splitext(
             generateUniqueFileName(scriptCall.crs, format=output_fmt))
-        main_output_filename = "%s_%i%s" % (tmpfile, os.getpid(), tmpfile_fmt)
+        main_output_filename = "%s_%i%s" % (tmpfile, robust_pid, tmpfile_fmt)
 
         subdict["out"] = main_output_filename
         subdict["out_" + varOf(scriptCall)] = main_output_filename
