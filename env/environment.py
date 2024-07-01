@@ -209,12 +209,16 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
             "nco (ncatted) not available, can not stamp netcdf files")
         do_stamping = False
     try:
-        convert_software = my_which("convert")
+        convert_software = my_which("magick")
         clogger.info("convert found -> " + convert_software)
     except:
-        convert_software = None
-        clogger.warning("convert not available, can not stamp png files")
-        do_stamping = False
+        try:
+            convert_software = my_which("convert")
+            clogger.info("convert found -> " + convert_software)
+        except:
+            convert_software = None
+            clogger.warning("convert not available, can not stamp png files")
+            do_stamping = False
     try:
         pdftk_software = my_which("pdftk")
         clogger.info("pdftk found -> " + pdftk_software)
@@ -247,4 +251,4 @@ if atTGCC:
     # We are running there in a container, so concurrent instances
     # of CliMAF may have the same process ID, while they have distinct
     # values of environement variable SCRIPTID
-    pid = os.getenv("SCRIPT_PID", robust_pid)
+    robust_pid = os.getenv("SCRIPT_PID", robust_pid)
