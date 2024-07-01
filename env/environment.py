@@ -250,5 +250,5 @@ robust_pid = os.getpid()
 if atTGCC:
     # We are running there in a container, so concurrent instances
     # of CliMAF may have the same process ID, while they have distinct
-    # values of environement variable SCRIPTID
-    robust_pid = os.getenv("SCRIPT_PID", robust_pid)
+    # values of environement variable SLURM_JOBID
+    robust_pid = os.getenv("SLURM_JOBID", robust_pid)
