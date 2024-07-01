@@ -224,11 +224,11 @@ def register(filename, crs, costs, outfilename=None):
                                                                                   filename)
             elif re.findall(".png$", filename) and convert_software is not None:
                 crs2 = crs.replace(r"%", r"\%").replace(r'"', r'\"')
-                command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
+                command = "%s %s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
-                          "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
-                          (convert_software, crs2, climaf_version,
-                           filename, filename, filename, filename)
+                          "%s (http://climaf.rtfd.org)\" %s.png && mv -f %s.png %s" % \
+                          (convert_software, filename, crs2, climaf_version,
+                           filename, filename, filename)
             elif re.findall(".pdf$", filename) and pdftk_software is not None:
                 tmpfile = str(uuid.uuid4())
                 command = "%s %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
