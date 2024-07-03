@@ -247,7 +247,7 @@ else:
 
 #: A pid which fits at TGCC in case of containerized concurrent processes
 robust_pid = os.getpid()
-if atTGCC:
+if atTGCC or atIDRIS:
     # We are running there in a container, so concurrent instances
     # of CliMAF may have the same process ID, while they have distinct
     # values of environement variable SLURM_JOBID
