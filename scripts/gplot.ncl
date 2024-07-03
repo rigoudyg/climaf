@@ -16,10 +16,10 @@ function str_convert(str:string)
 
 local val, valf
 begin
-  if .not. ismissing(str_match(str,"true")) then
+  if .not. ismissing(str_match(str,"true")) .or. .not. ismissing(str_match(str,"True")) then
     return(True)
   else
-    if .not. ismissing(str_match(str,"false")) then
+    if .not. ismissing(str_match(str,"false")) .or. .not. ismissing(str_match(str,"False"))then
       return(False)
     else
 
