@@ -245,7 +245,7 @@ if atCNRM or onSpirit or atTGCC or atIDRIS:
 else:
     pdf_page_builder = "pdfjam"
 
-#: A pid which fits at TGCC in case of containerized concurrent processes
+#: A pid which fits at TGCC and IDRIS in case of containerized concurrent processes
 robust_pid = os.getpid()
 if atTGCC or atIDRIS:
     # We are running there in a container, so concurrent instances

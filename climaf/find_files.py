@@ -186,7 +186,7 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                 if len(lfiles) == 0 and altvar != variable:
                     clogger.debug(
                         "No file found with regular variable name %s, trying with filenameVar %s" %
-                        variable, altvar)
+                        (variable, altvar))
                     lfiles = find_by_globbing(
                         url, full_template, instanciated_template, kwargs,
                         simple_kwargs.copy(), alt_variable=altvar)
@@ -356,7 +356,10 @@ def store_wildcard_facet_values(f, values, kwargs, wildcards, merge_periods_on=N
     project = kwargs["project"]
     proj = cprojects[project]
     for kw in kwargs:
-        valid_values = proj.cvalid(kw, None)
+        if kw == 'filenameVar' :
+            valid_values = None
+        else:
+            valid_values = proj.cvalid(kw, None)
         if kw in values:
             facet_value = values[kw]
             if isinstance(valid_values, list) and (facet_value not in valid_values):
