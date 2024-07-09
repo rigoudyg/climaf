@@ -1161,9 +1161,13 @@ class cdataset(cobject):
         """
         if (force and self.project != 'file') or self.files is None:
             if ensure_dataset:
+                clogger.debug(
+                    "baseFile calls explore method with default option")
                 self.explore()
             else:
+                clogger.debug("baseFiles calls explore with option 'choices'")
                 cases = self.explore(option='choices')
+                clogger.debug("baseFiles : explore result is %s" % cases)
                 list_keys = [k for k in cases if type(
                     cases[k]) is list and k != 'period']
                 if len(list_keys) > 0:

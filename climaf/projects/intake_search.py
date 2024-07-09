@@ -36,8 +36,9 @@ if intake_catalog is not None:
         project = kwargs['project']
         alias = cprojects[project].translate_facet
 
-        # A dict of values for facets not handled by the project
-        # (they are removed for the search, then restored)
+        # A dict of values for facets not handled by the intake
+        # catalog for the project (they are removed for the search,
+        # then restored)
         non_project_values = dict()
 
         # Rename some facets, withdraw some others
@@ -48,12 +49,11 @@ if intake_catalog is not None:
                 else:
                     non_project_values[facet] = kwargs.pop(facet)
 
-        # For CMIP6, users are accustomed to request version 'latest',
-        # which is not available when using intake. But fortunately, there
-        # is only one version kept for each dataset, at least for now at
-        # IPSL
-        if project == 'CMIP6' and 'version' in kwargs and kwargs['version'] == 'latest':
+        # For CMIP, users are accustomed to request version 'latest',
+        # which is not available 'as is' when using intake.
+        if project in ['CMIP5', 'CMIP6'] and kwargs.get('version', None) == 'latest':
             kwargs['version'] = '*'
+            kwargs['latest'] = True
 
         # Change glob-style wildcards to regexp wildcards
         for kw in kwargs:
@@ -76,6 +76,7 @@ if intake_catalog is not None:
         subcat = intake_search(catalogs[project], **kwargs)
         clogger.info("Done querying in %d seconds" % (time.time() - tim1))
         dic_list = subcat.df.to_dict(orient='records')
+        clogger.debug("Query result is %s" % dic_list)
 
         for dico in dic_list:
             # Translate back facet names
@@ -129,8 +130,16 @@ if intake_catalog is not None:
                  if "." not in value}
         wild = {key: value for key, value in kwargs.items() if "." in value}
         subcat = catalog.search(**plain)
-        return subcat.search(**wild)
-
+        clogger.debug("Search with plain arguments %s returned : %s" %
+                      (plain, len(subcat.df.to_dict(orient='records'))))
+        if len(wild) == 0:
+            clogger.debug("And there is no wildcard args")
+            return subcat
+        else:
+            rep = subcat.search(**wild)
+            clogger.debug("Search with wildcard arguments %s returned : %s" %
+                          (wild, len(rep.df.to_dict(orient='records'))))
+            return rep
 else:
 
     def intake_find(kwargs):

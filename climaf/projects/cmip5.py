@@ -119,9 +119,7 @@ if True:
         if atCNRM:
             cdef('version', '*', project=project)
         else:
-            #cdef('version', 'latest', project=project)
-            # With intake, version 'latest' is not available anymore
-            cdef('version', '*', project=project)
+            cdef('version', 'latest', project=project)
         cdef('frequency', '*', project=project)
     cdef('extent_experiment', 'rcp85', project='CMIP5_extent')
 
