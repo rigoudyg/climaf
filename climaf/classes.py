@@ -1047,8 +1047,8 @@ class cdataset(cobject):
         clogger.debug("Looking with dic=%s" % repr(dic))
         # if option != 'check_and_store' :
         wildcards = dict()
-        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on, use_frequency=use_frequency,
-                            **dic)
+        files = selectFiles(return_wildcards=wildcards, merge_periods_on=group_periods_on,
+                            use_frequency=use_frequency, **dic)
         # -- Use the requested variable instead of the aliased
         if self.alias:
             dic["variable"] = req_var

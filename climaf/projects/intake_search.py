@@ -51,7 +51,7 @@ if intake_catalog is not None:
 
         # For CMIP, users are accustomed to request version 'latest',
         # which is not available 'as is' when using intake.
-        if project in ['CMIP5', 'CMIP6'] and kwargs.get('version', None) == 'latest':
+        if project in ['CMIP5', 'CMIP6', 'CORDEX'] and kwargs.get('version', None) == 'latest':
             kwargs['version'] = '*'
             kwargs['latest'] = True
 
@@ -127,8 +127,9 @@ if intake_catalog is not None:
 
         """
         plain = {key: value for key, value in kwargs.items()
-                 if "." not in value}
-        wild = {key: value for key, value in kwargs.items() if "." in value}
+                 if type(value) is not str or "." not in value}
+        wild = {key: value for key, value in kwargs.items()
+                if type(value) is str and "." in value}
         subcat = catalog.search(**plain)
         clogger.debug("Search with plain arguments %s returned : %s" %
                       (plain, len(subcat.df.to_dict(orient='records'))))

@@ -95,10 +95,8 @@ if root:
     cdef('experiment', 'rcp85', project='CORDEX-Adjust')
 
     for project in ['CORDEX', 'CORDEX_extent', 'CORDEX-Adjust']:
-        cfreqs(project, {'daily': 'day'})
-        #cdef('version', 'latest', project=project)
-        # With intake, version 'latest' is not available anymore
-        cdef('version', '*', project=project)
+        cfreqs(project, {'daily': 'day', '3h': '3hr', 'monthly': 'mon'})
+        cdef('version', 'latest', project=project)
         cdef('root', root, project=project)
         cdef('institute', '*', project=project)
         cdef('realization', 'r1i1p1', project=project)

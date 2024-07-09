@@ -299,8 +299,22 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
             rep = ' '.join(rep)
         return rep
 
+    search_dict2 = search_dict.copy()
+
+    # Convert normalized frequency to project-specific frequency if applicable
+    if "frequency" in search_dict and project in frequencies:
+        normfreq = search_dict2['frequency']
+        if normfreq in frequencies[project]:
+            search_dict2['frequency'] = frequencies[project][normfreq]
+
+    # Convert normalized realm to project-specific realm if applicable
+    if "realm" in search_dict and project in realms:
+        normrealm = search_dict2['realm']
+        if normrealm in realms[project]:
+            search_dict2['realm'] = realms[project][normrealm]
+
     if project in projects_using_intake:
-        rep = selectGenericFiles(None, search_dict, return_combinations=return_combinations,
+        rep = selectGenericFiles(None, search_dict2, return_combinations=return_combinations,
                                  use_frequency=use_frequency, return_wildcards=return_wildcards,
                                  merge_periods_on=merge_periods_on)
         return format_output(rep)
@@ -329,19 +343,6 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
             if return_combinations is not None and len(return_combinations) > 0:
                 raise Climaf_Error(
                     "Can handle multiple facet query only for organization=generic ")
-        search_dict2 = search_dict.copy()
-
-        # Convert normalized frequency to project-specific frequency if applicable
-        if "frequency" in search_dict and project in frequencies:
-            normfreq = search_dict2['frequency']
-            if normfreq in frequencies[project]:
-                search_dict2['frequency'] = frequencies[project][normfreq]
-
-        # Convert normalized realm to project-specific realm if applicable
-        if "realm" in search_dict and project in realms:
-            normrealm = search_dict2['realm']
-            if normrealm in realms[project]:
-                search_dict2['realm'] = realms[project][normrealm]
         #
         # Call organization-specific routine
         if org in ["EM", ]:
