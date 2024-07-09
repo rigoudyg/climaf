@@ -194,7 +194,7 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         self.assertEqual(a["simulation"], "")
         self.assertEqual(a["table"], "*")
         self.assertEqual(a["variable"], "")
-        self.assertEqual(a["version"], "*")
+        self.assertEqual(a["version"], "latest")
         self.assertEqual(a["period"], init_period("1850-2000"))
         self.assertEqual(a["project"], "CMIP6")
         a = processDatasetArgs(project="CMIP6", period="fx")
@@ -225,7 +225,7 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         if atCNRM:
             self.assertEqual(a["version"], "*")
         else:
-            self.assertEqual(a["version"], "*")
+            self.assertEqual(a["version"], "latest")
         self.assertEqual(a["period"], init_period("1850-2000"))
         self.assertEqual(a["project"], "CMIP5")
         self.assertEqual(a["realm"], "*")
