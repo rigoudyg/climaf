@@ -106,6 +106,7 @@ from climaf.derived_variables import *
 from climaf.functions import *
 from climaf.easyCMIP_functions import *
 from IPython.display import Image, display
+from climaf.plot_operators import plot
 
 
 #: Path for the CliMAF package. From here, can write e.g. ``cpath+"../scripts"``. The value shown in the doc is not
