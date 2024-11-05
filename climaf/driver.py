@@ -49,6 +49,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # but this could be expensive
 dig_hard_into_cache = True
 
+#: How should the file be open, which hosts scripts outputs. Can use 'w' and 'a'
+scripts_ouput_write_mode = 'w'
+
 
 def capply(climaf_operator, *operands, **parameters):
     """
@@ -222,8 +225,8 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
         if len(ds_ambiguous_args) != 0:
             ds = ds.explore("resolve")
             clogger.warning("When doing a cfile on dataset %s, we had to ensure that it "
-                            "is completely defined, using  method 'explore', by updating "
-                            "with the following arguments: %s" % (cobject.crs,
+                            "is completely defined, using  method 'explore', by choosing "
+                            "for the following facets: %s" % (cobject.crs,
                                                                   str(ds_ambiguous_args)))
             clogger.warning("This was at the cost of querying the file system, more or "
                             "less heavily. You may wish to add such attributes by yourself")
@@ -1019,7 +1022,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     tim1 = time.time()
     clogger.info("Launching command:" + template)
     #
-    with open(logdir + '/last.out', 'w') as logfile:
+    with open(logdir + '/last.out', scripts_ouput_write_mode) as logfile:
         logfile.write(
             "\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
         try:
