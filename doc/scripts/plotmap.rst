@@ -199,7 +199,7 @@ That field is (by default) drawned by `Cartopy's contourf function <https://scit
   - ``vcb``: a logical value for setting the colorbar vertical; default to True
   - ``colorbar_options`` : a dict for arguments/values for routine `colorbar <https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure.colorbar>_`, which allows to finely tune colorbar rendering
   - ``colored_map_engine`` (or ``clre``) : the Cartopy routine used for creating the colored map, defaut is ``'contourf'``, and you may choose ``'pcolormesh'``, which do not interpolate across grid cells, and which may be more robust for some cases (e.g. Nemo tri-polar grid)
-  - ``colored_map_engine_options`` (or ``clreo``) : additional arguments for the colred map engine routine
+  - ``colored_map_engine_options`` (or ``clreo``) : additional arguments for the colored map engine routine
   - ``colored_map_transform, colored_map_transform_options, colored_map_selection_options, colored_map_min, colored_map_max, colored_map_scale, colored_map_offset`` : see :ref:`the common arguments<all_field_args>`
 
     
@@ -227,6 +227,7 @@ That field is (by default) drawned by `Cartopy's contour function`_, which basic
 
   - ``contours (contours_map_levels, cntl)`` : see just above
   - ``contours_map_colors (cntc)`` : value is passed as argument ``color`` to `Cartopy's contour function <https://scitools.org.uk/cartopy/docs/latest/reference/generated/cartopy.mpl.geoaxes.GeoAxes.html#cartopy.mpl.geoaxes.GeoAxes.contour>`_ . Default value is ``'black'``.
+  - ``contours_map_engine_options`` (or ``cnteo``) : additional arguments for the contours engine routine
   - ``contours_map_transform (cntt), contours_map_transform_options (cntto), contours_map_selection_options (cntso), contours_map_min (cntn), contours_map_max (cntx), contours_map_scale (cnts), contours_map_offset (cnto)`` : see :ref:`the common arguments<all_field_args>`
   - for labeling contours, use argument :ref:`plt_methods <plt_methods>` and method `clabel <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.clabel.html#matplotlib.pyplot.clabel>`_
 
