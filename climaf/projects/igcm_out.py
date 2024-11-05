@@ -124,6 +124,20 @@ from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
 
+def igcm_out_facet_ambiguity_solver(dic, facet, values_list):
+    """
+    Choose a value for FACET among VALUES_LIST, given the
+    context of facet values in DIC.
+    Return the chosen value, or None
+    """
+    if facet == "frequency":
+        if "DIR" in dic:
+            if dic["DIR"] == "ATM":
+                if "monthly" in values_list:
+                    return "monthly"
+                elif "daily" in values_list:
+                    return "daily"
+
 root = None
 login = None
 if atTGCC:
@@ -145,6 +159,7 @@ if root:
     p = cproject("IGCM_OUT", "root", "login", "model", "status", "experiment", "simulation", "DIR", "OUT", "ave_length",
                  "frequency", "period", "clim_period", "clim_period_length",
                  ensemble=["model", "simulation", "clim_period"], separator="%")
+    p.resolve_ambiguities = igcm_out_facet_ambiguity_solver
 
     cdef('root', root, project='IGCM_OUT')
     if login:
@@ -417,3 +432,5 @@ if root:
     calias('IGCM_OUT', 'hflsevap', 'hfls', scale=-
            1. / 2.5e6, filenameVar='histmth')
     # derive('IGCM_OUT', 'pme', 'minus', 'pr' ,'hflsevap')
+
+    
