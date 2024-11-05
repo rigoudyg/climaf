@@ -168,14 +168,22 @@ class cproject(object):
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
         self.use_frequency = kwargs.get("use_frequency", False)
+        
         # A dict for translating CliMAF facet names to project facet names
         # for use by intake
         self.translate_facet = kwargs.get("translate_facet", dict())
+
         # A pattern for extracting the period from the filename
         # This is used for project which data is indexed using intake,
         # and only until intake fields 'period_start' and 'period_end'
         # are fixed at IPSL
         self.period_pattern = kwargs.get("period_pattern", "*_${PERIOD}.nc")
+
+        # resolve_ambiguities is a method which chooses among facet values when
+        # they are ambiguous. It receives args : dic (the facets dic),
+        # facet (the ambiguous facet) and lvalues (the list of possibel values)
+        # (historical behaviour is to raise an error on ambiguities)
+        self.resolve_ambiguities = None
 
     def derive(self, new_name, new_facets=list()):
         """
@@ -777,13 +785,28 @@ class cdataset(cobject):
                 return False
         return True
 
+    def prefered_value(self, kw, values_list):
+        """ If the project described by DIC["project"] has a prefered
+        value among VALUES_LIST for facet KW, returns it, else None"""
+        if "project" in dic:
+            chooser = cprojects[dic["project"]].resolve_ambiguities
+            if chooser:
+                clogger.debug("Trying to solve ambiguity for ", kw)
+                return chooser(self.kvp, kw, values_list)
+            else:
+                clogger.debug("No way to resolve ambiguity for project ",dic["project"])
+
     def check_if_dict_ambiguous(self, input_dict):
         ambiguous_dict = dict()
         non_ambigous_dict = dict()
         for (kw, val) in input_dict.items():
             if isinstance(val, list):
                 if len(val) > 1:
-                    ambiguous_dict[kw] = val
+                    prefered = self.prefered_value(kw, val)
+                    if prefered:
+                        non_ambigous_dict[kw] = prefered
+                    else:
+                        ambiguous_dict[kw] = val
                 else:
                     non_ambigous_dict[kw] = val[0]
             elif kw in ['variable', ]:  # Should take care of aliasing to fileVar
