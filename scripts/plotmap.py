@@ -27,10 +27,10 @@ lefttitle = ""
 righttitle = ""
 
 
-def read_dataset(input_file, variable=None):
-    with xr.open_dataset(input_file, decode_cf=True, decode_times=True,
-                         decode_coords=True, decode_timedelta=True,
-                         use_cftime=True) as ds:
+def read_dataset(input_file, variable=None, time_decode=True):
+    with xr.open_dataset(input_file, decode_cf=True, decode_times=time_decode,
+                         decode_coords=True, decode_timedelta=time_decode,
+                         use_cftime=time_decode) as ds:
         if variable is None:
             return ds
         else:
@@ -54,7 +54,7 @@ def filter_dataset(dataset, dimensions, selection_options=dict()):
             selargs = {dimension: kwargs[dimension]}
             dataset = dataset.__getattribute__(method).__call__(**selargs)
     dims_to_remove = sorted(list(set(dataset.dims) - set(dimensions)))
-    if len(dims_to_remove) > 0:
+    if debug and len(dims_to_remove) > 0:
         print("Warning: The following dimensions will be selected by their first value : %s"
               % ", ".join(dims_to_remove))
         dataset = dataset.isel(**{dim: 0 for dim in dims_to_remove})
@@ -62,7 +62,8 @@ def filter_dataset(dataset, dimensions, selection_options=dict()):
     if len(missing_dims) > 0:
         raise ValueError("The following dimensions cannot be found : %s" %
                          ", ".join(missing_dims))
-    print(dataset)
+    if debug:
+        print(dataset)
     return dataset
 
 
@@ -129,7 +130,7 @@ def ccrs_from_metadata(filename):
     """
     ccrs_name = None
     ccrs_options = {}
-    f = xr.open_dataset(filename)
+    f = xr.open_dataset(filename, decode_times=False, decode_coords=False, decode_timedelta=False)
     for attr in f.attrs:
         if 'lambert_conformal' in attr.lower():
             ccrs_name = 'LambertConformal'
@@ -211,13 +212,21 @@ def get_variable_and_coordinates_from_dataset(
     # Check that the file exists
     if not os.path.isfile(input_file):
         raise ValueError("The input file %s does not exist" % input_file)
-    variable_dataset = read_dataset(input_file, variable)
+    # Analyze if decoding time is needed
+    time_decode = False
+    if "isel" in selection_options and "time" in selection_options["isel"] :
+        time_decode = True
+    # Read
+    variable_dataset = read_dataset(input_file, variable,time_decode)
     if dimensions == ["auto"]:
         dimensions = horizontal_dimensions(variable_dataset.dims)
         if debug:
             print("Using horizontal dimensions :", dimensions)
     variable_dataset = filter_dataset(
         variable_dataset, dimensions, selection_options)
+    for d in dimensions:
+        if len(variable_dataset[d]) < 2 :
+            raise ValueError("Dimension %s has too short a size for a map (%d)"%(d,len(variable_dataset[d])))
 
     # add cyclic point if one of the dimensions is a longitude and longitude range is ~ 360
     d0 = dimensions[0]  # Name of first dimension
@@ -324,7 +333,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     # Find the transform
     if colored_map_transform != "no_remap":
         if debug:
-            print("Using dedicated transform %s for interpreting colored map field")
+            print("Using dedicated transform for interpreting colored map field")
             # colored_map_transform)
         transform = find_ccrs(colored_map_transform,
                               colored_map_transform_options,
@@ -350,7 +359,10 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     if args.units:
         units = args.units
     else:
-        units = variable_data.units
+        try:
+            units = variable_data.units
+        except:
+            units="?"
     try:
         name = variable_data.__getattr__('long_name')
     except:
@@ -475,7 +487,10 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
     if args.units:
         units = args.units
     else:
-        units = variable_data.units
+        try:
+            units = variable_data.units
+        except:
+            units="?"    
     try:
         name = variable_data.__getattr__('long_name')
     except:
