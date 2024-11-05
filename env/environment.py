@@ -252,3 +252,9 @@ if atTGCC or atIDRIS:
     # of CliMAF may have the same process ID, while they have distinct
     # values of environement variable SLURM_JOBID
     robust_pid = int(os.getenv("SLURM_JOBID", robust_pid))
+
+
+#: Should we try to replace old 'plot' operator calls with 'plotmap' calls
+plot_use_plotmap = False
+# Should the plotmap wrapper explain how it transforms plot calls to plotmap calls
+teach_me_plotmap = False
