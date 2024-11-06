@@ -786,15 +786,17 @@ class cdataset(cobject):
         return True
 
     def prefered_value(self, kw, values_list):
-        """ If the project described by DIC["project"] has a prefered
+        """ If the project described by dataset's project has a prefered
         value among VALUES_LIST for facet KW, returns it, else None"""
-        if "project" in dic:
-            chooser = cprojects[dic["project"]].resolve_ambiguities
+        if "project" in self.kvp:
+            project = self.kvp["project"]
+            chooser = cprojects[project].resolve_ambiguities
             if chooser:
-                clogger.debug("Trying to solve ambiguity for ", kw)
+                clogger.debug("Trying to solve ambiguity for "+repr(kw))
                 return chooser(self.kvp, kw, values_list)
             else:
-                clogger.debug("No way to resolve ambiguity for project ",dic["project"])
+                clogger.error("No way to resolve ambiguity on %s among %s for project %s"\
+                              %(kw,values_list,project))
 
     def check_if_dict_ambiguous(self, input_dict):
         ambiguous_dict = dict()

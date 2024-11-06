@@ -251,7 +251,7 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                 elif proj in compatible_projections :
                     pass
                 else:
-                    clogger.info(f"Plotmap warning: Projection {proj} is "+`
+                    clogger.info(f"Plotmap warning: Projection {proj} is "\
                                  f"not (yet) managed. Caller is :{caller}")
                     outargs.pop(arg)
 
