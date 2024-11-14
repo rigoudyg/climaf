@@ -194,6 +194,7 @@ That field is (by default) drawned by `Cartopy's contourf function <https://scit
      - or ``levels`` (synonyms:``colors``, ``colored_map_levels``, ``clrl``): list of levels used when applying colormap e.g. ``colors="260 270 280 290"`` or ``colors=[260, 270, 280, 290]``
      - default is ``contourf()`` default
 
+  - ``missing_value_color`` (synonym: mvc) : name of the color to use for representing the missing/_Fill value
   - ``scale``, ``offset``: for scaling the colored map field (x -> x*scale + offset); default is no scaling
   - ``print_time`` : set it to True in order to add data time in the upper left caption
   - ``vcb``: a logical value for setting the colorbar vertical; default to True

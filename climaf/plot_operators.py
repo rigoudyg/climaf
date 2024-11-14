@@ -41,6 +41,8 @@ def load_plot_operators():
             "--colored_map_cmap='${colored_map_cmap}' "
             "--colored_map_cmap='${cmap}' "
             "--colored_map_cmap='${color}' "
+            "--missing_value_color='${missing_value_color}' "
+            "--missing_value_color='${mvc}' "
             "--colored_map_transform=${colored_map_transform} "
             "--colored_map_transform=${clrt} "
             "--colored_map_transform_options='${colored_map_transform_options}' "
@@ -274,9 +276,11 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                 options = kwargs["options"].split("|")
                 for option in options:
                     if "=" in option:
-                        param,value=option.split("=")
+                        param, value = option.split("=")
                         if param == "gsnAddCyclic" :
                             pass  # This is automatic in plotmap
+                        elif param == "cnMissingValFillColor" :
+                            outargs["missing_value_color"] = value
                         elif param == "mpProjection":
                             if value in compatible_projections:
                                 outargs["proj"] = value                        
@@ -294,6 +298,12 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                         param,value=option.split("=")
                         if param == "cnLineThicknessF" :
                             outargs["contours_map_engine_options"]["linewidths"] = int(value)
+                        if param == "cnLineLabelsOn" :
+                            if "axis_methods" not in outargs:
+                                outargs["axis_methods"] = dict()
+                            if "clabel" not in outargs["axis_methods"]:
+                                outargs["axis_methods"]["clabel"] = dict()
+                            outargs["axis_methods"]["clabel"]["inline"] = value
                         else:
                             clogger.info(f"Plotmap warning: aux_option {param} is not managed" +\
                                          ". Caller is :%s"%caller)
