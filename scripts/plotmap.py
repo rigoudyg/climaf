@@ -389,6 +389,14 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     except:
         pass
 
+    if args.missing_value_color is not None:
+        if debug:
+            print("Setting missing value color to ",args.missing_value_color)
+        # colored_map_cmap.set_bad(args.missing_value_color,alpha=1.)
+        # With cartopy, need to use set_facecolor instead of set_bad !!
+        # See : https://stackoverflow.com/questions/74505514/set-bad-function-not-perform-correctly-in-cartopy
+        ax.set_facecolor(args.missing_value_color)
+        
     # Prepare to plot the map
     contourf_args = dict(zorder=0, cmap=colored_map_cmap)
     contourf_args.update(colored_map_engine_options)

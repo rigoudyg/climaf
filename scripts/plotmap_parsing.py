@@ -53,6 +53,9 @@ def create_parser():
     colored_map_group.add_argument("--colored_map_cmap",
                                    help="Colors list or colormap name to use for the colored map",
                                    type=check_json_format, default='"BlueDarkRed18"')
+    colored_map_group.add_argument("--missing_value_color",
+                                   help="Name of the color to use for representing the missing/fill value",
+                                   type=check_json_format, default=None)
     colored_map_group.add_argument("--colored_map_transform",
                                    help="Coordinate system on which the colored map data is.",
                                    type=str, default=None)
