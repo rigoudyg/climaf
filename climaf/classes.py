@@ -1297,6 +1297,7 @@ class cdataset(cobject):
                             "is not named 'time' (%s)" % self)
             return None
         #
+        monthly = False # JS
         if self.frequency in ["monthly", "mon"] or \
            dsets[0].frequency in ["monthly", "mon"]:
             monthly = True

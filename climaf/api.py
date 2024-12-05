@@ -31,6 +31,8 @@ Main functions are :
 
  - ``cMA``      : get the Masked Array value of a CliMAF object (compute it)
 
+ - ``cxr``      : get the Xarray value of a CliMAF object (compute it)
+
  - ``cvalue``   : get the value of a CliMAF object which actually is a scalar
 
  - ``cens``     : define an ensemble of objects
@@ -93,7 +95,7 @@ from .projects import *
 from climaf.classes import cdef, cdataset, ds, cproject, cpage, \
     cfreqs, cens, eds, fds, cpage_pdf, varOf, crealms, derive_cproject
 from climaf.cmacro import macro
-from climaf.driver import ceval, cfile, cMA, cvalue, cimport, cexport, calias, efile
+from climaf.driver import ceval, cfile, cMA, cvalue, cimport, cexport, calias, efile, cxr
 from climaf.dataloc import dataloc
 from climaf.operators import cscript, fixed_fields
 from climaf.operators_derive import derive

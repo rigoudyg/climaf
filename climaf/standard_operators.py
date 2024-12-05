@@ -180,7 +180,7 @@ def load_standard_operators():
     cscript('curves', '(ncl -Q ' + scriptpath + 'curves.ncl infile=\'"${mmin}"\' '
                                                 'plotname=\'"${out}"\' var=\'"${Var}"\' title=\'${title}\' '
                                                 'y=\'${y}\' labels=\'${labels}\' colors=\'${colors}\' '
-                                                'units=\'${units}\' X_axis=\'${X_axis}\"\' fmt=\'${fmt}\' '
+                                                'units=\'${units}\' X_axis=\'${X_axis}\' fmt=\'${fmt}\' '
                                                 'options=\'${options}\' aux_options=\'${aux_options}\' '
                                                 'lgcols=${lgcols} myscale=${scale} myoffset=${offset} '
                                                 'type=\'${format}\' resolution=\'${resolution}\' trim=\'"${trim}"\' '
