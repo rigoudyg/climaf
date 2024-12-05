@@ -1418,6 +1418,15 @@ def cshow(obj):
     return value
 
 
+def cxr(obj):
+    """
+    Provide the Xarray value of a CliMAF object. Launch computation if needed.
+    (current design is as simple as possible : no control of re-computation)
+    """
+    with xarray.open_dataset(cfile(obj)) as f:
+        return f[obj.variable]
+
+    
 def cMA(obj, deep=None):
     """
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.

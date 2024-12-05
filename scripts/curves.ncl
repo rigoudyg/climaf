@@ -247,7 +247,7 @@ begin
 
 	; data vector for X axis
         if (i .eq. 0) then
-          Xaxis=fld&$coord$              ; Take first file as reference for X axis  
+          Xaxis=fld&$coord$              ; Take first file as reference for X axis
         else
           if (X_axis .eq. "real") then
        

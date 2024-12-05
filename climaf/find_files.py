@@ -168,6 +168,7 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
         save_kwargs = copy.deepcopy(kwargs)
         #
         for one_url in urls:
+            clogger.debug("Now processing url " + one_url)
             # Some keywords in kwargs can have values of type 'set', which must then be
             # expanded by cartesian product. This occurs with e.g. cmip6_optimize
             expanded_urls, simple_kwargs, kwargs = cartesian_product_substitute(
@@ -183,6 +184,11 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                 # Use brute force : globbing
                 lfiles = find_by_globbing(url, full_template,
                                           instanciated_template, kwargs, simple_kwargs.copy())
+                clogger.debug("Found %d files with raw variable name"%len(lfiles))
+                
+                # Construct a regexp with a group name for each facets but period
+                facets_regexp = build_facets_regexp(one_url, kwargs)
+                
                 if len(lfiles) == 0 and altvar != variable:
                     clogger.debug(
                         "No file found with regular variable name %s, trying with filenameVar %s" %
@@ -190,21 +196,30 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                     lfiles = find_by_globbing(
                         url, full_template, instanciated_template, kwargs,
                         simple_kwargs.copy(), alt_variable=altvar)
+                    clogger.debug("Found %d files with alt variable name"%len(lfiles))
+                    alt_kwargs = kwargs.copy()
+                    alt_kwargs['variable'] = altvar
+                    facets_regexp = build_facets_regexp(one_url, alt_kwargs)
+
                 #
-                # First construct a regexp with a group name for each facets but period
-                facets_regexp = build_facets_regexp(one_url, kwargs)
 
                 for f in lfiles:
                     if f in rep:
                         continue
                     if check_for_variable(f, url, variable, altvar):
                         # Extract facet values from filename
-                        values = re.search(facets_regexp, f).groupdict()
-                        #
-                        if check_period_and_store(
-                                f, period, values, kwargs, wildcards, merge_periods_on,
-                                return_combinations, periods, periods_dict):
-                            rep.append(remote_prefix + f)
+                        a_match=re.search(facets_regexp, f)
+                        if a_match: 
+                            values = a_match.groupdict()
+                            #
+                            if check_period_and_store(
+                                    f, period, values, kwargs, wildcards, merge_periods_on,
+                                    return_combinations, periods, periods_dict):
+                                rep.append(remote_prefix + f)
+                        #     else:
+                        #         clogger.debug("Not appending for" +repr(values))
+                        # else:
+                        #     clogger.debug("No match for "+ f + " and " + facets_regexp)
 
             # Break on first url with any matching data
             if len(rep) > 0:
@@ -467,13 +482,15 @@ def my_glob(template, url, project):
         #
         ret = set()
         for f in lfiles:
-            match = pattern_to_search.match(f)
-            if not match:
+            the_match = pattern_to_search.match(f)
+            if not the_match:
                 raise ValueError("Should not pass here")
             else:
-                match = match.groupdict()["new_period"]
-                if patterns_to_fill.match(match):
+                the_match = the_match.groupdict()["new_period"]
+                if patterns_to_fill.match(the_match):
                     ret.add(f)
+                # else:
+                #     print("No match, ",the_match, patterns_to_fill)
     return list(ret)
 
 
