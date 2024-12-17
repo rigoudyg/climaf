@@ -48,17 +48,17 @@ def load_standard_operators():
             ' --period="${period_iso}" --region="${domain}" --alias="${alias}" --units="${units}" '
             '--vm="${missing}" ${ins}')
     #
-    cscript('ccdo_fast', 'cdo ${operator} ${in} ${out}')
-    cscript('ccdo2', 'cdo ${operator} ${in_1} ${in_2} ${out}')
-    cscript('ccdo3', 'cdo ${operator} ${in_1} ${in_2} ${in_3} ${out}')
+    cscript('ccdo_fast', 'cdo ${!operator} ${in} ${out}')
+    cscript('ccdo2', 'cdo ${!operator} ${in_1} ${in_2} ${out}')
+    cscript('ccdo3', 'cdo ${!operator} ${in_1} ${in_2} ${in_3} ${out}')
     #
     # Define some CliMAF operators with tricky arguments ordering in order that CliMAF
     # do not loose track of variable name for the output of some CDO operators
     # because it takes it from operand ${in_1}, while some CDO operators impose to have it second
-    cscript('ccdo2_flip', 'cdo ${operator} ${in_2} ${in_1} ${out}')
-    cscript('ccdo3_flip', 'cdo ${operator} ${in_3} ${in_1} ${in_2} ${out}')
+    cscript('ccdo2_flip', 'cdo ${!operator} ${in_2} ${in_1} ${out}')
+    cscript('ccdo3_flip', 'cdo ${!operator} ${in_3} ${in_1} ${in_2} ${out}')
     #
-    cscript('ccdo_ens', 'cdo ${operator} ${mmin} ${out}')
+    cscript('ccdo_ens', 'cdo ${!operator} ${mmin} ${out}')
     #
     cscript('minus', 'cdo sub ${in_1} ${in_2} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
@@ -218,22 +218,22 @@ def load_standard_operators():
     cscript('ncdump', 'ncdump -h ${in} ', format="txt")
     #
     cscript('cslice_average',
-            "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} tmp.nc ; "
-            "ncwa -O -a ${dim} tmp.nc ${out} ; rm -f tmp.nc")
+            "ncks -O -F -v ${Var} -d ${!dim},${!min},${!max} ${in} tmp.nc ; "
+            "ncwa -O -a ${!dim} tmp.nc ${out} ; rm -f tmp.nc")
     #
     cscript('cslice_select',
-            "ncks -O -F -v ${Var} -d ${dim},${min},${max} ${in} ${out}")
+            "ncks -O -F -v ${Var} -d ${!dim},${!min},${!max} ${in} ${out}")
     #
-    cscript("mask", "cdo setctomiss,${miss} ${in} ${out}")
+    cscript("mask", "cdo setctomiss,${!miss} ${in} ${out}")
     #
-    cscript("ncpdq", "ncpdq ${arg} ${in} ${out}")
+    cscript("ncpdq", "ncpdq ${!arg} ${in} ${out}")
     #
     # Add nav_lon and nav_lat to a file
     cscript('add_nav_lat',
-            'cp ${in} ${out} ; ncks -A ${nav_lat_file} ${out} ;'
+            'cp ${in} ${out} ; ncks -A ${!nav_lat_file} ${out} ;'
             ' ncatted -O -a coordinates,${Var},o,c,${coordinates} ${out}')
     cscript('add_nav_lon_nav_lat_from_mesh_mask',
-            'cp ${in} ${out} ; ncks -A -v nav_lon,nav_lat ${mesh_mask_file} ${out}')
+            'cp ${in} ${out} ; ncks -A -v nav_lon,nav_lat ${!mesh_mask_file} ${out}')
     #
     cscript('get_oneVar', 'ncks -v ${Var} ${in} ${out}')
     cscript('cncks', 'ncks -v ${Var} ${in} ${out}')
