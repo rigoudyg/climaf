@@ -22,6 +22,8 @@ import cftime
 from datetime import timedelta
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+from  matplotlib.dates import YearLocator
+from  matplotlib.ticker import MultipleLocator
 
 import argparse
 
@@ -194,6 +196,10 @@ parser.add_argument('--vertical_lines_lw', action='store', default=None,
                     help='vertical lines thickness')
 parser.add_argument('--vertical_lines_colors', action='store', default=None,
                     help='vertical lines colors')
+parser.add_argument('--draw_grid', action='store', default="True",
+                    help='Draw a grid ? True/False')
+parser.add_argument('--year_delta', action='store', type=int, default=10, 
+                    help='Interval between tick marks for time (x) axis')
 
 # -- Default values
 default_left_string_fontsize = 30.
@@ -337,6 +343,7 @@ if args.horizontal_lines_values:
 # -- Loop on the netcdf files
 handles_for_legend = []
 dataset_number = 0
+seasonal_cycle = False
 for pathfilename in filenames_list:
     dat = Dataset(pathfilename)
     test_dat = (dat.variables[variable][:]) * scale + offset
@@ -349,8 +356,15 @@ for pathfilename in filenames_list:
     nctime = dat.variables[tname][:]
     # get unit  "days since 1950-01-01T00:00:00Z"
     t_unit = dat.variables[tname].units
-    if 'months' in t_unit:
+    if 'months' in t_unit or len(nctime) == 12:
         if len(nctime) == 12:
+            if pathfilename == filenames_list[0]:
+                seasonal_cycle = True
+            else:
+                if not seasonal_cycle:
+                    print("Error : file %s doesn't fit for a seasonal_cycle"%\
+                          pathfilename)
+                    sys.exit(1)
             x = np.array(range(1, 13))
             datevar = []
         else:
@@ -409,7 +423,11 @@ for pathfilename in filenames_list:
                  alpha=float(alphas_list[dataset_number]),
                  label=labels_list[dataset_number])[0]
     )
-
+    if seasonal_cycle :
+        plt.gca().xaxis.set_major_locator(MultipleLocator(1))
+        pass
+    else:
+        plt.gca().xaxis.set_major_locator(YearLocator(args.year_delta))
     print('dataset_numb :', dataset_number)
     print('lw_list :', int(lw_list[dataset_number]))
     print('lw_list :', np.shape(lw_list))
@@ -434,8 +452,8 @@ for pathfilename in filenames_list:
     # )
 
     #
-    # -- Highlight the period used to compute the climatology
-    if args.highlight_period:
+    # -- Highlight the period used to compute the climatology, except for annual cycles
+    if args.highlight_period and (type(x[0]) == type(cdatetime(1800,1,1))) :
         # highlight_period = highlight_period_list[filenames_list.index(pathfilename)]
         # filenames_list.index(pathfilename)]
         highlight_period = highlight_period_list[dataset_number]
@@ -458,7 +476,8 @@ for pathfilename in filenames_list:
     dataset_number = dataset_number + 1
 
 # -- Add the grid
-plt.grid()
+if args.draw_grid.lower() == 'true'  :
+    plt.grid()
 
 # -- Force setting the X limits
 if args.xlim:
@@ -515,7 +534,7 @@ else:
               fontsize=right_string_fontsize)
 
 # -- X and Y axis labels
-if args.xlabel:
+if args.xlabel and not seasonal_cycle:
     plt.xlabel(args.xlabel,
                fontsize=(float(args.xlabel_fontsize) if args.xlabel_fontsize else default_xlabel_fontsize))
 if args.ylabel:
@@ -570,8 +589,8 @@ if draw_legend:
 
         # for legobj in leg.legendHandles:
         print('legend_lw_list = ', legend_lw_list)
-        for ind in range(0, len(leg.legendHandles)):
-            leg.legendHandles[ind].set_linewidth(float(legend_lw_list[ind]))
+        for ind in range(0, len(leg.legend_handles)):
+            leg.legend_handles[ind].set_linewidth(float(legend_lw_list[ind]))
 
 # -- Add some text
 if args.text:

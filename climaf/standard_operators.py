@@ -298,6 +298,8 @@ def load_standard_operators():
                                       '--vertical_lines_styles=${vertical_lines_styles} '
                                       '--vertical_lines_lw=${vertical_lines_lw} '
                                       '--vertical_lines_colors=${vertical_lines_colors} '
+                                      '--draw_grid=${draw_grid} '
+                                      '--year_delta=${year_delta} '
                                       '--fig_size=${fig_size} ',
             format='png')
     #
