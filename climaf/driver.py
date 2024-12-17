@@ -115,10 +115,14 @@ def capply_script(script_name, *operands, **parameters):
     # Check that all parameters to the call are expected by the script
     command = script.command
     for para in parameters:
-        if not(r"{%s}" % para in command) and not(r"{%s_iso}" % para in command) and para not in ['member_label', ] \
-                and not para.startswith("add_"):
-            raise Climaf_Driver_Error("parameter '%s' is not expected by script %s (which command is : %s)" %
-                                      (para, script_name, command))
+        if not(r"{%s}" % para in command) \
+           and not(r"{!%s}" % para in command) \
+           and not(r"{%s_iso}" % para in command) \
+           and not para in ['member_label', ] \
+           and not para.startswith("add_"):
+            raise Climaf_Driver_Error(
+                "parameter '%s' is not expected by script %s (which command is : %s)" %
+                (para, script_name, command))
     #
     # Check that only first operand can be an ensemble
     opscopy = list(operands)
@@ -796,7 +800,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script = cscripts[scriptCall.operator]
-    template = Template(script.command)
+    template = Template(script.command.replace("{!","{") )
     total_costs = compute_cost()
     # Evaluate input data
     invalues, sizes, partial_cost = evaluate_inputs(
@@ -940,9 +944,13 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 scriptCall.crs + "." + output, format=output_fmt)
 
     # Account for script call parameters
-    for p in scriptCall.parameters:
-        # clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
-        subdict[p] = json.dumps(scriptCall.parameters[p])
+    for p,value in scriptCall.parameters.items():
+        # clogger.debug("processing parameter %s=%s"%(p,value))
+        if r"{!%s}"%p in script.command :
+            # Don't use json, just provide string or other simple type
+            subdict[p] = value
+        else:
+            subdict[p] = json.dumps(value)
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
@@ -971,7 +979,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             subdict.pop('member_label')
     #
     # Substitute all args
-    clogger.debug("Script call template and subdict before sustitution : " +
+    clogger.debug("Script call template and subdict before substitution : " +
                   template.safe_substitute() + repr(subdict))
     template = template.safe_substitute(subdict)
     clogger.debug("Script call template after sustitution : " +

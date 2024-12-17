@@ -33,7 +33,7 @@ Changes, newest first:
 	   - a dict `translate_facet` for matching CliMAF facet names to intake catalog facet names
 	   - a string `period_pattern` which allows to extract the period from the filename; this is needed only because IPSL catalogs do not provide relevant values for that, yet
 	     
-    - When calling an external script, operator arguments values are dumped in json format; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
+    - When calling an external script, operator arguments values are dumped in json format (except if argument keyword has prefix !) ; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
     - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
     - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)
