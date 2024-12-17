@@ -72,7 +72,7 @@ def header(title, style_file=None):
 def trailer():
     """ Returns the text for closing an html document
     """
-    return "</body>\n</hmtl>\n"
+    return "</body>\n"
 
 
 def vspace(nb=1):
@@ -264,7 +264,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
 
     """
     # A string to format a table element
-    td_format = "<TD ALIGN=RIGHT> %s </TD>\n"
+    td_format = "<TD ALIGN=RIGHT>%s</TD>\n"
     #
     if dirname is None :
         if altdir and filename :  
@@ -276,7 +276,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
     else:
         #
         if filename is None :
-            td_format % link(label, None, thumbnail, hover)
+            return td_format % link(label, None, thumbnail, hover)
         #
         else:  
             os.system('mkdir -p ' + dirname)

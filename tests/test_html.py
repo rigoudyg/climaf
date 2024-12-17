@@ -275,10 +275,11 @@ class CellTests(unittest.TestCase):
 
     def test_cell_dirname_None(self):
         self.assertEqual(cell(self.test_label, filename=self.test_filename),
-                         self.test_template.safe_substitute(LINK=link(self.test_label, self.test_filename, None, True)))
+                         self.test_template.safe_substitute(
+                             LINK=link(self.test_label, self.test_filename, None, True)))
         self.assertEqual(cell(self.test_label, filename=self.test_filename, altdir=self.test_altdir),
-                         self.test_template.safe_substitute(LINK=link(self.test_label, self.changed_filename, None,
-                                                                      True)))
+                         self.test_template.safe_substitute(
+                             LINK=link(self.test_label, self.changed_filename, None, True)))
 
     def test_cell_dirname_not_None_filename_None(self):
         self.assertEqual(cell(self.test_label, filename=None, dirname=self.test_dirname),
