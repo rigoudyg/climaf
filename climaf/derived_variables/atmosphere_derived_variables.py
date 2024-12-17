@@ -81,7 +81,8 @@ derive('*', 'albt', 'divide', 'rsut', 'rsdt')
 derive('*', 'albs', 'divide', 'rsus', 'rsds')
 
 # -- Atmosphere Curl Tau
-derive('*', 'curltau', 'curl_tau_atm', 'tauu', 'tauv')
+if 'curltau' in cscripts :
+    derive('*', 'curltau', 'curl_tau_atm', 'tauu', 'tauv')
 
 # -- Atmospheric Variables on vertical levels
 for tmpvar in ['ua', 'va', 'ta', 'hus', 'hur', 'zg']:
