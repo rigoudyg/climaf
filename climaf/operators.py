@@ -356,9 +356,11 @@ class cscript(object):
                 clogger.debug("CliMAF script %s has been declared" % name)
             except subprocess.CalledProcessError:
                 if fatal:
-                    raise Climaf_Operator_Error("defining %s : command %s is not executable" % (name, scriptcommand))
+                    raise Climaf_Operator_Error(
+                        "defining %s : command %s is not executable" % (name, scriptcommand))
                 else:
-                    clogger.warning("defining %s : command %s is not executable" % (name, scriptcommand))
+                    clogger.warning(
+                        "defining %s : command %s is not executable" % (name, scriptcommand))
                     return None
 
     def __repr__(self):

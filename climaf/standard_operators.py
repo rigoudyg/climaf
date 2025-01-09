@@ -237,6 +237,7 @@ def load_standard_operators():
     #
     cscript('get_oneVar', 'ncks -v ${Var} ${in} ${out}')
     cscript('cncks', 'ncks -v ${Var} ${in} ${out}')
+    cscript('cnckso', 'ncks -v ${Var} ${!operator} ${in} ${out}')
     # cscript('cnco','${operator} ${arg} ${in} ${out}')
     #
     # ensemble_ts_plot
