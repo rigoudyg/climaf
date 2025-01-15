@@ -8,6 +8,7 @@ Changes, newest first:
 
 - V3.x:
 
+  - script ensemble_ts_plot now has options --year_delta and --draw_grid
   - Add function :py:func:`~climaf.driver.cxr` that returns a DataArray version of a CliMAF object
   - Fix a bug when finding data files using calias(.., fileNameVar=)
   - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs. First use implies reading the catalog, which can last up to 30s for CMIP6; but next requests are much quicker. Can be deactivated by setting `env.environment.projects_using_intake` list to []. Current list includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included as a test case for introducing a new project natively managed with intake. See 'internals' below for details. 
