@@ -1801,7 +1801,7 @@ def calias(project, variable, fileVariable=None, **kwargs):
 def CFlongname(varname):
     """ Returns long_name of variable VARNAME after CF convention
     """
-    return "TBD_should_improve_function_climaf.driver.CFlongname"
+    return "TBD_should_improve_function_climaf.driver.CFlongname for "+varname
 
 
 def efile(obj, filename, force=False):

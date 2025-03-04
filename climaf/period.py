@@ -189,7 +189,7 @@ class cperiod(object):
     def includes(self, included):
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
-        if self.fx:
+        if self.fx or included.fx:
             return False
         # raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end:
