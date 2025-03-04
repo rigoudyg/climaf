@@ -25,7 +25,6 @@ import copy
 import time
 
 from env.environment import *
-from env.environment import projects_using_intake
 from env.clogging import clogger
 import env
 from climaf.utils import Climaf_Error, Climaf_Classes_Error, cartesian_product_substitute

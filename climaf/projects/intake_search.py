@@ -39,31 +39,37 @@ if intake_catalog is not None:
         # A dict of values for facets not handled by the intake
         # catalog for the project (they are removed for the search,
         # then restored)
-        non_project_values = dict()
+        non_intake_facets = dict()
 
-        # Rename some facets, withdraw some others
-        for facet, project_facet in alias.items():
-            if facet in kwargs:
-                if project_facet is not None:
-                    kwargs[project_facet] = kwargs.pop(facet)
+        # A dict for the intake request
+        req = dict()
+        
+        # Rename some facets, store apart some others
+        for facet,value in kwargs.items():
+            if facet in alias.keys() :
+                intake_facet = alias[facet]
+                if intake_facet is None:
+                    non_intake_facets[facet] = value
                 else:
-                    non_project_values[facet] = kwargs.pop(facet)
-
+                    req[intake_facet] = value
+            else:
+                req[facet] = value
+                
         # For CMIP, users are accustomed to request version 'latest',
         # which is not available 'as is' when using intake.
         if project in ['CMIP5', 'CMIP6', 'CORDEX'] and kwargs.get('version', None) == 'latest':
-            kwargs['version'] = '*'
-            kwargs['latest'] = True
+            req['version'] = '*'
+            req['latest'] = True
 
         # Change glob-style wildcards to regexp wildcards
-        for kw in kwargs:
-            if type(kwargs[kw]) is str:
-                kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
+        for kw in req:
+            if type(req[kw]) is str:
+                req[kw] = req[kw].replace("?", ".").replace("*", ".*")
 
         if not with_period:
-            kwargs.pop('period', None)
+            req.pop('period', None)
 
-        # Do search and convert results to a list of dicts
+        # Opening catalog if needed
         if project not in catalogs:
             clogger.info("Opening %s intake catalog " %
                          project + intake_catalog)
@@ -71,18 +77,20 @@ if intake_catalog is not None:
             catalog = intake.open_catalog(intake_catalog)
             catalogs[project] = catalog[project]
             clogger.info("Done opening in %d seconds" % (time.time() - tim1))
-        clogger.info("Querying catalog with " + str(kwargs))
+        
+        # Do search and convert results to a list of dicts
+        clogger.info("Querying catalog with " + str(req))
         tim1 = time.time()
-        subcat = intake_search(catalogs[project], **kwargs)
+        subcat = intake_search(catalogs[project], **req)
         clogger.info("Done querying in %d seconds" % (time.time() - tim1))
         dic_list = subcat.df.to_dict(orient='records')
         clogger.debug("Query result is %s" % dic_list)
 
         for dico in dic_list:
             # Translate back facet names
-            for facet, project_facet in alias.items():
-                if project_facet is not None:
-                    dico[facet] = dico.pop(project_facet)
+            for facet, intake_facet in alias.items():
+                if intake_facet is not None:
+                    dico[facet] = dico.pop(intake_facet)
 
             # Convert period_start + period_end in CliMAF period
             start = dico.pop('period_start')
@@ -109,15 +117,16 @@ if intake_catalog is not None:
                 dico['period'] = None
 
             # Discard facets that CliMAF doesn't manage
-            for project_facet in list(dico.keys()):
-                if project_facet not in cprojects[project].facets and \
-                        project_facet != "path":
-                    dico.pop(project_facet)
+            for intake_facet in list(dico.keys()):
+                if intake_facet not in cprojects[project].facets and \
+                        intake_facet != "path":
+                    dico.pop(intake_facet)
 
             # Restore facets not managed by the project
-            dico.update(non_project_values)
+            dico.update(non_intake_facets)
 
         return dic_list
+    
 
     def intake_search(catalog, **kwargs):
         """
