@@ -931,3 +931,16 @@ def load_ensemble_object(filename):
     myens = cens(myens_dict)
 
     return(myens)
+
+
+def read_dataset_attribute(dataset, attribute, default=None, safe_mode=False):
+    if safe_mode :
+        try :
+            filename = cfile(dataset)
+        except:
+            print("Computing dataset (for reading units) failed for ",dataset)
+            return default
+    else:
+        filename = cfile(dataset)
+    variable = dataset.variable
+    return climaf.netcdfbasics.attrOfDataset(filename, variable, attribute, default)

@@ -269,6 +269,10 @@ def attrOfFile(filename, attribute, default=None):
     with xr.open_dataset(filename, decode_times=False) as ds:
         return getattr(ds, attribute, default)
 
+def attrOfDataset(filename, variable, attribute, default=None):
+    with xr.open_dataset(filename, decode_times=False) as ds:
+        return getattr(ds[variable], attribute, default)
+
 
 def infer_freq(times, monthly):
     """A wrapper for xarray.infer_freq, for alleviating its shortcoming in
