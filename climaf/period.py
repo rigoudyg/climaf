@@ -172,7 +172,7 @@ class cperiod(object):
     def start_with(self, begin):
         """ If period BEGIN actually begins period SELF, returns the
         complement of BEGIN in SELF; otherwise returns None """
-        if self.fx:
+        if self.fx or begin.fx:
             return False
         if self.start == begin.start and self.end >= begin.end:
             return cperiod(begin.end, self.end)

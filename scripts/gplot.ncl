@@ -1130,7 +1130,11 @@ begin
   wks = gsn_open_wks(type,plotname)
   gsn_define_colormap(wks,colormap)
 
-  i = NhlNewColor(wks,0.8,0.8,0.8)
+  ; i = NhlNewColor(wks,0.8,0.8,0.8)
+  getvalues wks
+    "wkColorMapLen" : maplen
+  end getvalues
+  NhlSetColor(wks,maplen,0.8,0.8,0.8)
   ; reverse colormap
   if reverse then gsn_reverse_colormap(wks) end if
 
