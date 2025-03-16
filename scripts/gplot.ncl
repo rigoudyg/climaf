@@ -1134,7 +1134,7 @@ begin
   getvalues wks
     "wkColorMapLen" : maplen
   end getvalues
-  NhlSetColor(wks,maplen,0.8,0.8,0.8)
+  NhlSetColor(wks,maplen-1,0.8,0.8,0.8)
   ; reverse colormap
   if reverse then gsn_reverse_colormap(wks) end if
 
