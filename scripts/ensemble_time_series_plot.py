@@ -587,10 +587,14 @@ if draw_legend:
                 legend_lw_list = [
                     legend_lw_list[0]] * len(filenames_list) + legend_lw_list[1:len(legend_lw_list)]
 
-        # for legobj in leg.legendHandles:
         print('legend_lw_list = ', legend_lw_list)
-        for ind in range(0, len(leg.legend_handles)):
-            leg.legend_handles[ind].set_linewidth(float(legend_lw_list[ind]))
+        # At some stage, we had different versions of matplotlib on the various centers
+        if getattr(leg,"legend_handles",False) :
+            handles = leg.legend_handles
+        else:
+            handles = leg.legendHandles
+        for ind in range(0,len(handles)):
+            handles[ind].set_linewidth(float(legend_lw_list[ind]))
 
 # -- Add some text
 if args.text:
