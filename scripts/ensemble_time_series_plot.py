@@ -198,8 +198,8 @@ parser.add_argument('--vertical_lines_colors', action='store', default=None,
                     help='vertical lines colors')
 parser.add_argument('--draw_grid', action='store', default="True",
                     help='Draw a grid ? True/False')
-parser.add_argument('--year_delta', action='store', type=int, default=10, 
-                    help='Interval between tick marks for time (x) axis')
+parser.add_argument('--year_delta', action='store', type=int, default=0, 
+                    help='Interval between tick marks for time (x) axis (default is auto)')
 
 # -- Default values
 default_left_string_fontsize = 30.
@@ -424,10 +424,10 @@ for pathfilename in filenames_list:
                  label=labels_list[dataset_number])[0]
     )
     if seasonal_cycle :
-        plt.gca().xaxis.set_major_locator(MultipleLocator(1))
-        pass
+        plt.xticks(x, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ])
     else:
-        plt.gca().xaxis.set_major_locator(YearLocator(args.year_delta))
+        if args.year_delta != 0:
+            plt.gca().xaxis.set_major_locator(YearLocator(args.year_delta))
     print('dataset_numb :', dataset_number)
     print('lw_list :', int(lw_list[dataset_number]))
     print('lw_list :', np.shape(lw_list))

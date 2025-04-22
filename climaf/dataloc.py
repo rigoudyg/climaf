@@ -286,6 +286,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
     - pass urls and relevant facet values to this filenames search function
 
     """
+    clogger.debug("\nEntering SelectFiles with search_dict=%s"%search_dict)
     project = search_dict['project']
 
     def format_output(rep):

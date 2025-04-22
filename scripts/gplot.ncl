@@ -518,8 +518,8 @@ begin
       if (ystyle .eq. "log") then useXY=False end if
    
       ; get latitude and/or longitude name
-      latnames=(/"lat", "LAT", "latitude", "nav_lat", "nav_lat_grid_M", "nav_lat_grid_U", "nav_lat_grid_V", "lat_dom_out"/) 
-      lonnames=(/"lon", "LON", "longitude", "nav_lon", "nav_lon_grid_M", "nav_lon_grid_U", "nav_lon_grid_V", "lon_dom_out"/)
+      latnames=(/"lat", "LAT", "latitude", "nav_lat", "nav_lat_grid_T", "nav_lat_grid_M", "nav_lat_grid_U", "nav_lat_grid_V", "lat_dom_out"/) 
+      lonnames=(/"lon", "LON", "longitude", "nav_lon", "nav_lon_grid_T", "nav_lon_grid_M", "nav_lon_grid_U", "nav_lon_grid_V", "lon_dom_out"/)
       dimnames=(/latnames, lonnames/)
 
       do k=0,1 

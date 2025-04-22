@@ -732,7 +732,7 @@ def zonmean(dat):
     return ccdo(dat, operator='zonmean')
 
 
-def diff_zonmean(dat1, dat2):
+def diff_zonmean(dat1, dat2, do_zonmean_1=True, do_zonmean_2=True):
     """
     Returns the zonal mean bias of dat1 against dat2
 
@@ -747,8 +747,15 @@ def diff_zonmean(dat1, dat2):
 
     """
     #
-    zonmean_dat1 = ccdo(dat1, operator='zonmean')
-    zonmean_dat2 = ccdo(dat2, operator='zonmean')
+    if do_zonmean_1:
+        zonmean_dat1 = ccdo(dat1, operator='zonmean')
+    else:
+        zonmean_dat1 = dat1
+    #
+    if do_zonmean_2:
+        zonmean_dat2 = ccdo(dat2, operator='zonmean')
+    else:
+        zonmean_dat2 = dat2
 
     rgrd_dat1 = lonlatvert_interpolation(zonmean_dat1, zonmean_dat2)
     #

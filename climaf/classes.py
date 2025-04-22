@@ -1137,7 +1137,10 @@ class cdataset(cobject):
                 raise Climaf_Classes_Error(" ".join(error_msg))
             else:
                 dic.update(**non_ambiguous_dict)
-                return ds(**dic)
+                self.files = files
+                rep = ds(**dic)
+                rep.files = files
+                return rep 
         elif option in ['choices', ]:
             clogger.debug(
                 "Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
@@ -1175,6 +1178,7 @@ class cdataset(cobject):
             self.files = files
         else:
             raise Climaf_Classes_Error("Unknown option %s" % option)
+                        
 
     def baseFiles(self, force=False, ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
@@ -1898,8 +1902,8 @@ def allow_error_on_ds(allow=True):
 
 def select_projects(**kwargs):
     """
-    If kwargs['project'] is a list (has multiple values), select_projects loops on the projects
-    until it finds a file containing the aliased variable name.
+    If kwargs['project'] is a list (has multiple values), select_projects loops
+    on the projects until it finds a file containing the aliased variable name.
     """
     if 'project' not in kwargs:
         return kwargs
