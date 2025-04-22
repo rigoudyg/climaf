@@ -120,7 +120,7 @@ def load_standard_operators():
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=False)
     #
     cscript('rescale',
-            'cdo expr,\"${var}=${scale}*${var}+${offset};\" ${in} ${out}',
+            'cdo expr,\"${Var}=${scale}*${Var}+${offset};\" ${in} ${out}',
             commuteWithTimeConcatenation=True, commuteWithSpaceConcatenation=True)
     #
     cscript('mean_and_std',

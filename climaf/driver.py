@@ -38,7 +38,7 @@ from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile, varsOfFile
-from climaf.period import init_period, merge_periods
+from climaf.period import cperiod, init_period, merge_periods
 from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
 from climaf.ESMValTool_diags import call_evt_script
@@ -225,6 +225,10 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     ds = cobject
     # If the dataset was not defined by its path, check that it is completely defined
     if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
+        if ds.alias :
+            filevar, _, _, _, filenameVar, _, conditions = ds.alias
+            if filenameVar:
+                ds.kvp["filenameVar"] = filenameVar
         ds_ambiguous_args = ds.explore("choices")
         if len(ds_ambiguous_args) != 0:
             ds = ds.explore("resolve")
@@ -894,7 +898,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             # Provide period selection if script allows for
             if op:
                 per = timePeriod(op)
-                if not per.fx and per != "":
+                if type(per) is cperiod and not per.fx and per != "":
                     subdict["period_%d" % i] = str(per)
                     subdict["period_iso_%d" % i] = per.iso()
             subdict["domain_%d" % i] = domainOf(op)
@@ -1272,8 +1276,8 @@ def set_variable(obj, varname, format):
             command = "ncatted -a long_name,%s,o,c,%s %s" % (
                 varname, long_name, obj)
             if os.system(command) != 0:
-                clogger.error("Issue with changing long_name for var %s in %s" %
-                              (varname, obj))
+                clogger.error("Issue with changing long_name for var %s to %s in %s with command: %s"%
+                              (varname, long_name, obj,command))
                 return None
             return True
     elif format == 'MaskedArray':
@@ -1801,7 +1805,7 @@ def calias(project, variable, fileVariable=None, **kwargs):
 def CFlongname(varname):
     """ Returns long_name of variable VARNAME after CF convention
     """
-    return "TBD_should_improve_function_climaf.driver.CFlongname for "+varname
+    return "TBD_should_improve_function_climaf.driver.CFlongname_for_"+varname
 
 
 def efile(obj, filename, force=False):
