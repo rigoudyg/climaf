@@ -1302,14 +1302,20 @@ class cdataset(cobject):
             return None
         #
         monthly = False # JS
-        if self.frequency in ["monthly", "mon"] or \
-           dsets[0].frequency in ["monthly", "mon"]:
+        if self.frequency in ["monthly", "mon"]:
             monthly = True
+        else:
+            field = dsets[0][self.variable]
+            if hasattr(field, 'frequency') and field.frequency in ["monthly", "mon"] :
+                monthly = True
         #
         times = all_dsets.time
         clogger.debug('Time data of selected files: %s' % times)
         cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
-        time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
+        #time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
+        # Some HadISST data have cell_methods = 'time: lat: lon: mean', which 
+        # does not comply with the CF convention. We have to account for it.
+        time_average = (re.findall(' *time: *([a-zA-Z0-9]*: *)*?mean', cell_methods) != [])
         #
         data_freq = infer_freq(times, monthly)
         clogger.debug("Frequency is "+data_freq)
@@ -1381,8 +1387,8 @@ class cdataset(cobject):
             if not file_period.includes(self.period):
                 consist = "not "
                 rep = False
-            clogger.info("Datafile time period (%s) includes dataset time period (%s)" %
-                         (file_period, self.period) + "=> time periods are %sconsistent." % consist)
+            clogger.info("Data file(s) time period (%s) does %sinclude dataset time period (%s)" %
+                         (file_period, consist, self.period) + "=> time periods are %sconsistent." % consist)
         return rep
 
 
@@ -1975,7 +1981,8 @@ def ds(*args, **kwargs):
                 match = re.match(
                     "(?P<option>last|LAST|first|FIRST)_(?P<duration>[0-9]*)([yY])$", kwargs['period'])
                 if match is not None:
-                    return resolve_first_or_last_years(copy.deepcopy(kwargs), match.group('duration'),
+                    return resolve_first_or_last_years(copy.deepcopy(kwargs),
+                                                       match.group('duration'),
                                                        option=match.group('option').lower())
         return cdataset(**select_projects(**kwargs))
 

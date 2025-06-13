@@ -189,7 +189,7 @@ class cperiod(object):
     def includes(self, included):
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
-        if self.fx or included.fx:
+        if self.fx or type(included) is not cperiod or included.fx:
             return False
         # raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end:
@@ -547,11 +547,13 @@ def group_periods(diclist):
 def freq_to_minutes(data_freq):
     """
     Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
-    or in : day, mon, sem, 6hr, 3hr
-    Returns duration in minutes (quite arbitrary for months)
+    or in : day, daily, mon, monthly, sem, 6hr, 3hr
+    Returns duration in minutes (quite arbitrary for months : 30 days)
     """
     data_freq = data_freq.replace("sem", "6MS")
+    data_freq = data_freq.replace("monthly", "MS")
     data_freq = data_freq.replace("mon", "MS")
+    data_freq = data_freq.replace("daily", "D")
     data_freq = data_freq.replace("day", "D")
     data_freq = data_freq.replace("6hr", "6H")
     data_freq = data_freq.replace("3hr", "3H")
