@@ -330,7 +330,7 @@ def create_parser():
     # gplot_group.add_argument("--", help="",
     #                         type=, default=)
 
-    return(parser)
+    return (parser)
 
 
 def process_args(args):
@@ -475,10 +475,10 @@ def mimic_gplot(args, selection_options_list):
             dpi = args.figure_options['dpi']
             if resol is None:
                 # Ncl default is 1024*1024 pixels
-                args.figure_options['figsize'] = (1250/dpi, 1250/dpi)
+                args.figure_options['figsize'] = (1250 / dpi, 1250 / dpi)
             else:
                 # User should have provided values in pixels
-                args.figure_options['figsize'] = (resol[0]/dpi, resol[1]/dpi)
+                args.figure_options['figsize'] = (resol[0] / dpi, resol[1] / dpi)
 
     # Handle 'trim'
     if args.trim:
@@ -572,8 +572,8 @@ def mimic_gplot(args, selection_options_list):
             # We can handle either a list of levels, or min/max.
             # Contourf rather uses min/max (if provided)
             if args.colored_map_min is not None and args.colored_map_max is not None:
-                #cdic["vmin"] = args.colored_map_min
-                #cdic["vmax"] = args.colored_map_max
+                # cdic["vmin"] = args.colored_map_min
+                # cdic["vmax"] = args.colored_map_max
                 if args.colored_map_delta is not None:
                     args.colored_map_levels = list(np.arange(
                         args.colored_map_min,

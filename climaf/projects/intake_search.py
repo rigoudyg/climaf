@@ -43,10 +43,10 @@ if intake_catalog is not None:
 
         # A dict for the intake request
         req = dict()
-        
+
         # Rename some facets, store apart some others
-        for facet,value in kwargs.items():
-            if facet in alias.keys() :
+        for facet, value in kwargs.items():
+            if facet in alias.keys():
                 intake_facet = alias[facet]
                 if intake_facet is None:
                     non_intake_facets[facet] = value
@@ -54,7 +54,7 @@ if intake_catalog is not None:
                     req[intake_facet] = value
             else:
                 req[facet] = value
-                
+
         # For CMIP, users are accustomed to request version 'latest',
         # which is not available 'as is' when using intake.
         if project in ['CMIP5', 'CMIP6', 'CORDEX'] and kwargs.get('version', None) == 'latest':
@@ -77,7 +77,7 @@ if intake_catalog is not None:
             catalog = intake.open_catalog(intake_catalog)
             catalogs[project] = catalog[project]
             clogger.info("Done opening in %d seconds" % (time.time() - tim1))
-        
+
         # Do search and convert results to a list of dicts
         clogger.info("Querying catalog with " + str(req))
         tim1 = time.time()
@@ -126,7 +126,6 @@ if intake_catalog is not None:
             dico.update(non_intake_facets)
 
         return dic_list
-    
 
     def intake_search(catalog, **kwargs):
         """

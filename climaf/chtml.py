@@ -266,8 +266,8 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
     # A string to format a table element
     td_format = "<TD ALIGN=RIGHT>%s</TD>\n"
     #
-    if dirname is None :
-        if altdir and filename :  
+    if dirname is None:
+        if altdir and filename:
             fn = filename.replace(default_cache, altdir)
         else:
             fn = filename
@@ -275,16 +275,16 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
     #
     else:
         #
-        if filename is None :
+        if filename is None:
             return td_format % link(label, None, thumbnail, hover)
         #
-        else:  
+        else:
             os.system('mkdir -p ' + dirname)
-            if target_filename is None :
+            if target_filename is None:
                 # !!! # -- Make a unique filename to avoid the issues with images
                 #          in the cache of the browser
-                _ , filext = os.path.splitext(os.path.basename(filename))
-                
+                _, filext = os.path.splitext(os.path.basename(filename))
+
                 nbs = []
                 from random import randrange
                 nb = randrange(1, 10000000000)
@@ -292,14 +292,14 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
                     nb = randrange(1, 10000000000)
                     nbs.append(nb)
                 target_filename = "climaf_atlas" + str(nb) + filext
-            else :
+            else:
                 # Use same extension as filename
                 froot, fext = os.path.splitext(filename)
                 troot, text = os.path.splitext(target_filename)
-                if text != fext :
-                    target_filename = troot + fext                
+                if text != fext:
+                    target_filename = troot + fext
             #
-            
+
             full_target_filename = dirname + "/" + target_filename
             os.system('rm -f ' + full_target_filename)
             try:
@@ -310,7 +310,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
             # -- Create/append the index file in the output directory that will provide
             # -- the CRS with the new png file (climaf_atlas...png)
             atlas_index = dirname + "/index_atlas"
-            index_dict = {getCRS(filename): target_filename }
+            index_dict = {getCRS(filename): target_filename}
             #
             if not os.path.isfile(atlas_index):
                 # -- Create the dictionary

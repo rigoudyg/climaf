@@ -81,7 +81,7 @@ derive('*', 'albt', 'divide', 'rsut', 'rsdt')
 derive('*', 'albs', 'divide', 'rsus', 'rsds')
 
 # -- Atmosphere Curl Tau
-if 'curltau' in cscripts :
+if 'curltau' in cscripts:
     derive('*', 'curltau', 'curl_tau_atm', 'tauu', 'tauv')
 
 # -- Atmospheric Variables on vertical levels

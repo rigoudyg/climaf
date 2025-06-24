@@ -27,7 +27,7 @@ from datetime import timedelta
 from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
-from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list,\
+from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list, \
     lastyears, firstyears, group_periods, freq_to_minutes, build_date_regexp_pattern
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id, infer_freq
@@ -168,7 +168,7 @@ class cproject(object):
         if 'ensemble' in kwargs:
             self.attributes_for_ensemble.extend(kwargs["ensemble"])
         self.use_frequency = kwargs.get("use_frequency", False)
-        
+
         # A dict for translating CliMAF facet names to project facet names
         # for use by intake
         self.translate_facet = kwargs.get("translate_facet", dict())
@@ -792,11 +792,11 @@ class cdataset(cobject):
             project = self.kvp["project"]
             chooser = cprojects[project].resolve_ambiguities
             if chooser:
-                clogger.debug("Trying to solve ambiguity for "+repr(kw))
+                clogger.debug("Trying to solve ambiguity for " + repr(kw))
                 return chooser(self.kvp, kw, values_list)
             else:
-                clogger.error("No way to resolve ambiguity on %s among %s for project %s"\
-                              %(kw,values_list,project))
+                clogger.error("No way to resolve ambiguity on %s among %s for project %s"
+                              % (kw, values_list, project))
 
     def check_if_dict_ambiguous(self, input_dict):
         ambiguous_dict = dict()
@@ -1140,7 +1140,7 @@ class cdataset(cobject):
                 self.files = files
                 rep = ds(**dic)
                 rep.files = files
-                return rep 
+                return rep
         elif option in ['choices', ]:
             clogger.debug(
                 "Listing possible values for these wildcard attributes %s" % wildcard_attributes_list)
@@ -1178,7 +1178,6 @@ class cdataset(cobject):
             self.files = files
         else:
             raise Climaf_Classes_Error("Unknown option %s" % option)
-                        
 
     def baseFiles(self, force=False, ensure_dataset=True):
         """ Returns the list of (local or remote) files which include the data
@@ -1279,7 +1278,7 @@ class cdataset(cobject):
         if not (frequency or period or gap):
             clogger.error(
                 "You must activate at least one of the diags : frequency, gap or period")
-            return(None)
+            return (None)
         #
         if self.frequency == 'fx' or self.frequency == 'annual_cycle':
             clogger.info("No check for fixed data for %s", self)
@@ -1301,24 +1300,24 @@ class cdataset(cobject):
                             "is not named 'time' (%s)" % self)
             return None
         #
-        monthly = False # JS
+        monthly = False  # JS
         if self.frequency in ["monthly", "mon"]:
             monthly = True
         else:
             field = dsets[0][self.variable]
-            if hasattr(field, 'frequency') and field.frequency in ["monthly", "mon"] :
+            if hasattr(field, 'frequency') and field.frequency in ["monthly", "mon"]:
                 monthly = True
         #
         times = all_dsets.time
         clogger.debug('Time data of selected files: %s' % times)
         cell_methods = getattr(dsets[0][varOf(self)], "cell_methods", None)
-        #time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
-        # Some HadISST data have cell_methods = 'time: lat: lon: mean', which 
+        # time_average = (re.findall('.*time *: *mean', cell_methods)[0] != '')
+        # Some HadISST data have cell_methods = 'time: lat: lon: mean', which
         # does not comply with the CF convention. We have to account for it.
         time_average = (re.findall(' *time: *([a-zA-Z0-9]*: *)*?mean', cell_methods) != [])
         #
         data_freq = infer_freq(times, monthly)
-        clogger.debug("Frequency is "+data_freq)
+        clogger.debug("Frequency is " + data_freq)
         if data_freq is None:
             if (frequency and self.frequency != "*") or (gap and not monthly):
                 clogger.error(

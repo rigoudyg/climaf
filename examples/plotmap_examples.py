@@ -2,7 +2,7 @@ import hplot_operator
 lcmn
 # export PROJ_DATA=/net/nfs/tools/Users/SU/jservon/spirit-2021.11_envs/20230904/share/proj
 # export PYPROJ_GLOBAL_CONTEXT=ON
-~/climaf_installs/climaf_running/bin/climaf
+~ / climaf_installs / climaf_running / bin / climaf
 
 
 clog('debug')

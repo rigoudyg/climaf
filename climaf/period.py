@@ -447,8 +447,8 @@ def intersect_periods_list(lperiod1, lperiod2):
     Algorithm : for each period in l1, compute intersection with all periods in l2,
     and add it in a big list; finally, merge  the big list
     """
-    if not(isinstance(lperiod1, list) and [isinstance(elt, cperiod) for elt in lperiod1] and
-           isinstance(lperiod2, list) and [isinstance(elt, cperiod) for elt in lperiod2]):
+    if not (isinstance(lperiod1, list) and [isinstance(elt, cperiod) for elt in lperiod1] and
+            isinstance(lperiod2, list) and [isinstance(elt, cperiod) for elt in lperiod2]):
         raise Climaf_Period_Error(
             "Can not deal with something else than list of cperiod objects")
     else:

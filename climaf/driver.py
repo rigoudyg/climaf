@@ -115,9 +115,9 @@ def capply_script(script_name, *operands, **parameters):
     # Check that all parameters to the call are expected by the script
     command = script.command
     for para in parameters:
-        if not(r"{%s}" % para in command) \
-           and not(r"{!%s}" % para in command) \
-           and not(r"{%s_iso}" % para in command) \
+        if not (r"{%s}" % para in command) \
+           and not (r"{!%s}" % para in command) \
+           and not (r"{%s_iso}" % para in command) \
            and not para in ['member_label', ] \
            and not para.startswith("add_"):
             raise Climaf_Driver_Error(
@@ -225,7 +225,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     ds = cobject
     # If the dataset was not defined by its path, check that it is completely defined
     if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
-        if ds.alias :
+        if ds.alias:
             filevar, _, _, _, filenameVar, _, conditions = ds.alias
             if filenameVar:
                 ds.kvp["filenameVar"] = filenameVar
@@ -235,7 +235,7 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
             clogger.warning("When doing a cfile on dataset %s, we had to ensure that it "
                             "is completely defined, using  method 'explore', by choosing "
                             "for the following facets: %s" % (cobject.crs,
-                                                                  str(ds_ambiguous_args)))
+                                                              str(ds_ambiguous_args)))
             clogger.warning("This was at the cost of querying the file system, more or "
                             "less heavily. You may wish to add such attributes by yourself")
             # clogger.debug("After resolve for ambiguous arg, updated dataset kvp is %s",str(ds.kvp))
@@ -804,7 +804,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script = cscripts[scriptCall.operator]
-    template = Template(script.command.replace("{!","{") )
+    template = Template(script.command.replace("{!", "{"))
     total_costs = compute_cost()
     # Evaluate input data
     invalues, sizes, partial_cost = evaluate_inputs(
@@ -948,9 +948,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 scriptCall.crs + "." + output, format=output_fmt)
 
     # Account for script call parameters
-    for p,value in scriptCall.parameters.items():
+    for p, value in scriptCall.parameters.items():
         # clogger.debug("processing parameter %s=%s"%(p,value))
-        if r"{!%s}"%p in script.command :
+        if r"{!%s}" % p in script.command:
             # Don't use json, just provide string or other simple type
             subdict[p] = value
         else:
@@ -1276,8 +1276,8 @@ def set_variable(obj, varname, format):
             command = "ncatted -a long_name,%s,o,c,%s %s" % (
                 varname, long_name, obj)
             if os.system(command) != 0:
-                clogger.error("Issue with changing long_name for var %s to %s in %s with command: %s"%
-                              (varname, long_name, obj,command))
+                clogger.error("Issue with changing long_name for var %s to %s in %s with command: %s" %
+                              (varname, long_name, obj, command))
                 return None
             return True
     elif format == 'MaskedArray':
@@ -1438,7 +1438,7 @@ def cxr(obj):
     with xarray.open_dataset(cfile(obj)) as f:
         return f[obj.variable]
 
-    
+
 def cMA(obj, deep=None):
     """
     Provide the Masked Array value for a CliMAF object. Launch computation if needed.
@@ -1805,7 +1805,7 @@ def calias(project, variable, fileVariable=None, **kwargs):
 def CFlongname(varname):
     """ Returns long_name of variable VARNAME after CF convention
     """
-    return "TBD_should_improve_function_climaf.driver.CFlongname_for_"+varname
+    return "TBD_should_improve_function_climaf.driver.CFlongname_for_" + varname
 
 
 def efile(obj, filename, force=False):

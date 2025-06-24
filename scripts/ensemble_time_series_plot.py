@@ -22,8 +22,8 @@ import cftime
 from datetime import timedelta
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
-from  matplotlib.dates import YearLocator
-from  matplotlib.ticker import MultipleLocator
+from matplotlib.dates import YearLocator
+from matplotlib.ticker import MultipleLocator
 
 import argparse
 
@@ -198,7 +198,7 @@ parser.add_argument('--vertical_lines_colors', action='store', default=None,
                     help='vertical lines colors')
 parser.add_argument('--draw_grid', action='store', default="True",
                     help='Draw a grid ? True/False')
-parser.add_argument('--year_delta', action='store', type=int, default=0, 
+parser.add_argument('--year_delta', action='store', type=int, default=0,
                     help='Interval between tick marks for time (x) axis (default is auto)')
 
 # -- Default values
@@ -362,7 +362,7 @@ for pathfilename in filenames_list:
                 seasonal_cycle = True
             else:
                 if not seasonal_cycle:
-                    print("Error : file %s doesn't fit for a seasonal_cycle"%\
+                    print("Error : file %s doesn't fit for a seasonal_cycle" %
                           pathfilename)
                     sys.exit(1)
             x = np.array(range(1, 13))
@@ -423,8 +423,8 @@ for pathfilename in filenames_list:
                  alpha=float(alphas_list[dataset_number]),
                  label=labels_list[dataset_number])[0]
     )
-    if seasonal_cycle :
-        plt.xticks(x, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ])
+    if seasonal_cycle:
+        plt.xticks(x, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
     else:
         if args.year_delta != 0:
             plt.gca().xaxis.set_major_locator(YearLocator(args.year_delta))
@@ -439,8 +439,8 @@ for pathfilename in filenames_list:
     print('X :', x[0])
     print('X :', np.shape(x))
     print('X :', type(x[0]))
-    #print('Y :', int(y[0]))
-    #print('Y :', type(int(y[0])))
+    # print('Y :', int(y[0]))
+    # print('Y :', type(int(y[0])))
 
     # handles_for_legend.append(
     #    #plt.plot(x,y,lw=lw_list[filenames_list.index(pathfilename)], color=colors[filenames_list.index(pathfilename)],
@@ -453,7 +453,7 @@ for pathfilename in filenames_list:
 
     #
     # -- Highlight the period used to compute the climatology, except for annual cycles
-    if args.highlight_period and (type(x[0]) == type(cdatetime(1800,1,1))) :
+    if args.highlight_period and (type(x[0]) == type(cdatetime(1800, 1, 1))):
         # highlight_period = highlight_period_list[filenames_list.index(pathfilename)]
         # filenames_list.index(pathfilename)]
         highlight_period = highlight_period_list[dataset_number]
@@ -476,7 +476,7 @@ for pathfilename in filenames_list:
     dataset_number = dataset_number + 1
 
 # -- Add the grid
-if args.draw_grid.lower() == 'true'  :
+if args.draw_grid.lower() == 'true':
     plt.grid()
 
 # -- Force setting the X limits
@@ -589,11 +589,11 @@ if draw_legend:
 
         print('legend_lw_list = ', legend_lw_list)
         # At some stage, we had different versions of matplotlib on the various centers
-        if getattr(leg,"legend_handles",False) :
+        if getattr(leg, "legend_handles", False):
             handles = leg.legend_handles
         else:
             handles = leg.legendHandles
-        for ind in range(0,len(handles)):
+        for ind in range(0, len(handles)):
             handles[ind].set_linewidth(float(legend_lw_list[ind]))
 
 # -- Add some text

@@ -141,7 +141,7 @@ def ccrs_from_metadata(filename):
             if 'standard_parallel' in attr.lower():
                 ccrs_options['standard_parallels'] = (float(f.attrs[attr][:-1]),
                                                       float(f.attrs[attr][:-1]))
-    return(ccrs_name, ccrs_options)
+    return (ccrs_name, ccrs_options)
 
 
 def fix_longitudes(lons):
@@ -151,7 +151,7 @@ def fix_longitudes(lons):
     """
     fixed_lons = lons.copy()
     for i, start in enumerate(np.argmax(np.abs(np.diff(lons)) > 180, axis=1)):
-        fixed_lons[i, start+1:] += 360
+        fixed_lons[i, start + 1:] += 360
     return fixed_lons
 
 
@@ -214,10 +214,10 @@ def get_variable_and_coordinates_from_dataset(
         raise ValueError("The input file %s does not exist" % input_file)
     # Analyze if decoding time is needed
     time_decode = False
-    if "isel" in selection_options and "time" in selection_options["isel"] :
+    if "isel" in selection_options and "time" in selection_options["isel"]:
         time_decode = True
     # Read
-    variable_dataset = read_dataset(input_file, variable,time_decode)
+    variable_dataset = read_dataset(input_file, variable, time_decode)
     if dimensions == ["auto"]:
         dimensions = horizontal_dimensions(variable_dataset.dims)
         if debug:
@@ -225,8 +225,8 @@ def get_variable_and_coordinates_from_dataset(
     variable_dataset = filter_dataset(
         variable_dataset, dimensions, selection_options)
     for d in dimensions:
-        if len(variable_dataset[d]) < 2 :
-            raise ValueError("Dimension %s has too short a size for a map (%d)"%(d,len(variable_dataset[d])))
+        if len(variable_dataset[d]) < 2:
+            raise ValueError("Dimension %s has too short a size for a map (%d)" % (d, len(variable_dataset[d])))
 
     # add cyclic point if one of the dimensions is a longitude and longitude range is ~ 360
     d0 = dimensions[0]  # Name of first dimension
@@ -303,7 +303,7 @@ def choose_among_CF_coordinates(CF_coords):
     if debug:
         print("Choosing coordinates %s among CF coordinates %s" %
               (CF_coords, chosen))
-    return(chosen)
+    return (chosen)
 
 
 def create_norm(nlevels, cmap, z, zmin, zmax):
@@ -329,7 +329,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
                      colored_map_scale, colored_map_offset, colored_map_methods,
                      colorbar_options, print_time):
     if debug:
-        print("\n\nPlotting colored map\n", 55*"-")
+        print("\n\nPlotting colored map\n", 55 * "-")
     # Find the transform
     if colored_map_transform != "no_remap":
         if debug:
@@ -362,7 +362,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
         try:
             units = variable_data.units
         except:
-            units="?"
+            units = "?"
     try:
         name = variable_data.__getattr__('long_name')
     except:
@@ -391,12 +391,12 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
 
     if args.missing_value_color is not None:
         if debug:
-            print("Setting missing value color to ",args.missing_value_color)
+            print("Setting missing value color to ", args.missing_value_color)
         # colored_map_cmap.set_bad(args.missing_value_color,alpha=1.)
         # With cartopy, need to use set_facecolor instead of set_bad !!
         # See : https://stackoverflow.com/questions/74505514/set-bad-function-not-perform-correctly-in-cartopy
         ax.set_facecolor(args.missing_value_color)
-        
+
     # Prepare to plot the map
     contourf_args = dict(zorder=0, cmap=colored_map_cmap)
     contourf_args.update(colored_map_engine_options)
@@ -477,7 +477,7 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
                       contours_map_min, contours_map_max,
                       contours_map_scale, contours_map_offset):
     if debug:
-        print("\n\nPlotting contours map\n", 55*"-")
+        print("\n\nPlotting contours map\n", 55 * "-")
     # Find the transform
     if contours_map_transform != "no_remap":
         transform = find_ccrs(contours_map_transform,
@@ -498,7 +498,7 @@ def plot_contours_map(ax, coordinates, contours_map_file, contours_map_variable,
         try:
             units = variable_data.units
         except:
-            units="?"    
+            units = "?"
     try:
         name = variable_data.__getattr__('long_name')
     except:
@@ -540,7 +540,7 @@ def plot_shaded_map(ax, coordinates, shaded_map_file, shaded_map_variable,
                     shaded_map_min, shaded_map_max,
                     shaded_map_scale, shaded_map_offset):
     if debug:
-        print("\n\n Plotting shaded map\n", 55*"-")
+        print("\n\n Plotting shaded map\n", 55 * "-")
     # Find the transform
     if shaded_map_transform != "no_remap":
         transform = find_ccrs(shaded_map_transform,
@@ -593,7 +593,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
                     vectors_map_type, vectors_map_options, vectors_map_selection_options,
                     vectors_map_scale, vectors_map_gridsizes):
     if debug:
-        print("\n\n Plotting vector map\n", 55*"-")
+        print("\n\n Plotting vector map\n", 55 * "-")
     # Find the transform
     if vectors_map_transform != "no_remap":
         transform = find_ccrs(vectors_map_transform,

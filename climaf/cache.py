@@ -102,7 +102,7 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
                         raise Climaf_Cache_Error("Cannot create dir " % dirn)
         if os.path.islink(rep) and not os.path.exists(os.path.realpath(rep)):
             os.remove(rep)
-        #clogger.debug("returning %s" % rep)
+        # clogger.debug("returning %s" % rep)
         return rep
 
 
@@ -337,7 +337,7 @@ def hasMatchingObject(cobject, ds_func):
                 continue  # usually case of a CRS which project is not currently defined
         if co:
             crs2eval[crs] = co
-            #clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
+            # clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
                 f, costs = crs2filename[crs]

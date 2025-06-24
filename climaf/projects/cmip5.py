@@ -46,6 +46,7 @@ translate_facet = {
 # and period_end)
 period_pattern = "*_${PERIOD}.nc"
 
+
 def cmip5_facet_ambiguity_solver(dic, facet, values_list):
     """
     Choose a value for FACET among VALUES_LIST, given the
@@ -53,10 +54,10 @@ def cmip5_facet_ambiguity_solver(dic, facet, values_list):
     Return the chosen value, or None
     """
     if facet == "table":
-        if "Amon" in values_list :
+        if "Amon" in values_list:
             clogger.warning("Chosing table = Amon")
             return "Amon"
-        elif "day" in values_list :
+        elif "day" in values_list:
             clogger.warning("Chosing table = day")
             return "day"
 
@@ -66,9 +67,9 @@ if True:
     # -- Declare a CMIP5 CliMAF project
     # ------------------------------------ >
     p = cproject('CMIP5', 'root', 'model', 'table', 'experiment',
-             'realization', 'frequency', 'realm', 'version',
-             ensemble=['model', 'realization'], separator='%',
-             translate_facet=translate_facet, period_pattern=period_pattern)
+                 'realization', 'frequency', 'realm', 'version',
+                 ensemble=['model', 'realization'], separator='%',
+                 translate_facet=translate_facet, period_pattern=period_pattern)
     p.resolve_ambiguities = cmip5_facet_ambiguity_solver
 
     # -- Declare a CMIP5 'extent' CliMAF project = extracts a period covering historical and a scenario

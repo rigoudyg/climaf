@@ -913,8 +913,8 @@ def save_ensemble_object(ens, outfilename='ensemble_object.json'):
 
     with open(outfilename, "w") as outfile:
         json.dump(save_json_dict, outfile)
-    print('Saved ensemble object in : '+outfilename)
-    print('Use load_ensemble_object("'+outfilename +
+    print('Saved ensemble object in : ' + outfilename)
+    print('Use load_ensemble_object("' + outfilename +
           '") to load it back as a CliMAF ensemble')
 
 
@@ -937,15 +937,15 @@ def load_ensemble_object(filename):
 
     myens = cens(myens_dict)
 
-    return(myens)
+    return (myens)
 
 
 def read_dataset_attribute(dataset, attribute, default=None, safe_mode=False):
-    if safe_mode :
-        try :
+    if safe_mode:
+        try:
             filename = cfile(dataset)
         except:
-            print("Computing dataset (for reading units) failed for ",dataset)
+            print("Computing dataset (for reading units) failed for ", dataset)
             return default
     else:
         filename = cfile(dataset)

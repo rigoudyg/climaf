@@ -48,7 +48,7 @@ def varsOfFile(filename, all=False):
             # remove dimensions
             lvars = lvars - set(list(ds.dims))
             # Remove scalar coordinates
-            lvars = [elt for elt in lvars if not(
+            lvars = [elt for elt in lvars if not (
                 hasattr(ds[elt], "axis") or hasattr(ds[elt], "bounds"))]
             # Remove variables which are related to dimensions (e.g. dim bounds....)
             lvars = [elt for elt in lvars
@@ -169,10 +169,10 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
                     return None
         #
         if cell_methods is not None and time_average is None:
-            #time_average = (re.findall( '.*time *: *mean', cell_methods)[0] != '')
-            # Some HadISST data have cell_methods = 'time: lat: lon: mean', which 
+            # time_average = (re.findall( '.*time *: *mean', cell_methods)[0] != '')
+            # Some HadISST data have cell_methods = 'time: lat: lon: mean', which
             # does not comply with the CF convention. We have to account for it.
-            time_average = (re.findall(' *time: *([a-zA-Z0-9]*: *)*?mean', cell_methods) != [] )
+            time_average = (re.findall(' *time: *([a-zA-Z0-9]*: *)*?mean', cell_methods) != [])
 
         # Diagnose delta, the time interval between data samples
         if time_average is False:
@@ -187,12 +187,12 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
                 data_freq = use_frequency
             if not data_freq:
                 data_freq = use_frequency
-            if data_freq == "monthly" :
+            if data_freq == "monthly":
                 data_freq = "MS"
             if not data_freq:
                 raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %
                                    timedim.name + os.linesep + str(timedim))
-            clogger.debug("In timeLimits: calling freq_to_minutes with data_freq=%s",data_freq)
+            clogger.debug("In timeLimits: calling freq_to_minutes with data_freq=%s", data_freq)
             delta = freq_to_minutes(data_freq) / 2
             if delta is None:
                 clogger.error("Frequency %s not yet managed" % data_freq)
@@ -264,6 +264,7 @@ def attrOfFile(filename, attribute, default=None):
     with xr.open_dataset(filename, decode_times=False) as ds:
         return getattr(ds, attribute, default)
 
+
 def attrOfDataset(filename, variable, attribute, default=None):
     with xr.open_dataset(filename, decode_times=False) as ds:
         return getattr(ds[variable], attribute, default)
@@ -281,7 +282,7 @@ def infer_freq(times, monthly):
     OK = 1
     for cpt in range(0, 4):
         ptim = time_values[cpt]
-        tim = time_values[cpt+1]
+        tim = time_values[cpt + 1]
         delta = tim - ptim
         if delta < timedelta(days=29) or delta > timedelta(days=31):
             OK = 0

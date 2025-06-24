@@ -23,7 +23,7 @@ if onSpirit:
     period_pattern = "*_${PERIOD}.nc"
 
     cproject('PMIP3', 'institute', 'model', 'experiment', 'frequency', 'realm',
-             'table',  'ensemble',  'version', ensemble=['model', 'ensemble'],
+             'table', 'ensemble', 'version', ensemble=['model', 'ensemble'],
              translate_facet=translate_facet, period_pattern=period_pattern, separator='%')
 
     cfreqs('PMIP3', {'monthly': 'mon', 'daily': 'day'})

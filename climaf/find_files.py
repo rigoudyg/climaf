@@ -186,29 +186,29 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                     **simple_kwargs)
 
                 # Use brute force : globbing
-                lfiles = find_by_globbing(url, full_template,\
-                            instanciated_template, kwargs, simple_kwargs.copy())
-                clogger.info("Found %d files with raw variable name %s"%\
-                             (len(lfiles),kwargs))
-                
+                lfiles = find_by_globbing(url, full_template,
+                                          instanciated_template, kwargs, simple_kwargs.copy())
+                clogger.info("Found %d files with raw variable name %s" %
+                             (len(lfiles), kwargs))
+
                 # Construct a regexp with a group name for each facets but period
                 facets_regexp = build_facets_regexp(one_url, kwargs)
-                
+
                 if len(lfiles) == 0 and altvar != variable:
                     clogger.debug(
-                        "No file found with regular variable name "+\
+                        "No file found with regular variable name " +
                         "%s, trying with filenameVar %s" % (variable, altvar))
                     lfiles = find_by_globbing(
                         url, full_template, instanciated_template, kwargs,
                         simple_kwargs.copy(), alt_variable=altvar)
-                    clogger.info("Found %d files with alt variable name for %s"%\
-                                 (len(lfiles),kwargs))
+                    clogger.info("Found %d files with alt variable name for %s" %
+                                 (len(lfiles), kwargs))
                     alt_kwargs = kwargs.copy()
                     alt_kwargs['variable'] = altvar
                     facets_regexp = build_facets_regexp(one_url, alt_kwargs)
                 elif len(lfiles) == 0:
-                    clogger.debug("No alternate variable name is available for %s"\
-                                  %variable)
+                    clogger.debug("No alternate variable name is available for %s"
+                                  % variable)
 
                 #
 
@@ -217,15 +217,15 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                         continue
                     if check_for_variable(f, url, variable, altvar):
                         # Extract facet values from filename
-                        a_match=re.search(facets_regexp, f)
-                        if a_match: 
+                        a_match = re.search(facets_regexp, f)
+                        if a_match:
                             values = a_match.groupdict()
                             #
-                            if check_period_and_store( f, period, values,
-                                    kwargs, wildcards, merge_periods_on,
-                                    return_combinations, periods, periods_dict):
+                            if check_period_and_store(f, period, values,
+                                                      kwargs, wildcards, merge_periods_on,
+                                                      return_combinations, periods, periods_dict):
                                 rep.append(remote_prefix + f)
-                            #else:
+                            # else:
                             #    clogger.info("Not appending for" +repr(values))
                         # else:
                         #     clogger.info("No match for "+ f + " and " + facets_regexp)
@@ -380,7 +380,7 @@ def store_wildcard_facet_values(f, values, kwargs, wildcards, merge_periods_on=N
     project = kwargs["project"]
     proj = cprojects[project]
     for kw in kwargs:
-        if kw in ['filenameVar', 'host_variable'] :
+        if kw in ['filenameVar', 'host_variable']:
             valid_values = None
         else:
             valid_values = proj.cvalid(kw, None)
