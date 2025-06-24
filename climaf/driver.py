@@ -50,7 +50,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 dig_hard_into_cache = True
 
 #: How should the file be open, which hosts scripts outputs. Can use 'w' and 'a'
-scripts_ouput_write_mode = 'w'
+scripts_output_write_mode = 'w'
 
 
 def capply(climaf_operator, *operands, **parameters):
@@ -1034,7 +1034,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     tim1 = time.time()
     clogger.info("Launching command:" + template)
     #
-    with open(logdir + '/last.out', scripts_ouput_write_mode) as logfile:
+    with open(logdir + '/last.out', scripts_output_write_mode) as logfile:
         logfile.write(
             "\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
         try:

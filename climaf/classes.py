@@ -582,8 +582,8 @@ class cdataset(cobject):
            - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
 
         - check : this is actually not a dataset attribute but an
-          optionnal argument that can trigger a check of the datafiles
-          associated with th dataset; allowed values are : 
+          optional argument that can trigger a check of the datafiles
+          associated with the dataset; allowed values are : 
 
             - 'light' : checks that the period indicated by dates in data 
               filenames includes dataset's period (see :py:func:`~climaf.classes.cdataset.light_check)` 

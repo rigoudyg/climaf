@@ -187,7 +187,7 @@ def timeLimits(filename_or_timedim, use_frequency=False, strict_on_time_dim_name
                 data_freq = use_frequency
             if not data_freq:
                 data_freq = use_frequency
-            if data_freq = "monthly" :
+            if data_freq == "monthly" :
                 data_freq = "MS"
             if not data_freq:
                 raise Climaf_Error("Xarray cannot infer frequency using time dimension %s" %

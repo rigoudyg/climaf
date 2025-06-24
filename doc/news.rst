@@ -12,13 +12,15 @@ Changes, newest first:
   - Add function :py:func:`~climaf.driver.cxr` that returns a DataArray version of a CliMAF object
   - Fix a bug when finding data files using calias(.., fileNameVar=)
   - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs. First use implies reading the catalog, which can last up to 30s for CMIP6; but next requests are much quicker. Can be deactivated by setting `env.environment.projects_using_intake` list to []. Current list includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included as a test case for introducing a new project natively managed with intake. See 'internals' below for details. 
-  - Add operator **plotmap**, a replacement for operator `plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`. Calls to plot that end up as a map should be transformed accordingly. You can also set `env.environment.plot_use_plotmap=True` for automatically transofrming plot calls to plotmap calls, but this will fail when plot is used for 1- and 2-d profiles, curves or time series (except if adding argument `forbid_plotmap=False` to such calls). The generated plotmap call is displayed when setting `env.environment.teach_me_plotmap = True`, 
+  - Add operator **plotmap**, a replacement for operator `plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`, which gives access to introductory notebooks. Calls to plot that end up as a map should be transformed accordingly. You can also set `env.environment.plot_use_plotmap=True` for automatically transforming plot calls to plotmap calls, but this will fail when plot is used for 1- and 2-d profiles, curves or time series (except if adding argument `forbid_plotmap=False` to such plot() calls). The generated plotmap call is displayed when setting `env.environment.teach_me_plotmap = True`. 
   - Function cshow now calls display(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
   - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.ds`
   - Various fixes for running at IDRIS
   - Fixes errors in : cdu(), iplot_members()
   - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new argument ensure_period (default is True)
-
+  - New operator cnkso mimics operator cnks but allows to apply a composite operator
+  - Function :py:func:`~climaf.chtml.cell()` allows to choose the target image filename
+  - Setting variable driver.scripts_ouput_write_mode to 'a' allows to accumulate scripts outputs in last.out. Default value is 'w' and allows to keep only the output of last script.
     
   - Internals :
 
@@ -38,7 +40,7 @@ Changes, newest first:
     - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
     - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)
-    - add function period.build_date_rexep()
+    - add function period.build_date_regexp()
     - fix concurrency issue in makedirs(tmpdir)
     - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
     
