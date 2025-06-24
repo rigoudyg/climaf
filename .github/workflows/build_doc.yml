@@ -7,7 +7,7 @@ on:
 jobs:
   Sole_job_yet:
     name: Build doc 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -el {0}
@@ -15,10 +15,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         
-      - name: Setup Mambaforge 
+      - name: Setup Miniforge3 
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
+          miniforge-variant: Miniforge3
           miniforge-version: latest
           activate-environment: climaf_test
           use-mamba: true
