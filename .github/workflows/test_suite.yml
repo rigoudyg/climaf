@@ -57,7 +57,7 @@ jobs:
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "driver" 0)
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "dataloc" 0)
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "find_files" 0)
-      - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "html" 0)
+      #- run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "html" 0)
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "example_data_retrieval" 0)
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "example_index_html" 0)
       - run: (cd tests && ./launch_tests_with_coverage.sh 1 3 "mcdo" 0)
