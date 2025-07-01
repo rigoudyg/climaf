@@ -293,7 +293,7 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                           key_index=-1, reset=False, value_pattern=None, root=None):
     """
     Returns the ensemble of directories which have files matching a
-    given GLOB_PATTERN, which is supposed to end with a '/*' which
+    given GLOB_PATTERN, which is supposed to end with a '/\*' which
     corresponds to CASE_VALUE. The directory names are extracted from
     glob() return at a hierarchy level indicated by SPLIT_INDEX;
 

@@ -117,7 +117,7 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                 - si on a pu filtrer sur la variable,
                   ou que variable ="*" ou variable multiple,
                   ou que le fichier contient la bonne variable, eventuellement après renommage
-                    on retient le fichier
+                  alors on retient le fichier
 
             - A chaque fois qu'on retient un fichier, on ajoute au dict wildcard_facets les
               valeurs recontrées pour les attributs
