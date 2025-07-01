@@ -46,7 +46,8 @@ Example of a 'ref_ts' project dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, \
+    atCerfacs, atCNRM, onObelix
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -63,7 +64,8 @@ if atCerfacs:
     root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
-
+if onObelix:
+    root = "/home/orchideeshare/igcmg/IGCM/ReferenceDatasets/"
 cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type',
          ensemble=['product'], separator='%')
 cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day',

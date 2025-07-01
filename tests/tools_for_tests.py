@@ -69,7 +69,7 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None,
                 "Could not find a reference file for %s" % file_ref_name)
         else:
             file_ref = default_file_ref
-            dir_ref = dir_ref_default
+            #dir_ref = dir_ref_default
     if not os.path.exists(file_test) or not os.path.exists(file_ref):
         raise OSError("Check files existence: %s - %s" % (file_test, file_ref))
     if file_ref.split(".")[-1] != "html":
@@ -103,7 +103,8 @@ def compare_html_files(file_test, file_ref_name, dir_ref, dir_ref_default=None,
     for (fig_ref, fig_test) in zip(list_figures_ref, list_figures_test):
         try:
             triplets = compare_picture_files(fig_test, fig_ref, dir_ref,
-                                             dir_ref_default=None, display_error=display_error,
+                                             dir_ref_default, display_error=display_error,
+#                                             dir_ref_default=None, display_error=display_error,
                                              provide_triplets=generate_diffs_html)
             if generate_diffs_html:
                 diffs_triplets.extend(triplets)

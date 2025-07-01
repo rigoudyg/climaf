@@ -22,6 +22,7 @@ onErgon = False
 atIDRIS = False
 onJeanZay = False
 onSpip = False
+onObelix = False
 
 HostName = os.uname()[1].strip().lower()
 Home = os.getenv('HOME')
@@ -58,6 +59,9 @@ if 'Spip' in HostName or 'lsce3005' in HostName or 'lsce3072' in HostName or os.
     VolumesDir = os.getenv('VolumesDir')
 if os.path.exists('/data/scratch/globc'):
     atCerfacs = True
+if HostName.startswith('obelix') :
+    onObelix = True
+
 
 
 def _found_python_version_to_use(list_dirs, python_version):

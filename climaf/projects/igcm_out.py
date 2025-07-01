@@ -119,7 +119,7 @@ Contact: jerome.servonnat@lsce.ipsl.fr
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import atTGCC, atIDRIS, onCiclad, onSpirit, onSpip
+from env.site_settings import atTGCC, atIDRIS, onCiclad, onSpirit, onSpip, onObelix
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -146,11 +146,13 @@ if atTGCC:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/ccc/store/cont003/gencmip6"
 if atIDRIS:
-    root = "/gpfsstore/rech/psl/"
+    root = "/gpfsstore/rech/psl"
 if onCiclad or onSpirit:
     # Declare a list of root directories for CMIP5 data on IPSL's Ciclad file system
     root = "/ccc/store/cont003/thredds"
     login = "fabric"
+if onObelix:
+    root = "/home/scratch01"
 if onSpip:
     # Declare a list of root directories for IPSL data at TGCC
     root = "/Users/marti/Volumes/CURIE/ccc/store/cont003/dsm"
@@ -190,7 +192,7 @@ if root:
     cfreqs('IGCM_OUT', {'monthly': '1M', 'daily': '1D',
            'seasonal': 'SE', 'annual_cycle': 'SE', 'yearly': '1Y'})
 
-    if onCiclad or onSpirit:
+    if onCiclad or onSpirit or onObelix:
         urls_IGCM_OUT = [
             "${root}/${login}/${model}/${status}/${experiment}/${simulation}/${DIR}/${OUT}/${ave_length}/"
             "${simulation}_${PERIOD}_${frequency}_${variable}.nc",

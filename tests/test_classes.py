@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from env.environment import *
-from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC
+from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC, onObelix
 from climaf.cache import setNewUniqueCache, craz
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
     calias, crealms

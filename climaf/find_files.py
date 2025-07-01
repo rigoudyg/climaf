@@ -182,27 +182,23 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
                 remote_prefix, basename = mysplit(url)
                 #
                 full_template = Template(basename)
-                instanciated_template = full_template.safe_substitute(
-                    **simple_kwargs)
 
                 # Use brute force : globbing
                 lfiles = find_by_globbing(url, full_template,
-                                          instanciated_template, kwargs, simple_kwargs.copy())
-                clogger.info("Found %d files with raw variable name %s" %
-                             (len(lfiles), kwargs))
-
+                                          simple_kwargs.copy(), kwargs['project'])
+                clogger.debug("Found %d files with raw variable name"%len(lfiles))
+                
                 # Construct a regexp with a group name for each facets but period
                 facets_regexp = build_facets_regexp(one_url, kwargs)
 
                 if len(lfiles) == 0 and altvar != variable:
-                    clogger.debug(
-                        "No file found with regular variable name " +
-                        "%s, trying with filenameVar %s" % (variable, altvar))
-                    lfiles = find_by_globbing(
-                        url, full_template, instanciated_template, kwargs,
-                        simple_kwargs.copy(), alt_variable=altvar)
-                    clogger.info("Found %d files with alt variable name for %s" %
-                                 (len(lfiles), kwargs))
+                    clogger.info(
+                        "No file found with regular variable name %s, trying with filenameVar %s" %
+                        (variable, altvar))
+                    lfiles = find_by_globbing(url, full_template, simple_kwargs.copy(),
+                        kwargs['project'],alt_variable=altvar)
+                    clogger.debug("Found %d files with alt variable name %s"%\
+                                  (len(lfiles),altvar))
                     alt_kwargs = kwargs.copy()
                     alt_kwargs['variable'] = altvar
                     facets_regexp = build_facets_regexp(one_url, alt_kwargs)
@@ -266,6 +262,8 @@ def check_for_variable(f, url, variable, altvar):
         if (fileHasVar(f, variable) or
                 (altvar != variable and fileHasVar(f, altvar))):
             return True
+        else:
+            clogger.debug("File %s doesn't include variable %s nor %s"%(f,variable,altvar))
     else:  # remote data
         if (variable != altvar and (f.find(altvar) >= 0)) or \
            "," in variable:
@@ -324,6 +322,8 @@ def build_facets_regexp(string, kwargs):
 
     # Change glob syntax wildcards to regexp syntax
     base = base.replace("?", ".").replace("*", ".*")
+    # Toward a canonical form...
+    base = base.replace("//","/")
 
     # Substitute rightmost occurrences by a group-capable pattern which name is the facet name
     alt_kwargs = kwargs.copy()
@@ -440,19 +440,18 @@ def store_wildcard_facet_values(f, values, kwargs, wildcards, merge_periods_on=N
     return True
 
 
-def find_by_globbing(url, base_template, instanciated_template, kwargs, simple_kwargs, alt_variable=None):
+def find_by_globbing(url, base_template, simple_kwargs, project, alt_variable=None):
 
     if alt_variable is not None:
         simple_kwargs['variable'] = alt_variable
     template = base_template.safe_substitute(**simple_kwargs)
     #
     # Do globbing
-    clogger.info("Globbing with variable=%s on %s " %
-                 (simple_kwargs['variable'], instanciated_template))
+    clogger.info("Globbing on %s " % template)
     tim1 = time.time()
-    lfiles = my_glob(template, url, kwargs['project'])
-    clogger.info("Globbed %d files in %d s with variable=%s on %s " %
-                 (len(lfiles), time.time() - tim1, simple_kwargs['variable'], instanciated_template))
+    lfiles = my_glob(template, url, project)
+    clogger.info("Globbed %d files in %d s on %s " %
+                 (len(lfiles), time.time() - tim1, template))
     return lfiles
 
 

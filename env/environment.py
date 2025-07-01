@@ -239,7 +239,7 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         stamping = None
     clogger.info("---")
 
-if atCNRM or onSpirit or atTGCC or atIDRIS:
+if atCNRM or onSpirit or atTGCC or atIDRIS or onObelix:
     pdf_page_builder = os.sep.join([os.path.dirname(
         os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
