@@ -459,15 +459,16 @@ for pathfilename in filenames_list:
         highlight_period = highlight_period_list[dataset_number]
         sep = ('_' if '_' in highlight_period else '-')
         dum = highlight_period.split(sep)
-        startyear = int(dum[0])
-        endyear = int(dum[1])
-        #
-        ind = np.argwhere((x > cdatetime(startyear, 1, 1)) & (
-            x < cdatetime(endyear, 12, 31))).flatten()
-        print('highlight_period = ', highlight_period)
-        print("highlight_period_lw_list[dataset_number] = ",
-              highlight_period_lw_list[dataset_number])
-        plt.plot(x[ind], y[ind],
+        if len(dum) > 1:
+            startyear = int(dum[0])
+            endyear = int(dum[1])
+            #
+            ind = np.argwhere((x > cdatetime(startyear, 1, 1)) & (
+                x < cdatetime(endyear, 12, 31))).flatten()
+            print('highlight_period = ', highlight_period)
+            print("highlight_period_lw_list[dataset_number] = ",
+                  highlight_period_lw_list[dataset_number])
+            plt.plot(x[ind], y[ind],
                  lw=highlight_period_lw_list[dataset_number],
                  alpha=alphas_list[dataset_number],
                  linestyle=linestyles_list[dataset_number],

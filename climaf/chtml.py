@@ -248,8 +248,8 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
     to file filename. This allow to generate a portable atlas in that
     directory, while keeping a version of the file in CliMAF
     cache. Hard links are named after pattern
-    climaf_atlas<digit>.<extension> unless a target_filename is
-    provided. If hard-linking fails, a copy is made.
+    climaf_atlas<digit>.<extension> unless a target_filename
+    (without extension) is provided. If hard-linking fails, a copy is made.
 
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
@@ -280,11 +280,10 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
         #
         else:
             os.system('mkdir -p ' + dirname)
+            _, filext = os.path.splitext(os.path.basename(filename))
             if target_filename is None:
                 # !!! # -- Make a unique filename to avoid the issues with images
                 #          in the cache of the browser
-                _, filext = os.path.splitext(os.path.basename(filename))
-
                 nbs = []
                 from random import randrange
                 nb = randrange(1, 10000000000)
@@ -294,10 +293,7 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
                 target_filename = "climaf_atlas" + str(nb) + filext
             else:
                 # Use same extension as filename
-                froot, fext = os.path.splitext(filename)
-                troot, text = os.path.splitext(target_filename)
-                if text != fext:
-                    target_filename = troot + fext
+                target_filename = target_filename + filext
             #
 
             full_target_filename = dirname + "/" + target_filename
