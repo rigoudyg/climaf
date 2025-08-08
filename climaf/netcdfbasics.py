@@ -52,9 +52,9 @@ def varsOfFile(filename, all=False):
                 hasattr(ds[elt], "axis") or hasattr(ds[elt], "bounds"))]
             # Remove variables which are related to dimensions (e.g. dim bounds....)
             lvars = [elt for elt in lvars
-                     if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat|nav_lon|^time|crs|_bnds$)", elt)]
+                     if not re.findall("(^lat|^lon|^LAT|^LON|nav_lat*|nav_lon*|^time|crs|_bnds$)", elt)]
         else:
-            lvars = lvars & set(list(ds.dim))
+            lvars = lvars + set(list(ds.dim))
     return sorted(list(lvars))
 
 
