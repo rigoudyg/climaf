@@ -830,6 +830,9 @@ def ts_plot(ts, **kwargs):
        >>> p4bis = ts_plot(ens_ts)
 
     """
+    if ts is None:
+        return default_cache + '/Empty.png'
+
     # -- If ts is not a CliMAF ensemble, we can't pass it directly to ensemble_ts_plot
     if not isinstance(ts, cens):
         # -- Case 1: it's a single CliMAF dataset
