@@ -140,7 +140,7 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
     #
     if return_wildcards is not None:
         # Need to manage a dict of periods lists (or sets), which keys = TBD
-        # This dict is possibly feeded across iterated calls
+        # This dict is possibly fed across iterated calls
         periods_dict = return_wildcards.get("period", dict())
         #
         # Change periods dict values type from list to set
@@ -310,13 +310,13 @@ def mysplit(url):
 
 
 def build_facets_regexp(string, kwargs):
-    """
-    STRING is a pattern which includes facet keywords (r"${%s}"),
+    """STRING is a pattern which includes facet keywords (r"${%s}"),
     KWARGS is a dict of keyword/values
 
-    For later extracting encountered values for those facets which have a wildcard,
-    we construct and return a regexp with a group name for each facet present in KWARGS 
-    (but period)
+    For later extracting encountered values for those facets which
+    have a wildcard, we construct and return a regexp with a group
+    name for each facet present in KWARGS (but period)
+
     """
     _, base = mysplit(string)
 
@@ -325,24 +325,19 @@ def build_facets_regexp(string, kwargs):
     # Toward a canonical form...
     base = base.replace("//","/")
 
-    # Substitute rightmost occurrences by a group-capable pattern which name is the facet name
     alt_kwargs = kwargs.copy()
     for kw in kwargs:
-        # This excludes period attribute, which has a type
+        # Substitute leftmost occurrences by a group-capable pattern which name is
+        # the facet name, and other occurences by a pattern ensuring same value
+        #
+        # Next condition excludes period attribute, which has a type
         if isinstance(kwargs[kw], six.string_types):
             alt_kwargs[kw] = kwargs[kw].replace("?", ".").replace("*", ".*")
-            # We replace by the rightmost because matching fields in filenames
-            # (so, at right) is trickier than in pathnames when using wildcards
-            # (we could do that only for wildcards facets)
-            base = rreplace(base, r"${%s}" %
-                            kw, r"(?P<%s>%s)" % (kw, alt_kwargs[kw]))
-    #
-    # We substitute second and next occurrences by non-group-capable patterns
-    facets_regexp = Template(base).safe_substitute(**alt_kwargs)
-    #
-    # Same for date regexp, except from the left (why ?)
-    facets_regexp = facets_regexp.replace(date_keyword, date_regexp_pattern, 1)
-    facets_regexp = facets_regexp.replace(date_keyword, ".*")
+            base = base.replace(r"${%s}" % kw,
+                            r"(?P<%s>%s)" % (kw, alt_kwargs[kw]), 1)
+            base = base.replace(r"${%s}" % kw, r"(?P=%s)" % kw)
+    facets_regexp = base.replace(date_keyword, date_regexp_pattern, 1)
+    facets_regexp = facets_regexp.replace(date_keyword, r"(?P=period)")
     #
     return facets_regexp
 

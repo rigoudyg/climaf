@@ -8,19 +8,49 @@ Changes, newest first:
 
 - V3.x:
 
-  - script ensemble_ts_plot now has options --year_delta and --draw_grid
-  - Add function :py:func:`~climaf.driver.cxr` that returns a DataArray version of a CliMAF object
+  - **Warning : next entry describes a significant change in default behaviour when
+  defining a dataset : a check of available data is now performed, which may
+  raise an error. Also, second entry describes the use of intake catalogs which,
+  for CMIP6 data (see  below) implies a significant setup time**
+  - On creating a dataset using :py:func:`~climaf.classes.ds()`, a check of the
+  dataset's period w.r.t. the period covered by the datafiles may be automatically
+  performed, depending on new arguments 'check' and 'check_type'. Default
+  values are env.environment.data_check and env.environment.period_check_type,
+  which default settings lead to activate the check when some datafiles actually
+  exist, and to perform a 'light' check. See
+  :ref:`that section of class documentation<data_check>` for details
+  - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs.
+  First use implies reading the catalog, which can last up to 30s for CMIP6;
+  but next requests are much quicker. Can be deactivated by setting
+  `env.environment.projects_using_intake` list to []. Current list
+  includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included
+  as a test case for introducing a new project natively managed with
+  intake. See 'internals' below for details. 
+  - Add operator **plotmap**, a replacement for operator `plot`, albeit
+  only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz;
+  see :doc:`scripts/plotmap`, which gives access to introductory notebooks.
+  Calls to plot that end up as a map should be transformed accordingly.
+  You can also set `env.environment.plot_use_plotmap=True` for automatically
+  transforming plot calls to plotmap calls, but this will fail when plot is
+  used for 1- and 2-d profiles, curves or time series (except if
+  adding argument `forbid_plotmap=False` to such plot() calls).
+  The generated plotmap call is displayed when setting
+  `env.environment.teach_me_plotmap = True`. 
+  - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new
+  argument ensure_period (default is True)
+  - Script ensemble_ts_plot now has options --year_delta and --draw_grid
+  - Add function :py:func:`~climaf.driver.cxr` that returns a DataArray
+  (of Xarray suite) version of a CliMAF object
   - Fix a bug when finding data files using calias(.., fileNameVar=)
-  - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs. First use implies reading the catalog, which can last up to 30s for CMIP6; but next requests are much quicker. Can be deactivated by setting `env.environment.projects_using_intake` list to []. Current list includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included as a test case for introducing a new project natively managed with intake. See 'internals' below for details. 
-  - Add operator **plotmap**, a replacement for operator `plot`, albeit only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz; see :doc:`scripts/plotmap`, which gives access to introductory notebooks. Calls to plot that end up as a map should be transformed accordingly. You can also set `env.environment.plot_use_plotmap=True` for automatically transforming plot calls to plotmap calls, but this will fail when plot is used for 1- and 2-d profiles, curves or time series (except if adding argument `forbid_plotmap=False` to such plot() calls). The generated plotmap call is displayed when setting `env.environment.teach_me_plotmap = True`. 
-  - Function cshow now calls display(Image()) if called from a notebook. This applies to default function cshow (the one in climaf.api)
-  - Function ds() has a new argument 'check' for light to full check of datafiles associated with the dataset. See :py:func:`~climaf.classes.ds`
+  - Function cshow now calls display(Image()) if called from a notebook.
+  This applies to default function cshow (the one in climaf.api)
   - Various fixes for running at IDRIS
   - Fixes errors in : cdu(), iplot_members()
-  - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new argument ensure_period (default is True)
   - New operator cnkso mimics operator cnks but allows to apply a composite operator
-  - Function :py:func:`~climaf.chtml.cell()` allows to choose the target image filename
-  - Setting variable driver.scripts_ouput_write_mode to 'a' allows to accumulate scripts outputs in last.out. Default value is 'w' and allows to keep only the output of last script.
+  - Function :py:func:`climaf.chtml.cell()` allows to choose the target image filename
+  - Setting variable :data:`climaf.driver.scripts_ouput_write_mode` to 'a'
+  allows to accumulate scripts outputs in last.out. Default value is 'w'
+  and allows to keep only the output of last script run.
     
   - Internals :
 
@@ -36,7 +66,7 @@ Changes, newest first:
 	   - a dict `translate_facet` for matching CliMAF facet names to intake catalog facet names
 	   - a string `period_pattern` which allows to extract the period from the filename; this is needed only because IPSL catalogs do not provide relevant values for that, yet
 	     
-    - When calling an external script, operator arguments values are dumped in json format (except if argument keyword has prefix !) ; so, called scripts must decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
+    - When calling an external script, operator arguments values are dumped in json format (except if argument keyword has prefix '!') ; called scripts must then decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
     - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
     - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)

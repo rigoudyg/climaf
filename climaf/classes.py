@@ -28,7 +28,8 @@ from env.environment import *
 from climaf.utils import Climaf_Classes_Error, remove_keys_with_same_values
 from climaf.dataloc import isLocal, getlocs, selectFiles, dataloc
 from climaf.period import init_period, cperiod, merge_periods, intersect_periods_list, \
-    lastyears, firstyears, group_periods, freq_to_minutes, build_date_regexp_pattern
+    lastyears, firstyears, group_periods, freq_to_minutes, build_date_regexp_pattern, \
+    period_from_filenames
 from env.clogging import clogger
 from climaf.netcdfbasics import fileHasVar, varsOfFile, attrOfFile, timeLimits, model_id, infer_freq
 
@@ -579,22 +580,39 @@ class cdataset(cobject):
 
            - or a 'derived' variable (see  :py:func:`~climaf.operators_derive.derive` ),
 
-           - or, an aliased variable name (see :py:func:`~climaf.classes.alias` )
+           - or, an aliased variable name (see :py:func:`~climaf.classes.calias` )
 
-        - check : this is actually not a dataset attribute but an
-          optional argument that can trigger a check of the datafiles
-          associated with the dataset; allowed values are : 
+        .. _data_check:
 
+        - check : optional argument that drives the check of the
+          period covered by the datafiles w.r.t. the period defined
+          for the dataset; allowed values are True, False and
+          "if_found"; the latter means : do check except if there is
+          no data file for the dataset; this is intended for cases
+          where datafiles are not (no more) accessible while the user
+          expect to get processed data from the cache. Default value is
+          env.environment.data_check. An error is raised if check
+          fails.
+
+        - check_type : defines the extent of period check; default value
+          is env.environment.period_check_type; allowed values are : 
+
+            - 'none' : don't check period
+        
             - 'light' : checks that the period indicated by dates in data 
-              filenames includes dataset's period (see :py:func:`~climaf.classes.cdataset.light_check)` 
+              filenames includes dataset's period (see method
+              :py:meth:`~climaf.classes.cdataset.light_check`)
 
-            - 'period' : checks that the period covered by data in files 
-              includes dataset's period (see :py:func:`~climaf.classes.cdataset.check)`
+            - 'medium' : checks that the period covered by data in files 
+              includes dataset's period (see method
+              :py:meth:`~climaf.classes.cdataset.check`)
 
-            - 'full' : in addition to case 'period', also checks for gaps in 
-               data, and for frequency (see :py:func:`~climaf.classes.cdataset.check)`
+            - 'full' : in addition to case 'period', also checks for gaps 
+              in data, and for frequency (see method
+              :py:meth:`~climaf.classes.cdataset.check`)
 
-           An error is raised if the check fails.
+          If check is True (or "if_found", and some datafile exists), an
+          error is raised if the check fails.
 
         - in project CMIP5 , for triplets (frequency, simulation, period, table )  :
           if any is 'fx' (or 'r0i0p0 for simulation), the others are forced to
@@ -626,7 +644,6 @@ class cdataset(cobject):
         if self.frequency in ['seasonal', 'annual_cycle']:
             self.period.fx = True
         freqs_dic = frequencies.get(self.project, None)
-        # print freqs_dic
         if freqs_dic:
             for k in freqs_dic:
                 if freqs_dic[k] == self.frequency and k == 'annual_cycle':
@@ -646,22 +663,48 @@ class cdataset(cobject):
         self.files = None
         self.local_copies_of_remote_files = None
         self.register()
-        if "check" in kwargs:
-            if kwargs["check"] == "light":
+        #
+        check = kwargs.get("check",env.environment.data_check)
+        if self.period == '*' or self.period is cperiod('fx') or self.period.fx:
+            check = False
+        if check is not False:
+            check_type = kwargs.get("check_type", env.environment.period_check_type)
+            error_msg = None
+            if check_type == "none":
+                pass
+            elif check_type == "light":
                 if not self.light_check():
-                    raise Climaf_Classes_Error(
-                        "Period light check failed for %s" % self)
-            elif kwargs["check"] == "period":
+                    error_msg = "Period light check failed for %s" % self
+            elif check_type == "medium":
                 if not self.check(period=True, gap=False, frequency=False):
-                    raise Climaf_Classes_Error(
-                        "Period check failed for %s" % self)
-            elif kwargs["check"] == "full":
+                    error_msg = "Period check failed for %s" % self
+            elif check_type == "full":
                 if not self.check(period=True, gap=True, frequency=True):
-                    raise Climaf_Classes_Error(
-                        "Period/gap/frequency check failed for %s" % self)
+                    error_msg = "Period/gap/frequency check failed for %s" % self
             else:
                 raise Climaf_Classes_Error(
-                    "Provided value for check is invalid %s" % kwargs["check"])
+                    "Provided value for 'check_type' is invalid: %s" % check_type)
+            if error_msg:
+                # Is there any datafile for this dataset, whatever the period ?
+                alt_kw = copy.deepcopy(kwargs)
+                alt_kw.update(period="*", check=False)
+                alt_ds = ds(**alt_kw)
+                files = alt_ds.baseFiles()
+                if files is None:
+                    if check == "if_found":
+                        clogger.warning("No data file for checking period. "+\
+                                        "Assuming we rely on cache content for "+\
+                                        "results based on dataset %s" % self )
+                        return
+                    else:
+                        raise Climaf_Classes_Error(error_msg + \
+                            " - There is no relevant file whatever the period")
+                else:
+                    whole_period = period_from_filenames(files)
+                    raise Climaf_Classes_Error(error_msg + \
+                               " Requested period is %s - Available period is %s"%
+                                               (self.period, whole_period))
+                
 
     def __eq__(self, other):
         res = super(cdataset, self).__eq__(other)
@@ -1225,10 +1268,10 @@ class cdataset(cobject):
         return False
 
     def light_check(self):
-        """Check that dataset's period is covered by the period deduced from
-        the filenames of its datafiles. Filenames with non-date digits
-        (e.g. initialization year) may generate interpretation
-        problems
+        """Check that dataset's period is covered by the period
+        deduced from the filenames of its datafiles. Filenames with
+        non-date digits (e.g. initialization year) and which period
+        has no end date may generate interpretation problems.
 
         Return True if the period is covered
 
@@ -1237,26 +1280,19 @@ class cdataset(cobject):
 
         """
         #
-        pattern = build_date_regexp_pattern()
         files = self.baseFiles()
         if files is None:
             clogger.warning("No data file for dataset %s" % self)
             return None
-        files = files.split()
-        periods = []
-        for fil in files:
-            matches = re.findall(pattern, fil)
-            if len(matches) != 1:
-                clogger.error(
-                    f"No (or too much) date(s) found in filename {file}")
-                return None
-            else:
-                # First element is a tuple, which first element matches the period
-                periods.append(init_period(matches[0][0]))
-        clogger.debug("File periods are :" + str(periods))
-        data_period = merge_periods(periods)
-        clogger.debug("Merged periods : " + str(data_period))
-        return any([p.includes(self.period) for p in data_period])
+        data_period = period_from_filenames(files)
+        check_ok = any([p.includes(self.period) for p in data_period])
+        if not check_ok :
+            clogger.error("Period check fails : relevant datafile(s) cover " + \
+                            str(data_period) + \
+                          " while requested period is " + str(self.period))
+
+        return check_ok
+
 
     def check(self, frequency=False, gap=False, period=True):
         """
@@ -1368,8 +1404,8 @@ class cdataset(cobject):
                         cpt += 1
                         if cpt > 3:
                             break
-                        clogger.error("File data time issue between %s and %s, interval inconsistent with %s" %
-                                      (ptim, tim, delta))
+                        clogger.error("File data time issue between %s and %s, interval " +\
+                                      "inconsistent with %s" % (ptim, tim, delta))
         #
         if period:
             # Compare period covered by data files with dataset's period
@@ -2681,7 +2717,7 @@ def resolve_star_period(kwargs):
 def resolve_first_or_last_years(kwargs, duration, option="last"):
     # Returns a dataset after translation of period like 'last_50y'
     kwargs['period'] = '*'
-    explorer = ds(**kwargs)
+    explorer = ds(**kwargs, check=False)
     attributes = explorer.explore(option='choices')
     if 'period' in attributes:
         periods = attributes['period']
@@ -2693,7 +2729,7 @@ def resolve_first_or_last_years(kwargs, duration, option="last"):
             kwargs['period'] = firstyears(period, int(duration))
     else:
         kwargs['period'] = '*'
-    explorer = ds(**kwargs)
+    explorer = ds(**kwargs, check=False)
     return explorer.explore('resolve')
 
 

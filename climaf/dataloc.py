@@ -216,7 +216,7 @@ def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", ta
     the lowest number of wildcards (*) in attributes
 
     """
-    if project in projects_using_intake:
+    if project in env.environment.projects_using_intake:
         return [('intake', None, None)]
     rep = []
     for loc in locs:
@@ -242,7 +242,7 @@ def getlocs(project="*", model="*", simulation="*", frequency="*", realm="*", ta
 def isLocal(project, model, simulation, frequency, realm="*", table="*"):
     if project == 'file':
         return True
-    if project in projects_using_intake:
+    if project in env.environment.projects_using_intake:
         return True
     #
     ofu = getlocs(project=project, model=model, simulation=simulation,
@@ -314,7 +314,7 @@ def selectFiles(return_wildcards=None, merge_periods_on=None, return_combination
         if normrealm in realms[project]:
             search_dict2['realm'] = realms[project][normrealm]
 
-    if project in projects_using_intake:
+    if project in env.environment.projects_using_intake:
         rep = selectGenericFiles(None, search_dict2, return_combinations=return_combinations,
                                  use_frequency=use_frequency, return_wildcards=return_wildcards,
                                  merge_periods_on=merge_periods_on)

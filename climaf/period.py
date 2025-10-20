@@ -585,6 +585,48 @@ def build_date_regexp_pattern():
     date_regexp_patt = f"(?P<period>(?P<start>{date})([_-](?P<end>{date}))?)"
     return date_regexp_patt
 
+def period_from_filenames(files):
+    """Given a string containing (space separated) filenames, analyze
+    filenames for dates and periods, and returns the period covered by
+    the list of files.
+
+    Can cope with 'version' labels built using dates, provided they
+    occur only in filenames that also bear a period with an 'end'
+    part. A better method would be to use the filenames pattern
+    (providing a group for matching the period), but this would
+    require more code re-engineering...
+
+    """
+    clogger.debug("period_from_filenames , files="+files)
+    files = files.split()
+    periods = []
+    pattern = build_date_regexp_pattern()
+    for fil in files:
+        periods_got = 0
+        nb_periods_with_an_end = 0
+        for m in re.finditer(pattern, fil):
+            period = m.groupdict()["period"]
+            clogger.debug("period_from_filenames , period="+period)
+            periods_got += 1
+            if m.groupdict()["end"] is not None:
+                clogger.debug("period_from_filenames , end="+m.groupdict()["end"])
+                nb_periods_with_an_end += 1
+                period_with_an_end = period
+        if periods_got == 0:
+            clogger.error( f"No date found in filename {fil}")
+            return
+        elif periods_got == 1:
+            periods.append(init_period(period))
+        elif nb_periods_with_an_end == 1:
+            # Heuristic : if there is only one period with both a
+            # start and an end, assume this is the correct one. This
+            # allows to discard any date which actually is a version label
+            periods.append(init_period(period_with_an_end))
+        else:
+            clogger.error( f"Too much dates in filename {fil}")
+            return 
+    #clogger.debug("File periods are :" + str(periods))
+    return merge_periods(periods)
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):

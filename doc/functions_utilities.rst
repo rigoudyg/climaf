@@ -5,6 +5,15 @@ Utility functions and variables
 .. default-domain:: python
 
 
+scripts_output_write_mode : should we accumulate scripts output
+------------------------------------------------------------------
+
+.. autodata:: climaf.driver.scripts_output_write_mode
+
+Value 'a' allows to accumulate scripts outputs in file last.out.
+Default value is 'w' and allows to keep only the output of last script.
+
+
 cerr : display the output of last operator call 
 --------------------------------------------------
 

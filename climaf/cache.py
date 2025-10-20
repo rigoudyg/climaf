@@ -332,12 +332,18 @@ def hasMatchingObject(cobject, ds_func):
         co = crs2eval.get(crs, None)
         if co is None:
             try:
+                clogger.debug("Cache hasMatching eval "+crs)
+                save = env.environment.data_check
+                env.environment.data_check = False
                 co = eval(crs, sys.modules['__main__'].__dict__)
+                env.environment.data_check = save
             except:
                 continue  # usually case of a CRS which project is not currently defined
         if co:
             crs2eval[crs] = co
             # clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
+            clogger.debug("Cache hasMatching compare trees ")
+
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
                 f, costs = crs2filename[crs]

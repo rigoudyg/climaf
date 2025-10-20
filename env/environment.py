@@ -15,12 +15,11 @@ from subprocess import getoutput, getstatusoutput
 from env.clogging import clogger, clog, clog_file
 import env.clogging
 from env.site_settings import *
+from env.utils import get_subprocess_output
 
 # Variables
 
 #: Climaf version
-from env.utils import get_subprocess_output
-
 climaf_version = "3.0"
 
 #: Dictionary of declared projects (type is cproject)
@@ -258,3 +257,9 @@ if atTGCC or atIDRIS:
 plot_use_plotmap = False
 # Should the plotmap wrapper explain how it transforms plot calls to plotmap calls
 teach_me_plotmap = False
+
+#: Should ds() calls be checked w.r.t. datafiles. "if_found" means yes if some relevant datafiles exists. Other allowed values are True and False. See :ref:`that section of class cdataset's documentation<data_check>`
+data_check = "if_found"
+
+#: On ds() calls, which level of check of the requested period w.r.t datafiles. See :ref:`that section of class cdataset's documentation<data_check>`
+period_check_type = "light"
