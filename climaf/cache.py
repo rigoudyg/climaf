@@ -332,7 +332,6 @@ def hasMatchingObject(cobject, ds_func):
         co = crs2eval.get(crs, None)
         if co is None:
             try:
-                clogger.debug("Cache hasMatching eval "+crs)
                 save = env.environment.data_check
                 env.environment.data_check = False
                 co = eval(crs, sys.modules['__main__'].__dict__)
@@ -342,8 +341,6 @@ def hasMatchingObject(cobject, ds_func):
         if co:
             crs2eval[crs] = co
             # clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
-            clogger.debug("Cache hasMatching compare trees ")
-
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
                 f, costs = crs2filename[crs]
@@ -479,6 +476,8 @@ def cdrop(obj, rm=True, force=False):
         fil, _ = crs2filename[crs]
         if not os.path.exists(fil):
             fil = alternate_filename(fil)
+        if not os.path.exists(fil):
+            fil = None
     else:
         # In case the cache index is not up-to-date
         fil, cost = hasExactObject(obj)
@@ -490,7 +489,7 @@ def cdrop(obj, rm=True, force=False):
                 if force:
                     os.system("chmod +w " + fil)
                 if not os.access(fil, os.W_OK):
-                    clogger.info("Object %s is protected" % crs)
+                    clogger.info("Object %s is protected, file is %s" % (crs,fil))
                     return
                 path_file = os.path.dirname(fil)
                 os.remove(fil)
@@ -506,7 +505,9 @@ def cdrop(obj, rm=True, force=False):
                     "When trying to remove %s : file does not exist in cache" % crs)
                 return False
     else:
-        clogger.info("%s is not cached" % crs)
+        clogger.info("%s is not cached and will be removed from index" % crs)
+        crs2filename.pop(crs,None)
+        dropped_crs.append(crs)
         return None
 
 
@@ -699,7 +700,7 @@ def craz(force=False, hideError=False):
                                   generateUniqueFileName(crs))
                 else:
                     clogger.debug(
-                        'Could not remove file (either not existing or protected): %s', crs2filename[crs])
+                        'Could not remove file (either not existing or protected)')
                     clogger.debug('Associated CRS : %s', crs)
         # os.system("ls  " + cc)
 
