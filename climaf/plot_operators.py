@@ -7,6 +7,7 @@ from env.clogging import clogger
 from climaf import __path__ as cpath
 from climaf import operators
 from climaf.operators import cscript, fixed_fields
+from climaf.cache import cdrop
 
 scriptpath = cpath[0] + '/../scripts/'
 binpath = cpath[0] + '/../bin/'
@@ -95,8 +96,10 @@ def load_plot_operators():
             "--contours_map_max='${cntx}' "
             "--contours_map_scale='${contours_map_scale}' "
             "--contours_map_scale='${cnts}' "
+            "--scale_aux=${scale_aux} "
             "--contours_map_offset='${contours_map_offset}' "
             "--contours_map_offset='${cnto}' "
+            "--offset_aux=${offset_aux} "
             #
             # Vector map
             #
@@ -180,15 +183,22 @@ def load_plot_operators():
 
 
 def plot(*largs, forbid_plotmap=False, **kwargs):
-    """ 
-    A replacement for old CliMAF plot operator, which uses plotmap, 
-    simplifies the plot if needed, and keep tracks of arguments not managed by plotmaps
+    """
+    A replacement for old CliMAF plot operator, which uses plotmap
+    if possible, simplifies the plot if needed, and keep tracks of
+    arguments not managed by plotmap
+
     """
     caller = sys._getframe().f_back.f_code.co_name
 
     if not env.environment.plot_use_plotmap or forbid_plotmap:
+        if not env.environment.plot_use_plotmap :
+            reason = "because of global setting"
+        else:
+            reason = "because of call argument"
         rep = operators.plot(*largs, **kwargs)
-        clogger.info("Plotmap warning: using old plot for %s. Caller is :%s" % (rep.crs, caller))
+        clogger.info("Plotmap warning: using old plot for %s %s. Caller is :%s" %
+                     (rep.crs, reason, caller))
         return (rep)
 
     # Should check that input data has two horizontal dimensions ...
@@ -226,7 +236,6 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                               "Gnomonic", "Mercator", "LambertConformal", "Robinson",
                               "Hammer", "Mollweide", "PlateCarree"]
     must_use_old_plot = False
-
     # shade_above et al. : a affiner
     outargs = dict()
     for arg in kwargs.keys():
@@ -245,9 +254,10 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                              ". Caller is :%s" % caller)
                 outargs.pop(arg)
 
-            # "proj" : change Ncl names in  Cartopy's , when applicable
+            # "proj" : check that projection is known by plotmap; adapt default options
             if arg == "proj":
                 proj = kwargs["proj"]
+                clogger.info("Processing proj %s"%proj)
                 if proj[0:2] in ["NH", "SH"]:
                     pass
                 elif proj in compatible_projections:
@@ -329,7 +339,14 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
                 outargs[oarg] = 'streamplot'
 
         elif arg.lower() == "mpcenterlonf":
-            outargs["proj_options"] = {'central_longitude': kwargs[arg]}
+            if "proj" in kwargs and kwargs['proj'][0:2] not in ["NH", "SH"]:
+                if 'proj_options' not in outargs:
+                    outargs['proj_options'] = dict()
+                outargs['proj_options']['central_longitude'] = kwargs[arg]
+            else:
+                # Mimic NCl behaviour, which just neglect that option
+                # for polar stereo projections
+                pass
 
         elif arg == "gsnLeftString":
             if "title_options" not in outargs:
@@ -381,13 +398,20 @@ def plot(*largs, forbid_plotmap=False, **kwargs):
     # if 'proj' not in outargs:
     #     outargs["proj"] = "PlateCarree"
 
+    if 'proj' in outargs:
+        if outargs['proj'] == 'Robinson':
+            if 'proj_options' not in outargs:
+                outargs['proj_options'] = dict()
+            if 'central_longitude' not in outargs['proj_options']:
+                outargs['proj_options']['central_longitude'] = 180.
+
     if must_use_old_plot:
         rep = operators.plot(*largs, **kwargs)
         clogger.info("Plotmap warning: using old plot for %s" % rep.crs +
                      ". Caller is :%s" % caller)
-        return (rep)
-
-    rep = operators.plotmap(main, aux, u, v, shade2, **outargs)
-    if env.environment.teach_me_plotmap:
-        print("Plotmap call: %s" % rep.crs)
+    else: 
+        rep = operators.plotmap(main, aux, u, v, shade2, **outargs)
+        if env.environment.teach_me_plotmap:
+            print("Plotmap call: %s" % rep.crs)
+        #cdrop(rep)
     return (rep)

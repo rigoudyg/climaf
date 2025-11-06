@@ -438,7 +438,6 @@ def mimic_gplot(args, selection_options_list):
     For most cases, this consists in changing 'args'
     For the remaining cases, this translates in returned dict 'settings'
 
-    Currenty handles : trim, date, time, units, focus, vcb
     """
 
     settings = dict()
@@ -497,6 +496,8 @@ def mimic_gplot(args, selection_options_list):
             "https://scitools.org.uk/cartopy/docs/latest/gallery/lines_and_polygons/always_circular_stereo.html")
         if len(args.projection) > 2:
             latitude_limit = float(args.projection[2:])
+        else:
+            latitude_limit = 50.
         ranges_dict = dict(lon_range=[-180, 180])
         if args.projection[0:2] == 'NH':
             args.projection = "NorthPolarStereo"
@@ -512,7 +513,10 @@ def mimic_gplot(args, selection_options_list):
         if args.projection_options is None:
             args.projection_options = dict()
         if "central_longitude" not in args.projection_options:
-            args.projection_options["central_longitude"] = 0.0
+            if args.projection in [ "NorthPolarStereo",  "SouthPolarStereo" ]:
+                args.projection_options["central_longitude"] = 0.0
+            else:
+                args.projection_options["central_longitude"] = 0.0
         if 'gridlines' not in args.axis_methods:
             args.axis_methods['gridlines'] = [dict(draw_labels=True, linestyle="--",
                                                    color='black', alpha=0.5)]
@@ -579,7 +583,7 @@ def mimic_gplot(args, selection_options_list):
                         args.colored_map_min,
                         args.colored_map_max + args.colored_map_delta,
                         args.colored_map_delta))
-                    cdic['levels'] = args.colored_map_levels
+                    #cdic['levels'] = args.colored_map_levels
 
     if args.debug:
         print("Colors/levels options for colormap engine=", cdic)

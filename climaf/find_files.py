@@ -246,7 +246,7 @@ def selectGenericFiles(urls, kwargs, return_combinations=None, use_frequency=Fal
 
 
 def fixed_frequency(kwargs):
-    return kwargs.get('frequency') in ["fx", "seasonnal", "annual_cycle"] or \
+    return kwargs.get('frequency') in ["fx", "seasonal", "annual_cycle"] or \
         kwargs.get('period') in [cperiod("fx"), ] or \
         kwargs.get('table') in ['fx', ]
 
@@ -278,7 +278,7 @@ def check_period_and_store(f, period, values, kwargs, wildcards, merge_periods_o
     if fixed_frequency(kwargs):
         return store_wildcard_facet_values(f, values, kwargs, wildcards, merge_periods_on, combinations)
     else:
-        fperiod = values['period']
+        fperiod = values.get('period', values.get('clim_period'))
         if fperiod and isinstance(fperiod, six.string_types):
             fperiod = init_period(fperiod)
         #

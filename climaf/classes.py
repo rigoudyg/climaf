@@ -642,7 +642,10 @@ class cdataset(cobject):
         self.frequency = attval.get('frequency', "*")
         # Normalized name is annual_cycle, but allow also for 'seasonal' for the time being
         if self.frequency in ['seasonal', 'annual_cycle']:
-            self.period.fx = True
+           if type(self.period) is cperiod:
+               self.period.fx = True
+           else:
+               self.period = cperiod("fx")
         freqs_dic = frequencies.get(self.project, None)
         if freqs_dic:
             for k in freqs_dic:

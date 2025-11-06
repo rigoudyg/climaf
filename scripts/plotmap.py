@@ -103,13 +103,15 @@ def find_ccrs(crs_name, options=dict(), data_filename=None):
 
     # If there is a file, try yo get CRS from its metadata
     if fic is not None:
-        crs_name, options = ccrs_from_metadata(fic)
-
+        crs_name, file_options = ccrs_from_metadata(fic)
+        file_options.update(options)
+        options = file_options
+        
     # Default CRS is PlateCarree
     if crs_name is None:
         # raise ValueError(
         #     "crs_name is None (can't deduce it from file %s)" % fic)
-        return ccrs.PlateCarree()
+        return ccrs.PlateCarree(**options)
 
     if debug:
         print("In find_ccrs, crs_name=", crs_name)
@@ -127,6 +129,8 @@ def ccrs_from_metadata(filename):
     http://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf-conventions.html#appendix-grid-mappings
 
     Yet limited to the case of Lambert Conformal projection, as coded in Aladin model outputs.
+
+    Could be easily improved to identify PlateCaree, based on even lat and lon cooordinates
     """
     ccrs_name = None
     ccrs_options = {}
@@ -226,7 +230,8 @@ def get_variable_and_coordinates_from_dataset(
         variable_dataset, dimensions, selection_options)
     for d in dimensions:
         if len(variable_dataset[d]) < 2:
-            raise ValueError("Dimension %s has too short a size for a map (%d)" % (d, len(variable_dataset[d])))
+            raise ValueError("Dimension %s has too short a size for a map (%d)" % \
+                             (d, len(variable_dataset[d])))
 
     # add cyclic point if one of the dimensions is a longitude and longitude range is ~ 360
     d0 = dimensions[0]  # Name of first dimension
@@ -240,8 +245,11 @@ def get_variable_and_coordinates_from_dataset(
         if lon_range > 359.9 or lon_range < 0.1:
             if debug:
                 print("Adding cyclic longitude")
-            variable_dataset = gv.xr_add_cyclic_longitudes(
-                variable_dataset, d0)
+            try:
+                variable_dataset = gv.xr_add_cyclic_longitudes(
+                    variable_dataset, d0)
+            except:
+                pass
 
     # Retrieve and possibly compute coordinates data
     variable_coordinates_data = list()
@@ -316,7 +324,7 @@ def create_norm(nlevels, cmap, z, zmin, zmax):
     levels = MaxNLocator(nbins=nlevels).tick_values(zmin, zmax)
     if type(cmap) is str:
         cmap = plt.colormaps[cmap]
-    norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+    norm = BoundaryNorm(levels, ncolors=cmap.N, extend='both', clip=True)
     return norm
 
 
@@ -401,7 +409,23 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     contourf_args = dict(zorder=0, cmap=colored_map_cmap)
     contourf_args.update(colored_map_engine_options)
     if colored_map_levels is not None and 'levels' not in contourf_args:
+        colored_map_levels = [ float(l) for l in colored_map_levels ]
         contourf_args['levels'] = colored_map_levels
+        
+        # Mimic Ncl, which copes with too short colormaps
+        # Method is quite direct : forgot some of the highest levels
+        if colored_map_cmap.N < len(colored_map_levels) + 1:
+            to_skip = len(colored_map_levels) + 1 - colored_map_cmap.N
+            colored_map_levels = colored_map_levels[0: -to_skip ]
+            if debug:
+                print("Reducing the number of levels to match the number of colors")
+                print("Levels list is now ", colored_map_levels)
+
+        contourf_args['norm'] = BoundaryNorm(colored_map_levels,
+                                             ncolors=colored_map_cmap.N,
+                                             extend='both')
+        
+    contourf_args['extend'] = 'both'
     contourf_args["transform"] = transform
     #
     if colored_map_engine == "contourf":
