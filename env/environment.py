@@ -260,6 +260,8 @@ teach_me_plotmap = False
 
 #: Should ds() calls be checked w.r.t. datafiles. "if_found" means yes if some relevant datafiles exists. Other allowed values are True and False. See :ref:`that section of class cdataset's documentation<data_check>`
 data_check = "if_found"
+# For the time being, ensure compatibility with earlier behaviour
+data_check = False
 
 #: On ds() calls, which level of check of the requested period w.r.t datafiles. See :ref:`that section of class cdataset's documentation<data_check>`
 period_check_type = "light"

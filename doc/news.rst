@@ -8,16 +8,15 @@ Changes, newest first:
 
 - V3.x:
 
-  - **Warning : next entry describes a significant change in default behaviour when
-  defining a dataset : a check of available data is now performed, which may
+  - **Warning : next entry describes a way to significantly change default behaviour when
+  defining a dataset : a check of available data can be performed, which may
   raise an error. Also, second entry describes the use of intake catalogs which,
   for CMIP6 data (see  below) implies a significant setup time**
   - On creating a dataset using :py:func:`~climaf.classes.ds()`, a check of the
   dataset's period w.r.t. the period covered by the datafiles may be automatically
   performed, depending on new arguments 'check' and 'check_type'. Default
   values are env.environment.data_check and env.environment.period_check_type,
-  which default settings lead to activate the check when some datafiles actually
-  exist, and to perform a 'light' check. See
+  which default settings do not yet activate the check. See
   :ref:`that section of class documentation<data_check>` for details
   - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs.
   First use implies reading the catalog, which can last up to 30s for CMIP6;
