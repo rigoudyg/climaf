@@ -11,6 +11,9 @@ import os
 import sys
 import platform
 
+from .clogging import clogger
+
+
 atCNRM = False
 atCerfacs = False
 atIPSL = False
@@ -84,3 +87,8 @@ if atCNRM:
                 sys.path.append(os.sep.join([additional_packages, r, "site-packages"]))
     else:
         print("Warning: additional packages not found, could cause issues.")
+    # Remove some environment variables which cause issues with cdo
+    for env_var in ["MAGPLUS_DEBUG", "MAGPLUS_INFO"]:
+        if env_var in os.environ:
+            clogger.warning(f"Unset {env_var} which causes issues with cdo")
+            del os.environ[env_var]
