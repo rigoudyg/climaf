@@ -8,24 +8,24 @@ on:
 jobs:
   Sole_job_yet:
     name: Build doc 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash -el {0}
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
-      - name: Setup Mambaforge 
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Setup Miniforge3 
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
+          miniforge-variant: Miniforge3
           miniforge-version: latest
           activate-environment: climaf_test
           use-mamba: true
           
       - name: Cache Conda env
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CONDA }}/envs
           key:
@@ -44,7 +44,7 @@ jobs:
       - run: (cd doc && make -k html)
 
       - name: Archive doc
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: doc
           retention-days: 5

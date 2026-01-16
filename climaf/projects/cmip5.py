@@ -6,8 +6,7 @@ libIGCM or Eclis for all frequencies.
 
 Attributes for CMIP5 datasets are: model, experiment, table, realization, grid, version, institute, mip, root
 
-Syntax for these attributes is described in `the CMIP5 DRS document
-  <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`
+Syntax for these attributes is described in `the CMIP5 DRS document <http://cmip-pcmdi.llnl.gov/cmip5/docs/cmip5_data_reference_syntax.pdf>`_
 
 Example for a CMIP5 dataset declaration:
 
@@ -31,17 +30,54 @@ if atCNRM:
     # Declare a list of root directories for IPSL data at CNRM
     root = "/cnrm/cmip/cnrm/ESG"
 
+# a dict translating CliMAF facets to CMIP5 facets (those known by intake)
+translate_facet = {
+    'realization': 'ensemble',
+    'table': 'cmor_table',
+    'frequency': 'time_frequency',
+    'simulation': None,
+    'domain': None,
+    'root': None,
+    'frequency': None,
+}
+
+# A pattern for finding period in filename when using intake catalogs
+# (which, at IPSL, as of 20240517, have buggy values for period_start
+# and period_end)
+period_pattern = "*_${PERIOD}.nc"
+
+
+def cmip5_facet_ambiguity_solver(dic, facet, values_list):
+    """
+    Choose a value for FACET among VALUES_LIST, given the
+    context of facet values in DIC.
+    Return the chosen value, or None
+    """
+    if facet == "table":
+        if "Amon" in values_list:
+            clogger.warning("Chosing table = Amon")
+            return "Amon"
+        elif "day" in values_list:
+            clogger.warning("Chosing table = day")
+            return "day"
+
+
 # if root:
 if True:
     # -- Declare a CMIP5 CliMAF project
     # ------------------------------------ >
-    cproject('CMIP5', 'root', 'model', 'table', 'experiment', 'realization', 'frequency', 'realm',
-             'version', ensemble=['model', 'realization'], separator='%')
+    p = cproject('CMIP5', 'root', 'model', 'table', 'experiment',
+                 'realization', 'frequency', 'realm', 'version',
+                 ensemble=['model', 'realization'], separator='%',
+                 translate_facet=translate_facet, period_pattern=period_pattern)
+    p.resolve_ambiguities = cmip5_facet_ambiguity_solver
+
     # -- Declare a CMIP5 'extent' CliMAF project = extracts a period covering historical and a scenario
     # ------------------------------------ >
-    cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment', 'extent_experiment', 'realization', 'frequency',
-             'realm',
-             'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
+    cproject('CMIP5_extent', 'root', 'model', 'table', 'experiment',
+             'extent_experiment', 'realization', 'frequency', 'realm',
+             'version', 'extent_version', ensemble=['model', 'realization'],
+             separator='%')
 
     # -- Define the pattern for CMIP5
     if atCNRM:

@@ -79,6 +79,11 @@ Remarks :
    - ``vertical_lines_lw``: vertical lines thickness
    - ``vertical_lines_colors``: vertical lines colors
 
+   # -- Misc
+   - ``draw_grid``: should we draw the grid (True)
+   - ``year_delta``: interval between x tick marks, in years (10)
+     
+     
 # -- Default values
 default_left_string_fontsize = 30.
 default_center_string_fontsize = 20.

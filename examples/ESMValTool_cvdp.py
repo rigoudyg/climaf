@@ -12,8 +12,8 @@ climaf.ESMValTool_diags.wrapper = \
 # (use the same syntax as the ESMVaTool recipe for designating the script)
 evt_script("call_cvdp", "cvdp/cvdp_wrapper")
 
-# Prepare input datasets for the diag. 
-base = dict(project="CMIP6", experiment="historical", realization='r1i1p1f2',  table="Amon", period="1850-1855", )
+# Prepare input datasets for the diag.
+base = dict(project="CMIP6", experiment="historical", realization='r1i1p1f2', table="Amon", period="1850-1855", )
 models = ["CNRM-CM6-1", "CNRM-ESM2-1"]
 
 variables = ["ts", "tas", "pr", "psl"]
@@ -22,7 +22,7 @@ ensembles = []
 for variable in variables:
     ensemble = cens(
         {
-            model:  ds(model=model, variable=variable, **base)
+            model: ds(model=model, variable=variable, **base)
             for model in models
         })
     ensembles.append(ensemble)
@@ -31,7 +31,7 @@ for variable in variables:
 # the preprocessing steps that ESMValTool recipes implement upstream
 # of the diagnostic script. For CVDP, there is actually no such
 # preprocessing
-    
+
 # Call the diag. You may provide parameters that are known to ESMValTool
 # or to the diagnostic script
 wdir, prov = call_cvdp(*ensembles, output_dir="./out", write_netcdf=False)
@@ -47,5 +47,3 @@ print(one_output, its_attributes['caption'])
 
 # But there is no further established framework in ESMValTool for a
 # diagnostic to 'publish' a list of identifiers for its outputs
-
-

@@ -21,7 +21,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from env.site_settings import onCiclad, onSpirit
+from env.site_settings import onCiclad, onSpirit, onObelix
 from env.clogging import clogger, clog
 
 
@@ -77,7 +77,7 @@ def parse_args():
     args = parser.parse_args()
     return dict(input_files=args.input_files, operator=args.operator, output_file=args.output_file,
                 variable=args.variable, period=args.period, region=args.region, alias=args.alias, units=args.units,
-                vm=args.vm,  apply_operator_after_merge=args.apply_operator_after_merge,
+                vm=args.vm, apply_operator_after_merge=args.apply_operator_after_merge,
                 running_climaf_tests=args.running_climaf_tests)
 
 
@@ -92,7 +92,7 @@ nemo_coordinates_pattern = re.compile(r'coord.*t_ave_01month|t_ave_00086400')
 aladin_coordinates_pattern = re.compile(r'.*coord.*lon lat.*|.*coord.* lat lon|float longitude|float latitude')
 
 IPSL_CMIP6_msftyz_filename_pattern = re.compile(r'.*msftyz_Omon_IPSL-CM6A.*\.nc')
-IPSL_CMIP6_msftyz_issue_pattern = re.compile(r'.*x = 1 ;.*') 
+IPSL_CMIP6_msftyz_issue_pattern = re.compile(r'.*x = 1 ;.*')
 
 
 def clim_timefix(file_to_treat):
@@ -172,8 +172,8 @@ def aladin_coordfix(file_to_treat, tmp_dir, filevar, test=None):
     # of file variable (particularly for outputs created with post-treatment tool called 'postald')
     # Echoes the name of a file with renamed variable attribute (be it a modified file or a copy)
     # Creates an alternate file in $tmp if no write permission and renaming is actually useful
-    if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not(re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
-                                                              not(re.compile(r".*MED-11.*.nc").match(file_to_treat))):
+    if re.compile(r".*ALADIN.*.nc").match(file_to_treat) and (not (re.compile(r".*r1i1p1.*.nc").match(file_to_treat)) or
+                                                              not (re.compile(r".*MED-11.*.nc").match(file_to_treat))):
         current_command = " ".join(["ncdump", "-h", file_to_treat])
         print_in_file(current_command, output_file=test)
         rep = subprocess.check_output(current_command, shell=True)
@@ -217,14 +217,14 @@ def IPSL_CMIP6_msftyz_dimfix(file_to_treat, tmp_dir, filevar, test=None):
         rep = rep.split("\n")
 
         if any([IPSL_CMIP6_msftyz_issue_pattern.match(line) for line in rep]):
-            
+
             clogger.debug("File content matches IPSL CMIP6 msftyz data")
             # Create an alternate target filename
             out = os.path.sep.join([tmp_dir, "renamed_{}".format(os.path.basename(file_to_treat))])
             if os.path.isfile(out):
                 os.remove(out)
-            
-            # Process orginal file to target file 
+
+            # Process orginal file to target file
             ds = xr.open_dataset(file_to_treat, decode_times=False)
             ds['msftyz'] = ds['msftyz'].sel(x=0)
             ds = ds.reset_coords(names=['nav_lat', 'nav_lon'])
@@ -250,7 +250,7 @@ def call_subprocess(command, test=None, allow_seldate_failure=False):
     # On request, allow for non-zero return code in case command
     # includes 'cdo ... seldate' and stderr shows evidence that this
     # seldate operation failed (and then return False)
-    
+
     clogger.debug("Command launched %s" % command)
     clogger.debug("Time at launch %s" % time.time())
     print_in_file(command, output_file=test)
@@ -345,7 +345,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
     # Find out which command must be used for cdo
     # For the time being, at most sites, must use NetCDF3 file format chained CDO
     # operations because NetCDF4 is not threadsafe there
-    if (onCiclad or onSpirit) and not running_climaf_tests:
+    if (onCiclad or onSpirit or onObelix) and not running_climaf_tests:
         init_cdo_command = "cdo -O"
     else:
         init_cdo_command = "cdo -O -f nc"
@@ -460,7 +460,7 @@ def main(input_files, output_file, tmp, original_directory, variable=None, alias
                 else:
                     # Assume that seldate provided no data, and just ignore that file
                     pass
-            else: 
+            else:
                 if not os.path.isfile(a_file):
                     clogger.error("Could not access file %s" % a_file)
                     raise Exception("Could not access file %s" % a_file)

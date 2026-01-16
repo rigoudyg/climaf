@@ -11,7 +11,7 @@ import subprocess
 
 
 def get_subprocess_output(command, to_replace=list()):
-	rep = subprocess.check_output(command, shell=True).decode("utf-8")
-	for (rep1, rep2) in to_replace:
-		rep = rep.replace(rep1, rep2)
-	return rep
+    rep = subprocess.check_output(command, shell=True).decode("utf-8")
+    for (rep1, rep2) in to_replace:
+        rep = rep.replace(rep1, rep2)
+    return rep

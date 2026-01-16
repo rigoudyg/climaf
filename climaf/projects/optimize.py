@@ -5,8 +5,7 @@
 shell-like wildcards (i.e. include * or ?)
 
 For now limited to project CMIP6 and active only if
-env.environment.optimize_cmip6_wildcards is True (which is the
-default) . See doc for
+env.environment.optimize_cmip6_wildcards is True. See doc for
 :py:func:`~climaf.projects.optimize.cmip6_optimize_wildcards`
 
 """
@@ -95,16 +94,21 @@ def cmip6_optimize_wildcards(kwargs):
         ##########
         if wild(mip):
             if wild(experiment):
-                raise ValueError("When requesting optimization, must provide at least mip or experiment")
-            mip = possible_values("CMIP6", "experiment2mip", root, experiment, mip)[0]
-            clogger.debug("Based on experiment = %s, attribute mip is set to %s" % (experiment, mip))
+                raise ValueError(
+                    "When requesting optimization, must provide at least mip or experiment")
+            mip = possible_values("CMIP6", "experiment2mip",
+                                  root, experiment, mip)[0]
+            clogger.debug(
+                "Based on experiment = %s, attribute mip is set to %s" % (experiment, mip))
         #
         # Institute
         ################
-        institutes = possible_values("CMIP6", "model2institute", root, model, institute)
+        institutes = possible_values(
+            "CMIP6", "model2institute", root, model, institute)
         paths = list()
         for inst in institutes:
-            paths.extend(listdirs(os.sep.join([root, mip]), inst, test_exists=wild(model)))
+            paths.extend(listdirs(os.sep.join(
+                [root, mip]), inst, test_exists=wild(model)))
 
         # Model
         #############
@@ -114,7 +118,8 @@ def cmip6_optimize_wildcards(kwargs):
             models = possible_values("CMIP6", "mip_institute_experiment2model", root,
                                      "_".join([mip, institute, experiment]), model)
             for amodel in models:
-                new_paths.extend(listdirs(path, amodel, test_exists=wild(experiment)))
+                new_paths.extend(
+                    listdirs(path, amodel, test_exists=wild(experiment)))
         paths = new_paths
 
         # experiment
@@ -122,7 +127,8 @@ def cmip6_optimize_wildcards(kwargs):
         new_paths = list()
         for path in paths:
             model = cmip6_facets(path, root, 3)[0]
-            experiments = possible_values("CMIP6", "mip_model2experiment", root, "_".join([mip, model]), experiment)
+            experiments = possible_values(
+                "CMIP6", "mip_model2experiment", root, "_".join([mip, model]), experiment)
             for exp in experiments:
                 new_paths.extend(listdirs(path, exp))
         paths = new_paths
@@ -191,12 +197,14 @@ def cmip6_optimize_wildcards(kwargs):
         # And also : at that final stage, test that directories exist
         ################################
         new_paths = list()
-        clogger.info('cmip6_optimize: before ensuring paths exists, there are %d paths' % len(paths))
+        clogger.info(
+            'cmip6_optimize: before ensuring paths exists, there are %d paths' % len(paths))
         clogger.debug('Paths: %s', paths)
         for path in paths:
             new_paths.extend(listdirs(path, version, test_exists=True))
         paths = new_paths
-        clogger.info('cmip6_optimize: after ensuring paths exists, there are %d paths' % len(paths))
+        clogger.info(
+            'cmip6_optimize: after ensuring paths exists, there are %d paths' % len(paths))
         clogger.debug('Paths: %s', paths)
 
         dicts = list()
@@ -207,7 +215,8 @@ def cmip6_optimize_wildcards(kwargs):
             d['root'] = kwargs['root']
             dicts.append(d)
 
-        clogger.debug("There are %d optimized paths for data directories" % len(dicts))
+        clogger.debug(
+            "There are %d optimized paths for data directories" % len(dicts))
         return dicts
 
 
@@ -273,7 +282,8 @@ def cmip6_optimize_check_paths(paths):
     test = [not path.startswith(start) for path in paths]
     if any(test):
         for path in [paths[i] for (i, t) in enumerate(test) if t]:
-            clogger.debug("Path %s does not fit requirements for optimization" % path)
+            clogger.debug(
+                "Path %s does not fit requirements for optimization" % path)
         return False
     else:
         return True
@@ -281,8 +291,9 @@ def cmip6_optimize_check_paths(paths):
 
 def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                           key_index=-1, reset=False, value_pattern=None, root=None):
-    """Returns the ensemble of directories which have files matching a
-    given GLOB_PATTERN, which is supposed to end with a "/*" which
+    """
+    Returns the ensemble of directories which have files matching a
+    given GLOB_PATTERN, which is supposed to end with a '/\*' which
     corresponds to CASE_VALUE. The directory names are extracted from
     glob() return at a hierarchy level indicated by SPLIT_INDEX;
 
@@ -334,13 +345,15 @@ def dirnames_for_one_case(case_name, glob_pattern, split_index, case_value,
                     key += "%s_" % (case.split(os.sep)[k])
             value = case.split(os.sep)[split_index]
             dirnames[case_name][key].append(value)
-            clogger.debug('Adding value %s to entry %s of case %s ' % (value, key, case_name))
+            clogger.debug('Adding value %s to entry %s of case %s ' %
+                          (value, key, case_name))
         for v in dirnames[case_name]:
             dirnames[case_name][v] = list(set(dirnames[case_name][v]))
     #
     if should_write:
         with open(filen, "w") as f:
-            json.dump(dirnames[case_name], f, separators=(',', ': '), indent=3, ensure_ascii=True)
+            json.dump(dirnames[case_name], f, separators=(
+                ',', ': '), indent=3, ensure_ascii=True)
 
     #
     if not wild(case_value):
@@ -482,7 +495,8 @@ def possible_values(project, tag, root, key, value_pattern):
         if tag in params[project]:
             paras = params[project][tag]
         else:
-            paras = [params[project][a_tag] for a_tag in params[project] if a_tag in tag]
+            paras = [params[project][a_tag]
+                     for a_tag in params[project] if a_tag in tag]
             if len(paras) > 0:
                 paras = paras[0]
             else:
@@ -492,5 +506,6 @@ def possible_values(project, tag, root, key, value_pattern):
         #
         ret = dirnames_for_one_case(case_name=case_name, case_value=key, value_pattern=value_pattern, root=root,
                                     **paras)
-        clogger.debug('According to table %s , %s and %s lead to possible values %s' % (tag, key, value_pattern, ret))
+        clogger.debug('According to table %s , %s and %s lead to possible values %s' % (
+            tag, key, value_pattern, ret))
         return ret

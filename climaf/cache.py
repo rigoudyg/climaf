@@ -102,7 +102,7 @@ def generateUniqueFileName(expression, format="nc", option="new", create_dirs=Tr
                         raise Climaf_Cache_Error("Cannot create dir " % dirn)
         if os.path.islink(rep) and not os.path.exists(os.path.realpath(rep)):
             os.remove(rep)
-        clogger.debug("returning %s" % rep)
+        # clogger.debug("returning %s" % rep)
         return rep
 
 
@@ -203,14 +203,15 @@ def register(filename, crs, costs, outfilename=None):
 
     global dropped_crs
     #
-    # It appears that we have to let some time to the file system  for updating its inode tables
+    # It appears that we have to let some time to the file system
+    # for updating its inode tables
     waited = 0
     while waited < 50 and not os.path.exists(filename):
         time.sleep(0.1)
         waited += 1
     if not os.path.exists(filename):
-        raise Climaf_Cache_Error("File %s wasn't created upstream (or not quick enough). It represents %s" %
-                                 (filename, crs))
+        raise Climaf_Cache_Error("File %s wasn't created upstream " % filename +
+                                 "(or not quick enough). It represents %s" % crs)
     else:
         if stamping is False:
             clogger.debug('No stamping')
@@ -223,11 +224,11 @@ def register(filename, crs, costs, outfilename=None):
                                                                                   filename)
             elif re.findall(".png$", filename) and convert_software is not None:
                 crs2 = crs.replace(r"%", r"\%").replace(r'"', r'\"')
-                command = "%s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
+                command = "%s %s -set \"CRS_def\" \"%s\" -set \"CliMAF\" " \
                           "\"CLImate Model Assessment Framework version " \
-                          "%s (http://climaf.rtfd.org)\" %s %s.png && mv -f %s.png %s" % \
-                          (convert_software, crs2, climaf_version,
-                           filename, filename, filename, filename)
+                          "%s (http://climaf.rtfd.org)\" %s.png && mv -f %s.png %s" % \
+                          (convert_software, filename, crs2, climaf_version,
+                           filename, filename, filename)
             elif re.findall(".pdf$", filename) and pdftk_software is not None:
                 tmpfile = str(uuid.uuid4())
                 command = "%s %s dump_data output %s && echo -e \"InfoBegin\nInfoKey: Keywords\nInfoValue: %s\" " \
@@ -331,12 +332,15 @@ def hasMatchingObject(cobject, ds_func):
         co = crs2eval.get(crs, None)
         if co is None:
             try:
+                save = env.environment.data_check
+                env.environment.data_check = False
                 co = eval(crs, sys.modules['__main__'].__dict__)
+                env.environment.data_check = save
             except:
                 continue  # usually case of a CRS which project is not currently defined
         if co:
             crs2eval[crs] = co
-            clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
+            # clogger.debug("Compare trees for %s and %s" % (crs, cobject.crs))
             altperiod = compare_trees(co, cobject, ds_func, op_squeezes_time)
             if altperiod:
                 f, costs = crs2filename[crs]
@@ -472,6 +476,8 @@ def cdrop(obj, rm=True, force=False):
         fil, _ = crs2filename[crs]
         if not os.path.exists(fil):
             fil = alternate_filename(fil)
+        if not os.path.exists(fil):
+            fil = None
     else:
         # In case the cache index is not up-to-date
         fil, cost = hasExactObject(obj)
@@ -483,7 +489,7 @@ def cdrop(obj, rm=True, force=False):
                 if force:
                     os.system("chmod +w " + fil)
                 if not os.access(fil, os.W_OK):
-                    clogger.info("Object %s is protected" % crs)
+                    clogger.info("Object %s is protected, file is %s" % (crs,fil))
                     return
                 path_file = os.path.dirname(fil)
                 os.remove(fil)
@@ -499,7 +505,9 @@ def cdrop(obj, rm=True, force=False):
                     "When trying to remove %s : file does not exist in cache" % crs)
                 return False
     else:
-        clogger.info("%s is not cached" % crs)
+        clogger.info("%s is not cached and will be removed from index" % crs)
+        crs2filename.pop(crs,None)
+        dropped_crs.append(crs)
         return None
 
 
@@ -692,7 +700,7 @@ def craz(force=False, hideError=False):
                                   generateUniqueFileName(crs))
                 else:
                     clogger.debug(
-                        'Could not remove file (either not existing or protected): %s', crs2filename[crs])
+                        'Could not remove file (either not existing or protected)')
                     clogger.debug('Associated CRS : %s', crs)
         # os.system("ls  " + cc)
 

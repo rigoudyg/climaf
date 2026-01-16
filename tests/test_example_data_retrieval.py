@@ -46,14 +46,14 @@ class DataRetrieval_1(unittest.TestCase):
         g = ds(project='CMIP6', period='1850-1854', variable='rls', model='CNRM-CM6-1')
         climaf_ds = ccdo(ccdo(g, operator='fldmean'), operator='yearavg')
         self.assertEqual(str(climaf_ds),
-                         "ccdo(ccdo(ds('CMIP6%%rls%1850-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%g*%"
+                         "ccdo(ccdo(ds('CMIP6%%rls%1850-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%%g*%"
                          "latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
 
         g = ds(project='CMIP6', period='1852-1854', variable='rls', model='CNRM-CM6-1')
         climaf_ds = ccdo(ccdo(g, operator='fldmean'), operator='yearavg')
         self.assertEqual(str(climaf_ds),
-                         "ccdo(ccdo(ds('CMIP6%%rls%1852-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%g*%"
+                         "ccdo(ccdo(ds('CMIP6%%rls%1852-1854%global%/cnrm/cmip%CNRM-CM6-1%*%*%*%historical%r1i1p1f*%%g*%"
                          "latest'),operator='fldmean'),operator='yearavg')")
         cMA(climaf_ds)
 

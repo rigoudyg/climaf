@@ -15,12 +15,11 @@ from subprocess import getoutput, getstatusoutput
 from env.clogging import clogger, clog, clog_file
 import env.clogging
 from env.site_settings import *
+from env.utils import get_subprocess_output
 
 # Variables
 
 #: Climaf version
-from env.utils import get_subprocess_output
-
 climaf_version = "3.0"
 
 #: Dictionary of declared projects (type is cproject)
@@ -92,6 +91,20 @@ cacheIndexFileName = None
 # (buggy - SS - 2022/01/07 - don't find some data for CNRM-CM6-1 with r1i1p1f*)
 optimize_cmip6_wildcards = False
 
+#: Keyword used in filename patterns as a placeholder for a pair of dates representing the data period for the file
+date_keyword = "${PERIOD}"
+# date_keyword is used in climaf/projects/*py and climaf/classes.py for class cprojects
+
+if onSpirit:
+    #: Path for the Intake data catalog
+    intake_catalog = '/modfs/catalogs/master_latest.yml'
+
+    #: List of projects that can have an optimized search using an intake catalog
+    projects_using_intake = ["CMIP5", "CMIP6", "CORDEX", "PMIP3"]
+else:
+    intake_catalog = None
+    projects_using_intake = []
+
 #: Define whether we stamp the data files with their CRS.
 # True means mandatory. None means : please try. False means : don't try
 stamping = True
@@ -120,9 +133,10 @@ clog_file(logfilelevel)
 if "TMPDIR" in os.environ and not os.path.isdir(os.environ["TMPDIR"]):
     # raise OSError("TMPDIR points to a non existing directory! Change the value of the variable to go on.")
     tmpdir = os.environ["TMPDIR"]
-    if os.path.exists(tmpdir):
+    if os.path.isfile(tmpdir):
         os.remove(tmpdir)
-    os.makedirs(tmpdir)
+    # Account for the case where concurrent jobs execute this line almost simultaneously
+    os.makedirs(tmpdir, exist_ok=True)
 
 # Check dependencies
 try:
@@ -194,12 +208,16 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
             "nco (ncatted) not available, can not stamp netcdf files")
         do_stamping = False
     try:
-        convert_software = my_which("convert")
+        convert_software = my_which("magick")
         clogger.info("convert found -> " + convert_software)
     except:
-        convert_software = None
-        clogger.warning("convert not available, can not stamp png files")
-        do_stamping = False
+        try:
+            convert_software = my_which("convert")
+            clogger.info("convert found -> " + convert_software)
+        except:
+            convert_software = None
+            clogger.warning("convert not available, can not stamp png files")
+            do_stamping = False
     try:
         pdftk_software = my_which("pdftk")
         clogger.info("pdftk found -> " + pdftk_software)
@@ -220,16 +238,30 @@ if os.environ.get('CLIMAF_CHECK_DEPENDENCIES', "yes") in ["yes", ] and \
         stamping = None
     clogger.info("---")
 
-if atCNRM:
+if atCNRM or onSpirit or atTGCC or atIDRIS or onObelix:
     pdf_page_builder = os.sep.join([os.path.dirname(
         os.path.abspath(__file__)), "..", "scripts", "generate_pdf.py"])
 else:
     pdf_page_builder = "pdfjam"
 
-#: A pid which fits at TGCC in case of containerized concurrent processes
+#: A pid which fits at TGCC and IDRIS in case of containerized concurrent processes
 robust_pid = os.getpid()
-if atTGCC:
+if atTGCC or atIDRIS:
     # We are running there in a container, so concurrent instances
     # of CliMAF may have the same process ID, while they have distinct
-    # values of environement variable SCRIPTID
-    pid = os.getenv("SCRIPT_PID", robust_pid)
+    # values of environement variable SLURM_JOBID
+    robust_pid = int(os.getenv("SLURM_JOBID", robust_pid))
+
+
+#: Should we try to replace old 'plot' operator calls with 'plotmap' calls
+plot_use_plotmap = False
+# Should the plotmap wrapper explain how it transforms plot calls to plotmap calls
+teach_me_plotmap = False
+
+#: Should ds() calls be checked w.r.t. datafiles. "if_found" means yes if some relevant datafiles exists. Other allowed values are True and False. See :ref:`that section of class cdataset's documentation<data_check>`
+data_check = "if_found"
+# For the time being, ensure compatibility with earlier behaviour
+data_check = False
+
+#: On ds() calls, which level of check of the requested period w.r.t datafiles. See :ref:`that section of class cdataset's documentation<data_check>`
+period_check_type = "light"

@@ -19,6 +19,7 @@ import tempfile
 from datetime import datetime
 from functools import reduce
 from six import string_types
+import json
 
 import warnings
 from xarray import open_dataset as xr_open_dataset
@@ -37,7 +38,7 @@ from climaf.cache import compute_cost, hasExactObject, cdrop, hasIncludingObject
 from climaf.cmacro import instantiate
 from env.clogging import clogger, indent as cindent, dedent as cdedent
 from climaf.netcdfbasics import varOfFile, varsOfFile
-from climaf.period import init_period, merge_periods
+from climaf.period import cperiod, init_period, merge_periods
 from climaf.classes import allow_errors_on_ds_call, cens, varOf, ctree, scriptChild, cdataset, cpage, cpage_pdf, \
     domainOf, cobject, modelOf, simulationOf, projectOf, realmOf, gridOf
 from climaf.ESMValTool_diags import call_evt_script
@@ -47,6 +48,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # When evaluating an object, default behaviour is to search cache for including or begin objects
 # but this could be expensive
 dig_hard_into_cache = True
+
+#: How should the file be open, which hosts scripts outputs. Can use 'w' and 'a'
+scripts_output_write_mode = 'w'
 
 
 def capply(climaf_operator, *operands, **parameters):
@@ -111,10 +115,14 @@ def capply_script(script_name, *operands, **parameters):
     # Check that all parameters to the call are expected by the script
     command = script.command
     for para in parameters:
-        if not(r"{%s}" % para in command) and not(r"{%s_iso}" % para in command) and para not in ['member_label', ] \
-                and not para.startswith("add_"):
-            raise Climaf_Driver_Error("parameter '%s' is not expected by script %s (which command is : %s)" %
-                                      (para, script_name, command))
+        if not (r"{%s}" % para in command) \
+           and not (r"{!%s}" % para in command) \
+           and not (r"{%s_iso}" % para in command) \
+           and not para in ['member_label', ] \
+           and not para.startswith("add_"):
+            raise Climaf_Driver_Error(
+                "parameter '%s' is not expected by script %s (which command is : %s)" %
+                (para, script_name, command))
     #
     # Check that only first operand can be an ensemble
     opscopy = list(operands)
@@ -217,13 +225,17 @@ def ceval_for_cdataset(cobject, userflags=None, format="MaskedArray", deep=None,
     ds = cobject
     # If the dataset was not defined by its path, check that it is completely defined
     if "path" not in ds.kvp or ds.kvp["path"] in ["", None]:
+        if ds.alias:
+            filevar, _, _, _, filenameVar, _, conditions = ds.alias
+            if filenameVar:
+                ds.kvp["filenameVar"] = filenameVar
         ds_ambiguous_args = ds.explore("choices")
         if len(ds_ambiguous_args) != 0:
             ds = ds.explore("resolve")
             clogger.warning("When doing a cfile on dataset %s, we had to ensure that it "
-                            "is completely defined, using  method 'explore', by updating "
-                            "with the following arguments: %s" % (cobject.crs,
-                                                                  str(ds_ambiguous_args)))
+                            "is completely defined, using  method 'explore', by choosing "
+                            "for the following facets: %s" % (cobject.crs,
+                                                              str(ds_ambiguous_args)))
             clogger.warning("This was at the cost of querying the file system, more or "
                             "less heavily. You may wish to add such attributes by yourself")
             # clogger.debug("After resolve for ambiguous arg, updated dataset kvp is %s",str(ds.kvp))
@@ -792,7 +804,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     Returns a CLiMAF cache data filename
     """
     script = cscripts[scriptCall.operator]
-    template = Template(script.command)
+    template = Template(script.command.replace("{!", "{"))
     total_costs = compute_cost()
     # Evaluate input data
     invalues, sizes, partial_cost = evaluate_inputs(
@@ -886,7 +898,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
             # Provide period selection if script allows for
             if op:
                 per = timePeriod(op)
-                if not per.fx and per != "":
+                if type(per) is cperiod and not per.fx and per != "":
                     subdict["period_%d" % i] = str(per)
                     subdict["period_iso_%d" % i] = per.iso()
             subdict["domain_%d" % i] = domainOf(op)
@@ -895,14 +907,16 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     # redefine e.g period
     #
     # Provide one cache filename for each output and instantiates the command accordingly
-    if script.outputFormat not in none_formats:
+    required_outputFormat = scriptCall.parameters.get('format', None)
+    if script.outputFormat not in none_formats and required_outputFormat != "show":
         if script.outputFormat == "graph":
             if 'format' in scriptCall.parameters:
-                if scriptCall.parameters['format'] in graphic_formats:
-                    output_fmt = scriptCall.parameters['format']
+                if required_outputFormat in graphic_formats:
+                    output_fmt = required_outputFormat
                 else:
-                    raise Climaf_Driver_Error('Allowed graphic formats yet are : %s' % ', '.join(
-                        [repr(x) for x in graphic_formats]))
+                    raise Climaf_Driver_Error("Required format % s doesn't belong to graphic formats : %s"
+                                              % (required_outputFormat,
+                                                 ', '.join([repr(x) for x in graphic_formats])))
             else:  # default graphic format
                 output_fmt = "png"
         else:
@@ -934,21 +948,26 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
                 scriptCall.crs + "." + output, format=output_fmt)
 
     # Account for script call parameters
-    for p in scriptCall.parameters:
-        # clogger.debug("processing parameter %s=%s"%(p,scriptCall.parameters[p]))
-        subdict[p] = scriptCall.parameters[p]
+    for p, value in scriptCall.parameters.items():
+        # clogger.debug("processing parameter %s=%s"%(p,value))
+        if r"{!%s}" % p in script.command:
+            # Don't use json, just provide string or other simple type
+            subdict[p] = value
+        else:
+            subdict[p] = json.dumps(value)
         if p == "period":
             subdict["period_iso"] = init_period(scriptCall.parameters[p]).iso()
     subdict["crs"] = opscrs.replace("'", "")
     #
     # Discard selection parameters if selection already occurred for first operand
     # TBD : manage the cases where other operands didn't undergo selection
-    exact, _ = hasExactObject(scriptCall.operands[0])
-    if exact:
-        # for key in ["period","period_iso","var","domain","missing","alias","units"]:
-        for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
-            if key in subdict:
-                subdict.pop(key)
+    if scriptCall.operands[0] != '':
+        exact, _ = hasExactObject(scriptCall.operands[0])
+        if exact:
+            # for key in ["period","period_iso","var","domain","missing","alias","units"]:
+            for key in ["period", "period_iso", "var", "domain", "missing", "alias"]:
+                if key in subdict:
+                    subdict.pop(key)
     #
     # print("subdict="+`subdict`)
     # Combine CRS and possibly member_label to provide/complement title
@@ -958,24 +977,34 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     #        else:
     #            subdict["title"]=subdict["crs"]
     else:
-        # print("Got a member label : %s"%subdict['member_label'])
         if 'member_label' in subdict:
-            subdict["title"] = subdict["title"] + " " + subdict['member_label']
+            subdict["title"] = json.dumps(
+                eval(subdict["title"]) + " " + eval(subdict['member_label']))
             subdict.pop('member_label')
     #
     # Substitute all args
+    clogger.debug("Script call template and subdict before substitution : " +
+                  template.safe_substitute() + repr(subdict))
     template = template.safe_substitute(subdict)
+    clogger.debug("Script call template after sustitution : " +
+                  template)
     #
     # Allowing for some formal parameters to be missing in the actual call:
     #
     # Discard remaining substrings looking like :
-    #  some_word='"${some_keyword}"' , or simply : '"${some_keyword}"'
-    template = re.sub(r'((--)?\w*=)?(\'\")?\$\{\w*\}(\"\')?', r"", template)
-    #
-    # Discard remaining substrings looking like :
-    #  some_word=${some_keyword}  or  simply : ${some_keyword}
-    template = re.sub(r"((--)?\w*=)?\$\{\w*\}", r"", template)
-    #
+    #  some_keyword='"${some_word}"' , or '"${some_word}"'
+    #  some_keyword="'${some_word}'" , or "'${some_word}'"
+    #  some_keyword="${some_word}" , or "${some_word}"
+    #  some_keyword='${some_word}' , or '${some_word}'
+    #  some_keyword=${some_word}   , or ${some_word}
+    #  with optionnal '--' before 'some_keyword'
+    template = re.sub(r'((--)?\w*=)?([\'\"]{0,2})\$\{\w*\}\3', r"", template)
+    clogger.debug("Script call template after removing missing args : " +
+                  template)
+    template = re.sub(r'((--)?\w*=) *([\'\"])\3', r"", template)
+    clogger.debug("Script call template after removing empty args : " +
+                  template)
+    #    #
     # Link the fixed fields needed by the script/operator
     if script.fixedfields is not None:
         # subdict_ff=dict()
@@ -1005,7 +1034,7 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
     tim1 = time.time()
     clogger.info("Launching command:" + template)
     #
-    with open(logdir + '/last.out', 'w') as logfile:
+    with open(logdir + '/last.out', scripts_output_write_mode) as logfile:
         logfile.write(
             "\n\nstdout and stderr of script call :\n\t " + template + "\n\n")
         try:
@@ -1038,7 +1067,9 @@ def ceval_script(scriptCall, deep, recurse_list=[]):
         with open(logdir + "/last.out", 'r') as f:
             for line in f.readlines():
                 sys.stdout.write(line)
-    if script.outputFormat in none_formats:
+    if script.outputFormat in none_formats or required_outputFormat == 'show':
+        clogger.debug("No output to manage, because script.outputFormat=%s and required_outputFormat=%s" %
+                      (script.outputFormat, required_outputFormat))
         return None, 0.0
     # Tagging output files with their CliMAF Reference Syntax definition
     # 1 - Un-named main output
@@ -1245,8 +1276,8 @@ def set_variable(obj, varname, format):
             command = "ncatted -a long_name,%s,o,c,%s %s" % (
                 varname, long_name, obj)
             if os.system(command) != 0:
-                clogger.error("Issue with changing long_name for var %s in %s" %
-                              (varname, obj))
+                clogger.error("Issue with changing long_name for var %s to %s in %s with command: %s" %
+                              (varname, long_name, obj, command))
                 return None
             return True
     elif format == 'MaskedArray':
@@ -1397,6 +1428,15 @@ def cshow(obj):
     clogger.debug("cshow called on " + str(obj))
     value, costs = ceval(obj, format='MaskedArray')
     return value
+
+
+def cxr(obj):
+    """
+    Provide the Xarray value of a CliMAF object. Launch computation if needed.
+    (current design is as simple as possible : no control of re-computation)
+    """
+    with xarray.open_dataset(cfile(obj)) as f:
+        return f[obj.variable]
 
 
 def cMA(obj, deep=None):
@@ -1765,7 +1805,7 @@ def calias(project, variable, fileVariable=None, **kwargs):
 def CFlongname(varname):
     """ Returns long_name of variable VARNAME after CF convention
     """
-    return "TBD_should_improve_function_climaf.driver.CFlongname"
+    return "TBD_should_improve_function_climaf.driver.CFlongname_for_" + varname
 
 
 def efile(obj, filename, force=False):

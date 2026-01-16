@@ -37,6 +37,11 @@ cdataset : define a dataset object
 
 .. automethod:: climaf.classes.cdataset.check
 
+:py:meth:`cdataset.light_check: check time consistency of a dataset w.r.t to dates in data filenames <climaf.classes.cdataset.light_check>`
+=============================================================================================================================================
+
+.. automethod:: climaf.classes.cdataset.light_check
+
 :py:meth:`cdataset.listfiles: returns the list of (local) files of a dataset <climaf.classes.cdataset.listfiles>`
 ===================================================================================================================
 
@@ -79,6 +84,8 @@ cprojects : dictionary of known projects
 --------------------------------------------------------------------------
 
 .. autodata:: env.environment.cprojects
+.. autodata:: env.environment.data_check
+.. autodata:: env.environment.period_check_type
 
 dataloc : describe data locations for a series of simulations
 --------------------------------------------------------------------------

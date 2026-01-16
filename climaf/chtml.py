@@ -237,17 +237,19 @@ def link_on_its_own_line(label, filename, thumbnail=None, hover=True):
     return open_line() + link(label, filename, thumbnail=thumbnail, hover=hover) + close_line()
 
 
-def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=None):
-    """
-    Create a table cell with the provided label, which bears a link to
+def cell(label, filename=None, thumbnail=None, hover=True, dirname=None,
+         altdir=None, target_filename=None):
+    """Create a table cell with the provided label, which bears a link to
     the provided filename and possibly shows a thumbnail for the link
     with the provided thumbnail size (in pixels) and possibly display
     it when you mouse over it (with the provided hover size in pixels).
 
-    If 'dirname' is not None, creates  a hard link in directory dirname
-    to file filename. This allow to generate a portable atlas in this
-    directory. Hard links are named after pattern
-    climaf_atlas<digit>.<extension>
+    If 'dirname' is not None, creates a hard link in directory dirname
+    to file filename. This allow to generate a portable atlas in that
+    directory, while keeping a version of the file in CliMAF
+    cache. Hard links are named after pattern
+    climaf_atlas<digit>.<extension> unless a target_filename
+    (without extension) is provided. If hard-linking fails, a copy is made.
 
     'dirname' can be a relative or absolute path, as long as
     filename and dirname paths are coherent
@@ -261,65 +263,71 @@ def cell(label, filename=None, thumbnail=None, hover=True, dirname=None, altdir=
     - URL https://vesg.ipsl.upmc.fr **/thredds/fileServer/IPSLFS/fabric/coding_sprint_NEMO/stephane/** .../fig.png
 
     """
-    if dirname:
-        os.system('mkdir -p ' + dirname)
-        if filename:
-            tmpfilename, filextension = os.path.splitext(
-                os.path.basename(filename))
-
-            # !!! # -- Make a new nb that is unique to avoid the issues with images
-            #          in the cache of the browser
-            nbs = []
-            from random import randrange
-            nb = randrange(1, 10000000000)
-            while nb in nbs:
+    # A string to format a table element
+    td_format = "<TD ALIGN=RIGHT>%s</TD>\n"
+    #
+    if dirname is None:
+        if altdir and filename:
+            fn = filename.replace(default_cache, altdir)
+        else:
+            fn = filename
+        return td_format % link(label, fn, thumbnail, hover)
+    #
+    else:
+        #
+        if filename is None:
+            return td_format % link(label, None, thumbnail, hover)
+        #
+        else:
+            os.system('mkdir -p ' + dirname)
+            _, filext = os.path.splitext(os.path.basename(filename))
+            if target_filename is None:
+                # !!! # -- Make a unique filename to avoid the issues with images
+                #          in the cache of the browser
+                nbs = []
+                from random import randrange
                 nb = randrange(1, 10000000000)
-            nbs.append(nb)
+                while nb in nbs:
+                    nb = randrange(1, 10000000000)
+                    nbs.append(nb)
+                target_filename = "climaf_atlas" + str(nb) + filext
+            else:
+                # Use same extension as filename
+                target_filename = target_filename + filext
+            #
+
+            full_target_filename = dirname + "/" + target_filename
+            os.system('rm -f ' + full_target_filename)
             try:
-                os.link(filename, dirname + "/climaf_atlas" +
-                        str(nb) + filextension)
+                os.link(filename, full_target_filename)
             except:
-                shutil.copy(filename, dirname + "/climaf_atlas" +
-                            str(nb) + filextension)
+                shutil.copy(filename, full_target_filename)
+            #
             # -- Create/append the index file in the output directory that will provide
             # -- the CRS with the new png file (climaf_atlas...png)
-            index_atlas = dirname + "/index_atlas"
-            index_dict = {getCRS(filename): "climaf_atlas" +
-                          str(nb) + filextension}
+            atlas_index = dirname + "/index_atlas"
+            index_dict = {getCRS(filename): target_filename}
             #
-            if not os.path.isfile(index_atlas):
+            if not os.path.isfile(atlas_index):
                 # -- Create the dictionary
                 tt = index_dict
             else:
-                # -- Read the content of the index
-                print('index_atlas in chtml.py = ', index_atlas)
+                # -- Read and update index content
                 try:
-                    with open(os.path.expanduser(index_atlas), "rb") as atlas_index_r:
+                    with open(os.path.expanduser(atlas_index), "rb") as atlas_index_r:
                         tt = pickle.load(atlas_index_r)
                 except:
                     tt = index_dict
                 # -- Append the file
                 tt.update(index_dict)
-            # -- Save the file
-            with open(os.path.expanduser(index_atlas), "wb") as atlas_index_w:
+            #
+            # -- Save the index file
+            with open(os.path.expanduser(atlas_index), "wb") as atlas_index_w:
                 # Used for python 2 compatibility
                 pickle.dump(tt, atlas_index_w, protocol=2)
 
-            return '<TD ALIGN=RIGHT>' + \
-                   link(label, "climaf_atlas" + str(nb) + filextension, thumbnail, hover) + \
-                   '</TD>\n'
-        else:  # lv
-            return '<TD ALIGN=RIGHT>' + \
-                   link(label, filename, thumbnail, hover) + \
-                   '</TD>\n'
-
-    else:
-        fn = filename
-        if altdir and fn:  # lv
-            fn = filename.replace(default_cache, altdir)
-        return '<TD ALIGN=RIGHT>' + \
-               link(label, fn, thumbnail, hover) + \
-               '</TD>\n'
+            return td_format % link(label, target_filename, thumbnail, hover)
+    #
 
 
 def line(list_of_pairs, title="", thumbnail=None, hover=True, dirname=None, altdir=None):

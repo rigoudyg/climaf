@@ -6,6 +6,73 @@ What's new
 
 Changes, newest first:
 
+- V3.x:
+
+  - **Warning : next entry describes a way to significantly change default behaviour when
+  defining a dataset : a check of available data can be performed, which may
+  raise an error. Also, second entry describes the use of intake catalogs which,
+  for CMIP6 data (see  below) implies a significant setup time**
+  - On creating a dataset using :py:func:`~climaf.classes.ds()`, a check of the
+  dataset's period w.r.t. the period covered by the datafiles may be automatically
+  performed, depending on new arguments 'check' and 'check_type'. Default
+  values are env.environment.data_check and env.environment.period_check_type,
+  which default settings do not yet activate the check. See
+  :ref:`that section of class documentation<data_check>` for details
+  - On Spirit, use **intake catalogs**, as available at IPSL for some MIPs.
+  First use implies reading the catalog, which can last up to 30s for CMIP6;
+  but next requests are much quicker. Can be deactivated by setting
+  `env.environment.projects_using_intake` list to []. Current list
+  includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included
+  as a test case for introducing a new project natively managed with
+  intake. See 'internals' below for details. 
+  - Add operator **plotmap**, a replacement for operator `plot`, albeit
+  only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz;
+  see :doc:`scripts/plotmap`, which gives access to introductory notebooks.
+  Calls to plot that end up as a map should be transformed accordingly.
+  You can also set `env.environment.plot_use_plotmap=True` for automatically
+  transforming plot calls to plotmap calls, but this will fail when plot is
+  used for 1- and 2-d profiles, curves or time series (except if
+  adding argument `forbid_plotmap=False` to such plot() calls).
+  The generated plotmap call is displayed when setting
+  `env.environment.teach_me_plotmap = True`. 
+  - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new
+  argument ensure_period (default is True)
+  - Script ensemble_ts_plot now has options --year_delta and --draw_grid
+  - Add function :py:func:`~climaf.driver.cxr` that returns a DataArray
+  (of Xarray suite) version of a CliMAF object
+  - Fix a bug when finding data files using calias(.., fileNameVar=)
+  - Function cshow now calls display(Image()) if called from a notebook.
+  This applies to default function cshow (the one in climaf.api)
+  - Various fixes for running at IDRIS
+  - Fixes errors in : cdu(), iplot_members()
+  - New operator cnkso mimics operator cnks but allows to apply a composite operator
+  - Function :py:func:`climaf.chtml.cell()` allows to choose the target image filename
+  - Setting variable :data:`climaf.driver.scripts_ouput_write_mode` to 'a'
+  allows to accumulate scripts outputs in last.out. Default value is 'w'
+  and allows to keep only the output of last script run.
+    
+  - Internals :
+
+    - New module projects/intake_search.py handles intake catalogs, thanks to:
+
+       - variables in env.environment.py :
+ 
+           - the list of target projects: `projects_using_intake` and
+           - the catalog path: `intake_catalog`
+
+       - for each target project:
+	 
+	   - a dict `translate_facet` for matching CliMAF facet names to intake catalog facet names
+	   - a string `period_pattern` which allows to extract the period from the filename; this is needed only because IPSL catalogs do not provide relevant values for that, yet
+	     
+    - When calling an external script, operator arguments values are dumped in json format (except if argument keyword has prefix '!') ; called scripts must then decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
+    - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
+    - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
+    - test suite on GitHub was updated for dependencies (ipython, pyproj, geocat-viz) and for cache and miniconda versions (v4)
+    - add function period.build_date_regexp()
+    - fix concurrency issue in makedirs(tmpdir)
+    - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
+    
 - V3.0:
 
   - Compatibility break:
@@ -87,8 +154,8 @@ Changes, newest first:
   - log:
 
     - CliMAF check for external softwares version at init stage can be
-    silent, using :py:func:`~env.clogging.clog`, with a log level of
-    'critical'
+      silent, using :py:func:`~env.clogging.clog`, with a log level of
+      'critical'
 
     - Other messages at init stage can be discarded by redirecting stderr
 
@@ -164,7 +231,7 @@ Changes, newest first:
   - Operator:
 
     - Standard operator ``slice`` has been renamed into ``cslice_average`` and ``cslice_select`` has been created.
-    - New operators :doc:`scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
+    - New operators `scripts/ccdo2_flip` and `ccdo3_flip` allow CliMAF to keep track of the variable
       available as output of those CDO operators which use an ancilary field as first
       argument (as e.g. 'ifthen' and 'ifthenelse').
 

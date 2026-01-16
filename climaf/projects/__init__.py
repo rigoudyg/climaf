@@ -48,4 +48,5 @@ from env.environment import *
 
 __all__ = ["example", "cami", "cmip3", "cmip5", "ocmip5", "obs4mips", "em", "erai", "erai_land", "gpcc", "gpcp",
            "ceres", "cruts3", "file", "ref_climatos_and_ts", "igcm_out", "emn36", "nemo", "igcm_cmip6", "cmip6", "eobs",
-           "cordex", "cmip6cerfacs", "ref_era5cerfacs", "optimize"]
+           "cordex", "cmip6cerfacs", "ref_era5cerfacs", "pmip3", "optimize",
+           "intake_search"]

@@ -19,3 +19,6 @@ examples/romain/
 /doc/_static/
 /testing/last.out
 NOTES
+/tests/a.pdf
+last.out
+/examples/climaf_tmp_*

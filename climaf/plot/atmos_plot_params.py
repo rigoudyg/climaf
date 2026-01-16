@@ -27,8 +27,8 @@ dict_plot_params = {
     'hurs': {
         'default': {'focus': 'ocean'},
         'full_field': {'colors': ranges_to_string(ranges=[72, 92, 2]), 'color': 'precip_11lev'},
-        'bias': {'colors': ranges_to_string(ranges=[0, 10, 1], sym=True), 'color': 'precip_diff_12lev'},
-        'model_model': {'colors': ranges_to_string(ranges=[0, 10, 1], sym=True), 'color': 'precip_diff_12lev'},
+        'bias': {'colors': ranges_to_string(ranges=[0, 10, 2], sym=True), 'color': 'precip_diff_12lev'},
+        'model_model': {'colors': ranges_to_string(ranges=[0, 10, 2], sym=True), 'color': 'precip_diff_12lev'},
     },
     'rstt': {
         'full_field': {'colors': ranges_to_string(ranges=[0, 320, 20]), 'color': 'WhiteBlueGreenYellowRed'},
