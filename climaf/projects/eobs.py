@@ -13,7 +13,7 @@ The specific attributes are:
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, onSpirit
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef

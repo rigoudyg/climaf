@@ -68,7 +68,7 @@ class cscript(object):
 
         For introducing the syntax, please consider this example, with the following commands::
 
-        >>> cscript('mycdo','cdo ${operator} ${in} ${out}')
+        >>> cscript('mycdo','cdo ${!operator} ${in} ${out}')
         >>> # define some dataset
         >>> tas_ds = ds(project='example', simulation='AMIPV6ALB2G', variable='tas', period='1980-1981')
         >>> # Apply operator 'mycdo' to dataset 'tas_ds', choosing a given 'operator' argument
@@ -89,14 +89,17 @@ class cscript(object):
 
         **Detailed syntax**:
 
-        -  formal arguments appear as : ``${argument}`` (in the example : ``${in}``, ``${out}``, ``${operator}`` )
+        -  formal arguments appear as : ``${argument}`` or  ``${!argument}`` (in the example : ``${in}``, ``${out}``, ``${!operator}`` )
 
         -  except for reserved keywords, arguments in the pattern will be
            replaced by the values for corresponding keywords used when invoking
            the diagnostic operator:
 
-          - in the example above : argument ``operator`` is replaced by value ``timavg``,
-            which is a keyword known to the external binary called, CDO
+          - in the example above : argument ``!operator`` is replaced by string ``timavg``,
+            which is a keyword known to the external binary called, CDO.
+
+          - arguments are normally replaced by a json encoding of the value. Prefix
+            character ``!`` allows to bypass this encoding, if needed.
 
         -  reserved argument keywords are :
 
@@ -353,9 +356,11 @@ class cscript(object):
                 clogger.debug("CliMAF script %s has been declared" % name)
             except subprocess.CalledProcessError:
                 if fatal:
-                    raise Climaf_Operator_Error("defining %s : command %s is not executable" % (name, scriptcommand))
+                    raise Climaf_Operator_Error(
+                        "defining %s : command %s is not executable" % (name, scriptcommand))
                 else:
-                    clogger.warning("defining %s : command %s is not executable" % (name, scriptcommand))
+                    clogger.warning(
+                        "defining %s : command %s is not executable" % (name, scriptcommand))
                     return None
 
     def __repr__(self):

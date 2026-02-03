@@ -35,21 +35,47 @@ if atCNRM:
     # Declare a list of root directories for CMIP6 data at CNRM
     root = "/cnrm/cmip"
 
+# a dict translating CliMAF facets to CMIP6 facets (those known by intake)
+translate_facet = {
+    'institute': 'institution_id',
+    'model': 'source_id',
+    'mip': 'activity_id',
+    'experiment': 'experiment_id',
+    'realization': 'member_id',
+    'table': 'table_id',
+    'variable': 'variable_id',
+    'grid': 'grid_label',
+    'simulation': None,
+    'domain': None,
+    'root': None,
+    'frequency': None,
+}
+
+# A pattern for finding period in filename when using intake catalogs
+# (which, at IPSL, as of 20240517, have buggy values for period_start
+# and period_end)
+period_pattern = "*_${PERIOD}.nc"
+
 if True:
     # -- Declare a 'CMIP6 CliMAF project
     # ------------------------------------ >
-    cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'realization',
+    cproject('CMIP6', 'root', 'model', 'institute', 'mip', 'table',
+             'experiment', 'realization', 'frequency', 'grid', 'version',
+             ensemble=['model', 'realization'], separator='%',
+             translate_facet=translate_facet, period_pattern=period_pattern)
+
+    # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
+    # ------------------------------------ >
+    cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table',
+             'experiment', 'extent_experiment', 'realization',
+             'frequency', 'grid', 'version', 'extent_version',
+             ensemble=['model', 'realization'], separator='%')
+
+    # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
+    # ------------------------------------ >
+    cproject('IPSL-CM6_historical-EXT', 'root', 'model', 'institute',
+             'mip', 'table', 'experiment', 'realization', 'frequency',
              'grid', 'version', ensemble=['model', 'realization'], separator='%')
-
-    # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
-    # ------------------------------------ >
-    cproject('CMIP6_extent', 'root', 'model', 'institute', 'mip', 'table', 'experiment', 'extent_experiment',
-             'realization', 'grid', 'version', 'extent_version', ensemble=['model', 'realization'], separator='%')
-
-    # -- Declare a CMIP6 'extent' CliMAF project = extracts a period covering historical and a scenario
-    # ------------------------------------ >
-    cproject('IPSL-CM6_historical-EXT', 'root', 'model', 'institute', 'mip', 'table', 'experiment',
-             'realization', 'grid', 'version', ensemble=['model', 'realization'], separator='%')
 
     for project in ["CMIP6", "CMIP6_extent", 'IPSL-CM6_historical-EXT']:
         cprojects[project].initialize_cvalid_values("CMIP6")
@@ -89,7 +115,9 @@ if True:
     cdef('grid', 'g*', project=project)
     cdef('realization', 'r1i1p1f*', project=project)
     cdef('experiment', 'historical', project=project)
-    cdef('version', 'latest', project=project)
+    # cdef('version', 'latest', project=project)
+    # With intake, version 'latest' is not available anymore
+    cdef('version', '*', project=project)
     cdef('table', '*', project=project)
 
     # ------------

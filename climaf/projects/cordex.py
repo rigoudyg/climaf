@@ -33,6 +33,8 @@ if onCiclad or onSpirit:
 if root:
     # -- Declare the various CORDEX CliMAF project
     # --------------------------------------------- >
+
+    # -- CORDEX
     pattern1 = '${root}/CORDEX/output/${CORDEX_domain}/${institute}/${driving_model}/${experiment}/${realization}/' \
                '${model}/${model_version}/${frequency}/${variable}/${version}/' \
                '${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_' \
@@ -45,10 +47,27 @@ if root:
                 '${model}/${model_version}/${frequency}/${variable}/${version}/' \
                 '${variable}_${CORDEX_domain}_${driving_model}_${experiment}_${realization}_${model}_${model_version}_'\
                 'fx.nc'
-    # -- CORDEX
+
+    # a dict translating CliMAF facets to CORDEX facets (those known by intake)
+    translate_facet = {
+        'CORDEX_domain': 'domain',
+        'realization': 'ensemble',
+        'model': 'rcm_model',
+        'model_version': 'rcm_version',
+        'frequency': 'time_frequency',
+        'simulation': None,
+        'domain': None,
+        'root': None,
+    }
+
+    # A pattern for finding period in filename when using intake
+    # catalogs (which, at IPSL, as of 20240517, have buggy values for
+    # period_start and period_end)
+    period_pattern = "*_${PERIOD}.nc"
+
     cproject('CORDEX', 'root', 'model', 'CORDEX_domain', 'model_version', 'frequency', 'driving_model',
              'realization', 'experiment', 'version', 'institute', ensemble=['model', 'driving_model', 'realization'],
-             separator='%')
+             translate_facet=translate_facet, period_pattern=period_pattern, separator='%')
     dataloc(project='CORDEX', url=[patternfx, pattern1])
     cdef('experiment', '*', project='CORDEX')
     cdef('model_version', '*', project='CORDEX')
@@ -76,7 +95,7 @@ if root:
     cdef('experiment', 'rcp85', project='CORDEX-Adjust')
 
     for project in ['CORDEX', 'CORDEX_extent', 'CORDEX-Adjust']:
-        cfreqs(project, {'daily': 'day'})
+        cfreqs(project, {'daily': 'day', '3h': '3hr', 'monthly': 'mon'})
         cdef('version', 'latest', project=project)
         cdef('root', root, project=project)
         cdef('institute', '*', project=project)
@@ -85,7 +104,7 @@ if root:
         cdef('driving_model', '*', project=project)
         cdef('CORDEX_domain', '*', project=project)
         cdef('model', '*', project=project)
-    # -- Overwrite root only for CORDEX-Adjust 
+    # -- Overwrite root only for CORDEX-Adjust
     cdef('root', '/prodigfs/project', project='CORDEX-Adjust')
 
     for var in ['tas', 'tasmax', 'tasmin', 'pr', 'rsds', 'sfcWind']:

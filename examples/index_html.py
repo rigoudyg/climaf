@@ -74,10 +74,10 @@ index += open_table()
 # to control the size of a thumbnail (fixed) image, and of the image which shows
 # when the mouse passes over the link label or thumbnail
 index += open_line('Surface temperature') + \
-         cell('DJF', my_slice('tas', 'DJF'), thumbnail=60) + \
-         cell('MAM', my_slice('tas', 'MAM'), thumbnail="60*60", hover=True) + \
-         cell('JJA', my_slice('tas', 'JJA'), thumbnail="60x60", hover="200x200") + \
-         close_line()
+    cell('DJF', my_slice('tas', 'DJF'), thumbnail=60) + \
+    cell('MAM', my_slice('tas', 'MAM'), thumbnail="60*60", hover=True) + \
+    cell('JJA', my_slice('tas', 'JJA'), thumbnail="60x60", hover="200x200") + \
+    close_line()
 
 # Second way to create the line of html links ; using climaf.html.fline() with three args:
 #  - the function (here 'my_slice') called for each column

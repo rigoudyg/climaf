@@ -95,7 +95,7 @@ def call_evt_script(climaf_name, script, ensembles, *operands, **parameters):
         'write_netcdf': True,
         'write_plots': True,
         'quick_plot': {},
-        }
+    }
 
     # Account for dynamical, un-controlled, script call parameters to update settings
     settings.update(parameters)

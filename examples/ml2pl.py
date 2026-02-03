@@ -8,14 +8,14 @@
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from climaf.api import *
-from env.site_settings import onCiclad, onSpirit
+from env.site_settings import onCiclad, onSpirit, onObelix
 
 clog('critical')
 
 cdef("project", "example")
 cdef("frequency", "monthly")
 
-if onCiclad or onSpirit:
+if onCiclad or onSpirit or onObelix:
     # 0 - define a dataset
     var_file = ds(simulation='NPv3.1ada', variable='ua', period='fx')
     pres_file = ds(simulation='NPv3.1ada', variable='pres', period='fx')

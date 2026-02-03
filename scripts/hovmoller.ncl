@@ -22,10 +22,10 @@ function str_convert(str:string)
 local val, valf
 begin
   
-  if .not. ismissing(str_match(str,"True")) then
+  if .not. ismissing(str_match(str,"true")) then
     return(True)
   else
-    if .not. ismissing(str_match(str,"False")) then
+    if .not. ismissing(str_match(str,"false")) then
       return(False)
     else
 
@@ -581,12 +581,33 @@ begin
   end if
 
   if (.not.isvar("colormap")) then colormap="amwg256" end if
-  if (.not.isvar("reverse")) then reverse=False end if
   if (.not.isvar("myscale")) then myscale=1.0 end if
   if (.not.isvar("myoffset")) then myoffset=0.0 end if
   if (.not.isvar("type")) then type="png" end if
-  if (.not. isvar("invXY")) then invXY=False end if
-  if (.not.isvar("trim")) then trim=True end if
+    
+  if (.not. isvar("trim")) then
+    trim=True
+  else
+    inv=str_convert(trim)
+    delete(trim)
+    trim=inv
+  end if
+
+  if (.not. isvar("invXY")) then
+    invXY=False
+  else
+    inv=str_convert(invXY)
+    delete(invXY)
+    invXY=inv
+  end if
+  
+  if (.not. isvar("reverse")) then
+    reverse=False
+  else
+    inv=str_convert(reverse)
+    delete(reverse)
+    reverse=inv
+  end if
   ;
   ;---Defining data to plot 
   ;                                            

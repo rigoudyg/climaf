@@ -275,10 +275,11 @@ class CellTests(unittest.TestCase):
 
     def test_cell_dirname_None(self):
         self.assertEqual(cell(self.test_label, filename=self.test_filename),
-                         self.test_template.safe_substitute(LINK=link(self.test_label, self.test_filename, None, True)))
+                         self.test_template.safe_substitute(
+                             LINK=link(self.test_label, self.test_filename, None, True)))
         self.assertEqual(cell(self.test_label, filename=self.test_filename, altdir=self.test_altdir),
-                         self.test_template.safe_substitute(LINK=link(self.test_label, self.changed_filename, None,
-                                                                      True)))
+                         self.test_template.safe_substitute(
+                             LINK=link(self.test_label, self.changed_filename, None, True)))
 
     def test_cell_dirname_not_None_filename_None(self):
         self.assertEqual(cell(self.test_label, filename=None, dirname=self.test_dirname),
@@ -314,10 +315,41 @@ class LineTests(unittest.TestCase):
 
 class FlineTests(unittest.TestCase):
 
-    @unittest.skipUnless(False, "Not implemented")
     def test_fline(self):
-        # TODO: Implement the tests
-        pass
+        def my_func(*args):
+            print(args)
+            return str(args)
+
+        rep = fline(my_func, 'COD', ['EurNland', 'EurSland', 'AtlOce', 'MedSea'], title="Seasonal cycle (1)",
+                    common_args=['AERmon', [{'id': 'MODIS',
+                                             'name': 'MODIS',
+                                             'ignore': ['EUC12', 'Scplains'],
+                                             'period': '2003-2018',
+                                             'var': 'Cloud_Optical_Thickness_Combined_Mean_Mean'}], True],
+                    other_args={'EurNland': ['blue black black black black black black', '0 0 2 16 5 13 15', 0, 40],
+                                'EurSland': ['blue black black black black black black', '0 0 2 16 5 13 15', 0, 40],
+                                'AtlOce': ['blue black black black black black black', '0 0 2 16 5 13 15', 0, 40],
+                                'MedSea': ['blue black black black black black black', '0 0 2 16 5 13 15', 0, 40]})
+        reference_rep = " <TR>\n" \
+                        " <TH ALIGN=LEFT> <li>Seasonal cycle (1)</li> </TH> \n" \
+                        "<TD ALIGN=RIGHT>('COD', 'EurNland', 'AERmon', [{'id': 'MODIS', 'name': 'MODIS', 'ignore': " \
+                        "['EUC12', 'Scplains'], 'period': '2003-2018', 'var': " \
+                        "'Cloud_Optical_Thickness_Combined_Mean_Mean'}], True, " \
+                        "'blue black black black black black black', '0 0 2 16 5 13 15', 0, 40)</TD>\n" \
+                        "<TD ALIGN=RIGHT>('COD', 'EurSland', 'AERmon', [{'id': 'MODIS', 'name': 'MODIS', 'ignore': " \
+                        "['EUC12', 'Scplains'], 'period': '2003-2018', 'var': " \
+                        "'Cloud_Optical_Thickness_Combined_Mean_Mean'}], True, " \
+                        "'blue black black black black black black', '0 0 2 16 5 13 15', 0, 40)</TD>\n" \
+                        "<TD ALIGN=RIGHT>('COD', 'AtlOce', 'AERmon', [{'id': 'MODIS', 'name': 'MODIS', 'ignore': " \
+                        "['EUC12', 'Scplains'], 'period': '2003-2018', 'var': " \
+                        "'Cloud_Optical_Thickness_Combined_Mean_Mean'}], True, " \
+                        "'blue black black black black black black', '0 0 2 16 5 13 15', 0, 40)</TD>\n" \
+                        "<TD ALIGN=RIGHT>('COD', 'MedSea', 'AERmon', [{'id': 'MODIS', 'name': 'MODIS', 'ignore': " \
+                        "['EUC12', 'Scplains'], 'period': '2003-2018', 'var': " \
+                        "'Cloud_Optical_Thickness_Combined_Mean_Mean'}], True, " \
+                        "'blue black black black black black black', '0 0 2 16 5 13 15', 0, 40)</TD>\n " \
+                        "</TR>\n"
+        self.assertEqual(rep, reference_rep)
 
     def tearDown(self):
         craz()

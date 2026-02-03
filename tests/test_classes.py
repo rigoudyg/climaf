@@ -13,7 +13,7 @@ import unittest
 from tests.tools_for_tests import remove_dir_and_content
 
 from env.environment import *
-from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC
+from env.site_settings import atCNRM, onCiclad, onSpirit, atTGCC, onObelix
 from climaf.cache import setNewUniqueCache, craz
 from climaf.classes import cproject, cdef, Climaf_Classes_Error, cobject, cdummy, processDatasetArgs, cdataset, \
     calias, crealms
@@ -30,7 +30,8 @@ class CprojectTests(unittest.TestCase):
         self.assertEqual(a_project.project, "my_project")
         self.assertEqual(a_project.facets, ["project", "simulation", "variable", "period", "domain", "my_arg",
                                             "my_other_arg"])
-        self.assertDictEqual(a_project.facet_defaults, dict(my_arg="my_default"))
+        self.assertDictEqual(a_project.facet_defaults,
+                             dict(my_arg="my_default"))
         self.assertEqual(a_project.separator, "-")
         self.assertEqual(a_project.crs,
                          "${project}-${simulation}-${variable}-${period}-${domain}-${my_arg}-${my_other_arg}")
@@ -40,10 +41,12 @@ class CprojectTests(unittest.TestCase):
         self.assertIn("my_project", cprojects)
         a_project = cprojects["my_project"]
         self.assertEqual(a_project.project, "my_project")
-        self.assertEqual(a_project.facets, ["project", "simulation", "variable", "period", "domain", "my_other_arg"])
+        self.assertEqual(a_project.facets, [
+                         "project", "simulation", "variable", "period", "domain", "my_other_arg"])
         self.assertDictEqual(a_project.facet_defaults, dict())
         self.assertEqual(a_project.separator, ".")
-        self.assertEqual(a_project.crs, "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
+        self.assertEqual(
+            a_project.crs, "${project}.${simulation}.${variable}.${period}.${domain}.${my_other_arg}")
         self.assertEqual(a_project.attributes_for_ensemble, ["simulation", ])
         with self.assertRaises(Climaf_Classes_Error):
             cproject("my_project", "my_other_arg", sep=",")
@@ -86,7 +89,8 @@ class CdefTests(unittest.TestCase):
         a = cdef("model", project="CMIP6")
         self.assertEqual(a, "*")
         cdef("model", value="CNRM-CM6-1", project="CMIP6")
-        self.assertEqual(cprojects["CMIP6"].facet_defaults["model"], "CNRM-CM6-1")
+        self.assertEqual(
+            cprojects["CMIP6"].facet_defaults["model"], "CNRM-CM6-1")
         with self.assertRaises(Climaf_Classes_Error):
             cdef("my_attribute", project="CMIP6")
         with self.assertRaises(Climaf_Classes_Error):
@@ -167,9 +171,9 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         with self.assertRaises(Climaf_Classes_Error):
             processDatasetArgs(project="CMIP6", simulation="r1%t2")
         a = processDatasetArgs(project="CMIP6", period="1850-2000")
-        self.assertEqual(sorted(list(a)), sorted(["domain", "experiment", "grid", "institute", "mip", "model",
-                                                  "realization", "root", "simulation", "table", "variable", "version",
-                                                  "project", "period"]))
+        self.assertEqual(sorted(list(a)), sorted(["domain", "experiment", "frequency", "grid", "institute",
+                                                  "mip", "model", "realization", "root", "simulation",
+                                                  "table", "variable", "version", "project", "period"]))
         self.assertEqual(a["domain"], "global")
         self.assertEqual(a["experiment"], "historical")
         self.assertEqual(a["grid"], "g*")
@@ -226,7 +230,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         self.assertEqual(a["project"], "CMIP5")
         self.assertEqual(a["realm"], "*")
         self.assertEqual(a["frequency"], "*")
-        a = processDatasetArgs(project="CMIP5", period="1850-2000", member=None)
+        a = processDatasetArgs(
+            project="CMIP5", period="1850-2000", member=None)
         self.assertEqual(sorted(list(a)), sorted(["domain", "experiment", "model", "realization", "root", "simulation",
                                                   "table", "variable", "version", "project", "period", "realm",
                                                   "frequency"]))
@@ -236,7 +241,8 @@ class ProcessDatasetArgsTests(unittest.TestCase):
                                                   "table", "variable", "version", "project", "period", "realm",
                                                   "frequency"]))
         self.assertEqual(a["simulation"], "")
-        a = processDatasetArgs(project="CMIP5", period="1850-2000", member="toto")
+        a = processDatasetArgs(
+            project="CMIP5", period="1850-2000", member="toto")
         self.assertEqual(sorted(list(a)), sorted(["domain", "experiment", "model", "realization", "root", "simulation",
                                                   "table", "variable", "version", "project", "period", "realm",
                                                   "frequency"]))
@@ -251,12 +257,14 @@ class ProcessDatasetArgsTests(unittest.TestCase):
         self.assertEqual(a["table"], "fx")
         self.assertEqual(repr(a["period"]), "fx")
         self.assertEqual(a["frequency"], "fx")
-        a = processDatasetArgs(project="CMIP5", period="1850-2000", frequency="fx")
+        a = processDatasetArgs(
+            project="CMIP5", period="1850-2000", frequency="fx")
         self.assertEqual(a["simulation"], "r0i0p0")
         self.assertEqual(a["table"], "fx")
         self.assertEqual(repr(a["period"]), "fx")
         self.assertEqual(a["frequency"], "fx")
-        a = processDatasetArgs(project="CMIP5", period="1850-2000", simulation="r0i0p0")
+        a = processDatasetArgs(
+            project="CMIP5", period="1850-2000", simulation="r0i0p0")
         self.assertEqual(a["simulation"], "r0i0p0")
         self.assertEqual(a["table"], "fx")
         self.assertEqual(repr(a["period"]), "fx")
@@ -837,7 +845,8 @@ class ResolveFirstOrLastYearsTests(unittest.TestCase):
 
 if __name__ == '__main__':
     # Jump into the test directory
-    tmp_directory = "/".join([os.environ["HOME"], "tmp", "tests", "test_classes"])
+    tmp_directory = "/".join([os.environ["HOME"],
+                             "tmp", "tests", "test_classes"])
     remove_dir_and_content(tmp_directory)
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory)

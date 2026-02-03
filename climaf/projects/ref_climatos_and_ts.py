@@ -46,7 +46,8 @@ Example of a 'ref_ts' project dataset declaration ::
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, atCerfacs, atCNRM
+from env.site_settings import onCiclad, onSpirit, atTGCC, atIDRIS, \
+    atCerfacs, atCNRM, onObelix
 from env.environment import *
 from climaf.dataloc import dataloc
 from climaf.classes import cproject, calias, cfreqs, cdef
@@ -58,15 +59,17 @@ if onCiclad or onSpirit:
 if atTGCC:
     root = "/ccc/work/cont003/igcmg/igcmg/IGCM/ReferenceDatasets/"
 if atIDRIS:
-    root = "/workgpfs/rech/psl/rpsl035/IGCM/ReferenceDatasets/"
+    root = "/gpfswork/rech/psl/commun/IGCM/ReferenceDatasets/"
 if atCerfacs:
     root = "/data/scratch/globc/dcom/CMIP6_TOOLS/ReferenceDatasets/"
 if atCNRM:
     root = "/cnrm/est/COMMON/climaf/reference_datasets_from_IPSL/"
-
+if onObelix:
+    root = "/home/orchideeshare/igcmg/IGCM/ReferenceDatasets/"
 cproject('ref_climatos', ('frequency', 'annual_cycle'), 'product', 'clim_period', 'table', 'obs_type',
          ensemble=['product'], separator='%')
-cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day', 'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
+cfreqs('ref_climatos', {'monthly': 'mo', 'daily': 'day',
+       'seasonal': 'mo', 'annual_cycle': 'mo', 'yearly': 'yr'})
 
 cdef('variable', '*', project='ref_climatos')
 cdef('product', '*', project='ref_climatos')
@@ -98,8 +101,10 @@ cdef('period', '1980-2005', project='ref_ts')
 cdef('obs_type', '*', project='ref_ts')
 cdef('table', '*', project='ref_ts')
 
-calias(project='ref_ts', variable='moc', fileVariable='stream_function_mar', filenameVar='moc')
+calias(project='ref_ts', variable='moc',
+       fileVariable='stream_function_mar', filenameVar='moc')
 
 if root:
-    pattern1 = root + "ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
+    pattern1 = root + \
+        "ts/*/${frequency}/${variable}/${variable}_${table}_${product}_${obs_type}_${PERIOD}.nc"
     dataloc(project='ref_ts', organization='generic', url=[pattern1])

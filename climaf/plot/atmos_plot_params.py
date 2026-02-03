@@ -27,8 +27,8 @@ dict_plot_params = {
     'hurs': {
         'default': {'focus': 'ocean'},
         'full_field': {'colors': ranges_to_string(ranges=[72, 92, 2]), 'color': 'precip_11lev'},
-        'bias': {'colors': ranges_to_string(ranges=[0, 10, 1], sym=True), 'color': 'precip_diff_12lev'},
-        'model_model': {'colors': ranges_to_string(ranges=[0, 10, 1], sym=True), 'color': 'precip_diff_12lev'},
+        'bias': {'colors': ranges_to_string(ranges=[0, 10, 2], sym=True), 'color': 'precip_diff_12lev'},
+        'model_model': {'colors': ranges_to_string(ranges=[0, 10, 2], sym=True), 'color': 'precip_diff_12lev'},
     },
     'rstt': {
         'full_field': {'colors': ranges_to_string(ranges=[0, 320, 20]), 'color': 'WhiteBlueGreenYellowRed'},
@@ -445,19 +445,19 @@ dict_plot_params = {
     },
     'ta850': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },
     'ta700': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },
     'ta500': {
         'default': {'units': 'degC', 'color': 'BlueWhiteOrangeRed', 'offset': -273.15},
-        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, -10], [0, 25, 5]])},
+        'full_field': {'colors': ranges_to_string(ranges=[[-40, 0, 10], [0, 25, 5]])},
         'bias': {'min': -5, 'max': 5, 'delta': 1, 'offset': 0},
         'model_model': {'min': -10, 'max': 10, 'delta': 1, 'offset': 0},
     },

@@ -16,11 +16,10 @@ function str_convert(str:string)
 
 local val, valf
 begin
-  
-  if .not. ismissing(str_match(str,"True")) then
+  if .not. ismissing(str_match(str,"true")) .or. .not. ismissing(str_match(str,"True")) then
     return(True)
   else
-    if .not. ismissing(str_match(str,"False")) then
+    if .not. ismissing(str_match(str,"false")) .or. .not. ismissing(str_match(str,"False"))then
       return(False)
     else
 
@@ -519,8 +518,8 @@ begin
       if (ystyle .eq. "log") then useXY=False end if
    
       ; get latitude and/or longitude name
-      latnames=(/"lat", "LAT", "latitude", "nav_lat", "nav_lat_grid_M", "nav_lat_grid_U", "nav_lat_grid_V", "lat_dom_out"/) 
-      lonnames=(/"lon", "LON", "longitude", "nav_lon", "nav_lon_grid_M", "nav_lon_grid_U", "nav_lon_grid_V", "lon_dom_out"/)
+      latnames=(/"lat", "LAT", "latitude", "nav_lat", "nav_lat_grid_T", "nav_lat_grid_M", "nav_lat_grid_U", "nav_lat_grid_V", "lat_dom_out"/) 
+      lonnames=(/"lon", "LON", "longitude", "nav_lon", "nav_lon_grid_T", "nav_lon_grid_M", "nav_lon_grid_U", "nav_lon_grid_V", "lon_dom_out"/)
       dimnames=(/latnames, lonnames/)
 
       do k=0,1 
@@ -768,8 +767,38 @@ begin
   if (.not. isvar("myscale_aux")) then myscale_aux=1.0 end if
   if (.not. isvar("myoffset_aux")) then myoffset_aux=0.0 end if
   if (.not. isvar("type")) then type="png" end if
-  if (.not. isvar("trim")) then trim=True end if
-  if (.not. isvar("invXY")) then invXY=False end if
+    
+  if (.not. isvar("trim")) then
+    trim=True
+  else
+    inv=str_convert(trim)
+    delete(trim)
+    trim=inv
+  end if
+
+  if (.not. isvar("invXY")) then
+    invXY=False
+  else
+    inv=str_convert(invXY)
+    delete(invXY)
+    invXY=inv
+  end if
+  
+  if (.not. isvar("vcb")) then
+    vcb=True
+  else
+    inv=str_convert(vcb)
+    delete(vcb)
+    vcb=inv
+  end if
+  
+  if (.not. isvar("reverse")) then
+    reverse=False
+  else
+    inv=str_convert(reverse)
+    delete(reverse)
+    reverse=inv
+  end if
   
   LABELON=False
   RASTER=True 
@@ -917,7 +946,6 @@ begin
     end if
   else
     power10=floattoint(log10(dim_max(ndtooned(tofloat(fld)))))
-    print(power10)
     if ismissing(power10) then 
       print("Field has only missing values" )
       power10=1
@@ -1103,8 +1131,14 @@ begin
   gsn_define_colormap(wks,colormap)
 
   i = NhlNewColor(wks,0.8,0.8,0.8)
+  if i .eq. -1 then
+    getvalues wks
+      "wkColorMapLen" : maplen
+    end getvalues
+    NhlSetColor(wks,maplen-1,0.8,0.8,0.8)
+  end if	
   ; reverse colormap
-  if (isvar("reverse") .and. reverse) then gsn_reverse_colormap(wks) end if
+  if reverse then gsn_reverse_colormap(wks) end if
 
   ; main field resources
   res=True
@@ -1181,12 +1215,10 @@ begin
     res@lbLabelFontThicknessF= 3.0
     res@lbTitleFontThicknessF= 3.0
     res@lbLabelAutoStride = True
-    if ( .not. isvar("vcb") .or. (isvar("vcb") .and. vcb) ) then
+    if vcb then
       res@lbOrientation     = "vertical"
     else
-      if ( isvar("vcb") .and. (.not. vcb) ) then
-        res@lbOrientation     = "horizontal"
-      end if
+      res@lbOrientation     = "horizontal"
     end if
 
     ; Axis Label 

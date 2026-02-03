@@ -110,7 +110,8 @@ class cperiod(object):
         e.g. : 1980-01-01T00:00:00,1980-12-31T23:59:00
         """
         if self.fx:
-            raise Climaf_Period_Error("There is no ISO representation for period 'fx'")
+            raise Climaf_Period_Error(
+                "There is no ISO representation for period 'fx'")
         endproxy = self.end - datetime.timedelta(0, 60)  # substract 1 minute
         return "%s,%s" % (self.start.isoformat(), endproxy.isoformat())
 
@@ -171,7 +172,7 @@ class cperiod(object):
     def start_with(self, begin):
         """ If period BEGIN actually begins period SELF, returns the
         complement of BEGIN in SELF; otherwise returns None """
-        if self.fx:
+        if self.fx or begin.fx:
             return False
         if self.start == begin.start and self.end >= begin.end:
             return cperiod(begin.end, self.end)
@@ -188,7 +189,7 @@ class cperiod(object):
     def includes(self, included):
         """ if period self does include period 'included', returns a pair of
         periods which represents the difference """
-        if self.fx:
+        if self.fx or type(included) is not cperiod or included.fx:
             return False
         # raise Climaf_Period_Error("Meaningless for period 'fx'")
         if self.start <= included.start and included.end <= self.end:
@@ -221,6 +222,15 @@ class cperiod(object):
                 return cperiod("fx")
             else:
                 return cperiod(self.start, self.end)
+
+
+def init_period_iso(start, end):
+    """
+    Init a CliMAF 'period' object from two ISO dates such as 1850-01-01T00:00:00
+    """
+    def concat(date):
+        return date[0:4] + date[5:7] + date[8:10] + date[11:13] + date[14:16]
+    return init_period(concat(start) + "_" + concat(end))
 
 
 def init_period(dates):
@@ -287,14 +297,17 @@ def init_period(dates):
                 add_minute = 1
         try:
             if year <= 0:
-                raise Climaf_Period_Error("Could not yet deal with negative or null years.")
+                raise Climaf_Period_Error(
+                    "Could not yet deal with negative or null years.")
             else:
-                rep = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute)
+                rep = datetime.datetime(
+                    year=year, month=month, day=day, hour=hour, minute=minute)
         except:
             raise Climaf_Period_Error(
                 "String %s is not a date (%s %s %s %s %s)" % (a_date, year, month, day, hour, minute))
         if end:
-            rep += datetime.timedelta(days=add_day, hours=add_hour, minutes=add_minute)
+            rep += datetime.timedelta(days=add_day,
+                                      hours=add_hour, minutes=add_minute)
         return rep
 
     # clogger.debug("analyzing  %s"%dates)
@@ -307,7 +320,8 @@ def init_period(dates):
         if dates in ['fx', ]:
             return cperiod('fx')
         else:
-            period_regexp = re.compile(r"(?P<start>-?\d+)([-_](?P<end>-?\d+))?")
+            period_regexp = re.compile(
+                r"(?P<start>-?\d+)([-_](?P<end>-?\d+))?")
             period_match = period_regexp.match(dates)
             if period_match:
                 start = period_match.groupdict()["start"]
@@ -320,9 +334,11 @@ def init_period(dates):
                 if s < e:
                     return cperiod(s, e, None)
                 else:
-                    raise Climaf_Period_Error("Must have start (%s) before or equal to end (%s)" % (repr(s), repr(e)))
+                    raise Climaf_Period_Error(
+                        "Must have start (%s) before or equal to end (%s)" % (repr(s), repr(e)))
             else:
-                raise Climaf_Period_Error("Could not create a period with string %s" % dates)
+                raise Climaf_Period_Error(
+                    "Could not create a period with string %s" % dates)
 
 
 def sort_periods_list(periods_list):
@@ -364,7 +380,8 @@ def sort_periods_list(periods_list):
             insert(clist.pop(), sorted_tree)
         return walk(sorted_tree)
     else:
-        raise Climaf_Period_Error("Can not deal with something else than a list of cperiod objects.")
+        raise Climaf_Period_Error(
+            "Can not deal with something else than a list of cperiod objects.")
 
 
 def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=True):
@@ -382,7 +399,8 @@ def merge_periods(remain_to_merge, already_merged=list(), handle_360_days_year=T
     proceed with batches of N elements
     """
     if not (isinstance(remain_to_merge, list) and all([isinstance(elt, cperiod) for elt in remain_to_merge])):
-        raise Climaf_Period_Error("Can not deal with something else than a list of cperiod objects.")
+        raise Climaf_Period_Error(
+            "Can not deal with something else than a list of cperiod objects.")
     else:
         N = 300
         if isinstance(already_merged, list) and len(already_merged) == 0:
@@ -429,9 +447,10 @@ def intersect_periods_list(lperiod1, lperiod2):
     Algorithm : for each period in l1, compute intersection with all periods in l2,
     and add it in a big list; finally, merge  the big list
     """
-    if not(isinstance(lperiod1, list) and [isinstance(elt, cperiod) for elt in lperiod1] and
-           isinstance(lperiod2, list) and [isinstance(elt, cperiod) for elt in lperiod2]):
-        raise Climaf_Period_Error("Can not deal with something else than list of cperiod objects")
+    if not (isinstance(lperiod1, list) and [isinstance(elt, cperiod) for elt in lperiod1] and
+            isinstance(lperiod2, list) and [isinstance(elt, cperiod) for elt in lperiod2]):
+        raise Climaf_Period_Error(
+            "Can not deal with something else than list of cperiod objects")
     else:
         big = []
         for p1 in lperiod1:
@@ -450,7 +469,8 @@ def lastyears(period, nyears):
     if isinstance(period, six.string_types):
         period = init_period(period)
     elif not isinstance(period, cperiod):
-        raise Climaf_Period_Error("Can not deal with periods that are not string or cperiod objects")
+        raise Climaf_Period_Error(
+            "Can not deal with periods that are not string or cperiod objects")
     if not isinstance(nyears, int):
         raise Climaf_Period_Error("nyears must be an integer, not %s" % nyears)
     rep = cperiod(period.start, period.end)
@@ -458,7 +478,8 @@ def lastyears(period, nyears):
     ystart = rep.start.year
     if ystart < yend - nyears:
         s = rep.end
-        rep.start = datetime.datetime(year=yend - nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
+        rep.start = datetime.datetime(
+            year=yend - nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
     return repr(rep)
 
 
@@ -469,7 +490,8 @@ def firstyears(period, nyears):
     if isinstance(period, six.string_types):
         period = init_period(period)
     elif not isinstance(period, cperiod):
-        raise Climaf_Period_Error("Can not deal with periods that are not string or cperiod objects")
+        raise Climaf_Period_Error(
+            "Can not deal with periods that are not string or cperiod objects")
     if not isinstance(nyears, int):
         raise Climaf_Period_Error("nyears must be an integer, not %s" % nyears)
     rep = cperiod(period.start, period.end)
@@ -477,7 +499,8 @@ def firstyears(period, nyears):
     ystart = rep.start.year
     if yend > ystart + nyears:
         s = rep.start
-        rep.end = datetime.datetime(year=ystart + nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
+        rep.end = datetime.datetime(
+            year=ystart + nyears, month=s.month, day=s.day, hour=s.hour, minute=s.minute)
     # print "period=",period, 'type=',type(period),'nyears=',nyears
     # print rep
     return repr(rep)
@@ -486,12 +509,16 @@ def firstyears(period, nyears):
 def group_periods(diclist):
     """Assuming DICLIST is a list of dictionnaries which include key
     'period', identifies all dicts which have the same content for the
-    other keys, merge the periosd for those dicts and returns the list of 
+    other keys, merge the periods for those dicts and returns the list of 
     dicts with this merge periods
 
     Used e.g. on 'return_combinations' output of a series of selectGenericFiles
     """
     tempo = dict()
+    #
+    # For each dict,
+    #  - build a key with the set of key values (except for key period),
+    #  - and enlist period value in dict tempo
     for dic in diclist:
         aperiod = dic['period']
         if not isinstance(aperiod, cperiod):
@@ -500,13 +527,14 @@ def group_periods(diclist):
         keys = list(dic.keys())
         keys.remove('period')
         keys.sort()
-        tuple_key = tuple([dic[k] for k in keys])
+        values_tuple = tuple([dic[k] for k in keys])
         #
-        if tuple_key not in tempo:
-            tempo[tuple_key] = dic.copy()
-            tempo[tuple_key]['period'] = list()
-        tempo[tuple_key]['period'].append(aperiod)
+        if values_tuple not in tempo:
+            tempo[values_tuple] = dic.copy()
+            tempo[values_tuple]['period'] = list()
+        tempo[values_tuple]['period'].append(aperiod)
     #
+    # Merge the enlisted periods
     output = list()
     for key in tempo:
         dic = tempo[key]
@@ -519,9 +547,17 @@ def group_periods(diclist):
 def freq_to_minutes(data_freq):
     """
     Interprets values returned by Panda's infer_freq() , such as '2D', 'H', '6MS'.. 
-    Returns duration in minutes (quite arbitrary for months)
+    or in : day, daily, mon, monthly, sem, 6hr, 3hr
+    Returns duration in minutes (quite arbitrary for months : 30 days)
     """
+    data_freq = data_freq.replace("sem", "6MS")
+    data_freq = data_freq.replace("monthly", "MS")
     data_freq = data_freq.replace("mon", "MS")
+    data_freq = data_freq.replace("daily", "D")
+    data_freq = data_freq.replace("day", "D")
+    data_freq = data_freq.replace("6hr", "6H")
+    data_freq = data_freq.replace("3hr", "3H")
+
     number = re.findall("^[0-9]*", data_freq)
     if len(number[0]) == 0:
         number = 1
@@ -532,8 +568,65 @@ def freq_to_minutes(data_freq):
     if units in scale:
         return number * scale[units]
     else:
-        raise Climaf_Error("Cannot interpret frequency %s, returning O minutes" % data_freq)
+        raise Climaf_Error(
+            "Cannot interpret frequency %s, returning O minutes" % data_freq)
 
+
+def build_date_regexp_pattern():
+    # a pattern for dates for regexp, with groups 'period', 'start' and 'end'
+    digit = "[0-9]"
+    year = "%s{4}" % digit
+    month = "(01|02|03|04|05|06|07|08|09|10|11|12)"
+    day = "([0-3][0-9])"
+    hour = "(00|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23)"
+    minutes = "[0-5][0-9]"
+    seconds = minutes
+    date = f"{year}({month}({day}({hour}({minutes}({seconds})?)?)?)?)?"
+    date_regexp_patt = f"(?P<period>(?P<start>{date})([_-](?P<end>{date}))?)"
+    return date_regexp_patt
+
+def period_from_filenames(files):
+    """Given a string containing (space separated) filenames, analyze
+    filenames for dates and periods, and returns the period covered by
+    the list of files.
+
+    Can cope with 'version' labels built using dates, provided they
+    occur only in filenames that also bear a period with an 'end'
+    part. A better method would be to use the filenames pattern
+    (providing a group for matching the period), but this would
+    require more code re-engineering...
+
+    """
+    clogger.debug("period_from_filenames , files="+files)
+    files = files.split()
+    periods = []
+    pattern = build_date_regexp_pattern()
+    for fil in files:
+        periods_got = 0
+        nb_periods_with_an_end = 0
+        for m in re.finditer(pattern, fil):
+            period = m.groupdict()["period"]
+            clogger.debug("period_from_filenames , period="+period)
+            periods_got += 1
+            if m.groupdict()["end"] is not None:
+                clogger.debug("period_from_filenames , end="+m.groupdict()["end"])
+                nb_periods_with_an_end += 1
+                period_with_an_end = period
+        if periods_got == 0:
+            clogger.error( f"No date found in filename {fil}")
+            return
+        elif periods_got == 1:
+            periods.append(init_period(period))
+        elif nb_periods_with_an_end == 1:
+            # Heuristic : if there is only one period with both a
+            # start and an end, assume this is the correct one. This
+            # allows to discard any date which actually is a version label
+            periods.append(init_period(period_with_an_end))
+        else:
+            clogger.error( f"Too much dates in filename {fil}")
+            return 
+    #clogger.debug("File periods are :" + str(periods))
+    return merge_periods(periods)
 
 class Climaf_Period_Error(Exception):
     def __init__(self, valeur):
