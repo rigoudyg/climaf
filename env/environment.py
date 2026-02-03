@@ -20,7 +20,7 @@ from env.utils import get_subprocess_output
 # Variables
 
 #: Climaf version
-climaf_version = "3.0"
+climaf_version = "3.1"
 
 #: Dictionary of declared projects (type is cproject)
 cprojects = dict()
