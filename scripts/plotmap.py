@@ -654,7 +654,7 @@ def plot_vector_map(ax, coordinates, vectors_map_u_file, vectors_map_v_file,
     if vectors_map_scale:
         variable_u_data = variable_u_data * vectors_map_scale
         variable_v_data = variable_v_data * vectors_map_scale
-        if not arg.units:
+        if not args.units:
             units = "?"
 
     if type(vectors_map_gridsizes) is int:

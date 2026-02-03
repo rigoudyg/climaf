@@ -8,6 +8,9 @@ cftime
 # Cython>0.15.1
 # cartopy==0.17
 # python-dateutil
+# pdflatex
+# joblib
+# geocat.viz
 natsort
 pyyaml
 xarray

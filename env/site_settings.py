@@ -82,8 +82,8 @@ if atCNRM:
         ["", "cnrm", "est", "COMMON", "climaf", "add_packages", "lib"])
     if os.path.isdir(additional_packages):
         rep = os.listdir(additional_packages)
-        rep = [r for r in rep if "python" in r]
-        python_version = platform.python_version()
+        rep = [r.replace("python", "") for r in rep if "python" in r]
+        python_version = "python" + platform.python_version()
         found, python_version_to_add = _found_python_version_to_use(
             rep, python_version)
         if found:
@@ -93,6 +93,7 @@ if atCNRM:
             for r in rep:
                 sys.path.append(os.sep.join(
                     [additional_packages, r, "site-packages"]))
+        os.environ["PYTHONPATH"] += ":" + ":".join(sys.path)
     else:
         print("Warning: additional packages not found, could cause issues.")
     # Remove some environment variables which cause issues with cdo
