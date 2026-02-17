@@ -580,7 +580,7 @@ if draw_legend:
     if args.legend_lw:
         legend_lw_list = args.legend_lw.split(',')
         if len(legend_lw_list) == 1:
-            legend_lw_list = legend_lw_list * len(leg.legendHandles)
+            legend_lw_list = legend_lw_list * len(leg.legend_handles)
         if args.legend_labels and args.append_custom_legend_to_default.lower() in ['true']:
             if len(legend_lw_list) == len(legend_labels_list):
                 legend_lw_list = [2] * len(filenames_list) + legend_lw_list
