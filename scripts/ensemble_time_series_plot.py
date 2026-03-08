@@ -578,10 +578,18 @@ if draw_legend:
     print('leg_dict = ', leg_dict)
     leg = plt.legend(**leg_dict)
     if args.legend_lw:
+        # At some stage, we had different versions of matplotlib
+        # on the various centers
+        if getattr(leg, "legend_handles", False):
+            handles = leg.legend_handles
+        else:
+            handles = leg.legendHandles
+        #
         legend_lw_list = args.legend_lw.split(',')
         if len(legend_lw_list) == 1:
-            legend_lw_list = legend_lw_list * len(leg.legend_handles)
-        if args.legend_labels and args.append_custom_legend_to_default.lower() in ['true']:
+            legend_lw_list = legend_lw_list * len(handles)
+        if args.legend_labels and \
+           args.append_custom_legend_to_default.lower() in ['true']:
             if len(legend_lw_list) == len(legend_labels_list):
                 legend_lw_list = [2] * len(filenames_list) + legend_lw_list
             if len(legend_lw_list) == (len(legend_labels_list) + 1):
@@ -589,11 +597,7 @@ if draw_legend:
                     legend_lw_list[0]] * len(filenames_list) + legend_lw_list[1:len(legend_lw_list)]
 
         print('legend_lw_list = ', legend_lw_list)
-        # At some stage, we had different versions of matplotlib on the various centers
-        if getattr(leg, "legend_handles", False):
-            handles = leg.legend_handles
-        else:
-            handles = leg.legendHandles
+        #
         for ind in range(0, len(handles)):
             handles[ind].set_linewidth(float(legend_lw_list[ind]))
 
