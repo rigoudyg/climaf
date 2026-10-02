@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+This script aims at plotting different fields on the same map.
+"""
+
+from __future__ import division, print_function, unicode_literals, absolute_import
+
 import os
 import json
 
@@ -106,7 +115,7 @@ def find_ccrs(crs_name, options=dict(), data_filename=None):
         crs_name, file_options = ccrs_from_metadata(fic)
         file_options.update(options)
         options = file_options
-        
+
     # Default CRS is PlateCarree
     if crs_name is None:
         # raise ValueError(
@@ -206,7 +215,7 @@ def get_variable_and_coordinates_from_dataset(
     - identify coordinates order based on heuristics (see horizontal_dimensions())
     - convert coordinates to projection space if they are 2D
     - add a cyclic point in longitude under some conditions
-    - select data 
+    - select data
 
     If REGULAR is True, and when variable coordinates are 2D,
     values for coordinates are assumed to be regularly
@@ -411,7 +420,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
     if colored_map_levels is not None and 'levels' not in contourf_args:
         colored_map_levels = [ float(l) for l in colored_map_levels ]
         contourf_args['levels'] = colored_map_levels
-        
+
         # Mimic Ncl, which copes with too short colormaps
         # Method is quite direct : forgot some of the highest levels
         if colored_map_cmap.N < len(colored_map_levels) + 1:
@@ -424,7 +433,7 @@ def plot_colored_map(fig, ax, coordinates, colored_map_file, colored_map_variabl
         contourf_args['norm'] = BoundaryNorm(colored_map_levels,
                                              ncolors=colored_map_cmap.N,
                                              extend='both')
-        
+
     contourf_args['extend'] = 'both'
     contourf_args["transform"] = transform
     #

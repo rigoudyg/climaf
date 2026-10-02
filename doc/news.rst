@@ -24,7 +24,7 @@ Changes, newest first:
   `env.environment.projects_using_intake` list to []. Current list
   includes CMIP5, CMIP6, and CORDEX. Project PMIP3 was also included
   as a test case for introducing a new project natively managed with
-  intake. See 'internals' below for details. 
+  intake. See 'internals' below for details.
   - Add operator **plotmap**, a replacement for operator `plot`, albeit
   only for maps. It is based on Matplotlib, Cartopy and GeoCat Viz;
   see :doc:`scripts/plotmap`, which gives access to introductory notebooks.
@@ -34,7 +34,7 @@ Changes, newest first:
   used for 1- and 2-d profiles, curves or time series (except if
   adding argument `forbid_plotmap=False` to such plot() calls).
   The generated plotmap call is displayed when setting
-  `env.environment.teach_me_plotmap = True`. 
+  `env.environment.teach_me_plotmap = True`.
   - Dataset's method :py:meth:`~climaf.classes.cdataset.glob` has new
   argument ensure_period (default is True)
   - Script ensemble_ts_plot now has options --year_delta and --draw_grid
@@ -51,21 +51,21 @@ Changes, newest first:
   allows to accumulate scripts outputs in last.out. Default value is 'w'
   and allows to keep only the output of last script run.
   - Add CMIP7 and CORDEX-CMIP6 projects
-    
+
   - Internals :
 
     - New module projects/intake_search.py handles intake catalogs, thanks to:
 
        - variables in env.environment.py :
- 
+
            - the list of target projects: `projects_using_intake` and
            - the catalog path: `intake_catalog`
 
        - for each target project:
-	 
+
 	   - a dict `translate_facet` for matching CliMAF facet names to intake catalog facet names
 	   - a string `period_pattern` which allows to extract the period from the filename; this is needed only because IPSL catalogs do not provide relevant values for that, yet
-	     
+
     - When calling an external script, operator arguments values are dumped in json format (except if argument keyword has prefix '!') ; called scripts must then decode json format when they accept complex arguments; and must also interpret strings 'true' and 'false' as logical values
     - Add value 'show' to operator's output format possibe values; in that case, CliMAF doesn't handle any output; the value is forwarded to the script
     - a number of data samples have been added in examples/data : Nemo, Aladin, (uas, vas)
@@ -74,7 +74,7 @@ Changes, newest first:
     - fix concurrency issue in makedirs(tmpdir)
     - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
     - create tests/reference_data/test_data_plot/cnrm_ubuntu_ncl6.6.2_cdo2.4.0
-    
+
 - V3.0:
 
   - Compatibility break:

@@ -93,7 +93,7 @@ if atCNRM:
             for r in rep:
                 sys.path.append(os.sep.join(
                     [additional_packages, r, "site-packages"]))
-        os.environ["PYTHONPATH"] += ":" + ":".join(sys.path)
+        os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + ":" + ":".join(sys.path)
     else:
         print("Warning: additional packages not found, could cause issues.")
     # Remove some environment variables which cause issues with cdo
