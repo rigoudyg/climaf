@@ -6,7 +6,7 @@ What's new
 
 Changes, newest first:
 
-- V3.x:
+- V3.1:
 
   - **Warning : next entry describes a way to significantly change default behaviour when
   defining a dataset : a check of available data can be performed, which may
@@ -47,9 +47,10 @@ Changes, newest first:
   - Fixes errors in : cdu(), iplot_members()
   - New operator cnkso mimics operator cnks but allows to apply a composite operator
   - Function :py:func:`climaf.chtml.cell()` allows to choose the target image filename
-  - Setting variable :data:`climaf.driver.scripts_ouput_write_mode` to 'a'
+  - Setting variable :data:`climaf.driver.scripts_output_write_mode` to 'a'
   allows to accumulate scripts outputs in last.out. Default value is 'w'
   and allows to keep only the output of last script run.
+  - Add CMIP7 and CORDEX-CMIP6 projects
     
   - Internals :
 
@@ -72,6 +73,7 @@ Changes, newest first:
     - add function period.build_date_regexp()
     - fix concurrency issue in makedirs(tmpdir)
     - create tests/reference_data/test_data_plot/idris_20230611_V3.0_IPSL2
+    - create tests/reference_data/test_data_plot/cnrm_ubuntu_ncl6.6.2_cdo2.4.0
     
 - V3.0:
 
